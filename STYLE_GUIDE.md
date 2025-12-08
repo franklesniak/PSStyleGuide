@@ -16,7 +16,6 @@ A comprehensive style guide for writing consistent, maintainable, and profession
 6. [Module and Script Organization](#module-and-script-organization)
 7. [Security Considerations](#security-considerations)
 8. [Testing](#testing)
-9. [Acknowledgments](#acknowledgments)
 
 ---
 
@@ -85,24 +84,6 @@ This style guide establishes standards for PowerShell code to ensure consistency
 ## Testing
 
 *[Content will be added here]*
-
----
-
-## Acknowledgments
-
-This style guide was developed with inspiration and insights from existing PowerShell community resources. Special thanks to the authors of the following style guides, whose work helped fill in the blanks and shape best practices:
-
-> **Note:** The following are placeholder entries to be replaced with actual style guide references.
-
-1. **[First Style Guide Name]** by [Author Name]
-   - Link: [URL to be added]
-   - Key contributions: [Description of helpful aspects - to be added]
-
-2. **[Second Style Guide Name]** by [Author Name]
-   - Link: [URL to be added]
-   - Key contributions: [Description of helpful aspects - to be added]
-
-These resources represent significant contributions to the PowerShell community, and their thoughtful work deserves recognition. If you're developing your own PowerShell standards, I encourage you to check out these guides as well.
 
 ---
 
