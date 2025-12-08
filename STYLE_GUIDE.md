@@ -92,13 +92,15 @@ This style guide establishes standards for PowerShell code to ensure consistency
 
 This style guide was developed with inspiration and insights from existing PowerShell community resources. Special thanks to the authors of the following style guides, whose work helped fill in the blanks and shape best practices:
 
-1. **[Style Guide Name Placeholder]** by [Author Name]
-   - [Link to guide or description]
-   - Key contributions: [Brief description of what was helpful]
+> **Note:** The following are placeholder entries to be replaced with actual style guide references.
 
-2. **[Style Guide Name Placeholder]** by [Author Name]
-   - [Link to guide or description]
-   - Key contributions: [Brief description of what was helpful]
+1. **[First Style Guide Name]** by [Author Name]
+   - Link: [URL to be added]
+   - Key contributions: [Description of helpful aspects - to be added]
+
+2. **[Second Style Guide Name]** by [Author Name]
+   - Link: [URL to be added]
+   - Key contributions: [Description of helpful aspects - to be added]
 
 These resources represent significant contributions to the PowerShell community, and their thoughtful work deserves recognition. If you're developing your own PowerShell standards, I encourage you to check out these guides as well.
 
