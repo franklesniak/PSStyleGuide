@@ -13,6 +13,7 @@ This work is licensed under a [Creative Commons Attribution-ShareAlike 4.0 Inter
 **Attribution:** Don Jones, Matt Penny, Carlos Perez, Joel Bennett and the PowerShell Community.
 
 **Copyright Information:**
+
 - Portions copyright (c) Don Jones, Matt Penny, 2014-2015
 - Portions copyright (c) Carlos Perez, 2015
 - Portions copyright (c) Joel Bennett, 2015
@@ -28,6 +29,7 @@ Microsoft's official PowerShell development guidelines provide authoritative rec
 ## How These Sources Were Used
 
 These sources were consulted to:
+
 - Fill gaps in style conventions not covered by the author's own PowerShell codebase
 - Validate and align with community-accepted best practices
 - Ensure consistency with Microsoft's official guidance
@@ -40,5 +42,6 @@ This style guide is released under the MIT License. The acknowledgment of CC BY-
 ---
 
 *For more information about the licenses:*
+
 - [Creative Commons Attribution-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-sa/4.0/)
 - [MIT License](LICENSE)
