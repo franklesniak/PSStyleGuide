@@ -25,6 +25,10 @@ A comprehensive style guide for writing consistent, maintainable, and profession
 
 This style guide establishes standards for PowerShell code to ensure consistency, readability, and maintainability across projects.
 
+### Sources and Acknowledgments
+
+This style guide is informed by the author's extensive PowerShell codebase and practical experience. Where gaps existed, this guide draws upon established community resources and official Microsoft guidance. For full details on sources and proper attribution, please see [ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md).
+
 ---
 
 ## Naming Conventions

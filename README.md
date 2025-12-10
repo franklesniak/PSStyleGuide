@@ -33,6 +33,10 @@ The [STYLE_GUIDE.md](STYLE_GUIDE.md) document covers:
 
 This is a living document. Feedback and contributions are welcome to help improve and expand this guide.
 
+## 🙏 Acknowledgments
+
+This style guide was informed by established community resources and official Microsoft guidance. See [ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md) for detailed attribution and sources.
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
