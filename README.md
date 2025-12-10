@@ -10,17 +10,19 @@ This repository contains a detailed PowerShell style guide that establishes codi
 
 The complete style guide is available in [STYLE_GUIDE.md](STYLE_GUIDE.md).
 
-### Quick Navigation
+### Table of Contents
 
-The [STYLE_GUIDE.md](STYLE_GUIDE.md) document covers:
+The [STYLE_GUIDE.md](STYLE_GUIDE.md) document contains the following sections:
 
-- **Naming Conventions** - Standards for functions, variables, parameters, and constants
-- **Code Formatting** - Rules for indentation, braces, whitespace, and line length
-- **Comments and Documentation** - Guidelines for comment-based help and inline comments
-- **Best Practices** - Error handling, pipeline usage, string handling, and more
-- **Module Organization** - Structure and organization for PowerShell modules
-- **Security** - Security considerations and best practices
-- **Testing** - Guidelines for writing Pester tests
+1. [Executive Summary: Author Profile](STYLE_GUIDE.md#executive-summary-author-profile)
+2. [Code Layout and Formatting](STYLE_GUIDE.md#code-layout-and-formatting)
+3. [Capitalization and Naming Conventions](STYLE_GUIDE.md#capitalization-and-naming-conventions)
+4. [Documentation and Comments](STYLE_GUIDE.md#documentation-and-comments)
+5. [Functions and Parameter Blocks](STYLE_GUIDE.md#functions-and-parameter-blocks)
+6. [Error Handling](STYLE_GUIDE.md#error-handling)
+7. [Language Interop, Versioning, and .NET](STYLE_GUIDE.md#language-interop-versioning-and-net)
+8. [Output Formatting and Streams](STYLE_GUIDE.md#output-formatting-and-streams)
+9. [Performance, Security, and Other](STYLE_GUIDE.md#performance-security-and-other)
 
 ## 🎯 Goals
 
