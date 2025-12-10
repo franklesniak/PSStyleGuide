@@ -53,7 +53,7 @@ function New-StyleGuideCopilotVersion {
 function New-StyleGuideChatVersion {
     <#
     .SYNOPSIS
-    Creates STYLE_GUIDE_CHAT.md with escaped triple backticks wrapped in a markdown code fence.
+    Creates STYLE_GUIDE_CHAT.md wrapped in a markdown code fence using proper fence nesting.
 
     .PARAMETER SourcePath
     Path to the source STYLE_GUIDE.md file.
@@ -62,8 +62,10 @@ function New-StyleGuideChatVersion {
     Path to the destination STYLE_GUIDE_CHAT.md file.
 
     .DESCRIPTION
-    This function reads STYLE_GUIDE.md, escapes all triple backticks by prefixing them with
-    a backslash, and wraps the entire content in a markdown code fence.
+    This function reads STYLE_GUIDE.md, finds the maximum number of consecutive backticks
+    in the content, and wraps the entire content in a markdown code fence using one more
+    backtick than the maximum found. This follows the CommonMark rule that a fence closes
+    only when it encounters the same character with at least as many characters as the opener.
 
     .OUTPUTS
     Returns 0 on success, 1 on failure.
@@ -79,14 +81,25 @@ function New-StyleGuideChatVersion {
     try {
         $strContent = Get-Content -Path $SourcePath -Raw -Encoding UTF8
         
-        # Escape triple backticks by prefixing with backslash
-        $strEscapedContent = $strContent -replace '```', '\```'
+        # Find the maximum number of consecutive backticks in the content
+        $intMaxBackticks = 0
+        $arrMatches = [regex]::Matches($strContent, '`+')
+        foreach ($objMatch in $arrMatches) {
+            $intCurrentLength = $objMatch.Length
+            if ($intCurrentLength -gt $intMaxBackticks) {
+                $intMaxBackticks = $intCurrentLength
+            }
+        }
         
-        # Wrap in markdown code fence
-        $strWrappedContent = "``````markdown`n$strEscapedContent`n``````"
+        # Use one more backtick than the maximum found (minimum of 4 for readability)
+        $intOuterFenceLength = [Math]::Max(4, $intMaxBackticks + 1)
+        $strOuterFence = '`' * $intOuterFenceLength
+        
+        # Wrap in markdown code fence without escaping
+        $strWrappedContent = "$strOuterFence" + "markdown`n$strContent`n$strOuterFence"
         
         Set-Content -Path $DestinationPath -Value $strWrappedContent -Encoding UTF8 -NoNewline
-        Write-Host "Successfully created $DestinationPath"
+        Write-Host "Successfully created $DestinationPath (using $intOuterFenceLength backticks for outer fence)"
         return 0
     } catch {
         Write-Error "Failed to create STYLE_GUIDE_CHAT.md: $_"
