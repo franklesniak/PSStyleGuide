@@ -10,6 +10,16 @@ This repository contains a detailed PowerShell style guide that establishes codi
 
 The complete style guide is available in [STYLE_GUIDE.md](STYLE_GUIDE.md).
 
+### Generated Versions
+
+For convenience, this repository automatically generates two additional versions of the style guide:
+
+- **[copilot-instructions.md](copilot-instructions.md)** - Drop-in ready for GitHub Copilot custom instructions. Copy this file to your repository's `.github` folder to enable Copilot to follow these conventions when generating code.
+  
+- **[STYLE_GUIDE_CHAT.md](STYLE_GUIDE_CHAT.md)** - Formatted for copy-pasting into interactive chat sessions with LLMs (ChatGPT, Claude, etc.). The content is wrapped in a markdown code fence for easy sharing.
+
+These files are automatically updated whenever [STYLE_GUIDE.md](STYLE_GUIDE.md) changes.
+
 ### Table of Contents
 
 The [STYLE_GUIDE.md](STYLE_GUIDE.md) document contains the following sections:
