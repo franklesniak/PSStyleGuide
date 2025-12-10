@@ -1,0 +1,64 @@
+name: Build Style Guide Artifacts
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'STYLE_GUIDE.md'
+  pull_request:
+    paths:
+      - 'STYLE_GUIDE.md'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Generate style guide artifacts
+        shell: pwsh
+        run: |
+          ./.github/workflows/Generate-StyleGuideArtifacts.ps1
+      
+      - name: Check for changes
+        id: check_changes
+        shell: pwsh
+        run: |
+          $boolHasChanges = $false
+          $arrChangedFiles = @(git status --porcelain)
+          
+          if ($arrChangedFiles.Count -gt 0) {
+              $boolHasChanges = $true
+              Write-Host "Changes detected:"
+              git status --short
+          } else {
+              Write-Host "No changes detected"
+          }
+          
+          # Output for GitHub Actions
+          "has_changes=$($boolHasChanges.ToString().ToLower())" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+      
+      - name: Commit and push changes
+        if: github.event_name == 'push' && steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add STYLE_GUIDE_COPILOT.md STYLE_GUIDE_CHAT.md
+          git commit -m "chore: update generated style guide artifacts [skip ci]"
+          git push
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: style-guide-artifacts
+          path: |
+            STYLE_GUIDE_COPILOT.md
+            STYLE_GUIDE_CHAT.md

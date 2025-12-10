@@ -1,0 +1,122 @@
+#Requires -Version 5.1
+
+<#
+.SYNOPSIS
+Generates STYLE_GUIDE_COPILOT.md and STYLE_GUIDE_CHAT.md from STYLE_GUIDE.md.
+
+.DESCRIPTION
+This script reads STYLE_GUIDE.md and creates two derived files:
+- STYLE_GUIDE_COPILOT.md: A direct copy of STYLE_GUIDE.md
+- STYLE_GUIDE_CHAT.md: A chat-ready version with escaped triple backticks wrapped in a markdown code fence
+
+.EXAMPLE
+.\Generate-StyleGuideArtifacts.ps1
+
+.NOTES
+This script follows the PowerShell style guide conventions defined in this repository.
+#>
+
+function New-StyleGuideCopilotVersion {
+    <#
+    .SYNOPSIS
+    Creates STYLE_GUIDE_COPILOT.md as a direct copy of STYLE_GUIDE.md.
+
+    .PARAMETER SourcePath
+    Path to the source STYLE_GUIDE.md file.
+
+    .PARAMETER DestinationPath
+    Path to the destination STYLE_GUIDE_COPILOT.md file.
+
+    .OUTPUTS
+    Returns 0 on success, 1 on failure.
+    #>
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$SourcePath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$DestinationPath
+    )
+
+    try {
+        $strContent = Get-Content -Path $SourcePath -Raw -Encoding UTF8
+        Set-Content -Path $DestinationPath -Value $strContent -Encoding UTF8 -NoNewline
+        Write-Host "Successfully created $DestinationPath"
+        return 0
+    } catch {
+        Write-Error "Failed to create STYLE_GUIDE_COPILOT.md: $_"
+        return 1
+    }
+}
+
+
+function New-StyleGuideChatVersion {
+    <#
+    .SYNOPSIS
+    Creates STYLE_GUIDE_CHAT.md with escaped triple backticks wrapped in a markdown code fence.
+
+    .PARAMETER SourcePath
+    Path to the source STYLE_GUIDE.md file.
+
+    .PARAMETER DestinationPath
+    Path to the destination STYLE_GUIDE_CHAT.md file.
+
+    .DESCRIPTION
+    This function reads STYLE_GUIDE.md, escapes all triple backticks by prefixing them with
+    a backslash, and wraps the entire content in a markdown code fence.
+
+    .OUTPUTS
+    Returns 0 on success, 1 on failure.
+    #>
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$SourcePath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$DestinationPath
+    )
+
+    try {
+        $strContent = Get-Content -Path $SourcePath -Raw -Encoding UTF8
+        
+        # Escape triple backticks by prefixing with backslash
+        $strEscapedContent = $strContent -replace '```', '\```'
+        
+        # Wrap in markdown code fence
+        $strWrappedContent = "``````markdown`n$strEscapedContent`n``````"
+        
+        Set-Content -Path $DestinationPath -Value $strWrappedContent -Encoding UTF8 -NoNewline
+        Write-Host "Successfully created $DestinationPath"
+        return 0
+    } catch {
+        Write-Error "Failed to create STYLE_GUIDE_CHAT.md: $_"
+        return 1
+    }
+}
+
+
+# Main execution
+$strSourceFile = "STYLE_GUIDE.md"
+$strCopilotFile = "STYLE_GUIDE_COPILOT.md"
+$strChatFile = "STYLE_GUIDE_CHAT.md"
+
+# Verify source file exists
+if (-not (Test-Path -Path $strSourceFile)) {
+    Write-Error "Source file $strSourceFile not found"
+    exit 1
+}
+
+# Generate STYLE_GUIDE_COPILOT.md
+$intCopilotResult = New-StyleGuideCopilotVersion -SourcePath $strSourceFile -DestinationPath $strCopilotFile
+if ($intCopilotResult -ne 0) {
+    exit 1
+}
+
+# Generate STYLE_GUIDE_CHAT.md
+$intChatResult = New-StyleGuideChatVersion -SourcePath $strSourceFile -DestinationPath $strChatFile
+if ($intChatResult -ne 0) {
+    exit 1
+}
+
+Write-Host "All style guide artifacts generated successfully"
+exit 0
