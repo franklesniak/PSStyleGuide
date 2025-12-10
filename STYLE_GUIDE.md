@@ -1,6 +1,6 @@
-## PowerShell Writing Style
+# PowerShell Writing Style
 
-### Executive Summary: Author Profile
+## Executive Summary: Author Profile
 
 The author's code writing style can be characterized as a highly disciplined "PowerShell v1.0 Classicist" approach when applicable. This is a deliberate engineering choice to ensure maximum backward compatibility with PowerShell version 1.0 in scenarios where the script could feasibly run on that platform, such as standalone string manipulation functions, data parsing utilities, or scripts that interact with basic Windows operating system information without external dependencies. It prioritizes portability, robustness, and deterministic behavior in legacy or mixed environments where newer PowerShell versions cannot be assumed. However, this v1.0 compatibility is not rigidly enforced; when external constraints require newer PowerShell versions (e.g., dependencies on modules like Az, which mandate Windows PowerShell 5.1 or PowerShell 7.x), the author readily adopts modern language constructs such as try/catch for error handling, advanced functions with [CmdletBinding()], and other features to align with the required runtime.
 
@@ -8,7 +8,7 @@ This explains the systematic avoidance of features introduced in v2.0 or later i
 
 Within these constraints, the author adheres closely to community best practices for readability, naming, documentation, and maintainability. Functions are designed as reusable tools with a single purpose—e.g., performing targeted data transformations or validations. Outputs are explicit and controlled: a status code (e.g., an integer indicating full success, partial success, or failure) is typically returned, while complex results are passed via reference parameters only when necessary to modify data in the caller's scope, avoiding unnecessary use of [ref] for read-only objects since it provides no performance benefits in PowerShell. Error handling is "fail-controlled," suppressing issues to allow graceful recovery without halting execution. The code is robust, thoroughly documented, and predictable across versions, making it ideal for tools in legacy or mixed environments. Performance is balanced with readability, favoring script constructs over pipelines. If the v1.0 constraint were lifted (e.g., due to modern dependencies), the style would evolve to incorporate features like pipeline-friendly objects and structured errors while retaining strong typing and documentation for clarity.
 
-### Code Layout and Formatting
+## Code Layout and Formatting
 
 The layout emphasizes scannability, consistency, and readability, following community guidelines to make the code familiar and easy to maintain. Indentation uses four spaces for all logical blocks, including param declarations, conditional statements (if/else), loops, and function bodies—no tabs are used. Bracing strictly adheres to the "One True Brace Style" (OTBS): opening braces are placed at the end of the statement line, and closing braces start on a new line, aligned with the opening statement. This applies universally to functions, conditionals, and most script blocks.
 
@@ -98,13 +98,13 @@ function ExampleFunction {
     $strMessage = ($SSORegion + ': Error occurred')
     ```
 
-### Capitalization and Naming Conventions
+## Capitalization and Naming Conventions
 
 Capitalization and naming follow .NET-inspired conventions for consistency and readability, treating PowerShell as a .NET scripting language. All public identifiers—function names, parameters, and attributes—use PascalCase (e.g., Convert-StringToObject, $ReferenceToResultObject). Language keywords (e.g., function, param, if, else, return, trap) are always lowercase. Operators like -gt or -eq are lowercase with surrounding spaces.
 
 Function names strictly use the Verb-Noun pattern with approved verbs (e.g., Convert-, Get-, Test-, Split-) and singular nouns, ensuring discoverability and avoiding duplication. Parameters are descriptive and PascalCased, with aliases (if any) documented in help. Local variables use camelCase with a type-hinting prefix (e.g., $strMessage for strings, $intReturnValue for integers, $boolResult for booleans, $arrElements for arrays). This prefixing is a deliberate choice to make intended types obvious in a dynamically typed language, especially without IDE support—enhancing clarity at the cost of slight verbosity.
 
-#### Overview of Observed Naming Discipline
+### Overview of Observed Naming Discipline
 
 The author exhibits an uncompromising commitment to **explicit, self-documenting identifiers** across all code elements. This manifests as a complete rejection of aliases, abbreviations, or any form of shorthand in function names, parameter names, or command invocations. Every identifier is fully spelled out using clear, descriptive language that communicates intent without requiring external context or documentation lookup. This practice eliminates ambiguity and future-proofs the code against changes in command behavior or parameter sets—common sources of subtle bugs in PowerShell scripting.
 
@@ -117,7 +117,7 @@ The naming strategy is rooted in **.NET Framework capitalization conventions**, 
 
 This consistent application creates a visual hierarchy that allows rapid comprehension of code structure and data flow, even in large or complex functions.
 
-#### Script and Function Naming: Full Explicit Form
+### Script and Function Naming: Full Explicit Form
 
 **Function names** strictly adhere to the **Verb-Noun** pattern using **approved verbs** and **singular nouns**, rendered in **PascalCase**. Examples include:
 
@@ -126,7 +126,7 @@ This consistent application creates a visual hierarchy that allows rapid compreh
 - `Test-ErrorOccurred`
 - `Split-StringOnLiteralString`
 
-#### Script and Function Naming: Approved Verbs
+### Script and Function Naming: Approved Verbs
 
 Using approved verbs is a core PowerShell convention that ensures discoverability and consistency. You can always retrieve the complete list of approved verbs by running the following command:
 
@@ -145,7 +145,7 @@ PowerShell uses a verb-noun pair for the names of cmdlets and for their derived 
 
 Each approved verb has a corresponding *alias prefix* defined. We use this alias prefix in aliases for commands using that verb. For example, the alias prefix for `Import` is `ip` and, accordingly, the alias for `Import-Module` is `ipmo`. This is a recommendation but not a rule; in particular, it need not be respected for command aliases mimicking well known commands from other environments.
 
-##### Verb Naming Recommendations
+#### Verb Naming Recommendations
 
 The following recommendations help you choose an appropriate verb for your cmdlet, to ensure consistency between the cmdlets that you create, the cmdlets that are provided by PowerShell, and the cmdlets that are designed by others.
 
@@ -162,35 +162,35 @@ The following recommendations help you choose an appropriate verb for your cmdle
 
 You may get a complete list of verbs using the `Get-Verb` cmdlet.
 
-##### Similar Verbs for Different Actions
+#### Similar Verbs for Different Actions
 
 The following similar verbs represent different actions.
 
-###### `New` vs. `Add`
+##### `New` vs. `Add`
 
 Use the `New` verb to create a new resource. Use the `Add` to add something to an existing container or resource. For example, `Add-Content` adds output to an existing file.
 
-###### `New` vs. `Set`
+##### `New` vs. `Set`
 
 Use the `New` verb to create a new resource. Use the `Set` verb to modify an existing resource, optionally creating it if it doesn't exist, such as the `Set-Variable` cmdlet.
 
-###### `Find` vs. `Search`
+##### `Find` vs. `Search`
 
 Use the `Find` verb to look for an object. Use the `Search` verb to create a reference to a resource in a container.
 
-###### `Get` vs. `Read`
+##### `Get` vs. `Read`
 
 Use the `Get` verb to obtain information about a resource (such as a file) or to obtain an object with which you can access the resource in future. Use the `Read` verb to open a resource and extract information contained within.
 
-###### `Invoke` vs. `Start`
+##### `Invoke` vs. `Start`
 
 Use the `Invoke` verb to perform synchronous operations, such as running a command and waiting for it to end. Use the `Start` verb to begin asynchronous operations, such as starting an autonomous process.
 
-###### `Ping` vs. `Test`
+##### `Ping` vs. `Test`
 
 Use the `Test` verb.
 
-##### Common Verbs
+#### Common Verbs
 
 PowerShell uses the `System.Management.Automation.VerbsCommon` enumeration class to define generic actions that can apply to almost any cmdlet. The following table lists most of the defined verbs.
 
@@ -231,7 +231,7 @@ PowerShell uses the `System.Management.Automation.VerbsCommon` enumeration class
 | `Unlock` (`uk`) | Releases a resource that was locked. This verb is paired with `Lock`. | Release, Unrestrict, Unsecure |
 | `Watch` (`wc`) | Continually inspects or monitors a resource for changes. | |
 
-##### Communications Verbs
+#### Communications Verbs
 
 PowerShell uses the `System.Management.Automation.VerbsCommunications` class to define actions that apply to communications. The following table lists most of the defined verbs.
 
@@ -244,7 +244,7 @@ PowerShell uses the `System.Management.Automation.VerbsCommunications` class to 
 | `Send` (`sd`) | Delivers information to a destination. This verb is paired with `Receive`. | Put, Broadcast, Mail, Fax |
 | `Write` (`wr`) | Adds information to a target. This verb is paired with `Read`. | Put, Print |
 
-##### Data Verbs
+#### Data Verbs
 
 PowerShell uses the `System.Management.Automation.VerbsData` class to define actions that apply to data handling. The following table lists most of the defined verbs.
 
@@ -275,7 +275,7 @@ PowerShell uses the `System.Management.Automation.VerbsData` class to define act
 | `Unpublish` (`ub`) | Makes a resource unavailable to others. This verb is paired with `Publish`. | Uninstall, Revert, Hide |
 | `Update` (`ud`) | Brings a resource up-to-date to maintain its state, accuracy, conformance, or compliance. For example, the `Update-FormatData` cmdlet updates and adds formatting files to the current PowerShell console. | Refresh, Renew, Recalculate, Re-index |
 
-##### Diagnostic Verbs
+#### Diagnostic Verbs
 
 PowerShell uses the `System.Management.Automation.VerbsDiagnostic` class to define actions that apply to diagnostics. The following table lists most of the defined verbs.
 
@@ -289,7 +289,7 @@ PowerShell uses the `System.Management.Automation.VerbsDiagnostic` class to defi
 | `Test` (`t`) | Verifies the operation or consistency of a resource. | Diagnose, Analyze, Salvage, Verify |
 | `Trace` (`tr`) | Tracks the activities of a resource. | Track, Follow, Inspect, Dig |
 
-##### Lifecycle Verbs
+#### Lifecycle Verbs
 
 PowerShell uses the `System.Management.Automation.VerbsLifecycle` class to define actions that apply to the lifecycle of a resource. The following table lists most of the defined verbs.
 
@@ -318,7 +318,7 @@ PowerShell uses the `System.Management.Automation.VerbsLifecycle` class to defin
 | `Unregister` (`ur`) | Removes the entry for a resource from a repository. This verb is paired with `Register`. | Remove |
 | `Wait` (`w`) | Pauses an operation until a specified event occurs. For example, the `Wait-Job` cmdlet pauses operations until one or more of the background jobs are complete. | Sleep, Pause |
 
-##### Security Verbs
+#### Security Verbs
 
 PowerShell uses the `System.Management.Automation.VerbsSecurity` class to define actions that apply to security. The following table lists most of the defined verbs.
 
@@ -331,7 +331,7 @@ PowerShell uses the `System.Management.Automation.VerbsSecurity` class to define
 | `Unblock` (`ul`) | Removes restrictions to a resource. This verb is paired with `Block`. | Clear, Allow |
 | `Unprotect` (`up`) | Removes safeguards from a resource that were added to prevent it from attack or loss. This verb is paired with `Protect`. | Decrypt, Unseal |
 
-##### Other Verbs
+#### Other Verbs
 
 PowerShell uses the `System.Management.Automation.VerbsOther` class to define canonical verb names that don't fit into a specific verb name category such as the common, communications, data, lifecycle, or security verb names verbs.
 
@@ -339,7 +339,7 @@ PowerShell uses the `System.Management.Automation.VerbsOther` class to define ca
 | --- | --- | --- |
 | `Use` (`u`) | Uses or includes a resource to do something. | |
 
-#### Script and Function Naming: Nouns
+### Script and Function Naming: Nouns
 
 **Noun Singularity:** The noun **must** be singular, even if the function returns multiple objects. This is a core PowerShell convention (e.g., `Get-Process`, `Get-ChildItem`) and corresponds to the **PSScriptAnalyzer `PSUseSingularNouns`** rule. The noun describes the *type* of object the function works with, not the *quantity* of its output.
 
@@ -348,7 +348,7 @@ PowerShell uses the `System.Management.Automation.VerbsOther` class to define ca
 - **Correct:** `Expand-TrustPrincipal` (operates on *one* principal node, even if it results in many values)
 - **Incorrect:** `Expand-TrustPrincipals`
 
-#### Module Naming: Noun-Based Containers
+### Module Naming: Noun-Based Containers
 
 **Modules are treated as .NET Namespaces or Class Libraries (Containers), not Actions.** Therefore, Module names **must** be **PascalCase Nouns** or **Noun Phrases**.
 
@@ -365,7 +365,7 @@ By naming the module `ObjectFlattener` (the tool) and the function `ConvertTo-Fl
 
 Do not compromise the module name for the sake of keyword searching. Instead, rely on the **Module Manifest (`.psd1`)** to handle discoverability. The `Tags` key in the manifest must be populated aggressively with relevant keywords (including verbs) to ensure the module is found during searches, while keeping the architectural name pure.
 
-#### Do Not Use Aliases
+### Do Not Use Aliases
 
 No aliases (e.g., `gci`, `gps`) or abbreviated forms appear in the code. Even common operations use full command names. This ensures:
 
@@ -379,7 +379,7 @@ Furthermore, **Modules must not export "Compatibility Aliases"** solely to bridg
 
 Aliases may only be exported in a Module Manifest if they provide genuine short-hand convenience for *interactive* users (e.g., `cfo` for `ConvertTo-FlatObject`) and are strictly documented as optional. They must never be used to mask non-approved verbs.
 
-#### Parameter Naming
+### Parameter Naming
 
 **Parameter names** follow the same PascalCase convention and are highly descriptive:
 
@@ -390,7 +390,7 @@ Aliases may only be exported in a Module Manifest if they provide genuine short-
 
 These names leave no ambiguity about the parameter’s purpose, expected type, or direction of data flow. The use of `ReferenceTo` prefix for `[ref]` parameters is a deliberate pattern that instantly signals **pass-by-reference** semantics—a critical distinction in PowerShell v1.0 where such mechanics are not visually obvious. However, [ref] is used only when data must be written back to the caller's scope (e.g., for modifying variables or returning multiple outputs); for passing complex objects that do not need modification, they are passed by value, as [ref] offers no performance advantages in PowerShell.
 
-#### Local Variable Naming: Type-Prefixed camelCase
+### Local Variable Naming: Type-Prefixed camelCase
 
 Local variables follow a **Hungarian-style notation** combining a **type-hinting prefix** with **descriptive `camelCase`**. **These names must be fully descriptive and avoid all abbreviations or shorthand.**
 
@@ -417,7 +417,7 @@ This prefixing is **not** a legacy artifact but a **deliberate design decision**
 
 While some modern styles discourage such prefixes, in this context they represent **defensive programming**—a hallmark of the author’s v1.0-focused robustness philosophy.
 
-#### Path and Scope Handling
+### Path and Scope Handling
 
 The author **avoids relative paths** (`.`, `..`) and the **home directory shortcut `~`** entirely. This is due to:
 
@@ -437,7 +437,7 @@ For shared state, the author would use:
 
 This eliminates environment-dependent behavior and ensures deterministic execution.
 
-#### Options for Local Variable Prefixes: Forensic Evaluation
+### Options for Local Variable Prefixes: Forensic Evaluation
 
 The use of type prefixes on local variables represents a **stylistic fork** with no community-mandated "correct" answer. The guides explicitly state this is a **"matter of taste"** for private variables. Below is a forensic breakdown of the two viable paths:
 
@@ -448,7 +448,7 @@ The use of type prefixes on local variables represents a **stylistic fork** with
 
 **Forensic Recommendation**: **Retain prefixes in v1.0-targeted code**. The clarity benefit outweighs verbosity when IDE support cannot be assumed. In v2.0+ codebases with consistent tooling, transition to plain camelCase is acceptable.
 
-#### Summary: Naming as Defensive Architecture
+### Summary: Naming as Defensive Architecture
 
 The author’s naming conventions are not merely stylistic—they form a **defensive architecture** that:
 
@@ -459,9 +459,9 @@ The author’s naming conventions are not merely stylistic—they form a **defen
 
 This results in code that is **self-documenting**, **resilient to change**, and **immediately comprehensible** to any PowerShell practitioner—regardless of their familiarity with the specific script.
 
-### Documentation and Comments
+## Documentation and Comments
 
-#### Overview of Documentation Philosophy
+### Overview of Documentation Philosophy
 
 The author treats **documentation as a first-class citizen** of the codebase, embedding comprehensive, structured, and immediately actionable information directly within every function—regardless of scope, complexity, or visibility. This is not an afterthought but a **core engineering principle**: code must be **self-explanatory** to any consumer, even in the absence of external manuals, IDE tooltips, or prior knowledge. The documentation strategy is **v1.0-native** in compatible scripts, relying exclusively on PowerShell’s original comment-based help system (introduced in v1.0) without dependence on newer features like `[CmdletBinding()]`, `Get-Help` enhancements in v2.0+, or external XML help files. In scripts requiring modern PowerShell due to dependencies, the author incorporates these newer help features as appropriate.
 
@@ -473,7 +473,7 @@ Every function—**including nested private helpers**—receives **identical tre
 
 ---
 
-#### Comment-Based Help: Structure and Format
+### Comment-Based Help: Structure and Format
 
 All functions include **full comment-based help** using **single-line comments** (`#`) with **dotted keywords** (`.SYNOPSIS`, `.DESCRIPTION`, etc.). The help block is **placed inside the function**, **immediately above the `param` block**, ensuring:
 
@@ -515,7 +515,7 @@ All functions include **full comment-based help** using **single-line comments**
 
 ---
 
-#### Help Content Quality: Forensic Standards
+### Help Content Quality: Forensic Standards
 
 The documentation exceeds minimal compliance and achieves **forensic-grade completeness**:
 
@@ -531,7 +531,7 @@ The documentation exceeds minimal compliance and achieves **forensic-grade compl
 
 ---
 
-#### Inline Comments: Purpose and Placement
+### Inline Comments: Purpose and Placement
 
 Inline comments are **sparse but surgical**, focusing exclusively on **"why"** rather than **"what"**. They are:
 
@@ -553,7 +553,7 @@ No redundant comments (e.g., `# Increment i by 1`) appear—code is considered s
 
 ---
 
-#### Structural Documentation: Regions and Licensing
+### Structural Documentation: Regions and Licensing
 
 The script uses **`#region` / `#endregion`** blocks to create **logical code folding**:
 
@@ -580,7 +580,7 @@ This enables:
 
 ---
 
-#### Function and Script Versioning
+### Function and Script Versioning
 
 All distributable functions and scripts must include a version number in the `.NOTES` section of their comment-based help. This version number provides critical change tracking and must follow a strict, `[System.Version]`-compatible format: `Major.Minor.Build.Revision`.
 
@@ -601,7 +601,7 @@ This example assumes that the current date is November 3, 2025. In any code you 
 
 ---
 
-#### Parameter Documentation Placement: Strategic Choice
+### Parameter Documentation Placement: Strategic Choice
 
 Parameter help is **centralized in the comment-based help block**, not duplicated above individual parameters in the `param` block.
 
@@ -629,7 +629,7 @@ The author’s choice prioritizes **consistency and maintainability**.
 
 ---
 
-#### Help Format Options: Forensic Evaluation
+### Help Format Options: Forensic Evaluation
 
 The author uses **single-line comments** (`# .SECTION`) rather than **block comments** (`<# ... #>`).
 
@@ -642,7 +642,7 @@ The author uses **single-line comments** (`# .SECTION`) rather than **block comm
 
 ---
 
-#### Summary: Documentation as Forensic Evidence
+### Summary: Documentation as Forensic Evidence
 
 The documentation system is **forensically complete**:
 
@@ -656,9 +656,9 @@ This is not merely "good documentation"—it is **executable specification**. A 
 
 The author has elevated documentation from a **maintenance task** to a **core reliability mechanism**, ensuring the code remains understandable, debuggable, and maintainable across decades and environments.
 
-### Functions and Parameter Blocks
+## Functions and Parameter Blocks
 
-#### Overview of Function Architecture
+### Overview of Function Architecture
 
 The author designs **functions as atomic, reusable tools** with a single, well-defined purpose. Every function is a **self-contained unit of execution** that accepts input, performs a transformation or validation, and produces a **predictable, deterministic output**. This design philosophy is rooted in **PowerShell v1.0 constraints** for compatible scripts and deliberately avoids any feature introduced in v2.0 or later in those cases. The result is a **robust, portable, and highly maintainable** codebase that operates identically across all PowerShell versions from 1.0 onward when feasible. However, in scripts with external dependencies requiring newer versions (e.g., modern modules), the author incorporates appropriate features like pipeline processing or structured error handling.
 
@@ -682,7 +682,7 @@ This creates a **C-style procedural model** within PowerShell, prioritizing **co
 
 ---
 
-#### Function Declaration and Structure
+### Function Declaration and Structure
 
 All functions follow a **strict, uniform template**:
 
@@ -708,7 +708,7 @@ function Verb-Noun {
 
 ---
 
-#### Parameter Block Design: Forensic Analysis
+### Parameter Block Design: Forensic Analysis
 
 The `param` block is the **primary contract** between caller and function. Every parameter is:
 
@@ -751,7 +751,7 @@ This ensures the function can be called with minimal arguments while maintaining
 
 ---
 
-#### Return Semantics: Explicit Status Codes
+### Return Semantics: Explicit Status Codes
 
 Every function returns a **single integer status code** via explicit `return` statement:
 
@@ -777,7 +777,7 @@ This pattern creates a **C-style error code contract** that is immediately famil
 
 ---
 
-#### Input/Output Contract: Reference Parameters
+### Input/Output Contract: Reference Parameters
 
 Functions use **`[ref]` parameters** to return complex data only when write-back is required:
 
@@ -803,7 +803,7 @@ $status = 4
 
 ---
 
-#### Pipeline Behavior: Deliberately Disabled
+### Pipeline Behavior: Deliberately Disabled
 
 In v1.0-targeted functions, pipeline input is **explicitly rejected**:
 
@@ -821,7 +821,7 @@ In scripts requiring modern PowerShell, pipeline support is added as needed.
 
 ---
 
-#### Positional Parameter Support
+### Positional Parameter Support
 
 Functions support **positional parameter binding** for v1.0 usability:
 
@@ -841,7 +841,7 @@ This enables:
 
 ---
 
-#### Advanced Feature Emulation (v1.0-Native)
+### Advanced Feature Emulation (v1.0-Native)
 
 In v1.0 scripts, the author **emulates modern features** using v1.0 constructs:
 
@@ -855,7 +855,7 @@ In v1.0 scripts, the author **emulates modern features** using v1.0 constructs:
 
 ---
 
-#### Options for Return Mechanism: Forensic Evaluation
+### Options for Return Mechanism: Forensic Evaluation
 
 The use of explicit `return` vs. implicit output represents a **philosophical choice**:
 
@@ -868,7 +868,7 @@ The use of explicit `return` vs. implicit output represents a **philosophical ch
 
 ---
 
-#### Rule: "Modern Advanced" Function/Script Requirements (v2.0+)
+### Rule: "Modern Advanced" Function/Script Requirements (v2.0+)
 
 The "v1.0 Classicist" style is the default for standalone, portable utilities that must maintain backward compatibility.
 
@@ -919,7 +919,7 @@ function Get-ModernData {
 
 **Trade-off**: Breaks v1.0 compatibility
 
-##### "Modern Advanced" Functions/Scripts: Exception for Suppressing Nested Verbose Streams
+#### "Modern Advanced" Functions/Scripts: Exception for Suppressing Nested Verbose Streams
 
 Rule 5 states that manual toggling of `$VerbosePreference` is prohibited. This rule's primary intent is to ensure your function or script *respects* the user's desire for verbose output from *your* script (via `Write-Verbose`).
 
@@ -959,23 +959,23 @@ try {
 
 This `try/finally` pattern is robust, safe, and compliantly achieves your goal of controlling output from third-party cmdlets.
 
-##### "Modern Advanced" Functions/Scripts: Singlular `[OutputType()]`
+#### "Modern Advanced" Functions/Scripts: Singlular `[OutputType()]`
 
 When a function returns one or more objects via the pipeline (streaming), the `[OutputType()]` attribute **must** declare the *singular* type of object in the stream (e.g., `[OutputType([pscustomobject])]`). Do not use the plural array type (e.g., `[OutputType([pscustomobject[]])]`). The pipeline *always* creates an array for the caller automatically if multiple objects are returned.
 
-##### "Modern Advanced" Functions/Scripts: Handling Multiple or Dynamic Output Types
+#### "Modern Advanced" Functions/Scripts: Handling Multiple or Dynamic Output Types
 
 When a function is *intentionally* designed to return different, non-related object types (e.g., a wrapper for `ConvertFrom-Json` which can return a single object, an array, or a scalar type), it is preferred to **list all primary output types** using multiple `[OutputType()]` attributes. This is far more descriptive and helpful to the caller than using a single, generic `[OutputType([System.Object])]`.
 
 If a function's output type is truly dynamic and unpredictable, `[OutputType([System.Object])]` should be used only as a last resort, as it provides minimal value for discoverability.
 
-##### "Modern Advanced" Functions/Scripts: Prioritizing Primary Output Types
+#### "Modern Advanced" Functions/Scripts: Prioritizing Primary Output Types
 
 When using multiple `[OutputType()]` attributes, the goal is to list the **primary, high-level** object types a user can expect. It is **not** necessary to create an exhaustive list of every possible scalar or primitive type (e.g., `[int]`, `[bool]`, `[double]`) if they are not the main, intended output of the function.
 
 This practice avoids cluttering the function's definition and keeps the developer's focus on the most common and important return values. For example, a JSON parsing function should list `[pscustomobject]` and `[object[]]`, but does not need to list `[int]`.
 
-##### "Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)
+#### "Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)
 
 Using `[CmdletBinding()]` unlocks powerful parameter validation attributes like `[Parameter(Mandatory = $true)]`, `[ValidateNotNullOrEmpty()]`, and `[ValidateSet()]`.
 
@@ -994,7 +994,7 @@ These are **not stylistic requirements**; they are **design tools** that must be
   - The parameter is *technically* optional, but if it *is* provided, it must not be an empty string.
   - This is common for optional parameters like `$LogPath` or `$Description`.
 
-#### Consuming Streaming Functions (The `0-1-Many` Problem)
+### Consuming Streaming Functions (The `0-1-Many` Problem)
 
 When a function or script streams its output (whether it's a "modern advanced" function/script as mandated by the "Processing Collections" rule, or whether it's a standard, v1.0-compatible function and just happens to be streaming its output), the caller's variable will be `$null` if zero objects are returned, a *scalar object* if one object is returned, or an `[object[]]` array if multiple objects are returned.
 
@@ -1013,7 +1013,7 @@ $arrPrincipals = @(Expand-TrustPrincipal -PrincipalNode $statement.Principal)
 
 ---
 
-#### Summary: Function Design as Reliability Engineering
+### Summary: Function Design as Reliability Engineering
 
 The function and parameter block design represents **reliability engineering at the architectural level**:
 
@@ -1033,9 +1033,9 @@ This creates **industrial-grade script components** that can be:
 
 The absence of modern features in v1.0 scripts is not a limitation—it is **evidence of mastery** over the v1.0 platform and a deliberate choice for **maximum reliability**.
 
-### Error Handling
+## Error Handling
 
-#### Executive Summary: Error Handling Philosophy
+### Executive Summary: Error Handling Philosophy
 
 The author implements a **forensically complete, v1.0-native error handling system** in compatible scripts that is **fail-controlled, deterministic, and self-diagnosing**. This is not a workaround for missing `try/catch` (introduced in v2.0) but a **deliberately engineered reliability layer** that:
 
@@ -1049,7 +1049,7 @@ The system is **atomic**—each error-prone operation is isolated, measured, and
 
 ---
 
-#### Core Error Suppression Mechanism
+### Core Error Suppression Mechanism
 
 The author uses **two complementary v1.0-native suppression techniques**:
 
@@ -1074,7 +1074,7 @@ $global:ErrorActionPreference = $originalPref  # State restoration
 
 ---
 
-#### Error Detection: Reference-Based Comparison
+### Error Detection: Reference-Based Comparison
 
 The author **rejects unreliable heuristics** (`$?`, `$Error[0].Exception`, null checks) and implements a **reference-equality detection system** using two custom helper functions:
 
@@ -1101,7 +1101,7 @@ This eliminates false positives from `$error` array clearing and ensures **100% 
 
 ---
 
-#### Atomic Error Handling Pattern
+### Atomic Error Handling Pattern
 
 Every type conversion or risky operation follows this **exact atomic pattern**:
 
@@ -1132,7 +1132,7 @@ function Convert-Safely {
 
 ---
 
-#### Anomaly Reporting: Write-Warning for Logical Impossibilities
+### Anomaly Reporting: Write-Warning for Logical Impossibilities
 
 The author uses `Write-Warning` **sparingly and surgically** to flag **logically impossible states**:
 
@@ -1150,7 +1150,7 @@ These warnings are **never suppressed** — they represent **contract violations
 
 ---
 
-#### Error Context Preservation
+### Error Context Preservation
 
 Despite suppression, **full error context is preserved** in the global `$Error` array:
 
@@ -1167,7 +1167,7 @@ if ($errorOccurred) {
 
 ---
 
-#### Duplication Risk and Mitigation
+### Duplication Risk and Mitigation
 
 The error detection helpers (`Get-ReferenceToLastError`, `Test-ErrorOccurred`) are **duplicated in multiple conversion functions**.
 
@@ -1193,7 +1193,7 @@ This eliminates duplication while preserving v1.0 compatibility.
 
 ---
 
-#### Comparison with Modern Alternatives
+### Comparison with Modern Alternatives
 
 | Feature | v1.0 Implementation | v2.0+ Equivalent |
 |-------|---------------------|------------------|
@@ -1206,7 +1206,7 @@ The v1.0 pattern is **functionally equivalent** but **more verbose** and **dupli
 
 ---
 
-#### Modern `catch` Block Requirements
+### Modern `catch` Block Requirements
 
 In modern functions using `try/catch` (i.e., those not targeting v1.0), `catch` blocks **must not be empty**. An empty `catch` block is flagged by PSScriptAnalyzer and provides no diagnostic value. At a minimum, the error should be logged to the **Debug** stream, as it represents an *internal, handled* failure.
 
@@ -1221,7 +1221,7 @@ try {
 
 ---
 
-#### Summary: Error Handling as Forensic Instrumentation
+### Summary: Error Handling as Forensic Instrumentation
 
 The error handling system is a **masterclass in v1.0 reliability engineering**:
 
@@ -1235,9 +1235,9 @@ This is not "working around" v1.0 limitations — it is **exploiting v1.0 mechan
 
 The only forensic weakness is **helper function duplication**, which should be consolidated into shared nested definitions to eliminate maintenance risk. With this single improvement, the error handling system would achieve **perfect reliability scoring** across all PowerShell versions.
 
-### Language Interop, Versioning, and .NET
+## Language Interop, Versioning, and .NET
 
-#### Executive Summary: Interop and Versioning Strategy
+### Executive Summary: Interop and Versioning Strategy
 
 The author employs a **sophisticated, version-aware interoperability layer** that seamlessly bridges **PowerShell v1.0 scripting** with **.NET Framework capabilities** while maintaining **strict backward compatibility** and **deterministic behavior** across all PowerShell versions from 1.0 to modern releases in compatible scripts. This is achieved through:
 
@@ -1251,7 +1251,7 @@ The strategy transforms potentially version-breaking operations (e.g., handling 
 
 ---
 
-#### Runtime Version Detection: `Get-PSVersion`
+### Runtime Version Detection: `Get-PSVersion`
 
 The author implements a **dedicated version probe** that returns a `[System.Version]` object representing the executing PowerShell runtime:
 
@@ -1283,7 +1283,7 @@ This function serves as the **central version oracle** for all conditional logic
 
 ---
 
-#### Conditional .NET Feature Usage: Progressive Enhancement
+### Conditional .NET Feature Usage: Progressive Enhancement
 
 The author uses **PowerShell version as a feature flag** to enable increasingly capable .NET types for handling edge cases like numeric overflow:
 
@@ -1313,7 +1313,7 @@ if ($versionPS.Major -ge 3) {
 
 ---
 
-#### .NET Interop Patterns: Safe and Documented
+### .NET Interop Patterns: Safe and Documented
 
 The author uses **direct .NET interop** in controlled scenarios:
 
@@ -1348,7 +1348,7 @@ $listAttached = New-Object System.Collections.Generic.List[object]
 
 ---
 
-#### Type Conversion Safety Chain
+### Type Conversion Safety Chain
 
 The author implements a **defense-in-depth conversion chain** for numeric strings:
 
@@ -1369,7 +1369,7 @@ Each step uses the **atomic error handling pattern** (trap + preference toggle +
 
 ---
 
-#### Version-Aware Fallback Logic
+### Version-Aware Fallback Logic
 
 Functions use version detection to **bypass expensive checks** when possible:
 
@@ -1389,7 +1389,7 @@ if ($PSVersion -eq ([version]'0.0')) {
 
 ---
 
-#### Path and Scope Handling: Explicit and Provider-Agnostic
+### Path and Scope Handling: Explicit and Provider-Agnostic
 
 The author **avoids all relative path notation** and the `~` shortcut:
 
@@ -1413,7 +1413,7 @@ For file paths, the author would use:
 
 ---
 
-#### .NET Type Usage Summary
+### .NET Type Usage Summary
 
 | .NET Type | First Available | Used In | Forensic Purpose |
 |----------|-----------------|--------|------------------|
@@ -1426,7 +1426,7 @@ All types are **v1.0-safe** except `BigInteger`, which is **guarded by version c
 
 ---
 
-#### Modernization Path (v2.0+)
+### Modernization Path (v2.0+)
 
 If v1.0 compatibility were not required, the author would likely:
 
@@ -1437,7 +1437,7 @@ If v1.0 compatibility were not required, the author would likely:
 
 ---
 
-#### Summary: Interop as Adaptive Resilience
+### Summary: Interop as Adaptive Resilience
 
 The language interop and versioning strategy represents **adaptive resilience engineering**:
 
@@ -1456,9 +1456,9 @@ This creates code that:
 
 The system transforms version fragmentation from a liability into a **non-issue** — the script simply **does the right thing** regardless of where it runs.
 
-### Output Formatting and Streams
+## Output Formatting and Streams
 
-#### Executive Summary: Output Discipline
+### Executive Summary: Output Discipline
 
 The author enforces a **zero-tolerance policy for uncontrolled output** and implements a **strict, single-typed, stream-isolated communication model**. This is not merely stylistic preference but a **core reliability requirement** driven by the function’s role as a **reusable tool** in **v1.0 PowerShell environments** when applicable.
 
@@ -1472,7 +1472,7 @@ This creates a **predictable, composable, and debuggable** interface that works 
 
 ---
 
-#### Primary Output: Integer Status Code via `return`
+### Primary Output: Integer Status Code via `return`
 
 The **only value returned from the function** is a **single `[int]` status code**:
 
@@ -1502,7 +1502,7 @@ This status code serves as the **function’s contract** — a machine-readable 
 
 ---
 
-#### Processing Collections in Modern Functions (Streaming Output)
+### Processing Collections in Modern Functions (Streaming Output)
 
 A modern (non-v1.0) function **should not** build a large collection (like a `List<T>`) and return it at the end. This is memory-inefficient, as it requires holding all results in memory, and often creates an unnecessary O(n) performance hit when the list is copied.
 
@@ -1544,7 +1544,7 @@ This rule is distinct from the v1.0-native pattern, which uses explicit integer 
 
 ---
 
-#### Complex Output: Reference Parameters (`[ref]`)
+### Complex Output: Reference Parameters (`[ref]`)
 
 All **structured data** is returned via **`[ref]` parameters** only when write-back to the caller is required:
 
@@ -1570,7 +1570,7 @@ $status   = 4
 
 ---
 
-#### Stream Usage: Forensic Mapping
+### Stream Usage: Forensic Mapping
 
 The author uses **exactly three output Streams**, each with a **single, immutable purpose**:
 
@@ -1584,7 +1584,7 @@ The author uses **exactly three output Streams**, each with a **single, immutabl
 
 ---
 
-#### Warning Stream: Diagnostic Beacon
+### Warning Stream: Diagnostic Beacon
 
 `Write-Warning` is used **sparingly and surgically** for **logically impossible states**:
 
@@ -1603,7 +1603,7 @@ These warnings are **never suppressed** and serve as **forensic breadcrumbs** fo
 
 ---
 
-#### Host Stream: Deliberately Disabled
+### Host Stream: Deliberately Disabled
 
 **No output ever goes to the host console** via:
 
@@ -1619,7 +1619,7 @@ These warnings are **never suppressed** and serve as **forensic breadcrumbs** fo
 
 ---
 
-#### Output Type Consistency: Single-Type Guarantee
+### Output Type Consistency: Single-Type Guarantee
 
 The function **never emits mixed object types**. The only object that can leave via the success stream is the **integer status code**.
 
@@ -1638,7 +1638,7 @@ This enables:
 
 ---
 
-#### Format Files: Future-Proof Design Pattern
+### Format Files: Future-Proof Design Pattern
 
 While not implemented in this v1.0 script, the author’s design **anticipates** the use of **`.format.ps1xml` files** for custom object display:
 
@@ -1662,7 +1662,7 @@ While not implemented in this v1.0 script, the author’s design **anticipates**
 
 ---
 
-#### Stream Interaction Matrix
+### Stream Interaction Matrix
 
 | Caller Context | Success Stream | Warning Stream | Host Stream |
 |----------------|----------------|----------------|-------------|
@@ -1672,7 +1672,7 @@ While not implemented in this v1.0 script, the author’s design **anticipates**
 
 ---
 
-#### Modern Stream Capabilities (v2.0+ Context)
+### Modern Stream Capabilities (v2.0+ Context)
 
 In PowerShell v2.0+, the author would likely add:
 
@@ -1695,7 +1695,7 @@ But in **v1.0**, these are **deliberately omitted** — not due to ignorance, bu
 
 ---
 
-#### Summary: Output as Controlled Interface
+### Summary: Output as Controlled Interface
 
 The output formatting and stream usage represent **military-grade interface discipline**:
 
@@ -1714,14 +1714,14 @@ This creates a **fortified boundary** between the function and its environment:
 
 The absence of `Write-Host` and mixed output types is not a limitation — it is **evidence of mastery** over PowerShell’s output model and a deliberate choice for **maximum reliability** in v1.0 environments.
 
-#### Choosing Between Warning and Debug Streams
+### Choosing Between Warning and Debug Streams
 
 The choice of output stream is critical for communicating intent:
 
 - **Warning Stream (`Write-Warning`):** Reserved for logical anomalies or conditions that the **end-user** should be aware of, but which do not halt execution (e.g., "Could not determine root user email for account X").
 - **Debug Stream (`Write-Debug`):** Used for logging **internal function details** that are not relevant to the end-user but are critical for diagnostics. This includes handled `catch` block errors, or fallback logic (e.g., "Failed to create generic lists; falling back to ArrayLists.").
 
-#### Suppression of Method Output
+### Suppression of Method Output
 
 When calling .NET methods that return a value (like `System.Collections.ArrayList.Add()`), that output must be suppressed to avoid polluting the pipeline. The preferred method is to cast the entire statement to `[void]` for performance, as it is measurably faster than piping to `| Out-Null`.
 
@@ -1733,9 +1733,9 @@ When calling .NET methods that return a value (like `System.Collections.ArrayLis
 $list.Add($item) | Out-Null
 ```
 
-### Performance, Security, and Other
+## Performance, Security, and Other
 
-#### Executive Summary: Holistic Design Constraints
+### Executive Summary: Holistic Design Constraints
 
 The author operates under **three immutable design pillars** that govern every decision in performance, security, and auxiliary behavior:
 
@@ -1747,11 +1747,11 @@ These constraints create a **highly constrained optimization space** where perfo
 
 ---
 
-#### Performance: Measured Pragmatism
+### Performance: Measured Pragmatism
 
 The author adopts a **"measure, then optimize"** philosophy, but within v1.0 constraints, **measurement is limited**. No `Measure-Command` or profiling cmdlets exist in v1.0, so performance decisions are based on **algorithmic complexity analysis** and **known PowerShell behavioral characteristics**.
 
-##### Key Performance Characteristics
+#### Key Performance Characteristics
 
 | Operation | Complexity | Forensic Rationale |
 |---------|------------|------------------|
@@ -1762,7 +1762,7 @@ The author adopts a **"measure, then optimize"** philosophy, but within v1.0 con
 
 **Total worst-case complexity**: **O(n)** where *n* is input string length.
 
-##### Performance-Critical Paths
+#### Performance-Critical Paths
 
 1. **Literal string splitting**  
    Uses `[regex]::Escape()` + `[regex]::Split()` instead of `-split` operator  
@@ -1778,7 +1778,7 @@ The author adopts a **"measure, then optimize"** philosophy, but within v1.0 con
    On first successful parse, **excess segments are stored** and processing halts  
    Prevents unnecessary type conversion attempts
 
-##### Performance Trade-offs
+#### Performance Trade-offs
 
 | Trade-off | Decision | Forensic Justification |
 |---------|----------|------------------------|
@@ -1790,11 +1790,11 @@ The author adopts a **"measure, then optimize"** philosophy, but within v1.0 con
 
 ---
 
-#### Security: Defense-in-Depth by Design
+### Security: Defense-in-Depth by Design
 
 The function processes **untrusted inputs** (e.g., from external sources). The security model is **input-agnostic and side-effect-free**.
 
-##### Security Posture
+#### Security Posture
 
 | Threat Vector | Mitigation | Forensic Evidence |
 |---------------|-----------|-------------------|
@@ -1804,14 +1804,14 @@ The function processes **untrusted inputs** (e.g., from external sources). The s
 | **Information disclosure** | No `Write-Host` | Only Warning stream for anomalies |
 | **Privilege escalation** | No external calls | Pure .NET type usage |
 
-##### Secure-by-Default Patterns
+#### Secure-by-Default Patterns
 
 1. **No file/registry access** → eliminates path-based attacks
 2. **No `Invoke-Expression`** → prevents code injection
 3. **No external processes** → no command execution
 4. **All .NET interop is read-only** → `[regex]`, `[version]`, `[Numerics.BigInteger]`
 
-##### Credential Handling (Inferred)
+#### Credential Handling (Inferred)
 
 While not present, the author’s pattern suggests future security handling would use:
 
@@ -1826,9 +1826,9 @@ With **SecureString** and **never** clear-text storage.
 
 ---
 
-#### Other: Maintainability, Extensibility, and Modernization
+### Other: Maintainability, Extensibility, and Modernization
 
-##### Maintainability: High Cohesion, Controlled Coupling
+#### Maintainability: High Cohesion, Controlled Coupling
 
 | Aspect | Implementation | Forensic Benefit |
 |-------|----------------|------------------|
@@ -1837,7 +1837,7 @@ With **SecureString** and **never** clear-text storage.
 | **Helper consolidation needed** | Duplicate error functions | **Action item**: nest in parent scope |
 | **Versioned internally** | `.NOTES: Version: 1.0.20250218.0` | Change tracking |
 
-##### Extensibility Points
+#### Extensibility Points
 
 | Extension | Method | v1.0 Compatibility |
 |---------|--------|-------------------|
@@ -1845,7 +1845,7 @@ With **SecureString** and **never** clear-text storage.
 | **Strict mode** | Add switch `[switch]$Strict` | Yes |
 | **Output object** | Return `[pscustomobject]` | No (requires v2.0+) |
 
-##### Modernization Path (v2.0+)
+#### Modernization Path (v2.0+)
 
 If v1.0 compatibility were not required, the author would likely:
 
@@ -1874,7 +1874,7 @@ process {
 
 ---
 
-#### Summary: Performance, Security, and Holistic Design
+### Summary: Performance, Security, and Holistic Design
 
 The **Performance, Security, and Other** aspects reveal a **mature, constrained optimization**:
 
