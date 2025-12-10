@@ -1,4 +1,4 @@
-```markdown
+````markdown
 # PowerShell Writing Style
 
 ## Executive Summary: Author Profile
@@ -17,17 +17,17 @@ The layout emphasizes scannability, consistency, and readability, following comm
 >
 > **Compliant `if/else`:**
 >
-> \```powershell
+> ```powershell
 > if ($condition) {
 >     # ...
 > } else {
 >     # ...
 > }
-> \```
+> ```
 >
 > **Compliant `try/catch`:**
 >
-> \```powershell
+> ```powershell
 > try {
 >     # ...
 > } catch {
@@ -35,14 +35,14 @@ The layout emphasizes scannability, consistency, and readability, following comm
 > } finally {
 >     # ...
 > }
-> \```
+> ```
 
 Whitespace is used precisely to enhance clarity: a single space surrounds operators (e.g., -gt, =, -and, -eq) and follows commas in parameter lists or arrays, with no unnecessary spaces inside parentheses, brackets, or subexpressions. Line terminators avoid semicolons entirely, as they are unnecessary and can complicate edits. Line continuation eschews backticks, preferring natural breaks at operators, pipes, or commas where possible—though in v1.0-focused code, long lines (e.g., in comments or regex patterns) are tolerated for completeness. Line lengths aim for under 115 characters where practical, but verbose comments may exceed this; this is acceptable per flexible guidelines, as it prioritizes detailed explanations without sacrificing core code readability.
 
 - **Operator Alignment:** Use **exactly one space** on either side of an operator (e.g., `=`, `-eq`). Do not add extra whitespace to vertically align operators across multiple lines. This ensures compliance with standard PSScriptAnalyzer rules.
 - **Multi-line Method Indentation:** When a method call (like `.Add()`) is wrapped (e.g., in a `[void]` cast) and its parameter is a multi-line script block (like a hashtable or `[pscustomobject]`), an **additional** level of indentation is required for the contents of that script block.
 
-\```powershell
+```powershell
 [void]($list.Add(
         [pscustomobject]@{
             # This line is indented three times:
@@ -52,13 +52,13 @@ Whitespace is used precisely to enhance clarity: a single space surrounds operat
             Key = $Value
         }
     ))
-\```
+```
 
 Blank lines are used sparingly but effectively: two surround function definitions for visual separation, and single blanks group related logic within functions (e.g., before a block comment or between setup and main logic). Files end with a single blank line. Regions (#region ... #endregion) logically group elements like licenses or helper sections, improving navigability in larger scripts.
 
 Example snippet illustrating bracing, indentation, spacing, and blank lines:
 
-\```powershell
+```powershell
 function ExampleFunction {
     param (
         [string]$ParamOne
@@ -72,32 +72,32 @@ function ExampleFunction {
 
     return 0
 }
-\```
+```
 
 - **Variable Delimiting in Strings:** When a variable in an expandable string (`"..."`) is immediately followed by punctuation (especially a colon `:`) or other text that is not part of the variable name, it can cause parsing errors.
   - **Non-Compliant (Ambiguous):**
 
-    \```powershell
+    ```powershell
     $strMessage = "$SSORegion: Error occurred"
-    \```
+    ```
 
   - **Compliant (Preferred):** Use curly braces to explicitly delimit the variable name:
 
-    \```powershell
+    ```powershell
     $strMessage = "${SSORegion}: Error occurred"
-    \```
+    ```
 
   - **Compliant (Also Preferred):** Use the `-f` format operator, which avoids all parsing ambiguity.
 
-    \```powershell
+    ```powershell
     $strMessage = ("{0}: Error occurred" -f $SSORegion)
-    \```
+    ```
 
   - **Compliant (Acceptable):** Use string concatenation.
 
-    \```powershell
+    ```powershell
     $strMessage = ($SSORegion + ': Error occurred')
-    \```
+    ```
 
 ## Capitalization and Naming Conventions
 
@@ -131,9 +131,9 @@ This consistent application creates a visual hierarchy that allows rapid compreh
 
 Using approved verbs is a core PowerShell convention that ensures discoverability and consistency. You can always retrieve the complete list of approved verbs by running the following command:
 
-\```powershell
+```powershell
 Get-Verb
-\```
+```
 
 If a verb (like `Review` or `Check`) is not on this list, you must choose the closest approved alternative, such as `Get-` (to retrieve information) or `Test-` (to return a boolean).
 
@@ -427,9 +427,9 @@ The author **avoids relative paths** (`.`, `..`) and the **home directory shortc
 
 Instead, **explicit scoping** is used:
 
-\```powershell
+```powershell
 $global:ErrorActionPreference
-\```
+```
 
 For shared state, the author would use:
 
@@ -496,7 +496,7 @@ All functions include **full comment-based help** using **single-line comments**
 
 **Example of complete help block** (from a generic parsing function):
 
-\```powershell
+```powershell
 # .SYNOPSIS
 # Processes a string input with flexible handling of non-standard formats.
 # .DESCRIPTION
@@ -512,7 +512,7 @@ All functions include **full comment-based help** using **single-line comments**
 # [int] Status code: 0=success, 1-5=partial success with extras, -1=failure
 # .NOTES
 # Supports positional parameters. Version: 1.0.20250218.0
-\```
+```
 
 ---
 
@@ -542,13 +542,13 @@ Inline comments are **sparse but surgical**, focusing exclusively on **"why"** r
 
 **Examples**:
 
-\```powershell
+```powershell
 # Retrieve the newest error on the stack prior to doing work
 $refLastKnownError = Get-ReferenceToLastError
 
 # Set ErrorActionPreference to SilentlyContinue; this will suppress error output...
 $global:ErrorActionPreference = [System.Management.Automation.ActionPreference]::SilentlyContinue
-\```
+```
 
 No redundant comments (e.g., `# Increment i by 1`) appear—code is considered self-documenting when possible.
 
@@ -558,7 +558,7 @@ No redundant comments (e.g., `# Increment i by 1`) appear—code is considered s
 
 The script uses **`#region` / `#endregion`** blocks to create **logical code folding**:
 
-\```powershell
+```powershell
 #region License ########################################################
 # Full MIT-style license
 #endregion License ########################################################
@@ -567,7 +567,7 @@ The script uses **`#region` / `#endregion`** blocks to create **logical code fol
 # Get-ReferenceToLastError
 # Test-ErrorOccurred
 #endregion FunctionsToSupportErrorHandling ############################
-\```
+```
 
 In addition to top-level script regions, this pattern can be applied inside individual functions:
 
@@ -593,10 +593,10 @@ All distributable functions and scripts must include a version number in the `.N
 
 **Compliant Example:**
 
-\```powershell
+```powershell
 # .NOTES
 # Version: 1.2.20251103.0
-\```
+```
 
 This example assumes that the current date is November 3, 2025. In any code you write, use the current date in place of November 3, 2025.
 
@@ -614,14 +614,14 @@ Parameter help is **centralized in the comment-based help block**, not duplicate
 
 **Alternative considered (but not used)**: Inline comments above each parameter:
 
-\```powershell
+```powershell
 param (
     # Reference to store the result object
     [ref]$ReferenceToResultObject,
     # Array to store extra strings
     [ref]$ReferenceArrayOfExtraStrings
 )
-\```
+```
 
 **Pros**: Immediate proximity  
 **Cons**: Risk of desync, visual noise  
@@ -687,7 +687,7 @@ This creates a **C-style procedural model** within PowerShell, prioritizing **co
 
 All functions follow a **strict, uniform template**:
 
-\```powershell
+```powershell
 function Verb-Noun {
     # Full comment-based help block
     param (
@@ -697,7 +697,7 @@ function Verb-Noun {
     # Implementation
     return $statusCode
 }
-\```
+```
 
 **Key characteristics**:
 
@@ -743,10 +743,10 @@ In this scenario, the parameter should be left **un-typed** (or explicitly typed
 
 **Default values** are used judiciously:
 
-\```powershell
+```powershell
 [string]$StringToProcess = '',
 [version]$PSVersion = ([version]'0.0')
-\```
+```
 
 This ensures the function can be called with minimal arguments while maintaining type safety.
 
@@ -769,10 +769,10 @@ Every function returns a **single integer status code** via explicit `return` st
 3. **v1.0 compatibility** — `return` works identically in all versions
 4. **Caller control** — status code can be stored, tested, or ignored
 
-\```powershell
+```powershell
 $status = Process-String ([ref]$result) ([ref]$extras) $input
 if ($status -eq 0) { ... }  # Full success
-\```
+```
 
 This pattern creates a **C-style error code contract** that is immediately familiar to systems programmers.
 
@@ -782,10 +782,10 @@ This pattern creates a **C-style error code contract** that is immediately famil
 
 Functions use **`[ref]` parameters** to return complex data only when write-back is required:
 
-\```powershell
+```powershell
 [ref]$ReferenceToResultObject     → [object]
 [ref]$ReferenceArrayOfExtraStrings → [string[]]
-\```
+```
 
 **Advantages**:
 
@@ -796,11 +796,11 @@ Functions use **`[ref]` parameters** to return complex data only when write-back
 
 **Example post-call state**:
 
-\```powershell
+```powershell
 $result = processed value
 $extras = @('','', '', 'extra', '')
 $status = 4
-\```
+```
 
 ---
 
@@ -826,13 +826,13 @@ In scripts requiring modern PowerShell, pipeline support is added as needed.
 
 Functions support **positional parameter binding** for v1.0 usability:
 
-\```powershell
+```powershell
 # Named parameters
 Process-String ([ref]$r) ([ref]$e) $str
 
 # Positional parameters (documented in .NOTES)
 Process-String ([ref]$r) ([ref]$e) $str $psver
-\```
+```
 
 This enables:
 
@@ -888,7 +888,7 @@ Functions written in this "Modern Advanced" style **MUST** adhere to the followi
 
 **Example of a Compliant Modern Function:**
 
-\```powershell
+```powershell
 function Get-ModernData {
     [CmdletBinding()]
     [OutputType([pscustomobject])]
@@ -914,7 +914,7 @@ function Get-ModernData {
         }
     }
 }
-\```
+```
 
 **Benefits**: Pipeline-friendly, discoverable
 
@@ -928,7 +928,7 @@ An exception to this rule is **required** when you must *surgically suppress* th
 
 In this specific scenario, you **MUST** use the following pattern to temporarily set `$VerbosePreference` and guarantee it is restored, even if the command fails:
 
-\```powershell
+```powershell
 # Save the user's current preference
 $VerbosePreferenceAtStartOfBlock = $VerbosePreference
 
@@ -956,7 +956,7 @@ try {
     # even if the 'catch' block runs and throws an error.
     $VerbosePreference = $VerbosePreferenceAtStartOfBlock
 }
-\```
+```
 
 This `try/finally` pattern is robust, safe, and compliantly achieves your goal of controlling output from third-party cmdlets.
 
@@ -1005,12 +1005,12 @@ To ensure the result is **always** an array (even if empty or with a single item
 
 **Compliant `.EXAMPLE`:**
 
-\```powershell
+```powershell
 # .EXAMPLE
 # This example shows how to safely call the function and guarantee the
 # result is an array, even if only one principal is returned.
 $arrPrincipals = @(Expand-TrustPrincipal -PrincipalNode $statement.Principal)
-\```
+```
 
 ---
 
@@ -1059,13 +1059,13 @@ The author uses **two complementary v1.0-native suppression techniques**:
 | **`trap { }`** | Empty trap block at function scope | Catches **terminating errors** (e.g., type cast failures) and prevents script termination |
 | **`$global:ErrorActionPreference = 'SilentlyContinue'`** | Temporarily set before risky operation, restored immediately after | Suppresses **non-terminating error output** to host |
 
-\```powershell
+```powershell
 trap { }  # Intentional error suppression
 $originalPref = $global:ErrorActionPreference
 $global:ErrorActionPreference = [System.Management.Automation.ActionPreference]::SilentlyContinue
 # Risky operation here
 $global:ErrorActionPreference = $originalPref  # State restoration
-\```
+```
 
 **Key characteristics**:
 
@@ -1084,12 +1084,12 @@ The author **rejects unreliable heuristics** (`$?`, `$Error[0].Exception`, null 
 
 **Detection workflow**:
 
-\```powershell
+```powershell
 $refBefore = Get-ReferenceToLastError    # Snapshot pre-operation
 # ... perform risky operation ...
 $refAfter = Get-ReferenceToLastError     # Snapshot post-operation
 $errorOccurred = Test-ErrorOccurred $refBefore $refAfter
-\```
+```
 
 **Reference comparison logic**:
 
@@ -1106,7 +1106,7 @@ This eliminates false positives from `$error` array clearing and ensures **100% 
 
 Every type conversion or risky operation follows this **exact atomic pattern**:
 
-\```powershell
+```powershell
 function Convert-Safely {
     param([ref]$refOutput, [string]$input)
 
@@ -1122,7 +1122,7 @@ function Convert-Safely {
 
     return (-not (Test-ErrorOccurred $refBefore $refAfter))
 }
-\```
+```
 
 **Key guarantees**:
 
@@ -1137,9 +1137,9 @@ function Convert-Safely {
 
 The author uses `Write-Warning` **sparingly and surgically** to flag **logically impossible states**:
 
-\```powershell
+```powershell
 Write-Warning -Message 'Conversion failed even though individual parts succeeded. This should not be possible!'
-\```
+```
 
 **Purpose**:
 
@@ -1159,12 +1159,12 @@ Despite suppression, **full error context is preserved** in the global `$Error` 
 - Stack trace, exception details, and target object are available
 - Can be inspected after execution for detailed analysis
 
-\```powershell
+```powershell
 if ($errorOccurred) {
     # Full error details available in $Error[0]
     $lastError = $Error[0]
 }
-\```
+```
 
 ---
 
@@ -1185,14 +1185,14 @@ The v1.0 pattern is **functionally equivalent** but **more verbose** and **dupli
 
 In modern functions using `try/catch` (i.e., those not targeting v1.0), `catch` blocks **must not be empty**. An empty `catch` block is flagged by PSScriptAnalyzer and provides no diagnostic value. At a minimum, the error should be logged to the **Debug** stream, as it represents an *internal, handled* failure.
 
-\```powershell
+```powershell
 # Compliant
 try {
     ...
 } catch {
     Write-Debug ("Failed to do X: {0}" -f ($_.Exception.Message -or $_.ToString()))
 }
-\```
+```
 
 ---
 
@@ -1230,7 +1230,7 @@ The strategy transforms potentially version-breaking operations (e.g., handling 
 
 The author implements a **dedicated version probe** that returns a `[System.Version]` object representing the executing PowerShell runtime:
 
-\```powershell
+```powershell
 function Get-PSVersion {
     if (Test-Path variable:\PSVersionTable) {
         return $PSVersionTable.PSVersion
@@ -1238,7 +1238,7 @@ function Get-PSVersion {
         return [version]'1.0'
     }
 }
-\```
+```
 
 **Analysis of detection logic**:
 
@@ -1262,7 +1262,7 @@ This function serves as the **central version oracle** for all conditional logic
 
 The author uses **PowerShell version as a feature flag** to enable increasingly capable .NET types for handling edge cases like numeric overflow:
 
-\```powershell
+```powershell
 if ($versionPS.Major -ge 3) {
     # Use BigInteger (available in .NET 4.0+, loaded in PS v3+)
     $boolResult = Convert-StringToBigIntegerSafely ...
@@ -1270,7 +1270,7 @@ if ($versionPS.Major -ge 3) {
     # Fall back to double
     $boolResult = Convert-StringToDoubleSafely ...
 }
-\```
+```
 
 **Progressive enhancement stack**:
 
@@ -1300,20 +1300,20 @@ The author uses **direct .NET interop** in controlled scenarios:
 
 **Example: Literal string splitting**:
 
-\```powershell
+```powershell
 $strSplitterInRegEx = [regex]::Escape($Splitter)
 $result = [regex]::Split($StringToSplit, $strSplitterInRegEx)
-\```
+```
 
 **Typed Generic Collections:** When instantiating generic .NET collections, such as `System.Collections.Generic.List[T]`, the specific type `T` **must be provided** if known (e.g., `[PSCustomObject]`, `[string]`). This is more precise, safer, and more descriptive than using the generic `[object]`.
 
-\```powershell
+```powershell
 # Compliant (Preferred)
 $listAttached = New-Object System.Collections.Generic.List[PSCustomObject]
 
 # Non-Compliant (Vague)
 $listAttached = New-Object System.Collections.Generic.List[object]
-\```
+```
 
 **Advantages**:
 
@@ -1327,13 +1327,13 @@ $listAttached = New-Object System.Collections.Generic.List[object]
 
 The author implements a **defense-in-depth conversion chain** for numeric strings:
 
-\```powershell
+```powershell
 # 1. Try int32 (safe, fast)
 # 2. If overflow → try int64
 # 3. If still overflow and PS v3+ → try BigInteger
 # 4. If still overflow or PS v1.0 → try double
 # 5. If all fail → treat as non-numeric
-\```
+```
 
 Each step uses the **atomic error handling pattern** (trap + preference toggle + reference comparison) to:
 
@@ -1348,13 +1348,13 @@ Each step uses the **atomic error handling pattern** (trap + preference toggle +
 
 Functions use version detection to **bypass expensive checks** when possible:
 
-\```powershell
+```powershell
 if ($PSVersion -eq ([version]'0.0')) {
     $versionPS = Get-PSVersion  # Detect if not provided
 } else {
     $versionPS = $PSVersion     # Use caller-provided value
 }
-\```
+```
 
 **Benefits**:
 
@@ -1376,9 +1376,9 @@ The author **avoids all relative path notation** and the `~` shortcut:
 
 **Preferred pattern**:
 
-\```powershell
+```powershell
 $global:ErrorActionPreference = 'SilentlyContinue'
-\```
+```
 
 For file paths, the author would use:
 
@@ -1451,11 +1451,11 @@ This creates a **predictable, composable, and debuggable** interface that works 
 
 The **only value returned from the function** is a **single `[int]` status code**:
 
-\```powershell
+```powershell
 return 0    # Full success
 return 4    # Partial success
 return -1   # Complete failure
-\```
+```
 
 **Key characteristics**:
 
@@ -1468,10 +1468,10 @@ return -1   # Complete failure
 
 **Documented in `.OUTPUTS`**:
 
-\```powershell
+```powershell
 # .OUTPUTS
 # [int] Status code: 0=success, 1-5=partial with additional data, -1=failure
-\```
+```
 
 This status code serves as the **function’s contract** — a machine-readable indicator of outcome.
 
@@ -1488,7 +1488,7 @@ The preferred, idiomatic PowerShell pattern is to **"stream" the output**: write
 
 **Compliant (Streaming) Example:**
 
-\```powershell
+```powershell
 [CmdletBinding()]
 [OutputType([pscustomobject])]
 param(...)
@@ -1498,11 +1498,11 @@ foreach ($objItem in $SourceData) {
     $objResult # This writes the object to the pipeline
 }
 # Note: There is no 'return' statement for the collection
-\```
+```
 
 **Non-Compliant (Collecting) Example:**
 
-\```powershell
+```powershell
 [CmdletBinding()]
 [OutputType([pscustomobject[]])] # Unnecessary plural
 param(...)
@@ -1513,7 +1513,7 @@ foreach ($objItem in $SourceData) {
     [void]($listOutput.Add($objResult))
 }
 return $listOutput.ToArray() # Unnecessary copy and non-idiomatic
-\```
+```
 
 This rule is distinct from the v1.0-native pattern, which uses explicit integer `return` codes and passes data via `[ref]` parameters. The v1.0-native pattern may be desireable in situations where the function should return no output in the event of any error occurring during processing, or where error/warning status needs to be passed back to the caller.
 
@@ -1523,10 +1523,10 @@ This rule is distinct from the v1.0-native pattern, which uses explicit integer 
 
 All **structured data** is returned via **`[ref]` parameters** only when write-back to the caller is required:
 
-\```powershell
+```powershell
 [ref]$ReferenceToResultObject        → [object]
 [ref]$ReferenceArrayOfExtraStrings → [string[]]
-\```
+```
 
 **Advantages**:
 
@@ -1537,11 +1537,11 @@ All **structured data** is returned via **`[ref]` parameters** only when write-b
 
 **Post-call state example**:
 
-\```powershell
+```powershell
 $result = processed value
 $extras = @('','', '', 'extra', '')
 $status   = 4
-\```
+```
 
 ---
 
@@ -1563,9 +1563,9 @@ The author uses **exactly three output Streams**, each with a **single, immutabl
 
 `Write-Warning` is used **sparingly and surgically** for **logically impossible states**:
 
-\```powershell
+```powershell
 Write-Warning -Message 'Conversion of string failed even though valid. This should not be possible!'
-\```
+```
 
 **Purpose**:
 
@@ -1600,10 +1600,10 @@ The function **never emits mixed object types**. The only object that can leave 
 
 **Guarantee**:
 
-\```powershell
+```powershell
 $result = Process-String ...
 $result.GetType().FullName  # Always "System.Int32"
-\```
+```
 
 This enables:
 
@@ -1617,7 +1617,7 @@ This enables:
 
 While not implemented in this v1.0 script, the author’s design **anticipates** the use of **`.format.ps1xml` files** for custom object display:
 
-\```xml
+```xml
 <!-- Hypothetical modulename.format.ps1xml -->
 <Type>
   <Name>ProcessingResult</Name>
@@ -1627,7 +1627,7 @@ While not implemented in this v1.0 script, the author’s design **anticipates**
     <NoteProperty Name="Extras" Type="string[]" />
   </Members>
 </Type>
-\```
+```
 
 **Design considerations**:
 
@@ -1651,14 +1651,14 @@ While not implemented in this v1.0 script, the author’s design **anticipates**
 
 In PowerShell v2.0+, the author would likely add:
 
-\```powershell
+```powershell
 [CmdletBinding()]
 param(...)
 process {
     Write-Verbose "Attempting operation on $StringToProcess"
     Write-Debug   "Pre-operation error count: $($Error.Count)"
 }
-\```
+```
 
 **Streams enabled**:
 
@@ -1700,13 +1700,13 @@ The choice of output stream is critical for communicating intent:
 
 When calling .NET methods that return a value (like `System.Collections.ArrayList.Add()`), that output must be suppressed to avoid polluting the pipeline. The preferred method is to cast the entire statement to `[void]` for performance, as it is measurably faster than piping to `| Out-Null`.
 
-\```powershell
+```powershell
 # Compliant (Preferred for performance)
 [void]($list.Add($item))
 
 # Non-Compliant (Typically slower than casting to void)
 $list.Add($item) | Out-Null
-\```
+```
 
 ## Performance, Security, and Other
 
@@ -1790,10 +1790,10 @@ The function processes **untrusted inputs** (e.g., from external sources). The s
 
 While not present, the author’s pattern suggests future security handling would use:
 
-\```powershell
+```powershell
 [Parameter()]
 [PSCredential]$Credential
-\```
+```
 
 With **SecureString** and **never** clear-text storage.
 
@@ -1824,7 +1824,7 @@ With **SecureString** and **never** clear-text storage.
 
 If v1.0 compatibility were not required, the author would likely:
 
-\```powershell
+```powershell
 [CmdletBinding()]
 [OutputType([PSCustomObject])]
 param(
@@ -1837,7 +1837,7 @@ process {
         Extras = $extras
     }
 }
-\```
+```
 
 **Benefits**:
 
@@ -1862,4 +1862,4 @@ The **Performance, Security, and Other** aspects reveal a **mature, constrained 
 The function is a **minimal, maximalist** design: it does **exactly one thing**, does it **perfectly**, and **refuses to do anything else**. This is the hallmark of **industrial-grade PowerShell tooling** — code that can be deployed in 2006 or 2026 with identical behavior when compatible.
 
 **Final Assessment**: **"Fit for purpose across 18 years of PowerShell evolution."**
-```
+````
