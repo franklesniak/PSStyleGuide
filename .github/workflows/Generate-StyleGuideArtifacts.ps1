@@ -82,6 +82,7 @@ function New-StyleGuideChatVersion {
         $strContent = Get-Content -Path $SourcePath -Raw -Encoding UTF8
         
         # Find the maximum number of consecutive backticks in the content
+        # The pattern '``+' matches one or more backticks (escaped as `` in PowerShell strings)
         $strBacktickPattern = '``+'
         $arrMatches = [regex]::Matches($strContent, $strBacktickPattern)
         $intMaxBackticks = 0
@@ -90,7 +91,9 @@ function New-StyleGuideChatVersion {
             $intMaxBackticks = $objMeasurement.Maximum
         }
         
-        # Use one more backtick than the maximum found (minimum of 4 for readability)
+        # Use one more backtick than the maximum found to ensure the outer fence is longer
+        # than any inner fence (per CommonMark spec). Minimum of 4 for readability and to
+        # ensure proper nesting even if the content only has single or double backticks.
         $intOuterFenceLength = [Math]::Max(4, $intMaxBackticks + 1)
         $strOuterFence = '`' * $intOuterFenceLength
         
