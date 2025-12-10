@@ -51,7 +51,7 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add STYLE_GUIDE_COPILOT.md STYLE_GUIDE_CHAT.md
+          git add copilot-instructions.md STYLE_GUIDE_CHAT.md
           git commit -m "chore: update generated style guide artifacts [skip ci]"
           git push
       
@@ -60,5 +60,5 @@ jobs:
         with:
           name: style-guide-artifacts
           path: |
-            STYLE_GUIDE_COPILOT.md
+            copilot-instructions.md
             STYLE_GUIDE_CHAT.md

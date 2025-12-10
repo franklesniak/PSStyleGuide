@@ -2,11 +2,11 @@
 
 <#
 .SYNOPSIS
-Generates STYLE_GUIDE_COPILOT.md and STYLE_GUIDE_CHAT.md from STYLE_GUIDE.md.
+Generates copilot-instructions.md and STYLE_GUIDE_CHAT.md from STYLE_GUIDE.md.
 
 .DESCRIPTION
 This script reads STYLE_GUIDE.md and creates two derived files:
-- STYLE_GUIDE_COPILOT.md: A direct copy of STYLE_GUIDE.md
+- copilot-instructions.md: A direct copy of STYLE_GUIDE.md for use as GitHub Copilot custom instructions
 - STYLE_GUIDE_CHAT.md: A chat-ready version with escaped triple backticks wrapped in a markdown code fence
 
 .EXAMPLE
@@ -19,13 +19,13 @@ This script follows the PowerShell style guide conventions defined in this repos
 function New-StyleGuideCopilotVersion {
     <#
     .SYNOPSIS
-    Creates STYLE_GUIDE_COPILOT.md as a direct copy of STYLE_GUIDE.md.
+    Creates copilot-instructions.md as a direct copy of STYLE_GUIDE.md.
 
     .PARAMETER SourcePath
     Path to the source STYLE_GUIDE.md file.
 
     .PARAMETER DestinationPath
-    Path to the destination STYLE_GUIDE_COPILOT.md file.
+    Path to the destination copilot-instructions.md file.
 
     .OUTPUTS
     Returns 0 on success, 1 on failure.
@@ -44,7 +44,7 @@ function New-StyleGuideCopilotVersion {
         Write-Host "Successfully created $DestinationPath"
         return 0
     } catch {
-        Write-Error "Failed to create STYLE_GUIDE_COPILOT.md: $_"
+        Write-Error "Failed to create copilot-instructions.md: $_"
         return 1
     }
 }
@@ -97,7 +97,7 @@ function New-StyleGuideChatVersion {
 
 # Main execution
 $strSourceFile = "STYLE_GUIDE.md"
-$strCopilotFile = "STYLE_GUIDE_COPILOT.md"
+$strCopilotFile = "copilot-instructions.md"
 $strChatFile = "STYLE_GUIDE_CHAT.md"
 
 # Verify source file exists
@@ -106,7 +106,7 @@ if (-not (Test-Path -Path $strSourceFile)) {
     exit 1
 }
 
-# Generate STYLE_GUIDE_COPILOT.md
+# Generate copilot-instructions.md
 $intCopilotResult = New-StyleGuideCopilotVersion -SourcePath $strSourceFile -DestinationPath $strCopilotFile
 if ($intCopilotResult -ne 0) {
     exit 1
