@@ -437,16 +437,16 @@ For shared state, the author would use:
 
 This eliminates environment-dependent behavior and ensures deterministic execution.
 
-### Options for Local Variable Prefixes: Forensic Evaluation
+### Options for Local Variable Prefixes: Analysis
 
-The use of type prefixes on local variables represents a **stylistic fork** with no community-mandated "correct" answer. The guides explicitly state this is a **"matter of taste"** for private variables. Below is a forensic breakdown of the two viable paths:
+The use of type prefixes on local variables represents a **stylistic fork** with no community-mandated "correct" answer. The guides explicitly state this is a **"matter of taste"** for private variables. Below is an analysis of the two viable paths:
 
 | Option | Description | Pros | Cons |
 |-------|-------------|------|------|
 | **1. Keep Type Prefixes**<br>e.g., `$strMessage`, `$intCount` | Retain current Hungarian-style notation | • Immediate type visibility in plain text<br>• Critical in v1.0 without IDE support<br>• Reduces runtime type errors<br>• Self-documenting in large functions | • Increases visual noise<br>• Feels dated in modern editors<br>• **Intentionally longer variable names** (as abbreviations are forbidden) |
 | **2. Use Plain camelCase**<br>e.g., `$message`, `$count` | Remove prefixes, rely on context/tools | • Cleaner, more modern aesthetic<br>• Aligns with .NET naming simplicity<br>• Shorter, easier to type | • Requires IDE/IntelliSense for type clarity<br>• Risk of confusion in complex logic<br>• Less resilient in plain-text review |
 
-**Forensic Recommendation**: **Retain prefixes in v1.0-targeted code**. The clarity benefit outweighs verbosity when IDE support cannot be assumed. In v2.0+ codebases with consistent tooling, transition to plain camelCase is acceptable.
+**Recommendation**: **Retain prefixes in v1.0-targeted code**. The clarity benefit outweighs verbosity when IDE support cannot be assumed. In v2.0+ codebases with consistent tooling, transition to plain camelCase is acceptable.
 
 ### Summary: Naming as Defensive Architecture
 
@@ -465,11 +465,11 @@ This results in code that is **self-documenting**, **resilient to change**, and 
 
 The author treats **documentation as a first-class citizen** of the codebase, embedding comprehensive, structured, and immediately actionable information directly within every function—regardless of scope, complexity, or visibility. This is not an afterthought but a **core engineering principle**: code must be **self-explanatory** to any consumer, even in the absence of external manuals, IDE tooltips, or prior knowledge. The documentation strategy is **v1.0-native** in compatible scripts, relying exclusively on PowerShell’s original comment-based help system (introduced in v1.0) without dependence on newer features like `[CmdletBinding()]`, `Get-Help` enhancements in v2.0+, or external XML help files. In scripts requiring modern PowerShell due to dependencies, the author incorporates these newer help features as appropriate.
 
-Every function—**including nested private helpers**—receives **identical treatment** in documentation rigor. This creates a **uniform information density** across the entire script, enabling rapid onboarding, debugging, and maintenance. The documentation serves three forensic audiences:
+Every function—**including nested private helpers**—receives **identical treatment** in documentation rigor. This creates a **uniform information density** across the entire script, enabling rapid onboarding, debugging, and maintenance. The documentation serves three distinct audiences:
 
 1. **End users** (via `Get-Help`)
 2. **Script maintainers** (via inline context)
-3. **Forensic analysts** (via complete behavioral contracts)
+3. **Code reviewers** (via complete behavioral contracts)
 
 ---
 
@@ -515,9 +515,9 @@ All functions include **full comment-based help** using **single-line comments**
 
 ---
 
-### Help Content Quality: Forensic Standards
+### Help Content Quality: High Standards
 
-The documentation exceeds minimal compliance and achieves **forensic-grade completeness**:
+The documentation exceeds minimal compliance and achieves **comprehensive completeness**:
 
 1. **Behavioral Contracts**: Every possible return code is documented with **exact meaning**, **resulting state**, and **example**.
 2. **Edge Case Coverage**: Examples include:
@@ -576,7 +576,7 @@ This enables:
 
 - **Rapid navigation** in any editor
 - **Isolation of concerns** (license, helpers, core logic)
-- **Forensic reconstruction** of design intent
+- **Clear understanding** of design intent
 
 ---
 
@@ -605,7 +605,7 @@ This example assumes that the current date is November 3, 2025. In any code you 
 
 Parameter help is **centralized in the comment-based help block**, not duplicated above individual parameters in the `param` block.
 
-**Forensic Rationale**:
+**Rationale**:
 
 - **Single source of truth** → reduces maintenance drift
 - **v1.0 compatibility** → avoids v2.0+ parameter attributes
@@ -629,7 +629,7 @@ The author’s choice prioritizes **consistency and maintainability**.
 
 ---
 
-### Help Format Options: Forensic Evaluation
+### Help Format Options: Comparison
 
 The author uses **single-line comments** (`# .SECTION`) rather than **block comments** (`<# ... #>`).
 
@@ -638,13 +638,13 @@ The author uses **single-line comments** (`# .SECTION`) rather than **block comm
 | **Single-line (`#`)** | • Granular editing<br>• Clear in diff tools<br>• No escaping issues | • More vertical space<br>• Slightly more typing |
 | **Block (`<# #>`)** | • Compact<br>• Modern aesthetic | • Harder to edit individual lines<br>• Risk of malformed blocks |
 
-**Forensic Finding**: Both are **equally valid** and **discoverable by `Get-Help`** in PowerShell v1.0+. The author’s choice of single-line format is **defensible and consistent** with the v1.0 compatibility goal.
+**Finding**: Both are **equally valid** and **discoverable by `Get-Help`** in PowerShell v1.0+. The author’s choice of single-line format is **defensible and consistent** with the v1.0 compatibility goal.
 
 ---
 
-### Summary: Documentation as Forensic Evidence
+### Summary: Documentation as Complete Specification
 
-The documentation system is **forensically complete**:
+The documentation system is **comprehensive and complete**:
 
 - **Zero ambiguity** in function contracts
 - **Full behavioral coverage** including failure modes
@@ -662,7 +662,7 @@ The author has elevated documentation from a **maintenance task** to a **core re
 
 The author designs **functions as atomic, reusable tools** with a single, well-defined purpose. Every function is a **self-contained unit of execution** that accepts input, performs a transformation or validation, and produces a **predictable, deterministic output**. This design philosophy is rooted in **PowerShell v1.0 constraints** for compatible scripts and deliberately avoids any feature introduced in v2.0 or later in those cases. The result is a **robust, portable, and highly maintainable** codebase that operates identically across all PowerShell versions from 1.0 onward when feasible. However, in scripts with external dependencies requiring newer versions (e.g., modern modules), the author incorporates appropriate features like pipeline processing or structured error handling.
 
-The forensic signature of this architecture in v1.0-targeted scripts is the **complete absence** of:
+The characteristic pattern of this architecture in v1.0-targeted scripts is the **complete absence** of:
 
 - `[CmdletBinding()]` and `[OutputType()]` attributes
 - `begin`, `process`, or `end` blocks
@@ -698,7 +698,7 @@ function Verb-Noun {
 }
 ```
 
-**Key forensic markers**:
+**Key characteristics**:
 
 1. **No `[CmdletBinding()]`** → intentional omission for v1.0 compatibility
 2. **No pipeline blocks** → `process` block would imply pipeline input, which is not supported
@@ -708,7 +708,7 @@ function Verb-Noun {
 
 ---
 
-### Parameter Block Design: Forensic Analysis
+### Parameter Block Design: Detailed Analysis
 
 The `param` block is the **primary contract** between caller and function. Every parameter is:
 
@@ -761,7 +761,7 @@ Every function returns a **single integer status code** via explicit `return` st
 | `1–5` | Partial success with additional data |
 | `-1` | Complete failure |
 
-**Forensic rationale for explicit `return`**:
+**Rationale for explicit `return`**:
 
 1. **Determinism** — only the status code is returned
 2. **No pipeline pollution** — prevents accidental object emission
@@ -786,7 +786,7 @@ Functions use **`[ref]` parameters** to return complex data only when write-back
 [ref]$ReferenceArrayOfExtraStrings → [string[]]
 ```
 
-**Forensic advantages**:
+**Advantages**:
 
 - **Multiple return values** without pipeline
 - **Caller owns memory** — no temporary objects
@@ -855,7 +855,7 @@ In v1.0 scripts, the author **emulates modern features** using v1.0 constructs:
 
 ---
 
-### Options for Return Mechanism: Forensic Evaluation
+### Options for Return Mechanism: Comparison
 
 The use of explicit `return` vs. implicit output represents a **philosophical choice**:
 
@@ -864,7 +864,7 @@ The use of explicit `return` vs. implicit output represents a **philosophical ch
 | **Explicit `return` (current)** | • Full control<br>• No accidental output<br>• v1.0 compatible<br>• Clear contract | • Not pipeline-friendly<br>• Verbose |
 | **Implicit output (modern)** | • Pipeline composable<br>• Concise | • Risk of extra objects<br>• Requires v2.0+ for safety |
 
-**Forensic verdict**: The explicit `return` pattern is **correct and optimal** for v1.0-targeted, non-pipeline tools.
+**Conclusion**: The explicit `return` pattern is **correct and optimal** for v1.0-targeted, non-pipeline tools.
 
 ---
 
@@ -1037,7 +1037,7 @@ The absence of modern features in v1.0 scripts is not a limitation—it is **evi
 
 ### Executive Summary: Error Handling Philosophy
 
-The author implements a **forensically complete, v1.0-native error handling system** in compatible scripts that is **fail-controlled, deterministic, and self-diagnosing**. This is not a workaround for missing `try/catch` (introduced in v2.0) but a **deliberately engineered reliability layer** that:
+The author implements a **complete, v1.0-native error handling system** in compatible scripts that is **fail-controlled, deterministic, and self-diagnosing**. This is not a workaround for missing `try/catch` (introduced in v2.0) but a **deliberately engineered reliability layer** that:
 
 1. **Suppresses terminating and non-terminating errors** to prevent script abortion
 2. **Detects error occurrence** with 100% accuracy using reference-based comparison
@@ -1059,14 +1059,14 @@ The author uses **two complementary v1.0-native suppression techniques**:
 | **`$global:ErrorActionPreference = 'SilentlyContinue'`** | Temporarily set before risky operation, restored immediately after | Suppresses **non-terminating error output** to host |
 
 ```powershell
-trap { }  # Forensic marker: intentional error swallowing
+trap { }  # Intentional error suppression
 $originalPref = $global:ErrorActionPreference
 $global:ErrorActionPreference = [System.Management.Automation.ActionPreference]::SilentlyContinue
 # Risky operation here
 $global:ErrorActionPreference = $originalPref  # State restoration
 ```
 
-**Forensic significance**:
+**Key characteristics**:
 
 - **No error leakage** to host → script continues
 - **State preservation** → original preference restored
@@ -1123,7 +1123,7 @@ function Convert-Safely {
 }
 ```
 
-**Forensic guarantees**:
+**Key guarantees**:
 
 - Operation is **isolated** — error cannot affect caller
 - **State is restored** — preference reset
@@ -1140,7 +1140,7 @@ The author uses `Write-Warning` **sparingly and surgically** to flag **logically
 Write-Warning -Message 'Conversion failed even though individual parts succeeded. This should not be possible!'
 ```
 
-**Forensic purpose**:
+**Purpose**:
 
 - **Diagnostic beacon** for developers
 - **Production-safe** — does not terminate execution
@@ -1156,7 +1156,7 @@ Despite suppression, **full error context is preserved** in the global `$Error` 
 
 - Original `ErrorRecord` objects remain intact
 - Stack trace, exception details, and target object are available
-- Can be inspected post-facto for forensic analysis
+- Can be inspected after execution for detailed analysis
 
 ```powershell
 if ($errorOccurred) {
@@ -1164,32 +1164,6 @@ if ($errorOccurred) {
     $lastError = $Error[0]
 }
 ```
-
----
-
-### Duplication Risk and Mitigation
-
-The error detection helpers (`Get-ReferenceToLastError`, `Test-ErrorOccurred`) are **duplicated in multiple conversion functions**.
-
-**Forensic risk assessment**:
-
-- **High maintenance debt** — bug fixes must be applied 5+ times
-- **Inconsistency potential** — divergent implementations over time
-- **Code bloat** — violates DRY principle
-
-**Recommended mitigation** (v1.0-compatible):
-
-```powershell
-function MainFunction {
-    # Define helpers ONCE in parent scope
-    function local:Get-ReferenceToLastError { ... }
-    function local:Test-ErrorOccurred { ... }
-
-    # All nested functions use shared implementations
-}
-```
-
-This eliminates duplication while preserving v1.0 compatibility.
 
 ---
 
@@ -1221,19 +1195,19 @@ try {
 
 ---
 
-### Summary: Error Handling as Forensic Instrumentation
+### Summary: Error Handling as Diagnostic Instrumentation
 
 The error handling system is a **masterclass in v1.0 reliability engineering**:
 
 - **Fail-controlled** — never crashes
 - **Self-diagnosing** — detects errors with certainty
 - **State-preserving** — restores environment
-- **Forensically complete** — preserves full error context
+- **Comprehensive** — preserves full error context
 - **Production-safe** — warnings for impossible states
 
 This is not "working around" v1.0 limitations — it is **exploiting v1.0 mechanics to achieve enterprise-grade reliability**. The system transforms potentially fatal failures into **predictable, analyzable status codes** while maintaining **zero host output** in normal operation.
 
-The only forensic weakness is **helper function duplication**, which should be consolidated into shared nested definitions to eliminate maintenance risk. With this single improvement, the error handling system would achieve **perfect reliability scoring** across all PowerShell versions.
+The only identified weakness is **helper function duplication**, which should be consolidated into shared nested definitions to eliminate maintenance risk. With this single improvement, the error handling system would achieve **perfect reliability scoring** across all PowerShell versions.
 
 ## Language Interop, Versioning, and .NET
 
@@ -1265,14 +1239,14 @@ function Get-PSVersion {
 }
 ```
 
-**Forensic analysis of detection logic**:
+**Analysis of detection logic**:
 
 | Condition | PowerShell Version | Result |
 |---------|-------------------|--------|
 | `$PSVersionTable` exists | v2.0+ | Actual version (e.g., 5.1.22621.2506) |
 | `$PSVersionTable` missing | v1.0 | Hard-coded `[version]'1.0'` |
 
-**Critical forensic findings**:
+**Critical findings**:
 
 - **No reliance** on `$PSVersionTable.PSVersion.Major` ≥ 2 → avoids false positives
 - **Explicit fallback** to `'1.0'` → prevents `$null` or exceptions
@@ -1305,7 +1279,7 @@ if ($versionPS.Major -ge 3) {
 | v1.0–v2.0 | `[double]` | ±1.7 × 10³⁰⁸ (IEEE 754) |
 | All versions | `[int]`, `[int64]` | Built-in safe conversions |
 
-**Forensic rationale**:
+**Rationale**:
 
 - **BigInteger** → handles numbers larger than `[int32]::MaxValue` (2,147,483,647)
 - **Double** → v1.0-compatible approximation for large numbers
@@ -1317,7 +1291,7 @@ if ($versionPS.Major -ge 3) {
 
 The author uses **direct .NET interop** in controlled scenarios:
 
-| .NET Usage | Implementation | Forensic Justification |
+| .NET Usage | Implementation | Technical Justification |
 |-----------|----------------|------------------------|
 | **`[regex]::Escape()`** | `Split-StringOnLiteralString` | Ensures literal string splitting (not regex) in v1.0 |
 | **`[regex]::Split()`** | Same function | v1.0-compatible alternative to `-split` operator (v2.0+) |
@@ -1340,7 +1314,7 @@ $listAttached = New-Object System.Collections.Generic.List[PSCustomObject]
 $listAttached = New-Object System.Collections.Generic.List[object]
 ```
 
-**Forensic advantages**:
+**Advantages**:
 
 - **v1.0 compatible** → `[regex]` class exists in .NET 2.0
 - **Deterministic behavior** → no regex metacharacter interpretation
@@ -1381,7 +1355,7 @@ if ($PSVersion -eq ([version]'0.0')) {
 }
 ```
 
-**Forensic benefits**:
+**Benefits**:
 
 - **Performance optimization** → skip version detection if caller knows runtime
 - **Flexibility** → supports both interactive and scripted use
@@ -1415,7 +1389,7 @@ For file paths, the author would use:
 
 ### .NET Type Usage Summary
 
-| .NET Type | First Available | Used In | Forensic Purpose |
+| .NET Type | First Available | Used In | Technical Purpose |
 |----------|-----------------|--------|------------------|
 | `[regex]` | .NET 2.0 (PS v1.0) | String operations | Literal string parsing |
 | `[System.Numerics.BigInteger]` | .NET 4.0 (PS v3.0+) | Overflow handling | Unlimited integer precision |
@@ -1462,7 +1436,7 @@ The system transforms version fragmentation from a liability into a **non-issue*
 
 The author enforces a **zero-tolerance policy for uncontrolled output** and implements a **strict, single-typed, stream-isolated communication model**. This is not merely stylistic preference but a **core reliability requirement** driven by the function’s role as a **reusable tool** in **v1.0 PowerShell environments** when applicable.
 
-All output follows **three forensic principles**:
+All output follows **three key principles**:
 
 1. **Single output type** — only one kind of object ever leaves the function
 2. **Explicit stream routing** — each message type uses exactly one stream
@@ -1482,7 +1456,7 @@ return 4    # Partial success
 return -1   # Complete failure
 ```
 
-**Forensic characteristics**:
+**Key characteristics**:
 
 | Property | Implementation |
 |--------|----------------|
@@ -1553,7 +1527,7 @@ All **structured data** is returned via **`[ref]` parameters** only when write-b
 [ref]$ReferenceArrayOfExtraStrings → [string[]]
 ```
 
-**Forensic advantages**:
+**Advantages**:
 
 - **No pipeline interference** — data never accidentally flows downstream
 - **Caller-controlled lifetime** — variables persist after function exit
@@ -1570,7 +1544,7 @@ $status   = 4
 
 ---
 
-### Stream Usage: Forensic Mapping
+### Stream Usage: Clear Mapping
 
 The author uses **exactly three output Streams**, each with a **single, immutable purpose**:
 
@@ -1580,7 +1554,7 @@ The author uses **exactly three output Streams**, each with a **single, immutabl
 | **Warning** | `Write-Warning` | Logical anomalies ("should not happen") | `"Operation failed despite valid inputs"` |
 | **Host** | *Never used* | Interactive feedback | **Prohibited** |
 
-**`Write-Host` is completely absent** — a deliberate forensic marker of **production-grade tooling**.
+**`Write-Host` is completely absent** — a deliberate indicator of **production-grade tooling**.
 
 ---
 
@@ -1592,14 +1566,14 @@ The author uses **exactly three output Streams**, each with a **single, immutabl
 Write-Warning -Message 'Conversion of string failed even though valid. This should not be possible!'
 ```
 
-**Forensic purpose**:
+**Purpose**:
 
 - **Developer alert** — indicates internal contract violation
 - **Non-terminating** — does not halt execution
 - **Actionable** — includes exact values and context
 - **Production-safe** — visible only with `-WarningAction` or `$WarningPreference`
 
-These warnings are **never suppressed** and serve as **forensic breadcrumbs** for root cause analysis.
+These warnings are **never suppressed** and serve as **diagnostic information** for root cause analysis.
 
 ---
 
@@ -1611,7 +1585,7 @@ These warnings are **never suppressed** and serve as **forensic breadcrumbs** fo
 - `Write-Output` (except via `return`)
 - Echo/print statements
 
-**Forensic rationale**:
+**Rationale**:
 
 - **Pipeline safety** — prevents data leakage
 - **Script compatibility** — silent operation in automation
@@ -1623,7 +1597,7 @@ These warnings are **never suppressed** and serve as **forensic breadcrumbs** fo
 
 The function **never emits mixed object types**. The only object that can leave via the success stream is the **integer status code**.
 
-**Forensic guarantee**:
+**Guarantee**:
 
 ```powershell
 $result = Process-String ...
@@ -1654,7 +1628,7 @@ While not implemented in this v1.0 script, the author’s design **anticipates**
 </Type>
 ```
 
-**Forensic inference**:
+**Design considerations**:
 
 - **Raw data preserved** — objects contain full fidelity
 - **Display decoupled** — formatting is external
@@ -1753,7 +1727,7 @@ The author adopts a **"measure, then optimize"** philosophy, but within v1.0 con
 
 #### Key Performance Characteristics
 
-| Operation | Complexity | Forensic Rationale |
+| Operation | Complexity | Technical Rationale |
 |---------|------------|------------------|
 | **String splitting** | O(n) | `[regex]::Split` with escaped delimiter — linear pass |
 | **Type casting loop** | O(1) per attempt, bounded | Bounded by input segments |
@@ -1780,13 +1754,13 @@ The author adopts a **"measure, then optimize"** philosophy, but within v1.0 con
 
 #### Performance Trade-offs
 
-| Trade-off | Decision | Forensic Justification |
+| Trade-off | Decision | Technical Justification |
 |---------|----------|------------------------|
 | **Script vs. Pipeline** | Script constructs (`foreach`) | Avoids pipeline overhead; v1.0 has no optimized pipeline |
 | **Regex vs. String methods** | Regex for splitting | `[regex]::Escape()` ensures literal behavior; `String.Split()` has different empty-string semantics |
 | **Early version detection** | Optional `$PSVersion` parameter | Caller can skip `Get-PSVersion` if known → saves one `Test-Path` |
 
-**Forensic verdict**: Performance is **bounded, predictable, and appropriate** for typical use cases. No premature optimization occurs.
+**Conclusion**: Performance is **bounded, predictable, and appropriate** for typical use cases. No premature optimization occurs.
 
 ---
 
@@ -1796,7 +1770,7 @@ The function processes **untrusted inputs** (e.g., from external sources). The s
 
 #### Security Posture
 
-| Threat Vector | Mitigation | Forensic Evidence |
+| Threat Vector | Mitigation | Evidence |
 |---------------|-----------|-------------------|
 | **Injection via string** | Strong typing + safe casting | Type casts fail fast if malformed |
 | **Path traversal** | No file system access | Function is pure computation |
@@ -1822,7 +1796,7 @@ While not present, the author’s pattern suggests future security handling woul
 
 With **SecureString** and **never** clear-text storage.
 
-**Forensic inference**: The function is **security-neutral** — it neither introduces nor mitigates external risks, but **cannot be exploited** due to its isolated, pure-function design.
+**Design consideration**: The function is **security-neutral** — it neither introduces nor mitigates external risks, but **cannot be exploited** due to its isolated, pure-function design.
 
 ---
 
@@ -1830,7 +1804,7 @@ With **SecureString** and **never** clear-text storage.
 
 #### Maintainability: High Cohesion, Controlled Coupling
 
-| Aspect | Implementation | Forensic Benefit |
+| Aspect | Implementation | Benefit |
 |-------|----------------|------------------|
 | **Single responsibility** | Targeted operations | Clear contract |
 | **No global state mutation** | Only `$global:ErrorActionPreference` (restored) | Predictable |
@@ -1886,4 +1860,4 @@ The **Performance, Security, and Other** aspects reveal a **mature, constrained 
 
 The function is a **minimal, maximalist** design: it does **exactly one thing**, does it **perfectly**, and **refuses to do anything else**. This is the hallmark of **industrial-grade PowerShell tooling** — code that can be deployed in 2006 or 2026 with identical behavior when compatible.
 
-**Final Forensic Verdict**: **"Fit for purpose across 18 years of PowerShell evolution."**
+**Final Assessment**: **"Fit for purpose across 18 years of PowerShell evolution."**
