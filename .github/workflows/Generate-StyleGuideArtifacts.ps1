@@ -82,13 +82,12 @@ function New-StyleGuideChatVersion {
         $strContent = Get-Content -Path $SourcePath -Raw -Encoding UTF8
         
         # Find the maximum number of consecutive backticks in the content
+        $strBacktickPattern = '``+'
+        $arrMatches = [regex]::Matches($strContent, $strBacktickPattern)
         $intMaxBackticks = 0
-        $arrMatches = [regex]::Matches($strContent, '`+')
-        foreach ($objMatch in $arrMatches) {
-            $intCurrentLength = $objMatch.Length
-            if ($intCurrentLength -gt $intMaxBackticks) {
-                $intMaxBackticks = $intCurrentLength
-            }
+        if ($arrMatches.Count -gt 0) {
+            $objMeasurement = $arrMatches | Measure-Object -Property Length -Maximum
+            $intMaxBackticks = $objMeasurement.Maximum
         }
         
         # Use one more backtick than the maximum found (minimum of 4 for readability)
