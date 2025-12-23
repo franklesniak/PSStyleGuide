@@ -8,9 +8,32 @@ This explains the systematic avoidance of features introduced in v2.0 or later i
 
 Within these constraints, the author adheres closely to community best practices for readability, naming, documentation, and maintainability. Functions are designed as reusable tools with a single purpose—e.g., performing targeted data transformations or validations. Outputs are explicit and controlled: a status code (e.g., an integer indicating full success, partial success, or failure) is typically returned, while complex results are passed via reference parameters only when necessary to modify data in the caller's scope, avoiding unnecessary use of [ref] for read-only objects since it provides no performance benefits in PowerShell. Error handling is "fail-controlled," suppressing issues to allow graceful recovery without halting execution. The code is robust, thoroughly documented, and predictable across versions, making it ideal for tools in legacy or mixed environments. Performance is balanced with readability, favoring script constructs over pipelines. If the v1.0 constraint were lifted (e.g., due to modern dependencies), the style would evolve to incorporate features like pipeline-friendly objects and structured errors while retaining strong typing and documentation for clarity.
 
+## Quick Reference Checklist
+
+### Code Layout and Formatting
+
+- **[All]** Use 4 spaces for indentation, never tabs → [Indentation Rules](#indentation-rules)
+- **[All]** Place opening braces on same line (OTBS) → [Brace Placement (OTBS)](#brace-placement-otbs)
+- **[All]** Keep `catch`, `finally`, `else` on same line as closing brace → [Exception: catch, finally, and else Keywords](#exception-catch-finally-and-else-keywords)
+- **[All]** Use single space around operators, no extra alignment → [Operator Spacing and Alignment](#operator-spacing-and-alignment)
+- **[All]** No vertical operator alignment across multiple lines → [Operator Spacing and Alignment](#operator-spacing-and-alignment)
+- **[All]** Add extra indentation for multi-line method parameters → [Multi-line Method Indentation](#multi-line-method-indentation)
+- **[All]** Use blank lines sparingly: two around functions, one within → [Blank Line Usage](#blank-line-usage)
+- **[All]** Delimit variables in strings with `${}` or `-f` operator → [Variable Delimiting in Strings](#variable-delimiting-in-strings)
+
 ## Code Layout and Formatting
 
-The layout emphasizes scannability, consistency, and readability, following community guidelines to make the code familiar and easy to maintain. Indentation uses four spaces for all logical blocks, including param declarations, conditional statements (if/else), loops, and function bodies—no tabs are used. Bracing strictly adheres to the "One True Brace Style" (OTBS): opening braces are placed at the end of the statement line, and closing braces start on a new line, aligned with the opening statement. This applies universally to functions, conditionals, and most script blocks.
+The layout emphasizes scannability, consistency, and readability, following community guidelines to make the code familiar and easy to maintain.
+
+### Indentation Rules
+
+Indentation uses four spaces for all logical blocks, including param declarations, conditional statements (if/else), loops, and function bodies—no tabs are used.
+
+### Brace Placement (OTBS)
+
+Bracing strictly adheres to the "One True Brace Style" (OTBS): opening braces are placed at the end of the statement line, and closing braces start on a new line, aligned with the opening statement. This applies universally to functions, conditionals, and most script blocks.
+
+### Exception: catch, finally, and else Keywords
 
 > **Exception for `catch`, `finally`, and `else`:** These keywords are the major exception to this rule. To be syntactically valid, the `catch`, `finally`, and `else` (or `elseif`) keywords **must** follow the closing brace (`}`) of the preceding block on the **same line**.
 >
@@ -36,10 +59,15 @@ The layout emphasizes scannability, consistency, and readability, following comm
 > }
 > ```
 
+### Operator Spacing and Alignment
+
 Whitespace is used precisely to enhance clarity: a single space surrounds operators (e.g., -gt, =, -and, -eq) and follows commas in parameter lists or arrays, with no unnecessary spaces inside parentheses, brackets, or subexpressions. Line terminators avoid semicolons entirely, as they are unnecessary and can complicate edits. Line continuation eschews backticks, preferring natural breaks at operators, pipes, or commas where possible—though in v1.0-focused code, long lines (e.g., in comments or regex patterns) are tolerated for completeness. Line lengths aim for under 115 characters where practical, but verbose comments may exceed this; this is acceptable per flexible guidelines, as it prioritizes detailed explanations without sacrificing core code readability.
 
-- **Operator Alignment:** Use **exactly one space** on either side of an operator (e.g., `=`, `-eq`). Do not add extra whitespace to vertically align operators across multiple lines. This ensures compliance with standard PSScriptAnalyzer rules.
-- **Multi-line Method Indentation:** When a method call (like `.Add()`) is wrapped (e.g., in a `[void]` cast) and its parameter is a multi-line script block (like a hashtable or `[pscustomobject]`), an **additional** level of indentation is required for the contents of that script block.
+Use **exactly one space** on either side of an operator (e.g., `=`, `-eq`). Do not add extra whitespace to vertically align operators across multiple lines. This ensures compliance with standard PSScriptAnalyzer rules.
+
+### Multi-line Method Indentation
+
+When a method call (like `.Add()`) is wrapped (e.g., in a `[void]` cast) and its parameter is a multi-line script block (like a hashtable or `[pscustomobject]`), an **additional** level of indentation is required for the contents of that script block.
 
 ```powershell
 [void]($list.Add(
@@ -52,6 +80,8 @@ Whitespace is used precisely to enhance clarity: a single space surrounds operat
         }
     ))
 ```
+
+### Blank Line Usage
 
 Blank lines are used sparingly but effectively: two surround function definitions for visual separation, and single blanks group related logic within functions (e.g., before a block comment or between setup and main logic). Files end with a single blank line. Regions (#region ... #endregion) logically group elements like licenses or helper sections, improving navigability in larger scripts.
 
@@ -73,30 +103,33 @@ function ExampleFunction {
 }
 ```
 
-- **Variable Delimiting in Strings:** When a variable in an expandable string (`"..."`) is immediately followed by punctuation (especially a colon `:`) or other text that is not part of the variable name, it can cause parsing errors.
-  - **Non-Compliant (Ambiguous):**
+### Variable Delimiting in Strings
 
-    ```powershell
-    $strMessage = "$SSORegion: Error occurred"
-    ```
+When a variable in an expandable string (`"..."`) is immediately followed by punctuation (especially a colon `:`) or other text that is not part of the variable name, it can cause parsing errors.
 
-  - **Compliant (Preferred):** Use curly braces to explicitly delimit the variable name:
+- **Non-Compliant (Ambiguous):**
 
-    ```powershell
-    $strMessage = "${SSORegion}: Error occurred"
-    ```
+  ```powershell
+  $strMessage = "$SSORegion: Error occurred"
+  ```
 
-  - **Compliant (Also Preferred):** Use the `-f` format operator, which avoids all parsing ambiguity.
+- **Compliant (Preferred):** Use curly braces to explicitly delimit the variable name:
 
-    ```powershell
-    $strMessage = ("{0}: Error occurred" -f $SSORegion)
-    ```
+  ```powershell
+  $strMessage = "${SSORegion}: Error occurred"
+  ```
 
-  - **Compliant (Acceptable):** Use string concatenation.
+- **Compliant (Also Preferred):** Use the `-f` format operator, which avoids all parsing ambiguity.
 
-    ```powershell
-    $strMessage = ($SSORegion + ': Error occurred')
-    ```
+  ```powershell
+  $strMessage = ("{0}: Error occurred" -f $SSORegion)
+  ```
+
+- **Compliant (Acceptable):** Use string concatenation.
+
+  ```powershell
+  $strMessage = ($SSORegion + ': Error occurred')
+  ```
 
 ## Capitalization and Naming Conventions
 
