@@ -8,6 +8,19 @@ This explains the systematic avoidance of features introduced in v2.0 or later i
 
 Within these constraints, the author adheres closely to community best practices for readability, naming, documentation, and maintainability. Functions are designed as reusable tools with a single purpose—e.g., performing targeted data transformations or validations. Outputs are explicit and controlled: a status code (e.g., an integer indicating full success, partial success, or failure) is typically returned, while complex results are passed via reference parameters only when necessary to modify data in the caller's scope, avoiding unnecessary use of [ref] for read-only objects since it provides no performance benefits in PowerShell. Error handling is "fail-controlled," suppressing issues to allow graceful recovery without halting execution. The code is robust, thoroughly documented, and predictable across versions, making it ideal for tools in legacy or mixed environments. Performance is balanced with readability, favoring script constructs over pipelines. If the v1.0 constraint were lifted (e.g., due to modern dependencies), the style would evolve to incorporate features like pipeline-friendly objects and structured errors while retaining strong typing and documentation for clarity.
 
+## Quick Reference Checklist
+
+### Code Layout and Formatting
+
+- **[All]** Use 4 spaces for indentation, never tabs → [Code Layout and Formatting](#code-layout-and-formatting)
+- **[All]** Place opening braces on same line (OTBS) → [Code Layout and Formatting](#code-layout-and-formatting)
+- **[All]** Keep `catch`, `finally`, `else` on same line as closing brace → [Code Layout and Formatting](#code-layout-and-formatting)
+- **[All]** Use single space around operators, no extra alignment → [Code Layout and Formatting](#code-layout-and-formatting)
+- **[All]** No vertical operator alignment across multiple lines → [Code Layout and Formatting](#code-layout-and-formatting)
+- **[All]** Add extra indentation for multi-line method parameters → [Code Layout and Formatting](#code-layout-and-formatting)
+- **[All]** Use blank lines sparingly: two around functions, one within → [Code Layout and Formatting](#code-layout-and-formatting)
+- **[All]** Delimit variables in strings with `${}` or `-f` operator → [Code Layout and Formatting](#code-layout-and-formatting)
+
 ## Code Layout and Formatting
 
 The layout emphasizes scannability, consistency, and readability, following community guidelines to make the code familiar and easy to maintain. Indentation uses four spaces for all logical blocks, including param declarations, conditional statements (if/else), loops, and function bodies—no tabs are used. Bracing strictly adheres to the "One True Brace Style" (OTBS): opening braces are placed at the end of the statement line, and closing braces start on a new line, aligned with the opening statement. This applies universally to functions, conditionals, and most script blocks.
