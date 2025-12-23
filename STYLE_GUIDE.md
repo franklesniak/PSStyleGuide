@@ -21,6 +21,22 @@ Within these constraints, the author adheres closely to community best practices
 - **[All]** Use blank lines sparingly: two around functions, one within → [Blank Line Usage](#blank-line-usage)
 - **[All]** Delimit variables in strings with `${}` or `-f` operator → [Variable Delimiting in Strings](#variable-delimiting-in-strings)
 
+### Capitalization and Naming Conventions
+
+- **[Functions]** Use PascalCase for public identifiers (functions, parameters, properties) → [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
+- **[Keywords]** Use lowercase for PowerShell keywords (function, param, if, else, return, trap) → [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
+- **[Local Variables]** Use camelCase with type-hinting prefixes (e.g., $strMessage, $intCount) → [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase)
+- **[Functions]** Follow Verb-Noun pattern with approved verbs → [Script and Function Naming: Full Explicit Form](#script-and-function-naming-full-explicit-form)
+- **[Functions]** Use singular nouns in function names → [Script and Function Naming: Nouns](#script-and-function-naming-nouns)
+- **[Modules]** Use PascalCase nouns (containers, not actions) → [Module Naming: Noun-Based Containers](#module-naming-noun-based-containers)
+- **[All]** Never use aliases in code → [Do Not Use Aliases](#do-not-use-aliases)
+- **[Modules]** No compatibility aliases in module exports (exception: genuine interactive shortcuts) → [Do Not Use Aliases](#do-not-use-aliases)
+- **[Parameters]** Use PascalCase, fully descriptive names → [Parameter Naming](#parameter-naming)
+- **[Parameters]** Use "ReferenceTo" prefix for reference parameters → [Parameter Naming](#parameter-naming)
+- **[Local Variables]** Use type prefixes + camelCase, fully descriptive (no abbreviations) → [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase)
+- **[Paths]** Avoid relative paths and tilde (~) shortcut → [Path and Scope Handling](#path-and-scope-handling)
+- **[Scope]** Use explicit scoping ($global:, $script:) → [Path and Scope Handling](#path-and-scope-handling)
+
 ## Code Layout and Formatting
 
 The layout emphasizes scannability, consistency, and readability, following community guidelines to make the code familiar and easy to maintain.
