@@ -97,8 +97,10 @@ function New-StyleGuideChatVersion {
         $intOuterFenceLength = [Math]::Max(4, $intMaxBackticks + 1)
         $strOuterFence = '`' * $intOuterFenceLength
         
-        # Wrap in markdown code fence without escaping
-        $strWrappedContent = "$strOuterFence" + "markdown`n$strContent`n$strOuterFence"
+        # Wrap in markdown code fence with a heading and proper trailing newline
+        # Add a top-level heading to satisfy MD041 (first-line-heading)
+        # Add trailing newline after closing fence to satisfy MD047 (single-trailing-newline)
+        $strWrappedContent = "# PowerShell Writing Style Guide - Formatted for Copy-Paste Into LLM Chat`n`n$strOuterFence" + "markdown`n$strContent`n$strOuterFence`n"
         
         Set-Content -Path $DestinationPath -Value $strWrappedContent -Encoding UTF8 -NoNewline
         Write-Host "Successfully created $DestinationPath (using $intOuterFenceLength backticks for outer fence)"
