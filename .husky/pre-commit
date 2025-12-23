@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Get list of staged markdown files
+STAGED_MD_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.md$' || true)
+
+if [ -n "$STAGED_MD_FILES" ]; then
+  echo "Running markdownlint on staged files..."
+  npx markdownlint-cli2 $STAGED_MD_FILES
+  LINT_EXIT_CODE=$?
+  
+  if [ $LINT_EXIT_CODE -ne 0 ]; then
+    echo ""
+    echo "❌ Markdownlint failed. Please fix the errors above before committing."
+    echo "To see all errors: npm run lint:md"
+    exit 1
+  fi
+  
+  echo "✅ Markdownlint passed for staged files."
+fi
+
+exit 0

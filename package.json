@@ -1,0 +1,33 @@
+{
+  "name": "psstyleguide",
+  "version": "1.0.0",
+  "description": "A style guide that describes how I want my PowerShell written",
+  "private": true,
+  "scripts": {
+    "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\"",
+    "lint:md:nested": "node scripts/lint-nested-markdown.js",
+    "prepare": "husky install || true"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/franklesniak/PSStyleGuide.git"
+  },
+  "keywords": [
+    "powershell",
+    "style-guide",
+    "coding-standards"
+  ],
+  "author": "Frank Lesniak",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/franklesniak/PSStyleGuide/issues"
+  },
+  "homepage": "https://github.com/franklesniak/PSStyleGuide#readme",
+  "devDependencies": {
+    "glob": "^10.3.10",
+    "husky": "^9.1.7",
+    "markdown-it": "^14.0.0",
+    "markdownlint": "^0.36.1",
+    "markdownlint-cli2": "^0.16.0"
+  }
+}
