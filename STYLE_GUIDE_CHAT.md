@@ -1,4 +1,4 @@
-# PowerShell Writing Style Guide
+# PowerShell Writing Style Guide - Formatted for Copy-Paste Into LLM Chat
 
 ````markdown
 # PowerShell Writing Style
