@@ -14,7 +14,7 @@ This new section should be titled "## Quick Reference Checklist" and should cont
 For this first task, create the checklist structure and populate it with items covering the "Code Layout and Formatting" section. Each checklist item should:
 
 1. Be a brief, actionable statement (one line, 10-15 words maximum)
-2. Include a Markdown link to the corresponding detailed section in the document
+2. Include a Markdown link to the corresponding detailed subsection in the document. Ensure all anchor links point to the correct, specific subsections in the document. Create/update headers as necessary.
 3. Indicate whether the rule applies to "Modern" scripts (targeting PowerShell 5.1+ and PowerShell 7.x+), "v1.0" scripts (backward compatible to Windows PowerShell v1.0), or "All" scripts
 
 Format each checklist item like this:
@@ -60,7 +60,9 @@ For the "Capitalization and Naming Conventions" section, create checklist items 
 - Avoid relative paths and tilde (~) shortcut
 - Explicit scoping ($global:, $script:)
 
-Ensure all anchor links point to the correct sections in the document.
+Each checklist item should indicate whether the rule applies to "Modern" scripts (targeting PowerShell 5.1+ and PowerShell 7.x+), "v1.0" scripts (backward compatible to Windows PowerShell v1.0), or "All" scripts.
+
+Ensure all anchor links point to the correct, specific subsections in the document. Create/update headers for subsections as necessary. Verify that all anchor links are correctly formatted for GitHub Markdown and will navigate to the intended sections.
 `````
 
 ---
@@ -88,7 +90,9 @@ For the "Documentation and Comments" section, create checklist items covering:
 - Per-function licensing in distributable helpers (#region License after param block)
 - Parameter documentation centralized in help block (not above individual parameters)
 
-Ensure all anchor links point to the correct sections in the document.
+Each checklist item should indicate whether the rule applies to "Modern" scripts (targeting PowerShell 5.1+ and PowerShell 7.x+), "v1.0" scripts (backward compatible to Windows PowerShell v1.0), or "All" scripts.
+
+Ensure all anchor links point to the correct, specific subsections in the document. Create/update headers for subsections as necessary. Verify that all anchor links are correctly formatted for GitHub Markdown and will navigate to the intended sections.
 `````
 
 ---
@@ -133,7 +137,9 @@ For the "Functions and Parameter Blocks" section, create checklist items coverin
 - [ref] used exclusively for output requiring write-back to caller scope
 - [ref] not used for complex objects that don't need modification
 
-Ensure all anchor links point to the correct sections in the document. Note that some items will link to the same section but represent different rules.
+Each checklist item should indicate whether the rule applies to "Modern" scripts (targeting PowerShell 5.1+ and PowerShell 7.x+), "v1.0" scripts (backward compatible to Windows PowerShell v1.0), or "All" scripts.
+
+Ensure all anchor links point to the correct, specific subsections in the document. Create/update headers for subsections as necessary. Verify that all anchor links are correctly formatted for GitHub Markdown and will navigate to the intended sections.
 `````
 
 ---
@@ -162,7 +168,9 @@ After adding these items, review the entire checklist to ensure:
 4. All anchor links are correct and will work in GitHub's Markdown rendering
 5. The checklist is comprehensive enough that an LLM processing the first 100-200 lines will understand all key style requirements
 
-Ensure all anchor links point to the correct sections in the document.
+Each checklist item should indicate whether the rule applies to "Modern" scripts (targeting PowerShell 5.1+ and PowerShell 7.x+), "v1.0" scripts (backward compatible to Windows PowerShell v1.0), or "All" scripts.
+
+Ensure all anchor links point to the correct, specific subsections in the document. Create/update headers for subsections as necessary. Verify that all anchor links are correctly formatted for GitHub Markdown and will navigate to the intended sections.
 `````
 
 ---
