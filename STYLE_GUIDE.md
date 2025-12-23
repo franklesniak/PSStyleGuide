@@ -25,15 +25,14 @@ Within these constraints, the author adheres closely to community best practices
 
 - **[All]** Use PascalCase for public identifiers (functions, parameters, properties) → [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
 - **[All]** Use lowercase for PowerShell keywords (function, param, if, else, return, trap) → [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
-- **[v1.0]** Use camelCase with type-hinting prefixes for local variables (e.g., $strMessage, $intCount) → [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase)
+- **[v1.0]** Use camelCase with type-hinting prefixes for local variables, fully descriptive (e.g., $strMessage, $intCount, no abbreviations) → [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase)
 - **[All]** Follow Verb-Noun pattern with approved verbs → [Script and Function Naming: Full Explicit Form](#script-and-function-naming-full-explicit-form)
 - **[All]** Use singular nouns in function names → [Script and Function Naming: Nouns](#script-and-function-naming-nouns)
 - **[All]** Use PascalCase nouns for modules (containers, not actions) → [Module Naming: Noun-Based Containers](#module-naming-noun-based-containers)
 - **[All]** Never use aliases in code → [Do Not Use Aliases](#do-not-use-aliases)
-- **[All]** No compatibility aliases in module exports (exception: genuine interactive shortcuts) → [Do Not Use Aliases](#do-not-use-aliases)
+- **[Modern]** No compatibility aliases in module exports (exception: genuine interactive shortcuts) → [Do Not Use Aliases](#do-not-use-aliases)
 - **[All]** Use PascalCase, fully descriptive parameter names → [Parameter Naming](#parameter-naming)
 - **[v1.0]** Use "ReferenceTo" prefix for reference parameters → [Parameter Naming](#parameter-naming)
-- **[v1.0]** Use type prefixes + camelCase for local variables, fully descriptive (no abbreviations) → [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase)
 - **[All]** Avoid relative paths and tilde (~) shortcut → [Path and Scope Handling](#path-and-scope-handling)
 - **[All]** Use explicit scoping ($global:, $script:) → [Path and Scope Handling](#path-and-scope-handling)
 
