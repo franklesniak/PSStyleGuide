@@ -36,6 +36,22 @@ Within these constraints, the author adheres closely to community best practices
 - **[All]** Avoid relative paths and tilde (~) shortcut → [Path and Scope Handling](#path-and-scope-handling)
 - **[All]** Use explicit scoping ($global:, $script:) → [Path and Scope Handling](#path-and-scope-handling)
 
+### Documentation and Comments
+
+- **[All]** All functions must have full comment-based help → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
+- **[All]** Place comment-based help inside function body, above param block → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
+- **[All]** Use single-line comments (#) with dotted keywords (.SYNOPSIS, .DESCRIPTION, etc.) → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
+- **[All]** Include required help sections: .SYNOPSIS, .DESCRIPTION, .PARAMETER, .EXAMPLE, .INPUTS, .OUTPUTS, .NOTES → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
+- **[All]** Provide multiple examples with input, output, and explanation → [Help Content Quality: High Standards](#help-content-quality-high-standards)
+- **[All]** Document all return codes with exact meanings in .OUTPUTS → [Help Content Quality: High Standards](#help-content-quality-high-standards)
+- **[All]** Document positional parameter support in .NOTES → [Help Content Quality: High Standards](#help-content-quality-high-standards)
+- **[All]** Include version number in .NOTES (format: Major.Minor.YYYYMMDD.Revision) → [Function and Script Versioning](#function-and-script-versioning)
+- **[All]** Version build component must be current date in YYYYMMDD format → [Function and Script Versioning](#function-and-script-versioning)
+- **[All]** Inline comments focus on "why" not "what" → [Inline Comments: Purpose and Placement](#inline-comments-purpose-and-placement)
+- **[All]** Use #region / #endregion for logical code folding → [Structural Documentation: Regions and Licensing](#structural-documentation-regions-and-licensing)
+- **[All]** Per-function licensing in distributable helpers (#region License after param block) → [Structural Documentation: Regions and Licensing](#structural-documentation-regions-and-licensing)
+- **[All]** Centralize parameter documentation in help block, not above individual parameters → [Parameter Documentation Placement: Strategic Choice](#parameter-documentation-placement-strategic-choice)
+
 ## Code Layout and Formatting
 
 The layout emphasizes scannability, consistency, and readability, following community guidelines to make the code familiar and easy to maintain.
