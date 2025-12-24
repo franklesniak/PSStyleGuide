@@ -88,7 +88,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 
 ### Output Formatting and Streams
 
-- **[Modern]** Do not collect results in List<T> and return; stream objects to pipeline → [Processing Collections in Modern Functions (Streaming Output)](#processing-collections-in-modern-functions-streaming-output)
+- **[Modern]** Do not collect results in `List<T>` and return; stream objects to pipeline → [Processing Collections in Modern Functions (Streaming Output)](#processing-collections-in-modern-functions-streaming-output)
 - **[Modern]** Wrap streaming function calls in @(...) to handle 0-1-Many problem → [Consuming Streaming Functions (The `0-1-Many` Problem)](#consuming-streaming-functions-the-0-1-many-problem)
 - **[All]** Use Write-Warning for user-facing anomalies; Write-Debug for internal details → [Choosing Between Warning and Debug Streams](#choosing-between-warning-and-debug-streams)
 - **[All]** Suppress .NET method output with [void](...), not | Out-Null → [Suppression of Method Output](#suppression-of-method-output)
