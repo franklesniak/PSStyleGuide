@@ -7,7 +7,7 @@
  * markdownlint on them to ensure nested Markdown content follows the same
  * linting rules as the outer Markdown files.
  * 
- * Usage: node scripts/lint-nested-markdown.js
+ * Usage: node .github/workflows/lint-nested-markdown.js
  */
 
 const fs = require('fs');
@@ -44,7 +44,7 @@ function loadMarkdownlintConfig() {
     for (const configPath of configPaths) {
         if (fs.existsSync(configPath)) {
             const content = fs.readFileSync(configPath, 'utf8');
-            // Strip out // comments and /* */ comments for . jsonc compatibility
+            // Strip out // comments and /* */ comments for .jsonc compatibility
             const jsonContent = content
                 .replace(/\/\/.*$/gm, '')  // Remove single-line comments
                 .replace(/\/\*[\s\S]*?\*\//g, '');  // Remove multi-line comments
