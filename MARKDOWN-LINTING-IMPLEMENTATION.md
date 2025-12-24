@@ -98,24 +98,30 @@ Fixed a trailing spaces issue in `ToDo-MarkdownLintingUpdates.md` (MD009 violati
 
 ### Error Reporting
 
-When violations are found, the output clearly shows the nesting depth and path:
+When violations are found, the output clearly shows the nesting depth and path, with actual file line numbers:
 
 ```text
 Nested Markdown Linting Issues:
 
+File: CopilotAgentPrompts.md
+  Code fence at line 9 (markdown block #1) (line 9):
+    21:1 MD032/blanks-around-lists Lists should be surrounded by blank lines
+    26:1 MD032/blanks-around-lists Lists should be surrounded by blank lines
+
 File: samples/test-violations-recursive.md
   Code fence at line 12 [depth 1] (markdown block #2) (line 7 > block at line 12):
-    1:1 MD022/blanks-around-headings Headings should be surrounded by blank lines
+    13:1 (nested line 1) MD022/blanks-around-headings Headings should be surrounded by blank lines
 
 File: samples/test-violations-recursive.md
   Code fence at line 32 [depth 2] (markdown block #5) (line 22 > block at line 27 > block at line 32):
-    1:1 MD022/blanks-around-headings Headings should be surrounded by blank lines
+    33:1 (nested line 1) MD022/blanks-around-headings Headings should be surrounded by blank lines
 ```
 
 The output includes:
 
 - **File**: Original source file
-- **Line**: Line number where the code fence starts
+- **Line**: Actual line number in the outer file where the error occurs
+- **Nested line indicator**: For nested blocks (depth > 0), shows the line within the nested content in parentheses
 - **Depth**: Nesting level (0 = top-level, 1 = nested once, 2 = nested twice, etc.)
 - **Path**: Full nesting path showing parent block locations (e.g., "line 22 > block at line 27 > block at line 32")
 
@@ -165,7 +171,17 @@ Tested with:
 
 ## Recent Enhancements
 
-### Recursive Nesting Support (December 2025)
+### Actual File Line Number Reporting (December 2024)
+
+Fixed the error reporting to show actual file line numbers instead of just line numbers within nested content:
+
+- Error messages now display the actual line number in the outer file where the issue occurs
+- For nested blocks (depth > 0), also shows the line within the nested content in parentheses for context
+- Makes it much easier for users to locate and fix issues
+- Example: `26:1 MD032/blanks-around-lists` now clearly shows the issue is at line 26 of the file
+- For deeply nested content: `33:1 (nested line 1) MD022/blanks-around-headings` shows file line 33, which is line 1 within the nested block
+
+### Recursive Nesting Support (December 2024)
 
 Enhanced the script to support **recursive nested markdown** - markdown inside markdown at any depth level. The script now:
 

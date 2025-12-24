@@ -155,7 +155,12 @@ function displayResults(allResults) {
         console.log(`  ${colors.yellow}Code fence at line ${result.line}${depthIndicator} (${result.info} block #${result.blockIndex})${pathInfo}:${colors.reset}`);
         
         for (const error of result.errors) {
-            console.log(`    ${error.lineNumber}:${error.errorRange ? error.errorRange[0] : 1} ${colors.red}${error.ruleNames.join('/')}${colors.reset} ${error.ruleDescription}`);
+            // Calculate the actual line number in the outer file
+            // The fence starts at result.line, and the content starts at result.line + 1
+            // So error at line N in nested content is at line (result.line + N) in outer file
+            const actualLineNumber = result.line + error.lineNumber;
+            const nestedLineInfo = result.depth > 0 ? ` (nested line ${error.lineNumber})` : '';
+            console.log(`    ${actualLineNumber}:${error.errorRange ? error.errorRange[0] : 1}${nestedLineInfo} ${colors.red}${error.ruleNames.join('/')}${colors.reset} ${error.ruleDescription}`);
             if (error.errorDetail) {
                 console.log(`      ${colors.yellow}${error.errorDetail}${colors.reset}`);
             }
