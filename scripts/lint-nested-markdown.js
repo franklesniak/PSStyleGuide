@@ -156,8 +156,9 @@ function displayResults(allResults) {
         
         for (const error of result.errors) {
             // Calculate the actual line number in the outer file
-            // The fence starts at result.line, and the content starts at result.line + 1
-            // So error at line N in nested content is at line (result.line + N) in outer file
+            // result.line is the fence opening line (e.g., line 9)
+            // error.lineNumber is 1-based line within the content (e.g., line 1 is first content line)
+            // Content starts at result.line + 1, so line N of content is at result.line + N
             const actualLineNumber = result.line + error.lineNumber;
             const nestedLineInfo = result.depth > 0 ? ` (nested line ${error.lineNumber})` : '';
             console.log(`    ${actualLineNumber}:${error.errorRange ? error.errorRange[0] : 1}${nestedLineInfo} ${colors.red}${error.ruleNames.join('/')}${colors.reset} ${error.ruleDescription}`);

@@ -171,7 +171,7 @@ Tested with:
 
 ## Recent Enhancements
 
-### Actual File Line Number Reporting (December 2024)
+### Actual File Line Number Reporting (December 2025)
 
 Fixed the error reporting to show actual file line numbers instead of just line numbers within nested content:
 
@@ -181,7 +181,7 @@ Fixed the error reporting to show actual file line numbers instead of just line 
 - Example: `26:1 MD032/blanks-around-lists` now clearly shows the issue is at line 26 of the file
 - For deeply nested content: `33:1 (nested line 1) MD022/blanks-around-headings` shows file line 33, which is line 1 within the nested block
 
-### Recursive Nesting Support (December 2024)
+### Recursive Nesting Support (December 2025)
 
 Enhanced the script to support **recursive nested markdown** - markdown inside markdown at any depth level. The script now:
 
