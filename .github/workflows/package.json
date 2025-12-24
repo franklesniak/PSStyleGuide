@@ -4,8 +4,8 @@
   "description": "A style guide that describes how I want my PowerShell written",
   "private": true,
   "scripts": {
-    "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\"",
-    "lint:md:nested": "node scripts/lint-nested-markdown.js",
+    "lint:md": "cd ../.. && markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#.github/workflows/node_modules\" --config .github/workflows/.markdownlint.jsonc",
+    "lint:md:nested": "node lint-nested-markdown.js",
     "prepare": "husky install || true"
   },
   "repository": {

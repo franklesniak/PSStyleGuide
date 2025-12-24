@@ -33,10 +33,12 @@ const colors = {
  * Load markdownlint configuration from .markdownlint.jsonc or .markdownlint.json
  */
 function loadMarkdownlintConfig() {
+    // Look for config in the same directory as this script
+    const scriptDir = __dirname;
     // Try .jsonc first (preferred), then fall back to .json
     const configPaths = [
-        path.join(process.cwd(), '.markdownlint.jsonc'),
-        path.join(process.cwd(), '.markdownlint.json')
+        path.join(scriptDir, '.markdownlint.jsonc'),
+        path.join(scriptDir, '.markdownlint.json')
     ];
 
     for (const configPath of configPaths) {
@@ -198,10 +200,13 @@ async function main() {
         // Load markdownlint configuration
         const config = loadMarkdownlintConfig();
         
+        // Repository root is two levels up from this script
+        const repoRoot = path.resolve(__dirname, '../..');
+        
         // Find all markdown files (excluding node_modules)
         const files = await glob('**/*.md', {
             ignore: ['node_modules/**', '**/node_modules/**'],
-            cwd: process.cwd(),
+            cwd: repoRoot,
             absolute: true
         });
         
@@ -212,7 +217,7 @@ async function main() {
         
         // Process each file
         for (const file of files) {
-            const relativePath = path.relative(process.cwd(), file);
+            const relativePath = path.relative(repoRoot, file);
             const blocks = extractMarkdownFences(file);
             
             if (blocks.length > 0) {
