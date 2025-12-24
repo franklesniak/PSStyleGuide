@@ -1,5 +1,18 @@
 # PowerShell Writing Style
 
+## Table of Contents
+
+- [Executive Summary: Author Profile](#executive-summary-author-profile)
+- [Quick Reference Checklist](#quick-reference-checklist)
+- [Code Layout and Formatting](#code-layout-and-formatting)
+- [Capitalization and Naming Conventions](#capitalization-and-naming-conventions)
+- [Documentation and Comments](#documentation-and-comments)
+- [Functions and Parameter Blocks](#functions-and-parameter-blocks)
+- [Error Handling](#error-handling)
+- [Language Interop, Versioning, and .NET](#language-interop-versioning-and-net)
+- [Output Formatting and Streams](#output-formatting-and-streams)
+- [Performance, Security, and Other](#performance-security-and-other)
+
 ## Executive Summary: Author Profile
 
 The author's code writing style can be characterized as a highly disciplined "PowerShell v1.0 Classicist" approach when applicable. This is a deliberate engineering choice to ensure maximum backward compatibility with PowerShell version 1.0 in scenarios where the script could feasibly run on that platform, such as standalone string manipulation functions, data parsing utilities, or scripts that interact with basic Windows operating system information without external dependencies. It prioritizes portability, robustness, and deterministic behavior in legacy or mixed environments where newer PowerShell versions cannot be assumed. However, this v1.0 compatibility is not rigidly enforced; when external constraints require newer PowerShell versions (e.g., dependencies on modules like Az, which mandate Windows PowerShell 5.1 or PowerShell 7.x), the author readily adopts modern language constructs such as try/catch for error handling, advanced functions with [CmdletBinding()], and other features to align with the required runtime.
