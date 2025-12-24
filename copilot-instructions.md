@@ -52,6 +52,33 @@ Within these constraints, the author adheres closely to community best practices
 - **[All]** Per-function licensing in distributable helpers (#region License after param block) → [Structural Documentation: Regions and Licensing](#structural-documentation-regions-and-licensing)
 - **[All]** Centralize parameter documentation in help block, not above individual parameters → [Parameter Documentation Placement: Strategic Choice](#parameter-documentation-placement-strategic-choice)
 
+### Functions and Parameter Blocks
+
+- **[v1.0]** No [CmdletBinding()] attribute in v1.0-targeted functions → [Function Declaration and Structure](#function-declaration-and-structure)
+- **[v1.0]** No [OutputType()] attribute in v1.0-targeted functions → [Function Declaration and Structure](#function-declaration-and-structure)
+- **[v1.0]** No begin/process/end blocks in v1.0-targeted functions → [Function Declaration and Structure](#function-declaration-and-structure)
+- **[v1.0]** No pipeline input support in v1.0-targeted functions → [Pipeline Behavior: Deliberately Disabled](#pipeline-behavior-deliberately-disabled)
+- **[v1.0]** Simple function keyword with param() block in v1.0-targeted functions → [Function Declaration and Structure](#function-declaration-and-structure)
+- **[v1.0]** Strong typing in parameters → [Parameter Block Design: Detailed Analysis](#parameter-block-design-detailed-analysis)
+- **[v1.0]** Explicit return statements in v1.0-targeted functions → [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes)
+- **[v1.0]** Reference parameters ([ref]) for outputs requiring caller modification → [Input/Output Contract: Reference Parameters](#inputoutput-contract-reference-parameters)
+- **[v1.0]** Return single integer status code (0=success, 1-5=partial, -1=failure) → [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes)
+- **[v1.0]** Support positional parameters for v1.0 usability → [Positional Parameter Support](#positional-parameter-support)
+- **[v1.0]** trap-based error handling (not try/catch) in v1.0-targeted functions → [Overview of Function Architecture](#overview-of-function-architecture)
+- **[Modern]** Must use [CmdletBinding()] attribute → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** Must use [OutputType()] declaring singular primary type → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** Must use streaming output (write objects directly to pipeline in loop) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** Must use try/catch for error handling → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** Must use Write-Verbose and Write-Debug (not manual preference toggling) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** Exception: May temporarily suppress $VerbosePreference for noisy nested commands using try/finally → ["Modern Advanced" Functions/Scripts: Exception for Suppressing Nested Verbose Streams](#modern-advanced-functionsscripts-exception-for-suppressing-nested-verbose-streams)
+- **[Modern]** Use [Parameter(Mandatory=$true)] only when function cannot work without value → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
+- **[Modern]** Use [ValidateNotNullOrEmpty()] for optional-but-not-empty parameters → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
+- **[Modern]** Multiple [OutputType()] only for intentionally polymorphic returns → ["Modern Advanced" Functions/Scripts: Handling Multiple or Dynamic Output Types](#modern-advanced-functionsscripts-handling-multiple-or-dynamic-output-types)
+- **[All]** Functions are atomic, reusable tools with single purpose → [Overview of Function Architecture](#overview-of-function-architecture)
+- **[All]** Polymorphic parameters (multiple incompatible types) left un-typed or [object] → [Parameter Block Design: Detailed Analysis](#parameter-block-design-detailed-analysis)
+- **[All]** [ref] used exclusively for output requiring write-back to caller scope → [Input/Output Contract: Reference Parameters](#inputoutput-contract-reference-parameters)
+- **[All]** [ref] not used for complex objects that don't need modification → [Input/Output Contract: Reference Parameters](#inputoutput-contract-reference-parameters)
+
 ## Code Layout and Formatting
 
 The layout emphasizes scannability, consistency, and readability, following community guidelines to make the code familiar and easy to maintain.
