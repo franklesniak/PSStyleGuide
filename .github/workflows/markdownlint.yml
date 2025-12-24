@@ -1,9 +1,9 @@
 # Markdownlint CI Workflow
-# 
+#
 # This workflow uses markdownlint by David Anson (@DavidAnson)
 # Licensed under MIT License
 # Source: https://github.com/DavidAnson/markdownlint
-# 
+#
 # Purpose: Enforce consistent Markdown formatting across the repository
 # Runs on: push and pull_request events
 
@@ -18,29 +18,29 @@ on:
 jobs:
   markdownlint:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Run markdownlint on outer files
         id: lint-outer
         continue-on-error: true
         run: npm run lint:md
-      
+
       - name: Run markdownlint on nested Markdown code fences
         id: lint-nested
         continue-on-error: true
         run: npm run lint:md:nested
-      
+
       - name: Check linting results
         if: steps.lint-outer.outcome == 'failure' || steps.lint-nested.outcome == 'failure'
         run: |
