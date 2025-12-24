@@ -81,6 +81,22 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[All]** [ref] used exclusively for output requiring write-back to caller scope → [Input/Output Contract: Reference Parameters](#inputoutput-contract-reference-parameters)
 - **[All]** [ref] not used for complex objects that don't need modification → [Input/Output Contract: Reference Parameters](#inputoutput-contract-reference-parameters)
 
+### Error Handling
+
+- **[v1.0]** Use trap {} for error suppression in v1.0-targeted functions → [Core Error Suppression Mechanism](#core-error-suppression-mechanism)
+- **[Modern]** catch blocks must not be empty; log to Debug stream at minimum → [Modern catch Block Requirements](#modern-catch-block-requirements)
+
+### Output Formatting and Streams
+
+- **[Modern]** Do not collect results in `List<T>` and return; stream objects to pipeline → [Processing Collections in Modern Functions (Streaming Output)](#processing-collections-in-modern-functions-streaming-output)
+- **[Modern]** Wrap streaming function calls in @(...) to handle 0-1-Many problem → [Consuming Streaming Functions (The `0-1-Many` Problem)](#consuming-streaming-functions-the-0-1-many-problem)
+- **[All]** Use Write-Warning for user-facing anomalies; Write-Debug for internal details → [Choosing Between Warning and Debug Streams](#choosing-between-warning-and-debug-streams)
+- **[All]** Suppress .NET method output with [void](...), not | Out-Null → [Suppression of Method Output](#suppression-of-method-output)
+
+### Language Interop and .NET
+
+- **[All]** Provide specific type T for generic collections (List[PSCustomObject], not List[object]) → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
+
 ## Code Layout and Formatting
 
 The layout emphasizes scannability, consistency, and readability, following community guidelines to make the code familiar and easy to maintain.
