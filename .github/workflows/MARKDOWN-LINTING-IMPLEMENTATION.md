@@ -13,7 +13,7 @@ This implementation adds the capability to lint Markdown content that appears in
 - **glob** (^10.3.10): File pattern matching for finding Markdown files
 - **New npm script**: `lint:md:nested` - runs the nested markdown linting
 
-### 2. Extraction Script (scripts/lint-nested-markdown.js)
+### 2. Extraction Script (.github/workflows/lint-nested-markdown.js)
 
 A new Node.js script that:
 
@@ -28,7 +28,7 @@ A new Node.js script that:
 **Key features:**
 
 - **Supports recursive nesting**: Extracts and lints markdown at any depth (markdown inside markdown inside markdown, etc.)
-- Uses the existing `.markdownlint.json` configuration
+- Uses the markdownlint configuration from `.github/workflows/.markdownlint.jsonc`
 - Disables MD041 (first-line-heading) for nested blocks since snippets may not start with a top-level heading
 - Handles different fence lengths (```, ````, ``````, etc.)
 - Supports both `markdown` and `md` language identifiers
@@ -69,7 +69,7 @@ Created comprehensive test files demonstrating:
 
 - **test-violations-recursive.md**: Demonstrates violation detection at various depths
 
-### 5. Documentation (scripts/README.md)
+### 5. Documentation (.github/workflows/scripts-README.md)
 
 Added documentation for the new script including:
 
