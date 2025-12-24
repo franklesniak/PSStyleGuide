@@ -31,7 +31,7 @@ node scripts/lint-nested-markdown.js
 
 ### Configuration
 
-The script uses the `.markdownlint.json` configuration file in the repository root, with one modification:
+The script uses the `.markdownlint.jsonc` (or `.markdownlint.json`) configuration file in the repository root, with one modification:
 
 - **MD041** (first-line-heading) is disabled for nested markdown blocks, since code snippets may not start with a top-level heading
 

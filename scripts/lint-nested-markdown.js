@@ -30,12 +30,24 @@ const colors = {
 };
 
 /**
- * Load markdownlint configuration from .markdownlint.json
+ * Load markdownlint configuration from .markdownlint.jsonc or .markdownlint.json
  */
 function loadMarkdownlintConfig() {
-    const configPath = path.join(process.cwd(), '.markdownlint.json');
-    if (fs.existsSync(configPath)) {
-        return JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    // Try .jsonc first (preferred), then fall back to .json
+    const configPaths = [
+        path.join(process.cwd(), '.markdownlint.jsonc'),
+        path.join(process.cwd(), '.markdownlint.json')
+    ];
+
+    for (const configPath of configPaths) {
+        if (fs.existsSync(configPath)) {
+            const content = fs.readFileSync(configPath, 'utf8');
+            // Strip out // comments and /* */ comments for . jsonc compatibility
+            const jsonContent = content
+                .replace(/\/\/.*$/gm, '')  // Remove single-line comments
+                .replace(/\/\*[\s\S]*?\*\//g, '');  // Remove multi-line comments
+            return JSON.parse(jsonContent);
+        }
     }
     return {};
 }
