@@ -112,9 +112,12 @@ function lintMarkdownContent(content, config) {
     // Create a modified config for nested markdown
     // Disable MD041 (first-line-heading) since nested markdown snippets
     // may not start with a top-level heading
+    // Disable MD051 (link-fragments) since nested markdown often contains
+    // example/placeholder links that reference anchors in other documents
     const nestedConfig = {
         ...config,
-        'MD041': false
+        'MD041': false,
+        'MD051': false
     };
     
     const options = {
@@ -155,7 +158,13 @@ function displayResults(allResults) {
         console.log(`  ${colors.yellow}Code fence at line ${result.line}${depthIndicator} (${result.info} block #${result.blockIndex})${pathInfo}:${colors.reset}`);
         
         for (const error of result.errors) {
-            console.log(`    ${error.lineNumber}:${error.errorRange ? error.errorRange[0] : 1} ${colors.red}${error.ruleNames.join('/')}${colors.reset} ${error.ruleDescription}`);
+            // Calculate the actual line number in the outer file
+            // result.line is the fence opening line (e.g., line 9)
+            // error.lineNumber is 1-based line within the content (e.g., line 1 is first content line)
+            // Content starts at result.line + 1, so line N of content is at result.line + N
+            const actualLineNumber = result.line + error.lineNumber;
+            const nestedLineInfo = result.depth > 0 ? ` (nested line ${error.lineNumber})` : '';
+            console.log(`    ${actualLineNumber}:${error.errorRange ? error.errorRange[0] : 1}${nestedLineInfo} ${colors.red}${error.ruleNames.join('/')}${colors.reset} ${error.ruleDescription}`);
             if (error.errorDetail) {
                 console.log(`      ${colors.yellow}${error.errorDetail}${colors.reset}`);
             }

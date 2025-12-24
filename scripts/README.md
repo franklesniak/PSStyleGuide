@@ -42,15 +42,21 @@ When issues are found in nested markdown:
 ```text
 Nested Markdown Linting Issues:
 
+File: CopilotAgentPrompts.md
+  Code fence at line 9 (markdown block #1) (line 9):
+    21:1 MD032/blanks-around-lists Lists should be surrounded by blank lines
+    26:1 MD032/blanks-around-lists Lists should be surrounded by blank lines
+
 File: samples/example.md
   Code fence at line 42 [depth 1] (markdown block #2) (line 15 > block at line 42):
-    3:1 MD022/blanks-around-headings Headings should be surrounded by blank lines
+    45:1 (nested line 3) MD022/blanks-around-headings Headings should be surrounded by blank lines
 ```
 
 The output shows:
 
 - **File**: Original source file
-- **Line**: Line number where the code fence starts
+- **Line**: Actual line number in the outer file where the error occurs
+- **Nested line indicator**: For nested blocks (depth > 0), shows the line within the nested content in parentheses
 - **Depth**: Nesting level (0 = top-level, 1 = nested once, 2 = nested twice, etc.)
 - **Path**: Full nesting path showing parent block locations
 
