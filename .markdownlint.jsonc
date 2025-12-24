@@ -1,0 +1,24 @@
+{
+  // markdownlint configuration
+  // Based on https://github.com/DavidAnson/markdownlint
+  // MIT License - Copyright (c) David Anson
+
+  // Enable all rules by default
+  "default": true,
+
+  // Project-specific rule overrides
+
+  // MD013: Line length - disabled to allow longer lines in code examples and links
+  "MD013": false,
+
+  // MD033: Inline HTML - allowed for specific formatting needs
+  "MD033": {
+    "allowed_elements": ["br"]
+  },
+
+  // MD024: Multiple headings with the same content
+  // Allow duplicate headings in different sections
+  "MD024": {
+    "siblings_only": true
+  }
+}
