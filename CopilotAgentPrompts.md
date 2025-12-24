@@ -18,11 +18,13 @@ For this first task, create the checklist structure and populate it with items c
 3. Indicate whether the rule applies to "Modern" scripts (targeting PowerShell 5.1+ and PowerShell 7.x+), "v1.0" scripts (backward compatible to Windows PowerShell v1.0), or "All" scripts
 
 Format each checklist item like this:
+
 - **[Scope]** Brief guideline statement → [Link text](#anchor-to-section)
 
 Where [Scope] is one of: **[All]**, **[Modern]**, or **[v1.0]**
 
 For the "Code Layout and Formatting" section, create checklist items covering:
+
 - Indentation (4 spaces)
 - Opening braces placement (same line)
 - Exception for catch/finally/else keywords (must be on same line as closing brace)
@@ -43,9 +45,11 @@ Make sure the anchor links work correctly by using the standard GitHub Markdown 
 In the file `STYLE_GUIDE.md`, locate the "## Quick Reference Checklist" section that was created in the previous task. Add new checklist items at the end of this section to cover the "Capitalization and Naming Conventions" section of the document.
 
 Each checklist item should follow the same format established previously:
+
 - **[Scope]** Brief guideline statement → [Link text](#anchor-to-section)
 
 For the "Capitalization and Naming Conventions" section, create checklist items covering:
+
 - PascalCase for public identifiers (functions, parameters, properties)
 - Lowercase for PowerShell keywords (function, param, if, else, return, trap)
 - camelCase with type-hinting prefixes for local variables (e.g., $strMessage, $intCount)
@@ -73,9 +77,11 @@ Ensure all anchor links point to the correct, specific subsections in the docume
 In the file `STYLE_GUIDE.md`, locate the "## Quick Reference Checklist" section. Add new checklist items at the end of this section to cover the "Documentation and Comments" section.
 
 Each checklist item should follow the same format:
+
 - **[Scope]** Brief guideline statement → [Link text](#anchor-to-section)
 
 For the "Documentation and Comments" section, create checklist items covering:
+
 - All functions must have full comment-based help
 - Comment-based help placed inside function body
 - Use single-line comments (#) with dotted keywords (.SYNOPSIS, .DESCRIPTION, etc.)
@@ -103,11 +109,13 @@ Ensure all anchor links point to the correct, specific subsections in the docume
 In the file `STYLE_GUIDE.md`, locate the "## Quick Reference Checklist" section. Add new checklist items at the end of this section to cover the "Functions and Parameter Blocks" section.
 
 Each checklist item should follow the same format:
+
 - **[Scope]** Brief guideline statement → [Link text](#anchor-to-section)
 
 For the "Functions and Parameter Blocks" section, create checklist items covering:
 
 **v1.0-targeted functions:**
+
 - No [CmdletBinding()] attribute
 - No [OutputType()] attribute
 - No begin/process/end blocks
@@ -121,6 +129,7 @@ For the "Functions and Parameter Blocks" section, create checklist items coverin
 - trap-based error handling (not try/catch)
 
 **Modern functions (v2.0+):**
+
 - Must use [CmdletBinding()] attribute
 - Must use [OutputType()] declaring singular primary type
 - Must use streaming output (write objects directly to pipeline in loop)
@@ -132,6 +141,7 @@ For the "Functions and Parameter Blocks" section, create checklist items coverin
 - Multiple [OutputType()] only for intentionally polymorphic returns
 
 **All functions:**
+
 - Functions are atomic, reusable tools with single purpose
 - Polymorphic parameters (multiple incompatible types) left un-typed or [object]
 - [ref] used exclusively for output requiring write-back to caller scope
@@ -152,6 +162,7 @@ In the file `STYLE_GUIDE.md`, locate the "## Quick Reference Checklist" section.
 Specifically, add checklist items for:
 
 **Consuming Streaming Functions (0-1-Many Problem):**
+
 - When consuming streaming functions, wrap result in @() to handle 0-1-many scenarios
 - Single-item results become scalar without @() wrapper
 - Using @() ensures consistent array handling regardless of result count
@@ -159,9 +170,11 @@ Specifically, add checklist items for:
 **Any other guidelines found in the document that are not yet in the checklist.**
 
 Each checklist item should follow the same format:
+
 - **[Scope]** Brief guideline statement → [Link text](#anchor-to-section)
 
 After adding these items, review the entire checklist to ensure:
+
 1. All major stylistic guidelines from the document are represented
 2. Items are logically grouped (keep code layout together, naming together, documentation together, etc.)
 3. The scope tags ([All], [Modern], [v1.0]) are accurate

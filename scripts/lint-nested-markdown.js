@@ -112,9 +112,12 @@ function lintMarkdownContent(content, config) {
     // Create a modified config for nested markdown
     // Disable MD041 (first-line-heading) since nested markdown snippets
     // may not start with a top-level heading
+    // Disable MD051 (link-fragments) since nested markdown often contains
+    // example/placeholder links that reference anchors in other documents
     const nestedConfig = {
         ...config,
-        'MD041': false
+        'MD041': false,
+        'MD051': false
     };
     
     const options = {
