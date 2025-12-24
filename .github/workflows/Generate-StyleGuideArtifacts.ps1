@@ -81,6 +81,10 @@ function New-StyleGuideChatVersion {
     try {
         $strContent = Get-Content -Path $SourcePath -Raw -Encoding UTF8
         
+        # Trim trailing blank line from content before adding closing fence
+        # This ensures the closing fence appears immediately after the last line of content
+        $strContent = $strContent -replace '\r?\n$', ''
+        
         # Find the maximum number of consecutive backticks in the content
         # The pattern '``+' matches one or more backticks (escaped as `` in PowerShell strings)
         $strBacktickPattern = '``+'
