@@ -14,7 +14,7 @@ const fs = require('fs');
 const path = require('path');
 const { glob } = require('glob');
 const MarkdownIt = require('markdown-it');
-const markdownlint = require('markdownlint');
+const { lint: markdownlintSync } = require('markdownlint/sync');
 
 // Initialize markdown-it parser
 const md = new MarkdownIt();
@@ -141,7 +141,7 @@ function lintMarkdownContent(content, config) {
         config: nestedConfig
     };
 
-    return markdownlint.sync(options);
+    return markdownlintSync(options);
 }
 
 /**
