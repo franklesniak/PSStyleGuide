@@ -238,12 +238,12 @@ function ExampleFunction {
 ```powershell
 function ExampleFunction {
     param (
-        [string]$ParamOne   
+        [string]$ParamOne   # ← trailing spaces here (not shown)
     )
 }
 ```
 
-In the non-compliant example, line 3 ends with trailing spaces after `$ParamOne`, which is not allowed.
+In the non-compliant example, line 3 would end with trailing spaces after `$ParamOne` (before the comment), which is not allowed. The actual trailing spaces are not shown in this documentation to avoid violating the rule within this file itself.
 
 Most modern editors can be configured to automatically remove trailing whitespace on save, which is recommended to maintain compliance with this rule.
 
