@@ -1,5 +1,7 @@
 # PowerShell Writing Style
 
+**Version:** 1.2.20251230.1
+
 ## Table of Contents
 
 - [Executive Summary: Author Profile](#executive-summary-author-profile)
@@ -761,11 +763,22 @@ This enables:
 
 All distributable functions and scripts must include a version number in the `.NOTES` section of their comment-based help. This version number provides critical change tracking and must follow a strict, `[System.Version]`-compatible format: `Major.Minor.Build.Revision`.
 
-- **`Major.Minor`**: These numbers are manually incremented based on the scope of the change.
-  - Increment the **Major** version (e.g., `1.0` to `2.0`) for breaking changes.
-  - Increment the **Minor** version (e.g., `1.0` to `1.1`) for new features or significant non-breaking improvements.
+- **`Major`**: Increment the **Major** version (e.g., `1.0.0` to `2.0.0`) **any time a breaking change is introduced**. Breaking changes include:
+  - Removing or renaming a function, parameter, or public interface
+  - Changing parameter types in incompatible ways
+  - Altering return types or output formats that break existing consumers
+  - Any modification that requires users to update their code
+- **`Minor`**: Increment the **Minor** version (e.g., `1.0.0` to `1.1.0`) **any time a feature or function change is introduced that is non-breaking**. This includes:
+  - Adding new functions or capabilities
+  - Adding new optional parameters
+  - Enhancing existing functionality without changing interfaces
+  - Performance improvements that don't affect behavior
 - **`Build`**: This component **must** be an integer in the format **`YYYYMMDD`**, representing the date the code was last modified. This date must be updated to the **current date** for *any* modification, however minor.
-- **`Revision`**: This component is typically `0` for the first commit of the day. It can be incremented (e.g., `1`, `2`) if multiple, distinct builds or revisions are created on the *same day*.
+- **`Revision`**: This component is typically `0` for the first commit of the day. It should be **bumped any time a minor change is made on the same date a change has already been made**. Revisions are typically reserved for:
+  - Trivial edits (typos, formatting, comments)
+  - Bug fixes that don't change functionality
+  - Documentation-only updates
+  - Multiple commits on the same day
 
 **Compliant Example:**
 
