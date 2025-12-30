@@ -37,6 +37,8 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[All]** No vertical operator alignment across multiple lines → [Operator Spacing and Alignment](#operator-spacing-and-alignment)
 - **[All]** Add extra indentation for multi-line method parameters → [Multi-line Method Indentation](#multi-line-method-indentation)
 - **[All]** Use blank lines sparingly: two around functions, one within → [Blank Line Usage](#blank-line-usage)
+- **[All]** Blank lines must not contain any whitespace (spaces or tabs) → [Blank Line Usage](#blank-line-usage)
+- **[All]** No lines may end with trailing whitespace → [Trailing Whitespace](#trailing-whitespace)
 - **[All]** Delimit variables in strings with `${}` or `-f` operator → [Variable Delimiting in Strings](#variable-delimiting-in-strings)
 
 ### Capitalization and Naming Conventions
@@ -81,6 +83,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[v1.0]** Explicit return statements in v1.0-targeted functions → [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes)
 - **[v1.0]** Reference parameters ([ref]) for outputs requiring caller modification → [Input/Output Contract: Reference Parameters](#inputoutput-contract-reference-parameters)
 - **[v1.0]** Return single integer status code (0=success, 1-5=partial, -1=failure) → [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes)
+- **[v1.0]** Exception: Test-* functions may return Boolean when no practical error handling needed → [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes)
 - **[v1.0]** Support positional parameters for v1.0 usability → [Positional Parameter Support](#positional-parameter-support)
 - **[v1.0]** trap-based error handling (not try/catch) in v1.0-targeted functions → [Overview of Function Architecture](#overview-of-function-architecture)
 - **[Modern]** Must use [CmdletBinding()] attribute → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
@@ -177,6 +180,30 @@ When a method call (like `.Add()`) is wrapped (e.g., in a `[void]` cast) and its
 
 Blank lines are used sparingly but effectively: two surround function definitions for visual separation, and single blanks group related logic within functions (e.g., before a block comment or between setup and main logic). Files end with a single blank line. Regions (#region ... #endregion) logically group elements like licenses or helper sections, improving navigability in larger scripts.
 
+**Important:** Blank lines must be completely empty—they **must not contain any whitespace characters** (spaces or tabs). This ensures consistency and prevents issues with some editors and linters.
+
+**Compliant (blank line is truly empty):**
+
+```powershell
+{
+    Invoke-SomeCmdlet
+
+    Invoke-AnotherCmdlet
+}
+```
+
+**Non-Compliant (blank line contains spaces):**
+
+```powershell
+{
+    Invoke-SomeCmdlet
+    
+    Invoke-AnotherCmdlet
+}
+```
+
+In the non-compliant example, the blank line (line 3) contains spaces, which is not allowed.
+
 Example snippet illustrating bracing, indentation, spacing, and blank lines:
 
 ```powershell
@@ -194,6 +221,34 @@ function ExampleFunction {
     return 0
 }
 ```
+
+### Trailing Whitespace
+
+**No lines may end with trailing whitespace** (spaces or tabs). Trailing whitespace can cause issues with version control systems, some editors, and linters. It also serves no functional purpose and reduces code consistency.
+
+**Compliant (no trailing whitespace):**
+
+```powershell
+function ExampleFunction {
+    param (
+        [string]$ParamOne
+    )
+}
+```
+
+**Non-Compliant (trailing spaces on line 3):**
+
+```powershell
+function ExampleFunction {
+    param (
+        [string]$ParamOne   
+    )
+}
+```
+
+In the non-compliant example, line 3 ends with trailing spaces after `$ParamOne`, which is not allowed.
+
+Most modern editors can be configured to automatically remove trailing whitespace on save, which is recommended to maintain compliance with this rule.
 
 ### Variable Delimiting in Strings
 
@@ -885,6 +940,38 @@ Every function returns a **single integer status code** via explicit `return` st
 | `0` | Full success |
 | `1–5` | Partial success with additional data |
 | `-1` | Complete failure |
+
+**Exception for `Test-*` Functions:**
+
+For PowerShell v1.0 scripts/functions that use the `Test-` verb (in a Verb-Noun naming convention) and are **not reasonably anticipated to encounter errors that the caller needs to detect and react to programmatically**, a **Boolean return** is allowed instead of an integer status code.
+
+This exception applies when:
+
+1. The function's verb is `Test-`
+2. The function is designed to return a simple true/false result (e.g., testing for the existence of a condition)
+3. There is no practical need for the caller to distinguish between different error conditions or partial success states
+
+**Example of Compliant Test Function with Boolean Return:**
+
+```powershell
+function Test-PathExists {
+    # .SYNOPSIS
+    # Tests whether a path exists.
+    # .DESCRIPTION
+    # Returns $true if the path exists, $false otherwise.
+    # .PARAMETER Path
+    # The path to test.
+    # .OUTPUTS
+    # [bool] $true if the path exists, $false otherwise.
+    param (
+        [string]$Path
+    )
+
+    return (Test-Path -Path $Path)
+}
+```
+
+For `Test-*` functions that may encounter meaningful errors (e.g., access denied, network issues) that the caller should be able to detect, the standard integer status code pattern should still be used.
 
 **Rationale for explicit `return`**:
 
