@@ -27,7 +27,7 @@
     "glob": "^10.3.10",
     "husky": "^9.1.7",
     "markdown-it": "^14.0.0",
-    "markdownlint": "^0.36.1",
-    "markdownlint-cli2": "^0.16.0"
+    "markdownlint": "^0.40.0",
+    "markdownlint-cli2": "^0.20.0"
   }
 }
