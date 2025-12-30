@@ -784,10 +784,10 @@ All distributable functions and scripts must include a version number in the `.N
 
 ```powershell
 # .NOTES
-# Version: 1.2.20251103.0
+# Version: 1.2.20251230.0
 ```
 
-This example assumes that the current date is November 3, 2025. In any code you write, use the current date in place of November 3, 2025.
+This example assumes that the current date is December 30, 2025. In any code you write, use the current date in place of December 30, 2025.
 
 ---
 
