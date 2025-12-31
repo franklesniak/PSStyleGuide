@@ -3,7 +3,7 @@
 ````markdown
 # PowerShell Writing Style
 
-**Version:** 1.2.20251230.1
+**Version:** 1.2.20251231.0
 
 ## Table of Contents
 
