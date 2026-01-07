@@ -1458,7 +1458,7 @@ Failing to verify writeability upfront can result in wasted processing time, use
 
 There are two approaches to testing file writeability:
 
-1. **`.NET` approach**: Using a function like `Test-FileWriteability` that uses `[System.IO.File]::Create()` and related .NET methods with explicit file handle control and resource cleanup. This approach is comprehensive but results in a lengthy function (~1000+ lines when including helper functions and documentation).
+1. **`.NET` approach**: Using a function like `Test-FileWriteability` that uses .NET methods such as `[System.IO.File]::Create()`, `[System.IO.File]::WriteAllText()`, or related .NET file operations with explicit file handle control and resource cleanup. This approach is comprehensive but results in a lengthy function (~1000+ lines when including helper functions and documentation).
 
 2. **`try/catch` approach**: Using `New-Item` to create a test file and `Remove-Item` to delete it, wrapped in a `try/catch` block. This approach is much shorter (~10 lines) but requires PowerShell v2.0+ since `try/catch` was introduced in v2.0.
 
@@ -1515,7 +1515,7 @@ if (-not $boolIsWritable) {
 
 #### try/catch Approach
 
-Use the following `try/catch` pattern for PowerShell v2.0+:
+Use the following `try/catch` pattern for PowerShell v2.0+, where `$OutputPath` represents the target file path:
 
 ```powershell
 try {
