@@ -11,6 +11,7 @@
 - [Documentation and Comments](#documentation-and-comments)
 - [Functions and Parameter Blocks](#functions-and-parameter-blocks)
 - [Error Handling](#error-handling)
+- [File Writeability Testing](#file-writeability-testing)
 - [Language Interop, Versioning, and .NET](#language-interop-versioning-and-net)
 - [Output Formatting and Streams](#output-formatting-and-streams)
 - [Performance, Security, and Other](#performance-security-and-other)
@@ -103,6 +104,12 @@ This checklist provides a quick reference for both human developers and LLMs (li
 
 - **[v1.0]** Use trap {} for error suppression in v1.0-targeted functions → [Core Error Suppression Mechanism](#core-error-suppression-mechanism)
 - **[Modern]** catch blocks must not be empty; log to Debug stream at minimum → [Modern catch Block Requirements](#modern-catch-block-requirements)
+
+### File Writeability Testing
+
+- **[All]** Verify file writeability before significant processing when writing output to files → [File Writeability Testing](#file-writeability-testing)
+- **[v1.0]** Use `.NET` approach (`Test-FileWriteability` function) for v1.0-targeted scripts → [Scripts Requiring PowerShell v1.0 Support](#scripts-requiring-powershell-v10-support)
+- **[Modern]** Use `.NET` or `try/catch` approach for v2.0+ scripts based on requirements → [Scripts Requiring PowerShell v2.0+ Support](#scripts-requiring-powershell-v20-support)
 
 ### Output Formatting and Streams
 
@@ -1430,6 +1437,132 @@ The error handling system is a **masterclass in v1.0 reliability engineering**:
 This is not "working around" v1.0 limitations — it is **exploiting v1.0 mechanics to achieve enterprise-grade reliability**. The system transforms potentially fatal failures into **predictable, analyzable status codes** while maintaining **zero host output** in normal operation.
 
 The only identified weakness is **helper function duplication**, which should be consolidated into shared nested definitions to eliminate maintenance risk. With this single improvement, the error handling system would achieve **perfect reliability scoring** across all PowerShell versions.
+
+## File Writeability Testing
+
+### Why Test File Writeability
+
+When a PowerShell script is designed to write output to a file (e.g., export to CSV), it must verify that the destination path is writable **before performing any significant processing**. This is a **preflight check** to catch issues such as:
+
+- Invalid paths
+- Missing directories
+- Insufficient permissions
+- Read-only locations
+- Files locked by another application
+
+Failing to verify writeability upfront can result in wasted processing time, user frustration, or data loss when the script fails at the final write step.
+
+---
+
+### Recommended Approaches
+
+There are two approaches to testing file writeability:
+
+1. **`.NET` approach**: Using a function like `Test-FileWriteability` that uses .NET methods such as `[System.IO.File]::Create()`, `[System.IO.File]::WriteAllText()`, or related .NET file operations with explicit file handle control and resource cleanup. This approach is comprehensive but results in a lengthy function (~1000+ lines when including helper functions and documentation).
+
+2. **`try/catch` approach**: Using `New-Item` to create a test file and `Remove-Item` to delete it, wrapped in a `try/catch` block. This approach is much shorter (~10 lines) but requires PowerShell v2.0+ since `try/catch` was introduced in v2.0.
+
+Both approaches use a **create-then-delete pattern**. The delete step is critical because `Remove-Item` will reliably fail if the file is locked by another process, even in cases where `New-Item -Force` might succeed in creating/overwriting the file.
+
+---
+
+### Scripts Requiring PowerShell v1.0 Support
+
+For scripts that must maintain backward compatibility with PowerShell v1.0, the **`.NET` approach** is required. The `try/catch` construct is not available in PowerShell v1.0 and causes a **parser error** if present in the script.
+
+**Rationale**: Since `try/catch` was introduced in PowerShell v2.0, any script containing this syntax will fail to parse on v1.0, even if the code path is never executed.
+
+Use the `Test-FileWriteability` function bundled from the reference implementation (see [Reference Implementation](#reference-implementation)).
+
+---
+
+### Scripts Requiring PowerShell v2.0+ Support
+
+For scripts targeting PowerShell v2.0 or later, **either approach is acceptable**. Choose based on the following criteria:
+
+#### Prefer the `.NET` Approach (`Test-FileWriteability`) When
+
+- Script performs **mission-critical operations** or where strict error control/avoidance (i.e., avoiding users seeing an error) is paramount
+- Script runs **unattended** (scheduled tasks, automation pipelines)
+- Script is part of a **larger module or library** where consistency matters, or where the script/library has to be runnable on PowerShell v1.0 without throwing a parser error (for example, the script may have a module dependency that makes it require Windows PowerShell v5.1 or newer, and you've built-in proactive, graceful PowerShell version detection with a helpful warning when the version of PowerShell is not supported, and you need this version detection/warning workflow to function if the script is run on PowerShell v1.0—in other words, the script may only support newer versions of PowerShell but it needs to be runnable on PowerShell v1.0 without crashing due to `try/catch` introducing a parser error)
+- **Detailed error capture** is needed (e.g., populating a reference to an ErrorRecord for logging)
+- Script size is **not a concern**
+
+#### Prefer the `try/catch` Approach When
+
+- Script is a **simple, single-purpose utility**
+- Script runs **interactively** where users can see and respond to errors
+- The typical user is **PowerShell-savvy** and would be expected to interpret any issues without trouble
+- Script is **distributed to others** who may need to read/modify it (simpler code is easier to understand)
+- **Minimizing script size** is important
+
+---
+
+### Code Examples
+
+#### .NET Approach
+
+To follow the `.NET` approach, the script should bundle `Test-FileWriteability` from the [reference implementation](#reference-implementation) and then call it following the guidance in the function header. For example:
+
+```powershell
+$errRecord = $null
+$boolIsWritable = Test-FileWriteability -Path 'Z:\InvalidPath\file.log' -ReferenceToErrorRecord ([ref]$errRecord)
+if (-not $boolIsWritable) {
+    Write-Warning ('Failed to write to path. Error: ' + $errRecord.Exception.Message)
+    return # replace with an appropriate exiting action
+}
+```
+
+#### try/catch Approach
+
+Use the following `try/catch` pattern for PowerShell v2.0+, where `$OutputPath` represents the target file path:
+
+```powershell
+try {
+    [void](New-Item -Path $OutputPath -ItemType File -Force -ErrorAction Stop)
+    Remove-Item -LiteralPath $OutputPath -Force -ErrorAction Stop
+} catch {
+    throw "Cannot write to '$OutputPath': $($_.Exception.Message)"
+}
+```
+
+**Note**: Using `-LiteralPath` with `Remove-Item` is important to avoid wildcard interpretation issues.
+
+#### try/catch Alternative (.NET Methods)
+
+The following alternative provides `.NET` reliability without the bulk of a full function, for scripts targeting PowerShell v2.0+:
+
+```powershell
+try {
+    [System.IO.File]::WriteAllText($OutputPath, '')
+    [System.IO.File]::Delete($OutputPath)
+} catch {
+    throw "Cannot write to '$OutputPath': $($_.Exception.Message)"
+}
+```
+
+This approach:
+
+- Uses `.NET` methods directly (reliable, explicit)
+- Is much shorter than a full `Test-FileWriteability` function
+- Works on PowerShell v2.0+ (.NET Framework 2.0 includes these static methods)
+- Still requires `try/catch`, so does not work on PowerShell v1.0
+- Is less idiomatic than using `New-Item`/`Remove-Item`
+
+---
+
+### Reference Implementation
+
+For scripts requiring the comprehensive `.NET` approach, a full implementation of the `Test-FileWriteability` function is available at:
+
+<https://github.com/franklesniak/PowerShell_Resources/blob/main/Test-FileWriteability.ps1>
+
+This implementation includes:
+
+- Explicit file handle control and resource cleanup
+- Detailed error capture via reference parameters
+- Full documentation and examples
+- Support for PowerShell v1.0+
 
 ## Language Interop, Versioning, and .NET
 
