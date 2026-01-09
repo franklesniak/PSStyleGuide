@@ -3,7 +3,7 @@
 ````markdown
 # PowerShell Writing Style
 
-**Version:** 1.3.20260109.0
+**Version:** 1.3.20260109.1
 
 ## Table of Contents
 
@@ -73,6 +73,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[All]** Version build component must be current date in YYYYMMDD format → [Function and Script Versioning](#function-and-script-versioning)
 - **[All]** Inline comments focus on "why" not "what" → [Inline Comments: Purpose and Placement](#inline-comments-purpose-and-placement)
 - **[All]** Use #region / #endregion for logical code folding → [Structural Documentation: Regions and Licensing](#structural-documentation-regions-and-licensing)
+- **[All]** Place param() block before license region (if applicable) → [Structural Documentation: Regions and Licensing](#structural-documentation-regions-and-licensing)
 - **[All]** Per-function licensing in distributable helpers (#region License after param block) → [Structural Documentation: Regions and Licensing](#structural-documentation-regions-and-licensing)
 - **[All]** Centralize parameter documentation in help block, not above individual parameters → [Parameter Documentation Placement: Strategic Choice](#parameter-documentation-placement-strategic-choice)
 
@@ -767,7 +768,31 @@ The script uses **`#region` / `#endregion`** blocks to create **logical code fol
 
 In addition to top-level script regions, this pattern can be applied inside individual functions:
 
-- Per-Function Licensing: For distributable helper functions, the license text should be included inside a `#region License` block, placed immediately after the function's `param()` block.
+- **Function Structure with License**: For distributable helper functions, the structure must be: function declaration, comment-based help, `param()` block, and then the `#region License` block. The license region should be placed immediately after the function's `param()` block.
+
+**Example:**
+
+```powershell
+function Get-Example {
+    # .SYNOPSIS
+    # Example function with license
+    # .DESCRIPTION
+    # This demonstrates the correct placement of param() before license.
+    # .NOTES
+    # Version: 1.0.20260109.0
+    
+    param(
+        [string]$Parameter
+    )
+    
+    #region License ########################################################
+    # MIT License or other license text
+    #endregion License ########################################################
+    
+    # Function implementation
+    return 0
+}
+```
 
 This enables:
 
