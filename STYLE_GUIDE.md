@@ -1618,7 +1618,7 @@ function Get-WindowsSystemInfo {
     # .DESCRIPTION
     # This function only runs on Windows and uses Windows-specific cmdlets.
     # .NOTES
-    # Requires PowerShell Core 6.0+ or Windows PowerShell 5.1+
+    # Requires PowerShell Core 6.0+
     # Version: 1.0.20260109.0
 
     param()
