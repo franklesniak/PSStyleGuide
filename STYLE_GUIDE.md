@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 1.2.20260107.0
+**Version:** 1.3.20260109.0
 
 ## Table of Contents
 
@@ -12,6 +12,7 @@
 - [Functions and Parameter Blocks](#functions-and-parameter-blocks)
 - [Error Handling](#error-handling)
 - [File Writeability Testing](#file-writeability-testing)
+- [Operating System Compatibility Checks](#operating-system-compatibility-checks)
 - [Language Interop, Versioning, and .NET](#language-interop-versioning-and-net)
 - [Output Formatting and Streams](#output-formatting-and-streams)
 - [Performance, Security, and Other](#performance-security-and-other)
@@ -110,6 +111,13 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[All]** Verify file writeability before significant processing when writing output to files → [File Writeability Testing](#file-writeability-testing)
 - **[v1.0]** Use `.NET` approach (`Test-FileWriteability` function) for v1.0-targeted scripts → [Scripts Requiring PowerShell v1.0 Support](#scripts-requiring-powershell-v10-support)
 - **[Modern]** Use `.NET` or `try/catch` approach for v2.0+ scripts based on requirements → [Scripts Requiring PowerShell v2.0+ Support](#scripts-requiring-powershell-v20-support)
+
+### Operating System Compatibility Checks
+
+- **[All]** Include OS compatibility checks when script/function supports only specific operating systems → [When OS Checks Are Required](#when-os-checks-are-required)
+- **[Modern]** Use built-in `$IsWindows`, `$IsMacOS`, `$IsLinux` variables for PowerShell Core 6.0+ only scripts → [PowerShell Core 6.0+ OS Detection](#powershell-core-60-os-detection)
+- **[v1.0]** Use `Test-Windows`, `Test-macOS`, `Test-Linux` functions from PowerShell_Resources for scripts supporting older versions → [Cross-Version OS Detection](#cross-version-os-detection)
+- **[All]** Report wrong OS errors consistently with existing error handling patterns → [Error Handling for Wrong OS](#error-handling-for-wrong-os)
 
 ### Output Formatting and Streams
 
@@ -1563,6 +1571,262 @@ This implementation includes:
 - Detailed error capture via reference parameters
 - Full documentation and examples
 - Support for PowerShell v1.0+
+
+## Operating System Compatibility Checks
+
+### Overview: Ensuring Cross-Platform Compatibility
+
+When a PowerShell script or function is designed to run only on specific operating systems (Windows, Linux, and/or macOS), it **must** include appropriate checks to verify that the correct operating system is running before proceeding with its core operations. This prevents runtime failures, unexpected behavior, and provides clear error messages to users running the script on unsupported platforms.
+
+The method used to detect the operating system depends on the minimum PowerShell version the script or function targets. PowerShell Core 6.0 introduced automatic variables for OS detection (`$IsWindows`, `$IsMacOS`, `$IsLinux`), but these are not available in Windows PowerShell 1.0 through 5.1. Scripts that must support older versions require a "safe" approach using dedicated detection functions.
+
+---
+
+### When OS Checks Are Required
+
+If a script or function supports only specific operating systems (Windows, Linux, and/or macOS), it **must** include a check to verify that the appropriate operating system type(s) are running before proceeding with platform-specific operations.
+
+**Examples of when OS checks are required:**
+
+- Scripts that use Windows-only APIs or cmdlets (e.g., `Get-WmiObject`, `Get-CimInstance` for certain classes)
+- Scripts that interact with Linux-specific paths or commands (e.g., `/etc/`, `apt-get`)
+- Scripts that use macOS-specific frameworks or file locations
+- Any script that cannot function correctly on all platforms
+
+**Examples of when OS checks may not be required:**
+
+- Scripts that use only cross-platform PowerShell features
+- Scripts that gracefully degrade functionality based on available cmdlets/modules
+- Scripts explicitly documented as single-platform with clear naming (though checks are still recommended)
+
+---
+
+### PowerShell Core 6.0+ OS Detection
+
+If the script or function **only** needs to support PowerShell Core 6.0 or newer (and does not need to run on Windows PowerShell 1.0-5.1), the built-in automatic variables can be used for OS detection:
+
+- **`$IsWindows`** — `$true` on Windows, `$false` on other platforms
+- **`$IsMacOS`** — `$true` on macOS, `$false` on other platforms
+- **`$IsLinux`** — `$true` on Linux, `$false` on other platforms
+
+**Example: Windows-only script for PowerShell Core 6.0+:**
+
+```powershell
+function Get-WindowsSystemInfo {
+    # .SYNOPSIS
+    # Retrieves Windows-specific system information.
+    # .DESCRIPTION
+    # This function only runs on Windows and uses Windows-specific cmdlets.
+    # .NOTES
+    # Requires PowerShell Core 6.0+ or Windows PowerShell 5.1+
+    # Version: 1.0.20260109.0
+
+    param()
+
+    # Check if running on Windows
+    if (-not $IsWindows) {
+        Write-Error "This function only runs on Windows."
+        return -1
+    }
+
+    # Proceed with Windows-specific operations
+    $objSystemInfo = Get-CimInstance -ClassName Win32_OperatingSystem
+    return 0
+}
+```
+
+**Example: Linux or macOS script:**
+
+```powershell
+function Get-UnixSystemInfo {
+    # .SYNOPSIS
+    # Retrieves Unix-based system information.
+    # .DESCRIPTION
+    # This function runs on Linux or macOS only.
+    # .NOTES
+    # Requires PowerShell Core 6.0+
+    # Version: 1.0.20260109.0
+
+    param()
+
+    # Check if running on a Unix-based system
+    if (-not ($IsLinux -or $IsMacOS)) {
+        Write-Error "This function only runs on Linux or macOS."
+        return -1
+    }
+
+    # Proceed with Unix-specific operations
+    $strOutput = uname -a
+    return 0
+}
+```
+
+---
+
+### Cross-Version OS Detection
+
+If the script or function needs to support **any version of PowerShell older than PowerShell Core 6.0** (including Windows PowerShell 1.0 through 5.1), a "safe" check must be used because the `$IsWindows`, `$IsMacOS`, and `$IsLinux` variables do not exist in those versions.
+
+In this case, use the following dedicated functions from the [`PowerShell_Resources`](https://github.com/franklesniak/PowerShell_Resources) repository:
+
+| Operating System | Function | Repository Link |
+| --- | --- | --- |
+| **Windows** | `Test-Windows` | [`Test-Windows.ps1`](https://github.com/franklesniak/PowerShell_Resources/blob/master/Test-Windows.ps1) |
+| **macOS** | `Test-macOS` | [`Test-macOS.ps1`](https://github.com/franklesniak/PowerShell_Resources/blob/master/Test-macOS.ps1) |
+| **Linux** | `Test-Linux` | [`Test-Linux.ps1`](https://github.com/franklesniak/PowerShell_Resources/blob/master/Test-Linux.ps1) |
+
+These functions safely detect the operating system across all PowerShell versions and return a boolean value (`$true` if running on the specified OS, `$false` otherwise).
+
+**Example: Windows-only script for PowerShell 1.0+:**
+
+```powershell
+# Bundle the Test-Windows function from PowerShell_Resources repository
+# (Include full function definition here or dot-source it)
+
+function Get-WindowsSystemInfo {
+    # .SYNOPSIS
+    # Retrieves Windows-specific system information.
+    # .DESCRIPTION
+    # This function only runs on Windows and uses Windows-specific cmdlets.
+    # Compatible with PowerShell 1.0+.
+    # .NOTES
+    # Version: 1.0.20260109.0
+
+    param()
+
+    # Check if running on Windows using safe cross-version detection
+    $boolIsWindows = Test-Windows
+    if (-not $boolIsWindows) {
+        Write-Warning "This function only runs on Windows."
+        return -1
+    }
+
+    # Proceed with Windows-specific operations
+    # Use appropriate cmdlets based on PowerShell version
+    return 0
+}
+```
+
+**Example: Linux or macOS script for PowerShell 1.0+:**
+
+```powershell
+# Bundle Test-Linux and Test-macOS functions from PowerShell_Resources
+# (Include full function definitions here or dot-source them)
+
+function Get-UnixSystemInfo {
+    # .SYNOPSIS
+    # Retrieves Unix-based system information.
+    # .DESCRIPTION
+    # This function runs on Linux or macOS only.
+    # Compatible with PowerShell 1.0+.
+    # .NOTES
+    # Version: 1.0.20260109.0
+
+    param()
+
+    # Check if running on a Unix-based system
+    $boolIsLinux = Test-Linux
+    $boolIsMacOS = Test-macOS
+    
+    if (-not ($boolIsLinux -or $boolIsMacOS)) {
+        Write-Warning "This function only runs on Linux or macOS."
+        return -1
+    }
+
+    # Proceed with Unix-specific operations
+    return 0
+}
+```
+
+**Rationale for using dedicated functions:**
+
+The `$IsWindows`, `$IsMacOS`, and `$IsLinux` variables were introduced in PowerShell Core 6.0. Attempting to reference these variables in PowerShell 1.0-5.1 results in a `$null` value, which can lead to incorrect behavior (e.g., `-not $IsWindows` evaluates to `$true` on Windows PowerShell 5.1, incorrectly suggesting the script is not on Windows).
+
+The `Test-Windows`, `Test-macOS`, and `Test-Linux` functions from the PowerShell_Resources repository provide safe, reliable OS detection that works identically across all PowerShell versions from 1.0 onward.
+
+---
+
+### Error Handling for Wrong OS
+
+If the script or function detects that it is running on an unsupported operating system, it should report the error in a way that is **consistent with the script's or function's existing error handling patterns**.
+
+**Guidelines:**
+
+1. **Match the error reporting style:** If the function returns integer status codes (e.g., `0` for success, `-1` for failure), return the appropriate error code. If it uses exceptions, throw an exception. If it uses `Write-Error`, use that.
+
+2. **Provide clear error messages:** The error message should clearly state which operating system(s) are required and which OS was detected.
+
+3. **Fail early:** Perform the OS check at the beginning of the function or script, before any significant processing occurs.
+
+**Example: Function returning status code:**
+
+```powershell
+function Get-WindowsRegistryValue {
+    # .SYNOPSIS
+    # Retrieves a value from the Windows Registry.
+    # .OUTPUTS
+    # [int] Status code: 0=success, -1=failure (including wrong OS)
+
+    param(
+        [string]$Path
+    )
+
+    # OS check at the beginning
+    if (-not $IsWindows) {
+        Write-Error "This function requires Windows. Current OS is not supported."
+        return -1
+    }
+
+    # Proceed with Windows-specific operations
+    return 0
+}
+```
+
+**Example: Function using Write-Warning for non-critical failure:**
+
+```powershell
+function Get-OptionalWindowsInfo {
+    # .SYNOPSIS
+    # Retrieves optional Windows information.
+
+    param()
+
+    # Check OS and warn if not Windows
+    if (-not $IsWindows) {
+        Write-Warning "This function is optimized for Windows. Some features may not be available on other platforms."
+        return $null
+    }
+
+    # Proceed with Windows-specific operations
+    return $objInfo
+}
+```
+
+**Example: Script exiting with clear error:**
+
+```powershell
+# At the top of a Windows-only script
+if (-not $IsWindows) {
+    Write-Error "This script requires Windows. Current OS: $(if ($IsLinux) { 'Linux' } elseif ($IsMacOS) { 'macOS' } else { 'Unknown' })"
+    exit 1
+}
+
+# Continue with Windows-specific script logic
+```
+
+---
+
+### Summary: OS Compatibility Checks as Cross-Platform Reliability
+
+Operating system compatibility checks are a **critical reliability requirement** for platform-specific scripts and functions:
+
+- **Required** when scripts/functions support only specific operating systems
+- **Use built-in variables** (`$IsWindows`, `$IsMacOS`, `$IsLinux`) for PowerShell Core 6.0+ only scripts
+- **Use safe functions** (`Test-Windows`, `Test-macOS`, `Test-Linux`) for scripts supporting older PowerShell versions
+- **Report errors consistently** with the script's existing error handling patterns
+- **Fail early** to prevent unexpected behavior on unsupported platforms
+
+This approach ensures that users receive clear, actionable error messages when attempting to run platform-specific scripts on unsupported operating systems, preventing confusion and runtime failures.
 
 ## Language Interop, Versioning, and .NET
 
