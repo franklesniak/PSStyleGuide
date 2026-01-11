@@ -50,6 +50,58 @@ function New-StyleGuideCopilotVersion {
 }
 
 
+function New-StyleGuidePowerShellInstructionsVersion {
+    <#
+    .SYNOPSIS
+    Creates powershell.instructions.md with YAML frontmatter prepended to STYLE_GUIDE.md content.
+
+    .PARAMETER SourcePath
+    Path to the source STYLE_GUIDE.md file.
+
+    .PARAMETER DestinationPath
+    Path to the destination powershell.instructions.md file.
+
+    .DESCRIPTION
+    This function reads STYLE_GUIDE.md and prepends YAML frontmatter for GitHub Copilot
+    file-specific instructions. The frontmatter includes applyTo pattern and description.
+
+    .OUTPUTS
+    Returns 0 on success, 1 on failure.
+    #>
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$SourcePath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$DestinationPath
+    )
+
+    try {
+        $strContent = Get-Content -Path $SourcePath -Raw -Encoding UTF8
+        
+        # Define the YAML frontmatter with blank line after closing delimiter
+        $strFrontmatter = @"
+---
+applyTo:  "**/*.ps1"
+description: "PowerShell coding standards"
+---
+
+
+"@
+        
+        # Prepend frontmatter to content
+        $strFullContent = $strFrontmatter + $strContent
+        
+        Set-Content -Path $DestinationPath -Value $strFullContent -Encoding UTF8 -NoNewline
+        Write-Host "Successfully created $DestinationPath"
+        return 0
+    } catch {
+        Write-Error "Failed to create powershell.instructions.md: $_"
+        return 1
+    }
+}
+
+
 function New-StyleGuideChatVersion {
     <#
     .SYNOPSIS
@@ -119,6 +171,7 @@ function New-StyleGuideChatVersion {
 # Main execution
 $strSourceFile = "STYLE_GUIDE.md"
 $strCopilotFile = "copilot-instructions.md"
+$strPowerShellInstructionsFile = "powershell.instructions.md"
 $strChatFile = "STYLE_GUIDE_CHAT.md"
 
 # Verify source file exists
@@ -130,6 +183,12 @@ if (-not (Test-Path -Path $strSourceFile)) {
 # Generate copilot-instructions.md
 $intCopilotResult = New-StyleGuideCopilotVersion -SourcePath $strSourceFile -DestinationPath $strCopilotFile
 if ($intCopilotResult -ne 0) {
+    exit 1
+}
+
+# Generate powershell.instructions.md
+$intPowerShellInstructionsResult = New-StyleGuidePowerShellInstructionsVersion -SourcePath $strSourceFile -DestinationPath $strPowerShellInstructionsFile
+if ($intPowerShellInstructionsResult -ne 0) {
     exit 1
 }
 
