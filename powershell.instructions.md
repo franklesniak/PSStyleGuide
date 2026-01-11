@@ -1,6 +1,8 @@
-# PowerShell Writing Style Guide - Formatted for Copy-Paste Into LLM Chat
+---
+applyTo:  "**/*.ps1"
+description: "PowerShell coding standards"
+---
 
-````markdown
 # PowerShell Writing Style
 
 **Version:** 1.3.20260109.2
@@ -2520,4 +2522,3 @@ The **Performance, Security, and Other** aspects reveal a **mature, constrained 
 The function is a **minimal, maximalist** design: it does **exactly one thing**, does it **perfectly**, and **refuses to do anything else**. This is the hallmark of **industrial-grade PowerShell tooling** — code that can be deployed in 2006 or 2026 with identical behavior when compatible.
 
 **Final Assessment**: **"Fit for purpose across 18 years of PowerShell evolution."**
-````
