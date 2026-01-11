@@ -2,11 +2,12 @@
 
 <#
 .SYNOPSIS
-Generates copilot-instructions.md and STYLE_GUIDE_CHAT.md from STYLE_GUIDE.md.
+Generates copilot-instructions.md, powershell.instructions.md, and STYLE_GUIDE_CHAT.md from STYLE_GUIDE.md.
 
 .DESCRIPTION
-This script reads STYLE_GUIDE.md and creates two derived files:
-- copilot-instructions.md: A direct copy of STYLE_GUIDE.md for use as GitHub Copilot custom instructions
+This script reads STYLE_GUIDE.md and creates three derived files:
+- copilot-instructions.md: A direct copy of STYLE_GUIDE.md for use as GitHub Copilot custom instructions in PowerShell-only repositories
+- powershell.instructions.md: A version with YAML frontmatter for GitHub Copilot file-specific instructions in multi-language repositories
 - STYLE_GUIDE_CHAT.md: A chat-ready version with escaped triple backticks wrapped in a markdown code fence
 
 .EXAMPLE
