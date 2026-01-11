@@ -3,7 +3,15 @@
 ````markdown
 # PowerShell Writing Style
 
-**Version:** 1.3.20260109.1
+**Version:** 1.3.20260109.2
+
+## Metadata
+
+- **Status:** Active
+- **Owner:** Repository Maintainers
+- **Last Updated:** 2026-01-09
+- **Scope:** Defines PowerShell coding standards for all `.ps1` files in this repository. Covers style, formatting, naming conventions, error handling, documentation requirements, and compatibility patterns for both legacy (v1.0) and modern (v5.1+/v7.x+) PowerShell codebases.
+- **Related:** [Repository Copilot Instructions](../copilot-instructions.md), [Documentation Standards](docs.instructions.md)
 
 ## Table of Contents
 
