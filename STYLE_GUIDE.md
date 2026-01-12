@@ -42,113 +42,113 @@ This checklist provides a quick reference for both human developers and LLMs (li
 
 ### Code Layout and Formatting
 
-- **[All]** Use 4 spaces for indentation, never tabs → [Indentation Rules](#indentation-rules)
-- **[All]** Place opening braces on same line (OTBS) → [Brace Placement (OTBS)](#brace-placement-otbs)
-- **[All]** Keep `catch`, `finally`, `else` on same line as closing brace → [Exception: catch, finally, and else Keywords](#exception-catch-finally-and-else-keywords)
-- **[All]** Use single space around operators, no extra alignment → [Operator Spacing and Alignment](#operator-spacing-and-alignment)
-- **[All]** No vertical operator alignment across multiple lines → [Operator Spacing and Alignment](#operator-spacing-and-alignment)
-- **[All]** Add extra indentation for multi-line method parameters → [Multi-line Method Indentation](#multi-line-method-indentation)
-- **[All]** Use blank lines sparingly: two around functions, one within → [Blank Line Usage](#blank-line-usage)
+- **[All]** Code **MUST** use 4 spaces for indentation, never tabs → [Indentation Rules](#indentation-rules)
+- **[All]** Opening braces **MUST** be placed on same line (OTBS) → [Brace Placement (OTBS)](#brace-placement-otbs)
+- **[All]** `catch`, `finally`, `else` **MUST** be on same line as closing brace → [Exception: catch, finally, and else Keywords](#exception-catch-finally-and-else-keywords)
+- **[All]** Code **MUST** use single space around operators, no extra alignment → [Operator Spacing and Alignment](#operator-spacing-and-alignment)
+- **[All]** Operators **MUST NOT** be vertically aligned across multiple lines → [Operator Spacing and Alignment](#operator-spacing-and-alignment)
+- **[All]** Multi-line method parameters **MUST** have extra indentation → [Multi-line Method Indentation](#multi-line-method-indentation)
+- **[All]** Blank lines **SHOULD** be used sparingly: two around functions, one within → [Blank Line Usage](#blank-line-usage)
 - **[All]** Blank lines **MUST NOT** contain any whitespace (spaces or tabs) → [Blank Line Usage](#blank-line-usage)
-- **[All]** No lines may end with trailing whitespace → [Trailing Whitespace](#trailing-whitespace)
-- **[All]** Delimit variables in strings with `${}` or `-f` operator → [Variable Delimiting in Strings](#variable-delimiting-in-strings)
+- **[All]** Lines **MUST NOT** end with trailing whitespace → [Trailing Whitespace](#trailing-whitespace)
+- **[All]** Variables in strings **SHOULD** be delimited with `${}` or `-f` operator → [Variable Delimiting in Strings](#variable-delimiting-in-strings)
 
 ### Capitalization and Naming Conventions
 
-- **[All]** Use PascalCase for public identifiers (functions, parameters, properties) → [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
-- **[All]** Use lowercase for PowerShell keywords (function, param, if, else, return, trap) → [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
-- **[v1.0]** Use camelCase with type-hinting prefixes for local variables, fully descriptive (e.g., $strMessage, $intCount, no abbreviations) → [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase)
-- **[All]** Follow Verb-Noun pattern with approved verbs → [Script and Function Naming: Full Explicit Form](#script-and-function-naming-full-explicit-form)
-- **[All]** Use singular nouns in function names → [Script and Function Naming: Nouns](#script-and-function-naming-nouns)
-- **[All]** Use PascalCase nouns for modules (containers, not actions) → [Module Naming: Noun-Based Containers](#module-naming-noun-based-containers)
-- **[All]** Never use aliases in code → [Do Not Use Aliases](#do-not-use-aliases)
-- **[Modern]** No compatibility aliases in module exports (exception: genuine interactive shortcuts) → [Do Not Use Aliases](#do-not-use-aliases)
-- **[All]** Use PascalCase, fully descriptive parameter names → [Parameter Naming](#parameter-naming)
-- **[v1.0]** Use "ReferenceTo" prefix for reference parameters → [Parameter Naming](#parameter-naming)
-- **[All]** Avoid relative paths and tilde (~) shortcut → [Path and Scope Handling](#path-and-scope-handling)
-- **[All]** Use explicit scoping ($global:, $script:) → [Path and Scope Handling](#path-and-scope-handling)
+- **[All]** Public identifiers (functions, parameters, properties) **MUST** use PascalCase → [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
+- **[All]** PowerShell keywords (function, param, if, else, return, trap) **MUST** be lowercase → [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
+- **[v1.0]** Local variables **MUST** use camelCase with type-hinting prefixes, fully descriptive (e.g., $strMessage, $intCount, no abbreviations) → [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase)
+- **[All]** Functions **MUST** follow Verb-Noun pattern with approved verbs → [Script and Function Naming: Full Explicit Form](#script-and-function-naming-full-explicit-form)
+- **[All]** Functions **MUST** use singular nouns in function names → [Script and Function Naming: Nouns](#script-and-function-naming-nouns)
+- **[All]** Modules **MUST** use PascalCase nouns (containers, not actions) → [Module Naming: Noun-Based Containers](#module-naming-noun-based-containers)
+- **[All]** Aliases **MUST NOT** be used in code → [Do Not Use Aliases](#do-not-use-aliases)
+- **[Modern]** Modules **MUST NOT** export compatibility aliases (exception: genuine interactive shortcuts) → [Do Not Use Aliases](#do-not-use-aliases)
+- **[All]** Parameters **MUST** use PascalCase, fully descriptive names → [Parameter Naming](#parameter-naming)
+- **[v1.0]** Reference parameters **MUST** use "ReferenceTo" prefix → [Parameter Naming](#parameter-naming)
+- **[All]** Code **SHOULD** avoid relative paths and tilde (~) shortcut → [Path and Scope Handling](#path-and-scope-handling)
+- **[All]** Code **SHOULD** use explicit scoping ($global:, $script:) → [Path and Scope Handling](#path-and-scope-handling)
 
 ### Documentation and Comments
 
 - **[All]** All functions **MUST** have full comment-based help → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
-- **[All]** Place comment-based help inside function body, above param block → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
-- **[All]** Use single-line comments (#) with dotted keywords (.SYNOPSIS, .DESCRIPTION, etc.) → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
-- **[All]** Include required help sections: .SYNOPSIS, .DESCRIPTION, .PARAMETER, .EXAMPLE, .INPUTS, .OUTPUTS, .NOTES → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
-- **[All]** Provide multiple examples with input, output, and explanation → [Help Content Quality: High Standards](#help-content-quality-high-standards)
-- **[All]** Document all return codes with exact meanings in .OUTPUTS → [Help Content Quality: High Standards](#help-content-quality-high-standards)
-- **[All]** Document positional parameter support in .NOTES → [Help Content Quality: High Standards](#help-content-quality-high-standards)
-- **[All]** Include version number in .NOTES (format: Major.Minor.YYYYMMDD.Revision) → [Function and Script Versioning](#function-and-script-versioning)
+- **[All]** Comment-based help **MUST** be placed inside function body, above param block → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
+- **[All]** Comment-based help **MUST** use single-line comments (#) with dotted keywords (.SYNOPSIS, .DESCRIPTION, etc.) → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
+- **[All]** Comment-based help **MUST** include sections: .SYNOPSIS, .DESCRIPTION, .PARAMETER, .EXAMPLE, .INPUTS, .OUTPUTS, .NOTES → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
+- **[All]** Functions **SHOULD** provide multiple examples with input, output, and explanation → [Help Content Quality: High Standards](#help-content-quality-high-standards)
+- **[All]** All return codes **MUST** be documented with exact meanings in .OUTPUTS → [Help Content Quality: High Standards](#help-content-quality-high-standards)
+- **[All]** Positional parameter support **MUST** be documented in .NOTES → [Help Content Quality: High Standards](#help-content-quality-high-standards)
+- **[All]** Version number **MUST** be included in .NOTES (format: Major.Minor.YYYYMMDD.Revision) → [Function and Script Versioning](#function-and-script-versioning)
 - **[All]** Version build component **MUST** be current date in YYYYMMDD format → [Function and Script Versioning](#function-and-script-versioning)
-- **[All]** Inline comments focus on "why" not "what" → [Inline Comments: Purpose and Placement](#inline-comments-purpose-and-placement)
-- **[All]** Use #region / #endregion for logical code folding → [Structural Documentation: Regions and Licensing](#structural-documentation-regions-and-licensing)
-- **[All]** Place param() block before license region (if applicable) → [Structural Documentation: Regions and Licensing](#structural-documentation-regions-and-licensing)
-- **[All]** Per-function licensing in distributable helpers (#region License after param block) → [Structural Documentation: Regions and Licensing](#structural-documentation-regions-and-licensing)
-- **[All]** Centralize parameter documentation in help block, not above individual parameters → [Parameter Documentation Placement: Strategic Choice](#parameter-documentation-placement-strategic-choice)
+- **[All]** Inline comments **SHOULD** focus on "why" not "what" → [Inline Comments: Purpose and Placement](#inline-comments-purpose-and-placement)
+- **[All]** Code **SHOULD** use #region / #endregion for logical code folding → [Structural Documentation: Regions and Licensing](#structural-documentation-regions-and-licensing)
+- **[All]** The param() block **MUST** be placed before license region (if applicable) → [Structural Documentation: Regions and Licensing](#structural-documentation-regions-and-licensing)
+- **[All]** Distributable helpers **SHOULD** use per-function licensing (#region License after param block) → [Structural Documentation: Regions and Licensing](#structural-documentation-regions-and-licensing)
+- **[All]** Parameter documentation **SHOULD** be centralized in help block, not above individual parameters → [Parameter Documentation Placement: Strategic Choice](#parameter-documentation-placement-strategic-choice)
 
 ### Functions and Parameter Blocks
 
-- **[v1.0]** No [CmdletBinding()] attribute in v1.0-targeted functions → [Function Declaration and Structure](#function-declaration-and-structure)
-- **[v1.0]** No [OutputType()] attribute in v1.0-targeted functions → [Function Declaration and Structure](#function-declaration-and-structure)
-- **[v1.0]** No begin/process/end blocks in v1.0-targeted functions → [Function Declaration and Structure](#function-declaration-and-structure)
-- **[v1.0]** No pipeline input support in v1.0-targeted functions → [Pipeline Behavior: Deliberately Disabled](#pipeline-behavior-deliberately-disabled)
-- **[v1.0]** Simple function keyword with param() block in v1.0-targeted functions → [Function Declaration and Structure](#function-declaration-and-structure)
-- **[v1.0]** Strong typing in parameters → [Parameter Block Design: Detailed Analysis](#parameter-block-design-detailed-analysis)
-- **[v1.0]** Explicit return statements in v1.0-targeted functions → [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes)
-- **[v1.0]** Reference parameters ([ref]) for outputs requiring caller modification → [Input/Output Contract: Reference Parameters](#inputoutput-contract-reference-parameters)
-- **[v1.0]** Return single integer status code (0=success, 1-5=partial, -1=failure) → [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes)
-- **[v1.0]** Exception: Test-* functions may return Boolean when no practical error handling needed → [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes)
-- **[v1.0]** Support positional parameters for v1.0 usability → [Positional Parameter Support](#positional-parameter-support)
-- **[v1.0]** trap-based error handling (not try/catch) in v1.0-targeted functions → [Overview of Function Architecture](#overview-of-function-architecture)
-- **[Modern]** **MUST** use [CmdletBinding()] attribute → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
-- **[Modern]** **MUST** use [OutputType()] declaring singular primary type → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
-- **[Modern]** **MUST** use streaming output (write objects directly to pipeline in loop) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
-- **[Modern]** **MUST** use try/catch for error handling → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
-- **[Modern]** **MUST** use Write-Verbose and Write-Debug (not manual preference toggling) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
-- **[Modern]** Exception: May temporarily suppress $VerbosePreference for noisy nested commands using try/finally → ["Modern Advanced" Functions/Scripts: Exception for Suppressing Nested Verbose Streams](#modern-advanced-functionsscripts-exception-for-suppressing-nested-verbose-streams)
-- **[Modern]** Use [Parameter(Mandatory=$true)] only when function cannot work without value → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
-- **[Modern]** Use [ValidateNotNullOrEmpty()] for optional-but-not-empty parameters → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
-- **[Modern]** Multiple [OutputType()] only for intentionally polymorphic returns → ["Modern Advanced" Functions/Scripts: Handling Multiple or Dynamic Output Types](#modern-advanced-functionsscripts-handling-multiple-or-dynamic-output-types)
-- **[All]** Functions are atomic, reusable tools with single purpose → [Overview of Function Architecture](#overview-of-function-architecture)
-- **[All]** Polymorphic parameters (multiple incompatible types) left un-typed or [object] → [Parameter Block Design: Detailed Analysis](#parameter-block-design-detailed-analysis)
-- **[All]** [ref] used exclusively for output requiring write-back to caller scope → [Input/Output Contract: Reference Parameters](#inputoutput-contract-reference-parameters)
-- **[All]** [ref] not used for complex objects that don't need modification → [Input/Output Contract: Reference Parameters](#inputoutput-contract-reference-parameters)
+- **[v1.0]** v1.0-targeted functions **MUST NOT** use [CmdletBinding()] attribute → [Function Declaration and Structure](#function-declaration-and-structure)
+- **[v1.0]** v1.0-targeted functions **MUST NOT** use [OutputType()] attribute → [Function Declaration and Structure](#function-declaration-and-structure)
+- **[v1.0]** v1.0-targeted functions **MUST NOT** use begin/process/end blocks → [Function Declaration and Structure](#function-declaration-and-structure)
+- **[v1.0]** v1.0-targeted functions **MUST NOT** support pipeline input → [Pipeline Behavior: Deliberately Disabled](#pipeline-behavior-deliberately-disabled)
+- **[v1.0]** v1.0-targeted functions **MUST** use simple function keyword with param() block → [Function Declaration and Structure](#function-declaration-and-structure)
+- **[v1.0]** Parameters **MUST** use strong typing → [Parameter Block Design: Detailed Analysis](#parameter-block-design-detailed-analysis)
+- **[v1.0]** v1.0-targeted functions **MUST** use explicit return statements → [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes)
+- **[v1.0]** Reference parameters ([ref]) **MUST** be used for outputs requiring caller modification → [Input/Output Contract: Reference Parameters](#inputoutput-contract-reference-parameters)
+- **[v1.0]** Functions **MUST** return single integer status code (0=success, 1-5=partial, -1=failure) → [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes)
+- **[v1.0]** Exception: Test-* functions **MAY** return Boolean when no practical error handling needed → [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes)
+- **[v1.0]** Positional parameters **SHOULD** be supported for v1.0 usability → [Positional Parameter Support](#positional-parameter-support)
+- **[v1.0]** v1.0-targeted functions **MUST** use trap-based error handling (not try/catch) → [Overview of Function Architecture](#overview-of-function-architecture)
+- **[Modern]** Modern functions **MUST** use [CmdletBinding()] attribute → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** Modern functions **MUST** use [OutputType()] declaring singular primary type → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** Modern functions **MUST** use streaming output (write objects directly to pipeline in loop) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** Modern functions **MUST** use try/catch for error handling → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** Modern functions **MUST** use Write-Verbose and Write-Debug (not manual preference toggling) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** Exception: Modern functions **MAY** temporarily suppress $VerbosePreference for noisy nested commands using try/finally → ["Modern Advanced" Functions/Scripts: Exception for Suppressing Nested Verbose Streams](#modern-advanced-functionsscripts-exception-for-suppressing-nested-verbose-streams)
+- **[Modern]** [Parameter(Mandatory=$true)] **SHOULD** be used only when function cannot work without value → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
+- **[Modern]** [ValidateNotNullOrEmpty()] **SHOULD** be used for optional-but-not-empty parameters → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
+- **[Modern]** Multiple [OutputType()] **SHOULD** only be used for intentionally polymorphic returns → ["Modern Advanced" Functions/Scripts: Handling Multiple or Dynamic Output Types](#modern-advanced-functionsscripts-handling-multiple-or-dynamic-output-types)
+- **[All]** Functions **MUST** be atomic, reusable tools with single purpose → [Overview of Function Architecture](#overview-of-function-architecture)
+- **[All]** Polymorphic parameters (multiple incompatible types) **SHOULD** be left un-typed or [object] → [Parameter Block Design: Detailed Analysis](#parameter-block-design-detailed-analysis)
+- **[All]** [ref] **MUST** be used exclusively for output requiring write-back to caller scope → [Input/Output Contract: Reference Parameters](#inputoutput-contract-reference-parameters)
+- **[All]** [ref] **MUST NOT** be used for complex objects that don't need modification → [Input/Output Contract: Reference Parameters](#inputoutput-contract-reference-parameters)
 
 ### Error Handling
 
-- **[v1.0]** Use trap {} for error suppression in v1.0-targeted functions → [Core Error Suppression Mechanism](#core-error-suppression-mechanism)
-- **[Modern]** catch blocks **MUST NOT** be empty; log to Debug stream at minimum → [Modern catch Block Requirements](#modern-catch-block-requirements)
+- **[v1.0]** v1.0-targeted functions **MUST** use trap {} for error suppression → [Core Error Suppression Mechanism](#core-error-suppression-mechanism)
+- **[Modern]** catch blocks **MUST NOT** be empty; **MUST** log to Debug stream at minimum → [Modern catch Block Requirements](#modern-catch-block-requirements)
 
 ### File Writeability Testing
 
-- **[All]** Verify file writeability before significant processing when writing output to files → [File Writeability Testing](#file-writeability-testing)
-- **[v1.0]** Use `.NET` approach (`Test-FileWriteability` function) for v1.0-targeted scripts → [Scripts Requiring PowerShell v1.0 Support](#scripts-requiring-powershell-v10-support)
-- **[Modern]** Use `.NET` or `try/catch` approach for v2.0+ scripts based on requirements → [Scripts Requiring PowerShell v2.0+ Support](#scripts-requiring-powershell-v20-support)
+- **[All]** Scripts **MUST** verify file writeability before significant processing when writing output to files → [File Writeability Testing](#file-writeability-testing)
+- **[v1.0]** v1.0-targeted scripts **MUST** use `.NET` approach (`Test-FileWriteability` function) → [Scripts Requiring PowerShell v1.0 Support](#scripts-requiring-powershell-v10-support)
+- **[Modern]** v2.0+ scripts **MAY** use `.NET` or `try/catch` approach based on requirements → [Scripts Requiring PowerShell v2.0+ Support](#scripts-requiring-powershell-v20-support)
 
 ### Operating System Compatibility Checks
 
-- **[All]** Include OS compatibility checks when script/function supports only specific operating systems → [When OS Checks Are Required](#when-os-checks-are-required)
-- **[Modern]** Use built-in `$IsWindows`, `$IsMacOS`, `$IsLinux` variables for PowerShell Core 6.0+ only scripts → [PowerShell Core 6.0+ OS Detection](#powershell-core-60-os-detection)
-- **[v1.0]** Use `Test-Windows`, `Test-macOS`, `Test-Linux` functions from PowerShell_Resources for scripts supporting older versions → [Cross-Version OS Detection](#cross-version-os-detection)
-- **[All]** Report wrong OS errors consistently with existing error handling patterns → [Error Handling for Wrong OS](#error-handling-for-wrong-os)
+- **[All]** Scripts/functions supporting only specific operating systems **MUST** include OS compatibility checks → [When OS Checks Are Required](#when-os-checks-are-required)
+- **[Modern]** PowerShell Core 6.0+ only scripts **SHOULD** use built-in `$IsWindows`, `$IsMacOS`, `$IsLinux` variables → [PowerShell Core 6.0+ OS Detection](#powershell-core-60-os-detection)
+- **[v1.0]** Scripts supporting older versions **MUST** use `Test-Windows`, `Test-macOS`, `Test-Linux` functions from PowerShell_Resources → [Cross-Version OS Detection](#cross-version-os-detection)
+- **[All]** Wrong OS errors **MUST** be reported consistently with existing error handling patterns → [Error Handling for Wrong OS](#error-handling-for-wrong-os)
 
 ### Output Formatting and Streams
 
-- **[Modern]** Do not collect results in `List<T>` and return; stream objects to pipeline → [Processing Collections in Modern Functions (Streaming Output)](#processing-collections-in-modern-functions-streaming-output)
-- **[Modern]** Wrap streaming function calls in @(...) to handle 0-1-Many problem → [Consuming Streaming Functions (The `0-1-Many` Problem)](#consuming-streaming-functions-the-0-1-many-problem)
-- **[All]** Use Write-Warning for user-facing anomalies; Write-Debug for internal details → [Choosing Between Warning and Debug Streams](#choosing-between-warning-and-debug-streams)
-- **[All]** Suppress .NET method output with [void](...), not | Out-Null → [Suppression of Method Output](#suppression-of-method-output)
+- **[Modern]** Modern functions **MUST NOT** collect results in `List<T>` and return; **MUST** stream objects to pipeline → [Processing Collections in Modern Functions (Streaming Output)](#processing-collections-in-modern-functions-streaming-output)
+- **[Modern]** Streaming function calls **SHOULD** be wrapped in @(...) to handle 0-1-Many problem → [Consuming Streaming Functions (The `0-1-Many` Problem)](#consuming-streaming-functions-the-0-1-many-problem)
+- **[All]** Code **MUST** use Write-Warning for user-facing anomalies; Write-Debug for internal details → [Choosing Between Warning and Debug Streams](#choosing-between-warning-and-debug-streams)
+- **[All]** .NET method output **MUST** be suppressed with [void](...), not | Out-Null → [Suppression of Method Output](#suppression-of-method-output)
 
 ### Language Interop and .NET
 
-- **[All]** Provide specific type T for generic collections (List[PSCustomObject], not List[object]) → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
+- **[All]** Generic collections **MUST** provide specific type T (List[PSCustomObject], not List[object]) → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
 
 ### Testing
 
 - **[All]** New functions **SHOULD** have corresponding Pester tests when testability is a project requirement → [Testing with Pester](#testing-with-pester)
-- **[All]** Test files use `*.Tests.ps1` naming convention → [Test File Naming and Location](#test-file-naming-and-location)
-- **[All]** Tests use Pester 5.x syntax (BeforeAll, Describe, Context, It) → [Pester 5.x Syntax Requirements](#pester-5x-syntax-requirements)
-- **[All]** Use Arrange-Act-Assert pattern in test cases → [Test Structure: Arrange-Act-Assert](#test-structure-arrange-act-assert)
-- **[All]** Test all documented return codes for functions → [Testing Return Code Conventions](#testing-return-code-conventions)
+- **[All]** Test files **MUST** use `*.Tests.ps1` naming convention → [Test File Naming and Location](#test-file-naming-and-location)
+- **[All]** Tests **MUST** use Pester 5.x syntax (BeforeAll, Describe, Context, It) → [Pester 5.x Syntax Requirements](#pester-5x-syntax-requirements)
+- **[All]** Tests **SHOULD** use Arrange-Act-Assert pattern in test cases → [Test Structure: Arrange-Act-Assert](#test-structure-arrange-act-assert)
+- **[All]** Tests **MUST** verify all documented return codes for functions → [Testing Return Code Conventions](#testing-return-code-conventions)
 - **[All]** Test-* functions **MUST** have tests for both `$true` and `$false` cases → [Testing Return Code Conventions](#testing-return-code-conventions)
 
 ## Executive Summary: Author Profile
@@ -165,11 +165,11 @@ The layout emphasizes scannability, consistency, and readability, following comm
 
 ### Indentation Rules
 
-Indentation uses four spaces for all logical blocks, including param declarations, conditional statements (if/else), loops, and function bodies—no tabs are used.
+Indentation **MUST** use four spaces for all logical blocks, including param declarations, conditional statements (if/else), loops, and function bodies—tabs **MUST NOT** be used.
 
 ### Brace Placement (OTBS)
 
-Bracing strictly adheres to the "One True Brace Style" (OTBS): opening braces are placed at the end of the statement line, and closing braces start on a new line, aligned with the opening statement. This applies universally to functions, conditionals, and most script blocks.
+Bracing **MUST** strictly adhere to the "One True Brace Style" (OTBS): opening braces **MUST** be placed at the end of the statement line, and closing braces **MUST** start on a new line, aligned with the opening statement. This applies universally to functions, conditionals, and most script blocks.
 
 ### Exception: catch, finally, and else Keywords
 
@@ -199,13 +199,13 @@ Bracing strictly adheres to the "One True Brace Style" (OTBS): opening braces ar
 
 ### Operator Spacing and Alignment
 
-Whitespace is used precisely to enhance clarity: a single space surrounds operators (e.g., -gt, =, -and, -eq) and follows commas in parameter lists or arrays, with no unnecessary spaces inside parentheses, brackets, or subexpressions. Line terminators avoid semicolons entirely, as they are unnecessary and can complicate edits. Line continuation eschews backticks, preferring natural breaks at operators, pipes, or commas where possible—though in v1.0-focused code, long lines (e.g., in comments or regex patterns) are tolerated for completeness. Line lengths aim for under 115 characters where practical, but verbose comments may exceed this; this is acceptable per flexible guidelines, as it prioritizes detailed explanations without sacrificing core code readability.
+Whitespace **MUST** be used precisely to enhance clarity: a single space **MUST** surround operators (e.g., -gt, =, -and, -eq) and **MUST** follow commas in parameter lists or arrays, with no unnecessary spaces inside parentheses, brackets, or subexpressions. Line terminators **SHOULD** avoid semicolons entirely, as they are unnecessary and can complicate edits. Line continuation **SHOULD** eschew backticks, preferring natural breaks at operators, pipes, or commas where possible—though in v1.0-focused code, long lines (e.g., in comments or regex patterns) **MAY** be tolerated for completeness. Line lengths **SHOULD** aim for under 115 characters where practical, but verbose comments **MAY** exceed this; this is acceptable per flexible guidelines, as it prioritizes detailed explanations without sacrificing core code readability.
 
-Use **exactly one space** on either side of an operator (e.g., `=`, `-eq`). Do not add extra whitespace to vertically align operators across multiple lines. This ensures compliance with standard PSScriptAnalyzer rules.
+Code **MUST** use **exactly one space** on either side of an operator (e.g., `=`, `-eq`). Code **MUST NOT** add extra whitespace to vertically align operators across multiple lines. This ensures compliance with standard PSScriptAnalyzer rules.
 
 ### Multi-line Method Indentation
 
-When a method call (like `.Add()`) is wrapped (e.g., in a `[void]` cast) and its parameter is a multi-line script block (like a hashtable or `[pscustomobject]`), an **additional** level of indentation is required for the contents of that script block.
+When a method call (like `.Add()`) is wrapped (e.g., in a `[void]` cast) and its parameter is a multi-line script block (like a hashtable or `[pscustomobject]`), an **additional** level of indentation **MUST** be used for the contents of that script block.
 
 ```powershell
 [void]($list.Add(
@@ -221,7 +221,7 @@ When a method call (like `.Add()`) is wrapped (e.g., in a `[void]` cast) and its
 
 ### Blank Line Usage
 
-Blank lines are used sparingly but effectively: two surround function definitions for visual separation, and single blanks group related logic within functions (e.g., before a block comment or between setup and main logic). Files end with a single blank line. Regions (#region ... #endregion) logically group elements like licenses or helper sections, improving navigability in larger scripts.
+Blank lines **SHOULD** be used sparingly but effectively: two **SHOULD** surround function definitions for visual separation, and single blanks **SHOULD** group related logic within functions (e.g., before a block comment or between setup and main logic). Files **MUST** end with a single blank line. Regions (#region ... #endregion) **SHOULD** logically group elements like licenses or helper sections, improving navigability in larger scripts.
 
 **Important:** Blank lines **MUST** be completely empty—they **MUST NOT** contain any whitespace characters (spaces or tabs). This ensures consistency and prevents issues with some editors and linters.
 
@@ -267,7 +267,7 @@ function ExampleFunction {
 
 ### Trailing Whitespace
 
-**No lines may end with trailing whitespace** (spaces or tabs). Trailing whitespace can cause issues with version control systems, some editors, and linters. It also serves no functional purpose and reduces code consistency.
+**Lines MUST NOT end with trailing whitespace** (spaces or tabs). Trailing whitespace can cause issues with version control systems, some editors, and linters. It also serves no functional purpose and reduces code consistency.
 
 **Compliant (no trailing whitespace):**
 
@@ -291,7 +291,7 @@ function ExampleFunction {
 
 In the non-compliant example, line 3 would end with trailing spaces after `$ParamOne` (before the comment), which is not allowed. The actual trailing spaces are not shown in this documentation to avoid violating the rule within this file itself.
 
-Most modern editors can be configured to automatically remove trailing whitespace on save, which is recommended to maintain compliance with this rule.
+Most modern editors can be configured to automatically remove trailing whitespace on save, which is **RECOMMENDED** to maintain compliance with this rule.
 
 ### Variable Delimiting in Strings
 
@@ -323,9 +323,9 @@ When a variable in an expandable string (`"..."`) is immediately followed by pun
 
 ## Capitalization and Naming Conventions
 
-Capitalization and naming follow .NET-inspired conventions for consistency and readability, treating PowerShell as a .NET scripting language. All public identifiers—function names, parameters, and attributes—use PascalCase (e.g., Convert-StringToObject, $ReferenceToResultObject). Language keywords (e.g., function, param, if, else, return, trap) are always lowercase. Operators like -gt or -eq are lowercase with surrounding spaces.
+Capitalization and naming **MUST** follow .NET-inspired conventions for consistency and readability, treating PowerShell as a .NET scripting language. All public identifiers—function names, parameters, and attributes—**MUST** use PascalCase (e.g., Convert-StringToObject, $ReferenceToResultObject). Language keywords (e.g., function, param, if, else, return, trap) **MUST** always be lowercase. Operators like -gt or -eq **MUST** be lowercase with surrounding spaces.
 
-Function names strictly use the Verb-Noun pattern with approved verbs (e.g., Convert-, Get-, Test-, Split-) and singular nouns, ensuring discoverability and avoiding duplication. Parameters are descriptive and PascalCased, with aliases (if any) documented in help. Local variables use camelCase with a type-hinting prefix (e.g., $strMessage for strings, $intReturnValue for integers, $boolResult for booleans, $arrElements for arrays). This prefixing is a deliberate choice to make intended types obvious in a dynamically typed language, especially without IDE support—enhancing clarity at the cost of slight verbosity.
+Function names **MUST** strictly use the Verb-Noun pattern with approved verbs (e.g., Convert-, Get-, Test-, Split-) and singular nouns, ensuring discoverability and avoiding duplication. Parameters **MUST** be descriptive and PascalCased, with aliases (if any) documented in help. Local variables **MUST** use camelCase with a type-hinting prefix (e.g., $strMessage for strings, $intReturnValue for integers, $boolResult for booleans, $arrElements for arrays). This prefixing is a deliberate choice to make intended types obvious in a dynamically typed language, especially without IDE support—enhancing clarity at the cost of slight verbosity.
 
 ### Overview of Observed Naming Discipline
 
@@ -342,7 +342,7 @@ This consistent application creates a visual hierarchy that allows rapid compreh
 
 ### Script and Function Naming: Full Explicit Form
 
-**Function names** strictly adhere to the **Verb-Noun** pattern using **approved verbs** and **singular nouns**, rendered in **PascalCase**. Examples include:
+**Function names** **MUST** strictly adhere to the **Verb-Noun** pattern using **approved verbs** and **singular nouns**, rendered in **PascalCase**. Examples include:
 
 - `Convert-StringToObject`
 - `Get-ReferenceToLastError`
@@ -351,7 +351,7 @@ This consistent application creates a visual hierarchy that allows rapid compreh
 
 ### Script and Function Naming: Approved Verbs
 
-Using approved verbs is a core PowerShell convention that ensures discoverability and consistency. You can always retrieve the complete list of approved verbs by running the following command:
+Using approved verbs is a core PowerShell convention that ensures discoverability and consistency. You **MAY** always retrieve the complete list of approved verbs by running the following command:
 
 ```powershell
 Get-Verb
@@ -383,7 +383,7 @@ The following recommendations help you choose an appropriate verb for your cmdle
   - `Tee` (`te`)
   - `Where` (`wh`)
 
-You may get a complete list of verbs using the `Get-Verb` cmdlet.
+You **MAY** get a complete list of verbs using the `Get-Verb` cmdlet.
 
 #### Similar Verbs for Different Actions
 
@@ -590,7 +590,7 @@ Do not compromise the module name for the sake of keyword searching. Instead, re
 
 ### Do Not Use Aliases
 
-No aliases (e.g., `gci`, `gps`) or abbreviated forms appear in the code. Even common operations use full command names. This ensures:
+Aliases (e.g., `gci`, `gps`) or abbreviated forms **MUST NOT** appear in the code. Even common operations **MUST** use full command names. This ensures:
 
 1. **Discoverability**: The code is immediately understandable to any PowerShell user.
 2. **Future-proofing**: Changes to parameter sets in underlying cmdlets cannot break the script due to positional or partial-name matching.
@@ -604,7 +604,7 @@ Aliases **MAY** only be exported in a Module Manifest if they provide genuine sh
 
 ### Parameter Naming
 
-**Parameter names** follow the same PascalCase convention and are highly descriptive:
+**Parameter names** **MUST** follow the same PascalCase convention and **MUST** be highly descriptive:
 
 - `$ReferenceToResultObject`
 - `$ReferenceArrayOfExtraStrings`
@@ -642,12 +642,12 @@ While some modern styles discourage such prefixes, in this context they represen
 
 ### Path and Scope Handling
 
-The author **avoids relative paths** (`.`, `..`) and the **home directory shortcut `~`** entirely. This is due to:
+Code **SHOULD** avoid relative paths (`.`, `..`) and the **home directory shortcut `~`** entirely. This is due to:
 
 - `~` behavior varies by provider (FileSystem vs. Registry vs. others).
-- Relative paths depend on `[Environment]::CurrentDirectory`, which may diverge from `$PWD` when calling .NET methods or external tools.
+- Relative paths depend on `[Environment]::CurrentDirectory`, which **MAY** diverge from `$PWD` when calling .NET methods or external tools.
 
-Instead, **explicit scoping** is used:
+Instead, **explicit scoping** **SHOULD** be used:
 
 ```powershell
 $global:ErrorActionPreference
@@ -698,7 +698,7 @@ Every function—**including nested private helpers**—receives **identical tre
 
 ### Comment-Based Help: Structure and Format
 
-All functions include **full comment-based help** using **single-line comments** (`#`) with **dotted keywords** (`.SYNOPSIS`, `.DESCRIPTION`, etc.). The help block is **placed inside the function**, **immediately above the `param` block**, ensuring:
+All functions **MUST** include **full comment-based help** using **single-line comments** (`#`) with **dotted keywords** (`.SYNOPSIS`, `.DESCRIPTION`, etc.). The help block **MUST** be **placed inside the function**, **immediately above the `param` block**, ensuring:
 
 - **Proximity to implementation** → reduces drift during refactoring
 - **Visibility in plain text** → no IDE required
