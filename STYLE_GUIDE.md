@@ -1529,7 +1529,7 @@ Both approaches use a **create-then-delete pattern**. The delete step is critica
 
 ### Scripts Requiring PowerShell v1.0 Support
 
-For scripts that **MUST** maintain backward compatibility with PowerShell v1.0, the **`.NET` approach** is **REQUIRED**. The `try/catch` construct is not available in PowerShell v1.0 and causes a **parser error** if present in the script.
+Scripts that **MUST** maintain backward compatibility with PowerShell v1.0 **MUST** use the **`.NET` approach**. The `try/catch` construct is not available in PowerShell v1.0 and causes a **parser error** if present in the script.
 
 **Rationale**: Since `try/catch` was introduced in PowerShell v2.0, any script containing this syntax will fail to parse on v1.0, even if the code path is never executed.
 
@@ -2218,7 +2218,7 @@ $status   = 4
 
 ### Stream Usage: Clear Mapping
 
-The author uses **exactly three output Streams**, each with a **single, immutable purpose**:
+Code **MUST** use **exactly three output Streams**, each with a **single, immutable purpose**:
 
 | Stream | Command | Purpose | Example |
 | --- | --- | --- | --- |
@@ -2226,13 +2226,13 @@ The author uses **exactly three output Streams**, each with a **single, immutabl
 | **Warning** | `Write-Warning` | Logical anomalies ("should not happen") | `"Operation failed despite valid inputs"` |
 | **Host** | *Never used* | Interactive feedback | **Prohibited** |
 
-**`Write-Host` is completely absent** — a deliberate indicator of **production-grade tooling**.
+**`Write-Host` **MUST NOT** be used** — its absence is a deliberate indicator of **production-grade tooling**.
 
 ---
 
 ### Warning Stream: Diagnostic Beacon
 
-`Write-Warning` is used **sparingly and surgically** for **logically impossible states**:
+`Write-Warning` **MUST** be used **sparingly and surgically** for **logically impossible states**:
 
 ```powershell
 Write-Warning -Message 'Conversion of string failed even though valid. This should not be possible!'
@@ -2392,9 +2392,9 @@ $list.Add($item) | Out-Null
 Test files **MUST** follow consistent naming conventions to ensure discoverability:
 
 - **Naming Convention:** Test files **MUST** use the `*.Tests.ps1` suffix (e.g., `Get-UserInfo.Tests.ps1`)
-- **Preferred Location:** Store test files in a `tests/` directory at the repository root
-- **Alternative:** Place test files alongside source files (e.g., `Get-UserInfo.ps1` and `Get-UserInfo.Tests.ps1` in the same directory)
-- **One-to-One Mapping:** Generally, create one test file per function or script being tested
+- **Preferred Location:** Test files **SHOULD** be stored in a `tests/` directory at the repository root
+- **Alternative:** Test files **MAY** be placed alongside source files (e.g., `Get-UserInfo.ps1` and `Get-UserInfo.Tests.ps1` in the same directory)
+- **One-to-One Mapping:** Generally, one test file **SHOULD** be created per function or script being tested
 
 **Example directory structure:**
 
@@ -2426,7 +2426,7 @@ Tests **MUST** use Pester 5.x syntax. Do not use legacy Pester 3.x/4.x patterns.
 
 - Use `BeforeAll` for dot-sourcing scripts (not at the file level outside blocks)
 - Discovery and Run phases are separate—code at the top level runs during discovery
-- Use `Should -Be`, `Should -BeExactly`, `Should -BeNullOrEmpty`, etc. (not legacy `Assert-*` patterns)
+- Code **MUST** use `Should -Be`, `Should -BeExactly`, `Should -BeNullOrEmpty`, etc. (not legacy `Assert-*` patterns)
 
 ---
 
@@ -2474,8 +2474,8 @@ For functions that return integer status codes (`0` = success, `1-5` = partial s
 
 Additionally, if the function uses `[ref]` parameters for output:
 
-- Verify the reference parameter is populated correctly on success
-- Verify the reference parameter state on failure (typically `$null` or unchanged)
+- Tests **MUST** verify the reference parameter is populated correctly on success
+- Tests **MUST** verify the reference parameter state on failure (typically `$null` or unchanged)
 
 **Example for Integer Status Code Function:**
 
