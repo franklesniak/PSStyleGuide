@@ -141,12 +141,12 @@ This checklist provides a quick reference for both human developers and LLMs (li
 
 ### Testing
 
-- **[Modern]** New functions should have corresponding Pester tests when testability is a project requirement → [Testing with Pester](#testing-with-pester)
-- **[Modern]** Test files use `*.Tests.ps1` naming convention → [Test File Naming and Location](#test-file-naming-and-location)
-- **[Modern]** Tests use Pester 5.x syntax (BeforeAll, Describe, Context, It) → [Pester 5.x Syntax Requirements](#pester-5x-syntax-requirements)
-- **[Modern]** Use Arrange-Act-Assert pattern in test cases → [Test Structure: Arrange-Act-Assert](#test-structure-arrange-act-assert)
-- **[Modern]** Test all documented return codes for functions → [Testing Return Code Conventions](#testing-return-code-conventions)
-- **[Modern]** Test-* functions must have tests for both `$true` and `$false` cases → [Testing Return Code Conventions](#testing-return-code-conventions)
+- **[All]** New functions should have corresponding Pester tests when testability is a project requirement → [Testing with Pester](#testing-with-pester)
+- **[All]** Test files use `*.Tests.ps1` naming convention → [Test File Naming and Location](#test-file-naming-and-location)
+- **[All]** Tests use Pester 5.x syntax (BeforeAll, Describe, Context, It) → [Pester 5.x Syntax Requirements](#pester-5x-syntax-requirements)
+- **[All]** Use Arrange-Act-Assert pattern in test cases → [Test Structure: Arrange-Act-Assert](#test-structure-arrange-act-assert)
+- **[All]** Test all documented return codes for functions → [Testing Return Code Conventions](#testing-return-code-conventions)
+- **[All]** Test-* functions must have tests for both `$true` and `$false` cases → [Testing Return Code Conventions](#testing-return-code-conventions)
 
 ## Code Layout and Formatting
 
@@ -2372,7 +2372,7 @@ $list.Add($item) | Out-Null
 
 **Pester** is the standard testing framework for PowerShell, providing a domain-specific language for writing and executing tests. This section documents testing conventions that integrate with the coding standards in this guide. For comprehensive Pester documentation, see [pester.dev](https://pester.dev/).
 
-> **Note:** Testing guidance applies to **Modern** (`[Modern]`) PowerShell development. Pester requires PowerShell 3.0+ and the conventions below assume Pester 5.x, which uses different syntax than legacy Pester 3.x/4.x versions. Scripts targeting PowerShell v1.0 cannot use Pester directly; those scripts should be tested via wrapper scripts that run on newer PowerShell versions.
+> **Note:** Pester 5.x requires PowerShell 3.0+ to execute tests. However, v1.0-compatible scripts can still be tested with Pester—simply run the tests on a modern PowerShell version (e.g., pwsh 7.x on a CI platform like `ubuntu-latest`). The test files themselves will use modern Pester syntax, but the scripts under test can target any PowerShell version.
 
 ---
 
