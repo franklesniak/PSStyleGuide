@@ -918,7 +918,7 @@ The author has elevated documentation from a **maintenance task** to a **core re
 
 ### Overview of Function Architecture
 
-The author designs **functions as atomic, reusable tools** with a single, well-defined purpose. Every function is a **self-contained unit of execution** that accepts input, performs a transformation or validation, and produces a **predictable, deterministic output**. This design philosophy is rooted in **PowerShell v1.0 constraints** for compatible scripts and deliberately avoids any feature introduced in v2.0 or later in those cases. The result is a **robust, portable, and highly maintainable** codebase that operates identically across all PowerShell versions from 1.0 onward when feasible. However, in scripts with external dependencies requiring newer versions (e.g., modern modules), the author incorporates appropriate features like pipeline processing or structured error handling.
+Functions **MUST** be designed as **atomic, reusable tools** with a single, well-defined purpose. Every function **MUST** be a **self-contained unit of execution** that accepts input, performs a transformation or validation, and produces a **predictable, deterministic output**. This design philosophy is rooted in **PowerShell v1.0 constraints** for compatible scripts and deliberately avoids any feature introduced in v2.0 or later in those cases. The result is a **robust, portable, and highly maintainable** codebase that operates identically across all PowerShell versions from 1.0 onward when feasible. However, in scripts with external dependencies requiring newer versions (e.g., modern modules), the author incorporates appropriate features like pipeline processing or structured error handling.
 
 The characteristic pattern of this architecture in v1.0-targeted scripts is the **complete absence** of:
 
@@ -942,7 +942,7 @@ This creates a **C-style procedural model** within PowerShell, prioritizing **co
 
 ### Function Declaration and Structure
 
-All functions follow a **strict, uniform template**:
+All functions **MUST** follow a **strict, uniform template**:
 
 ```powershell
 function Verb-Noun {
@@ -958,17 +958,17 @@ function Verb-Noun {
 
 **Key characteristics**:
 
-1. **No `[CmdletBinding()]`** → intentional omission for v1.0 compatibility
-2. **No pipeline blocks** → `process` block would imply pipeline input, which is not supported
-3. **Explicit `return`** → guarantees single-value output and prevents accidental pipeline leakage
-4. **Strongly typed `param` block** → validates input at parse time
-5. `[CmdletBinding()]` and `[OutputType()]` Present → intentional inclusion for modern, non-v1.0 functions where either the function or script it sits in relies on external dependencies (e.g., a module that only supports Windows PowerShell v5.1 or PowerShell 7.x), making the function explicitly non-v1.0-compatible.
+1. **No `[CmdletBinding()]`** → intentional omission for v1.0 compatibility; v1.0-targeted functions **MUST NOT** use this
+2. **No pipeline blocks** → `process` block would imply pipeline input, which **MUST NOT** be supported in v1.0-targeted functions
+3. **Explicit `return`** → **MUST** be used to guarantee single-value output and prevent accidental pipeline leakage
+4. **Strongly typed `param` block** → **MUST** validate input at parse time
+5. `[CmdletBinding()]` and `[OutputType()]` Present → **MUST** be included for modern, non-v1.0 functions where either the function or script it sits in relies on external dependencies (e.g., a module that only supports Windows PowerShell v5.1 or PowerShell 7.x), making the function explicitly non-v1.0-compatible.
 
 ---
 
 ### Parameter Block Design: Detailed Analysis
 
-The `param` block is the **primary contract** between caller and function. Every parameter is:
+The `param` block is the **primary contract** between caller and function. Every parameter **MUST** be:
 
 - **Strongly typed** using .NET types
 - **Fully documented** in comment-based help
@@ -976,7 +976,7 @@ The `param` block is the **primary contract** between caller and function. Every
 
 **Exception for Polymorphic Parameters:**
 
-In rare cases, a function may be intentionally designed to accept a parameter that can be one of several different, incompatible types (e.g., a string *or* an object). This is common in "safe wrapper" functions that process dynamic input, such as the `Principal` element from an IAM policy.
+In rare cases, a function **MAY** be intentionally designed to accept a parameter that can be one of several different, incompatible types (e.g., a string *or* an object). This is common in "safe wrapper" functions that process dynamic input, such as the `Principal` element from an IAM policy.
 
 In this scenario, the parameter **SHOULD** be left **un-typed** (or explicitly typed as `[object]`). The function's internal logic is then responsible for inspecting the received object's type (e.g., using `if ($MyParameter -is [string])`) and handling it appropriately. This pattern **SHOULD** be used sparingly and only when required by the function's core purpose.
 
@@ -1011,7 +1011,7 @@ This ensures the function can be called with minimal arguments while maintaining
 
 ### Return Semantics: Explicit Status Codes
 
-Every function returns a **single integer status code** via explicit `return` statement:
+Every v1.0-targeted function **MUST** return a **single integer status code** via explicit `return` statement:
 
 | Code | Meaning |
 | --- | --- |
@@ -1021,7 +1021,7 @@ Every function returns a **single integer status code** via explicit `return` st
 
 **Exception for `Test-*` Functions:**
 
-For PowerShell v1.0 scripts/functions that use the `Test-` verb (in a Verb-Noun naming convention) and are **not reasonably anticipated to encounter errors that the caller needs to detect and react to programmatically**, a **Boolean return** is allowed instead of an integer status code.
+For PowerShell v1.0 scripts/functions that use the `Test-` verb (in a Verb-Noun naming convention) and are **not reasonably anticipated to encounter errors that the caller needs to detect and react to programmatically**, a **Boolean return** **MAY** be used instead of an integer status code.
 
 This exception applies when:
 
@@ -1069,7 +1069,7 @@ This pattern creates a **C-style error code contract** that is immediately famil
 
 ### Input/Output Contract: Reference Parameters
 
-Functions use **`[ref]` parameters** to return complex data only when write-back is required:
+Functions **MUST** use **`[ref]` parameters** to return complex data only when write-back is required:
 
 ```powershell
 [ref]$ReferenceToResultObject     → [object]
@@ -1095,7 +1095,7 @@ $status = 4
 
 ### Pipeline Behavior: Deliberately Disabled
 
-In v1.0-targeted functions, pipeline input is **explicitly rejected**:
+In v1.0-targeted functions, pipeline input **MUST** be **explicitly rejected**:
 
 - No `ValueFromPipeline` attributes
 - `.INPUTS` section states "None"
@@ -1113,7 +1113,7 @@ In scripts requiring modern PowerShell, pipeline support is added as needed.
 
 ### Positional Parameter Support
 
-Functions support **positional parameter binding** for v1.0 usability:
+Functions **SHOULD** support **positional parameter binding** for v1.0 usability:
 
 ```powershell
 # Named parameters
@@ -1213,7 +1213,7 @@ function Get-ModernData {
 
 Rule 5 states that manual toggling of `$VerbosePreference` is prohibited. This rule's primary intent is to ensure your function or script *respects* the user's desire for verbose output from *your* script (via `Write-Verbose`).
 
-An exception to this rule is **required** when you must *surgically suppress* the verbose stream from a "chatty" or "noisy" nested command (a command you call within your function or script). This pattern allows your function or script to remain verbose while silencing the underlying tool.
+An exception to this rule **MAY** be made when you **MUST** *surgically suppress* the verbose stream from a "chatty" or "noisy" nested command (a command you call within your function or script). This pattern allows your function or script to remain verbose while silencing the underlying tool.
 
 In this specific scenario, you **MUST** use the following pattern to temporarily set `$VerbosePreference` and guarantee it is restored, even if the command fails:
 
@@ -1251,7 +1251,7 @@ This `try/finally` pattern is robust, safe, and compliantly achieves your goal o
 
 #### "Modern Advanced" Functions/Scripts: Singlular `[OutputType()]`
 
-When a function returns one or more objects via the pipeline (streaming), the `[OutputType()]` attribute **MUST** declare the *singular* type of object in the stream (e.g., `[OutputType([pscustomobject])]`). Do not use the plural array type (e.g., `[OutputType([pscustomobject[]])]`). The pipeline *always* creates an array for the caller automatically if multiple objects are returned.
+When a function returns one or more objects via the pipeline (streaming), the `[OutputType()]` attribute **MUST** declare the *singular* type of object in the stream (e.g., `[OutputType([pscustomobject])]`). Code **MUST NOT** use the plural array type (e.g., `[OutputType([pscustomobject[]])]`). The pipeline *always* creates an array for the caller automatically if multiple objects are returned.
 
 #### "Modern Advanced" Functions/Scripts: Handling Multiple or Dynamic Output Types
 
@@ -1341,7 +1341,7 @@ The system is **atomic**—each error-prone operation is isolated, measured, and
 
 ### Core Error Suppression Mechanism
 
-The author uses **two complementary v1.0-native suppression techniques**:
+v1.0-targeted functions **MUST** use **two complementary v1.0-native suppression techniques**:
 
 | Technique | Implementation | Purpose |
 | --- | --- | --- |
@@ -1393,7 +1393,7 @@ This eliminates false positives from `$error` array clearing and ensures **100% 
 
 ### Atomic Error Handling Pattern
 
-Every type conversion or risky operation follows this **exact atomic pattern**:
+Every type conversion or risky operation **MUST** follow this **exact atomic pattern**:
 
 ```powershell
 function Convert-Safely {
@@ -1646,11 +1646,11 @@ If a script or function supports only specific operating systems (Windows, Linux
 - Scripts that use macOS-specific frameworks or file locations
 - Any script that cannot function correctly on all platforms
 
-**Examples of when OS checks may not be required:**
+**Examples of when OS checks **MAY** not be required:**
 
 - Scripts that use only cross-platform PowerShell features
 - Scripts that gracefully degrade functionality based on available cmdlets/modules
-- Scripts explicitly documented as single-platform with clear naming (though checks are still recommended)
+- Scripts explicitly documented as single-platform with clear naming (though checks are still **RECOMMENDED**)
 
 ---
 
