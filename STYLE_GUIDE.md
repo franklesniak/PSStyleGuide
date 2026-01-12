@@ -611,7 +611,7 @@ Aliases **MAY** only be exported in a Module Manifest if they provide genuine sh
 - `$StringToProcess`
 - `$PSVersion`
 
-These names leave no ambiguity about the parameter’s purpose, expected type, or direction of data flow. The use of `ReferenceTo` prefix for `[ref]` parameters is a deliberate pattern that instantly signals **pass-by-reference** semantics—a critical distinction in PowerShell v1.0 where such mechanics are not visually obvious. However, [ref] **SHOULD** be used only when data **MUST** be written back to the caller's scope (e.g., for modifying variables or returning multiple outputs); for passing complex objects that do not need modification, they are passed by value, as [ref] offers no performance advantages in PowerShell.
+These names leave no ambiguity about the parameter’s purpose, expected type, or direction of data flow. The use of `ReferenceTo` prefix for `[ref]` parameters is a deliberate pattern that instantly signals **pass-by-reference** semantics—a critical distinction in PowerShell v1.0 where such mechanics are not visually obvious. However, [ref] **MUST** be used only when data needs to be written back to the caller's scope (e.g., for modifying variables or returning multiple outputs); for passing complex objects that do not need modification, they are passed by value, as [ref] offers no performance advantages in PowerShell.
 
 ### Local Variable Naming: Type-Prefixed camelCase
 
@@ -793,7 +793,7 @@ The script uses **`#region` / `#endregion`** blocks to create **logical code fol
 
 In addition to top-level script regions, this pattern can be applied inside individual functions:
 
-- **Function Structure with License**: For distributable helper functions, the structure **MUST** be: function declaration, comment-based help, `param()` block, and then the `#region License` block. The license region **SHOULD** be placed immediately after the function's `param()` block.
+- **Function Structure with License**: For distributable helper functions, the structure **MUST** be: function declaration, comment-based help, `param()` block, and then the `#region License` block. The license region **MUST** be placed immediately after the function's `param()` block.
 
 **Example:**
 
@@ -1049,7 +1049,7 @@ function Test-PathExists {
 }
 ```
 
-For `Test-*` functions that **MAY** encounter meaningful errors (e.g., access denied, network issues) that the caller **SHOULD** be able to detect, the standard integer status code pattern **SHOULD** still be used.
+For `Test-*` functions that might encounter meaningful errors (e.g., access denied, network issues) that the caller **SHOULD** be able to detect, the standard integer status code pattern **SHOULD** still be used.
 
 **Rationale for explicit `return`**:
 
