@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 1.4.20260112.0
+**Version:** 1.5.20260112.0
 
 ## Metadata
 
@@ -11,8 +11,9 @@
 
 ## Table of Contents
 
-- [Executive Summary: Author Profile](#executive-summary-author-profile)
+- [Keywords](#keywords)
 - [Quick Reference Checklist](#quick-reference-checklist)
+- [Executive Summary: Author Profile](#executive-summary-author-profile)
 - [Code Layout and Formatting](#code-layout-and-formatting)
 - [Capitalization and Naming Conventions](#capitalization-and-naming-conventions)
 - [Documentation and Comments](#documentation-and-comments)
@@ -25,13 +26,15 @@
 - [Testing with Pester](#testing-with-pester)
 - [Performance, Security, and Other](#performance-security-and-other)
 
-## Executive Summary: Author Profile
+## Keywords
 
-The author's code writing style can be characterized as a highly disciplined "PowerShell v1.0 Classicist" approach when applicable. This is a deliberate engineering choice to ensure maximum backward compatibility with PowerShell version 1.0 in scenarios where the script could feasibly run on that platform, such as standalone string manipulation functions, data parsing utilities, or scripts that interact with basic Windows operating system information without external dependencies. It prioritizes portability, robustness, and deterministic behavior in legacy or mixed environments where newer PowerShell versions cannot be assumed. However, this v1.0 compatibility is not rigidly enforced; when external constraints require newer PowerShell versions (e.g., dependencies on modules like Az, which mandate Windows PowerShell 5.1 or PowerShell 7.x), the author readily adopts modern language constructs such as try/catch for error handling, advanced functions with [CmdletBinding()], and other features to align with the required runtime.
+The key words "**MUST**", "**MUST NOT**", "**REQUIRED**", "**SHALL**", "**SHALL NOT**", "**SHOULD**", "**SHOULD NOT**", "**RECOMMENDED**", "**MAY**", and "**OPTIONAL**" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119).
 
-This explains the systematic avoidance of features introduced in v2.0 or later in v1.0-targeted scripts, such as advanced functions with the [CmdletBinding()] attribute, structured try/catch error handling, common parameters like -Verbose or -Debug, begin/process/end blocks, and modern output streams. Instead, the style relies on PowerShell's foundational mechanics, such as simple function declarations, strongly typed param blocks, explicit return statements for single values, and a custom error detection pattern using trap statements and global preference toggling.
-
-Within these constraints, the author adheres closely to community best practices for readability, naming, documentation, and maintainability. Functions are designed as reusable tools with a single purpose—e.g., performing targeted data transformations or validations. Outputs are explicit and controlled: a status code (e.g., an integer indicating full success, partial success, or failure) is typically returned, while complex results are passed via reference parameters only when necessary to modify data in the caller's scope, avoiding unnecessary use of [ref] for read-only objects since it provides no performance benefits in PowerShell. Error handling is "fail-controlled," suppressing issues to allow graceful recovery without halting execution. The code is robust, thoroughly documented, and predictable across versions, making it ideal for tools in legacy or mixed environments. Performance is balanced with readability, favoring script constructs over pipelines. If the v1.0 constraint were lifted (e.g., due to modern dependencies), the style would evolve to incorporate features like pipeline-friendly objects and structured errors while retaining strong typing and documentation for clarity.
+- **MUST** / **REQUIRED** / **SHALL** — Absolute requirement. Non-negotiable.
+- **MUST NOT** / **SHALL NOT** — Absolute prohibition.
+- **SHOULD** / **RECOMMENDED** — Strong recommendation. Valid reasons may exist to deviate, but implications must be understood.
+- **SHOULD NOT** / **NOT RECOMMENDED** — Strong discouragement. Valid reasons may exist to do otherwise, but implications must be understood.
+- **MAY** / **OPTIONAL** — Truly optional. Implementations can choose to include or omit.
 
 ## Quick Reference Checklist
 
@@ -46,7 +49,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[All]** No vertical operator alignment across multiple lines → [Operator Spacing and Alignment](#operator-spacing-and-alignment)
 - **[All]** Add extra indentation for multi-line method parameters → [Multi-line Method Indentation](#multi-line-method-indentation)
 - **[All]** Use blank lines sparingly: two around functions, one within → [Blank Line Usage](#blank-line-usage)
-- **[All]** Blank lines must not contain any whitespace (spaces or tabs) → [Blank Line Usage](#blank-line-usage)
+- **[All]** Blank lines **MUST NOT** contain any whitespace (spaces or tabs) → [Blank Line Usage](#blank-line-usage)
 - **[All]** No lines may end with trailing whitespace → [Trailing Whitespace](#trailing-whitespace)
 - **[All]** Delimit variables in strings with `${}` or `-f` operator → [Variable Delimiting in Strings](#variable-delimiting-in-strings)
 
@@ -67,7 +70,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 
 ### Documentation and Comments
 
-- **[All]** All functions must have full comment-based help → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
+- **[All]** All functions **MUST** have full comment-based help → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
 - **[All]** Place comment-based help inside function body, above param block → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
 - **[All]** Use single-line comments (#) with dotted keywords (.SYNOPSIS, .DESCRIPTION, etc.) → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
 - **[All]** Include required help sections: .SYNOPSIS, .DESCRIPTION, .PARAMETER, .EXAMPLE, .INPUTS, .OUTPUTS, .NOTES → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
@@ -75,7 +78,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[All]** Document all return codes with exact meanings in .OUTPUTS → [Help Content Quality: High Standards](#help-content-quality-high-standards)
 - **[All]** Document positional parameter support in .NOTES → [Help Content Quality: High Standards](#help-content-quality-high-standards)
 - **[All]** Include version number in .NOTES (format: Major.Minor.YYYYMMDD.Revision) → [Function and Script Versioning](#function-and-script-versioning)
-- **[All]** Version build component must be current date in YYYYMMDD format → [Function and Script Versioning](#function-and-script-versioning)
+- **[All]** Version build component **MUST** be current date in YYYYMMDD format → [Function and Script Versioning](#function-and-script-versioning)
 - **[All]** Inline comments focus on "why" not "what" → [Inline Comments: Purpose and Placement](#inline-comments-purpose-and-placement)
 - **[All]** Use #region / #endregion for logical code folding → [Structural Documentation: Regions and Licensing](#structural-documentation-regions-and-licensing)
 - **[All]** Place param() block before license region (if applicable) → [Structural Documentation: Regions and Licensing](#structural-documentation-regions-and-licensing)
@@ -96,11 +99,11 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[v1.0]** Exception: Test-* functions may return Boolean when no practical error handling needed → [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes)
 - **[v1.0]** Support positional parameters for v1.0 usability → [Positional Parameter Support](#positional-parameter-support)
 - **[v1.0]** trap-based error handling (not try/catch) in v1.0-targeted functions → [Overview of Function Architecture](#overview-of-function-architecture)
-- **[Modern]** Must use [CmdletBinding()] attribute → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
-- **[Modern]** Must use [OutputType()] declaring singular primary type → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
-- **[Modern]** Must use streaming output (write objects directly to pipeline in loop) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
-- **[Modern]** Must use try/catch for error handling → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
-- **[Modern]** Must use Write-Verbose and Write-Debug (not manual preference toggling) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** **MUST** use [CmdletBinding()] attribute → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** **MUST** use [OutputType()] declaring singular primary type → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** **MUST** use streaming output (write objects directly to pipeline in loop) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** **MUST** use try/catch for error handling → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** **MUST** use Write-Verbose and Write-Debug (not manual preference toggling) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
 - **[Modern]** Exception: May temporarily suppress $VerbosePreference for noisy nested commands using try/finally → ["Modern Advanced" Functions/Scripts: Exception for Suppressing Nested Verbose Streams](#modern-advanced-functionsscripts-exception-for-suppressing-nested-verbose-streams)
 - **[Modern]** Use [Parameter(Mandatory=$true)] only when function cannot work without value → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
 - **[Modern]** Use [ValidateNotNullOrEmpty()] for optional-but-not-empty parameters → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
@@ -113,7 +116,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 ### Error Handling
 
 - **[v1.0]** Use trap {} for error suppression in v1.0-targeted functions → [Core Error Suppression Mechanism](#core-error-suppression-mechanism)
-- **[Modern]** catch blocks must not be empty; log to Debug stream at minimum → [Modern catch Block Requirements](#modern-catch-block-requirements)
+- **[Modern]** catch blocks **MUST NOT** be empty; log to Debug stream at minimum → [Modern catch Block Requirements](#modern-catch-block-requirements)
 
 ### File Writeability Testing
 
@@ -141,12 +144,20 @@ This checklist provides a quick reference for both human developers and LLMs (li
 
 ### Testing
 
-- **[All]** New functions should have corresponding Pester tests when testability is a project requirement → [Testing with Pester](#testing-with-pester)
+- **[All]** New functions **SHOULD** have corresponding Pester tests when testability is a project requirement → [Testing with Pester](#testing-with-pester)
 - **[All]** Test files use `*.Tests.ps1` naming convention → [Test File Naming and Location](#test-file-naming-and-location)
 - **[All]** Tests use Pester 5.x syntax (BeforeAll, Describe, Context, It) → [Pester 5.x Syntax Requirements](#pester-5x-syntax-requirements)
 - **[All]** Use Arrange-Act-Assert pattern in test cases → [Test Structure: Arrange-Act-Assert](#test-structure-arrange-act-assert)
 - **[All]** Test all documented return codes for functions → [Testing Return Code Conventions](#testing-return-code-conventions)
-- **[All]** Test-* functions must have tests for both `$true` and `$false` cases → [Testing Return Code Conventions](#testing-return-code-conventions)
+- **[All]** Test-* functions **MUST** have tests for both `$true` and `$false` cases → [Testing Return Code Conventions](#testing-return-code-conventions)
+
+## Executive Summary: Author Profile
+
+The author's code writing style can be characterized as a highly disciplined "PowerShell v1.0 Classicist" approach when applicable. This is a deliberate engineering choice to ensure maximum backward compatibility with PowerShell version 1.0 in scenarios where the script could feasibly run on that platform, such as standalone string manipulation functions, data parsing utilities, or scripts that interact with basic Windows operating system information without external dependencies. It prioritizes portability, robustness, and deterministic behavior in legacy or mixed environments where newer PowerShell versions cannot be assumed. However, this v1.0 compatibility is not rigidly enforced; when external constraints require newer PowerShell versions (e.g., dependencies on modules like Az, which mandate Windows PowerShell 5.1 or PowerShell 7.x), the author readily adopts modern language constructs such as try/catch for error handling, advanced functions with [CmdletBinding()], and other features to align with the required runtime.
+
+This explains the systematic avoidance of features introduced in v2.0 or later in v1.0-targeted scripts, such as advanced functions with the [CmdletBinding()] attribute, structured try/catch error handling, common parameters like -Verbose or -Debug, begin/process/end blocks, and modern output streams. Instead, the style relies on PowerShell's foundational mechanics, such as simple function declarations, strongly typed param blocks, explicit return statements for single values, and a custom error detection pattern using trap statements and global preference toggling.
+
+Within these constraints, the author adheres closely to community best practices for readability, naming, documentation, and maintainability. Functions are designed as reusable tools with a single purpose—e.g., performing targeted data transformations or validations. Outputs are explicit and controlled: a status code (e.g., an integer indicating full success, partial success, or failure) is typically returned, while complex results are passed via reference parameters only when necessary to modify data in the caller's scope, avoiding unnecessary use of [ref] for read-only objects since it provides no performance benefits in PowerShell. Error handling is "fail-controlled," suppressing issues to allow graceful recovery without halting execution. The code is robust, thoroughly documented, and predictable across versions, making it ideal for tools in legacy or mixed environments. Performance is balanced with readability, favoring script constructs over pipelines. If the v1.0 constraint were lifted (e.g., due to modern dependencies), the style would evolve to incorporate features like pipeline-friendly objects and structured errors while retaining strong typing and documentation for clarity.
 
 ## Code Layout and Formatting
 
@@ -162,7 +173,7 @@ Bracing strictly adheres to the "One True Brace Style" (OTBS): opening braces ar
 
 ### Exception: catch, finally, and else Keywords
 
-> **Exception for `catch`, `finally`, and `else`:** These keywords are the major exception to this rule. To be syntactically valid, the `catch`, `finally`, and `else` (or `elseif`) keywords **must** follow the closing brace (`}`) of the preceding block on the **same line**.
+> **Exception for `catch`, `finally`, and `else`:** These keywords are the major exception to this rule. To be syntactically valid, the `catch`, `finally`, and `else` (or `elseif`) keywords **MUST** follow the closing brace (`}`) of the preceding block on the **same line**.
 >
 > **Compliant `if/else`:**
 >
@@ -212,7 +223,7 @@ When a method call (like `.Add()`) is wrapped (e.g., in a `[void]` cast) and its
 
 Blank lines are used sparingly but effectively: two surround function definitions for visual separation, and single blanks group related logic within functions (e.g., before a block comment or between setup and main logic). Files end with a single blank line. Regions (#region ... #endregion) logically group elements like licenses or helper sections, improving navigability in larger scripts.
 
-**Important:** Blank lines must be completely empty—they **must not contain any whitespace characters** (spaces or tabs). This ensures consistency and prevents issues with some editors and linters.
+**Important:** Blank lines **MUST** be completely empty—they **MUST NOT** contain any whitespace characters (spaces or tabs). This ensures consistency and prevents issues with some editors and linters.
 
 **Compliant (blank line is truly empty):**
 
@@ -324,7 +335,7 @@ The naming strategy is rooted in **.NET Framework capitalization conventions**, 
 
 - **PascalCase** for all public-facing identifiers (function names, parameters, properties).
 - **lowercase** for PowerShell language keywords (`function`, `param`, `if`, `else`, `return`, `trap`).
-- **camelCase with type-hinting prefixes** for local variables. **These must be fully descriptive and non-abbreviated** (e.g., `$strMessage`, `$intReturnValue`, `$objMemoryStream`).
+- **camelCase with type-hinting prefixes** for local variables. **These MUST be fully descriptive and non-abbreviated** (e.g., `$strMessage`, `$intReturnValue`, `$objMemoryStream`).
 - **Noun-based naming for Modules**, treating them as containers/namespaces (e.g., `ObjectFlattener`) distinct from the executable actions they contain.
 
 This consistent application creates a visual hierarchy that allows rapid comprehension of code structure and data flow, even in large or complex functions.
@@ -346,7 +357,7 @@ Using approved verbs is a core PowerShell convention that ensures discoverabilit
 Get-Verb
 ```
 
-If a verb (like `Review` or `Check`) is not on this list, you must choose the closest approved alternative, such as `Get-` (to retrieve information) or `Test-` (to return a boolean).
+If a verb (like `Review` or `Check`) is not on this list, you **MUST** choose the closest approved alternative, such as `Get-` (to retrieve information) or `Test-` (to return a boolean).
 
 The list of approved PowerShell verbs can be viewed [on Microsoft's Docs page](https://learn.microsoft.com/en-us/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands?view=powershell-7.5). For offline scenarios, a copy of this page is included below, retrieved on November 3, 2025:
 
@@ -553,7 +564,7 @@ PowerShell uses the `System.Management.Automation.VerbsOther` class to define ca
 
 ### Script and Function Naming: Nouns
 
-**Noun Singularity:** The noun **must** be singular, even if the function returns multiple objects. This is a core PowerShell convention (e.g., `Get-Process`, `Get-ChildItem`) and corresponds to the **PSScriptAnalyzer `PSUseSingularNouns`** rule. The noun describes the *type* of object the function works with, not the *quantity* of its output.
+**Noun Singularity:** The noun **MUST** be singular, even if the function returns multiple objects. This is a core PowerShell convention (e.g., `Get-Process`, `Get-ChildItem`) and corresponds to the **PSScriptAnalyzer `PSUseSingularNouns`** rule. The noun describes the *type* of object the function works with, not the *quantity* of its output.
 
 - **Correct:** `Get-Process` (returns *many* process objects)
 - **Incorrect:** `Get-Processes`
@@ -562,7 +573,7 @@ PowerShell uses the `System.Management.Automation.VerbsOther` class to define ca
 
 ### Module Naming: Noun-Based Containers
 
-**Modules are treated as .NET Namespaces or Class Libraries (Containers), not Actions.** Therefore, Module names **must** be **PascalCase Nouns** or **Noun Phrases**.
+**Modules are treated as .NET Namespaces or Class Libraries (Containers), not Actions.** Therefore, Module names **MUST** be **PascalCase Nouns** or **Noun Phrases**.
 
 - **Correct:** `ObjectFlattener`, `NetworkManager`, `DataParser`
 - **Incorrect:** `FlattenObject`, `ManageNetwork`, `ParseData`
@@ -575,7 +586,7 @@ By naming the module `ObjectFlattener` (the tool) and the function `ConvertTo-Fl
 
 **Discoverability Strategy:**
 
-Do not compromise the module name for the sake of keyword searching. Instead, rely on the **Module Manifest (`.psd1`)** to handle discoverability. The `Tags` key in the manifest must be populated aggressively with relevant keywords (including verbs) to ensure the module is found during searches, while keeping the architectural name pure.
+Do not compromise the module name for the sake of keyword searching. Instead, rely on the **Module Manifest (`.psd1`)** to handle discoverability. The `Tags` key in the manifest **MUST** be populated aggressively with relevant keywords (including verbs) to ensure the module is found during searches, while keeping the architectural name pure.
 
 ### Do Not Use Aliases
 
@@ -585,11 +596,11 @@ No aliases (e.g., `gci`, `gps`) or abbreviated forms appear in the code. Even co
 2. **Future-proofing**: Changes to parameter sets in underlying cmdlets cannot break the script due to positional or partial-name matching.
 3. **Syntax highlighting**: Full names trigger proper IDE and GitHub syntax coloring.
 
-Furthermore, **Modules must not export "Compatibility Aliases"** solely to bridge a gap between a module name and a command name. For example, if a module is named `ObjectFlattener`, do **not** export an alias `Flatten-Object` just to make the syntax feel "natural." The command name `ConvertTo-FlatObject` is structurally correct; relying on an alias suggests a flaw in the underlying naming architecture.
+Furthermore, **Modules MUST NOT export "Compatibility Aliases"** solely to bridge a gap between a module name and a command name. For example, if a module is named `ObjectFlattener`, do **not** export an alias `Flatten-Object` just to make the syntax feel "natural." The command name `ConvertTo-FlatObject` is structurally correct; relying on an alias suggests a flaw in the underlying naming architecture.
 
 **Exceptions:**
 
-Aliases may only be exported in a Module Manifest if they provide genuine short-hand convenience for *interactive* users (e.g., `cfo` for `ConvertTo-FlatObject`) and are strictly documented as optional. They must never be used to mask non-approved verbs.
+Aliases **MAY** only be exported in a Module Manifest if they provide genuine short-hand convenience for *interactive* users (e.g., `cfo` for `ConvertTo-FlatObject`) and are strictly documented as optional. They **MUST NOT** be used to mask non-approved verbs.
 
 ### Parameter Naming
 
@@ -600,14 +611,14 @@ Aliases may only be exported in a Module Manifest if they provide genuine short-
 - `$StringToProcess`
 - `$PSVersion`
 
-These names leave no ambiguity about the parameter’s purpose, expected type, or direction of data flow. The use of `ReferenceTo` prefix for `[ref]` parameters is a deliberate pattern that instantly signals **pass-by-reference** semantics—a critical distinction in PowerShell v1.0 where such mechanics are not visually obvious. However, [ref] is used only when data must be written back to the caller's scope (e.g., for modifying variables or returning multiple outputs); for passing complex objects that do not need modification, they are passed by value, as [ref] offers no performance advantages in PowerShell.
+These names leave no ambiguity about the parameter’s purpose, expected type, or direction of data flow. The use of `ReferenceTo` prefix for `[ref]` parameters is a deliberate pattern that instantly signals **pass-by-reference** semantics—a critical distinction in PowerShell v1.0 where such mechanics are not visually obvious. However, [ref] **SHOULD** be used only when data **MUST** be written back to the caller's scope (e.g., for modifying variables or returning multiple outputs); for passing complex objects that do not need modification, they are passed by value, as [ref] offers no performance advantages in PowerShell.
 
 ### Local Variable Naming: Type-Prefixed camelCase
 
-Local variables follow a **Hungarian-style notation** combining a **type-hinting prefix** with **descriptive `camelCase`**. **These names must be fully descriptive and avoid all abbreviations or shorthand.**
+Local variables follow a **Hungarian-style notation** combining a **type-hinting prefix** with **descriptive `camelCase`**. **These names MUST be fully descriptive and avoid all abbreviations or shorthand.**
 
 - **Prefixes:** `$str` (string), `$int` (integer), `$bool` (boolean), `$arr` (array), `$obj` (object), `$hash` (hashtable), `$list` (generic list), etc.
-- **Descriptive Name:** The name must be **fully spelled out**.
+- **Descriptive Name:** The name **MUST** be **fully spelled out**.
 
 **Examples:**
 
@@ -675,7 +686,7 @@ This results in code that is **self-documenting**, **resilient to change**, and 
 
 ### Overview of Documentation Philosophy
 
-The author treats **documentation as a first-class citizen** of the codebase, embedding comprehensive, structured, and immediately actionable information directly within every function—regardless of scope, complexity, or visibility. This is not an afterthought but a **core engineering principle**: code must be **self-explanatory** to any consumer, even in the absence of external manuals, IDE tooltips, or prior knowledge. The documentation strategy is **v1.0-native** in compatible scripts, relying exclusively on PowerShell’s original comment-based help system (introduced in v1.0) without dependence on newer features like `[CmdletBinding()]`, `Get-Help` enhancements in v2.0+, or external XML help files. In scripts requiring modern PowerShell due to dependencies, the author incorporates these newer help features as appropriate.
+The author treats **documentation as a first-class citizen** of the codebase, embedding comprehensive, structured, and immediately actionable information directly within every function—regardless of scope, complexity, or visibility. This is not an afterthought but a **core engineering principle**: code **MUST** be **self-explanatory** to any consumer, even in the absence of external manuals, IDE tooltips, or prior knowledge. The documentation strategy is **v1.0-native** in compatible scripts, relying exclusively on PowerShell’s original comment-based help system (introduced in v1.0) without dependence on newer features like `[CmdletBinding()]`, `Get-Help` enhancements in v2.0+, or external XML help files. In scripts requiring modern PowerShell due to dependencies, the author incorporates these newer help features as appropriate.
 
 Every function—**including nested private helpers**—receives **identical treatment** in documentation rigor. This creates a **uniform information density** across the entire script, enabling rapid onboarding, debugging, and maintenance. The documentation serves three distinct audiences:
 
@@ -782,7 +793,7 @@ The script uses **`#region` / `#endregion`** blocks to create **logical code fol
 
 In addition to top-level script regions, this pattern can be applied inside individual functions:
 
-- **Function Structure with License**: For distributable helper functions, the structure must be: function declaration, comment-based help, `param()` block, and then the `#region License` block. The license region should be placed immediately after the function's `param()` block.
+- **Function Structure with License**: For distributable helper functions, the structure **MUST** be: function declaration, comment-based help, `param()` block, and then the `#region License` block. The license region **SHOULD** be placed immediately after the function's `param()` block.
 
 **Example:**
 
@@ -818,7 +829,7 @@ This enables:
 
 ### Function and Script Versioning
 
-All distributable functions and scripts must include a version number in the `.NOTES` section of their comment-based help. This version number provides critical change tracking and must follow a strict, `[System.Version]`-compatible format: `Major.Minor.Build.Revision`.
+All distributable functions and scripts **MUST** include a version number in the `.NOTES` section of their comment-based help. This version number provides critical change tracking and **MUST** follow a strict, `[System.Version]`-compatible format: `Major.Minor.Build.Revision`.
 
 - **`Major`**: Increment the **Major** version (e.g., `1.0.20251103.0` to `2.0.20251230.0`) **any time a breaking change is introduced**. Breaking changes include:
   - Removing or renaming a function, parameter, or public interface
@@ -830,8 +841,8 @@ All distributable functions and scripts must include a version number in the `.N
   - Adding new optional parameters
   - Enhancing existing functionality without changing interfaces
   - Performance improvements that don't affect behavior
-- **`Build`**: This component **must** be an integer in the format **`YYYYMMDD`**, representing the date the code was last modified. This date must be updated to the **current date** for *any* modification, however minor.
-- **`Revision`**: This component is typically `0` for the first commit of the day. It should be **bumped any time a minor change is made on the same date a change has already been made**. Revisions are typically reserved for:
+- **`Build`**: This component **MUST** be an integer in the format **`YYYYMMDD`**, representing the date the code was last modified. This date **MUST** be updated to the **current date** for *any* modification, however minor.
+- **`Revision`**: This component is typically `0` for the first commit of the day. It **SHOULD** be **bumped any time a minor change is made on the same date a change has already been made**. Revisions are typically reserved for:
   - Trivial edits (typos, formatting, comments)
   - Bug fixes that don't change functionality
   - Documentation-only updates
@@ -967,7 +978,7 @@ The `param` block is the **primary contract** between caller and function. Every
 
 In rare cases, a function may be intentionally designed to accept a parameter that can be one of several different, incompatible types (e.g., a string *or* an object). This is common in "safe wrapper" functions that process dynamic input, such as the `Principal` element from an IAM policy.
 
-In this scenario, the parameter should be left **un-typed** (or explicitly typed as `[object]`). The function's internal logic is then responsible for inspecting the received object's type (e.g., using `if ($MyParameter -is [string])`) and handling it appropriately. This pattern should be used sparingly and only when required by the function's core purpose.
+In this scenario, the parameter **SHOULD** be left **un-typed** (or explicitly typed as `[object]`). The function's internal logic is then responsible for inspecting the received object's type (e.g., using `if ($MyParameter -is [string])`) and handling it appropriately. This pattern **SHOULD** be used sparingly and only when required by the function's core purpose.
 
 **Parameter typing examples**:
 
@@ -978,14 +989,14 @@ In this scenario, the parameter should be left **un-typed** (or explicitly typed
 | `$StringToProcess` | `[string]` | Input: string to handle |
 | `$PSVersion` | `[version]` | Optional: runtime version for optimization |
 
-**Reference parameters (`[ref]`)** are used **exclusively for output** where data must be written back to the caller's scope—a deliberate pattern to:
+**Reference parameters (`[ref]`)** are used **exclusively for output** where data **MUST** be written back to the caller's scope—a deliberate pattern to:
 
 - Return multiple complex values
 - Avoid pipeline interference
 - Maintain v1.0 compatibility
 - Ensure caller controls variable lifetime
 
-[ref] is not used for passing complex objects that do not require modification, as PowerShell passes object references by default without performance gains from [ref] in such cases.
+[ref] **SHOULD NOT** be used for passing complex objects that do not require modification, as PowerShell passes object references by default without performance gains from [ref] in such cases.
 
 **Default values** are used judiciously:
 
@@ -1038,7 +1049,7 @@ function Test-PathExists {
 }
 ```
 
-For `Test-*` functions that may encounter meaningful errors (e.g., access denied, network issues) that the caller should be able to detect, the standard integer status code pattern should still be used.
+For `Test-*` functions that **MAY** encounter meaningful errors (e.g., access denied, network issues) that the caller **SHOULD** be able to detect, the standard integer status code pattern **SHOULD** still be used.
 
 **Rationale for explicit `return`**:
 
@@ -1149,7 +1160,7 @@ The use of explicit `return` vs. implicit output represents a **philosophical ch
 
 ### Rule: "Modern Advanced" Function/Script Requirements (v2.0+)
 
-The "v1.0 Classicist" style is the default for standalone, portable utilities that must maintain backward compatibility.
+The "v1.0 Classicist" style is the default for standalone, portable utilities that **MUST** maintain backward compatibility.
 
 However, if a script or function **cannot** target v1.0, it **MUST** be written as a "Modern Advanced" function. This condition is met if the code:
 
@@ -1240,25 +1251,25 @@ This `try/finally` pattern is robust, safe, and compliantly achieves your goal o
 
 #### "Modern Advanced" Functions/Scripts: Singlular `[OutputType()]`
 
-When a function returns one or more objects via the pipeline (streaming), the `[OutputType()]` attribute **must** declare the *singular* type of object in the stream (e.g., `[OutputType([pscustomobject])]`). Do not use the plural array type (e.g., `[OutputType([pscustomobject[]])]`). The pipeline *always* creates an array for the caller automatically if multiple objects are returned.
+When a function returns one or more objects via the pipeline (streaming), the `[OutputType()]` attribute **MUST** declare the *singular* type of object in the stream (e.g., `[OutputType([pscustomobject])]`). Do not use the plural array type (e.g., `[OutputType([pscustomobject[]])]`). The pipeline *always* creates an array for the caller automatically if multiple objects are returned.
 
 #### "Modern Advanced" Functions/Scripts: Handling Multiple or Dynamic Output Types
 
 When a function is *intentionally* designed to return different, non-related object types (e.g., a wrapper for `ConvertFrom-Json` which can return a single object, an array, or a scalar type), it is preferred to **list all primary output types** using multiple `[OutputType()]` attributes. This is far more descriptive and helpful to the caller than using a single, generic `[OutputType([System.Object])]`.
 
-If a function's output type is truly dynamic and unpredictable, `[OutputType([System.Object])]` should be used only as a last resort, as it provides minimal value for discoverability.
+If a function's output type is truly dynamic and unpredictable, `[OutputType([System.Object])]` **SHOULD** be used only as a last resort, as it provides minimal value for discoverability.
 
 #### "Modern Advanced" Functions/Scripts: Prioritizing Primary Output Types
 
 When using multiple `[OutputType()]` attributes, the goal is to list the **primary, high-level** object types a user can expect. It is **not** necessary to create an exhaustive list of every possible scalar or primitive type (e.g., `[int]`, `[bool]`, `[double]`) if they are not the main, intended output of the function.
 
-This practice avoids cluttering the function's definition and keeps the developer's focus on the most common and important return values. For example, a JSON parsing function should list `[pscustomobject]` and `[object[]]`, but does not need to list `[int]`.
+This practice avoids cluttering the function's definition and keeps the developer's focus on the most common and important return values. For example, a JSON parsing function **SHOULD** list `[pscustomobject]` and `[object[]]`, but does not need to list `[int]`.
 
 #### "Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)
 
 Using `[CmdletBinding()]` unlocks powerful parameter validation attributes like `[Parameter(Mandatory = $true)]`, `[ValidateNotNullOrEmpty()]`, and `[ValidateSet()]`.
 
-These are **not stylistic requirements**; they are **design tools** that must be used deliberately to enforce a function's operational contract.
+These are **not stylistic requirements**; they are **design tools** that **MUST** be used deliberately to enforce a function's operational contract.
 
 - **Use `[Parameter(Mandatory = $true)]` when:**
   - The function **cannot possibly perform its core purpose** without this value (e.g., `$Identity` for a `Get-User` function).
@@ -1267,10 +1278,10 @@ These are **not stylistic requirements**; they are **design tools** that must be
 - **DO NOT Use `[Parameter(Mandatory = $true)]` when:**
   - The function is a "safe" wrapper or helper designed to handle any input, including `$null`.
   - The function has a clear, graceful default behavior when the parameter is omitted (e.g., returning `$null`, an empty array, or `$false`).
-  - **Example:** The `Convert-JsonFromPossiblyUrlEncodedString` function is a "safe" wrapper. Its contract is to *try* to convert a string. A `$null` string is a valid input that should gracefully return `$null`, not throw a script-terminating error. Making `$InputString` mandatory would violate this "safe" contract.
+  - **Example:** The `Convert-JsonFromPossiblyUrlEncodedString` function is a "safe" wrapper. Its contract is to *try* to convert a string. A `$null` string is a valid input that **SHOULD** gracefully return `$null`, not throw a script-terminating error. Making `$InputString` mandatory would violate this "safe" contract.
 
 - **Prefer `[ValidateNotNullOrEmpty()]` over `[Parameter(Mandatory = $true)]` when:**
-  - The parameter is *technically* optional, but if it *is* provided, it must not be an empty string.
+  - The parameter is *technically* optional, but if it *is* provided, it **MUST NOT** be an empty string.
   - This is common for optional parameters like `$LogPath` or `$Description`.
 
 ### Consuming Streaming Functions (The `0-1-Many` Problem)
@@ -1279,7 +1290,7 @@ When a function or script streams its output (whether it's a "modern advanced" f
 
 This can cause errors in subsequent code that *always* expects an array (e.g., `foreach ($item in $result)` or `$result.Count`).
 
-To ensure the result is **always** an array (even if empty or with a single item), the caller should wrap the function call in the **array subexpression operator `@(...)`**. This is the standard, robust way to consume a streaming function and should be the default way to demonstrate usage in `.EXAMPLE` blocks.
+To ensure the result is **always** an array (even if empty or with a single item), the caller **SHOULD** wrap the function call in the **array subexpression operator `@(...)`**. This is the standard, robust way to consume a streaming function and **SHOULD** be the default way to demonstrate usage in `.EXAMPLE` blocks.
 
 **Compliant `.EXAMPLE`:**
 
@@ -1461,7 +1472,7 @@ The v1.0 pattern is **functionally equivalent** but **more verbose** and **dupli
 
 ### Modern `catch` Block Requirements
 
-In modern functions using `try/catch` (i.e., those not targeting v1.0), `catch` blocks **must not be empty**. An empty `catch` block is flagged by PSScriptAnalyzer and provides no diagnostic value. At a minimum, the error should be logged to the **Debug** stream, as it represents an *internal, handled* failure.
+In modern functions using `try/catch` (i.e., those not targeting v1.0), `catch` blocks **MUST NOT** be empty. An empty `catch` block is flagged by PSScriptAnalyzer and provides no diagnostic value. At a minimum, the error **SHOULD** be logged to the **Debug** stream, as it represents an *internal, handled* failure.
 
 ```powershell
 # Compliant
@@ -1486,13 +1497,13 @@ The error handling system is a **masterclass in v1.0 reliability engineering**:
 
 This is not "working around" v1.0 limitations — it is **exploiting v1.0 mechanics to achieve enterprise-grade reliability**. The system transforms potentially fatal failures into **predictable, analyzable status codes** while maintaining **zero host output** in normal operation.
 
-The only identified weakness is **helper function duplication**, which should be consolidated into shared nested definitions to eliminate maintenance risk. With this single improvement, the error handling system would achieve **perfect reliability scoring** across all PowerShell versions.
+The only identified weakness is **helper function duplication**, which **SHOULD** be consolidated into shared nested definitions to eliminate maintenance risk. With this single improvement, the error handling system would achieve **perfect reliability scoring** across all PowerShell versions.
 
 ## File Writeability Testing
 
 ### Why Test File Writeability
 
-When a PowerShell script is designed to write output to a file (e.g., export to CSV), it must verify that the destination path is writable **before performing any significant processing**. This is a **preflight check** to catch issues such as:
+When a PowerShell script is designed to write output to a file (e.g., export to CSV), it **MUST** verify that the destination path is writable **before performing any significant processing**. This is a **preflight check** to catch issues such as:
 
 - Invalid paths
 - Missing directories
@@ -1518,7 +1529,7 @@ Both approaches use a **create-then-delete pattern**. The delete step is critica
 
 ### Scripts Requiring PowerShell v1.0 Support
 
-For scripts that must maintain backward compatibility with PowerShell v1.0, the **`.NET` approach** is required. The `try/catch` construct is not available in PowerShell v1.0 and causes a **parser error** if present in the script.
+For scripts that **MUST** maintain backward compatibility with PowerShell v1.0, the **`.NET` approach** is **REQUIRED**. The `try/catch` construct is not available in PowerShell v1.0 and causes a **parser error** if present in the script.
 
 **Rationale**: Since `try/catch` was introduced in PowerShell v2.0, any script containing this syntax will fail to parse on v1.0, even if the code path is never executed.
 
@@ -1552,7 +1563,7 @@ For scripts targeting PowerShell v2.0 or later, **either approach is acceptable*
 
 #### .NET Approach
 
-To follow the `.NET` approach, the script should bundle `Test-FileWriteability` from the [reference implementation](#reference-implementation) and then call it following the guidance in the function header. For example:
+To follow the `.NET` approach, the script **SHOULD** bundle `Test-FileWriteability` from the [reference implementation](#reference-implementation) and then call it following the guidance in the function header. For example:
 
 ```powershell
 $errRecord = $null
@@ -1618,15 +1629,15 @@ This implementation includes:
 
 ### Overview: Ensuring Cross-Platform Compatibility
 
-When a PowerShell script or function is designed to run only on specific operating systems (Windows, Linux, and/or macOS), it **must** include appropriate checks to verify that the correct operating system is running before proceeding with its core operations. This prevents runtime failures, unexpected behavior, and provides clear error messages to users running the script on unsupported platforms.
+When a PowerShell script or function is designed to run only on specific operating systems (Windows, Linux, and/or macOS), it **MUST** include appropriate checks to verify that the correct operating system is running before proceeding with its core operations. This prevents runtime failures, unexpected behavior, and provides clear error messages to users running the script on unsupported platforms.
 
-The method used to detect the operating system depends on the minimum PowerShell version the script or function targets. PowerShell Core 6.0 introduced automatic variables for OS detection (`$IsWindows`, `$IsMacOS`, `$IsLinux`), but these are not available in Windows PowerShell 1.0 through 5.1. Scripts that must support older versions require a "safe" approach using dedicated detection functions.
+The method used to detect the operating system depends on the minimum PowerShell version the script or function targets. PowerShell Core 6.0 introduced automatic variables for OS detection (`$IsWindows`, `$IsMacOS`, `$IsLinux`), but these are not available in Windows PowerShell 1.0 through 5.1. Scripts that **MUST** support older versions **REQUIRE** a "safe" approach using dedicated detection functions.
 
 ---
 
 ### When OS Checks Are Required
 
-If a script or function supports only specific operating systems (Windows, Linux, and/or macOS), it **must** include a check to verify that the appropriate operating system type(s) are running before proceeding with platform-specific operations.
+If a script or function supports only specific operating systems (Windows, Linux, and/or macOS), it **MUST** include a check to verify that the appropriate operating system type(s) are running before proceeding with platform-specific operations.
 
 **Examples of when OS checks are required:**
 
@@ -1707,7 +1718,7 @@ function Get-UnixSystemInfo {
 
 ### Cross-Version OS Detection
 
-If the script or function needs to support **any version of PowerShell older than PowerShell Core 6.0** (including Windows PowerShell 1.0 through 5.1), a "safe" check must be used because the `$IsWindows`, `$IsMacOS`, and `$IsLinux` variables do not exist in those versions.
+If the script or function needs to support **any version of PowerShell older than PowerShell Core 6.0** (including Windows PowerShell 1.0 through 5.1), a "safe" check **MUST** be used because the `$IsWindows`, `$IsMacOS`, and `$IsLinux` variables do not exist in those versions.
 
 In this case, use the following dedicated functions from the [`PowerShell_Resources`](https://github.com/franklesniak/PowerShell_Resources) repository:
 
@@ -1790,13 +1801,13 @@ The `Test-Windows`, `Test-macOS`, and `Test-Linux` functions from the PowerShell
 
 ### Error Handling for Wrong OS
 
-If the script or function detects that it is running on an unsupported operating system, it should report the error in a way that is **consistent with the script's or function's existing error handling patterns**.
+If the script or function detects that it is running on an unsupported operating system, it **SHOULD** report the error in a way that is **consistent with the script's or function's existing error handling patterns**.
 
 **Guidelines:**
 
 1. **Match the error reporting style:** If the function returns integer status codes (e.g., `0` for success, `-1` for failure), return the appropriate error code. If it uses exceptions, throw an exception. If it uses `Write-Error`, use that.
 
-2. **Provide clear error messages:** The error message should clearly state which operating system(s) are required and which OS was detected.
+2. **Provide clear error messages:** The error message **SHOULD** clearly state which operating system(s) are required and which OS was detected.
 
 3. **Fail early:** Perform the OS check at the beginning of the function or script, before any significant processing occurs.
 
@@ -1965,7 +1976,7 @@ $strSplitterInRegEx = [regex]::Escape($Splitter)
 $result = [regex]::Split($StringToSplit, $strSplitterInRegEx)
 ```
 
-**Typed Generic Collections:** When instantiating generic .NET collections, such as `System.Collections.Generic.List[T]`, the specific type `T` **must be provided** if known (e.g., `[PSCustomObject]`, `[string]`). This is more precise, safer, and more descriptive than using the generic `[object]`.
+**Typed Generic Collections:** When instantiating generic .NET collections, such as `System.Collections.Generic.List[T]`, the specific type `T` **MUST** be provided if known (e.g., `[PSCustomObject]`, `[string]`). This is more precise, safer, and more descriptive than using the generic `[object]`.
 
 ```powershell
 # Compliant (Preferred)
@@ -2139,7 +2150,7 @@ This status code serves as the **function’s contract** — a machine-readable 
 
 ### Processing Collections in Modern Functions (Streaming Output)
 
-A modern (non-v1.0) function **should not** build a large collection (like a `List<T>`) and return it at the end. This is memory-inefficient, as it requires holding all results in memory, and often creates an unnecessary O(n) performance hit when the list is copied.
+A modern (non-v1.0) function **SHOULD NOT** build a large collection (like a `List<T>`) and return it at the end. This is memory-inefficient, as it requires holding all results in memory, and often creates an unnecessary O(n) performance hit when the list is copied.
 
 The preferred, idiomatic PowerShell pattern is to **"stream" the output**: write each result object *directly to the pipeline from within the processing loop*. This is highly memory-efficient and aligns with the pipeline's "one object at a time" philosophy.
 
@@ -2175,7 +2186,7 @@ foreach ($objItem in $SourceData) {
 return $listOutput.ToArray() # Unnecessary copy and non-idiomatic
 ```
 
-This rule is distinct from the v1.0-native pattern, which uses explicit integer `return` codes and passes data via `[ref]` parameters. The v1.0-native pattern may be desireable in situations where the function should return no output in the event of any error occurring during processing, or where error/warning status needs to be passed back to the caller.
+This rule is distinct from the v1.0-native pattern, which uses explicit integer `return` codes and passes data via `[ref]` parameters. The v1.0-native pattern **MAY** be desireable in situations where the function **SHOULD** return no output in the event of any error occurring during processing, or where error/warning status needs to be passed back to the caller.
 
 ---
 
@@ -2353,12 +2364,12 @@ The absence of `Write-Host` and mixed output types is not a limitation — it is
 
 The choice of output stream is critical for communicating intent:
 
-- **Warning Stream (`Write-Warning`):** Reserved for logical anomalies or conditions that the **end-user** should be aware of, but which do not halt execution (e.g., "Could not determine root user email for account X").
+- **Warning Stream (`Write-Warning`):** Reserved for logical anomalies or conditions that the **end-user** **SHOULD** be aware of, but which do not halt execution (e.g., "Could not determine root user email for account X").
 - **Debug Stream (`Write-Debug`):** Used for logging **internal function details** that are not relevant to the end-user but are critical for diagnostics. This includes handled `catch` block errors, or fallback logic (e.g., "Failed to create generic lists; falling back to ArrayLists.").
 
 ### Suppression of Method Output
 
-When calling .NET methods that return a value (like `System.Collections.ArrayList.Add()`), that output must be suppressed to avoid polluting the pipeline. The preferred method is to cast the entire statement to `[void]` for performance, as it is measurably faster than piping to `| Out-Null`.
+When calling .NET methods that return a value (like `System.Collections.ArrayList.Add()`), that output **MUST** be suppressed to avoid polluting the pipeline. The preferred method is to cast the entire statement to `[void]` for performance, as it is measurably faster than piping to `| Out-Null`.
 
 ```powershell
 # Compliant (Preferred for performance)
@@ -2378,9 +2389,9 @@ $list.Add($item) | Out-Null
 
 ### Test File Naming and Location
 
-Test files must follow consistent naming conventions to ensure discoverability:
+Test files **MUST** follow consistent naming conventions to ensure discoverability:
 
-- **Naming Convention:** Test files **must** use the `*.Tests.ps1` suffix (e.g., `Get-UserInfo.Tests.ps1`)
+- **Naming Convention:** Test files **MUST** use the `*.Tests.ps1` suffix (e.g., `Get-UserInfo.Tests.ps1`)
 - **Preferred Location:** Store test files in a `tests/` directory at the repository root
 - **Alternative:** Place test files alongside source files (e.g., `Get-UserInfo.ps1` and `Get-UserInfo.Tests.ps1` in the same directory)
 - **One-to-One Mapping:** Generally, create one test file per function or script being tested
@@ -2399,7 +2410,7 @@ repository/
 
 ### Pester 5.x Syntax Requirements
 
-Tests **must** use Pester 5.x syntax. Do not use legacy Pester 3.x/4.x patterns.
+Tests **MUST** use Pester 5.x syntax. Do not use legacy Pester 3.x/4.x patterns.
 
 | Block | Purpose |
 | --- | --- |
@@ -2421,13 +2432,13 @@ Tests **must** use Pester 5.x syntax. Do not use legacy Pester 3.x/4.x patterns.
 
 ### Test Structure: Arrange-Act-Assert
 
-Tests should follow the **Arrange-Act-Assert (AAA)** pattern for clarity and maintainability:
+Tests **SHOULD** follow the **Arrange-Act-Assert (AAA)** pattern for clarity and maintainability:
 
 1. **Arrange:** Set up test data, preconditions, and inputs
 2. **Act:** Execute the function or script under test
 3. **Assert:** Verify the output matches expectations
 
-Each `It` block should test **one specific behavior**. Use comments to delineate the AAA sections for readability.
+Each `It` block **SHOULD** test **one specific behavior**. Use comments to delineate the AAA sections for readability.
 
 **Example:**
 
@@ -2449,11 +2460,11 @@ It "Returns success code 0 when given valid input" {
 
 ### Testing Return Code Conventions
 
-Tests must verify the return code conventions documented in [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes).
+Tests **MUST** verify the return code conventions documented in [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes).
 
 #### Functions Returning Integer Status Codes
 
-For functions that return integer status codes (`0` = success, `1-5` = partial success, `-1` = failure), tests must cover:
+For functions that return integer status codes (`0` = success, `1-5` = partial success, `-1` = failure), tests **MUST** cover:
 
 | Return Code | Test Requirement |
 | --- | --- |
@@ -2518,7 +2529,7 @@ Describe "Convert-StringToObject" {
 
 #### Test-* Functions Returning Boolean
 
-For `Test-*` functions that return Boolean values (as documented in the exception for Test-* functions), tests must verify:
+For `Test-*` functions that return Boolean values (as documented in the exception for Test-* functions), tests **MUST** verify:
 
 - A case that returns `$true`
 - A case that returns `$false`
@@ -2629,9 +2640,9 @@ Invoke-Pester -Configuration $objPesterConfig
 
 The author operates under **three immutable design pillars** that govern every decision in performance, security, and auxiliary behavior:
 
-1. **v1.0 Compatibility** — the code must run on PowerShell 1.0 without modification when the script's nature allows (e.g., no modern dependencies)
-2. **Deterministic Execution** — every path must produce identical, predictable results
-3. **Zero Side Effects** — the function must not alter global state or emit uncontrolled output
+1. **v1.0 Compatibility** — the code **MUST** run on PowerShell 1.0 without modification when the script's nature allows (e.g., no modern dependencies)
+2. **Deterministic Execution** — every path **MUST** produce identical, predictable results
+3. **Zero Side Effects** — the function **MUST NOT** alter global state or emit uncontrolled output
 
 These constraints create a **highly constrained optimization space** where performance, security, and maintainability are balanced against **absolute portability**. The result is a **lean, defensive, and self-documenting** implementation that sacrifices micro-optimizations for **macro-reliability**. In dependency-constrained scripts, these pillars adapt to include modern optimizations.
 
