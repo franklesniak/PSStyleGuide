@@ -1,12 +1,12 @@
 # PowerShell Writing Style
 
-**Version:** 1.3.20260109.3
+**Version:** 1.4.20260112.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-01-09
+- **Last Updated:** 2026-01-12
 - **Scope:** Defines PowerShell coding standards for all `.ps1` files in this repository. Covers style, formatting, naming conventions, error handling, documentation requirements, and compatibility patterns for both legacy (v1.0) and modern (v5.1+/v7.x+) PowerShell codebases.
 
 ## Table of Contents
@@ -22,6 +22,7 @@
 - [Operating System Compatibility Checks](#operating-system-compatibility-checks)
 - [Language Interop, Versioning, and .NET](#language-interop-versioning-and-net)
 - [Output Formatting and Streams](#output-formatting-and-streams)
+- [Testing with Pester](#testing-with-pester)
 - [Performance, Security, and Other](#performance-security-and-other)
 
 ## Executive Summary: Author Profile
@@ -137,6 +138,15 @@ This checklist provides a quick reference for both human developers and LLMs (li
 ### Language Interop and .NET
 
 - **[All]** Provide specific type T for generic collections (List[PSCustomObject], not List[object]) → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
+
+### Testing
+
+- **[All]** New functions should have corresponding Pester tests when testability is a project requirement → [Testing with Pester](#testing-with-pester)
+- **[All]** Test files use `*.Tests.ps1` naming convention → [Test File Naming and Location](#test-file-naming-and-location)
+- **[All]** Tests use Pester 5.x syntax (BeforeAll, Describe, Context, It) → [Pester 5.x Syntax Requirements](#pester-5x-syntax-requirements)
+- **[All]** Use Arrange-Act-Assert pattern in test cases → [Test Structure: Arrange-Act-Assert](#test-structure-arrange-act-assert)
+- **[All]** Test all documented return codes for functions → [Testing Return Code Conventions](#testing-return-code-conventions)
+- **[All]** Test-* functions must have tests for both `$true` and `$false` cases → [Testing Return Code Conventions](#testing-return-code-conventions)
 
 ## Code Layout and Formatting
 
@@ -2356,6 +2366,261 @@ When calling .NET methods that return a value (like `System.Collections.ArrayLis
 
 # Non-Compliant (Typically slower than casting to void)
 $list.Add($item) | Out-Null
+```
+
+## Testing with Pester
+
+**Pester** is the standard testing framework for PowerShell, providing a domain-specific language for writing and executing tests. This section documents testing conventions that integrate with the coding standards in this guide. For comprehensive Pester documentation, see [pester.dev](https://pester.dev/).
+
+> **Note:** Pester 5.x requires PowerShell 3.0+ to execute tests. However, v1.0-compatible scripts can still be tested with Pester—simply run the tests on a modern PowerShell version (e.g., pwsh 7.x on a CI platform like `ubuntu-latest`). The test files themselves will use modern Pester syntax, but the scripts under test can target any PowerShell version.
+
+---
+
+### Test File Naming and Location
+
+Test files must follow consistent naming conventions to ensure discoverability:
+
+- **Naming Convention:** Test files **must** use the `*.Tests.ps1` suffix (e.g., `Get-UserInfo.Tests.ps1`)
+- **Preferred Location:** Store test files in a `tests/` directory at the repository root
+- **Alternative:** Place test files alongside source files (e.g., `Get-UserInfo.ps1` and `Get-UserInfo.Tests.ps1` in the same directory)
+- **One-to-One Mapping:** Generally, create one test file per function or script being tested
+
+**Example directory structure:**
+
+```text
+repository/
+├── src/
+│   └── Get-UserInfo.ps1
+└── tests/
+    └── Get-UserInfo.Tests.ps1
+```
+
+---
+
+### Pester 5.x Syntax Requirements
+
+Tests **must** use Pester 5.x syntax. Do not use legacy Pester 3.x/4.x patterns.
+
+| Block | Purpose |
+| --- | --- |
+| `BeforeAll` | One-time setup at the beginning of a `Describe` or `Context` block (e.g., dot-sourcing the function under test) |
+| `BeforeEach` | Setup before each `It` block (use sparingly) |
+| `AfterAll` / `AfterEach` | Teardown (cleanup resources, restore state) |
+| `Describe` | Groups tests for a single function or script |
+| `Context` | Groups tests for a specific scenario or condition |
+| `It` | Defines an individual test case |
+| `Should` | Assertion cmdlet for validating expected outcomes |
+
+**Key Pester 5.x Changes:**
+
+- Use `BeforeAll` for dot-sourcing scripts (not at the file level outside blocks)
+- Discovery and Run phases are separate—code at the top level runs during discovery
+- Use `Should -Be`, `Should -BeExactly`, `Should -BeNullOrEmpty`, etc. (not legacy `Assert-*` patterns)
+
+---
+
+### Test Structure: Arrange-Act-Assert
+
+Tests should follow the **Arrange-Act-Assert (AAA)** pattern for clarity and maintainability:
+
+1. **Arrange:** Set up test data, preconditions, and inputs
+2. **Act:** Execute the function or script under test
+3. **Assert:** Verify the output matches expectations
+
+Each `It` block should test **one specific behavior**. Use comments to delineate the AAA sections for readability.
+
+**Example:**
+
+```powershell
+It "Returns success code 0 when given valid input" {
+    # Arrange
+    $refResult = $null
+    $strInput = "valid-input"
+
+    # Act
+    $intReturnCode = Get-ProcessedData -ReferenceToResult ([ref]$refResult) -InputString $strInput
+
+    # Assert
+    $intReturnCode | Should -Be 0
+}
+```
+
+---
+
+### Testing Return Code Conventions
+
+Tests must verify the return code conventions documented in [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes).
+
+#### Functions Returning Integer Status Codes
+
+For functions that return integer status codes (`0` = success, `1-5` = partial success, `-1` = failure), tests must cover:
+
+| Return Code | Test Requirement |
+| --- | --- |
+| `0` | At least one test verifying success case |
+| `1-5` | At least one test for partial success cases (if applicable to the function) |
+| `-1` | At least one test verifying failure case |
+
+Additionally, if the function uses `[ref]` parameters for output:
+
+- Verify the reference parameter is populated correctly on success
+- Verify the reference parameter state on failure (typically `$null` or unchanged)
+
+**Example for Integer Status Code Function:**
+
+```powershell
+Describe "Convert-StringToObject" {
+    BeforeAll {
+        . $PSScriptRoot/../src/Convert-StringToObject.ps1
+    }
+
+    Context "When given valid input" {
+        It "Returns 0 for success" {
+            # Arrange
+            $refResult = $null
+            $strInput = "valid-data"
+
+            # Act
+            $intReturnCode = Convert-StringToObject -ReferenceToResult ([ref]$refResult) -StringToConvert $strInput
+
+            # Assert
+            $intReturnCode | Should -Be 0
+        }
+
+        It "Populates the reference parameter with the converted object" {
+            # Arrange
+            $refResult = $null
+            $strInput = "valid-data"
+
+            # Act
+            [void](Convert-StringToObject -ReferenceToResult ([ref]$refResult) -StringToConvert $strInput)
+
+            # Assert
+            $refResult | Should -Not -BeNullOrEmpty
+        }
+    }
+
+    Context "When given invalid input" {
+        It "Returns -1 for failure" {
+            # Arrange
+            $refResult = $null
+            $strInput = ""
+
+            # Act
+            $intReturnCode = Convert-StringToObject -ReferenceToResult ([ref]$refResult) -StringToConvert $strInput
+
+            # Assert
+            $intReturnCode | Should -Be -1
+        }
+    }
+}
+```
+
+#### Test-* Functions Returning Boolean
+
+For `Test-*` functions that return Boolean values (as documented in the exception for Test-* functions), tests must verify:
+
+- A case that returns `$true`
+- A case that returns `$false`
+
+**Example for Boolean Test Function:**
+
+```powershell
+Describe "Test-PathExists" {
+    BeforeAll {
+        . $PSScriptRoot/../src/Test-PathExists.ps1
+    }
+
+    Context "When the path exists" {
+        It "Returns true" {
+            # Arrange
+            $strPath = $env:TEMP  # Known to exist
+
+            # Act
+            $boolResult = Test-PathExists -Path $strPath
+
+            # Assert
+            $boolResult | Should -BeTrue
+        }
+    }
+
+    Context "When the path does not exist" {
+        It "Returns false" {
+            # Arrange
+            $strPath = "C:\NonExistent\Path\That\Does\Not\Exist"
+
+            # Act
+            $boolResult = Test-PathExists -Path $strPath
+
+            # Assert
+            $boolResult | Should -BeFalse
+        }
+    }
+}
+```
+
+---
+
+### Mocking External Dependencies
+
+Use Pester's `Mock` command to isolate the function under test from external dependencies:
+
+```powershell
+Context "When external service is unavailable" {
+    BeforeAll {
+        Mock Get-ExternalData { throw "Connection failed" }
+    }
+
+    It "Returns failure code -1 and does not throw" {
+        # Arrange
+        $refResult = $null
+
+        # Act
+        $intReturnCode = Process-ExternalData -ReferenceToResult ([ref]$refResult)
+
+        # Assert
+        $intReturnCode | Should -Be -1
+    }
+}
+```
+
+**Mocking Guidelines:**
+
+- Mock cmdlets and external commands that introduce dependencies (network, file system, cloud services)
+- Mock at the narrowest scope possible (prefer `Context`-level mocks over `Describe`-level)
+- Use `Assert-MockCalled` to verify expected interactions when appropriate
+
+---
+
+### Running Pester Tests
+
+**Basic invocation:**
+
+```powershell
+Invoke-Pester -Path tests/
+```
+
+**Detailed output:**
+
+```powershell
+Invoke-Pester -Path tests/ -Output Detailed
+```
+
+**Single test file:**
+
+```powershell
+Invoke-Pester -Path tests/Get-UserInfo.Tests.ps1
+```
+
+**With configuration object (for CI/CD scenarios):**
+
+```powershell
+$objPesterConfig = New-PesterConfiguration
+$objPesterConfig.Run.Path = 'tests/'
+$objPesterConfig.Output.Verbosity = 'Detailed'
+$objPesterConfig.TestResult.Enabled = $true
+$objPesterConfig.TestResult.OutputPath = 'test-results.xml'
+Invoke-Pester -Configuration $objPesterConfig
 ```
 
 ## Performance, Security, and Other
