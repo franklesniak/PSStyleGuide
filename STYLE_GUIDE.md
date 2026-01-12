@@ -38,7 +38,7 @@ The key words "**MUST**", "**MUST NOT**", "**REQUIRED**", "**SHALL**", "**SHALL 
 
 ## Quick Reference Checklist
 
-This checklist provides a quick reference for both human developers and LLMs (like GitHub Copilot) to follow the PowerShell style guidelines. Each item includes a scope tag indicating applicability: **[All]** applies to all PowerShell scripts regardless of target version, **[Modern]** applies only to scripts targeting PowerShell 5.1+ (with .NET Framework 4.6.2+) and PowerShell 7.x+ (requires features not available in v1.0), and **[v1.0]** applies only to scripts that must be backward compatible with Windows PowerShell v1.0. Each checklist item links to its detailed section for more information. This checklist is intentionally placed within the first 100-200 lines to give LLMs a complete picture of the style guide's requirements early in the document.
+This checklist provides a quick reference for both human developers and LLMs (like GitHub Copilot) to follow the PowerShell style guidelines. Each item includes a scope tag indicating applicability: **[All]** applies to all PowerShell scripts regardless of target version, **[Modern]** applies only to scripts targeting PowerShell 5.1+ (with .NET Framework 4.6.2+) and PowerShell 7.x+ (requires features not available in v1.0), and **[v1.0]** applies only to scripts that **MUST** be backward compatible with Windows PowerShell v1.0. Each checklist item links to its detailed section for more information. This checklist is intentionally placed within the first 100-200 lines to give LLMs a complete picture of the style guide's requirements early in the document.
 
 ### Code Layout and Formatting
 
@@ -586,7 +586,7 @@ By naming the module `ObjectFlattener` (the tool) and the function `ConvertTo-Fl
 
 **Discoverability Strategy:**
 
-Do not compromise the module name for the sake of keyword searching. Instead, rely on the **Module Manifest (`.psd1`)** to handle discoverability. The `Tags` key in the manifest **MUST** be populated aggressively with relevant keywords (including verbs) to ensure the module is found during searches, while keeping the architectural name pure.
+Module names **MUST NOT** be compromised for the sake of keyword searching. Instead, rely on the **Module Manifest (`.psd1`)** to handle discoverability. The `Tags` key in the manifest **MUST** be populated aggressively with relevant keywords (including verbs) to ensure the module is found during searches, while keeping the architectural name pure.
 
 ### Do Not Use Aliases
 
@@ -2410,7 +2410,7 @@ repository/
 
 ### Pester 5.x Syntax Requirements
 
-Tests **MUST** use Pester 5.x syntax. Do not use legacy Pester 3.x/4.x patterns.
+Tests **MUST** use Pester 5.x syntax. Legacy Pester 3.x/4.x patterns **MUST NOT** be used.
 
 | Block | Purpose |
 | --- | --- |
