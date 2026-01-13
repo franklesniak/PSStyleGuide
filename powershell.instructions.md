@@ -5,13 +5,13 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 1.5.20260112.0
+**Version:** 1.5.20260113.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-01-12
+- **Last Updated:** 2026-01-13
 - **Scope:** Defines PowerShell coding standards for all `.ps1` files in this repository. Covers style, formatting, naming conventions, error handling, documentation requirements, and compatibility patterns for both legacy (v1.0) and modern (v5.1+/v7.x+) PowerShell codebases.
 
 ## Table of Contents
