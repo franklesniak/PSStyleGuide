@@ -1,12 +1,12 @@
 # PowerShell Writing Style
 
-**Version:** 1.5.20260112.0
+**Version:** 1.5.20260113.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-01-12
+- **Last Updated:** 2026-01-13
 - **Scope:** Defines PowerShell coding standards for all `.ps1` files in this repository. Covers style, formatting, naming conventions, error handling, documentation requirements, and compatibility patterns for both legacy (v1.0) and modern (v5.1+/v7.x+) PowerShell codebases.
 
 ## Table of Contents
@@ -363,8 +363,7 @@ The list of approved PowerShell verbs can be viewed [on Microsoft's Docs page](h
 
 PowerShell uses a verb-noun pair for the names of cmdlets and for their derived .NET classes. The verb part of the name identifies the action that the cmdlet performs. The noun part of the name identifies the entity on which the action is performed. For example, the `Get-Command` cmdlet retrieves all the commands that are registered in PowerShell.
 
-> [!NOTE]
-> PowerShell uses the term *verb* to describe a word that implies an action even if that word isn't a standard verb in the English language. For example, the term `New` is a valid PowerShell verb name because it implies an action even though it isn't a verb in the English language.
+> **Note:** PowerShell uses the term *verb* to describe a word that implies an action even if that word isn't a standard verb in the English language. For example, the term `New` is a valid PowerShell verb name because it implies an action even though it isn't a verb in the English language.
 
 Each approved verb has a corresponding *alias prefix* defined. We use this alias prefix in aliases for commands using that verb. For example, the alias prefix for `Import` is `ip` and, accordingly, the alias for `Import-Module` is `ipmo`. This is a recommendation but not a rule; in particular, it need not be respected for command aliases mimicking well known commands from other environments.
 
@@ -1249,7 +1248,7 @@ try {
 
 This `try/finally` pattern is robust, safe, and compliantly achieves your goal of controlling output from third-party cmdlets.
 
-#### "Modern Advanced" Functions/Scripts: Singlular `[OutputType()]`
+#### "Modern Advanced" Functions/Scripts: Singular `[OutputType()]`
 
 When a function returns one or more objects via the pipeline (streaming), the `[OutputType()]` attribute **MUST** declare the *singular* type of object in the stream (e.g., `[OutputType([pscustomobject])]`). Code **MUST NOT** use the plural array type (e.g., `[OutputType([pscustomobject[]])]`). The pipeline *always* creates an array for the caller automatically if multiple objects are returned.
 
