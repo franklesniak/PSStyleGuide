@@ -1,12 +1,12 @@
 # PowerShell Writing Style
 
-**Version:** 1.5.20260113.0
+**Version:** 1.5.20260119.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-01-13
+- **Last Updated:** 2026-01-19
 - **Scope:** Defines PowerShell coding standards for all `.ps1` files in this repository. Covers style, formatting, naming conventions, error handling, documentation requirements, and compatibility patterns for both legacy (v1.0) and modern (v5.1+/v7.x+) PowerShell codebases.
 
 ## Table of Contents
@@ -1121,6 +1121,8 @@ Process-String ([ref]$r) ([ref]$e) $str
 # Positional parameters (documented in .NOTES)
 Process-String ([ref]$r) ([ref]$e) $str $psver
 ```
+
+**Important distinction:** While functions **SHOULD** support positional parameters in their declarations (for flexibility and v1.0 usability), function **calls** throughout the codebase **SHOULD** use named parameters for clarity and maintainability. The PSScriptAnalyzer configuration enforces this via the `PSAvoidUsingPositionalParameters` rule.
 
 This enables:
 
