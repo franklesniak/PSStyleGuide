@@ -1122,6 +1122,8 @@ Process-String ([ref]$r) ([ref]$e) $str
 Process-String ([ref]$r) ([ref]$e) $str $psver
 ```
 
+**Important distinction:** While functions **SHOULD** support positional parameters in their declarations (for flexibility and v1.0 usability), function **calls** throughout the codebase **SHOULD** use named parameters for clarity and maintainability. The PSScriptAnalyzer configuration enforces this via the `PSAvoidUsingPositionalParameters` rule.
+
 This enables:
 
 - **Interactive use** without naming
