@@ -703,13 +703,13 @@ All functions **MUST** include **full comment-based help** using **single-line c
 - **Visibility in plain text** → no IDE required
 - **Discoverability via `Get-Help`** → works in PowerShell v1.0+
 
-**Required sections present in every function**:
+**Required sections for comment-based help**:
 
 | Section | Purpose | Observed Implementation |
 | --- | --- | --- |
 | `.SYNOPSIS` | One-sentence purpose | Concise, imperative-voice summary |
 | `.DESCRIPTION` | Detailed behavior | Explains logic, edge cases, and failure modes |
-| `.PARAMETER` | Per-parameter documentation | One block per parameter, even for `[ref]` types |
+| `.PARAMETER` (if parameters exist) | Per-parameter documentation | One block per parameter, even for `[ref]` types |
 | `.EXAMPLE` | Usage demonstration | **Multiple examples** with input, output, and explanation |
 | `.INPUTS` | Pipeline input | Explicitly "None" (correct for non-pipeline design) |
 | `.OUTPUTS` | Return value semantics | Full mapping of integer codes to meanings |
