@@ -78,7 +78,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[All]** All functions **MUST** have full comment-based help → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
 - **[All]** Comment-based help **MUST** be placed inside function body, above param block → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
 - **[All]** Comment-based help **MUST** use single-line comments (#) with dotted keywords (.SYNOPSIS, .DESCRIPTION, etc.) → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
-- **[All]** Comment-based help **MUST** include sections: .SYNOPSIS, .DESCRIPTION, .PARAMETER, .EXAMPLE, .INPUTS, .OUTPUTS, .NOTES → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
+- **[All]** Comment-based help **MUST** include sections: .SYNOPSIS, .DESCRIPTION, .PARAMETER (one per parameter, if any), .EXAMPLE, .INPUTS, .OUTPUTS, .NOTES → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
 - **[All]** Functions **SHOULD** provide multiple examples with input, output, and explanation → [Help Content Quality: High Standards](#help-content-quality-high-standards)
 - **[All]** All return codes **MUST** be documented with exact meanings in .OUTPUTS → [Help Content Quality: High Standards](#help-content-quality-high-standards)
 - **[All]** Positional parameter support **MUST** be documented in .NOTES → [Help Content Quality: High Standards](#help-content-quality-high-standards)
@@ -719,6 +719,8 @@ All functions **MUST** include **full comment-based help** using **single-line c
 | `.INPUTS` | Pipeline input | Explicitly "None" (correct for non-pipeline design) |
 | `.OUTPUTS` | Return value semantics | Full mapping of integer codes to meanings |
 | `.NOTES` | Additional context | Positional parameters, versioning, design rationale |
+
+> **Note:** If a function has no parameters, the `.PARAMETER` section is omitted entirely. Do not include an empty or placeholder `.PARAMETER` block.
 
 **Example of complete help block** (from a generic parsing function):
 
