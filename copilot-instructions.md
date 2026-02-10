@@ -709,13 +709,13 @@ All functions **MUST** include **full comment-based help** using **single-line c
 | --- | --- | --- |
 | `.SYNOPSIS` | One-sentence purpose | Concise, imperative-voice summary |
 | `.DESCRIPTION` | Detailed behavior | Explains logic, edge cases, and failure modes |
-| `.PARAMETER` (if parameters exist) | Per-parameter documentation | One block per parameter, even for `[ref]` types |
+| `.PARAMETER` (if the function declares parameters in its `param()` block) | Per-parameter documentation | One block per parameter, even for `[ref]` types |
 | `.EXAMPLE` | Usage demonstration | **Multiple examples** with input, output, and explanation |
 | `.INPUTS` | Pipeline input | Explicitly "None" (correct for non-pipeline design) |
 | `.OUTPUTS` | Return value semantics | Full mapping of integer codes to meanings |
 | `.NOTES` | Additional context | Positional parameters, versioning, design rationale |
 
-> **Note:** If a function has no parameters, the `.PARAMETER` section is omitted entirely. Do not include an empty or placeholder `.PARAMETER` block.
+> **Note:** If a function declares no parameters in its `param()` block (excluding implicit common parameters), the `.PARAMETER` section is omitted entirely. Do not include an empty or placeholder `.PARAMETER` block.
 
 **Example of complete help block** (from a generic parsing function):
 
