@@ -896,7 +896,7 @@ The author uses **single-line comments** (`# .SECTION`) rather than **block comm
 | Format | Pros | Cons |
 | --- | --- | --- |
 | **Single-line (`#`)** | • Granular editing • Clear in diff tools • No escaping issues • Works in **all** PowerShell versions including v1.0 | • More vertical space • Slightly more typing |
-| **Block (`<# #>`)** | • Compact • Modern aesthetic | • **Not supported in PowerShell v1.0** (causes parser error) • Harder to edit individual lines • Risk of malformed blocks |
+| **Block (`<# ... #>`)** | • Compact • Modern aesthetic | • **Not supported in PowerShell v1.0** (causes parser error) • Harder to edit individual lines • Risk of malformed blocks |
 
 > **⚠ PowerShell v1.0 Compatibility Warning:** Block comments (`<# ... #>`) were introduced in PowerShell v2.0. In PowerShell v1.0, attempting to use block comments results in a **parser error** that prevents the script from running. Scripts targeting v1.0 compatibility **MUST** use only single-line comments (`#`). This applies to both comment-based help and general-purpose comments.
 
@@ -906,20 +906,24 @@ The author uses **single-line comments** (`# .SECTION`) rather than **block comm
 
 ```powershell
 # This will cause a parser error in PowerShell v1.0:
-<#
-.SYNOPSIS
-    Example function.
-#>
-function Get-Example { }
+function Get-Example {
+    <#
+    .SYNOPSIS
+        Example function.
+    #>
+    param ()
+}
 ```
 
 **Correct approach for v1.0 compatibility:**
 
 ```powershell
 # This works in all PowerShell versions, including v1.0:
-# .SYNOPSIS
-#     Example function.
-function Get-Example { }
+function Get-Example {
+    # .SYNOPSIS
+    #     Example function.
+    param ()
+}
 ```
 
 ---
