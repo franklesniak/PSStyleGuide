@@ -5,7 +5,7 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 1.5.20260210.0
+**Version:** 1.6.20260312.0
 
 ## Metadata
 
@@ -146,7 +146,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 
 ### Language Interop and .NET
 
-- **[All]** `System.Collections.ArrayList` is deprecated; code **MUST** use `System.Collections.Generic.List[T]` instead → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
+- **[All]** `System.Collections.ArrayList` is deprecated and **MUST NOT** be used in new code; use `System.Collections.Generic.List[T]` instead → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
 - **[All]** Generic collections **MUST** provide specific type T (List[PSCustomObject], not List[object]) → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
 
 ### Testing
