@@ -2012,9 +2012,9 @@ $strSplitterInRegEx = [regex]::Escape($Splitter)
 $result = [regex]::Split($StringToSplit, $strSplitterInRegEx)
 ```
 
-**Deprecation of `System.Collections.ArrayList`:** `System.Collections.ArrayList` is **deprecated** (consistent with [Microsoft's .NET guidance](https://learn.microsoft.com/en-us/dotnet/api/system.collections.arraylist)) and **MUST NOT** be used in new code. All new and newly-modified code **MUST** use `System.Collections.Generic.List[T]` instead. `Generic.List[T]` has been available since .NET Framework 2.0 (PowerShell v1.0), so backward compatibility is **not** a valid justification for using `ArrayList`.
+**Deprecation of `System.Collections.ArrayList`:** `System.Collections.ArrayList` is **deprecated** (consistent with [Microsoft's .NET guidance](https://learn.microsoft.com/en-us/dotnet/api/system.collections.arraylist)) and **MUST NOT** be used in new code. All new and newly-modified code **MUST** use `System.Collections.Generic.List[T]` instead. `System.Collections.Generic.List[T]` has been available since .NET Framework 2.0 (PowerShell v1.0).
 
-`ArrayList` is only permitted as a fallback in rare, well-justified cases where instantiation of `Generic.List[T]` genuinely fails in a constrained environment. Such fallback **MUST** be reported via the debug stream (e.g., `Write-Debug "Failed to create generic list; falling back to ArrayList."`).
+`ArrayList` is only permitted as a fallback in rare, well-justified cases where an attempt to instantiate `System.Collections.Generic.List[T]` throws an exception that is caught and handled. Such fallback **MUST** be reported via the debug stream, and the debug message **MUST** include the caught exception type and message (for example: `Write-Debug "Failed to create generic list; falling back to ArrayList. Exception: $($_.Exception.GetType().FullName): $($_.Exception.Message)"`).
 
 ```powershell
 # Compliant (Required for all new code)
