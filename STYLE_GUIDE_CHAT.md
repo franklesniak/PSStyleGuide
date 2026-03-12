@@ -144,6 +144,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 
 ### Language Interop and .NET
 
+- **[All]** `System.Collections.ArrayList` is deprecated; code **MUST** use `System.Collections.Generic.List[T]` instead → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
 - **[All]** Generic collections **MUST** provide specific type T (List[PSCustomObject], not List[object]) → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
 
 ### Testing
@@ -2008,6 +2009,20 @@ The author uses **direct .NET interop** in controlled scenarios:
 $strSplitterInRegEx = [regex]::Escape($Splitter)
 $result = [regex]::Split($StringToSplit, $strSplitterInRegEx)
 ```
+
+**Deprecation of `System.Collections.ArrayList`:** `System.Collections.ArrayList` is **deprecated** (consistent with [Microsoft's .NET guidance](https://learn.microsoft.com/en-us/dotnet/api/system.collections.arraylist)) and **MUST NOT** be used in new code. All new and newly-modified code **MUST** use `System.Collections.Generic.List[T]` instead. `Generic.List[T]` has been available since .NET Framework 2.0 (PowerShell v1.0), so backward compatibility is **not** a valid justification for using `ArrayList`.
+
+`ArrayList` is only permitted as a fallback in rare, well-justified cases where instantiation of `Generic.List[T]` genuinely fails in a constrained environment. Such fallback **MUST** be reported via the debug stream (e.g., `Write-Debug "Failed to create generic list; falling back to ArrayList."`).
+
+```powershell
+# Compliant (Required for all new code)
+$list = New-Object System.Collections.Generic.List[PSCustomObject]
+
+# Non-Compliant (Deprecated — do not use in new code)
+$list = New-Object System.Collections.ArrayList
+```
+
+> **Migration Note:** Legacy code that uses `System.Collections.ArrayList` **SHOULD** be refactored to use `System.Collections.Generic.List[T]` with the appropriate type parameter when the code is next modified. Replace `New-Object System.Collections.ArrayList` with `New-Object System.Collections.Generic.List[PSCustomObject]` (or the appropriate type), and verify that all `.Add()` calls and downstream consumers are compatible with the typed list.
 
 **Typed Generic Collections:** When instantiating generic .NET collections, such as `System.Collections.Generic.List[T]`, the specific type `T` **MUST** be provided if known (e.g., `[PSCustomObject]`, `[string]`). This is more precise, safer, and more descriptive than using the generic `[object]`.
 
