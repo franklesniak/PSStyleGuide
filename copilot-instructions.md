@@ -73,6 +73,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[All]** All functions **MUST** have full comment-based help → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
 - **[All]** Comment-based help **MUST** be placed inside function body, above param block → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
 - **[All]** Comment-based help **MUST** use single-line comments (#) with dotted keywords (.SYNOPSIS, .DESCRIPTION, etc.) → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
+- **[v1.0]** Block comments (`<# ... #>`) **MUST NOT** be used — they cause parser errors in PowerShell v1.0; use single-line comments (`#`) instead → [Help Format Options: Comparison](#help-format-options-comparison)
 - **[All]** Comment-based help **MUST** include sections: .SYNOPSIS, .DESCRIPTION, .PARAMETER (one per parameter, if any), .EXAMPLE, .INPUTS, .OUTPUTS, .NOTES → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
 - **[All]** Functions **SHOULD** provide multiple examples with input, output, and explanation → [Help Content Quality: High Standards](#help-content-quality-high-standards)
 - **[All]** All return codes **MUST** be documented with exact meanings in .OUTPUTS → [Help Content Quality: High Standards](#help-content-quality-high-standards)
@@ -894,10 +895,32 @@ The author uses **single-line comments** (`# .SECTION`) rather than **block comm
 
 | Format | Pros | Cons |
 | --- | --- | --- |
-| **Single-line (`#`)** | • Granular editing • Clear in diff tools • No escaping issues | • More vertical space • Slightly more typing |
-| **Block (`<# #>`)** | • Compact • Modern aesthetic | • Harder to edit individual lines • Risk of malformed blocks |
+| **Single-line (`#`)** | • Granular editing • Clear in diff tools • No escaping issues • Works in **all** PowerShell versions including v1.0 | • More vertical space • Slightly more typing |
+| **Block (`<# #>`)** | • Compact • Modern aesthetic | • **Not supported in PowerShell v1.0** (causes parser error) • Harder to edit individual lines • Risk of malformed blocks |
 
-**Finding**: Both are **equally valid** and **discoverable by `Get-Help`** in PowerShell v1.0+. The author’s choice of single-line format is **defensible and consistent** with the v1.0 compatibility goal.
+> **⚠ PowerShell v1.0 Compatibility Warning:** Block comments (`<# ... #>`) were introduced in PowerShell v2.0. In PowerShell v1.0, attempting to use block comments results in a **parser error** that prevents the script from running. Scripts targeting v1.0 compatibility **MUST** use only single-line comments (`#`). This applies to both comment-based help and general-purpose comments.
+
+**Finding**: Only **single-line comments** (`#`) are compatible with PowerShell v1.0. Block comments (`<# ... #>`) are valid in PowerShell v2.0+ and are discoverable by `Get-Help` in those versions, but they **MUST NOT** be used when v1.0 compatibility is required. The author’s choice of single-line format is **required** for the v1.0 compatibility goal.
+
+**Example — what fails in PowerShell v1.0:**
+
+```powershell
+# This will cause a parser error in PowerShell v1.0:
+<#
+.SYNOPSIS
+    Example function.
+#>
+function Get-Example { }
+```
+
+**Correct approach for v1.0 compatibility:**
+
+```powershell
+# This works in all PowerShell versions, including v1.0:
+# .SYNOPSIS
+#     Example function.
+function Get-Example { }
+```
 
 ---
 
