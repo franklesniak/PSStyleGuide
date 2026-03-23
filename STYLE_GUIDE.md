@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 1.6.20260312.0
+**Version:** 1.6.20260323.0
 
 ## Metadata
 
