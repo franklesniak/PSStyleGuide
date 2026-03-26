@@ -663,14 +663,14 @@ This eliminates environment-dependent behavior and ensures deterministic executi
 
 ### Options for Local Variable Prefixes: Analysis
 
-The use of type prefixes on local variables represents a **stylistic fork** with no community-mandated "correct" answer. The guides explicitly state this is a **"matter of taste"** for private variables. Below is an analysis of the two viable paths:
+The broader PowerShell community considers the use of type prefixes on local variables a **"matter of taste"** for private variables. Some style guides recommend plain camelCase (e.g., `$message`, `$count`) as a cleaner, more modern approach that aligns with .NET naming conventions. Below is a comparison of the two approaches for context:
 
 | Option | Description | Pros | Cons |
 | --- | --- | --- | --- |
-| **1. Keep Type Prefixes** (e.g., `$strMessage`, `$intCount`) | Retain current Hungarian-style notation | • Immediate type visibility in plain text • Critical in v1.0 without IDE support • Reduces runtime type errors • Self-documenting in large functions | • Increases visual noise • Feels dated in modern editors • **Intentionally longer variable names** (as abbreviations are forbidden) |
-| **2. Use Plain camelCase** (e.g., `$message`, `$count`) | Remove prefixes, rely on context/tools | • Cleaner, more modern aesthetic • Aligns with .NET naming simplicity • Shorter, easier to type | • Requires IDE/IntelliSense for type clarity • Risk of confusion in complex logic • Less resilient in plain-text review |
+| **1. Type Prefixes** (e.g., `$strMessage`, `$intCount`) | Hungarian-style notation **(required by this style guide)** | • Immediate type visibility in plain text • Critical in v1.0 without IDE support • Reduces runtime type errors • Self-documenting in large functions | • Increases visual noise • Feels dated in modern editors • **Intentionally longer variable names** (as abbreviations are forbidden) |
+| **2. Plain camelCase** (e.g., `$message`, `$count`) | Community alternative **(not permitted in this codebase)** | • Cleaner, more modern aesthetic • Aligns with .NET naming simplicity • Shorter, easier to type | • Requires IDE/IntelliSense for type clarity • Risk of confusion in complex logic • Less resilient in plain-text review |
 
-**Recommendation**: **Retain prefixes in all code**. The clarity benefit outweighs verbosity regardless of target PowerShell version, as IDE support cannot always be assumed and the prefixes provide immediate type context in any environment.
+**This style guide requires type prefixes (Option 1) in all code.** Plain camelCase is a valid community alternative, but it is **not permitted** in this codebase. The clarity benefit of type prefixes outweighs verbosity regardless of target PowerShell version, as IDE support cannot always be assumed and the prefixes provide immediate type context in any environment.
 
 ### Summary: Naming as Defensive Architecture
 
