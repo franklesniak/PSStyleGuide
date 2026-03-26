@@ -5,13 +5,13 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 1.6.20260312.0
+**Version:** 1.6.20260326.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-03-12
+- **Last Updated:** 2026-03-26
 - **Scope:** Defines PowerShell coding standards for all `.ps1` files in this repository. Covers style, formatting, naming conventions, error handling, documentation requirements, and compatibility patterns for both legacy (v1.0) and modern (v5.1+/v7.x+) PowerShell codebases.
 
 ## Table of Contents
@@ -62,7 +62,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 
 - **[All]** Public identifiers (functions, parameters, properties) **MUST** use PascalCase → [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
 - **[All]** PowerShell keywords (function, param, if, else, return, trap) **MUST** be lowercase → [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
-- **[v1.0]** Local variables **MUST** use camelCase with type-hinting prefixes, fully descriptive (e.g., $strMessage, $intCount, no abbreviations) → [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase)
+- **[All]** Local variables **MUST** use camelCase with type-hinting prefixes, fully descriptive (e.g., $strMessage, $intCount, no abbreviations) → [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase)
 - **[All]** Functions **MUST** follow Verb-Noun pattern with approved verbs → [Script and Function Naming: Full Explicit Form](#script-and-function-naming-full-explicit-form)
 - **[All]** Functions **MUST** use singular nouns in function names → [Script and Function Naming: Nouns](#script-and-function-naming-nouns)
 - **[All]** Modules **MUST** use PascalCase nouns (containers, not actions) → [Module Naming: Noun-Based Containers](#module-naming-noun-based-containers)
@@ -638,13 +638,13 @@ Local variables follow a **Hungarian-style notation** combining a **type-hinting
 - `$refLastKnownError`
 - `$versionPS`
 
-This prefixing is **not** a legacy artifact but a **deliberate design decision** to compensate for PowerShell’s dynamic typing and the absence of modern IDE tooling in v1.0 environments. The prefix:
+This prefixing is **not** a legacy artifact but a **deliberate design decision** to compensate for PowerShell’s dynamic typing and the frequent absence of modern IDE tooling. The prefix:
 
 - **Eliminates type inference errors** during debugging.
 - **Reduces cognitive load** when reading code without IntelliSense.
 - **Prevents accidental type mismatches** in complex logic flows.
 
-While some modern styles discourage such prefixes, in this context they represent **defensive programming**—a hallmark of the author’s v1.0-focused robustness philosophy.
+While some modern styles discourage such prefixes, in this context they represent **defensive programming**—a hallmark of the author’s robustness philosophy that applies to all scripts regardless of target PowerShell version.
 
 ### Path and Scope Handling
 
@@ -668,14 +668,14 @@ This eliminates environment-dependent behavior and ensures deterministic executi
 
 ### Options for Local Variable Prefixes: Analysis
 
-The use of type prefixes on local variables represents a **stylistic fork** with no community-mandated "correct" answer. The guides explicitly state this is a **"matter of taste"** for private variables. Below is an analysis of the two viable paths:
+The broader PowerShell community considers the use of type prefixes on local variables a **"matter of taste"** for private variables. Some style guides recommend plain camelCase (e.g., `$message`, `$count`) as a cleaner, more modern approach that aligns with .NET naming conventions. Below is a comparison of the two approaches for context:
 
 | Option | Description | Pros | Cons |
 | --- | --- | --- | --- |
-| **1. Keep Type Prefixes** (e.g., `$strMessage`, `$intCount`) | Retain current Hungarian-style notation | • Immediate type visibility in plain text • Critical in v1.0 without IDE support • Reduces runtime type errors • Self-documenting in large functions | • Increases visual noise • Feels dated in modern editors • **Intentionally longer variable names** (as abbreviations are forbidden) |
-| **2. Use Plain camelCase** (e.g., `$message`, `$count`) | Remove prefixes, rely on context/tools | • Cleaner, more modern aesthetic • Aligns with .NET naming simplicity • Shorter, easier to type | • Requires IDE/IntelliSense for type clarity • Risk of confusion in complex logic • Less resilient in plain-text review |
+| **1. Type Prefixes** (e.g., `$strMessage`, `$intCount`) | Hungarian-style notation **(required by this style guide)** | • Immediate type visibility in plain text • Critical in v1.0 without IDE support • Reduces runtime type errors • Self-documenting in large functions | • Increases visual noise • Feels dated in modern editors • **Intentionally longer variable names** (as abbreviations are forbidden) |
+| **2. Plain camelCase** (e.g., `$message`, `$count`) | Community alternative **(not permitted in this codebase)** | • Cleaner, more modern aesthetic • Aligns with .NET naming simplicity • Shorter, easier to type | • Requires IDE/IntelliSense for type clarity • Risk of confusion in complex logic • Less resilient in plain-text review |
 
-**Recommendation**: **Retain prefixes in v1.0-targeted code**. The clarity benefit outweighs verbosity when IDE support cannot be assumed. In v2.0+ codebases with consistent tooling, transition to plain camelCase is acceptable.
+**This style guide requires type prefixes (Option 1) in all code.** Plain camelCase is a valid community alternative, but it is **not permitted** in this codebase. The clarity benefit of type prefixes outweighs verbosity regardless of target PowerShell version, as IDE support cannot always be assumed and the prefixes provide immediate type context in any environment.
 
 ### Summary: Naming as Defensive Architecture
 
@@ -683,7 +683,7 @@ The author’s naming conventions are not merely stylistic—they form a **defen
 
 1. **Eliminates ambiguity** through full explicit names.
 2. **Future-proofs** against command evolution.
-3. **Compensates for v1.0 limitations** via type prefixes.
+3. **Provides immediate type context** via type prefixes.
 4. **Ensures deterministic behavior** through explicit scoping.
 
 This results in code that is **self-documenting**, **resilient to change**, and **immediately comprehensible** to any PowerShell practitioner—regardless of their familiarity with the specific script.
