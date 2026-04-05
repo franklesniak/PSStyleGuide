@@ -759,7 +759,6 @@ When writing explanatory or output-description lines within a `.EXAMPLE` section
 Rendered by `Get-Help`:
 
 ```text
-PS > Get-Help -Name ConvertTo-VectorRow -Examples
 $arrRows = @(ConvertTo-VectorRow -Counts $arrCounts -FeatureIndexObject $objIndex)
 # $arrRows[0].PrincipalKey = 'user-abc'
 # $arrRows[0].Vector = [double[]] (fixed-length array)
@@ -776,7 +775,6 @@ $arrRows = @(ConvertTo-VectorRow -Counts $arrCounts -FeatureIndexObject $objInde
 Rendered by `Get-Help`:
 
 ```text
-PS > Get-Help -Name ConvertTo-VectorRow -Examples
 $arrRows = @(ConvertTo-VectorRow -Counts $arrCounts -FeatureIndexObject $objIndex)
 Returns vector row objects with PrincipalKey, Vector, and TotalActions.
 ```
@@ -1371,9 +1369,9 @@ To ensure the result is **always** an array (even if empty or with a single item
 
 ```powershell
 # .EXAMPLE
-# This example shows how to safely call the function and guarantee the
-# result is an array, even if only one principal is returned.
-$arrPrincipals = @(Expand-TrustPrincipal -PrincipalNode $statement.Principal)
+# # This example shows how to safely call the function and guarantee the
+# # result is an array, even if only one principal is returned.
+# $arrPrincipals = @(Expand-TrustPrincipal -PrincipalNode $statement.Principal)
 ```
 
 ---
