@@ -3,13 +3,13 @@
 ````markdown
 # PowerShell Writing Style
 
-**Version:** 1.6.20260326.0
+**Version:** 1.6.20260405.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-03-26
+- **Last Updated:** 2026-04-05
 - **Scope:** Defines PowerShell coding standards for all `.ps1` files in this repository. Covers style, formatting, naming conventions, error handling, documentation requirements, and compatibility patterns for both legacy (v1.0) and modern (v5.1+/v7.x+) PowerShell codebases.
 
 ## Table of Contents
@@ -78,6 +78,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[All]** Comment-based help **MUST** use single-line comments (#) with dotted keywords (.SYNOPSIS, .DESCRIPTION, etc.) → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
 - **[v1.0]** Block comments (`<# ... #>`) **MUST NOT** be used — they cause parser errors in PowerShell v1.0; use single-line comments (`#`) instead → [Help Format Options: Comparison](#help-format-options-comparison)
 - **[All]** Comment-based help **MUST** include sections: .SYNOPSIS, .DESCRIPTION, .PARAMETER (one per parameter, if any), .EXAMPLE, .INPUTS, .OUTPUTS, .NOTES → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
+- **[All]** Explanatory or output-description lines within `.EXAMPLE` blocks **MUST** use double `#` (`# # <text>`) so that `Get-Help` renders them as valid PowerShell comments (`# <text>`) → [Inline Comments Within `.EXAMPLE` Blocks](#inline-comments-within-example-blocks)
 - **[All]** Functions **SHOULD** provide multiple examples with input, output, and explanation → [Help Content Quality: High Standards](#help-content-quality-high-standards)
 - **[All]** All return codes **MUST** be documented with exact meanings in .OUTPUTS → [Help Content Quality: High Standards](#help-content-quality-high-standards)
 - **[All]** Positional parameter support **MUST** be documented in .NOTES → [Help Content Quality: High Standards](#help-content-quality-high-standards)
@@ -742,6 +743,47 @@ All functions **MUST** include **full comment-based help** using **single-line c
 # Supports positional parameters. Version: 1.0.20250218.0
 ```
 
+#### Inline Comments Within `.EXAMPLE` Blocks
+
+When writing explanatory or output-description lines within a `.EXAMPLE` section of comment-based help, use **double `#`** — that is, `# # <text>`. The first `#` is the standard comment-based help line prefix (required for all help content). The second `#` creates a PowerShell comment within the rendered example output so that:
+
+1. `Get-Help -Examples` renders the line as `# <text>`, which is valid PowerShell syntax and can be safely copy-pasted.
+2. The explanatory text is visually distinct from executable code lines in the example.
+
+**Compliant** — explanatory lines use `# #`:
+
+```powershell
+# .EXAMPLE
+# $arrRows = @(ConvertTo-VectorRow -Counts $arrCounts -FeatureIndexObject $objIndex)
+# # $arrRows[0].PrincipalKey = 'user-abc'
+# # $arrRows[0].Vector = [double[]] (fixed-length array)
+```
+
+Rendered by `Get-Help`:
+
+```text
+$arrRows = @(ConvertTo-VectorRow -Counts $arrCounts -FeatureIndexObject $objIndex)
+# $arrRows[0].PrincipalKey = 'user-abc'
+# $arrRows[0].Vector = [double[]] (fixed-length array)
+```
+
+**Non-compliant** — single `#` for explanation text:
+
+```powershell
+# .EXAMPLE
+# $arrRows = @(ConvertTo-VectorRow -Counts $arrCounts -FeatureIndexObject $objIndex)
+# Returns vector row objects with PrincipalKey, Vector, and TotalActions.
+```
+
+Rendered by `Get-Help`:
+
+```text
+$arrRows = @(ConvertTo-VectorRow -Counts $arrCounts -FeatureIndexObject $objIndex)
+Returns vector row objects with PrincipalKey, Vector, and TotalActions.
+```
+
+The non-compliant form renders bare prose that (a) is not valid PowerShell, (b) can be confused with actual command output, and (c) is not safely copy-pasteable.
+
 ---
 
 ### Help Content Quality: High Standards
@@ -1330,9 +1372,9 @@ To ensure the result is **always** an array (even if empty or with a single item
 
 ```powershell
 # .EXAMPLE
-# This example shows how to safely call the function and guarantee the
-# result is an array, even if only one principal is returned.
-$arrPrincipals = @(Expand-TrustPrincipal -PrincipalNode $statement.Principal)
+# # This example shows how to safely call the function and guarantee the
+# # result is an array, even if only one principal is returned.
+# $arrPrincipals = @(Expand-TrustPrincipal -PrincipalNode $statement.Principal)
 ```
 
 ---
