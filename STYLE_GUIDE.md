@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 1.6.20260405.0
+**Version:** 1.6.20260405.1
 
 ## Metadata
 
@@ -101,11 +101,11 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[v1.0]** Exception: Test-* functions **MAY** return Boolean when no practical error handling needed → [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes)
 - **[v1.0]** Positional parameters **SHOULD** be supported for v1.0 usability → [Positional Parameter Support](#positional-parameter-support)
 - **[v1.0]** v1.0-targeted functions **MUST** use trap-based error handling (not try/catch) → [Overview of Function Architecture](#overview-of-function-architecture)
-- **[Modern]** Modern functions **MUST** use [CmdletBinding()] attribute → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
-- **[Modern]** Modern functions **MUST** use [OutputType()] declaring singular primary type → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
-- **[Modern]** Modern functions **MUST** use streaming output (write objects directly to pipeline in loop) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
-- **[Modern]** Modern functions **MUST** use try/catch for error handling → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
-- **[Modern]** Modern functions **MUST** use Write-Verbose and Write-Debug (not manual preference toggling) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** Modern functions and scripts **MUST** use [CmdletBinding()] attribute → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** Modern functions and scripts **MUST** use [OutputType()] declaring singular primary type → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** Modern functions and scripts **MUST** use streaming output (write objects directly to pipeline in loop) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** Modern functions and scripts **MUST** use try/catch for error handling → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** Modern functions and scripts **MUST** use Write-Verbose and Write-Debug (not manual preference toggling) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
 - **[Modern]** Exception: Modern functions **MAY** temporarily suppress $VerbosePreference for noisy nested commands using try/finally → ["Modern Advanced" Functions/Scripts: Exception for Suppressing Nested Verbose Streams](#modern-advanced-functionsscripts-exception-for-suppressing-nested-verbose-streams)
 - **[Modern]** [Parameter(Mandatory=$true)] **SHOULD** be used only when function cannot work without value → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
 - **[Modern]** [ValidateNotNullOrEmpty()] **SHOULD** be used for optional-but-not-empty parameters → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
@@ -1240,9 +1240,9 @@ However, if a script or function **cannot** target v1.0, it **MUST** be written 
 1. Has external module dependencies that require a modern PowerShell version (e.g., `AWS.Tools`, `Az`, `Microsoft.Graph`).
 2. Intentionally uses features from PowerShell v2.0 or later (e.g., `try/catch`, `[pscustomobject]` literals, `Add-Type -AssemblyName`), and there are no reasonable alternative approaches that can be used to ensure support for PowerShell v1.0.
 
-Functions written in this "Modern Advanced" style **MUST** adhere to the following rules:
+Functions and scripts written in this "Modern Advanced" style **MUST** adhere to the following rules:
 
-1. **Must Use `[CmdletBinding()]`:** All modern functions **MUST** begin with the `[CmdletBinding()]` attribute. This is the non-negotiable identifier of an advanced function and enables support for common parameters (`-Verbose`, `-Debug`, `-ErrorAction`, etc.).
+1. **Must Use `[CmdletBinding()]`:** All modern functions **MUST** begin with the `[CmdletBinding()]` attribute. This is the non-negotiable identifier of an advanced function and enables support for common parameters (`-Verbose`, `-Debug`, `-ErrorAction`, etc.). For modern scripts (`.ps1` files that are not functions), `[CmdletBinding()]` and the `param` block **MUST** be the first non-comment, non-attribute content in the file. Any executable statement before `[CmdletBinding()]` causes a `ParseException` when the script is invoked via the call operator (`& $path`).
 2. **Must Use `[OutputType()]`:** The function **MUST** declare its primary output object type using `[OutputType()]`. This is critical for discoverability, integration, and validating the function's contract.
 3. **Must Use Streaming Output:** Functions that return collections **MUST** write objects directly to the pipeline (stream) from within a loop. They **MUST NOT** collect results in a `List<T>` or array to be returned at the end. (See *Processing Collections in Modern Functions*).
 4. **Must Use `try/catch`:** Error handling **MUST** use `try/catch` blocks. The v1.0 `trap` / preference-toggling pattern is **prohibited** in this style.
