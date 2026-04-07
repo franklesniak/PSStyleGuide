@@ -745,9 +745,9 @@ All functions **MUST** include **full comment-based help** using **single-line c
 ```
 
 > **Note:** The terse single-line form (`# Supports positional parameters.`)
-> is acceptable for v1.0-compatible functions or scripts where brevity is preferred, but
-> the multi-line format shown above is **RECOMMENDED** because it explicitly
-> identifies which parameters are positional and at which positions. See
+> is acceptable where brevity is preferred, but the multi-line format shown
+> above is **RECOMMENDED** because it explicitly identifies which parameters
+> are positional and at which positions. See
 > [Positional Parameter Support](#positional-parameter-support) for full
 > guidance.
 
