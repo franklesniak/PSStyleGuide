@@ -677,14 +677,14 @@ This eliminates environment-dependent behavior and ensures deterministic executi
 **Non-compliant** (CWD-dependent):
 
 ```powershell
-# # Bad — result changes depending on where the caller invoked the script:
+# Bad — result changes depending on where the caller invoked the script:
 Get-Content -Path '../config.json'
 ```
 
 **Compliant** (`$PSScriptRoot`-anchored):
 
 ```powershell
-# # Good — always resolves relative to the script's own directory:
+# Good — always resolves relative to the script's own directory:
 Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath '../config.json')
 ```
 
@@ -2210,14 +2210,14 @@ For file paths, the author would use:
 **Non-compliant** (CWD-dependent):
 
 ```powershell
-# # Bad — result changes depending on where the caller invoked the script:
+# Bad — result changes depending on where the caller invoked the script:
 Get-Content -Path '../config.json'
 ```
 
 **Compliant** (`$PSScriptRoot`-anchored):
 
 ```powershell
-# # Good — always resolves relative to the script's own directory:
+# Good — always resolves relative to the script's own directory:
 Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath '../config.json')
 ```
 
