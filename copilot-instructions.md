@@ -662,6 +662,27 @@ For shared state, the author would use:
 
 This eliminates environment-dependent behavior and ensures deterministic execution.
 
+> **Note:** The guidance to avoid relative paths targets bare `.` / `..` paths
+> that depend on `[Environment]::CurrentDirectory` or `$PWD`. Paths anchored to
+> `$PSScriptRoot` — such as `"$PSScriptRoot/../config.json"` or
+> `Join-Path -Path $PSScriptRoot -ChildPath '../src/Helper.ps1'` — are
+> **deterministic** because they resolve relative to the executing script's
+> directory, not the process working directory.
+
+**Non-compliant** (CWD-dependent):
+
+```powershell
+# Bad — result changes depending on where the caller invoked the script:
+Get-Content -Path '../config.json'
+```
+
+**Compliant** (`$PSScriptRoot`-anchored):
+
+```powershell
+# Good — always resolves relative to the script's own directory:
+Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath '../config.json')
+```
+
 ### Options for Local Variable Prefixes: Analysis
 
 The broader PowerShell community considers the use of type prefixes on local variables a **"matter of taste"** for private variables. Some style guides recommend plain camelCase (e.g., `$message`, `$count`) as a cleaner, more modern approach that aligns with .NET naming conventions. Below is a comparison of the two approaches for context:
@@ -2173,6 +2194,27 @@ For file paths, the author would use:
 - **Absolute paths** via `$PSScriptRoot` (in modules)
 - **Explicit provider qualifiers** (e.g., `FileSystem::C:\path`)
 - **Join-Path** with validated roots
+
+> **Note:** The guidance to avoid relative paths targets bare `.` / `..` paths
+> that depend on `[Environment]::CurrentDirectory` or `$PWD`. Paths anchored to
+> `$PSScriptRoot` — such as `"$PSScriptRoot/../config.json"` or
+> `Join-Path -Path $PSScriptRoot -ChildPath '../src/Helper.ps1'` — are
+> **deterministic** because they resolve relative to the executing script's
+> directory, not the process working directory.
+
+**Non-compliant** (CWD-dependent):
+
+```powershell
+# Bad — result changes depending on where the caller invoked the script:
+Get-Content -Path '../config.json'
+```
+
+**Compliant** (`$PSScriptRoot`-anchored):
+
+```powershell
+# Good — always resolves relative to the script's own directory:
+Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath '../config.json')
+```
 
 ---
 
