@@ -3,13 +3,13 @@
 ````markdown
 # PowerShell Writing Style
 
-**Version:** 1.6.20260405.1
+**Version:** 1.6.20260407.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-04-05
+- **Last Updated:** 2026-04-07
 - **Scope:** Defines PowerShell coding standards for all `.ps1` files in this repository. Covers style, formatting, naming conventions, error handling, documentation requirements, and compatibility patterns for both legacy (v1.0) and modern (v5.1+/v7.x+) PowerShell codebases.
 
 ## Table of Contents
@@ -740,8 +740,20 @@ All functions **MUST** include **full comment-based help** using **single-line c
 # .OUTPUTS
 # [int] Status code: 0=success, 1-5=partial success with extras, -1=failure
 # .NOTES
-# Supports positional parameters. Version: 1.0.20250218.0
+# This function/script supports positional parameters:
+#   Position 0: ReferenceToResultObject
+#   Position 1: ReferenceArrayOfExtraStrings
+#   Position 2: InputString
+# Version: 1.0.20250218.0
 ```
+
+> **Note:** The terse form is acceptable where brevity is preferred, for
+> example: `# Supports positional parameters.` followed by
+> `# Version: 1.0.20250218.0`. The multi-line format shown above is
+> **RECOMMENDED** because it explicitly identifies which parameters are
+> positional and at which positions. See
+> [Positional Parameter Support](#positional-parameter-support) for full
+> guidance.
 
 #### Inline Comments Within `.EXAMPLE` Blocks
 
@@ -1204,6 +1216,24 @@ This enables:
 - **Interactive use** without naming
 - **Script compatibility** with older calling patterns
 - **Flexibility** without sacrificing type safety
+
+#### Documenting Positional Parameters in `.NOTES`
+
+When a function or script supports positional parameters, the `.NOTES` section **SHOULD** use the following multi-line format to document which parameters are positional and at which positions:
+
+```powershell
+# .NOTES
+# This function/script supports positional parameters:
+#   Position 0: VectorRows
+#   Position 1: KMeansResult
+# Version: 1.0.20250218.0
+```
+
+Guidance for this format:
+
+1. The header line **SHOULD** be `# This function/script supports positional parameters:` followed by each position listed on its own indented line as `#   Position N: ParameterName`.
+2. Only list parameters that are expected to be used positionally. For functions or scripts with many optional parameters, listing only the mandatory or commonly-used positional parameters is acceptable.
+3. The parameter name **SHOULD** match the declared parameter name without the `-` prefix (e.g., `VectorRows`, not `-VectorRows`), since the `.NOTES` section documents the parameter's identity, not its call syntax.
 
 ---
 
