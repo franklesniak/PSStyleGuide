@@ -3,7 +3,7 @@
 ````markdown
 # PowerShell Writing Style
 
-**Version:** 1.6.20260407.0
+**Version:** 1.6.20260407.1
 
 ## Metadata
 
