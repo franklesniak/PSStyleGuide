@@ -747,10 +747,11 @@ All functions **MUST** include **full comment-based help** using **single-line c
 # Version: 1.0.20250218.0
 ```
 
-> **Note:** The terse single-line form (`# Supports positional parameters.`)
-> is acceptable where brevity is preferred, but the multi-line format shown
-> above is **RECOMMENDED** because it explicitly identifies which parameters
-> are positional and at which positions. See
+> **Note:** The terse form is acceptable where brevity is preferred, for
+> example: `# Supports positional parameters.` followed by
+> `# Version: 1.0.20250218.0`. The multi-line format shown above is
+> **RECOMMENDED** because it explicitly identifies which parameters are
+> positional and at which positions. See
 > [Positional Parameter Support](#positional-parameter-support) for full
 > guidance.
 
