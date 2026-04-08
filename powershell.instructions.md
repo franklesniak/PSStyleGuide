@@ -2626,6 +2626,8 @@ It "Returns success code 0 when given valid input" {
 
 Tests **MUST** verify the return code conventions documented in [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes).
 
+> **Note for functions and scripts that return objects:** If a function or script returns `[pscustomobject]` or other structured data instead of integer status codes, this rule (Testing franklesniak/PSStyleGuide#5) does not apply. For such cases, output contract verification — including edge cases such as `$null` returns — SHOULD be covered by Pester tests in accordance with Testing franklesniak/PSStyleGuide#1, where applicable.
+
 #### Functions Returning Integer Status Codes
 
 For functions that return integer status codes (`0` = success, `1-5` = partial success, `-1` = failure), tests **MUST** cover:
