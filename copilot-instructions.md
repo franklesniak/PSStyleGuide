@@ -119,7 +119,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 
 - **[v1.0]** v1.0-targeted functions **MUST** use trap {} for error suppression → [Core Error Suppression Mechanism](#core-error-suppression-mechanism)
 - **[Modern]** catch blocks **MUST NOT** be empty; default pattern is `Write-Debug` + `throw` → [Modern catch Block Requirements](#modern-catch-block-requirements)
-- **[Modern]** Non-throwing catch (no `throw`) **REQUIRES** documented non-throwing contract → [Modern catch Block Requirements](#modern-catch-block-requirements)
+- **[Modern]** Non-throwing catch (no `throw`) **MUST** have a documented non-throwing contract → [Modern catch Block Requirements](#modern-catch-block-requirements)
 
 ### File Writeability Testing
 
@@ -1615,14 +1615,14 @@ The standard `catch` pattern for modern advanced functions and scripts **SHOULD*
 try {
     ...
 } catch {
-    Write-Debug ("Failed to do X: $_")
+    Write-Debug ("Failed to do X: {0}" -f $_)
     throw
 }
 ```
 
 #### Documented Non-Throwing Exception
 
-A modern function **MAY** intentionally handle an exception without re-throwing **only** when its contract explicitly specifies non-throwing behavior. In that case, the function's comment-based help (`.DESCRIPTION` and/or `.OUTPUTS`) **MUST** clearly document that failures are communicated through return values, output state, warnings, or another defined mechanism rather than by throwing.
+A modern function **MAY** intentionally handle an exception without re-throwing **only** when its contract explicitly specifies non-throwing behavior. In that case, the function's comment-based help (`.DESCRIPTION` and `.OUTPUTS`) **MUST** clearly document that failures are communicated through return values, output state, warnings, or another defined mechanism rather than by throwing.
 
 ```powershell
 # Non-throwing wrapper with documented contract
@@ -1647,7 +1647,7 @@ function Convert-SafelyFromJson {
     try {
         $JsonString | ConvertFrom-Json -ErrorAction Stop
     } catch {
-        Write-Debug ("JSON conversion failed: $_")
+        Write-Debug ("JSON conversion failed: {0}" -f $_)
         $null
     }
 }
