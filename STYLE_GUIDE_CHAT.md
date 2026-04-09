@@ -3,7 +3,7 @@
 ````markdown
 # PowerShell Writing Style
 
-**Version:** 1.6.20260408.0
+**Version:** 1.6.20260408.1
 
 ## Metadata
 
@@ -142,6 +142,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[Modern]** Streaming function calls **SHOULD** be wrapped in @(...) to handle 0-1-Many problem → [Consuming Streaming Functions (The `0-1-Many` Problem)](#consuming-streaming-functions-the-0-1-many-problem)
 - **[All]** Code **MUST** use Write-Warning for user-facing anomalies; Write-Debug for internal details → [Choosing Between Warning and Debug Streams](#choosing-between-warning-and-debug-streams)
 - **[All]** .NET method output **MUST** be suppressed with [void](...), not | Out-Null → [Suppression of Method Output](#suppression-of-method-output)
+- **[All]** `Write-Verbose` / `Write-Debug` **MUST NOT** emit raw PII, credentials, tokens, or other sensitive identifiers → [Sensitive Data in Verbose and Debug Streams](#sensitive-data-in-verbose-and-debug-streams)
 
 ### Language Interop and .NET
 
@@ -2540,6 +2541,20 @@ When calling .NET methods that return a value (like `System.Collections.ArrayLis
 # Non-Compliant (Typically slower than casting to void)
 $list.Add($item) | Out-Null
 ```
+
+### Sensitive Data in Verbose and Debug Streams
+
+When logging parameter values or internal state via `Write-Verbose` or `Write-Debug`, functions **MUST NOT** emit raw personally identifiable information (PII), credentials, secrets, tokens, or other sensitive identifiers that could be exposed in console output, transcript files, automation logs, or CI logs.
+
+Instead, code **SHOULD** use safe alternatives such as:
+
+- Boolean presence flags (for example, `ObjectIdPresent = $true`)
+- Non-sensitive metadata (for example, string length, item count, or type name)
+- Redacted or intentionally truncated values, but only when doing so does not expose sensitive information
+
+This applies especially to values such as user principal names (UPNs), email addresses, Azure AD object IDs, application IDs, tenant IDs, access tokens, client secrets, and similar identifiers.
+
+If diagnostic traceability is required, prefer logging whether a value was supplied, its general type, or other non-sensitive characteristics rather than the original value itself.
 
 ## Testing with Pester
 
