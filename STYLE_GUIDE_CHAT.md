@@ -2494,6 +2494,8 @@ process {
 }
 ```
 
+> **Note:** This example uses `$StringToProcess` for brevity. When the logged variable could contain PII, credentials, or other sensitive data, follow the guidance in [Sensitive Data in Verbose and Debug Streams](#sensitive-data-in-verbose-and-debug-streams).
+
 **Streams enabled**:
 
 - **Verbose** → operational details
