@@ -1620,7 +1620,7 @@ The standard `catch` pattern for modern advanced functions and scripts **SHOULD*
 try {
     ...
 } catch {
-    Write-Debug ("Failed to do X: {0}" -f ($_.Exception.Message -or $_.ToString()))
+    Write-Debug ("Failed to do X: $_")
     throw
 }
 ```
@@ -1632,26 +1632,27 @@ A modern function **MAY** intentionally handle an exception without re-throwing 
 ```powershell
 # Non-throwing wrapper with documented contract
 function Convert-SafelyFromJson {
-    <#
-    .DESCRIPTION
-    Attempts to convert a JSON string to an object. This function does
-    NOT throw on invalid input; instead it returns $null and logs the
-    error to the Debug stream. Callers MUST check the return value.
-
-    .OUTPUTS
-    [pscustomobject] on success; $null on failure.
-    #>
+    # .DESCRIPTION
+    # Attempts to convert a JSON string to an object. This function does
+    # NOT throw on invalid input; instead it returns $null and logs the
+    # error to the Debug stream. Callers MUST check the return value.
+    #
+    # .OUTPUTS
+    # [object] on success; $null on failure.
     [CmdletBinding()]
-    [OutputType([pscustomobject])]
+    [OutputType([object])]
     param (
-        [Parameter(Mandatory = $true)]
         [string]$JsonString
     )
+
+    if ([string]::IsNullOrEmpty($JsonString)) {
+        return $null
+    }
 
     try {
         $JsonString | ConvertFrom-Json -ErrorAction Stop
     } catch {
-        Write-Debug ("JSON conversion failed: {0}" -f ($_.Exception.Message -or $_.ToString()))
+        Write-Debug ("JSON conversion failed: $_")
         $null
     }
 }
