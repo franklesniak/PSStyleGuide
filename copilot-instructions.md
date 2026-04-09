@@ -1,12 +1,12 @@
 # PowerShell Writing Style
 
-**Version:** 1.6.20260408.1
+**Version:** 1.6.20260409.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-04-08
+- **Last Updated:** 2026-04-09
 - **Scope:** Defines PowerShell coding standards for all `.ps1` files in this repository. Covers style, formatting, naming conventions, error handling, documentation requirements, and compatibility patterns for both legacy (v1.0) and modern (v5.1+/v7.x+) PowerShell codebases.
 
 ## Table of Contents
@@ -118,7 +118,8 @@ This checklist provides a quick reference for both human developers and LLMs (li
 ### Error Handling
 
 - **[v1.0]** v1.0-targeted functions **MUST** use trap {} for error suppression → [Core Error Suppression Mechanism](#core-error-suppression-mechanism)
-- **[Modern]** catch blocks **MUST NOT** be empty; **MUST** log to Debug stream at minimum → [Modern catch Block Requirements](#modern-catch-block-requirements)
+- **[Modern]** catch blocks **MUST NOT** be empty; default pattern is `Write-Debug` + `throw` → [Modern catch Block Requirements](#modern-catch-block-requirements)
+- **[Modern]** Non-throwing catch (no `throw`) **MUST** have a documented non-throwing contract → [Modern catch Block Requirements](#modern-catch-block-requirements)
 
 ### File Writeability Testing
 
@@ -1597,14 +1598,58 @@ The v1.0 pattern is **functionally equivalent** but **more verbose** and **dupli
 
 ### Modern `catch` Block Requirements
 
-In modern functions using `try/catch` (i.e., those not targeting v1.0), `catch` blocks **MUST NOT** be empty. An empty `catch` block is flagged by PSScriptAnalyzer and provides no diagnostic value. At a minimum, the error **SHOULD** be logged to the **Debug** stream, as it represents an *internal, handled* failure.
+In modern functions using `try/catch` (i.e., those not targeting v1.0), `catch` blocks **MUST NOT** be empty. An empty `catch` block is flagged by PSScriptAnalyzer and provides no diagnostic value.
+
+#### Architectural Context: Library/Helper Functions vs. Higher-Level Code
+
+The return-code and error-swallowing patterns described in the preceding v1.0 sections are primarily associated with **library/helper functions** — highly reusable building blocks that handle operational errors internally and communicate failure through an explicitly documented contract (e.g., integer return codes, reference outputs). These functions are designed to **never throw**, and their non-throwing behavior **MUST** be documented in `.DESCRIPTION` and `.OUTPUTS`. While v1.0 compatibility is a common consequence of this design goal, the non-throwing contract itself is the primary architectural motivation; a modern function can adopt the same pattern when the design requires it.
+
+For **modern higher-level functions and scripts** — code that orchestrates these building blocks or performs tasks for end users — the default expectation is that unexpected failures **propagate** to the caller.
+
+#### Default Pattern: `Write-Debug` + `throw`
+
+The standard `catch` pattern for modern advanced functions and scripts **SHOULD** log the error to the **Debug** stream and then **re-throw** it so that unexpected failures propagate to the caller. This **SHOULD** be the default unless the function is explicitly designed as a non-throwing wrapper with a documented contract.
 
 ```powershell
-# Compliant
+# Default: log and re-throw
 try {
     ...
 } catch {
-    Write-Debug ("Failed to do X: {0}" -f ($_.Exception.Message -or $_.ToString()))
+    Write-Debug ("Failed to do X: {0}" -f $_)
+    throw
+}
+```
+
+#### Documented Non-Throwing Exception
+
+A modern function **MAY** intentionally handle an exception without re-throwing **only** when its contract explicitly specifies non-throwing behavior. In that case, the function's comment-based help (`.DESCRIPTION` and `.OUTPUTS`) **MUST** clearly document that failures are communicated through return values, output state, warnings, or another defined mechanism rather than by throwing.
+
+```powershell
+# Non-throwing wrapper with documented contract
+function Convert-SafelyFromJson {
+    # .DESCRIPTION
+    # Attempts to convert a JSON string to an object. This function does
+    # NOT throw on invalid input; instead it returns $null and logs the
+    # error to the Debug stream. Callers MUST check the return value.
+    #
+    # .OUTPUTS
+    # [object] on success; $null on failure.
+    [CmdletBinding()]
+    [OutputType([object])]
+    param (
+        [string]$JsonString
+    )
+
+    if ([string]::IsNullOrEmpty($JsonString)) {
+        return $null
+    }
+
+    try {
+        $JsonString | ConvertFrom-Json -ErrorAction Stop
+    } catch {
+        Write-Debug ("JSON conversion failed: {0}" -f $_)
+        $null
+    }
 }
 ```
 
