@@ -2798,7 +2798,7 @@ Describe "Test-PathExists" {
 
 ### Testing Property Names on PSCustomObject
 
-When testing that a `[pscustomobject]` contains the expected property names, assertions **MUST** use an **order-insensitive** comparison. Property enumeration order from `PSObject.Properties.Name` is deterministic for objects created via the `[pscustomobject]@{}` accelerator, but tests **SHOULD NOT** rely on this ordering because:
+When testing that a `[pscustomobject]` contains the expected property names, assertions **MUST** use an **order-insensitive** comparison. Although `PSObject.Properties.Name` preserves declaration order in practice for objects created via the `[pscustomobject]@{}` accelerator, this ordering is not a documented guarantee. Tests **SHOULD NOT** rely on property ordering because:
 
 1. Future refactors might change the property declaration order.
 2. Objects constructed via `Add-Member` or other mechanisms may not preserve insertion order.
