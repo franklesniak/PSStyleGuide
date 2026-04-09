@@ -2812,7 +2812,7 @@ $objResult.PSObject.Properties.Name | Should -Contain 'Type'
 $objResult.PSObject.Properties.Name | Should -HaveCount 2
 ```
 
-**Sorted array comparison** (acceptable alternative):
+**Sorted array comparison** (acceptable alternative — the expected array must be in sorted order to match the `Sort-Object` output):
 
 ```powershell
 ($objResult.PSObject.Properties.Name | Sort-Object) |
