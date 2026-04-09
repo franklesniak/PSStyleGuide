@@ -3,7 +3,7 @@
 ````markdown
 # PowerShell Writing Style
 
-**Version:** 1.6.20260409.0
+**Version:** 1.7.20260409.0
 
 ## Metadata
 
@@ -158,6 +158,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[All]** Tests **SHOULD** use Arrange-Act-Assert pattern in test cases → [Test Structure: Arrange-Act-Assert](#test-structure-arrange-act-assert)
 - **[All]** Tests **MUST** verify all documented return codes for functions → [Testing Return Code Conventions](#testing-return-code-conventions)
 - **[All]** Test-* functions **MUST** have tests for both `$true` and `$false` cases → [Testing Return Code Conventions](#testing-return-code-conventions)
+- **[All]** Tests asserting property names on `[pscustomobject]` **MUST** use order-insensitive comparisons → [Testing Property Names on PSCustomObject](#testing-property-names-on-pscustomobject)
 
 ## Executive Summary: Author Profile
 
@@ -2794,6 +2795,38 @@ Describe "Test-PathExists" {
         }
     }
 }
+```
+
+---
+
+### Testing Property Names on PSCustomObject
+
+When testing that a `[pscustomobject]` contains the expected property names, assertions **MUST** use an **order-insensitive** comparison. Property enumeration order from `PSObject.Properties.Name` is deterministic for objects created via the `[pscustomobject]@{}` accelerator, but tests **SHOULD NOT** rely on this ordering because:
+
+1. Future refactors might change the property declaration order.
+2. Objects constructed via `Add-Member` or other mechanisms may not preserve insertion order.
+3. Order-insensitive tests are more resilient and communicate intent more clearly.
+
+**Per-property containment** (preferred when property count is small):
+
+```powershell
+$objResult.PSObject.Properties.Name | Should -Contain 'Key'
+$objResult.PSObject.Properties.Name | Should -Contain 'Type'
+$objResult.PSObject.Properties.Name | Should -HaveCount 2
+```
+
+**Sorted array comparison** (acceptable alternative):
+
+```powershell
+($objResult.PSObject.Properties.Name | Sort-Object) |
+    Should -Be @('Key', 'Type')
+```
+
+**Non-Compliant** (order-sensitive — fragile):
+
+```powershell
+# Non-Compliant
+$objResult.PSObject.Properties.Name | Should -Be @('Key', 'Type')
 ```
 
 ---
