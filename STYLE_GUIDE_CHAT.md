@@ -3,7 +3,7 @@
 ````markdown
 # PowerShell Writing Style
 
-**Version:** 1.7.20260410.0
+**Version:** 1.7.20260410.1
 
 ## Metadata
 
@@ -144,6 +144,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[All]** Code **MUST** use Write-Warning for user-facing anomalies; Write-Debug for internal details → [Choosing Between Warning and Debug Streams](#choosing-between-warning-and-debug-streams)
 - **[All]** .NET method output **MUST** be suppressed with [void](...), not | Out-Null → [Suppression of Method Output](#suppression-of-method-output)
 - **[All]** `Write-Verbose` / `Write-Debug` **MUST NOT** emit raw PII, credentials, tokens, or other sensitive identifiers → [Sensitive Data in Verbose and Debug Streams](#sensitive-data-in-verbose-and-debug-streams)
+- **[Modern]** Hot-path `Write-Verbose` / `Write-Debug` with string formatting **SHOULD** be guarded behind a preference check → [Performance-Sensitive `Write-Verbose` / `Write-Debug` in Hot Paths](#performance-sensitive-write-verbose--write-debug-in-hot-paths)
 
 ### Language Interop and .NET
 
@@ -2625,6 +2626,28 @@ Write-Debug -Message ('PrincipalKey type: {0}' -f $strPrincipalKeyTypeName)
 $strPrincipalKeyLength = if ($PrincipalKey -is [string]) { [string]$PrincipalKey.Length } else { '<n/a>' }
 Write-Verbose -Message ('PrincipalKey length: {0}' -f $strPrincipalKeyLength)
 ```
+
+### Performance-Sensitive `Write-Verbose` / `Write-Debug` in Hot Paths
+
+**[Modern]** functions that are called per-record or inside tight loops (that is, hot paths) **SHOULD** guard `Write-Verbose` and `Write-Debug` calls that perform string formatting — such as with the `-f` operator or string concatenation — behind an appropriate preference check to avoid unconditional string allocation overhead when the stream is not enabled.
+
+**Recommended pattern for `Write-Verbose`:**
+
+```powershell
+if ($VerbosePreference -ne 'SilentlyContinue') {
+    Write-Verbose ("Processing item: {0}" -f $strCurrentItem)
+}
+```
+
+**Recommended pattern for `Write-Debug`:**
+
+```powershell
+if ($DebugPreference -ne 'SilentlyContinue') {
+    Write-Debug ("Processing item: {0}" -f $strCurrentItem)
+}
+```
+
+> **Note:** This guard is recommended only for performance-sensitive code paths and is **NOT** required for functions that run once, or only a small number of times, per pipeline or script execution.
 
 ## Testing with Pester
 
