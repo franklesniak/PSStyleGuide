@@ -5,7 +5,7 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 1.7.20260410.4
+**Version:** 1.7.20260410.6
 
 ## Metadata
 
@@ -125,6 +125,8 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[v1.0]** v1.0-targeted functions **MUST** use trap {} for error suppression → [Core Error Suppression Mechanism](#core-error-suppression-mechanism)
 - **[Modern]** catch blocks **MUST NOT** be empty; default pattern is `Write-Debug` + `throw` → [Modern catch Block Requirements](#modern-catch-block-requirements)
 - **[Modern]** Non-throwing catch (no `throw`) **MUST** have a documented non-throwing contract → [Modern catch Block Requirements](#modern-catch-block-requirements)
+- **[Modern]** `throw "message"` and `throw ("fmt" -f $args)` **MUST NOT** be used in catch blocks intended to rethrow → [Rethrow Anti-Pattern](#rethrow-anti-pattern)
+- **[Modern]** Exception wrapping **SHOULD** use `$PSCmdlet.ThrowTerminatingError()` with the original as `InnerException` → [Wrapping Exceptions with `$PSCmdlet.ThrowTerminatingError()`](#wrapping-exceptions-with-pscmdletthrowterminatingerror)
 - **[Modern]** Variables referenced in `finally` that are assigned in `try` **MUST** be initialized before the `try` block → [Set-StrictMode Considerations for finally Blocks](#set-strictmode-considerations-for-finally-blocks)
 
 ### File Writeability Testing
@@ -1633,6 +1635,72 @@ try {
     throw
 }
 ```
+
+#### Rethrow Anti-Pattern
+
+When a `catch` block is intended to rethrow, `throw "message"` and `throw ("format string" -f $args)` **MUST NOT** be used. These forms throw a string that PowerShell wraps into a **new** `RuntimeException`/`ErrorRecord`, discarding the original exception type, stack trace, and `ErrorRecord`. This makes root-cause analysis significantly harder and breaks any caller logic that catches specific exception types. This prohibition applies only to catch blocks whose intent is to preserve and propagate the original failure; catch blocks that intentionally translate an error into a new, independently documented message (such as the [file writeability tests](#file-writeability-testing)) are not subject to this rule.
+
+```powershell
+# WRONG — destroys the original exception:
+try {
+    Get-Item -Path $strPath -ErrorAction Stop
+} catch {
+    throw "Failed to get item: $($_.Exception.Message)"
+}
+
+# WRONG — same problem with -f operator:
+try {
+    Get-Item -Path $strPath -ErrorAction Stop
+} catch {
+    throw ("Failed to get item: {0}" -f $_.Exception.Message)
+}
+```
+
+#### Adding Context Before Rethrowing
+
+If contextual information is needed before rethrowing, it **SHOULD** be logged via `Write-Debug` before the bare `throw`. This preserves the original exception while still providing diagnostic context on the Debug stream, reinforcing the [Default Pattern](#default-pattern-write-debug--throw).
+
+```powershell
+# Correct — context logged, original exception preserved:
+try {
+    Get-Item -Path $strPath -ErrorAction Stop
+} catch {
+    Write-Debug ("Failed to get item at path '{0}': {1}" -f $strPath, $_)
+    throw
+}
+```
+
+#### Wrapping Exceptions with `$PSCmdlet.ThrowTerminatingError()`
+
+If an exception **must** be wrapped with additional context while still propagating, the preferred pattern for advanced functions **SHOULD** use `$PSCmdlet.ThrowTerminatingError()` and preserve the original exception as the `InnerException`. This approach maintains the full exception chain for callers while adding meaningful context.
+
+```powershell
+# Correct — wraps with context, preserves original as InnerException:
+function Get-ResolvedItem {
+    [CmdletBinding()]
+    param (
+        [string]$Path
+    )
+
+    try {
+        Get-Item -Path $Path -ErrorAction Stop
+    } catch {
+        $objException = [System.InvalidOperationException]::new(
+            ("Failed to resolve item at path '{0}'" -f $Path),
+            $_.Exception
+        )
+        $objErrorRecord = [System.Management.Automation.ErrorRecord]::new(
+            $objException,
+            'ResolvedItemFailure',
+            [System.Management.Automation.ErrorCategory]::ObjectNotFound,
+            $Path
+        )
+        $PSCmdlet.ThrowTerminatingError($objErrorRecord)
+    }
+}
+```
+
+> **Note:** The above wrapping pattern is appropriate only when additional context is genuinely needed beyond what `Write-Debug` + bare `throw` provides. In most cases, the [Default Pattern](#default-pattern-write-debug--throw) is sufficient.
 
 #### Documented Non-Throwing Exception
 
