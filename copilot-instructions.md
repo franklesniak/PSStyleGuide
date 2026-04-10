@@ -1,12 +1,12 @@
 # PowerShell Writing Style
 
-**Version:** 1.7.20260409.0
+**Version:** 1.7.20260410.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-04-09
+- **Last Updated:** 2026-04-10
 - **Scope:** Defines PowerShell coding standards for all `.ps1` files in this repository. Covers style, formatting, naming conventions, error handling, documentation requirements, and compatibility patterns for both legacy (v1.0) and modern (v5.1+/v7.x+) PowerShell codebases.
 
 ## Table of Contents
@@ -2600,6 +2600,28 @@ Instead, code **SHOULD** use safe alternatives such as:
 This applies especially to values such as user principal names (UPNs), email addresses, Azure AD object IDs, application IDs, tenant IDs, access tokens, client secrets, and similar identifiers.
 
 If diagnostic traceability is required, prefer logging whether a value was supplied, its general type, or other non-sensitive characteristics rather than the original value itself.
+
+**Non-Compliant** — logs a raw sensitive identifier:
+
+```powershell
+# Non-Compliant
+Write-Verbose -Message ('PrincipalKey: ' + $PrincipalKey)
+```
+
+**Compliant** — logs safe, non-sensitive metadata:
+
+```powershell
+# Compliant - logs whether the value is present (boolean)
+Write-Verbose -Message ('PrincipalKey present: {0}' -f ($null -ne $PrincipalKey))
+
+# Compliant - logs the value's type name with a null-safe fallback
+$strPrincipalKeyTypeName = if ($null -ne $PrincipalKey) { $PrincipalKey.GetType().Name } else { '<null>' }
+Write-Debug -Message ('PrincipalKey type: {0}' -f $strPrincipalKeyTypeName)
+
+# Compliant - logs non-sensitive metadata (string length) with a type-safe fallback
+$strPrincipalKeyLength = if ($PrincipalKey -is [string]) { [string]$PrincipalKey.Length } else { '<n/a>' }
+Write-Verbose -Message ('PrincipalKey length: {0}' -f $strPrincipalKeyLength)
+```
 
 ## Testing with Pester
 
