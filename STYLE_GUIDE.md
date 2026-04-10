@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 1.7.20260410.5
+**Version:** 1.7.20260410.6
 
 ## Metadata
 
@@ -1633,7 +1633,7 @@ try {
 
 #### Rethrow Anti-Pattern
 
-When a `catch` block is intended to rethrow, `throw "message"` and `throw ("format string" -f $args)` **MUST NOT** be used. These forms create a **new** `[string]`-based exception and discard the original exception type, stack trace, and `ErrorRecord`. This makes root-cause analysis significantly harder and breaks any caller logic that catches specific exception types.
+When a `catch` block is intended to rethrow, `throw "message"` and `throw ("format string" -f $args)` **MUST NOT** be used. These forms throw a string that PowerShell wraps into a **new** `RuntimeException`/`ErrorRecord`, discarding the original exception type, stack trace, and `ErrorRecord`. This makes root-cause analysis significantly harder and breaks any caller logic that catches specific exception types. This prohibition applies only to catch blocks whose intent is to preserve and propagate the original failure; catch blocks that intentionally translate an error into a new, independently documented message (such as the [file writeability tests](#file-writeability-testing)) are not subject to this rule.
 
 ```powershell
 # WRONG — destroys the original exception:
