@@ -5,7 +5,7 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 1.7.20260410.2
+**Version:** 1.7.20260410.3
 
 ## Metadata
 
@@ -125,6 +125,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[v1.0]** v1.0-targeted functions **MUST** use trap {} for error suppression → [Core Error Suppression Mechanism](#core-error-suppression-mechanism)
 - **[Modern]** catch blocks **MUST NOT** be empty; default pattern is `Write-Debug` + `throw` → [Modern catch Block Requirements](#modern-catch-block-requirements)
 - **[Modern]** Non-throwing catch (no `throw`) **MUST** have a documented non-throwing contract → [Modern catch Block Requirements](#modern-catch-block-requirements)
+- **[Modern]** Variables referenced in `finally` that are assigned in `try` **MUST** be initialized before the `try` block → [Set-StrictMode Considerations for finally Blocks](#set-strictmode-considerations-for-finally-blocks)
 
 ### File Writeability Testing
 
@@ -1660,6 +1661,30 @@ function Convert-SafelyFromJson {
     }
 }
 ```
+
+---
+
+### Set-StrictMode Considerations for `finally` Blocks
+
+When `Set-StrictMode -Version Latest` is in effect, referencing a variable that has never been assigned raises a terminating error. This creates a subtle but important pitfall when a `finally` block references a variable that is assigned inside the corresponding `try` block (for example, a disposable resource). If an exception occurs before the assignment executes, `Set-StrictMode` will raise a terminating error for the uninitialized variable inside `finally`, which can mask the original exception and interfere with proper cleanup.
+
+**Rule:** When a `finally` block references a variable that is assigned inside the corresponding `try` block, that variable **MUST** be initialized before the `try` block, typically to `$null`.
+
+**Compliant Example:**
+
+```powershell
+$objResource = $null
+try {
+    $objResource = [SomeDisposable]::Create()
+    # ... use $objResource ...
+} finally {
+    if ($null -ne $objResource) {
+        $objResource.Dispose()
+    }
+}
+```
+
+In this example, `$objResource` is initialized to `$null` before the `try` block. If `[SomeDisposable]::Create()` throws before the assignment completes, the `finally` block can safely check `$null -ne $objResource` without triggering a `Set-StrictMode` violation.
 
 ---
 
