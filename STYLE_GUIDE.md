@@ -1425,7 +1425,7 @@ These are **not stylistic requirements**; they are **design tools** that **MUST*
   - The function's logic depends on the parameter having a non-empty value (e.g., computing a hash, constructing a path, or performing a lookup).
   - PowerShell coerces `$null` to `[string]::Empty` for `[string]`-typed parameters. Because `[string]::Empty` is not `$null`, a mandatory `[string]` parameter satisfied by this coercion will pass the mandatory check but silently bind an empty string. This can cause incorrect behavior—for example, hashing an empty string instead of rejecting invalid input.
   - Adding `[ValidateNotNullOrEmpty()]` alongside `[Parameter(Mandatory = $true)]` catches this edge case at parameter-binding time and produces a clear error message.
-  - This guidance applies to modern functions and scripts targeting Windows PowerShell 2.0 or newer, because `[ValidateNotNullOrEmpty()]` is not available in Windows PowerShell v1.0.
+  - This guidance applies to functions and scripts targeting Windows PowerShell 2.0 or newer, because `[ValidateNotNullOrEmpty()]` is not available in Windows PowerShell v1.0.
 
 ### Consuming Streaming Functions (The `0-1-Many` Problem)
 
