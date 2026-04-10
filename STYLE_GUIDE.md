@@ -2631,8 +2631,7 @@ Write-Verbose -Message ('PrincipalKey length: {0}' -f $strPrincipalKeyLength)
 **Recommended pattern for `Write-Verbose`:**
 
 ```powershell
-if ($PSBoundParameters.ContainsKey('Verbose') -or
-        $VerbosePreference -ne 'SilentlyContinue') {
+if ($VerbosePreference -ne 'SilentlyContinue') {
     Write-Verbose ("Processing item: {0}" -f $strCurrentItem)
 }
 ```
@@ -2640,8 +2639,7 @@ if ($PSBoundParameters.ContainsKey('Verbose') -or
 **Recommended pattern for `Write-Debug`:**
 
 ```powershell
-if ($PSBoundParameters.ContainsKey('Debug') -or
-        $DebugPreference -ne 'SilentlyContinue') {
+if ($DebugPreference -ne 'SilentlyContinue') {
     Write-Debug ("Processing item: {0}" -f $strCurrentItem)
 }
 ```
