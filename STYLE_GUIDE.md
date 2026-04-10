@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 1.7.20260410.1
+**Version:** 1.7.20260410.2
 
 ## Metadata
 
@@ -157,6 +157,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[All]** Tests **MUST** verify all documented return codes for functions → [Testing Return Code Conventions](#testing-return-code-conventions)
 - **[All]** Test-* functions **MUST** have tests for both `$true` and `$false` cases → [Testing Return Code Conventions](#testing-return-code-conventions)
 - **[All]** Tests asserting property names on `[pscustomobject]` **MUST** use order-insensitive comparisons → [Testing Property Names on PSCustomObject](#testing-property-names-on-pscustomobject)
+- **[All]** Test `BeforeAll` dot-sourcing **MUST** use the `Split-Path` + `Join-Path` two-step pattern; multi-segment `Join-Path` forms **MUST NOT** be used → [Test File Dot-Sourcing Pattern](#test-file-dot-sourcing-pattern)
 
 ## Executive Summary: Author Profile
 
@@ -2697,6 +2698,24 @@ Tests **MUST** use Pester 5.x syntax. Legacy Pester 3.x/4.x patterns **MUST NOT*
 
 ---
 
+### Test File Dot-Sourcing Pattern
+
+Pester test files that dot-source scripts under test in `BeforeAll` **MUST** use the `Split-Path` + `Join-Path` two-step pattern. This pattern resolves the parent directory of the test file's directory and then builds the path to the source file:
+
+```powershell
+BeforeAll {
+    $strSrcPath = Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -ChildPath 'src'
+    . (Join-Path -Path $strSrcPath -ChildPath 'FunctionName.ps1')
+}
+```
+
+**Why this pattern is required:**
+
+- Multi-segment `Join-Path` forms such as `Join-Path $PSScriptRoot '..' 'src' 'FunctionName.ps1'` rely on the `-AdditionalChildPath` parameter, which was introduced in PowerShell 6.0 and is **not available** in Windows PowerShell 5.1. Test files **MUST NOT** use this form.
+- For consistency and canonical style in test files, `$PSScriptRoot`-anchored `..` path forms such as `$PSScriptRoot/../src/...` or `Join-Path -Path $PSScriptRoot -ChildPath '../src/...'` **MUST NOT** be used; use the explicit parent-resolution pattern instead.
+
+---
+
 ### Test Structure: Arrange-Act-Assert
 
 Tests **SHOULD** follow the **Arrange-Act-Assert (AAA)** pattern for clarity and maintainability:
@@ -2751,7 +2770,8 @@ Additionally, if the function uses `[ref]` parameters for output:
 ```powershell
 Describe "Convert-StringToObject" {
     BeforeAll {
-        . $PSScriptRoot/../src/Convert-StringToObject.ps1
+        $strSrcPath = Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -ChildPath 'src'
+        . (Join-Path -Path $strSrcPath -ChildPath 'Convert-StringToObject.ps1')
     }
 
     Context "When given valid input" {
@@ -2808,7 +2828,8 @@ For `Test-*` functions that return Boolean values (as documented in the exceptio
 ```powershell
 Describe "Test-PathExists" {
     BeforeAll {
-        . $PSScriptRoot/../src/Test-PathExists.ps1
+        $strSrcPath = Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -ChildPath 'src'
+        . (Join-Path -Path $strSrcPath -ChildPath 'Test-PathExists.ps1')
     }
 
     Context "When the path exists" {
