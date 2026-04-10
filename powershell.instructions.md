@@ -2142,7 +2142,7 @@ This function serves as the **central version oracle** for all conditional logic
 The author uses **PowerShell version as a feature flag** to enable increasingly capable .NET types for handling edge cases like numeric overflow:
 
 ```powershell
-if ($versionPS.Major -ge 3) {
+if ($versionPowerShell.Major -ge 3) {
     # Use BigInteger (available in .NET 4.0+, loaded in PS v3+)
     $boolResult = Convert-StringToBigIntegerSafely ...
 } else {
@@ -2243,9 +2243,9 @@ Functions use version detection to **bypass expensive checks** when possible:
 
 ```powershell
 if ($PSVersion -eq ([version]'0.0')) {
-    $versionPS = Get-PSVersion  # Detect if not provided
+    $versionPowerShell = Get-PSVersion  # Detect if not provided
 } else {
-    $versionPS = $PSVersion     # Use caller-provided value
+    $versionPowerShell = $PSVersion     # Use caller-provided value
 }
 ```
 
