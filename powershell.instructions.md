@@ -2619,11 +2619,13 @@ Write-Verbose -Message ('PrincipalKey: ' + $PrincipalKey)
 # Compliant - logs whether the value is present (boolean)
 Write-Verbose -Message ('PrincipalKey present: {0}' -f ($null -ne $PrincipalKey))
 
-# Compliant - logs the value's type name
-Write-Debug -Message ('PrincipalKey type: {0}' -f $PrincipalKey.GetType().Name)
+# Compliant - logs the value's type name with a null-safe fallback
+$strPrincipalKeyTypeName = if ($null -ne $PrincipalKey) { $PrincipalKey.GetType().Name } else { '<null>' }
+Write-Debug -Message ('PrincipalKey type: {0}' -f $strPrincipalKeyTypeName)
 
-# Compliant - logs non-sensitive metadata (string length)
-Write-Verbose -Message ('PrincipalKey length: {0}' -f $PrincipalKey.Length)
+# Compliant - logs non-sensitive metadata (string length) with a type-safe fallback
+$strPrincipalKeyLength = if ($PrincipalKey -is [string]) { $PrincipalKey.Length } else { '<n/a>' }
+Write-Verbose -Message ('PrincipalKey length: {0}' -f $strPrincipalKeyLength)
 ```
 
 ## Testing with Pester
