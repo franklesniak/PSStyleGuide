@@ -2619,7 +2619,7 @@ $strPrincipalKeyTypeName = if ($null -ne $PrincipalKey) { $PrincipalKey.GetType(
 Write-Debug -Message ('PrincipalKey type: {0}' -f $strPrincipalKeyTypeName)
 
 # Compliant - logs non-sensitive metadata (string length) with a type-safe fallback
-$strPrincipalKeyLength = if ($PrincipalKey -is [string]) { $PrincipalKey.Length } else { '<n/a>' }
+$strPrincipalKeyLength = if ($PrincipalKey -is [string]) { [string]$PrincipalKey.Length } else { '<n/a>' }
 Write-Verbose -Message ('PrincipalKey length: {0}' -f $strPrincipalKeyLength)
 ```
 
