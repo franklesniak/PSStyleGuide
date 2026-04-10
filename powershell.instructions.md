@@ -5,7 +5,7 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 1.7.20260410.3
+**Version:** 1.7.20260410.4
 
 ## Metadata
 
@@ -628,9 +628,11 @@ These names leave no ambiguity about the parameter’s purpose, expected type, o
 
 ### Local Variable Naming: Type-Prefixed camelCase
 
-Local variables follow a **Hungarian-style notation** combining a **type-hinting prefix** with **descriptive `camelCase`**. **These names MUST be fully descriptive and avoid all abbreviations or shorthand.**
+Local variables follow a **Hungarian-style notation** combining a **type-hinting prefix** with **descriptive `camelCase`**. **The descriptive portion of each name—everything after the type prefix—MUST be fully spelled out; abbreviations and shorthand are not permitted.**
 
-- **Prefixes:** `$str` (string), `$int` (integer), `$bool` (boolean), `$arr` (array), `$obj` (object), `$hash` (hashtable), `$list` (generic list), etc.
+- **Prefixes:** `$str` (string), `$int` (integer), `$dbl` (double), `$bool` (boolean), `$arr` (array), `$obj` (object/default), `$hashtable` (hashtable), `$list` (generic list), etc.
+- **Default prefix — `obj`:** Use `$obj` for any .NET type that does not have a dedicated approved prefix above. This includes enum values (e.g., `$objActionPreference`), complex .NET reference types (e.g., `$objMemoryStream`), and `[pscustomobject]` instances (e.g., `$objResult`).
+- **Open-ended list:** The "etc." above means additional descriptive prefixes such as `$ref` and `$version` are permitted when they provide immediate type clarity (e.g., `$refLastKnownError`, `$versionPowerShell`). However, authors **SHOULD NOT** invent ad hoc abbreviated type-name prefixes (e.g., do **not** use `$enumActionPreference`—use `$objActionPreference` instead).
 - **Descriptive Name:** The name **MUST** be **fully spelled out**.
 
 **Examples:**
@@ -642,8 +644,11 @@ Local variables follow a **Hungarian-style notation** combining a **type-hinting
 - `$intReturnValue`
 - `$boolResult`
 - `$arrElements`
+- `$hashtableSettings`
+- `$objActionPreference`
+- `$objResult`
 - `$refLastKnownError`
-- `$versionPS`
+- `$versionPowerShell`
 
 This prefixing is **not** a legacy artifact but a **deliberate design decision** to compensate for PowerShell’s dynamic typing and the frequent absence of modern IDE tooling. The prefix:
 
@@ -2137,7 +2142,7 @@ This function serves as the **central version oracle** for all conditional logic
 The author uses **PowerShell version as a feature flag** to enable increasingly capable .NET types for handling edge cases like numeric overflow:
 
 ```powershell
-if ($versionPS.Major -ge 3) {
+if ($versionPowerShell.Major -ge 3) {
     # Use BigInteger (available in .NET 4.0+, loaded in PS v3+)
     $boolResult = Convert-StringToBigIntegerSafely ...
 } else {
@@ -2238,9 +2243,9 @@ Functions use version detection to **bypass expensive checks** when possible:
 
 ```powershell
 if ($PSVersion -eq ([version]'0.0')) {
-    $versionPS = Get-PSVersion  # Detect if not provided
+    $versionPowerShell = Get-PSVersion  # Detect if not provided
 } else {
-    $versionPS = $PSVersion     # Use caller-provided value
+    $versionPowerShell = $PSVersion     # Use caller-provided value
 }
 ```
 
