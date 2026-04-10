@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 1.7.20260410.6
+**Version:** 1.7.20260410.7
 
 ## Metadata
 
@@ -108,7 +108,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[Modern]** Modern functions and scripts **MUST** use Write-Verbose and Write-Debug (not manual preference toggling) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
 - **[Modern]** Exception: Modern functions and scripts **MAY** temporarily suppress $VerbosePreference for noisy nested commands using try/finally → ["Modern Advanced" Functions/Scripts: Exception for Suppressing Nested Verbose Streams](#modern-advanced-functionsscripts-exception-for-suppressing-nested-verbose-streams)
 - **[Modern]** [Parameter(Mandatory=$true)] **SHOULD** be used only when function cannot work without value → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
-- **[Modern]** [ValidateNotNullOrEmpty()] **SHOULD** be used for optional-but-not-empty parameters → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
+- **[Modern]** [ValidateNotNullOrEmpty()] **SHOULD** be used for optional-but-not-empty parameters and for mandatory [string] parameters whose logic depends on a non-empty value → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
 - **[Modern]** Multiple [OutputType()] **SHOULD** only be used for intentionally polymorphic returns → ["Modern Advanced" Functions/Scripts: Handling Multiple or Dynamic Output Types](#modern-advanced-functionsscripts-handling-multiple-or-dynamic-output-types)
 - **[All]** Functions **MUST** be atomic, reusable tools with single purpose → [Overview of Function Architecture](#overview-of-function-architecture)
 - **[All]** Polymorphic parameters (multiple incompatible types) **SHOULD** be left un-typed or [object] → [Parameter Block Design: Detailed Analysis](#parameter-block-design-detailed-analysis)
@@ -1420,6 +1420,12 @@ These are **not stylistic requirements**; they are **design tools** that **MUST*
 - **Prefer `[ValidateNotNullOrEmpty()]` over `[Parameter(Mandatory = $true)]` when:**
   - The parameter is *technically* optional, but if it *is* provided, it **MUST NOT** be an empty string.
   - This is common for optional parameters like `$LogPath` or `$Description`.
+
+- **Also use `[ValidateNotNullOrEmpty()]` on mandatory `[string]` parameters when:**
+  - The function's logic depends on the parameter having a non-empty value (e.g., computing a hash, constructing a path, or performing a lookup).
+  - PowerShell coerces `$null` to `[string]::Empty` for `[string]`-typed parameters. Because `[string]::Empty` is not `$null`, a mandatory `[string]` parameter satisfied by this coercion will pass the mandatory check but silently bind an empty string. This can cause incorrect behavior—for example, hashing an empty string instead of rejecting invalid input.
+  - Adding `[ValidateNotNullOrEmpty()]` alongside `[Parameter(Mandatory = $true)]` catches this edge case at parameter-binding time and produces a clear error message.
+  - This guidance applies to modern functions and scripts targeting Windows PowerShell 2.0 or newer, because `[ValidateNotNullOrEmpty()]` is not available in Windows PowerShell v1.0.
 
 ### Consuming Streaming Functions (The `0-1-Many` Problem)
 
