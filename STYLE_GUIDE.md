@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 1.7.20260410.3
+**Version:** 1.7.20260410.4
 
 ## Metadata
 
@@ -625,7 +625,9 @@ These names leave no ambiguity about the parameter’s purpose, expected type, o
 
 Local variables follow a **Hungarian-style notation** combining a **type-hinting prefix** with **descriptive `camelCase`**. **These names MUST be fully descriptive and avoid all abbreviations or shorthand.**
 
-- **Prefixes:** `$str` (string), `$int` (integer), `$bool` (boolean), `$arr` (array), `$obj` (object), `$hash` (hashtable), `$list` (generic list), etc.
+- **Prefixes:** `$str` (string), `$int` (integer), `$dbl` (double), `$bool` (boolean), `$arr` (array), `$obj` (object/default), `$hashtable` (hashtable), `$list` (generic list), etc.
+- **Default prefix — `obj`:** Use `$obj` for any .NET type that does not have a dedicated approved prefix above. This includes enum values (e.g., `$objActionPreference`), complex .NET reference types (e.g., `$objMemoryStream`), and `[pscustomobject]` instances (e.g., `$objResult`).
+- **Open-ended list:** The "etc." above means additional descriptive prefixes such as `$ref` and `$version` are permitted when they provide immediate type clarity (e.g., `$refLastKnownError`, `$versionPS`). However, authors **SHOULD NOT** invent ad hoc abbreviated type-name prefixes (e.g., do **not** use `$enumActionPreference`—use `$objActionPreference` instead).
 - **Descriptive Name:** The name **MUST** be **fully spelled out**.
 
 **Examples:**
@@ -637,6 +639,9 @@ Local variables follow a **Hungarian-style notation** combining a **type-hinting
 - `$intReturnValue`
 - `$boolResult`
 - `$arrElements`
+- `$hashtableSettings`
+- `$objActionPreference`
+- `$objResult`
 - `$refLastKnownError`
 - `$versionPS`
 
