@@ -289,9 +289,11 @@ function New-StyleGuideFullVersion {
         foreach ($strKey in $hashtableSections.Keys) {
             $arrLines = $hashtableSections[$strKey]
 
-            # Filter out cross-reference blockquotes pointing back to main guide
+            # Filter out cross-reference blockquotes pointing back to main guide.
+            # Only remove "For ... see ... (STYLE_GUIDE.md#..." lines; preserve other
+            # blockquotes (e.g., "> **Note:** ...") that happen to link to the main guide.
             $arrFiltered = @($arrLines | Where-Object {
-                -not ($_ -match '^> .+STYLE_GUIDE\.md[#)]')
+                -not ($_ -match '^> For .+\(STYLE_GUIDE\.md#')
             })
 
             # Convert relative links to main guide into internal anchors
@@ -313,12 +315,21 @@ function New-StyleGuideFullVersion {
             }
         }
 
-        # Process the guide line by line, inserting rationale content after matching headings
+        # Process the guide line by line, inserting rationale content after matching headings.
+        # Also remove placeholder lines that mark intentionally blank sections, since the
+        # full version will have the actual rationale content re-inserted by the merge.
+        $strPlaceholder = '*This section intentionally left blank.*'
         $arrGuideLines = $strGuideContent -split '\r?\n'
         $arrOutputLines = [System.Collections.Generic.List[string]]::new()
 
         for ($intIndex = 0; $intIndex -lt $arrGuideLines.Count; $intIndex++) {
             $strLine = $arrGuideLines[$intIndex]
+
+            # Skip placeholder lines — the rationale content replaces them
+            if ($strLine.Trim() -eq $strPlaceholder) {
+                continue
+            }
+
             $arrOutputLines.Add($strLine)
 
             if ($strLine -match '^(#{2,3}) (.+)$') {
