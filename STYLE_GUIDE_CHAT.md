@@ -9,7 +9,7 @@
 
 ## Keywords
 
-Per [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119): **MUST** / **SHALL** = absolute requirement; **MUST NOT** / **SHALL NOT** = absolute prohibition; **SHOULD** = strong recommendation (deviations require justification); **SHOULD NOT** = strong discouragement; **MAY** = truly optional.
+Per [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119): **MUST** / **SHALL** / **REQUIRED** = absolute requirement; **MUST NOT** / **SHALL NOT** = absolute prohibition; **SHOULD** / **RECOMMENDED** = strong recommendation (deviations require justification); **SHOULD NOT** / **NOT RECOMMENDED** = strong discouragement; **MAY** / **OPTIONAL** = truly optional.
 
 <!-- rationale-anchor: keywords-extended-explanation -->
 
