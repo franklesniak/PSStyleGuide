@@ -42,6 +42,7 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Security: Defense-in-Depth by Design](#security-defense-in-depth-by-design)
   - [Other: Maintainability, Extensibility, and Modernization](#other-maintainability-extensibility-and-modernization)
   - [Summary: Performance, Security, and Holistic Design](#summary-performance-security-and-holistic-design)
+- [Content Relocated from STYLE_GUIDE.md](#content-relocated-from-style_guidemd)
 
 ---
 
@@ -667,3 +668,169 @@ The **Performance, Security, and Other** aspects reveal a **mature, constrained 
 The function is a **minimal, maximalist** design: it does **exactly one thing**, does it **perfectly**, and **refuses to do anything else**. This is the hallmark of **industrial-grade PowerShell tooling** — code that can be deployed in 2006 or 2026 with identical behavior when compatible.
 
 **Final Assessment**: **"Fit for purpose across 18 years of PowerShell evolution."**
+
+---
+
+## Content Relocated from STYLE_GUIDE.md
+
+> The following material was moved from `STYLE_GUIDE.md` to reduce the main guide's token footprint while preserving useful human-readable context.
+
+### Metadata and Navigation
+
+The main guide previously included:
+
+- **Status**, **Owner**, and **Last Updated** metadata fields for human maintainers
+- A full Table of Contents with links to all major sections
+- Navigational aids for human readers
+
+These are not required for runtime instruction processing and have been removed from the operational guide.
+
+### Keywords — Extended Explanation
+
+The main guide previously included the full RFC 2119 keyword definitions with all synonyms:
+
+- **MUST** / **REQUIRED** / **SHALL** — Absolute requirement. Non-negotiable.
+- **MUST NOT** / **SHALL NOT** — Absolute prohibition.
+- **SHOULD** / **RECOMMENDED** — Strong recommendation. Valid reasons may exist to deviate, but implications must be understood.
+- **SHOULD NOT** / **NOT RECOMMENDED** — Strong discouragement. Valid reasons may exist to do otherwise, but implications must be understood.
+- **MAY** / **OPTIONAL** — Truly optional. Implementations can choose to include or omit.
+
+### Approved Verb Selection — Tutorial Material
+
+The following tutorial content was previously inline in the main guide:
+
+PowerShell uses a verb-noun pair for the names of cmdlets and for their derived .NET classes. The verb part of the name identifies the action that the cmdlet performs. The noun part of the name identifies the entity on which the action is performed. For example, the `Get-Command` cmdlet retrieves all the commands that are registered in PowerShell.
+
+Each approved verb has a corresponding *alias prefix* defined. We use this alias prefix in aliases for commands using that verb. For example, the alias prefix for `Import` is `ip` and, accordingly, the alias for `Import-Module` is `ipmo`. This is a recommendation but not a rule.
+
+#### Verb Naming Recommendations
+
+- Use one of the predefined verb names provided by PowerShell
+- Use the verb to describe the general scope of the action, and use parameters to further refine the action of the cmdlet
+- Don't use a synonym of an approved verb. For example, always use `Remove`, never use `Delete` or `Eliminate`
+- Use only the form of each verb that's listed. For example, use `Get`, but don't use `Getting` or `Gets`
+
+### Approved Verb Tables — Action Descriptions
+
+The full verb tables previously included an "Action" column describing what each verb does. These descriptions are from [Microsoft's Approved Verbs documentation](https://learn.microsoft.com/en-us/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands?view=powershell-7.5). The condensed tables in the main guide retain verb names, aliases, and synonyms to avoid.
+
+### Local Variable Naming — Design Rationale
+
+Type-prefixed camelCase for local variables is **not** a legacy artifact but a **deliberate design decision** to compensate for PowerShell's dynamic typing and the frequent absence of modern IDE tooling. The prefix:
+
+- **Eliminates type inference errors** during debugging
+- **Reduces cognitive load** when reading code without IntelliSense
+- **Prevents accidental type mismatches** in complex logic flows
+
+### Parameter Naming — Detailed Examples
+
+Parameter names are PascalCased and descriptive. Examples of well-chosen names include:
+
+- `$ReferenceToResultObject` — clearly indicates a `[ref]` parameter for result storage
+- `$ReferenceArrayOfExtraStrings` — describes both the reference mechanism and content type
+- `$StringToProcess` — specifies both the type and purpose
+- `$PSVersion` — follows the established PowerShell naming convention
+
+These names leave no ambiguity about the parameter's purpose, expected type, or direction of data flow. The use of `ReferenceTo` prefix for `[ref]` parameters is a deliberate pattern that instantly signals pass-by-reference semantics — a critical distinction in PowerShell v1.0 where such mechanics are not visually obvious.
+
+### Do Not Use Aliases — Rationale
+
+Aliases are prohibited in code for three key reasons:
+
+1. **Discoverability**: The code is immediately understandable to any PowerShell user.
+2. **Future-proofing**: Changes to parameter sets in underlying cmdlets cannot break the script due to positional or partial-name matching.
+3. **Syntax highlighting**: Full names trigger proper IDE and GitHub syntax coloring.
+
+### Return Semantics — Rationale for Explicit Return
+
+The explicit `return` pattern creates a **C-style error code contract** that is immediately familiar to systems programmers:
+
+1. **Determinism** — only the status code is returned
+2. **No pipeline pollution** — prevents accidental object emission
+3. **v1.0 compatibility** — `return` works identically in all versions
+4. **Caller control** — status code can be stored, tested, or ignored
+
+### Pipeline Behavior — Design Rationale
+
+In v1.0-targeted functions, pipeline input is deliberately disabled. This is **not a limitation** but a **design requirement** for:
+
+- **Deterministic ordering** — processes one input at a time
+- **Stateful operations** — requires full control over input sequence
+- **v1.0 compatibility** — pipeline binding attributes require v2.0+
+
+### File Writeability Testing — Approach Selection Guidance
+
+#### Prefer the `.NET` Approach (`Test-FileWriteability`) When
+
+- Script performs mission-critical operations or where strict error control/avoidance is paramount
+- Script runs unattended (scheduled tasks, automation pipelines)
+- Script is part of a larger module or library where consistency matters, or where the script/library has to be runnable on PowerShell v1.0 without throwing a parser error
+- Detailed error capture is needed (e.g., populating a reference to an ErrorRecord for logging)
+- Script size is not a concern
+
+#### Prefer the `try/catch` Approach When
+
+- Script is a simple, single-purpose utility
+- Script runs interactively where users can see and respond to errors
+- The typical user is PowerShell-savvy
+- Script is distributed to others who may need to read/modify it
+- Minimizing script size is important
+
+### OS Compatibility — Extended Examples and Rationale
+
+#### When OS Checks Are Required
+
+- Scripts that use Windows-only APIs or cmdlets (e.g., `Get-WmiObject`, `Get-CimInstance` for certain classes)
+- Scripts that interact with Linux-specific paths or commands (e.g., `/etc/`, `apt-get`)
+- Scripts that use macOS-specific frameworks or file locations
+- Any script that cannot function correctly on all platforms
+
+#### When OS Checks MAY Not Be Required
+
+- Scripts that use only cross-platform PowerShell features
+- Scripts that gracefully degrade functionality based on available cmdlets/modules
+- Scripts explicitly documented as single-platform with clear naming (though checks are still recommended)
+
+#### Rationale for Dedicated OS Detection Functions
+
+The `$IsWindows`, `$IsMacOS`, and `$IsLinux` variables were introduced in PowerShell Core 6.0. Attempting to reference these variables in PowerShell 1.0-5.1 results in a `$null` value, which can lead to incorrect behavior (e.g., `-not $IsWindows` evaluates to `$true` on Windows PowerShell 5.1, incorrectly suggesting the script is not on Windows).
+
+The `Test-Windows`, `Test-macOS`, and `Test-Linux` functions from the PowerShell_Resources repository provide safe, reliable OS detection that works identically across all PowerShell versions from 1.0 onward.
+
+### Output Formatting — Extended Material
+
+#### Host Stream Rationale
+
+No output goes to the host console because:
+
+- **Pipeline safety** — prevents data leakage
+- **Script compatibility** — silent operation in automation
+- **v1.0 compliance** — avoids v2.0+ stream features
+
+#### Warning Stream Details
+
+`Write-Warning` serves as a diagnostic beacon for logically impossible states. Warnings are:
+
+- **Non-terminating** — do not halt execution
+- **Actionable** — include exact values and context
+- **Production-safe** — visible only with `-WarningAction` or `$WarningPreference`
+
+These warnings are never suppressed and serve as diagnostic information for root cause analysis.
+
+### Sensitive Data in Verbose and Debug Streams — Extended Examples
+
+Additional compliant examples for logging sensitive data safely:
+
+```powershell
+# Compliant - logs the value's type name with a null-safe fallback
+$strPrincipalKeyTypeName = if ($null -ne $PrincipalKey) { $PrincipalKey.GetType().Name } else { '<null>' }
+Write-Debug -Message ('PrincipalKey type: {0}' -f $strPrincipalKeyTypeName)
+
+# Compliant - logs non-sensitive metadata (string length) with a type-safe fallback
+$strPrincipalKeyLength = if ($PrincipalKey -is [string]) { [string]$PrincipalKey.Length } else { '<n/a>' }
+Write-Verbose -Message ('PrincipalKey length: {0}' -f $strPrincipalKeyLength)
+```
+
+### ArrayList Migration Note
+
+Legacy code that uses `System.Collections.ArrayList` **SHOULD** be refactored to use `System.Collections.Generic.List[T]` with the appropriate type parameter when the code is next modified. Replace `New-Object System.Collections.ArrayList` with `New-Object System.Collections.Generic.List[PSCustomObject]` (or the appropriate type), and verify that all `.Add()` calls and downstream consumers are compatible with the typed list.
