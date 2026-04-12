@@ -815,17 +815,7 @@ The non-compliant form renders bare prose that (a) is not valid PowerShell, (b) 
 
 ### Help Content Quality: High Standards
 
-The documentation exceeds minimal compliance and achieves **comprehensive completeness**:
-
-1. **Behavioral Contracts**: Every possible return code is documented with **exact meaning**, **resulting state**, and **example**.
-2. **Edge Case Coverage**: Examples include:
-   - Valid input
-   - Invalid segments
-   - Overflow conditions
-   - Excess parts
-3. **State Transparency**: Shows **exact contents** of output variables after execution.
-4. **Positional Parameter Support**: `.NOTES` explicitly documents positional ordering for v1.0 compatibility.
-5. **Versioning**: Includes internal version in `.NOTES` for change tracking.
+Comprehensive help also demonstrates **State Transparency**: showing **exact contents** of output variables after execution, so callers know precisely what to expect.
 
 1. **Behavioral Contracts**: Every possible return code documented with **exact meaning** and **example**.
 2. **Edge Case Coverage**: Examples include valid input, invalid segments, overflow conditions, excess parts.
@@ -835,12 +825,6 @@ The documentation exceeds minimal compliance and achieves **comprehensive comple
 ---
 
 ### Inline Comments: Purpose and Placement
-
-Inline comments are **sparse but surgical**, focusing exclusively on **"why"** rather than **"what"**. They are:
-
-- **Aligned** with at least two spaces from code
-- **Grouped** logically (e.g., before error-handling setup)
-- **Used only when behavior is non-obvious**
 
 **Examples**:
 
@@ -1174,13 +1158,6 @@ For `Test-*` functions that might encounter meaningful errors (e.g., access deni
 ---
 
 ### Input/Output Contract: Reference Parameters
-
-All **structured data** is returned via **`[ref]` parameters** only when write-back to the caller is required:
-
-```powershell
-[ref]$ReferenceToResultObject        → [object]
-[ref]$ReferenceArrayOfExtraStrings → [string[]]
-```
 
 **Advantages**:
 
