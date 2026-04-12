@@ -389,7 +389,7 @@ Use the `Test` verb.
 | --- | --- |
 | `Debug` (`db`) | Diagnose |
 | `Measure` (`ms`) | Calculate, Determine, Analyze |
-| `Ping` (`pi`) | Deprecated — use `Test` |
+| `Ping` (`pi`) — *deprecated; use `Test`* | |
 | `Repair` (`rp`) | Fix, Restore |
 | `Resolve` (`rv`) | Expand, Determine |
 | `Test` (`t`) | Diagnose, Analyze, Salvage, Verify |
@@ -401,11 +401,11 @@ Use the `Test` verb.
 | --- | --- |
 | `Approve` (`ap`) | |
 | `Assert` (`as`) | Certify |
-| `Build` (`bd`) | *(PS 6+)* |
+| `Build` (`bd`) — *PS 6+* | |
 | `Complete` (`cp`) | |
 | `Confirm` (`cn`) | Acknowledge, Agree, Certify, Validate, Verify |
 | `Deny` (`dn`) | Block, Object, Refuse, Reject |
-| `Deploy` (`dp`) | *(PS 6+)* |
+| `Deploy` (`dp`) — *PS 6+* | |
 | `Disable` (`d`) | Halt, Hide |
 | `Enable` (`e`) | Start, Begin |
 | `Install` (`is`) | Setup |
@@ -1361,7 +1361,7 @@ Scripts that write output to files **MUST** verify the destination path is writa
 1. **`.NET` approach** (`Test-FileWriteability`): Comprehensive, uses .NET file operations. **MUST** be used for v1.0-targeted scripts (since `try/catch` causes parser errors in v1.0).
 2. **`try/catch` approach**: Shorter (~10 lines), requires PowerShell v2.0+.
 
-Both use a **create-then-delete pattern**. The delete step is critical because `Remove-Item` reliably fails if the file is locked.
+Both use a **create-then-delete pattern**. The delete step catches additional failure modes (e.g., file locks on Windows) that file creation alone may miss.
 
 **[v1.0]** scripts **MUST** use the `.NET` approach. **[Modern]** scripts **MAY** use either approach.
 
