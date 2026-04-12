@@ -7,10 +7,14 @@ This companion document preserves the extended rationale, design philosophy, and
 - [Executive Summary: Author Profile](#executive-summary-author-profile)
 - [Naming Rationale](#naming-rationale)
   - [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
+  - [Module Naming: Noun-Based Containers](#module-naming-noun-based-containers)
+  - [Local Variable Naming: Defensive Design Philosophy](#local-variable-naming-defensive-design-philosophy)
   - [Options for Local Variable Prefixes: Analysis](#options-for-local-variable-prefixes-analysis)
   - [Summary: Naming as Defensive Architecture](#summary-naming-as-defensive-architecture)
 - [Documentation Rationale](#documentation-rationale)
   - [Overview of Documentation Philosophy](#overview-of-documentation-philosophy)
+  - [Parameter Documentation Placement: Strategic Choice](#parameter-documentation-placement-strategic-choice)
+  - [Help Format Options: Comparison](#help-format-options-comparison)
   - [Summary: Documentation as Complete Specification](#summary-documentation-as-complete-specification)
 - [Function Design Rationale](#function-design-rationale)
   - [Overview of Function Architecture](#overview-of-function-architecture)
@@ -23,6 +27,8 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Summary: Error Handling as Diagnostic Instrumentation](#summary-error-handling-as-diagnostic-instrumentation)
 - [Language Interop Rationale](#language-interop-rationale)
   - [Executive Summary: Interop and Versioning Strategy](#executive-summary-interop-and-versioning-strategy)
+  - [Type Conversion Safety Chain](#type-conversion-safety-chain)
+  - [Version-Aware Fallback Logic](#version-aware-fallback-logic)
   - [Modernization Path (v2.0+)](#modernization-path-v20)
   - [Summary: Interop as Adaptive Resilience](#summary-interop-as-adaptive-resilience)
 - [Output and Streams Rationale](#output-and-streams-rationale)
@@ -70,6 +76,26 @@ This consistent application creates a visual hierarchy that allows rapid compreh
 
 ---
 
+### Module Naming: Noun-Based Containers
+
+> For the module naming rules, see [Module Naming: Noun-Based Containers](STYLE_GUIDE.md#module-naming-noun-based-containers) in the main guide.
+
+In the .NET Framework design philosophy, a **Verb-Noun** phrase represents an executable *method* or *command* (an action). A **Noun** represents the *class*, *library*, or *tool* that contains those capabilities (the container). Naming a module using a Verb-Noun pattern (e.g., `FlattenObject`) blurs this distinction and creates cognitive dissonance, leading users to falsely expect a command named `Flatten-Object` to exist.
+
+By naming the module `ObjectFlattener` (the tool) and the function `ConvertTo-FlatObject` (the action), the architecture remains semantically pure and aligned with Microsoft’s own structural standards (e.g., the module `Microsoft.Graph` contains the command `Get-MgUser`).
+
+The discoverability strategy relies on the **Module Manifest (`.psd1`)** rather than compromising the architectural name. The `Tags` key in the manifest handles keyword searching, keeping the module name pure while ensuring findability during searches.
+
+---
+
+### Local Variable Naming: Defensive Design Philosophy
+
+> For the local variable naming rules, see [Local Variable Naming: Type-Prefixed camelCase](STYLE_GUIDE.md#local-variable-naming-type-prefixed-camelcase) in the main guide.
+
+While some modern styles discourage type prefixes on local variables, in this context they represent **defensive programming**—a hallmark of the robustness philosophy that applies to all scripts regardless of target PowerShell version.
+
+---
+
 ### Options for Local Variable Prefixes: Analysis
 
 > For the required prefix list, see [Local Variable Naming: Type-Prefixed camelCase](STYLE_GUIDE.md#local-variable-naming-type-prefixed-camelcase) in the main guide.
@@ -111,6 +137,49 @@ Every function—**including nested private helpers**—receives **identical tre
 1. **End users** (via `Get-Help`)
 2. **Script maintainers** (via inline context)
 3. **Code reviewers** (via complete behavioral contracts)
+
+---
+
+### Parameter Documentation Placement: Strategic Choice
+
+> For the parameter documentation rule, see [Parameter Documentation Placement: Strategic Choice](STYLE_GUIDE.md#parameter-documentation-placement-strategic-choice) in the main guide.
+
+The rationale for centralizing parameter help in the comment-based help block:
+
+- **Single source of truth** → reduces maintenance drift
+- **v1.0 compatibility** → avoids v2.0+ parameter attributes
+- **Clarity in examples** → full context in one place
+
+**Alternative considered (but not used)**: Inline comments above each parameter:
+
+```powershell
+param (
+    # Reference to store the result object
+    [ref]$ReferenceToResultObject,
+    # Array to store extra strings
+    [ref]$ReferenceArrayOfExtraStrings
+)
+```
+
+- **Pros**: Immediate proximity
+- **Cons**: Risk of desync, visual noise
+
+The choice prioritizes **consistency and maintainability**.
+
+---
+
+### Help Format Options: Comparison
+
+> For the help format rule and v1.0 compatibility warning, see [Help Format Options: Comparison](STYLE_GUIDE.md#help-format-options-comparison) in the main guide.
+
+The author uses **single-line comments** (`# .SECTION`) rather than **block comments** (`<# ... #>`).
+
+| Format | Pros | Cons |
+| --- | --- | --- |
+| **Single-line (`#`)** | • Granular editing • Clear in diff tools • No escaping issues • Works in **all** PowerShell versions including v1.0 | • More vertical space • Slightly more typing |
+| **Block (`<# ... #>`)** | • Compact • Modern aesthetic | • **Not supported in PowerShell v1.0** (causes parser error) • Harder to edit individual lines • Risk of malformed blocks |
+
+**Finding**: Only **single-line comments** (`#`) are compatible with PowerShell v1.0. Block comments (`<# ... #>`) are valid in PowerShell v2.0+ and are discoverable by `Get-Help` in those versions, but they **MUST NOT** be used when v1.0 compatibility is required. The single-line format is **required** for the v1.0 compatibility goal.
 
 ---
 
@@ -269,6 +338,51 @@ The author employs a **sophisticated, version-aware interoperability layer** tha
 5. **Explicit .NET interop** with full documentation of rationale
 
 The strategy transforms potentially version-breaking operations (e.g., handling large numbers) into **resilient, self-adapting code** that works identically whether running on PowerShell 1.0, 3.0, or 7.x. In scripts with dependencies requiring newer PowerShell, version detection is minimized or omitted in favor of assuming the required features.
+
+---
+
+### Type Conversion Safety Chain
+
+> For .NET interop patterns, see [.NET Interop Patterns: Safe and Documented](STYLE_GUIDE.md#net-interop-patterns-safe-and-documented) in the main guide.
+
+The author implements a **defense-in-depth conversion chain** for numeric strings:
+
+```powershell
+# 1. Try int32 (safe, fast)
+# 2. If overflow → try int64
+# 3. If still overflow and PS v3+ → try BigInteger
+# 4. If still overflow or PS v1.0 → try double
+# 5. If all fail → treat as non-numeric
+```
+
+Each step uses the **atomic error handling pattern** (trap + preference toggle + reference comparison) to:
+
+- Attempt conversion
+- Detect failure
+- Preserve original error
+- Return `$false` without throwing
+
+---
+
+### Version-Aware Fallback Logic
+
+> For version detection, see [Runtime Version Detection: `Get-PSVersion`](STYLE_GUIDE.md#runtime-version-detection-get-psversion) in the main guide.
+
+Functions use version detection to **bypass expensive checks** when possible:
+
+```powershell
+if ($PSVersion -eq ([version]'0.0')) {
+    $versionPowerShell = Get-PSVersion  # Detect if not provided
+} else {
+    $versionPowerShell = $PSVersion     # Use caller-provided value
+}
+```
+
+**Benefits**:
+
+- **Performance optimization** → skip version detection if caller knows runtime
+- **Flexibility** → supports both interactive and scripted use
+- **Defensive programming** → default case handles unexpected input
 
 ---
 

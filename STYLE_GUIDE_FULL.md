@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.1.20260412.0
+**Version:** 2.2.20260412.0
 
 ## Metadata
 
@@ -55,8 +55,8 @@ This checklist provides a quick reference for both human developers and LLMs (li
 
 ### Capitalization and Naming Conventions (Quick Reference)
 
-- **[All]** Public identifiers (functions, parameters, properties) **MUST** use PascalCase → [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
-- **[All]** PowerShell keywords (function, param, if, else, return, trap) **MUST** be lowercase → [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
+- **[All]** Public identifiers (functions, parameters, properties) **MUST** use PascalCase → [Capitalization and Naming Conventions](#capitalization-and-naming-conventions)
+- **[All]** PowerShell keywords (function, param, if, else, return, trap) **MUST** be lowercase → [Capitalization and Naming Conventions](#capitalization-and-naming-conventions)
 - **[All]** Local variables **MUST** use camelCase with type-hinting prefixes, fully descriptive (e.g., $strMessage, $intCount, no abbreviations) → [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase)
 - **[All]** Functions **MUST** follow Verb-Noun pattern with approved verbs → [Script and Function Naming: Full Explicit Form](#script-and-function-naming-full-explicit-form)
 - **[All]** Functions **MUST** use singular nouns in function names → [Script and Function Naming: Nouns](#script-and-function-naming-nouns)
@@ -100,7 +100,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[v1.0]** Functions **MUST** return single integer status code (0=success, 1-5=partial, -1=failure) → [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes)
 - **[v1.0]** Exception: Test-* functions **MAY** return Boolean when no practical error handling needed → [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes)
 - **[v1.0]** Positional parameters **SHOULD** be supported for v1.0 usability → [Positional Parameter Support](#positional-parameter-support)
-- **[v1.0]** v1.0-targeted functions **MUST** use trap-based error handling (not try/catch) → [Overview of Function Architecture](#overview-of-function-architecture)
+- **[v1.0]** v1.0-targeted functions **MUST** use trap-based error handling (not try/catch) → [Core Error Suppression Mechanism](#core-error-suppression-mechanism)
 - **[Modern]** Modern functions and scripts **MUST** use [CmdletBinding()] attribute → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
 - **[Modern]** Modern functions and scripts **MUST** use [OutputType()] declaring singular primary type → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
 - **[Modern]** Modern functions and scripts **MUST** use streaming output (write objects directly to pipeline in loop) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
@@ -110,7 +110,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[Modern]** [Parameter(Mandatory=$true)] **SHOULD** be used only when function cannot work without value → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
 - **[Modern]** [ValidateNotNullOrEmpty()] **SHOULD** be used for optional-but-not-empty parameters and for mandatory [string] parameters whose logic depends on a non-empty value → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
 - **[Modern]** Multiple [OutputType()] **SHOULD** only be used for intentionally polymorphic returns → ["Modern Advanced" Functions/Scripts: Handling Multiple or Dynamic Output Types](#modern-advanced-functionsscripts-handling-multiple-or-dynamic-output-types)
-- **[All]** Functions **MUST** be atomic, reusable tools with single purpose → [Overview of Function Architecture](#overview-of-function-architecture)
+- **[All]** Functions **MUST** be atomic, reusable tools with single purpose → [Function Declaration and Structure](#function-declaration-and-structure)
 - **[All]** Polymorphic parameters (multiple incompatible types) **SHOULD** be left un-typed or [object] → [Parameter Block Design: Detailed Analysis](#parameter-block-design-detailed-analysis)
 - **[All]** [ref] **MUST** be used exclusively for output requiring write-back to caller scope → [Input/Output Contract: Reference Parameters](#inputoutput-contract-reference-parameters)
 - **[All]** [ref] **MUST NOT** be used for complex objects that don't need modification → [Input/Output Contract: Reference Parameters](#inputoutput-contract-reference-parameters)
@@ -583,18 +583,16 @@ PowerShell uses the `System.Management.Automation.VerbsOther` class to define ca
 
 ### Module Naming: Noun-Based Containers
 
+In the .NET Framework design philosophy, a **Verb-Noun** phrase represents an executable *method* or *command* (an action). A **Noun** represents the *class*, *library*, or *tool* that contains those capabilities (the container). Naming a module using a Verb-Noun pattern (e.g., `FlattenObject`) blurs this distinction and creates cognitive dissonance, leading users to falsely expect a command named `Flatten-Object` to exist.
+
+By naming the module `ObjectFlattener` (the tool) and the function `ConvertTo-FlatObject` (the action), the architecture remains semantically pure and aligned with Microsoft’s own structural standards (e.g., the module `Microsoft.Graph` contains the command `Get-MgUser`).
+
+The discoverability strategy relies on the **Module Manifest (`.psd1`)** rather than compromising the architectural name. The `Tags` key in the manifest handles keyword searching, keeping the module name pure while ensuring findability during searches.
+
 **Modules are treated as .NET Namespaces or Class Libraries (Containers), not Actions.** Therefore, Module names **MUST** be **PascalCase Nouns** or **Noun Phrases**.
 
 - **Correct:** `ObjectFlattener`, `NetworkManager`, `DataParser`
 - **Incorrect:** `FlattenObject`, `ManageNetwork`, `ParseData`
-
-**Rationale:**
-
-In the .NET Framework design philosophy, a **Verb-Noun** phrase represents an executable *method* or *command* (an action). A **Noun** represents the *class*, *library*, or *tool* that contains those capabilities (the container). Naming a module using a Verb-Noun pattern (e.g., `FlattenObject`) blurs this distinction and creates cognitive dissonance, leading users to falsely expect a command named `Flatten-Object` to exist.
-
-By naming the module `ObjectFlattener` (the tool) and the function `ConvertTo-FlatObject` (the action), the architecture remains semantically pure and aligned with Microsoft's own structural standards (e.g., the module `Microsoft.Graph` contains the command `Get-MgUser`).
-
-**Discoverability Strategy:**
 
 Module names **MUST NOT** be compromised for the sake of keyword searching. Instead, rely on the **Module Manifest (`.psd1`)** to handle discoverability. The `Tags` key in the manifest **MUST** be populated aggressively with relevant keywords (including verbs) to ensure the module is found during searches, while keeping the architectural name pure.
 
@@ -653,7 +651,9 @@ This prefixing is **not** a legacy artifact but a **deliberate design decision**
 - **Reduces cognitive load** when reading code without IntelliSense.
 - **Prevents accidental type mismatches** in complex logic flows.
 
-While some modern styles discourage such prefixes, in this context they represent **defensive programming**—a hallmark of the author’s robustness philosophy that applies to all scripts regardless of target PowerShell version.
+### Local Variable Naming: Defensive Design Philosophy
+
+While some modern styles discourage type prefixes on local variables, in this context they represent **defensive programming**—a hallmark of the robustness philosophy that applies to all scripts regardless of target PowerShell version.
 
 ### Path and Scope Handling
 
@@ -668,7 +668,7 @@ Instead, **explicit scoping** **SHOULD** be used:
 $global:ErrorActionPreference
 ```
 
-For shared state, the author would use:
+For shared state, use:
 
 - `$Script:varName` for module/script-level variables
 - `$Global:varName` for session-wide state
@@ -729,8 +729,6 @@ Every function—**including nested private helpers**—receives **identical tre
 1. **End users** (via `Get-Help`)
 2. **Script maintainers** (via inline context)
 3. **Code reviewers** (via complete behavioral contracts)
-
----
 
 ### Comment-Based Help: Structure and Format
 
@@ -952,9 +950,7 @@ This example assumes that the current date is December 30, 2025. In any code you
 
 ### Parameter Documentation Placement: Strategic Choice
 
-Parameter help is **centralized in the comment-based help block**, not duplicated above individual parameters in the `param` block.
-
-**Rationale**:
+The rationale for centralizing parameter help in the comment-based help block:
 
 - **Single source of truth** → reduces maintenance drift
 - **v1.0 compatibility** → avoids v2.0+ parameter attributes
@@ -974,7 +970,9 @@ param (
 - **Pros**: Immediate proximity
 - **Cons**: Risk of desync, visual noise
 
-The author’s choice prioritizes **consistency and maintainability**.
+The choice prioritizes **consistency and maintainability**.
+
+Parameter help **SHOULD** be centralized in the comment-based help block, not duplicated above individual parameters in the `param` block.
 
 ---
 
@@ -987,9 +985,11 @@ The author uses **single-line comments** (`# .SECTION`) rather than **block comm
 | **Single-line (`#`)** | • Granular editing • Clear in diff tools • No escaping issues • Works in **all** PowerShell versions including v1.0 | • More vertical space • Slightly more typing |
 | **Block (`<# ... #>`)** | • Compact • Modern aesthetic | • **Not supported in PowerShell v1.0** (causes parser error) • Harder to edit individual lines • Risk of malformed blocks |
 
-> **⚠ PowerShell v1.0 Compatibility Warning:** Block comments (`<# ... #>`) were introduced in PowerShell v2.0. In PowerShell v1.0, attempting to use block comments results in a **parser error** that prevents the script from running. Scripts targeting v1.0 compatibility **MUST** use only single-line comments (`#`). This applies to both comment-based help and general-purpose comments.
+**Finding**: Only **single-line comments** (`#`) are compatible with PowerShell v1.0. Block comments (`<# ... #>`) are valid in PowerShell v2.0+ and are discoverable by `Get-Help` in those versions, but they **MUST NOT** be used when v1.0 compatibility is required. The single-line format is **required** for the v1.0 compatibility goal.
 
-**Finding**: Only **single-line comments** (`#`) are compatible with PowerShell v1.0. Block comments (`<# ... #>`) are valid in PowerShell v2.0+ and are discoverable by `Get-Help` in those versions, but they **MUST NOT** be used when v1.0 compatibility is required. The author’s choice of single-line format is **required** for the v1.0 compatibility goal.
+Comment-based help **MUST** use single-line comments (`#`) for v1.0-compatible code. Block comments (`<# ... #>`) **MUST NOT** be used when v1.0 compatibility is required.
+
+> **⚠ PowerShell v1.0 Compatibility Warning:** Block comments (`<# ... #>`) were introduced in PowerShell v2.0. In PowerShell v1.0, attempting to use block comments results in a **parser error** that prevents the script from running. Scripts targeting v1.0 compatibility **MUST** use only single-line comments (`#`). This applies to both comment-based help and general-purpose comments.
 
 **Example — what fails in PowerShell v1.0:**
 
@@ -1054,8 +1054,6 @@ Instead, the author relies on **v1.0-native constructs**:
 - Reference parameters (`[ref]`) for outputs that need to modify caller variables
 
 This creates a **C-style procedural model** within PowerShell, prioritizing **control flow predictability** over pipeline composability.
-
----
 
 ### Function Declaration and Structure
 
@@ -1280,8 +1278,6 @@ In v1.0 scripts, the author **emulates modern features** using v1.0 constructs:
 | `[OutputType()]` | Documented in `.OUTPUTS` |
 | Parameter validation | Strong typing + manual checks |
 
----
-
 ### Options for Return Mechanism: Comparison
 
 The use of explicit `return` vs. implicit output represents a **philosophical choice**:
@@ -1292,8 +1288,6 @@ The use of explicit `return` vs. implicit output represents a **philosophical ch
 | **Implicit output (modern)** | • Pipeline composable • Concise | • Risk of extra objects • Requires v2.0+ for safety |
 
 **Conclusion**: The explicit `return` pattern is **correct and optimal** for v1.0-targeted, non-pipeline tools.
-
----
 
 ### Rule: "Modern Advanced" Function/Script Requirements (v2.0+)
 
@@ -1480,8 +1474,6 @@ The author implements a **complete, v1.0-native error handling system** in compa
 
 The system is **atomic**—each error-prone operation is isolated, measured, and reported independently. This creates a **diagnostic breadcrumb trail** that enables root cause analysis even in production environments where verbose output is disabled. In scripts requiring modern PowerShell (e.g., due to module dependencies), the author switches to try/catch and other structured mechanisms for improved readability and functionality.
 
----
-
 ### Core Error Suppression Mechanism
 
 v1.0-targeted functions **MUST** use **two complementary v1.0-native suppression techniques**:
@@ -1610,8 +1602,6 @@ if ($errorOccurred) {
 | Anomaly reporting | `Write-Warning` | `Write-Warning` (same) |
 
 The v1.0 pattern is **functionally equivalent** but **more verbose** and **duplicate-prone**.
-
----
 
 ### Modern `catch` Block Requirements
 
@@ -2172,8 +2162,6 @@ The author employs a **sophisticated, version-aware interoperability layer** tha
 
 The strategy transforms potentially version-breaking operations (e.g., handling large numbers) into **resilient, self-adapting code** that works identically whether running on PowerShell 1.0, 3.0, or 7.x. In scripts with dependencies requiring newer PowerShell, version detection is minimized or omitted in favor of assuming the required features.
 
----
-
 ### Runtime Version Detection: `Get-PSVersion`
 
 The author implements a **dedicated version probe** that returns a `[System.Version]` object representing the executing PowerShell runtime:
@@ -2304,8 +2292,6 @@ Each step uses the **atomic error handling pattern** (trap + preference toggle +
 - Preserve original error
 - Return `$false` without throwing
 
----
-
 ### Version-Aware Fallback Logic
 
 Functions use version detection to **bypass expensive checks** when possible:
@@ -2323,53 +2309,6 @@ if ($PSVersion -eq ([version]'0.0')) {
 - **Performance optimization** → skip version detection if caller knows runtime
 - **Flexibility** → supports both interactive and scripted use
 - **Defensive programming** → default case handles unexpected input
-
----
-
-### Path and Scope Handling: Explicit and Provider-Agnostic
-
-The author **avoids all relative path notation** and the `~` shortcut:
-
-| Avoided | Reason |
-| --- | --- |
-| `.\file.txt` | Depends on `[Environment]::CurrentDirectory` |
-| `..\parent` | Same issue |
-| `~` | Behavior varies by provider (FileSystem vs. Registry) |
-
-**Preferred pattern**:
-
-```powershell
-$global:ErrorActionPreference = 'SilentlyContinue'
-```
-
-For file paths, the author would use:
-
-- **Absolute paths** via `$PSScriptRoot` (in modules)
-- **Explicit provider qualifiers** (e.g., `FileSystem::C:\path`)
-- **Join-Path** with validated roots
-
-> **Note:** The guidance to avoid relative paths targets bare `.` / `..` paths
-> that depend on `[Environment]::CurrentDirectory` or `$PWD`. Paths anchored to
-> `$PSScriptRoot` — such as `"$PSScriptRoot/../config.json"` or
-> `Join-Path -Path $PSScriptRoot -ChildPath '../src/Helper.ps1'` — are
-> **deterministic** because they resolve relative to the executing script's
-> directory, not the process working directory.
-
-**Non-compliant** (CWD-dependent):
-
-```powershell
-# Bad — result changes depending on where the caller invoked the script:
-Get-Content -Path '../config.json'
-```
-
-**Compliant** (`$PSScriptRoot`-anchored):
-
-```powershell
-# Good — always resolves relative to the script's own directory:
-Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath '../config.json')
-```
-
----
 
 ### .NET Type Usage Summary
 
@@ -2392,8 +2331,6 @@ If v1.0 compatibility were not required, the author would likely:
 2. **Use `[bigint]` PSCustomObject** instead of `BigInteger` (PS v7+)
 3. **Leverage `-split` operator** with `[regex]::Escape()` for literal splits
 4. **Add `[ValidateScript()]` attributes** for input validation
-
----
 
 ### Summary: Interop as Adaptive Resilience
 
@@ -2427,8 +2364,6 @@ All output follows **three key principles**:
 3. **No host pollution** — no output appears unless explicitly requested
 
 This creates a **predictable, composable, and debuggable** interface that works identically whether the function is called interactively, from a script, or within a larger pipeline. In modern-dependent scripts, additional streams like Verbose or Debug are used as needed.
-
----
 
 ### Primary Output: Integer Status Code via `return`
 
@@ -2618,8 +2553,6 @@ While not implemented in this v1.0 script, the author's design **anticipates** t
 - **Display decoupled** — formatting is external
 - **Pipeline-safe** — formatting applied only at display time
 
----
-
 ### Stream Interaction Matrix
 
 | Caller Context | Success Stream | Warning Stream | Host Stream |
@@ -2652,8 +2585,6 @@ process {
 - **Progress** → long-running operations (not applicable here)
 
 But in **v1.0**, these are **deliberately omitted** — not due to ignorance, but **design constraint**.
-
----
 
 ### Summary: Output as Controlled Interface
 
@@ -3072,8 +3003,6 @@ The author operates under **three immutable design pillars** that govern every d
 
 These constraints create a **highly constrained optimization space** where performance, security, and maintainability are balanced against **absolute portability**. The result is a **lean, defensive, and self-documenting** implementation that sacrifices micro-optimizations for **macro-reliability**. In dependency-constrained scripts, these pillars adapt to include modern optimizations.
 
----
-
 ### Performance: Measured Pragmatism
 
 The author adopts a **"measure, then optimize"** philosophy, but within v1.0 constraints, **measurement is limited**. No `Measure-Command` or profiling cmdlets exist in v1.0, so performance decisions are based on **algorithmic complexity analysis** and **known PowerShell behavioral characteristics**.
@@ -3120,8 +3049,6 @@ The author adopts a **"measure, then optimize"** philosophy, but within v1.0 con
 
 **Conclusion**: Performance is **bounded, predictable, and appropriate** for typical use cases. No premature optimization occurs.
 
----
-
 ### Security: Defense-in-Depth by Design
 
 The function processes **untrusted inputs** (e.g., from external sources). The security model is **input-agnostic and side-effect-free**.
@@ -3155,8 +3082,6 @@ While not present, the author's pattern suggests future security handling would 
 With **SecureString** and **never** clear-text storage.
 
 **Design consideration**: The function is **security-neutral** — it neither introduces nor mitigates external risks, but **cannot be exploited** due to its isolated, pure-function design.
-
----
 
 ### Other: Maintainability, Extensibility, and Modernization
 
@@ -3203,8 +3128,6 @@ process {
 - `-Verbose`/`-Debug` support
 
 **Trade-off**: Breaks v1.0 compatibility
-
----
 
 ### Summary: Performance, Security, and Holistic Design
 
