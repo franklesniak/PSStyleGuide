@@ -334,6 +334,14 @@ function New-StyleGuideFullVersion {
                 continue
             }
 
+            # Handle ToC comment anchors for FULL version. These restore ToC
+            # entries for sections that only exist in STYLE_GUIDE_FULL.md (via
+            # rationale-anchor restoration). The comment is replaced by its content.
+            if ($strLine -match '^\s*<!--\s*rationale-toc:\s*(.+?)\s*-->\s*$') {
+                $arrOutputLines.Add($Matches[1].Trim())
+                continue
+            }
+
             # Handle HTML comment anchors for rationale insertion.
             # These replace removed stub headings and are invisible in rendered
             # markdown. The full version restores the heading and rationale body.

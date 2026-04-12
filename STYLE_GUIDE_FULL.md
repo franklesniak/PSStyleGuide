@@ -13,6 +13,7 @@
 
 - [Keywords](#keywords)
 - [Quick Reference Checklist](#quick-reference-checklist)
+- [Executive Summary: Author Profile](#executive-summary-author-profile)
 - [Code Layout and Formatting](#code-layout-and-formatting)
 - [Capitalization and Naming Conventions](#capitalization-and-naming-conventions)
 - [Documentation and Comments](#documentation-and-comments)
