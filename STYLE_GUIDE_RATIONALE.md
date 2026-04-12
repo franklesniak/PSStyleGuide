@@ -834,7 +834,7 @@ The help block **MUST** be **placed inside the function**, **immediately above t
 | `.PARAMETER` (if the function declares parameters in its `param()` block) | Per-parameter documentation | One block per parameter, even for `[ref]` types |
 | `.EXAMPLE` | Usage demonstration | **Multiple examples** with input, output, and explanation |
 | `.INPUTS` | Pipeline input | Explicitly "None" (correct for non-pipeline design) |
-| `.OUTPUTS` | Return value semantics | Full mapping of integer codes to meanings |
+| `.OUTPUTS` | Return value semantics | Document all outputs; include full mapping for integer status codes when used |
 | `.NOTES` | Additional context | Positional parameters, versioning, design rationale |
 
 > **Note:** If a function declares no parameters in its `param()` block (excluding implicit common parameters), the `.PARAMETER` section is omitted entirely. Do not include an empty or placeholder `.PARAMETER` block.
