@@ -5,7 +5,7 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 2.0.20260412.0
+**Version:** 2.1.20260412.0
 
 ## Metadata
 
@@ -45,7 +45,7 @@ The key words "**MUST**", "**MUST NOT**", "**REQUIRED**", "**SHALL**", "**SHALL 
 
 This checklist provides a quick reference for both human developers and LLMs (like GitHub Copilot) to follow the PowerShell style guidelines. Each item includes a scope tag indicating applicability: **[All]** applies to all PowerShell scripts regardless of target version, **[Modern]** applies only to scripts targeting PowerShell 5.1+ (with .NET Framework 4.6.2+) and PowerShell 7.x+ (requires features not available in v1.0), and **[v1.0]** applies only to scripts that **MUST** be backward compatible with Windows PowerShell v1.0. Each checklist item links to its detailed section for more information. This checklist is intentionally placed within the first 100-200 lines to give LLMs a complete picture of the style guide's requirements early in the document.
 
-### Code Layout and Formatting
+### Code Layout and Formatting (Quick Reference)
 
 - **[All]** Code **MUST** use 4 spaces for indentation, never tabs → [Indentation Rules](#indentation-rules)
 - **[All]** Opening braces **MUST** be placed on same line (OTBS) → [Brace Placement (OTBS)](#brace-placement-otbs)
@@ -58,7 +58,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[All]** Lines **MUST NOT** end with trailing whitespace → [Trailing Whitespace](#trailing-whitespace)
 - **[All]** Variables in strings **SHOULD** be delimited with `${}` or `-f` operator → [Variable Delimiting in Strings](#variable-delimiting-in-strings)
 
-### Capitalization and Naming Conventions
+### Capitalization and Naming Conventions (Quick Reference)
 
 - **[All]** Public identifiers (functions, parameters, properties) **MUST** use PascalCase → [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
 - **[All]** PowerShell keywords (function, param, if, else, return, trap) **MUST** be lowercase → [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
@@ -73,7 +73,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[All]** Code **SHOULD** avoid relative paths and tilde (~) shortcut → [Path and Scope Handling](#path-and-scope-handling)
 - **[All]** Code **SHOULD** use explicit scoping ($global:, $script:) → [Path and Scope Handling](#path-and-scope-handling)
 
-### Documentation and Comments
+### Documentation and Comments (Quick Reference)
 
 - **[All]** All functions **MUST** have full comment-based help → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
 - **[All]** Comment-based help **MUST** be placed inside function body, above param block → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
@@ -92,7 +92,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[All]** Distributable helpers **SHOULD** use per-function licensing (#region License after param block) → [Structural Documentation: Regions and Licensing](#structural-documentation-regions-and-licensing)
 - **[All]** Parameter documentation **SHOULD** be centralized in help block, not above individual parameters → [Parameter Documentation Placement: Strategic Choice](#parameter-documentation-placement-strategic-choice)
 
-### Functions and Parameter Blocks
+### Functions and Parameter Blocks (Quick Reference)
 
 - **[v1.0]** v1.0-targeted functions **MUST NOT** use [CmdletBinding()] attribute → [Function Declaration and Structure](#function-declaration-and-structure)
 - **[v1.0]** v1.0-targeted functions **MUST NOT** use [OutputType()] attribute → [Function Declaration and Structure](#function-declaration-and-structure)
@@ -120,7 +120,7 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[All]** [ref] **MUST** be used exclusively for output requiring write-back to caller scope → [Input/Output Contract: Reference Parameters](#inputoutput-contract-reference-parameters)
 - **[All]** [ref] **MUST NOT** be used for complex objects that don't need modification → [Input/Output Contract: Reference Parameters](#inputoutput-contract-reference-parameters)
 
-### Error Handling
+### Error Handling (Quick Reference)
 
 - **[v1.0]** v1.0-targeted functions **MUST** use trap {} for error suppression → [Core Error Suppression Mechanism](#core-error-suppression-mechanism)
 - **[Modern]** catch blocks **MUST NOT** be empty; default pattern is `Write-Debug` + `throw` → [Modern catch Block Requirements](#modern-catch-block-requirements)
@@ -129,20 +129,20 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[Modern]** Exception wrapping **SHOULD** use `$PSCmdlet.ThrowTerminatingError()` with the original as `InnerException` → [Wrapping Exceptions with `$PSCmdlet.ThrowTerminatingError()`](#wrapping-exceptions-with-pscmdletthrowterminatingerror)
 - **[Modern]** Variables referenced in `finally` that are assigned in `try` **MUST** be initialized before the `try` block → [Set-StrictMode Considerations for finally Blocks](#set-strictmode-considerations-for-finally-blocks)
 
-### File Writeability Testing
+### File Writeability Testing (Quick Reference)
 
 - **[All]** Scripts **MUST** verify file writeability before significant processing when writing output to files → [File Writeability Testing](#file-writeability-testing)
 - **[v1.0]** v1.0-targeted scripts **MUST** use `.NET` approach (`Test-FileWriteability` function) → [Scripts Requiring PowerShell v1.0 Support](#scripts-requiring-powershell-v10-support)
 - **[Modern]** v2.0+ scripts **MAY** use `.NET` or `try/catch` approach based on requirements → [Scripts Requiring PowerShell v2.0+ Support](#scripts-requiring-powershell-v20-support)
 
-### Operating System Compatibility Checks
+### Operating System Compatibility Checks (Quick Reference)
 
 - **[All]** Scripts/functions supporting only specific operating systems **MUST** include OS compatibility checks → [When OS Checks Are Required](#when-os-checks-are-required)
 - **[Modern]** PowerShell Core 6.0+ only scripts **SHOULD** use built-in `$IsWindows`, `$IsMacOS`, `$IsLinux` variables → [PowerShell Core 6.0+ OS Detection](#powershell-core-60-os-detection)
 - **[v1.0]** Scripts supporting older versions **MUST** use `Test-Windows`, `Test-macOS`, `Test-Linux` functions from PowerShell_Resources → [Cross-Version OS Detection](#cross-version-os-detection)
 - **[All]** Wrong OS errors **MUST** be reported consistently with existing error handling patterns → [Error Handling for Wrong OS](#error-handling-for-wrong-os)
 
-### Output Formatting and Streams
+### Output Formatting and Streams (Quick Reference)
 
 - **[Modern]** Modern functions **MUST NOT** collect results in `List<T>` and return; **MUST** stream objects to pipeline → [Processing Collections in Modern Functions (Streaming Output)](#processing-collections-in-modern-functions-streaming-output)
 - **[Modern]** Streaming function calls **SHOULD** be wrapped in @(...) to handle 0-1-Many problem → [Consuming Streaming Functions (The `0-1-Many` Problem)](#consuming-streaming-functions-the-0-1-many-problem)
@@ -151,12 +151,12 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[All]** `Write-Verbose` / `Write-Debug` **MUST NOT** emit raw PII, credentials, tokens, or other sensitive identifiers → [Sensitive Data in Verbose and Debug Streams](#sensitive-data-in-verbose-and-debug-streams)
 - **[Modern]** Hot-path `Write-Verbose` / `Write-Debug` with string formatting **SHOULD** be guarded behind a preference check → [Performance-Sensitive `Write-Verbose` / `Write-Debug` in Hot Paths](#performance-sensitive-write-verbose--write-debug-in-hot-paths)
 
-### Language Interop and .NET
+### Language Interop and .NET (Quick Reference)
 
 - **[All]** `System.Collections.ArrayList` is deprecated and **MUST NOT** be used in new code; use `System.Collections.Generic.List[T]` instead → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
 - **[All]** Generic collections **MUST** provide specific type T (List[PSCustomObject], not List[object]) → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
 
-### Testing
+### Testing (Quick Reference)
 
 - **[All]** New functions **SHOULD** have corresponding Pester tests when testability is a project requirement → [Testing with Pester](#testing-with-pester)
 - **[All]** Test files **MUST** use `*.Tests.ps1` naming convention → [Test File Naming and Location](#test-file-naming-and-location)
