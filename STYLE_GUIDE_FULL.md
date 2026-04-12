@@ -250,7 +250,7 @@ In the non-compliant example, the blank line (line 3) contains spaces, which is 
 
 ### Trailing Whitespace
 
-Trailing whitespace can cause issues with version control systems, some editors, and linters. It also serves no functional purpose and reduces code consistency.
+The prohibition on trailing whitespace is motivated by practical concerns: trailing whitespace can cause issues with version control systems, some editors, and linters. It also serves no functional purpose and reduces code consistency.
 
 **Compliant (no trailing whitespace):**
 
@@ -278,7 +278,7 @@ In the non-compliant example, line 3 would end with trailing spaces after `$Para
 
 ### Variable Delimiting in Strings
 
-Additional compliant alternative:
+In addition to curly braces and the format operator, string concatenation is also an acceptable approach:
 
 - **Compliant (Acceptable):** Use string concatenation.
 
