@@ -337,21 +337,25 @@ function New-StyleGuideFullVersion {
             # Handle HTML comment anchors for rationale insertion.
             # These replace removed stub headings and are invisible in rendered
             # markdown. The full version restores the heading and rationale body.
-            if ($strLine -match '^<!-- rationale-anchor: (.+) -->$') {
+            if ($strLine -match '^\s*<!--\s*rationale-anchor:\s*(.+?)\s*-->\s*$') {
                 $strCommentAnchor = $Matches[1].Trim()
 
-                if ($hashtableCleanSections.ContainsKey($strCommentAnchor)) {
-                    $arrRationaleBody = $hashtableCleanSections[$strCommentAnchor]
+                if (-not $hashtableCleanSections.ContainsKey($strCommentAnchor)) {
+                    throw "Missing rationale section for anchor '$strCommentAnchor' while generating STYLE_GUIDE_FULL.md. The anchor comment would otherwise be dropped silently."
+                }
 
-                    # Restore the original heading from the rationale file
-                    if ($hashtableRationaleHeadings.ContainsKey($strCommentAnchor)) {
-                        $arrOutputLines.Add('')
-                        $arrOutputLines.Add($hashtableRationaleHeadings[$strCommentAnchor])
-                    }
-                    $arrOutputLines.Add('')
-                    foreach ($strRatLine in $arrRationaleBody) {
-                        $arrOutputLines.Add($strRatLine)
-                    }
+                if (-not $hashtableRationaleHeadings.ContainsKey($strCommentAnchor)) {
+                    throw "Missing rationale heading for anchor '$strCommentAnchor' while generating STYLE_GUIDE_FULL.md. The section cannot be restored correctly."
+                }
+
+                $arrRationaleBody = $hashtableCleanSections[$strCommentAnchor]
+
+                # Restore the original heading from the rationale file
+                $arrOutputLines.Add('')
+                $arrOutputLines.Add($hashtableRationaleHeadings[$strCommentAnchor])
+                $arrOutputLines.Add('')
+                foreach ($strRatLine in $arrRationaleBody) {
+                    $arrOutputLines.Add($strRatLine)
                 }
                 continue
             }
