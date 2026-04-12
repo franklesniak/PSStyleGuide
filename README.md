@@ -28,15 +28,14 @@ These files are automatically updated whenever [STYLE_GUIDE.md](STYLE_GUIDE.md) 
 
 The [STYLE_GUIDE.md](STYLE_GUIDE.md) document contains the following sections:
 
-1. [Executive Summary: Author Profile](STYLE_GUIDE.md#executive-summary-author-profile)
-2. [Code Layout and Formatting](STYLE_GUIDE.md#code-layout-and-formatting)
-3. [Capitalization and Naming Conventions](STYLE_GUIDE.md#capitalization-and-naming-conventions)
-4. [Documentation and Comments](STYLE_GUIDE.md#documentation-and-comments)
-5. [Functions and Parameter Blocks](STYLE_GUIDE.md#functions-and-parameter-blocks)
-6. [Error Handling](STYLE_GUIDE.md#error-handling)
-7. [Language Interop, Versioning, and .NET](STYLE_GUIDE.md#language-interop-versioning-and-net)
-8. [Output Formatting and Streams](STYLE_GUIDE.md#output-formatting-and-streams)
-9. [Performance, Security, and Other](STYLE_GUIDE.md#performance-security-and-other)
+1. [Code Layout and Formatting](STYLE_GUIDE.md#code-layout-and-formatting)
+2. [Capitalization and Naming Conventions](STYLE_GUIDE.md#capitalization-and-naming-conventions)
+3. [Documentation and Comments](STYLE_GUIDE.md#documentation-and-comments)
+4. [Functions and Parameter Blocks](STYLE_GUIDE.md#functions-and-parameter-blocks)
+5. [Error Handling](STYLE_GUIDE.md#error-handling)
+6. [Language Interop, Versioning, and .NET](STYLE_GUIDE.md#language-interop-versioning-and-net)
+7. [Output Formatting and Streams](STYLE_GUIDE.md#output-formatting-and-streams)
+8. [Performance, Security, and Other](STYLE_GUIDE.md#performance-security-and-other)
 
 ## 🎯 Goals
 

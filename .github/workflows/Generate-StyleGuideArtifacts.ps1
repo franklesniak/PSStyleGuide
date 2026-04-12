@@ -216,6 +216,7 @@ function New-StyleGuideFullVersion {
         # headers (e.g., "## Naming Rationale") that do not exist in the main guide.
         $arrRationaleLines = $strRationaleContent -split '\r?\n'
         $hashtableSections = @{}
+        $hashtableRationaleHeadings = @{}
         $strCurrentAnchor = $null
         $intCurrentLevel = 0
         $arrCurrentBody = [System.Collections.Generic.List[string]]::new()
@@ -239,6 +240,7 @@ function New-StyleGuideFullVersion {
                     $strCurrentAnchor = $strAnchor
                     $intCurrentLevel = 3
                     $arrCurrentBody = [System.Collections.Generic.List[string]]::new()
+                    $hashtableRationaleHeadings[$strAnchor] = '### ' + $strHeadingText
                 } elseif ($intLevel -eq 2) {
                     # Grouping header — reset tracking but do not collect
                     $strCurrentAnchor = $null
@@ -272,6 +274,7 @@ function New-StyleGuideFullVersion {
             } elseif ($boolInExecutiveSummary -and $strLine -match '^## ') {
                 # Hit the next ## heading, stop collecting
                 $hashtableSections['executive-summary-author-profile'] = $arrCurrentBody.ToArray()
+                $hashtableRationaleHeadings['executive-summary-author-profile'] = '## Executive Summary: Author Profile'
                 $boolInExecutiveSummary = $false
             } elseif ($boolInExecutiveSummary) {
                 $arrCurrentBody.Add($strLine)
@@ -279,6 +282,7 @@ function New-StyleGuideFullVersion {
         }
         if ($boolInExecutiveSummary) {
             $hashtableSections['executive-summary-author-profile'] = $arrCurrentBody.ToArray()
+            $hashtableRationaleHeadings['executive-summary-author-profile'] = '## Executive Summary: Author Profile'
         }
 
         # Clean each section body:
@@ -327,6 +331,28 @@ function New-StyleGuideFullVersion {
 
             # Skip placeholder lines — the rationale content replaces them
             if ($strLine.Trim() -eq $strPlaceholder) {
+                continue
+            }
+
+            # Handle HTML comment anchors for rationale insertion.
+            # These replace removed stub headings and are invisible in rendered
+            # markdown. The full version restores the heading and rationale body.
+            if ($strLine -match '^<!-- rationale-anchor: (.+) -->$') {
+                $strCommentAnchor = $Matches[1].Trim()
+
+                if ($hashtableCleanSections.ContainsKey($strCommentAnchor)) {
+                    $arrRationaleBody = $hashtableCleanSections[$strCommentAnchor]
+
+                    # Restore the original heading from the rationale file
+                    if ($hashtableRationaleHeadings.ContainsKey($strCommentAnchor)) {
+                        $arrOutputLines.Add('')
+                        $arrOutputLines.Add($hashtableRationaleHeadings[$strCommentAnchor])
+                    }
+                    $arrOutputLines.Add('')
+                    foreach ($strRatLine in $arrRationaleBody) {
+                        $arrOutputLines.Add($strRatLine)
+                    }
+                }
                 continue
             }
 
