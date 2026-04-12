@@ -12,15 +12,17 @@ The complete style guide is available in [STYLE_GUIDE.md](STYLE_GUIDE.md). Exten
 
 ### Generated Versions
 
-For convenience, this repository automatically generates three additional versions of the style guide:
+For convenience, this repository automatically generates four additional versions of the style guide:
 
 - **[copilot-instructions.md](copilot-instructions.md)** - For GitHub Copilot custom instructions in repositories that contain exclusively PowerShell code. Copy this file to your repository's `.github` folder as `.github/copilot-instructions.md` to enable Copilot to follow these conventions when generating code across your entire PowerShell project.
 
 - **[powershell.instructions.md](powershell.instructions.md)** - For GitHub Copilot file-specific instructions in repositories with multiple programming languages. This version includes YAML frontmatter that targets only `*.ps1` files. Copy this file to your repository as `.github/instructions/powershell.instructions.md` to enable Copilot to follow these PowerShell conventions specifically for `.ps1` files, allowing you to have different instructions for other file types.
-  
+
 - **[STYLE_GUIDE_CHAT.md](STYLE_GUIDE_CHAT.md)** - Formatted for copy-pasting into interactive chat sessions with LLMs (ChatGPT, Claude, etc.). The content is wrapped in a markdown code fence for easy sharing.
 
-These files are automatically updated whenever [STYLE_GUIDE.md](STYLE_GUIDE.md) changes.
+- **[STYLE_GUIDE_FULL.md](STYLE_GUIDE_FULL.md)** - A merged version combining the actionable rules from [STYLE_GUIDE.md](STYLE_GUIDE.md) with the design rationale from [STYLE_GUIDE_RATIONALE.md](STYLE_GUIDE_RATIONALE.md). This is the comprehensive version intended for human readers who want both the rules and the reasoning behind them in a single document.
+
+These files are automatically updated whenever [STYLE_GUIDE.md](STYLE_GUIDE.md) or [STYLE_GUIDE_RATIONALE.md](STYLE_GUIDE_RATIONALE.md) changes.
 
 ### Table of Contents
 

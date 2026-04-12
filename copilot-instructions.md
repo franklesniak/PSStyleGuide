@@ -26,8 +26,6 @@
 - [Testing with Pester](#testing-with-pester)
 - [Performance, Security, and Other](#performance-security-and-other)
 
-> **Companion Document:** Extended rationale, design philosophy, and historical context are documented in [STYLE_GUIDE_RATIONALE.md](STYLE_GUIDE_RATIONALE.md).
-
 ## Keywords
 
 The key words "**MUST**", "**MUST NOT**", "**REQUIRED**", "**SHALL**", "**SHALL NOT**", "**SHOULD**", "**SHOULD NOT**", "**RECOMMENDED**", "**MAY**", and "**OPTIONAL**" in this document are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119).
@@ -165,8 +163,6 @@ This checklist provides a quick reference for both human developers and LLMs (li
 - **[All]** Test `BeforeAll` dot-sourcing **MUST** use the `Split-Path` + `Join-Path` two-step pattern; multi-segment `Join-Path` forms **MUST NOT** be used → [Test File Dot-Sourcing Pattern](#test-file-dot-sourcing-pattern)
 
 ## Executive Summary: Author Profile
-
-> The extended author profile and design philosophy is documented in [Executive Summary: Author Profile](STYLE_GUIDE_RATIONALE.md#executive-summary-author-profile) in the companion rationale document.
 
 ## Code Layout and Formatting
 
@@ -337,8 +333,6 @@ Capitalization and naming **MUST** follow .NET-inspired conventions for consiste
 Function names **MUST** strictly use the Verb-Noun pattern with approved verbs (e.g., Convert-, Get-, Test-, Split-) and singular nouns, ensuring discoverability and avoiding duplication. Parameters **MUST** be descriptive and PascalCased, with aliases (if any) documented in help. Local variables **MUST** use camelCase with a type-hinting prefix (e.g., $strMessage for strings, $intReturnValue for integers, $boolResult for booleans, $arrElements for arrays). This prefixing is a deliberate choice to make intended types obvious in a dynamically typed language, especially without IDE support—enhancing clarity at the cost of slight verbosity.
 
 ### Overview of Observed Naming Discipline
-
-> The extended naming discipline rationale is documented in [Overview of Observed Naming Discipline](STYLE_GUIDE_RATIONALE.md#overview-of-observed-naming-discipline) in the companion rationale document.
 
 ### Script and Function Naming: Full Explicit Form
 
@@ -687,17 +681,11 @@ Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath '../config.json')
 
 ### Options for Local Variable Prefixes: Analysis
 
-> The comparison of type-prefix vs. plain camelCase approaches is documented in [Options for Local Variable Prefixes: Analysis](STYLE_GUIDE_RATIONALE.md#options-for-local-variable-prefixes-analysis) in the companion rationale document.
-
 ### Summary: Naming as Defensive Architecture
-
-> The extended summary of the naming philosophy is documented in [Summary: Naming as Defensive Architecture](STYLE_GUIDE_RATIONALE.md#summary-naming-as-defensive-architecture) in the companion rationale document.
 
 ## Documentation and Comments
 
 ### Overview of Documentation Philosophy
-
-> The extended documentation philosophy is documented in [Overview of Documentation Philosophy](STYLE_GUIDE_RATIONALE.md#overview-of-documentation-philosophy) in the companion rationale document.
 
 ---
 
@@ -988,13 +976,9 @@ function Get-Example {
 
 ### Summary: Documentation as Complete Specification
 
-> The extended summary of the documentation philosophy is documented in [Summary: Documentation as Complete Specification](STYLE_GUIDE_RATIONALE.md#summary-documentation-as-complete-specification) in the companion rationale document.
-
 ## Functions and Parameter Blocks
 
 ### Overview of Function Architecture
-
-> The extended function architecture philosophy is documented in [Overview of Function Architecture](STYLE_GUIDE_RATIONALE.md#overview-of-function-architecture) in the companion rationale document.
 
 ---
 
@@ -1211,13 +1195,9 @@ Guidance for this format:
 
 ### Advanced Feature Emulation (v1.0-Native)
 
-> The v1.0 feature emulation reference table is documented in [Advanced Feature Emulation (v1.0-Native)](STYLE_GUIDE_RATIONALE.md#advanced-feature-emulation-v10-native) in the companion rationale document.
-
 ---
 
 ### Options for Return Mechanism: Comparison
-
-> The comparison of explicit return vs. implicit output approaches is documented in [Options for Return Mechanism: Comparison](STYLE_GUIDE_RATIONALE.md#options-for-return-mechanism-comparison) in the companion rationale document.
 
 ---
 
@@ -1374,13 +1354,9 @@ To ensure the result is **always** an array (even if empty or with a single item
 
 ### Summary: Function Design as Reliability Engineering
 
-> The extended summary of the function design philosophy is documented in [Summary: Function Design as Reliability Engineering](STYLE_GUIDE_RATIONALE.md#summary-function-design-as-reliability-engineering) in the companion rationale document.
-
 ## Error Handling
 
 ### Executive Summary: Error Handling Philosophy
-
-> The extended error handling philosophy is documented in [Executive Summary: Error Handling Philosophy](STYLE_GUIDE_RATIONALE.md#executive-summary-error-handling-philosophy) in the companion rationale document.
 
 ---
 
@@ -1503,8 +1479,6 @@ if ($errorOccurred) {
 ---
 
 ### Comparison with Modern Alternatives
-
-> The comparison table between v1.0 and v2.0+ error handling approaches is documented in [Comparison with Modern Alternatives](STYLE_GUIDE_RATIONALE.md#comparison-with-modern-alternatives) in the companion rationale document.
 
 ---
 
@@ -1658,8 +1632,6 @@ In this example, `$objResource` is initialized to `$null` before the `try` block
 ---
 
 ### Summary: Error Handling as Diagnostic Instrumentation
-
-> The extended summary of the error handling philosophy is documented in [Summary: Error Handling as Diagnostic Instrumentation](STYLE_GUIDE_RATIONALE.md#summary-error-handling-as-diagnostic-instrumentation) in the companion rationale document.
 
 ## File Writeability Testing
 
@@ -2047,8 +2019,6 @@ This approach ensures that users receive clear, actionable error messages when a
 
 ### Executive Summary: Interop and Versioning Strategy
 
-> The extended interop and versioning philosophy is documented in [Executive Summary: Interop and Versioning Strategy](STYLE_GUIDE_RATIONALE.md#executive-summary-interop-and-versioning-strategy) in the companion rationale document.
-
 ---
 
 ### Runtime Version Detection: `Get-PSVersion`
@@ -2263,19 +2233,13 @@ All types are **v1.0-safe** except `BigInteger`, which is **guarded by version c
 
 ### Modernization Path (v2.0+)
 
-> The speculative modernization discussion for language interop is documented in [Modernization Path (v2.0+)](STYLE_GUIDE_RATIONALE.md#modernization-path-v20) in the companion rationale document.
-
 ---
 
 ### Summary: Interop as Adaptive Resilience
 
-> The extended summary of the interop and versioning philosophy is documented in [Summary: Interop as Adaptive Resilience](STYLE_GUIDE_RATIONALE.md#summary-interop-as-adaptive-resilience) in the companion rationale document.
-
 ## Output Formatting and Streams
 
 ### Executive Summary: Output Discipline
-
-> The extended output discipline philosophy is documented in [Executive Summary: Output Discipline](STYLE_GUIDE_RATIONALE.md#executive-summary-output-discipline) in the companion rationale document.
 
 ---
 
@@ -2447,8 +2411,6 @@ This enables:
 
 ### Format Files: Future-Proof Design Pattern
 
-> The speculative discussion of format file design patterns is documented in [Format Files: Future-Proof Design Pattern](STYLE_GUIDE_RATIONALE.md#format-files-future-proof-design-pattern) in the companion rationale document.
-
 ---
 
 ### Stream Interaction Matrix
@@ -2463,13 +2425,9 @@ This enables:
 
 ### Modern Stream Capabilities (v2.0+ Context)
 
-> The speculative discussion of v2.0+ stream capabilities is documented in [Modern Stream Capabilities (v2.0+ Context)](STYLE_GUIDE_RATIONALE.md#modern-stream-capabilities-v20-context) in the companion rationale document.
-
 ---
 
 ### Summary: Output as Controlled Interface
-
-> The extended summary of the output discipline philosophy is documented in [Summary: Output as Controlled Interface](STYLE_GUIDE_RATIONALE.md#summary-output-as-controlled-interface) in the companion rationale document.
 
 ### Choosing Between Warning and Debug Streams
 
@@ -2861,28 +2819,18 @@ Invoke-Pester -Configuration $objPesterConfig
 
 ### Executive Summary: Holistic Design Constraints
 
-> The extended design philosophy for performance, security, and holistic design constraints is documented in [Executive Summary: Holistic Design Constraints](STYLE_GUIDE_RATIONALE.md#executive-summary-holistic-design-constraints) in the companion rationale document.
-
 ---
 
 ### Performance: Measured Pragmatism
-
-> The extended performance analysis, complexity tables, and trade-off discussion are documented in [Performance: Measured Pragmatism](STYLE_GUIDE_RATIONALE.md#performance-measured-pragmatism) in the companion rationale document.
 
 ---
 
 ### Security: Defense-in-Depth by Design
 
-> The extended security analysis, threat model, and secure-by-default patterns are documented in [Security: Defense-in-Depth by Design](STYLE_GUIDE_RATIONALE.md#security-defense-in-depth-by-design) in the companion rationale document.
-
 ---
 
 ### Other: Maintainability, Extensibility, and Modernization
 
-> The extended discussion of maintainability, extensibility points, and the v2.0+ modernization path is documented in [Other: Maintainability, Extensibility, and Modernization](STYLE_GUIDE_RATIONALE.md#other-maintainability-extensibility-and-modernization) in the companion rationale document.
-
 ---
 
 ### Summary: Performance, Security, and Holistic Design
-
-> The extended rationale for this section's holistic design approach is documented in [Summary: Performance, Security, and Holistic Design](STYLE_GUIDE_RATIONALE.md#summary-performance-security-and-holistic-design) in the companion rationale document.

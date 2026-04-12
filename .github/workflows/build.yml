@@ -6,11 +6,13 @@ on:
       - main
     paths:
       - 'STYLE_GUIDE.md'
+      - 'STYLE_GUIDE_RATIONALE.md'
   pull_request:
     branches:
       - main
     paths:
       - 'STYLE_GUIDE.md'
+      - 'STYLE_GUIDE_RATIONALE.md'
 
 permissions:
   contents: write
@@ -53,7 +55,7 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add copilot-instructions.md powershell.instructions.md STYLE_GUIDE_CHAT.md
+          git add copilot-instructions.md powershell.instructions.md STYLE_GUIDE_CHAT.md STYLE_GUIDE_FULL.md
           git commit -m "chore: update generated style guide artifacts [skip ci]"
           git push
       
@@ -65,3 +67,4 @@ jobs:
             copilot-instructions.md
             powershell.instructions.md
             STYLE_GUIDE_CHAT.md
+            STYLE_GUIDE_FULL.md
