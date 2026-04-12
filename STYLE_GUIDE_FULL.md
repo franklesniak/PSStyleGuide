@@ -2,7 +2,7 @@
 
 **Version:** 2.2.20260412.1
 
-**Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v5.1+/v7.x+) codebases.
+**Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Keywords
 
@@ -20,7 +20,7 @@ The main guide previously included the full RFC 2119 keyword definitions with al
 
 ## Quick Reference Checklist
 
-Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell 5.1+/7.x+ only, **[v1.0]** = backward compatible with Windows PowerShell v1.0. Each item links to its detailed section.
+Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+ (requires features not available in v1.0), **[v1.0]** = backward compatible with Windows PowerShell v1.0. Each item links to its detailed section.
 
 ### Code Layout and Formatting (Quick Reference)
 
@@ -110,7 +110,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell 5.1+/
 
 - **[All]** Scripts **MUST** verify file writeability before significant processing when writing output to files → [File Writeability Testing](#file-writeability-testing)
 - **[v1.0]** v1.0-targeted scripts **MUST** use `.NET` approach (`Test-FileWriteability` function) → [Approaches](#approaches)
-- **[Modern]** v2.0+ scripts **MAY** use `.NET` or `try/catch` approach based on requirements → [Approaches](#approaches)
+- **[Modern]** Scripts **MAY** use `.NET` or `try/catch` approach based on requirements → [Approaches](#approaches)
 
 ### Operating System Compatibility Checks (Quick Reference)
 
