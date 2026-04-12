@@ -1345,7 +1345,7 @@ function Convert-Safely {
 
 ### Anomaly Reporting: Write-Warning for Logical Impossibilities
 
-`Write-Warning` **MUST** be used **sparingly** to flag **logically impossible states** (contract violations). These warnings are **never suppressed**.
+`Write-Warning` **MUST** be used **sparingly** to flag **logically impossible states** (contract violations). Code **MUST NOT** suppress these warnings.
 
 ```powershell
 Write-Warning -Message 'Conversion failed even though individual parts succeeded. This should not be possible!'
@@ -1614,7 +1614,7 @@ if (-not $IsWindows) {
 
 ### Cross-Version OS Detection
 
-For scripts supporting PowerShell older than 6.0 (including Windows PowerShell 1.0–5.1), `$IsWindows`/`$IsMacOS`/`$IsLinux` do not exist (they evaluate to `$null`, causing incorrect behavior). Use safe detection functions from [`PowerShell_Resources`](https://github.com/franklesniak/PowerShell_Resources):
+For scripts supporting PowerShell older than 6.0 (including Windows PowerShell 1.0–5.1), `$IsWindows`/`$IsMacOS`/`$IsLinux` do not exist; referencing them yields `$null` or throws under strict mode, causing incorrect behavior. Use safe detection functions from [`PowerShell_Resources`](https://github.com/franklesniak/PowerShell_Resources):
 
 | OS | Function | Link |
 | --- | --- | --- |
