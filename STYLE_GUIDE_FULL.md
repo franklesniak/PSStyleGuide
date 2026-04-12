@@ -250,7 +250,7 @@ In the non-compliant example, the blank line (line 3) contains spaces, which is 
 
 ### Trailing Whitespace
 
-**Lines MUST NOT end with trailing whitespace** (spaces or tabs). Trailing whitespace can cause issues with version control systems, some editors, and linters. It also serves no functional purpose and reduces code consistency.
+Trailing whitespace can cause issues with version control systems, some editors, and linters. It also serves no functional purpose and reduces code consistency.
 
 **Compliant (no trailing whitespace):**
 
@@ -274,31 +274,11 @@ function ExampleFunction {
 
 In the non-compliant example, line 3 would end with trailing spaces after `$ParamOne` (before the comment), which is not allowed. The actual trailing spaces are not shown in this documentation to avoid violating the rule within this file itself.
 
-Most modern editors can be configured to automatically remove trailing whitespace on save, which is **RECOMMENDED** to maintain compliance with this rule.
-
 **Lines MUST NOT end with trailing whitespace** (spaces or tabs). Most modern editors can be configured to automatically remove trailing whitespace on save, which is **RECOMMENDED**.
 
 ### Variable Delimiting in Strings
 
-When a variable in an expandable string (`"..."`) is immediately followed by punctuation (especially a colon `:`) or other text that is not part of the variable name, it can cause parsing errors.
-
-- **Non-Compliant (Ambiguous):**
-
-  ```powershell
-  $strMessage = "$SSORegion: Error occurred"
-  ```
-
-- **Compliant (Preferred):** Use curly braces to explicitly delimit the variable name:
-
-  ```powershell
-  $strMessage = "${SSORegion}: Error occurred"
-  ```
-
-- **Compliant (Also Preferred):** Use the `-f` format operator, which avoids all parsing ambiguity.
-
-  ```powershell
-  $strMessage = ("{0}: Error occurred" -f $SSORegion)
-  ```
+Additional compliant alternative:
 
 - **Compliant (Acceptable):** Use string concatenation.
 
@@ -586,7 +566,7 @@ Module names **MUST NOT** be compromised for the sake of keyword searching. Inst
 
 ### Do Not Use Aliases
 
-Aliases (e.g., `gci`, `gps`) or abbreviated forms **MUST NOT** appear in the code. Even common operations **MUST** use full command names. This ensures:
+Using full command names ensures:
 
 1. **Discoverability**: The code is immediately understandable to any PowerShell user.
 2. **Future-proofing**: Changes to parameter sets in underlying cmdlets cannot break the script due to positional or partial-name matching.
@@ -602,7 +582,7 @@ Aliases **MAY** only be exported in a Module Manifest if they provide genuine sh
 
 ### Parameter Naming
 
-**Parameter names** **MUST** follow the same PascalCase convention and **MUST** be highly descriptive:
+Examples of descriptive parameter names:
 
 - `$ReferenceToResultObject` — clearly indicates a `[ref]` parameter for result storage
 - `$ReferenceArrayOfExtraStrings` — describes both the reference mechanism and content type
@@ -2338,15 +2318,6 @@ if ($PSVersion -eq ([version]'0.0')) {
 
 ### .NET Type Usage Summary
 
-| .NET Type | First Available | Used In | Technical Purpose |
-| --- | --- | --- | --- |
-| `[regex]` | .NET 2.0 (PS v1.0) | String operations | Literal string parsing |
-| `[System.Numerics.BigInteger]` | .NET 4.0 (PS v3.0+) | Overflow handling | Unlimited integer precision |
-| `[version]` | .NET 2.0 | Version handling | Standard version semantics |
-| `[ref]` | .NET 2.0 | Output parameters | Multiple return values (only for write-back) |
-
-All types are **v1.0-safe** except `BigInteger`, which is **guarded by version check**.
-
 | .NET Type | First Available | Technical Purpose |
 | --- | --- | --- |
 | `[regex]` | .NET 2.0 (PS v1.0) | Literal string parsing |
@@ -2717,13 +2688,6 @@ if ($DebugPreference -ne 'SilentlyContinue') {
 
 ### Test File Naming and Location
 
-Test files **MUST** follow consistent naming conventions to ensure discoverability:
-
-- **Naming Convention:** Test files **MUST** use the `*.Tests.ps1` suffix (e.g., `Get-UserInfo.Tests.ps1`)
-- **Preferred Location:** Test files **SHOULD** be stored in a `tests/` directory at the repository root
-- **Alternative:** Test files **MAY** be placed alongside source files (e.g., `Get-UserInfo.ps1` and `Get-UserInfo.Tests.ps1` in the same directory)
-- **One-to-One Mapping:** Generally, one test file **SHOULD** be created per function or script being tested
-
 **Example directory structure:**
 
 ```text
@@ -3026,9 +2990,7 @@ $objPesterConfig.TestResult.OutputPath = 'test-results.xml'
 Invoke-Pester -Configuration $objPesterConfig
 ```
 
-```powershell
-Invoke-Pester -Path tests/ -Output Detailed
-```
+Use `Invoke-Pester -Path tests/ -Output Detailed` for standard test runs.
 
 ## Performance, Security, and Other
 

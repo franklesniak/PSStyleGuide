@@ -1939,9 +1939,7 @@ Context "When external service is unavailable" {
 
 ### Running Pester Tests
 
-```powershell
-Invoke-Pester -Path tests/ -Output Detailed
-```
+Use `Invoke-Pester -Path tests/ -Output Detailed` for standard test runs.
 
 ## Performance, Security, and Other
 
