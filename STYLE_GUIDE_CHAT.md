@@ -549,7 +549,7 @@ Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath '../config.json')
 
 All functions **MUST** include **full comment-based help** using **single-line comments** (`#`) with **dotted keywords** placed **inside the function**, **immediately above the `param` block**.
 
-**Required sections**: `.SYNOPSIS`, `.DESCRIPTION`, `.PARAMETER` (one per declared parameter, if any), `.EXAMPLE` (multiple with input, output, and explanation), `.INPUTS`, `.OUTPUTS` (full mapping of return codes to meanings), `.NOTES` (positional parameters, versioning).
+**Required sections**: `.SYNOPSIS`, `.DESCRIPTION`, `.PARAMETER` (one per declared parameter, if any), `.EXAMPLE` (multiple with input, output, and explanation), `.INPUTS`, `.OUTPUTS` (document all outputs; when integer status codes are used, include full mapping of codes to meanings), `.NOTES` (positional parameters, versioning).
 
 > **Note:** If a function declares no parameters in its `param()` block (excluding implicit common parameters), the `.PARAMETER` section is omitted entirely.
 
