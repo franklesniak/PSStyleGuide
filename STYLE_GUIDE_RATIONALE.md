@@ -975,7 +975,7 @@ The `.NET` `try/catch` alternative approach:
 
 For scripts requiring the comprehensive `.NET` approach, a full implementation of the `Test-FileWriteability` function is available at:
 
-<https://github.com/franklesniak/PowerShell_Resources/blob/main/Test-FileWriteability.ps1>
+<https://github.com/franklesniak/PowerShell_Resources/blob/master/Test-FileWriteability.ps1>
 
 This implementation includes:
 
