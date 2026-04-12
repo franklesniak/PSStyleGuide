@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.2.20260412.4
+**Version:** 2.2.20260412.5
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -51,7 +51,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Comment-based help **MUST** include sections: .SYNOPSIS, .DESCRIPTION, .PARAMETER (one per parameter, if any), .EXAMPLE, .INPUTS, .OUTPUTS, .NOTES → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
 - **[All]** Explanatory or output-description lines within `.EXAMPLE` blocks **MUST** use double `#` (`# # <text>`) so that `Get-Help` renders them as valid PowerShell comments (`# <text>`) → [Inline Comments Within `.EXAMPLE` Blocks](#inline-comments-within-example-blocks)
 - **[All]** Functions **SHOULD** provide multiple examples with input, output, and explanation → [Help Content Quality: High Standards](#help-content-quality-high-standards)
-- **[All]** Every possible output/return value **MUST** be documented in .OUTPUTS with exact meaning; integer status codes **MUST** include full code-to-meaning mapping → [Help Content Quality: High Standards](#help-content-quality-high-standards)
+- **[All]** Every possible output/return value **MUST** be documented in .OUTPUTS with exact type and meaning; integer status codes **MUST** include full code-to-meaning mapping; output examples **MUST** be placed in .EXAMPLE blocks → [Help Content Quality: High Standards](#help-content-quality-high-standards)
 - **[All]** Positional parameter support **MUST** be documented in .NOTES → [Help Content Quality: High Standards](#help-content-quality-high-standards)
 - **[All]** Version number **MUST** be included in .NOTES (format: Major.Minor.YYYYMMDD.Revision) → [Function and Script Versioning](#function-and-script-versioning)
 - **[All]** Version build component **MUST** be current date in YYYYMMDD format → [Function and Script Versioning](#function-and-script-versioning)
@@ -627,7 +627,7 @@ The non-compliant form renders bare prose that (a) is not valid PowerShell, (b) 
 
 ### Help Content Quality: High Standards
 
-1. **Behavioral Contracts**: Every possible output/return value documented with **exact meaning** and **example**; when integer status codes are used, include full mapping of codes to meanings.
+1. **Behavioral Contracts**: Every possible output/return value documented with **exact meaning** (in .OUTPUTS) and **example** (in .EXAMPLE blocks); when integer status codes are used, include full mapping of codes to meanings.
 2. **Edge Case Coverage**: Examples include valid input, invalid segments, overflow conditions, excess parts.
 3. **Positional Parameter Support**: `.NOTES` explicitly documents positional ordering.
 4. **Versioning**: Includes internal version in `.NOTES` for change tracking.
