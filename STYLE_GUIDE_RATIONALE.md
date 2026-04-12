@@ -934,33 +934,9 @@ if ($errorOccurred) {
 
 ### Approaches
 
-#### Why Test File Writeability
+#### v1.0 Parser Error Rationale
 
-When a PowerShell script is designed to write output to a file (e.g., export to CSV), it **MUST** verify that the destination path is writable **before performing any significant processing**. This is a **preflight check** to catch issues such as:
-
-- Invalid paths
-- Missing directories
-- Insufficient permissions
-- Read-only locations
-- Files locked by another application
-
-Failing to verify writeability upfront can result in wasted processing time, user frustration, or data loss when the script fails at the final write step.
-
-#### Recommended Approaches
-
-There are two approaches to testing file writeability:
-
-1. **`.NET` approach**: Using a function like `Test-FileWriteability` that uses .NET methods such as `[System.IO.File]::Create()`, `[System.IO.File]::WriteAllText()`, or related .NET file operations with explicit file handle control and resource cleanup. This approach is comprehensive but results in a lengthy function (~1000+ lines when including helper functions and documentation).
-
-2. **`try/catch` approach**: Using `New-Item` to create a test file and `Remove-Item` to delete it, wrapped in a `try/catch` block. This approach is much shorter (~10 lines) but requires PowerShell v2.0+ since `try/catch` was introduced in v2.0.
-
-Both approaches use a **create-then-delete pattern**. The delete step is critical because `Remove-Item` will reliably fail if the file is locked by another process, even in cases where `New-Item -Force` might succeed in creating/overwriting the file.
-
-#### Scripts Requiring PowerShell v1.0 Support
-
-Scripts that **MUST** maintain backward compatibility with PowerShell v1.0 **MUST** use the **`.NET` approach**. The `try/catch` construct is not available in PowerShell v1.0 and causes a **parser error** if present in the script.
-
-**Rationale**: Since `try/catch` was introduced in PowerShell v2.0, any script containing this syntax will fail to parse on v1.0, even if the code path is never executed.
+Since `try/catch` was introduced in PowerShell v2.0, any script containing this syntax will fail to parse on v1.0, even if the code path is never executed. This is why v1.0-targeted scripts **MUST** use the `.NET` approach.
 
 Use the `Test-FileWriteability` function bundled from the reference implementation (see [Reference Implementation](#reference-implementation)).
 
@@ -1317,14 +1293,7 @@ This status code serves as the **function's contract** — a machine-readable in
 
 ### Complex Output: Reference Parameters (`[ref]`)
 
-All **structured data** is returned via **`[ref]` parameters** only when write-back to the caller is required:
-
-```powershell
-[ref]$ReferenceToResultObject        → [object]
-[ref]$ReferenceArrayOfExtraStrings → [string[]]
-```
-
-**Advantages**:
+When structured data must be written back to the caller, `[ref]` parameters provide several practical **advantages**:
 
 - **No pipeline interference** — data never accidentally flows downstream
 - **Caller-controlled lifetime** — variables persist after function exit
@@ -1340,16 +1309,6 @@ $status   = 4
 ```
 
 ### Stream Usage: Clear Mapping
-
-Code **MUST** use **exactly three output Streams**, each with a **single, immutable purpose**:
-
-| Stream | Command | Purpose | Example |
-| --- | --- | --- | --- |
-| **Success** | `return` | Primary result (status code) | `return 0` |
-| **Warning** | `Write-Warning` | Logical anomalies ("should not happen") | `"Operation failed despite valid inputs"` |
-| **Host** | *Never used* | Interactive feedback | **Prohibited** |
-
-**`Write-Host` **MUST NOT** be used** — its absence is a deliberate indicator of **production-grade tooling**.
 
 #### Warning Stream Details
 
