@@ -669,14 +669,13 @@ The function is a **minimal, maximalist** design: it does **exactly one thing**,
 
 **Final Assessment**: **"Fit for purpose across 18 years of PowerShell evolution."**
 
-
 ---
 
 ## Content Relocated from STYLE_GUIDE.md
 
 > The following material was moved from `STYLE_GUIDE.md` to reduce the main guide's token footprint while preserving useful human-readable context.
 
-#### Metadata and Navigation
+### Metadata and Navigation
 
 The main guide previously included:
 
