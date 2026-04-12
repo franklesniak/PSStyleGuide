@@ -9,11 +9,11 @@ description: "PowerShell coding standards"
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v5.1+/v7.x+) codebases.
 
-<!-- rationale-toc: - [Executive Summary: Author Profile](#executive-summary-author-profile) -->
-
 ## Keywords
 
 Per [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119): **MUST** / **SHALL** = absolute requirement; **MUST NOT** / **SHALL NOT** = absolute prohibition; **SHOULD** = strong recommendation (deviations require justification); **SHOULD NOT** = strong discouragement; **MAY** = truly optional.
+
+<!-- rationale-anchor: keywords-extended-explanation -->
 
 ## Quick Reference Checklist
 
@@ -986,7 +986,7 @@ function Get-ModernData {
                 }
             }
         } catch {
-            Write-Error "Failed to process $InputPath: $($_.Exception.Message)"
+            Write-Error -Message "Failed to process $InputPath: $($_.Exception.Message)"
         }
     }
 }
@@ -1426,7 +1426,7 @@ Use built-in variables: `$IsWindows`, `$IsMacOS`, `$IsLinux`.
 
 ```powershell
 if (-not $IsWindows) {
-    Write-Error "This function only runs on Windows."
+    Write-Error -Message "This function only runs on Windows."
     return -1
 }
 ```
@@ -1446,7 +1446,7 @@ For scripts supporting PowerShell older than 6.0 (including Windows PowerShell 1
 ```powershell
 $boolIsWindows = Test-Windows
 if (-not $boolIsWindows) {
-    Write-Warning "This function only runs on Windows."
+    Write-Warning -Message "This function only runs on Windows."
     return -1
 }
 ```

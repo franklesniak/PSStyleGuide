@@ -676,7 +676,7 @@ The function is a **minimal, maximalist** design: it does **exactly one thing**,
 
 > The following material was moved from `STYLE_GUIDE.md` to reduce the main guide's token footprint while preserving useful human-readable context.
 
-### Metadata and Navigation
+#### Metadata and Navigation
 
 The main guide previously included:
 
@@ -1056,7 +1056,7 @@ function Get-WindowsSystemInfo {
 
     # Check if running on Windows
     if (-not $IsWindows) {
-        Write-Error "This function only runs on Windows."
+        Write-Error -Message "This function only runs on Windows."
         return -1
     }
 
@@ -1082,7 +1082,7 @@ function Get-UnixSystemInfo {
 
     # Check if running on a Unix-based system
     if (-not ($IsLinux -or $IsMacOS)) {
-        Write-Error "This function only runs on Linux or macOS."
+        Write-Error -Message "This function only runs on Linux or macOS."
         return -1
     }
 
@@ -1114,7 +1114,7 @@ function Get-WindowsSystemInfo {
     # Check if running on Windows using safe cross-version detection
     $boolIsWindows = Test-Windows
     if (-not $boolIsWindows) {
-        Write-Warning "This function only runs on Windows."
+        Write-Warning -Message "This function only runs on Windows."
         return -1
     }
 
@@ -1146,7 +1146,7 @@ function Get-UnixSystemInfo {
     $boolIsMacOS = Test-macOS
 
     if (-not ($boolIsLinux -or $boolIsMacOS)) {
-        Write-Warning "This function only runs on Linux or macOS."
+        Write-Warning -Message "This function only runs on Linux or macOS."
         return -1
     }
 
@@ -1188,7 +1188,7 @@ function Get-WindowsRegistryValue {
 
     # OS check at the beginning
     if (-not $IsWindows) {
-        Write-Error "This function requires Windows. Current OS is not supported."
+        Write-Error -Message "This function requires Windows. Current OS is not supported."
         return -1
     }
 
@@ -1208,7 +1208,7 @@ function Get-OptionalWindowsInfo {
 
     # Check OS and warn if not Windows
     if (-not $IsWindows) {
-        Write-Warning "This function is optimized for Windows. Some features may not be available on other platforms."
+        Write-Warning -Message "This function is optimized for Windows. Some features may not be available on other platforms."
         return $null
     }
 
@@ -1222,7 +1222,7 @@ function Get-OptionalWindowsInfo {
 ```powershell
 # At the top of a Windows-only script
 if (-not $IsWindows) {
-    Write-Error "This script requires Windows. Current OS: $(if ($IsLinux) { 'Linux' } elseif ($IsMacOS) { 'macOS' } else { 'Unknown' })"
+    Write-Error -Message "This script requires Windows. Current OS: $(if ($IsLinux) { 'Linux' } elseif ($IsMacOS) { 'macOS' } else { 'Unknown' })"
     exit 1
 }
 

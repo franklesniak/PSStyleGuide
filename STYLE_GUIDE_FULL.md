@@ -4,11 +4,19 @@
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v5.1+/v7.x+) codebases.
 
-- [Executive Summary: Author Profile](#executive-summary-author-profile)
-
 ## Keywords
 
 Per [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119): **MUST** / **SHALL** = absolute requirement; **MUST NOT** / **SHALL NOT** = absolute prohibition; **SHOULD** = strong recommendation (deviations require justification); **SHOULD NOT** = strong discouragement; **MAY** = truly optional.
+
+### Keywords — Extended Explanation
+
+The main guide previously included the full RFC 2119 keyword definitions with all synonyms:
+
+- **MUST** / **REQUIRED** / **SHALL** — Absolute requirement. Non-negotiable.
+- **MUST NOT** / **SHALL NOT** — Absolute prohibition.
+- **SHOULD** / **RECOMMENDED** — Strong recommendation. Valid reasons may exist to deviate, but implications must be understood.
+- **SHOULD NOT** / **NOT RECOMMENDED** — Strong discouragement. Valid reasons may exist to do otherwise, but implications must be understood.
+- **MAY** / **OPTIONAL** — Truly optional. Implementations can choose to include or omit.
 
 ## Quick Reference Checklist
 
@@ -1322,7 +1330,7 @@ function Get-ModernData {
                 }
             }
         } catch {
-            Write-Error "Failed to process $InputPath: $($_.Exception.Message)"
+            Write-Error -Message "Failed to process $InputPath: $($_.Exception.Message)"
         }
     }
 }
@@ -1921,7 +1929,7 @@ function Get-WindowsSystemInfo {
 
     # Check if running on Windows
     if (-not $IsWindows) {
-        Write-Error "This function only runs on Windows."
+        Write-Error -Message "This function only runs on Windows."
         return -1
     }
 
@@ -1947,7 +1955,7 @@ function Get-UnixSystemInfo {
 
     # Check if running on a Unix-based system
     if (-not ($IsLinux -or $IsMacOS)) {
-        Write-Error "This function only runs on Linux or macOS."
+        Write-Error -Message "This function only runs on Linux or macOS."
         return -1
     }
 
@@ -1961,7 +1969,7 @@ Use built-in variables: `$IsWindows`, `$IsMacOS`, `$IsLinux`.
 
 ```powershell
 if (-not $IsWindows) {
-    Write-Error "This function only runs on Windows."
+    Write-Error -Message "This function only runs on Windows."
     return -1
 }
 ```
@@ -1990,7 +1998,7 @@ function Get-WindowsSystemInfo {
     # Check if running on Windows using safe cross-version detection
     $boolIsWindows = Test-Windows
     if (-not $boolIsWindows) {
-        Write-Warning "This function only runs on Windows."
+        Write-Warning -Message "This function only runs on Windows."
         return -1
     }
 
@@ -2022,7 +2030,7 @@ function Get-UnixSystemInfo {
     $boolIsMacOS = Test-macOS
 
     if (-not ($boolIsLinux -or $boolIsMacOS)) {
-        Write-Warning "This function only runs on Linux or macOS."
+        Write-Warning -Message "This function only runs on Linux or macOS."
         return -1
     }
 
@@ -2048,7 +2056,7 @@ For scripts supporting PowerShell older than 6.0 (including Windows PowerShell 1
 ```powershell
 $boolIsWindows = Test-Windows
 if (-not $boolIsWindows) {
-    Write-Warning "This function only runs on Windows."
+    Write-Warning -Message "This function only runs on Windows."
     return -1
 }
 ```
@@ -2080,7 +2088,7 @@ function Get-WindowsRegistryValue {
 
     # OS check at the beginning
     if (-not $IsWindows) {
-        Write-Error "This function requires Windows. Current OS is not supported."
+        Write-Error -Message "This function requires Windows. Current OS is not supported."
         return -1
     }
 
@@ -2100,7 +2108,7 @@ function Get-OptionalWindowsInfo {
 
     # Check OS and warn if not Windows
     if (-not $IsWindows) {
-        Write-Warning "This function is optimized for Windows. Some features may not be available on other platforms."
+        Write-Warning -Message "This function is optimized for Windows. Some features may not be available on other platforms."
         return $null
     }
 
@@ -2114,7 +2122,7 @@ function Get-OptionalWindowsInfo {
 ```powershell
 # At the top of a Windows-only script
 if (-not $IsWindows) {
-    Write-Error "This script requires Windows. Current OS: $(if ($IsLinux) { 'Linux' } elseif ($IsMacOS) { 'macOS' } else { 'Unknown' })"
+    Write-Error -Message "This script requires Windows. Current OS: $(if ($IsLinux) { 'Linux' } elseif ($IsMacOS) { 'macOS' } else { 'Unknown' })"
     exit 1
 }
 
