@@ -106,12 +106,12 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell 5.1+/
 ### File Writeability Testing (Quick Reference)
 
 - **[All]** Scripts **MUST** verify file writeability before significant processing when writing output to files → [File Writeability Testing](#file-writeability-testing)
-- **[v1.0]** v1.0-targeted scripts **MUST** use `.NET` approach (`Test-FileWriteability` function) → [Scripts Requiring PowerShell v1.0 Support](#scripts-requiring-powershell-v10-support)
-- **[Modern]** v2.0+ scripts **MAY** use `.NET` or `try/catch` approach based on requirements → [Scripts Requiring PowerShell v2.0+ Support](#scripts-requiring-powershell-v20-support)
+- **[v1.0]** v1.0-targeted scripts **MUST** use `.NET` approach (`Test-FileWriteability` function) → [Approaches](#approaches)
+- **[Modern]** v2.0+ scripts **MAY** use `.NET` or `try/catch` approach based on requirements → [Approaches](#approaches)
 
 ### Operating System Compatibility Checks (Quick Reference)
 
-- **[All]** Scripts/functions supporting only specific operating systems **MUST** include OS compatibility checks → [When OS Checks Are Required](#when-os-checks-are-required)
+- **[All]** Scripts/functions supporting only specific operating systems **MUST** include OS compatibility checks → [Operating System Compatibility Checks](#operating-system-compatibility-checks)
 - **[Modern]** PowerShell Core 6.0+ only scripts **SHOULD** use built-in `$IsWindows`, `$IsMacOS`, `$IsLinux` variables → [PowerShell Core 6.0+ OS Detection](#powershell-core-60-os-detection)
 - **[v1.0]** Scripts supporting older versions **MUST** use `Test-Windows`, `Test-macOS`, `Test-Linux` functions from PowerShell_Resources → [Cross-Version OS Detection](#cross-version-os-detection)
 - **[All]** Wrong OS errors **MUST** be reported consistently with existing error handling patterns → [Error Handling for Wrong OS](#error-handling-for-wrong-os)
