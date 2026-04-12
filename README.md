@@ -8,7 +8,7 @@ This repository contains a detailed PowerShell style guide that establishes codi
 
 ## 📚 Documentation
 
-The complete style guide is available in [STYLE_GUIDE.md](STYLE_GUIDE.md).
+The complete style guide is available in [STYLE_GUIDE.md](STYLE_GUIDE.md). Extended rationale, design philosophy, and historical context are documented in the companion [STYLE_GUIDE_RATIONALE.md](STYLE_GUIDE_RATIONALE.md).
 
 ### Generated Versions
 
