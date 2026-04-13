@@ -45,6 +45,7 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Security: Defense-in-Depth by Design](#security-defense-in-depth-by-design)
   - [Other: Maintainability, Extensibility, and Modernization](#other-maintainability-extensibility-and-modernization)
   - [Summary: Performance, Security, and Holistic Design](#summary-performance-security-and-holistic-design)
+  - [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
 - [Content Relocated from STYLE_GUIDE.md](#content-relocated-from-style_guidemd)
 
 ---
@@ -707,6 +708,36 @@ The **Performance, Security, and Other** aspects reveal a **mature, constrained 
 The function is a **minimal, maximalist** design: it does **exactly one thing**, does it **perfectly**, and **refuses to do anything else**. This is the hallmark of **industrial-grade PowerShell tooling** — code that can be deployed in 2006 or 2026 with identical behavior when compatible.
 
 **Final Assessment**: **"Fit for purpose across 18 years of PowerShell evolution."**
+
+---
+
+### Prefer `-LiteralPath` Over `-Path` for Concrete Paths
+
+> For the actionable rules, see [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](STYLE_GUIDE.md#prefer--literalpath-over--path-for-concrete-paths) in the main guide.
+
+#### Why `-Path` Is Dangerous for Concrete Paths
+
+PowerShell's `-Path` parameter interprets wildcard characters (`*`, `?`, `[`, `]`) before resolving to the file system. This is by design—`-Path` supports glob patterns—but it creates a class of subtle, silent bugs when the path is a concrete value that happens to contain these characters:
+
+| Character | Wildcard Meaning | Real-World Source |
+| --- | --- | --- |
+| `[` `]` | Character-range match | IPv6 addresses in file names, version tags (`[1.0]`), user-generated names |
+| `*` | Zero-or-more-character match | Rare in file names but possible in UNC paths or user input |
+| `?` | Single-character match | Rare in file names but present in some encodings |
+
+When `-Path` encounters these characters, it attempts wildcard resolution. If no file matches the pattern, the cmdlet may silently return nothing or fail with a misleading error. If multiple files match, the cmdlet operates on all of them—potentially deleting, moving, or overwriting files the code never intended to touch.
+
+#### Variable-Derived Paths Are Especially Risky
+
+Paths built from variables, `Join-Path` output, user input, environment variables, or API results are particularly dangerous with `-Path` because their content is not visible at authoring time. A path like `$strDownloadPath` might resolve to `C:\Users\name\Downloads\report[final].docx`—and `Remove-Item -Path $strDownloadPath` would interpret `[final]` as a character class, potentially matching (and deleting) the wrong files or failing silently.
+
+#### Why `-LiteralPath` Is the Safe Default
+
+`-LiteralPath` treats the entire string as a literal file-system path with no wildcard interpretation. It is semantically equivalent to "this exact path" and eliminates the entire class of wildcard-injection bugs. There is no performance cost to using `-LiteralPath`; it simply bypasses the wildcard-resolution step.
+
+#### Destructive Operations Require Stronger Protection
+
+For `Remove-Item` and `Move-Item`, the consequences of accidental wildcard expansion are **irreversible**—deleted files cannot be recovered (without backups), and moved files may overwrite existing targets. This is why the main guide elevates the rule from **SHOULD** to **MUST** for destructive cmdlets with variable-derived paths.
 
 ---
 

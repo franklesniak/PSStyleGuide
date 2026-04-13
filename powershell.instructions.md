@@ -5,7 +5,7 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 2.4.20260413.0
+**Version:** 2.5.20260413.0
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -48,6 +48,8 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[v1.0]** Reference parameters **MUST** use "ReferenceTo" prefix → [Parameter Naming](#parameter-naming)
 - **[All]** Code **SHOULD** avoid relative paths and tilde (~) shortcut → [Path and Scope Handling](#path-and-scope-handling)
 - **[All]** Code **SHOULD** use explicit scoping ($global:, $script:) → [Path and Scope Handling](#path-and-scope-handling)
+- **[All]** `-LiteralPath` **SHOULD** be used instead of `-Path` when operating on concrete (non-wildcard) paths derived from variables or `Join-Path` → [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
+- **[All]** For destructive cmdlets (`Remove-Item`, `Move-Item`), `-LiteralPath` **MUST** be used for variable-derived paths → [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
 
 ### Documentation and Comments (Quick Reference)
 
@@ -558,7 +560,7 @@ Get-Content -Path '../config.json'
 
 ```powershell
 # Good — always resolves relative to the script's own directory:
-Get-Content -Path (Join-Path -Path $PSScriptRoot -ChildPath '../config.json')
+Get-Content -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath '../config.json')
 ```
 
 <!-- rationale-anchor: options-for-local-variable-prefixes-analysis -->
@@ -890,7 +892,7 @@ function Test-PathExists {
         [string]$Path
     )
 
-    return (Test-Path -Path $Path)
+    return (Test-Path -LiteralPath $Path)
 }
 ```
 
@@ -998,7 +1000,7 @@ function Get-ModernData {
         Write-Verbose "Processing file: $InputPath"
 
         try {
-            $data = Get-Content -Path $InputPath -ErrorAction Stop
+            $data = Get-Content -LiteralPath $InputPath -ErrorAction Stop
             foreach ($line in $data) {
                 # This is streaming output.
                 [pscustomobject]@{
@@ -1255,14 +1257,14 @@ When a `catch` block is intended to rethrow, `throw "message"` and `throw ("form
 ```powershell
 # WRONG — destroys the original exception:
 try {
-    Get-Item -Path $strPath -ErrorAction Stop
+    Get-Item -LiteralPath $strPath -ErrorAction Stop
 } catch {
     throw "Failed to get item: $($_.Exception.Message)"
 }
 
 # WRONG — same problem with -f operator:
 try {
-    Get-Item -Path $strPath -ErrorAction Stop
+    Get-Item -LiteralPath $strPath -ErrorAction Stop
 } catch {
     throw ("Failed to get item: {0}" -f $_.Exception.Message)
 }
@@ -1275,7 +1277,7 @@ If contextual information is needed before rethrowing, it **SHOULD** be logged v
 ```powershell
 # Correct — context logged, original exception preserved:
 try {
-    Get-Item -Path $strPath -ErrorAction Stop
+    Get-Item -LiteralPath $strPath -ErrorAction Stop
 } catch {
     Write-Debug ("Failed to get item at path '{0}': {1}" -f $strPath, $_)
     throw
@@ -1295,7 +1297,7 @@ function Get-ResolvedItem {
     )
 
     try {
-        Get-Item -Path $Path -ErrorAction Stop
+        Get-Item -LiteralPath $Path -ErrorAction Stop
     } catch {
         $objException = [System.InvalidOperationException]::new(
             ("Failed to resolve item at path '{0}'" -f $Path),
@@ -1418,7 +1420,7 @@ try {
 }
 ```
 
-**Note**: Using `-LiteralPath` with `Remove-Item` is important to avoid wildcard interpretation issues.
+**Note**: Using `-LiteralPath` with `Remove-Item` is important to avoid wildcard interpretation issues. See [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths) for the general rule.
 
 #### try/catch Alternative (.NET Methods)
 
@@ -1969,3 +1971,38 @@ Use `Invoke-Pester -Path tests/ -Output Detailed` for standard test runs.
 <!-- rationale-anchor: security-defense-in-depth-by-design -->
 <!-- rationale-anchor: other-maintainability-extensibility-and-modernization -->
 <!-- rationale-anchor: summary-performance-security-and-holistic-design -->
+
+### Prefer `-LiteralPath` Over `-Path` for Concrete Paths
+
+When a cmdlet supports both `-Path` and `-LiteralPath`, and the code is operating on a **single concrete path value**—not an intentionally wildcarded pattern—`-LiteralPath` **SHOULD** be used instead of `-Path`. This especially applies when the path is derived from variables, `Join-Path`, or string construction, because `-Path` interprets wildcard characters (`[`, `]`, `*`, `?`) and can silently match the wrong files or match nothing at all.
+
+For **destructive** operations—`Remove-Item`, `Move-Item`—`-LiteralPath` **MUST** be used when the path value comes from a variable or expression. Wildcard interpretation of a variable-derived path in a destructive cmdlet can silently delete or move unintended files.
+
+Reserve `-Path` for cases where wildcard expansion is **explicitly intended**.
+
+**Common cmdlets where this rule applies:** `Test-Path`, `Get-Item`, `Get-ChildItem`, `Get-Content`, `Set-Content`, `Copy-Item`, `Move-Item`, `Remove-Item`.
+
+**Compliant:**
+
+```powershell
+Test-Path -LiteralPath $strFilePath
+Get-Content -LiteralPath $strConfigFile -ErrorAction Stop
+Remove-Item -LiteralPath $strTempFile -Force
+```
+
+**Non-compliant** (variable-derived path with `-Path`):
+
+```powershell
+# Risk: $strFilePath may contain [] or wildcard characters
+Test-Path -Path $strFilePath
+Get-Content -Path $strConfigFile -ErrorAction Stop
+Remove-Item -Path $strTempFile -Force   # Dangerous: destructive + wildcard
+```
+
+**Acceptable** (intentional wildcard):
+
+```powershell
+# Intentional wildcard — -Path is correct here:
+Get-ChildItem -Path 'C:\Logs\*.log'
+Remove-Item -Path 'C:\Temp\*.tmp' -Force
+```
