@@ -5,6 +5,8 @@ This companion document preserves the extended rationale, design philosophy, and
 ## Table of Contents
 
 - [Executive Summary: Author Profile](#executive-summary-author-profile)
+- [Code Layout and Formatting Rationale](#code-layout-and-formatting-rationale)
+  - [File Encoding](#file-encoding)
 - [Naming Rationale](#naming-rationale)
   - [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
   - [Module Naming: Noun-Based Containers](#module-naming-noun-based-containers)
@@ -55,6 +57,30 @@ The author's code writing style can be characterized as a highly disciplined "Po
 This explains the systematic avoidance of features introduced in v2.0 or later in v1.0-targeted scripts, such as advanced functions with the [CmdletBinding()] attribute, structured try/catch error handling, common parameters like -Verbose or -Debug, begin/process/end blocks, and modern output streams. Instead, the style relies on PowerShell's foundational mechanics, such as simple function declarations, strongly typed param blocks, explicit return statements for single values, and a custom error detection pattern using trap statements and global preference toggling.
 
 Within these constraints, the author adheres closely to community best practices for readability, naming, documentation, and maintainability. Functions are designed as reusable tools with a single purpose—e.g., performing targeted data transformations or validations. Outputs are explicit and controlled: a status code (e.g., an integer indicating full success, partial success, or failure) is typically returned, while complex results are passed via reference parameters only when necessary to modify data in the caller's scope, avoiding unnecessary use of [ref] for read-only objects since it provides no performance benefits in PowerShell. Error handling is "fail-controlled," suppressing issues to allow graceful recovery without halting execution. The code is robust, thoroughly documented, and predictable across versions, making it ideal for tools in legacy or mixed environments. Performance is balanced with readability, favoring script constructs over pipelines. If the v1.0 constraint were lifted (e.g., due to modern dependencies), the style would evolve to incorporate features like pipeline-friendly objects and structured errors while retaining strong typing and documentation for clarity.
+
+---
+
+## Code Layout and Formatting Rationale
+
+> For the formatting rules themselves, see [Code Layout and Formatting](STYLE_GUIDE.md#code-layout-and-formatting) in the main guide.
+
+### File Encoding
+
+> For the actionable rule, see [File Encoding](STYLE_GUIDE.md#file-encoding) in the main guide.
+
+UTF-8 does not require a BOM. A leading BOM is an invisible character that can cause practical problems, including interfering with regex-based text processing, breaking shebang (`#!`) handling on Linux/macOS, and creating unnecessary cross-tool inconsistencies or diff noise. Saving `.ps1` files as BOM-less UTF-8 avoids these issues and aligns with modern editor and automation behavior.
+
+#### VS Code Configuration Example
+
+VS Code defaults to UTF-8 without BOM (`files.encoding: utf8`), so no change is typically needed. To verify, check the encoding shown in the status bar at the bottom-right of the window. To make the intent explicit in a workspace, add `"files.encoding": "utf8"` to `.vscode/settings.json`. The value `"utf8"` means no BOM; `"utf8bom"` would add one. To scope the setting to PowerShell files only, use a `"[powershell]"` language-specific override:
+
+```json
+{
+    "[powershell]": {
+        "files.encoding": "utf8"
+    }
+}
+```
 
 ---
 
