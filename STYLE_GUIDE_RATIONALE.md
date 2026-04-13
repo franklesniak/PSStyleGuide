@@ -913,7 +913,7 @@ The help block **MUST** be **placed inside the function**, **immediately above t
 
 In comment-based help, the first `#` on each line serves as the comment-based help prefix — PowerShell strips it when rendering the help content. For explanatory lines that should appear as PowerShell comments in `Get-Help` output, the second `#` becomes the visible comment marker, producing the intended `# <text>` rendering.
 
-When an author mistakenly uses three `#` characters (`# # # <text>`), the first `#` is consumed as the help prefix, leaving `# # <text>` as the rendered content. `Get-Help` then displays `## <text>`, which is neither valid PowerShell syntax nor consistent with the intended `# <text>` pattern. This is a subtle authoring error that the single-`#` non-compliant example does not explicitly cover, because the failure mode is different: single `#` produces bare prose (no comment marker at all), whereas triple `#` produces a *double* comment marker that looks like a Markdown heading rather than a PowerShell comment.
+When an author mistakenly uses three `#` characters (`# # # <text>`), the first `#` is consumed as the help prefix, leaving `# # <text>` as the rendered content. `Get-Help` then displays `## <text>`, which does not preserve the intended `# <text>` rendered form and introduces an extra visible comment marker that is visually inconsistent with the surrounding example content. This is a subtle authoring error that the single-`#` non-compliant example does not explicitly cover, because the failure mode is different: single `#` produces bare prose (no comment marker at all), whereas triple `#` produces a *double* comment marker that looks like a Markdown heading rather than a PowerShell comment.
 
 ### Help Content Quality: High Standards
 
