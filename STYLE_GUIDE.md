@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.2.20260413.6
+**Version:** 2.3.20260413.0
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -26,6 +26,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Blank lines **MUST NOT** contain any whitespace (spaces or tabs) → [Blank Line Usage](#blank-line-usage)
 - **[All]** Lines **MUST NOT** end with trailing whitespace → [Trailing Whitespace](#trailing-whitespace)
 - **[All]** Variables in strings **SHOULD** be delimited with `${}` or `-f` operator → [Variable Delimiting in Strings](#variable-delimiting-in-strings)
+- **[All]** Source `.ps1` files **MUST** be UTF-8 without BOM by default; see [File Encoding](#file-encoding) for the Windows PowerShell/non-ASCII exception
 
 ### Capitalization and Naming Conventions (Quick Reference)
 
@@ -249,6 +250,10 @@ When a variable in an expandable string (`"..."`) is immediately followed by pun
   ```powershell
   $strMessage = ("{0}: Error occurred" -f $SSORegion)
   ```
+
+### File Encoding
+
+PowerShell `.ps1` source files **MUST** be saved as UTF-8 **without** a Byte Order Mark (BOM, `U+FEFF`), **unless** the script contains non-ASCII characters (e.g., accented characters, CJK text, or special symbols in string literals or comments) **and** must run on Windows PowerShell v5.1 or earlier. In that case, the file **MUST** either (a) be saved as UTF-8 **with** BOM so that Windows PowerShell can detect the encoding, or (b) remain ASCII-only so that BOM-less UTF-8 and the system ANSI code page produce identical byte sequences. This exception does not apply to PowerShell 7+, which defaults to UTF-8. Editors used for PowerShell development **SHOULD** be configured to save `.ps1` files as UTF-8 without BOM by default. If tool-specific examples are included, they **SHOULD** be presented as examples rather than assumptions that all environments behave identically.
 
 ## Capitalization and Naming Conventions
 
