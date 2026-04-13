@@ -3141,9 +3141,9 @@ PowerShell's `-Path` parameter interprets wildcard characters (`*`, `?`, `[`, `]
 
 | Character | Wildcard Meaning | Real-World Source |
 | --- | --- | --- |
-| `[` `]` | Character-range match | IPv6 addresses in file names, version tags (`[1.0]`), user-generated names |
-| `*` | Zero-or-more-character match | Rare in file names but possible in UNC paths or user input |
-| `?` | Single-character match | Rare in file names but present in some encodings |
+| `[` `]` | Character-range match | Valid in Windows file names: version tags (`[1.0]`), user-generated names, bracketed metadata |
+| `*` | Zero-or-more-character match | Reserved in Windows file names; may appear via user-supplied input or on non-Windows filesystems |
+| `?` | Single-character match | Reserved in Windows file names; may appear via user-supplied input or on non-Windows filesystems |
 
 When `-Path` encounters these characters, it attempts wildcard resolution. If no file matches the pattern, the cmdlet may silently return nothing or fail with a misleading error. If multiple files match, the cmdlet operates on all of them—potentially deleting, moving, or overwriting files the code never intended to touch.
 
