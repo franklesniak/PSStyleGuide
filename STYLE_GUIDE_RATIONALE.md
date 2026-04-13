@@ -7,6 +7,7 @@ This companion document preserves the extended rationale, design philosophy, and
 - [Executive Summary: Author Profile](#executive-summary-author-profile)
 - [Code Layout and Formatting Rationale](#code-layout-and-formatting-rationale)
   - [File Encoding](#file-encoding)
+  - [Programmatic File Writing Encoding](#programmatic-file-writing-encoding)
 - [Naming Rationale](#naming-rationale)
   - [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
   - [Module Naming: Noun-Based Containers](#module-naming-noun-based-containers)
@@ -83,6 +84,16 @@ VS Code defaults to UTF-8 without BOM (`files.encoding: utf8`), so no change is 
     }
 }
 ```
+
+### Programmatic File Writing Encoding
+
+> For the actionable rule, see [Programmatic File Writing Encoding](STYLE_GUIDE.md#programmatic-file-writing-encoding) in the main guide.
+
+The default encoding used by `Set-Content`, `Out-File`, and the `>` redirection operator varies significantly across PowerShell versions. In Windows PowerShell 5.1, `Set-Content` defaults to the system ANSI code page, while `Out-File` and `>` default to UTF-16 LE (with BOM). In PowerShell 7+, all three default to UTF-8 without BOM. This divergence means that a script relying on default encoding can produce different output depending on the host, making build artifacts non-deterministic.
+
+The `.NET` `System.Text.UTF8Encoding` approach is preferred for cross-version determinism because it is available in every PowerShell version (including v1.0) and produces identical output regardless of host. The constructor argument `$false` suppresses the BOM, matching the project's source file encoding convention.
+
+The `-Encoding utf8NoBOM` parameter value was introduced in PowerShell 6.0 (Core). It does not exist in Windows PowerShell 5.1, so requiring it as the standard pattern would break backward compatibility. For projects that explicitly target only PowerShell 7+, using `-Encoding utf8NoBOM` with cmdlets is an acceptable alternative.
 
 ---
 
