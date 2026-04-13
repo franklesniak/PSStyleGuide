@@ -319,9 +319,11 @@ When a variable in an expandable string (`"..."`) is immediately followed by pun
 
 UTF-8 does not require a BOM. A leading BOM is an invisible character that can cause practical problems, including interfering with regex-based text processing, breaking shebang (`#!`) handling on Linux/macOS, and creating unnecessary cross-tool inconsistencies or diff noise. Saving `.ps1` files as BOM-less UTF-8 avoids these issues and aligns with modern editor and automation behavior.
 
+However, there is an important compatibility caveat: Windows PowerShell (v5.1 and earlier) does not assume UTF-8 for BOM-less files. Instead, it falls back to the system's ANSI code page. This means non-ASCII characters in a BOM-less UTF-8 script can be silently misinterpreted on legacy hosts. The actionable rule in the main guide addresses this with an explicit exception: scripts that contain non-ASCII characters and must target Windows PowerShell either need a BOM or must stay ASCII-only. For the vast majority of scripts (which are ASCII-only), BOM-less UTF-8 is safe across all PowerShell versions.
+
 #### VS Code Configuration Example
 
-VS Code defaults to UTF-8 without BOM (`files.encoding: utf8`), so no change is typically needed. To verify, check the encoding shown in the status bar at the bottom-right of the window. To make the intent explicit in a workspace, add `"files.encoding": "utf8"` to `.vscode/settings.json`. The value `"utf8"` means no BOM; `"utf8bom"` would add one. To scope the setting to PowerShell files only, use a `"[powershell]"` language-specific override:
+VS Code defaults to UTF-8 without BOM (`files.encoding: utf8`), so no change is typically needed. To verify, check the encoding shown in the status bar at the bottom-right of the window. To make the intent explicit in a workspace, add `"files.encoding": "utf8"` to `.vscode/settings.json`. The value `"utf8"` means no BOM; `"utf8bom"` would add one. For the rare case where a script must contain non-ASCII characters and target Windows PowerShell, use `"utf8bom"` instead, per the exception in the actionable rule. To scope the setting to PowerShell files only, use a `"[powershell]"` language-specific override:
 
 ```json
 {
@@ -332,6 +334,8 @@ VS Code defaults to UTF-8 without BOM (`files.encoding: utf8`), so no change is 
 ```
 
 PowerShell `.ps1` source files **MUST** be saved as UTF-8 **without** a Byte Order Mark (BOM, `U+FEFF`). Editors used for PowerShell development **SHOULD** be configured to save `.ps1` files as UTF-8 without BOM. If tool-specific examples are included, they **SHOULD** be presented as examples rather than assumptions that all environments behave identically.
+
+> **Exception for Windows PowerShell (v5.1 and earlier):** Windows PowerShell reads BOM-less files using the system ANSI code page, not UTF-8. Scripts that contain non-ASCII characters (e.g., accented characters, CJK text, or special symbols in string literals or comments) **and** must run on Windows PowerShell **MUST** either (a) use UTF-8 **with** BOM so that the host can detect the encoding, or (b) remain ASCII-only so that BOM-less UTF-8 and ANSI produce identical byte sequences. This exception does not apply to PowerShell 7+, which defaults to UTF-8.
 
 ## Capitalization and Naming Conventions
 

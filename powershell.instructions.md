@@ -260,6 +260,8 @@ When a variable in an expandable string (`"..."`) is immediately followed by pun
 
 PowerShell `.ps1` source files **MUST** be saved as UTF-8 **without** a Byte Order Mark (BOM, `U+FEFF`). Editors used for PowerShell development **SHOULD** be configured to save `.ps1` files as UTF-8 without BOM. If tool-specific examples are included, they **SHOULD** be presented as examples rather than assumptions that all environments behave identically.
 
+> **Exception for Windows PowerShell (v5.1 and earlier):** Windows PowerShell reads BOM-less files using the system ANSI code page, not UTF-8. Scripts that contain non-ASCII characters (e.g., accented characters, CJK text, or special symbols in string literals or comments) **and** must run on Windows PowerShell **MUST** either (a) use UTF-8 **with** BOM so that the host can detect the encoding, or (b) remain ASCII-only so that BOM-less UTF-8 and ANSI produce identical byte sequences. This exception does not apply to PowerShell 7+, which defaults to UTF-8.
+
 ## Capitalization and Naming Conventions
 
 Public identifiers (functions, parameters, properties) **MUST** use PascalCase. Keywords (`function`, `param`, `if`, `else`, `return`, `trap`) **MUST** be lowercase. Operators (`-gt`, `-eq`) **MUST** be lowercase with surrounding spaces. Local variables **MUST** use camelCase with a type-hinting prefix (e.g., `$strMessage`, `$intReturnValue`, `$boolResult`, `$arrElements`).
