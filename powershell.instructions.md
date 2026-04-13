@@ -5,7 +5,7 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 2.5.20260413.0
+**Version:** 2.6.20260413.0
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -650,6 +650,23 @@ Returns vector row objects with PrincipalKey, Vector, and TotalActions.
 ```
 
 The non-compliant form renders bare prose that (a) is not valid PowerShell, (b) can be confused with actual command output, and (c) is not safely copy-pasteable.
+
+**Non-compliant** — triple `#` for explanation text:
+
+```powershell
+# .EXAMPLE
+# $arrRows = @(ConvertTo-VectorRow -Counts $arrCounts -FeatureIndexObject $objIndex)
+# # # Returns vector row objects with PrincipalKey and Vector.
+```
+
+Rendered by `Get-Help`:
+
+```text
+$arrRows = @(ConvertTo-VectorRow -Counts $arrCounts -FeatureIndexObject $objIndex)
+## Returns vector row objects with PrincipalKey and Vector.
+```
+
+Lines within `.EXAMPLE` blocks that are intended to render as PowerShell comments in `Get-Help` output **MUST** use exactly two `#` characters (`# # <text>`). Using three or more `#` characters (for example, `# # # <text>`) is non-compliant because it does not preserve the intended rendered form of `# <text>` in `Get-Help` output.
 
 ---
 

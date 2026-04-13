@@ -909,6 +909,12 @@ The help block **MUST** be **placed inside the function**, **immediately above t
 
 > **Note:** If a function declares no parameters in its `param()` block (excluding implicit common parameters), the `.PARAMETER` section is omitted entirely. Do not include an empty or placeholder `.PARAMETER` block.
 
+#### Why Three or More `#` Characters Are Non-Compliant in `.EXAMPLE` Blocks
+
+In comment-based help, the first `#` on each line serves as the comment-based help prefix — PowerShell strips it when rendering the help content. For explanatory lines that should appear as PowerShell comments in `Get-Help` output, the second `#` becomes the visible comment marker, producing the intended `# <text>` rendering.
+
+When an author mistakenly uses three `#` characters (`# # # <text>`), the first `#` is consumed as the help prefix, leaving `# # <text>` as the rendered content. `Get-Help` then displays `## <text>`, which is neither valid PowerShell syntax nor consistent with the intended `# <text>` pattern. This is a subtle authoring error that the single-`#` non-compliant example does not explicitly cover, because the failure mode is different: single `#` produces bare prose (no comment marker at all), whereas triple `#` produces a *double* comment marker that looks like a Markdown heading rather than a PowerShell comment.
+
 ### Help Content Quality: High Standards
 
 Comprehensive help also demonstrates **State Transparency**: showing **exact contents** of output variables after execution, so callers know precisely what to expect.
