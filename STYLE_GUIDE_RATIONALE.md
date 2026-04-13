@@ -42,6 +42,7 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Security: Defense-in-Depth by Design](#security-defense-in-depth-by-design)
   - [Other: Maintainability, Extensibility, and Modernization](#other-maintainability-extensibility-and-modernization)
   - [Summary: Performance, Security, and Holistic Design](#summary-performance-security-and-holistic-design)
+- [Content Relocated from STYLE_GUIDE.md](#content-relocated-from-style_guidemd)
 
 ---
 
@@ -667,3 +668,760 @@ The **Performance, Security, and Other** aspects reveal a **mature, constrained 
 The function is a **minimal, maximalist** design: it does **exactly one thing**, does it **perfectly**, and **refuses to do anything else**. This is the hallmark of **industrial-grade PowerShell tooling** — code that can be deployed in 2006 or 2026 with identical behavior when compatible.
 
 **Final Assessment**: **"Fit for purpose across 18 years of PowerShell evolution."**
+
+---
+
+## Content Relocated from STYLE_GUIDE.md
+
+> The following material was moved from `STYLE_GUIDE.md` to reduce the main guide's token footprint while preserving useful human-readable context.
+
+### Metadata and Navigation
+
+The main guide previously included:
+
+- **Status**, **Owner**, and **Last Updated** metadata fields for human maintainers
+- A full Table of Contents with links to all major sections
+- Navigational aids for human readers
+
+These are not required for runtime instruction processing and have been removed from the operational guide.
+
+### Keywords — Extended Explanation
+
+The main guide previously included the full RFC 2119 keyword definitions with all synonyms:
+
+- **MUST** / **REQUIRED** / **SHALL** — Absolute requirement. Non-negotiable.
+- **MUST NOT** / **SHALL NOT** — Absolute prohibition.
+- **SHOULD** / **RECOMMENDED** — Strong recommendation. Valid reasons may exist to deviate, but implications must be understood.
+- **SHOULD NOT** / **NOT RECOMMENDED** — Strong discouragement. Valid reasons may exist to do otherwise, but implications must be understood.
+- **MAY** / **OPTIONAL** — Truly optional. Implementations can choose to include or omit.
+
+### Blank Line Usage
+
+Example snippet illustrating bracing, indentation, spacing, and blank lines:
+
+```powershell
+function ExampleFunction {
+    param (
+        [string]$ParamOne
+    )
+
+    if ($ParamOne -gt 0) {
+        # Spaced operator example
+    } else {
+        # Alternative path
+    }
+
+    return 0
+}
+```
+
+### Trailing Whitespace
+
+The prohibition on trailing whitespace is motivated by practical concerns: trailing whitespace can cause issues with version control systems, some editors, and linters. It also serves no functional purpose and reduces code consistency.
+
+**Compliant (no trailing whitespace):**
+
+```powershell
+function ExampleFunction {
+    param (
+        [string]$ParamOne
+    )
+}
+```
+
+**Non-Compliant (trailing spaces on line 3):**
+
+```powershell
+function ExampleFunction {
+    param (
+        [string]$ParamOne   # ← trailing spaces here (not shown)
+    )
+}
+```
+
+In the non-compliant example, line 3 would end with trailing spaces after `$ParamOne` (before the comment), which is not allowed. The actual trailing spaces are not shown in this documentation to avoid violating the rule within this file itself.
+
+### Variable Delimiting in Strings
+
+In addition to curly braces and the format operator, string concatenation is also an acceptable approach:
+
+- **Compliant (Acceptable):** Use string concatenation.
+
+  ```powershell
+  $strMessage = ($SSORegion + ': Error occurred')
+  ```
+
+### Script and Function Naming: Approved Verbs
+
+Using approved verbs is a core PowerShell convention that ensures discoverability and consistency. You **MAY** always retrieve the complete list of approved verbs by running the following command:
+
+```powershell
+Get-Verb
+```
+
+If a verb (like `Review` or `Check`) is not on this list, you **MUST** choose the closest approved alternative, such as `Get-` (to retrieve information) or `Test-` (to return a boolean).
+
+The list of approved PowerShell verbs can be viewed [on Microsoft's Docs page](https://learn.microsoft.com/en-us/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands?view=powershell-7.5). For offline scenarios, a copy of this page is included below, retrieved on November 3, 2025:
+
+PowerShell uses a verb-noun pair for the names of cmdlets and for their derived .NET classes. The verb part of the name identifies the action that the cmdlet performs. The noun part of the name identifies the entity on which the action is performed. For example, the `Get-Command` cmdlet retrieves all the commands that are registered in PowerShell.
+
+> **Note:** PowerShell uses the term *verb* to describe a word that implies an action even if that word isn't a standard verb in the English language. For example, the term `New` is a valid PowerShell verb name because it implies an action even though it isn't a verb in the English language.
+
+Each approved verb has a corresponding *alias prefix* defined. We use this alias prefix in aliases for commands using that verb. For example, the alias prefix for `Import` is `ip` and, accordingly, the alias for `Import-Module` is `ipmo`. This is a recommendation but not a rule; in particular, it need not be respected for command aliases mimicking well known commands from other environments.
+
+#### Verb Naming Recommendations
+
+The following recommendations help you choose an appropriate verb for your cmdlet, to ensure consistency between the cmdlets that you create, the cmdlets that are provided by PowerShell, and the cmdlets that are designed by others.
+
+- Use one of the predefined verb names provided by PowerShell
+- Use the verb to describe the general scope of the action, and use parameters to further refine the action of the cmdlet.
+- Don't use a synonym of an approved verb. For example, always use `Remove`, never use `Delete` or `Eliminate`.
+- Use only the form of each verb that's listed in this topic. For example, use `Get`, but don't use `Getting` or `Gets`.
+- Don't use the following reserved verbs or aliases. The PowerShell language and a rare few cmdlets use these verbs under exceptional circumstances.
+  - `ForEach` (`foreach`)
+  - `Ping` (`pi`)
+  - `Sort` (`sr`)
+  - `Tee` (`te`)
+  - `Where` (`wh`)
+
+You **MAY** get a complete list of verbs using the `Get-Verb` cmdlet.
+
+#### Approved Verb Tables — Action Descriptions
+
+The full verb tables previously included an "Action" column describing what each verb does. These descriptions are from [Microsoft's Approved Verbs documentation](https://learn.microsoft.com/en-us/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands?view=powershell-7.5). The condensed tables in the main guide retain verb names, aliases, and synonyms to avoid.
+
+### Do Not Use Aliases
+
+Using full command names ensures:
+
+1. **Discoverability**: The code is immediately understandable to any PowerShell user.
+2. **Future-proofing**: Changes to parameter sets in underlying cmdlets cannot break the script due to positional or partial-name matching.
+3. **Syntax highlighting**: Full names trigger proper IDE and GitHub syntax coloring.
+
+### Parameter Naming
+
+Examples of descriptive parameter names:
+
+- `$ReferenceToResultObject` — clearly indicates a `[ref]` parameter for result storage
+- `$ReferenceArrayOfExtraStrings` — describes both the reference mechanism and content type
+- `$StringToProcess` — specifies both the type and purpose
+- `$PSVersion` — follows the established PowerShell naming convention
+
+These names leave no ambiguity about the parameter's purpose, expected type, or direction of data flow. The use of `ReferenceTo` prefix for `[ref]` parameters is a deliberate pattern that instantly signals pass-by-reference semantics — a critical distinction in PowerShell v1.0 where such mechanics are not visually obvious.
+
+### Local Variable Naming: Type-Prefixed camelCase
+
+This prefixing is **not** a legacy artifact but a **deliberate design decision** to compensate for PowerShell's dynamic typing and the frequent absence of modern IDE tooling. The prefix:
+
+- **Eliminates type inference errors** during debugging
+- **Reduces cognitive load** when reading code without IntelliSense
+- **Prevents accidental type mismatches** in complex logic flows
+
+### Comment-Based Help: Structure and Format
+
+The help block **MUST** be **placed inside the function**, **immediately above the `param` block**, ensuring:
+
+- **Proximity to implementation** → reduces drift during refactoring
+- **Visibility in plain text** → no IDE required
+- **Discoverability via `Get-Help`** → works in PowerShell v1.0+
+
+**Detailed section reference:**
+
+| Section | Purpose | Observed Implementation |
+| --- | --- | --- |
+| `.SYNOPSIS` | One-sentence purpose | Concise, imperative-voice summary |
+| `.DESCRIPTION` | Detailed behavior | Explains logic, edge cases, and failure modes |
+| `.PARAMETER` (if the function declares parameters in its `param()` block) | Per-parameter documentation | One block per parameter, even for `[ref]` types |
+| `.EXAMPLE` | Usage demonstration | **Multiple examples** with input, output, and explanation |
+| `.INPUTS` | Pipeline input | Explicitly "None" (correct for non-pipeline design) |
+| `.OUTPUTS` | Return value semantics | Document all outputs; include full mapping for integer status codes when used |
+| `.NOTES` | Additional context | Positional parameters, versioning, design rationale |
+
+> **Note:** If a function declares no parameters in its `param()` block (excluding implicit common parameters), the `.PARAMETER` section is omitted entirely. Do not include an empty or placeholder `.PARAMETER` block.
+
+### Help Content Quality: High Standards
+
+Comprehensive help also demonstrates **State Transparency**: showing **exact contents** of output variables after execution, so callers know precisely what to expect.
+
+### Inline Comments: Purpose and Placement
+
+**Examples**:
+
+```powershell
+# Retrieve the newest error on the stack prior to doing work
+$refLastKnownError = Get-ReferenceToLastError
+
+# Set ErrorActionPreference to SilentlyContinue; this will suppress error output...
+$global:ErrorActionPreference = [System.Management.Automation.ActionPreference]::SilentlyContinue
+```
+
+No redundant comments (e.g., `# Increment i by 1`) appear—code is considered self-documenting when possible.
+
+### Structural Documentation: Regions and Licensing
+
+The structural documentation using `#region` enables:
+
+- **Rapid navigation** in any editor
+- **Isolation of concerns** (license, helpers, core logic)
+- **Clear understanding** of design intent
+
+### Return Semantics: Explicit Status Codes
+
+**Rationale for explicit `return`**:
+
+1. **Determinism** — only the status code is returned
+2. **No pipeline pollution** — prevents accidental object emission
+3. **v1.0 compatibility** — `return` works identically in all versions
+4. **Caller control** — status code can be stored, tested, or ignored
+
+```powershell
+$status = Process-String ([ref]$result) ([ref]$extras) $input
+if ($status -eq 0) { ... }  # Full success
+```
+
+This pattern creates a **C-style error code contract** that is immediately familiar to systems programmers.
+
+### Input/Output Contract: Reference Parameters
+
+**Advantages**:
+
+- **No pipeline interference** — data never accidentally flows downstream
+- **Caller-controlled lifetime** — variables persist after function exit
+- **Multiple return values** — result + additional data in one call
+- **v1.0 compatible** — `[ref]` works in all versions
+
+**Post-call state example**:
+
+```powershell
+$result = processed value
+$extras = @('','', '', 'extra', '')
+$status   = 4
+```
+
+### Pipeline Behavior: Deliberately Disabled
+
+In v1.0-targeted functions, pipeline input is deliberately disabled. This is **not a limitation** but a **design requirement** for:
+
+- **Deterministic ordering** — processes one input at a time
+- **Stateful operations** — requires full control over input sequence
+- **v1.0 compatibility** — pipeline binding attributes require v2.0+
+
+### Anomaly Reporting: Write-Warning for Logical Impossibilities
+
+**Purpose** of `Write-Warning` for anomaly reporting:
+
+- **Diagnostic beacon** for developers
+- **Production-safe** — does not terminate execution
+- **Actionable** — includes exact context (variable values, expected vs. actual)
+
+These warnings represent **contract violations** in the parsing logic and serve as diagnostic information for root cause analysis.
+
+### Error Context Preservation
+
+Despite suppression, **full error context is preserved** in the global `$Error` array:
+
+- Original `ErrorRecord` objects remain intact
+- Stack trace, exception details, and target object are available
+- Can be inspected after execution for detailed analysis
+
+```powershell
+if ($errorOccurred) {
+    # Full error details available in $Error[0]
+    $lastError = $Error[0]
+}
+```
+
+### Approaches
+
+#### v1.0 Parser Error Rationale
+
+Since `try/catch` was introduced in PowerShell v2.0, any script containing this syntax will fail to parse on v1.0, even if the code path is never executed. This is why v1.0-targeted scripts **MUST** use the `.NET` approach.
+
+Use the `Test-FileWriteability` function bundled from the reference implementation (see [Reference Implementation](#reference-implementation)).
+
+#### Scripts Requiring PowerShell v2.0+ Support
+
+For scripts targeting PowerShell v2.0 or later, **either approach is acceptable**.
+
+##### Prefer the `.NET` Approach (`Test-FileWriteability`) When
+
+- Script performs **mission-critical operations** or where strict error control/avoidance (i.e., avoiding users seeing an error) is paramount
+- Script runs **unattended** (scheduled tasks, automation pipelines)
+- Script is part of a **larger module or library** where consistency matters, or where the script/library has to be runnable on PowerShell v1.0 without throwing a parser error
+- **Detailed error capture** is needed (e.g., populating a reference to an ErrorRecord for logging)
+- Script size is **not a concern**
+
+##### Prefer the `try/catch` Approach When
+
+- Script is a **simple, single-purpose utility**
+- Script runs **interactively** where users can see and respond to errors
+- The typical user is **PowerShell-savvy** and would be expected to interpret any issues without trouble
+- Script is **distributed to others** who may need to read/modify it (simpler code is easier to understand)
+- **Minimizing script size** is important
+
+### Code Examples
+
+#### try/catch Alternative (.NET Methods) Rationale
+
+The `.NET` `try/catch` alternative approach:
+
+- Uses `.NET` methods directly (reliable, explicit)
+- Is much shorter than a full `Test-FileWriteability` function
+- Works on PowerShell v2.0+ (.NET Framework 2.0 includes these static methods)
+- Still requires `try/catch`, so does not work on PowerShell v1.0
+- Is less idiomatic than using `New-Item`/`Remove-Item`
+
+### Reference Implementation
+
+For scripts requiring the comprehensive `.NET` approach, a full implementation of the `Test-FileWriteability` function is available at:
+
+<https://github.com/franklesniak/PowerShell_Resources/blob/master/Test-FileWriteability.ps1>
+
+This implementation includes:
+
+- Explicit file handle control and resource cleanup
+- Detailed error capture via reference parameters
+- Full documentation and examples
+- Support for PowerShell v1.0+
+
+### PowerShell Core 6.0+ OS Detection
+
+If the script or function **only** needs to support PowerShell Core 6.0 or newer (and does not need to run on Windows PowerShell 1.0-5.1), the built-in automatic variables can be used for OS detection:
+
+- **`$IsWindows`** — `$true` on Windows, `$false` on other platforms
+- **`$IsMacOS`** — `$true` on macOS, `$false` on other platforms
+- **`$IsLinux`** — `$true` on Linux, `$false` on other platforms
+
+**Example: Windows-only script for PowerShell Core 6.0+:**
+
+```powershell
+function Get-WindowsSystemInfo {
+    # .SYNOPSIS
+    # Retrieves Windows-specific system information.
+    # .DESCRIPTION
+    # This function only runs on Windows and uses Windows-specific cmdlets.
+    # .NOTES
+    # Requires PowerShell Core 6.0+
+    # Version: 1.0.20260109.0
+
+    param()
+
+    # Check if running on Windows
+    if (-not $IsWindows) {
+        Write-Error -Message "This function only runs on Windows."
+        return -1
+    }
+
+    # Proceed with Windows-specific operations
+    $objSystemInfo = Get-CimInstance -ClassName Win32_OperatingSystem
+    return 0
+}
+```
+
+**Example: Linux or macOS script:**
+
+```powershell
+function Get-UnixSystemInfo {
+    # .SYNOPSIS
+    # Retrieves Unix-based system information.
+    # .DESCRIPTION
+    # This function runs on Linux or macOS only.
+    # .NOTES
+    # Requires PowerShell Core 6.0+
+    # Version: 1.0.20260109.0
+
+    param()
+
+    # Check if running on a Unix-based system
+    if (-not ($IsLinux -or $IsMacOS)) {
+        Write-Error -Message "This function only runs on Linux or macOS."
+        return -1
+    }
+
+    # Proceed with Unix-specific operations
+    $strOutput = uname -a
+    return 0
+}
+```
+
+### Cross-Version OS Detection
+
+**Example: Windows-only script for PowerShell 1.0+:**
+
+```powershell
+# Bundle the Test-Windows function from PowerShell_Resources repository
+# (Include full function definition here or dot-source it)
+
+function Get-WindowsSystemInfo {
+    # .SYNOPSIS
+    # Retrieves Windows-specific system information.
+    # .DESCRIPTION
+    # This function only runs on Windows and uses Windows-specific cmdlets.
+    # Compatible with PowerShell 1.0+.
+    # .NOTES
+    # Version: 1.0.20260109.0
+
+    param()
+
+    # Check if running on Windows using safe cross-version detection
+    $boolIsWindows = Test-Windows
+    if (-not $boolIsWindows) {
+        Write-Warning -Message "This function only runs on Windows."
+        return -1
+    }
+
+    # Proceed with Windows-specific operations
+    # Use appropriate cmdlets based on PowerShell version
+    return 0
+}
+```
+
+**Example: Linux or macOS script for PowerShell 1.0+:**
+
+```powershell
+# Bundle Test-Linux and Test-macOS functions from PowerShell_Resources
+# (Include full function definitions here or dot-source them)
+
+function Get-UnixSystemInfo {
+    # .SYNOPSIS
+    # Retrieves Unix-based system information.
+    # .DESCRIPTION
+    # This function runs on Linux or macOS only.
+    # Compatible with PowerShell 1.0+.
+    # .NOTES
+    # Version: 1.0.20260109.0
+
+    param()
+
+    # Check if running on a Unix-based system
+    $boolIsLinux = Test-Linux
+    $boolIsMacOS = Test-macOS
+
+    if (-not ($boolIsLinux -or $boolIsMacOS)) {
+        Write-Warning -Message "This function only runs on Linux or macOS."
+        return -1
+    }
+
+    # Proceed with Unix-specific operations
+    return 0
+}
+```
+
+**Rationale for using dedicated functions:**
+
+The `$IsWindows`, `$IsMacOS`, and `$IsLinux` variables were introduced in PowerShell Core 6.0. Attempting to reference these variables in PowerShell 1.0-5.1 results in a `$null` value, which can lead to incorrect behavior (e.g., `-not $IsWindows` evaluates to `$true` on Windows PowerShell 5.1, incorrectly suggesting the script is not on Windows).
+
+The `Test-Windows`, `Test-macOS`, and `Test-Linux` functions from the PowerShell_Resources repository provide safe, reliable OS detection that works identically across all PowerShell versions from 1.0 onward.
+
+### Error Handling for Wrong OS
+
+If the script or function detects that it is running on an unsupported operating system, it **SHOULD** report the error in a way that is **consistent with the script's or function's existing error handling patterns**.
+
+**Guidelines:**
+
+1. **Match the error reporting style:** If the function returns integer status codes (e.g., `0` for success, `-1` for failure), return the appropriate error code. If it uses exceptions, throw an exception. If it uses `Write-Error`, use that.
+
+2. **Provide clear error messages:** The error message **SHOULD** clearly state which operating system(s) are required and which OS was detected.
+
+3. **Fail early:** Perform the OS check at the beginning of the function or script, before any significant processing occurs.
+
+**Example: Function returning status code:**
+
+```powershell
+function Get-WindowsRegistryValue {
+    # .SYNOPSIS
+    # Retrieves a value from the Windows Registry.
+    # .OUTPUTS
+    # [int] Status code: 0=success, -1=failure (including wrong OS)
+
+    param(
+        [string]$Path
+    )
+
+    # OS check at the beginning
+    if (-not $IsWindows) {
+        Write-Error -Message "This function requires Windows. Current OS is not supported."
+        return -1
+    }
+
+    # Proceed with Windows-specific operations
+    return 0
+}
+```
+
+**Example: Function using Write-Warning for non-critical failure:**
+
+```powershell
+function Get-OptionalWindowsInfo {
+    # .SYNOPSIS
+    # Retrieves optional Windows information.
+
+    param()
+
+    # Check OS and warn if not Windows
+    if (-not $IsWindows) {
+        Write-Warning -Message "This function is optimized for Windows. Some features may not be available on other platforms."
+        return $null
+    }
+
+    # Proceed with Windows-specific operations
+    return $objInfo
+}
+```
+
+**Example: Script exiting with clear error:**
+
+```powershell
+# At the top of a Windows-only script
+if (-not $IsWindows) {
+    Write-Error -Message "This script requires Windows. Current OS: $(if ($IsLinux) { 'Linux' } elseif ($IsMacOS) { 'macOS' } else { 'Unknown' })"
+    exit 1
+}
+
+# Continue with Windows-specific script logic
+```
+
+#### Summary: OS Compatibility Checks
+
+Operating system compatibility checks are a **critical reliability requirement** for platform-specific scripts and functions:
+
+- **Required** when scripts/functions support only specific operating systems
+- **Use built-in variables** (`$IsWindows`, `$IsMacOS`, `$IsLinux`) for PowerShell Core 6.0+ only scripts
+- **Use safe functions** (`Test-Windows`, `Test-macOS`, `Test-Linux`) for scripts supporting older PowerShell versions
+- **Report errors consistently** with the script's existing error handling patterns
+- **Fail early** to prevent unexpected behavior on unsupported platforms
+
+### Runtime Version Detection: `Get-PSVersion`
+
+**Analysis of detection logic**:
+
+| Condition | PowerShell Version | Result |
+| --- | --- | --- |
+| `$PSVersionTable` exists | v2.0+ | Actual version (e.g., 5.1.22621.2506) |
+| `$PSVersionTable` missing | v1.0 | Hard-coded `[version]'1.0'` |
+
+**Critical findings**:
+
+- **No reliance** on `$PSVersionTable.PSVersion.Major` ≥ 2 → avoids false positives
+- **Explicit fallback** to `'1.0'` → prevents `$null` or exceptions
+- **Returns `[version]` type** → enables direct comparison (`$version.Major -ge 3`)
+- **v1.0 compatible** → uses only v1.0 features (`Test-Path`, variable access)
+
+### Conditional .NET Feature Usage: Progressive Enhancement
+
+The **progressive enhancement stack** for numeric overflow handling:
+
+| PowerShell Version | .NET Type Used | Numeric Range |
+| --- | --- | --- |
+| v3.0+ | `[System.Numerics.BigInteger]` | Unlimited (subject to memory) |
+| v1.0–v2.0 | `[double]` | ±1.7 × 10³⁰⁸ (IEEE 754) |
+| All versions | `[int]`, `[int64]` | Built-in safe conversions |
+
+**Rationale**:
+
+- **BigInteger** → handles numbers larger than `[int32]::MaxValue` (2,147,483,647)
+- **Double** → v1.0-compatible approximation for large numbers
+- **No runtime exceptions** → conversion functions return `$false` on failure
+
+### .NET Interop Patterns: Safe and Documented
+
+The author uses **direct .NET interop** in controlled scenarios:
+
+| .NET Usage | Implementation | Technical Justification |
+| --- | --- | --- |
+| **`[regex]::Escape()`** | `Split-StringOnLiteralString` | Ensures literal string splitting (not regex) in v1.0 |
+| **`[regex]::Split()`** | Same function | v1.0-compatible alternative to `-split` operator (v2.0+) |
+| **`[System.Numerics.BigInteger]`** | Overflow handling | Only when PS v3+ detected |
+
+**Example: Literal string splitting**:
+
+```powershell
+$strSplitterInRegEx = [regex]::Escape($Splitter)
+$result = [regex]::Split($StringToSplit, $strSplitterInRegEx)
+```
+
+**Deprecation of `System.Collections.ArrayList`:** `System.Collections.ArrayList` is **deprecated** (consistent with [Microsoft's .NET guidance](https://learn.microsoft.com/en-us/dotnet/api/system.collections.arraylist)) and **MUST NOT** be used in new code. All new and newly-modified code **MUST** use `System.Collections.Generic.List[T]` instead. `System.Collections.Generic.List[T]` has been available since .NET Framework 2.0 (PowerShell v1.0).
+
+`ArrayList` is only permitted as a fallback in rare, well-justified cases where an attempt to instantiate `System.Collections.Generic.List[T]` throws an exception that is caught and handled. Such fallback **MUST** be reported via the debug stream, and the debug message **MUST** include the caught exception type and message (for example: `Write-Debug "Failed to create generic list; falling back to ArrayList. Exception: $($_.Exception.GetType().FullName): $($_.Exception.Message)"`).
+
+```powershell
+# Compliant (Required for all new code)
+$list = New-Object System.Collections.Generic.List[PSCustomObject]
+
+# Non-Compliant (Deprecated — do not use in new code)
+$list = New-Object System.Collections.ArrayList
+```
+
+> **Migration Note:** Legacy code that uses `System.Collections.ArrayList` **SHOULD** be refactored to use `System.Collections.Generic.List[T]` with the appropriate type parameter when the code is next modified. Replace `New-Object System.Collections.ArrayList` with `New-Object System.Collections.Generic.List[PSCustomObject]` (or the appropriate type), and verify that all `.Add()` calls and downstream consumers are compatible with the typed list.
+
+**Typed Generic Collections:** When instantiating generic .NET collections, such as `System.Collections.Generic.List[T]`, the specific type `T` **MUST** be provided if known (e.g., `[PSCustomObject]`, `[string]`). This is more precise, safer, and more descriptive than using the generic `[object]`.
+
+```powershell
+# Compliant (Preferred)
+$listAttached = New-Object System.Collections.Generic.List[PSCustomObject]
+
+# Non-Compliant (Vague)
+$listAttached = New-Object System.Collections.Generic.List[object]
+```
+
+**Advantages**:
+
+- **v1.0 compatible** → `[regex]` class exists in .NET 2.0
+- **Deterministic behavior** → no regex metacharacter interpretation
+- **No external dependencies** → pure .NET Framework
+
+### Primary Output: Integer Status Code via `return`
+
+**Key characteristics** of the primary output status code:
+
+| Property | Implementation |
+| --- | --- |
+| **Type** | `[int]` (32-bit signed integer) |
+| **Source** | Explicit `return` statement |
+| **Stream** | Success (pipeline) |
+| **Cardinality** | Exactly one value |
+
+**Documented in `.OUTPUTS`**:
+
+```powershell
+# .OUTPUTS
+# [int] Status code: 0=success, 1-5=partial with additional data, -1=failure
+```
+
+This status code serves as the **function's contract** — a machine-readable indicator of outcome.
+
+### Complex Output: Reference Parameters (`[ref]`)
+
+When structured data must be written back to the caller, `[ref]` parameters provide several practical **advantages**:
+
+- **No pipeline interference** — data never accidentally flows downstream
+- **Caller-controlled lifetime** — variables persist after function exit
+- **Multiple return values** — result + additional data in one call
+- **v1.0 compatible** — `[ref]` works in all versions
+
+**Post-call state example**:
+
+```powershell
+$result = processed value
+$extras = @('','', '', 'extra', '')
+$status   = 4
+```
+
+### Stream Usage: Clear Mapping
+
+#### Warning Stream Details
+
+`Write-Warning` **MUST** be used **sparingly and surgically** for **logically impossible states**:
+
+```powershell
+Write-Warning -Message 'Conversion of string failed even though valid. This should not be possible!'
+```
+
+**Purpose**:
+
+- **Developer alert** — indicates internal contract violation
+- **Non-terminating** — does not halt execution
+- **Actionable** — includes exact values and context
+- **Production-safe** — visible only with `-WarningAction` or `$WarningPreference`
+
+#### Host Stream Rationale
+
+**No output ever goes to the host console** via:
+
+- `Write-Host`
+- `Write-Output` (except via `return`)
+- Echo/print statements
+
+**Rationale**:
+
+- **Pipeline safety** — prevents data leakage
+- **Script compatibility** — silent operation in automation
+- **v1.0 compliance** — avoids v2.0+ stream features
+
+#### Output Type Consistency
+
+The function **never emits mixed object types**. The only object that can leave via the success stream is the **integer status code**.
+
+**Guarantee**:
+
+```powershell
+$result = Process-String ...
+$result.GetType().FullName  # Always "System.Int32"
+```
+
+This enables:
+
+- **Pipeline chaining** with confidence
+- **Type-based filtering** in larger scripts
+- **Static analysis** of data flow
+
+#### Stream Interaction Matrix
+
+| Caller Context | Success Stream | Warning Stream | Host Stream |
+| --- | --- | --- | --- |
+| Interactive | Status code visible | Warnings shown | **Never** |
+| Script | `$status` captured | Warnings logged | **Never** |
+| Pipeline | Status flows downstream | Warnings preserved | **Never** |
+
+### Sensitive Data in Verbose and Debug Streams
+
+Additional compliant examples for logging sensitive data safely:
+
+```powershell
+# Compliant - logs the value's type name with a null-safe fallback
+$strPrincipalKeyTypeName = if ($null -ne $PrincipalKey) { $PrincipalKey.GetType().Name } else { '<null>' }
+Write-Debug -Message ('PrincipalKey type: {0}' -f $strPrincipalKeyTypeName)
+
+# Compliant - logs non-sensitive metadata (string length) with a type-safe fallback
+$strPrincipalKeyLength = if ($PrincipalKey -is [string]) { [string]$PrincipalKey.Length } else { '<n/a>' }
+Write-Verbose -Message ('PrincipalKey length: {0}' -f $strPrincipalKeyLength)
+```
+
+### Test File Naming and Location
+
+**Example directory structure:**
+
+```text
+repository/
+├── src/
+│   └── Get-UserInfo.ps1
+└── tests/
+    └── Get-UserInfo.Tests.ps1
+```
+
+#### Pester Intro
+
+**Pester** is the standard testing framework for PowerShell, providing a domain-specific language for writing and executing tests. This section documents testing conventions that integrate with the coding standards in this guide. For comprehensive Pester documentation, see [pester.dev](https://pester.dev/).
+
+> **Note:** Pester 5.x requires PowerShell 3.0+ to execute tests. However, v1.0-compatible scripts can still be tested with Pester—simply run the tests on a modern PowerShell version (e.g., pwsh 7.x on a CI platform like `ubuntu-latest`). The test files themselves will use modern Pester syntax, but the scripts under test can target any PowerShell version.
+
+### Running Pester Tests
+
+**Basic invocation:**
+
+```powershell
+Invoke-Pester -Path tests/
+```
+
+**Detailed output:**
+
+```powershell
+Invoke-Pester -Path tests/ -Output Detailed
+```
+
+**Single test file:**
+
+```powershell
+Invoke-Pester -Path tests/Get-UserInfo.Tests.ps1
+```
+
+**With configuration object (for CI/CD scenarios):**
+
+```powershell
+$objPesterConfig = New-PesterConfiguration
+$objPesterConfig.Run.Path = 'tests/'
+$objPesterConfig.Output.Verbosity = 'Detailed'
+$objPesterConfig.TestResult.Enabled = $true
+$objPesterConfig.TestResult.OutputPath = 'test-results.xml'
+Invoke-Pester -Configuration $objPesterConfig
+```
