@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.5.20260413.0
+**Version:** 2.6.20260413.0
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -777,6 +777,12 @@ The help block **MUST** be **placed inside the function**, **immediately above t
 
 > **Note:** If a function declares no parameters in its `param()` block (excluding implicit common parameters), the `.PARAMETER` section is omitted entirely. Do not include an empty or placeholder `.PARAMETER` block.
 
+#### Why Three or More `#` Characters Are Non-Compliant in `.EXAMPLE` Blocks
+
+In comment-based help, the first `#` on each line serves as the comment-based help prefix — PowerShell strips it when rendering the help content. For explanatory lines that should appear as PowerShell comments in `Get-Help` output, the second `#` becomes the visible comment marker, producing the intended `# <text>` rendering.
+
+When an author mistakenly uses three `#` characters (`# # # <text>`), the first `#` is consumed as the help prefix, leaving `# # <text>` as the rendered content. `Get-Help` then displays `## <text>`, which does not preserve the intended `# <text>` rendered form and introduces an extra visible comment marker that is visually inconsistent with the surrounding example content. This is a subtle authoring error that the single-`#` non-compliant example does not explicitly cover, because the failure mode is different: single `#` produces bare prose (no comment marker at all), whereas triple `#` produces a *double* comment marker that looks like a Markdown heading rather than a PowerShell comment.
+
 All functions **MUST** include **full comment-based help** using **single-line comments** (`#`) with **dotted keywords** placed **inside the function**, **immediately above the `param` block**.
 
 **Required sections**: `.SYNOPSIS`, `.DESCRIPTION`, `.PARAMETER` (one per declared parameter, if any), `.EXAMPLE` (multiple with input, output, and explanation), `.INPUTS`, `.OUTPUTS` (document all outputs; when integer status codes are used, include full mapping of codes to meanings), `.NOTES` (positional parameters, versioning).
@@ -855,6 +861,23 @@ Returns vector row objects with PrincipalKey, Vector, and TotalActions.
 ```
 
 The non-compliant form renders bare prose that (a) is not valid PowerShell, (b) can be confused with actual command output, and (c) is not safely copy-pasteable.
+
+**Non-compliant** — triple `#` for explanation text:
+
+```powershell
+# .EXAMPLE
+# $arrRows = @(ConvertTo-VectorRow -Counts $arrCounts -FeatureIndexObject $objIndex)
+# # # Returns vector row objects with PrincipalKey and Vector.
+```
+
+Rendered by `Get-Help`:
+
+```text
+$arrRows = @(ConvertTo-VectorRow -Counts $arrCounts -FeatureIndexObject $objIndex)
+## Returns vector row objects with PrincipalKey and Vector.
+```
+
+Lines within `.EXAMPLE` blocks that are intended to render as PowerShell comments in `Get-Help` output **MUST** use exactly two `#` characters (`# # <text>`). Using three or more `#` characters (for example, `# # # <text>`) is non-compliant because it does not preserve the intended rendered form of `# <text>` in `Get-Help` output.
 
 ---
 
