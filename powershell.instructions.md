@@ -5,7 +5,7 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 2.3.20260413.0
+**Version:** 2.4.20260413.0
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -32,6 +32,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Lines **MUST NOT** end with trailing whitespace → [Trailing Whitespace](#trailing-whitespace)
 - **[All]** Variables in strings **SHOULD** be delimited with `${}` or `-f` operator → [Variable Delimiting in Strings](#variable-delimiting-in-strings)
 - **[All]** Source `.ps1` files **MUST** be UTF-8 without BOM by default; see [File Encoding](#file-encoding) for the Windows PowerShell/non-ASCII exception
+- **[All]** When writing text files programmatically, encoding **MUST** be specified explicitly; prefer `.NET` for cross-version UTF-8 without BOM → [Programmatic File Writing Encoding](#programmatic-file-writing-encoding)
 
 ### Capitalization and Naming Conventions (Quick Reference)
 
@@ -259,6 +260,21 @@ When a variable in an expandable string (`"..."`) is immediately followed by pun
 ### File Encoding
 
 PowerShell `.ps1` source files **MUST** be saved as UTF-8 **without** a Byte Order Mark (BOM, `U+FEFF`), **unless** the script contains non-ASCII characters (e.g., accented characters, CJK text, or special symbols in string literals or comments) **and** must run on Windows PowerShell v5.1 or earlier. In that case, the file **MUST** either (a) be saved as UTF-8 **with** BOM so that Windows PowerShell can detect the encoding, or (b) remain ASCII-only so that BOM-less UTF-8 and the system ANSI code page produce identical byte sequences. This exception does not apply to PowerShell 7+, which defaults to UTF-8. Editors used for PowerShell development **SHOULD** be configured to save `.ps1` files as UTF-8 without BOM by default. If tool-specific examples are included, they **SHOULD** be presented as examples rather than assumptions that all environments behave identically.
+
+### Programmatic File Writing Encoding
+
+When writing or generating text files programmatically (for example, build scripts producing `.psm1` files or code generators producing repository artifacts), the output encoding **MUST** be specified explicitly so results are deterministic across PowerShell versions.
+
+The preferred cross-version pattern for UTF-8 without BOM **SHOULD** use a `.NET` encoding object:
+
+```powershell
+$objUtf8NoBomEncoding = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllText($strOutputFilePath, $strFileContent, $objUtf8NoBomEncoding)
+```
+
+`Set-Content` and similar cmdlets **MUST** include an explicit `-Encoding` parameter when writing generated artifacts, because default encoding behavior varies across PowerShell versions and can make output non-deterministic.
+
+`-Encoding utf8NoBOM` **MUST NOT** be the required cross-version pattern, because it is unavailable in Windows PowerShell 5.1. For code that explicitly targets only PowerShell 7+, it **MAY** be used.
 
 ## Capitalization and Naming Conventions
 
