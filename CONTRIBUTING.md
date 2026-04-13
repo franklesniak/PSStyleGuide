@@ -33,7 +33,7 @@ When a rule is added or changed in `STYLE_GUIDE.md`, add or update corresponding
 Consumer-facing style guide files must not cross-reference other files in this repository, including each other. The consumer-facing files are:
 
 - `STYLE_GUIDE.md` (source; the authoritative style guide)
-- `copilot-instructions.md` (generated from `STYLE_GUIDE.md`)
+- `/copilot-instructions.md` (generated from `STYLE_GUIDE.md`; distinct from `.github/copilot-instructions.md`, which provides repository-level Copilot instructions)
 - `powershell.instructions.md` (generated from `STYLE_GUIDE.md` with YAML frontmatter)
 - `STYLE_GUIDE_CHAT.md` (generated from `STYLE_GUIDE.md` wrapped in a code fence)
 - `STYLE_GUIDE_FULL.md` (generated; merged from `STYLE_GUIDE.md` and `STYLE_GUIDE_RATIONALE.md`)

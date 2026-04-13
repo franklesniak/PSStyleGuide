@@ -12,5 +12,5 @@ When making changes:
 3. Do not place extended rationale in `STYLE_GUIDE.md` unless it is necessary to understand or apply the rule.
 4. If a change introduces or modifies a rule in `STYLE_GUIDE.md`, add or update corresponding rationale in `STYLE_GUIDE_RATIONALE.md` when useful.
 5. Keep `STYLE_GUIDE.md` concise, scannable, and optimized for instruction-following by coding agents.
-6. Consumer-facing style guide files (`STYLE_GUIDE.md` and its generated derivatives: `copilot-instructions.md`, `powershell.instructions.md`, `STYLE_GUIDE_CHAT.md`, `STYLE_GUIDE_FULL.md`) must not cross-reference other files in this repository, including each other.
+6. Consumer-facing style guide files (`STYLE_GUIDE.md` and its generated derivatives: `/copilot-instructions.md`, `powershell.instructions.md`, `STYLE_GUIDE_CHAT.md`, `STYLE_GUIDE_FULL.md`) must not cross-reference other files in this repository, including each other.
 7. `STYLE_GUIDE_RATIONALE.md` may cross-reference `STYLE_GUIDE.md` to help human contributors navigate between rationale and the corresponding rule. The CI build script strips these cross-references when generating consumer-facing artifacts.
