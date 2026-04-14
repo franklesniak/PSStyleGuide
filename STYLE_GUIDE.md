@@ -1800,7 +1800,7 @@ When a test iterates or indexes into a collection returned by the function or sc
 
 1. **Pre-iteration non-emptiness.** Tests that iterate a collection with `foreach ($x in $collection) { ... }` **MUST** assert `$collection | Should -Not -BeNullOrEmpty` before the `foreach`. A `foreach` over `$null` or an empty collection executes zero iterations, causing all inner assertions to be silently skipped.
 
-2. **Pre-index count assertion.** Tests that access specific indices of a returned collection (e.g., `$arrResult[0]`) **MUST** assert `$arrResult.Count | Should -Be <N>` before any indexed access when the exact count is part of the contract being tested. If exact count is not part of the contract, the test **MUST** assert a minimum-count condition such as `Should -BeGreaterThan 0` before indexed access.
+2. **Pre-index count assertion.** Tests that access specific indices of a returned collection (e.g., `$arrResult[0]`) **MUST** assert `$arrResult.Count | Should -Be <N>` before any indexed access when the exact count is part of the contract being tested. If exact count is not part of the contract, the test **MUST** assert a minimum-count condition that covers the highest index accessed—for example, `Should -BeGreaterThan <highest-index-accessed>` (since collections are zero-based, `$arr.Count | Should -BeGreaterThan 2` guarantees that `$arr[0]`, `$arr[1]`, and `$arr[2]` are safe to access).
 
 3. **Pre-index non-empty on nested properties.** When a test indexes into a property of a returned element (e.g., `$arrResult[0].Principals[0]`), the test **MUST** also assert `$arrResult[0].Principals | Should -Not -BeNullOrEmpty` before the inner index.
 
@@ -2030,6 +2030,7 @@ When asserting that a property on a returned object is a non-empty, strongly-typ
 **Compliant** (preferred pattern):
 
 ```powershell
+$script:objResult.ClusterActions | Should -Not -BeNullOrEmpty
 foreach ($objCluster in $script:objResult.ClusterActions) {
     $objCluster.PSObject.Properties.Name | Should -Contain 'Principals'
     $objCluster.Principals | Should -Not -BeNullOrEmpty
