@@ -1508,7 +1508,7 @@ Invoke-Pester -Configuration $objPesterConfig
 
 #### Why `Should -Not -BeNullOrEmpty` before `.Count`
 
-When a property is `$null` or an empty array, `$obj.Prop.Count | Should -BeGreaterThan 0` produces a failure message like *"Expected the actual value to be greater than 0, but got 0"* (or worse, the `.Count` member access on `$null` returns `$null`, yielding *"Expected the actual value to be greater than 0, but got "* with no useful value). In contrast, `$obj.Prop | Should -Not -BeNullOrEmpty` immediately communicates that the value was null or empty, giving the developer a much clearer signal about what went wrong. Testing non-emptiness first also guards subsequent assertions—such as type checks—from operating on a `$null` value that would produce misleading results.
+When a property is `$null` or an empty array, `$obj.Prop.Count | Should -BeGreaterThan 0` can produce the same generic failure message—such as *"Expected the actual value to be greater than 0, but got 0"*—because in PowerShell `$null.Count` also evaluates to `0`. In contrast, `$obj.Prop | Should -Not -BeNullOrEmpty` immediately communicates that the value was null or empty, giving the developer a much clearer signal about what went wrong. Testing non-emptiness first also guards subsequent assertions—such as type checks—from operating on a `$null` value that would produce misleading results.
 
 #### Why permitting `[object[]]` weakens the test
 
