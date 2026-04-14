@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.6.20260413.0
+**Version:** 2.7.20260414.0
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -146,6 +146,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Tests **MUST** verify all documented return codes for functions → [Testing Return Code Conventions](#testing-return-code-conventions)
 - **[All]** Test-* functions **MUST** have tests for both `$true` and `$false` cases → [Testing Return Code Conventions](#testing-return-code-conventions)
 - **[All]** Tests asserting property names on `[pscustomobject]` **MUST** use order-insensitive comparisons → [Testing Property Names on PSCustomObject](#testing-property-names-on-pscustomobject)
+- **[All]** Tests asserting strongly-typed array properties **MUST** check non-emptiness first, then assert the exact array type with `-is`; **MUST NOT** permit `[object[]]` fallback → [Testing Strongly-Typed Array Properties](#testing-strongly-typed-array-properties)
 - **[All]** Test `BeforeAll` dot-sourcing **MUST** use the `Split-Path` + `Join-Path` two-step pattern; multi-segment `Join-Path` forms **MUST NOT** be used → [Test File Dot-Sourcing Pattern](#test-file-dot-sourcing-pattern)
 
 ## Executive Summary: Author Profile
@@ -2936,6 +2937,70 @@ $objResult.PSObject.Properties.Name | Should -HaveCount 2
 ```powershell
 # Non-Compliant
 $objResult.PSObject.Properties.Name | Should -Be @('Key', 'Type')
+```
+
+---
+
+### Testing Strongly-Typed Array Properties
+
+#### Why `Should -Not -BeNullOrEmpty` before `.Count`
+
+When a property is `$null` or an empty array, `$obj.Prop.Count | Should -BeGreaterThan 0` can produce the same generic failure message—such as *"Expected the actual value to be greater than 0, but got 0"*—because in PowerShell `$null.Count` also evaluates to `0`. In contrast, `$obj.Prop | Should -Not -BeNullOrEmpty` immediately communicates that the value was null or empty, giving the developer a much clearer signal about what went wrong. Testing non-emptiness first also guards subsequent assertions—such as type checks—from operating on a `$null` value that would produce misleading results.
+
+#### Why permitting `[object[]]` weakens the test
+
+When production code intentionally casts a property to a strongly-typed array like `[string[]]`, the test exists to ensure that cast is preserved. If a future refactor accidentally removes the cast, the property silently degrades to `[object[]]`—PowerShell's default array type. A disjunction such as `($x -is [string[]]) -or ($x -is [object[]])` will still pass in that scenario, defeating the purpose of the assertion. By requiring the exact type match (`-is [string[]]` alone), the test catches the regression immediately.
+
+#### Why `Should -BeOfType [string[]]` is discouraged for array-type assertions
+
+Pester's `-BeOfType` assertion receives its input through the PowerShell pipeline. When an array is piped (`$x | Should -BeOfType [string[]]`), PowerShell unrolls the array and sends each element individually to `Should`. Pester then evaluates `-BeOfType` against each *element*, not against the *array itself*. This means the assertion tests whether each string is of type `[string[]]`—which it is not—and the test fails even when the property is correctly typed.
+
+A workaround exists: the unary comma operator (`, $x | Should -BeOfType [string[]]`) wraps the array in a single-element wrapper array so that the original array survives pipeline unrolling as a single object. However, this idiom is obscure and error-prone; contributors unfamiliar with the trick may remove the comma or misunderstand the intent. The `-is` operator pattern (`($x -is [string[]]) | Should -BeTrue`) avoids pipeline unrolling entirely, is self-documenting, and is consistent across all array-type assertions.
+
+When asserting that a property on a returned object is a non-empty, strongly-typed array, tests **MUST** follow these rules:
+
+1. **Non-emptiness first.** Tests **MUST** use `Should -Not -BeNullOrEmpty` before any `.Count`-based assertion. This produces a clear failure message when the property is `$null` or empty, rather than a confusing "expected greater than 0" when the property is `$null`.
+
+2. **Strongly-typed assertion.** When production code explicitly casts an output property to a strongly-typed array (e.g., `[string[]]`), tests **MUST** assert that exact array type using the `-is` operator wrapped in `Should -BeTrue`:
+
+   ```powershell
+   ($obj.Prop -is [string[]]) | Should -BeTrue
+   ```
+
+   Tests **MUST NOT** use a disjunction that also permits `[object[]]`, because that masks regressions when the intended production cast is accidentally removed.
+
+3. **Avoid `Should -BeOfType [string[]]` for array types.** Tests **SHOULD NOT** use `$x | Should -BeOfType [string[]]` to assert array type, because the pipeline unrolls the array before Pester evaluates the type. Prefer the `-is [string[]]` pattern.
+
+4. **Ordering.** When combined with a property-name check, the recommended assertion order **SHOULD** be: property name first, then non-empty assertion, then strongly-typed assertion.
+
+**Compliant** (preferred pattern):
+
+```powershell
+foreach ($objCluster in $script:objResult.ClusterActions) {
+    $objCluster.PSObject.Properties.Name | Should -Contain 'Principals'
+    $objCluster.Principals | Should -Not -BeNullOrEmpty
+    ($objCluster.Principals -is [string[]]) | Should -BeTrue
+}
+```
+
+**Non-Compliant** (too permissive):
+
+```powershell
+# Non-Compliant: [object[]] disjunction masks regressions in the
+# production strongly-typed cast.
+(($objCluster.Principals -is [string[]]) -or ($objCluster.Principals -is [object[]])) |
+    Should -BeTrue
+
+# Non-Compliant: .Count on a potentially-null value is asserted before
+# proving the property is non-empty.
+$objCluster.Principals.Count | Should -BeGreaterThan 0
+```
+
+**Non-Compliant** (pipeline unrolling):
+
+```powershell
+# Non-Compliant: the array is unrolled before Pester evaluates the type assertion.
+$objCluster.Principals | Should -BeOfType [string[]]
 ```
 
 ---
