@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.7.20260414.0
+**Version:** 2.8.20260414.0
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -148,6 +148,8 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Tests asserting property names on `[pscustomobject]` **MUST** use order-insensitive comparisons → [Testing Property Names on PSCustomObject](#testing-property-names-on-pscustomobject)
 - **[All]** Tests asserting strongly-typed array properties **MUST** check non-emptiness first, then assert the exact array type with `-is`; **MUST NOT** permit `[object[]]` fallback → [Testing Strongly-Typed Array Properties](#testing-strongly-typed-array-properties)
 - **[All]** Test `BeforeAll` dot-sourcing **MUST** use the `Split-Path` + `Join-Path` two-step pattern; multi-segment `Join-Path` forms **MUST NOT** be used → [Test File Dot-Sourcing Pattern](#test-file-dot-sourcing-pattern)
+- **[All]** Tests iterating a returned collection with `foreach` **MUST** assert non-emptiness before the loop → [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing)
+- **[All]** Tests accessing specific indices of a returned collection **MUST** assert count before any indexed access → [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing)
 
 ## Executive Summary: Author Profile
 
@@ -2787,6 +2789,87 @@ It "Returns success code 0 when given valid input" {
     # Assert
     $intReturnCode | Should -Be 0
 }
+```
+
+---
+
+### Defensive Assertions Before Iteration and Indexing
+
+#### Why `foreach` over `$null` or an empty collection is a silent-pass risk
+
+In PowerShell, `foreach ($x in $null) { ... }` and `foreach ($x in @()) { ... }` both execute zero loop iterations. When a Pester `It` block places all of its `Should` assertions inside such a `foreach`, a bug that causes the function under test to return `$null` or an empty array will not trigger any assertion failure—the test silently passes with zero evaluated assertions. This is one of the most dangerous patterns in Pester tests because it gives a green test result for fundamentally broken code. A single `Should -Not -BeNullOrEmpty` assertion before the loop converts that silent pass into an immediate, descriptive failure.
+
+#### Why a direct Pester assertion is more actionable than a runtime indexing error
+
+When a test accesses `$arrResult[0]` without first asserting the collection count, a `$null` or empty result produces a runtime error such as *"Cannot index into a null array"* rather than a structured Pester failure. This runtime error obscures the root cause—the function returned unexpected output—behind an implementation detail of the test itself. A pre-index `$arrResult.Count | Should -Be <N>` assertion produces a clear Pester message like *"Expected 1, but got 0"*, immediately signaling that the function's output contract was violated, not the test code.
+
+#### Why outer-collection and nested-property assertions protect different failure modes
+
+An outer assertion like `$arrResult.Count | Should -Be 1` confirms that the top-level collection has the expected number of elements, but it says nothing about the structure of each element. A nested assertion like `$arrResult[0].Principals | Should -Not -BeNullOrEmpty` confirms that a specific property within that element is populated. These guard against different regression scenarios: one where the function returns too few (or too many) top-level results, and another where the function returns the right number of results but with missing or empty nested data. Both assertions are needed to fully protect subsequent indexed access into the nested property.
+
+#### How pre-assertions strengthen Arrange-Act-Assert
+
+The Arrange-Act-Assert pattern structures a test into setup, execution, and verification phases. Defensive pre-assertions fit naturally at the beginning of the Assert phase as *structural guards* that validate the shape and size of the result before the test proceeds to verify specific values. This layered approach ensures that each assertion failure maps to a single, unambiguous cause: a structural guard failure means the output contract was violated at a structural level, while a value assertion failure means the structure was correct but a specific value was wrong. Without these guards, a single failure can be ambiguous—did the function return the wrong value, or did it return nothing at all?
+
+When a test iterates or indexes into a collection returned by the function or script under test, the test **MUST** include defensive pre-assertions so that an empty or `$null` result produces a clear, immediate Pester failure instead of silently passing or generating a confusing runtime error.
+
+1. **Pre-iteration non-emptiness.** Tests that iterate a collection with `foreach ($x in $collection) { ... }` **MUST** assert `$collection | Should -Not -BeNullOrEmpty` before the `foreach`. A `foreach` over `$null` or an empty collection executes zero iterations, causing all inner assertions to be silently skipped.
+
+2. **Pre-index count assertion.** Tests that access specific indices of a returned collection (e.g., `$arrResult[0]`) **MUST** assert `$arrResult.Count | Should -Be <N>` before any indexed access when the exact count is part of the contract being tested. If exact count is not part of the contract, the test **MUST** assert a minimum-count condition such as `Should -BeGreaterThan 0` before indexed access.
+
+3. **Pre-index non-empty on nested properties.** When a test indexes into a property of a returned element (e.g., `$arrResult[0].Principals[0]`), the test **MUST** also assert `$arrResult[0].Principals | Should -Not -BeNullOrEmpty` before the inner index.
+
+4. **Ordering.** For a test that accesses `$arr[i].Prop[j]`, assertions **SHOULD** follow this order:
+   1. `$arr | Should -Not -BeNullOrEmpty` or `$arr.Count | Should -Be <N>`
+   2. `$arr[i].Prop | Should -Not -BeNullOrEmpty`
+   3. Strong-type check on `$arr[i].Prop`, if applicable
+   4. Assertions that verify the actual behavior under test
+
+**Compliant** (`foreach` — assert non-emptiness before iterating):
+
+```powershell
+It "Each ClusterActions entry includes a Principals array" {
+    # Assert
+    $script:objResult.ClusterActions | Should -Not -BeNullOrEmpty
+    foreach ($objCluster in $script:objResult.ClusterActions) {
+        $objCluster.PSObject.Properties.Name | Should -Contain 'Principals'
+        $objCluster.Principals | Should -Not -BeNullOrEmpty
+        ($objCluster.Principals -is [string[]]) | Should -BeTrue
+    }
+}
+```
+
+**Non-Compliant** (`foreach` — missing non-emptiness assertion):
+
+```powershell
+# Non-Compliant: foreach over $null or an empty collection can execute zero
+# iterations and leave the test without any evaluated inner assertions.
+It "Each ClusterActions entry includes a Principals array" {
+    # Assert
+    foreach ($objCluster in $script:objResult.ClusterActions) {
+        $objCluster.PSObject.Properties.Name | Should -Contain 'Principals'
+    }
+}
+```
+
+**Compliant** (indexed access — count and nested non-emptiness before indexing):
+
+```powershell
+# Assert
+$arrResult.Count | Should -Be 1
+$arrResult[0].Principals | Should -Not -BeNullOrEmpty
+$arrResult[0].Principals.Count | Should -Be 2
+$arrResult[0].Principals[0] | Should -Be 'userA'
+$arrResult[0].Principals[1] | Should -Be 'userB'
+```
+
+**Non-Compliant** (indexed access — no count assertion before `[0]`):
+
+```powershell
+# Non-Compliant: no count assertion before [0].
+# Assert
+$arrResult[0].Principals.Count | Should -Be 1
+$arrResult[0].Principals[0] | Should -Be 'userA'
 ```
 
 ---

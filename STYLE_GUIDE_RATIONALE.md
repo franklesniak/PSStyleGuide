@@ -1519,3 +1519,23 @@ When production code intentionally casts a property to a strongly-typed array li
 Pester's `-BeOfType` assertion receives its input through the PowerShell pipeline. When an array is piped (`$x | Should -BeOfType [string[]]`), PowerShell unrolls the array and sends each element individually to `Should`. Pester then evaluates `-BeOfType` against each *element*, not against the *array itself*. This means the assertion tests whether each string is of type `[string[]]`—which it is not—and the test fails even when the property is correctly typed.
 
 A workaround exists: the unary comma operator (`, $x | Should -BeOfType [string[]]`) wraps the array in a single-element wrapper array so that the original array survives pipeline unrolling as a single object. However, this idiom is obscure and error-prone; contributors unfamiliar with the trick may remove the comma or misunderstand the intent. The `-is` operator pattern (`($x -is [string[]]) | Should -BeTrue`) avoids pipeline unrolling entirely, is self-documenting, and is consistent across all array-type assertions.
+
+### Defensive Assertions Before Iteration and Indexing
+
+> For the normative rules, see [Defensive Assertions Before Iteration and Indexing](STYLE_GUIDE.md#defensive-assertions-before-iteration-and-indexing) in the main guide.
+
+#### Why `foreach` over `$null` or an empty collection is a silent-pass risk
+
+In PowerShell, `foreach ($x in $null) { ... }` and `foreach ($x in @()) { ... }` both execute zero loop iterations. When a Pester `It` block places all of its `Should` assertions inside such a `foreach`, a bug that causes the function under test to return `$null` or an empty array will not trigger any assertion failure—the test silently passes with zero evaluated assertions. This is one of the most dangerous patterns in Pester tests because it gives a green test result for fundamentally broken code. A single `Should -Not -BeNullOrEmpty` assertion before the loop converts that silent pass into an immediate, descriptive failure.
+
+#### Why a direct Pester assertion is more actionable than a runtime indexing error
+
+When a test accesses `$arrResult[0]` without first asserting the collection count, a `$null` or empty result produces a runtime error such as *"Cannot index into a null array"* rather than a structured Pester failure. This runtime error obscures the root cause—the function returned unexpected output—behind an implementation detail of the test itself. A pre-index `$arrResult.Count | Should -Be <N>` assertion produces a clear Pester message like *"Expected 1, but got 0"*, immediately signaling that the function's output contract was violated, not the test code.
+
+#### Why outer-collection and nested-property assertions protect different failure modes
+
+An outer assertion like `$arrResult.Count | Should -Be 1` confirms that the top-level collection has the expected number of elements, but it says nothing about the structure of each element. A nested assertion like `$arrResult[0].Principals | Should -Not -BeNullOrEmpty` confirms that a specific property within that element is populated. These guard against different regression scenarios: one where the function returns too few (or too many) top-level results, and another where the function returns the right number of results but with missing or empty nested data. Both assertions are needed to fully protect subsequent indexed access into the nested property.
+
+#### How pre-assertions strengthen Arrange-Act-Assert
+
+The Arrange-Act-Assert pattern structures a test into setup, execution, and verification phases. Defensive pre-assertions fit naturally at the beginning of the Assert phase as *structural guards* that validate the shape and size of the result before the test proceeds to verify specific values. This layered approach ensures that each assertion failure maps to a single, unambiguous cause: a structural guard failure means the output contract was violated at a structural level, while a value assertion failure means the structure was correct but a specific value was wrong. Without these guards, a single failure can be ambiguous—did the function return the wrong value, or did it return nothing at all?
