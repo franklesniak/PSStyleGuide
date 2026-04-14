@@ -1975,7 +1975,7 @@ foreach ($objCluster in $script:objResult.ClusterActions) {
 ```powershell
 # Non-Compliant: [object[]] disjunction masks regressions in the
 # production strong-type cast.
-($objCluster.Principals -is [string[]]) -or ($objCluster.Principals -is [object[]]) |
+(($objCluster.Principals -is [string[]]) -or ($objCluster.Principals -is [object[]])) |
     Should -BeTrue
 
 # Non-Compliant: .Count on a potentially-null value is asserted before
