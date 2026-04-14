@@ -1946,9 +1946,9 @@ $objResult.PSObject.Properties.Name | Should -Be @('Key', 'Type')
 
 When asserting that a property on a returned object is a non-empty, strongly-typed array, tests **MUST** follow these rules:
 
-1. **Non-emptiness first.** Tests **MUST** use `Should -Not -BeNullOrEmpty` before any `.Count`-based assertion. This produces a clear failure message when the property is `$null` or empty, rather than a confusing "expected greater than 0" on a null dereference.
+1. **Non-emptiness first.** Tests **MUST** use `Should -Not -BeNullOrEmpty` before any `.Count`-based assertion. This produces a clear failure message when the property is `$null` or empty, rather than a confusing "expected greater than 0" when the property is `$null`.
 
-2. **Strong-type assertion.** When production code explicitly casts an output property to a strongly-typed array (e.g., `[string[]]`), tests **MUST** assert that exact array type using the `-is` operator wrapped in `Should -BeTrue`:
+2. **Strongly-typed assertion.** When production code explicitly casts an output property to a strongly-typed array (e.g., `[string[]]`), tests **MUST** assert that exact array type using the `-is` operator wrapped in `Should -BeTrue`:
 
    ```powershell
    ($obj.Prop -is [string[]]) | Should -BeTrue
