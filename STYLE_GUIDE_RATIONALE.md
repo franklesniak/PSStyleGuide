@@ -1501,3 +1501,21 @@ $objPesterConfig.TestResult.Enabled = $true
 $objPesterConfig.TestResult.OutputPath = 'test-results.xml'
 Invoke-Pester -Configuration $objPesterConfig
 ```
+
+### Testing Strongly-Typed Array Properties
+
+> For the normative rules, see [Testing Strongly-Typed Array Properties](STYLE_GUIDE.md#testing-strongly-typed-array-properties) in the main guide.
+
+#### Why `Should -Not -BeNullOrEmpty` before `.Count`
+
+When a property is `$null` or an empty array, `$obj.Prop.Count | Should -BeGreaterThan 0` produces a failure message like *"Expected the actual value to be greater than 0, but got 0"* (or worse, the `.Count` member access on `$null` returns `$null`, yielding *"Expected the actual value to be greater than 0, but got "* with no useful value). In contrast, `$obj.Prop | Should -Not -BeNullOrEmpty` immediately communicates that the value was null or empty, giving the developer a much clearer signal about what went wrong. Testing non-emptiness first also guards subsequent assertions—such as type checks—from operating on a `$null` value that would produce misleading results.
+
+#### Why permitting `[object[]]` weakens the test
+
+When production code intentionally casts a property to a strongly-typed array like `[string[]]`, the test exists to ensure that cast is preserved. If a future refactor accidentally removes the cast, the property silently degrades to `[object[]]`—PowerShell's default array type. A disjunction such as `($x -is [string[]]) -or ($x -is [object[]])` will still pass in that scenario, defeating the purpose of the assertion. By requiring the exact type match (`-is [string[]]` alone), the test catches the regression immediately.
+
+#### Why `Should -BeOfType [string[]]` is discouraged for array-type assertions
+
+Pester's `-BeOfType` assertion receives its input through the PowerShell pipeline. When an array is piped (`$x | Should -BeOfType [string[]]`), PowerShell unrolls the array and sends each element individually to `Should`. Pester then evaluates `-BeOfType` against each *element*, not against the *array itself*. This means the assertion tests whether each string is of type `[string[]]`—which it is not—and the test fails even when the property is correctly typed.
+
+A workaround exists: the unary comma operator (`, $x | Should -BeOfType [string[]]`) wraps the array in a single-element wrapper array so that the original array survives pipeline unrolling as a single object. However, this idiom is obscure and error-prone; contributors unfamiliar with the trick may remove the comma or misunderstand the intent. The `-is` operator pattern (`($x -is [string[]]) | Should -BeTrue`) avoids pipeline unrolling entirely, is self-documenting, and is consistent across all array-type assertions.
