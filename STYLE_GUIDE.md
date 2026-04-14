@@ -1958,7 +1958,7 @@ When asserting that a property on a returned object is a non-empty, strongly-typ
 
 3. **Avoid `Should -BeOfType [string[]]` for array types.** Tests **SHOULD NOT** use `$x | Should -BeOfType [string[]]` to assert array type, because the pipeline unrolls the array before Pester evaluates the type. Prefer the `-is [string[]]` pattern.
 
-4. **Ordering.** When combined with a property-name check, the recommended assertion order **SHOULD** be: property name first, then non-empty assertion, then strong-type assertion.
+4. **Ordering.** When combined with a property-name check, the recommended assertion order **SHOULD** be: property name first, then non-empty assertion, then strongly-typed assertion.
 
 **Compliant** (preferred pattern):
 
@@ -1974,7 +1974,7 @@ foreach ($objCluster in $script:objResult.ClusterActions) {
 
 ```powershell
 # Non-Compliant: [object[]] disjunction masks regressions in the
-# production strong-type cast.
+# production strongly-typed cast.
 (($objCluster.Principals -is [string[]]) -or ($objCluster.Principals -is [object[]])) |
     Should -BeTrue
 
