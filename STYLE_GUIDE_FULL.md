@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.8.20260414.0
+**Version:** 2.9.20260415.0
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -45,6 +45,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Functions **MUST** follow Verb-Noun pattern with approved verbs → [Script and Function Naming: Full Explicit Form](#script-and-function-naming-full-explicit-form)
 - **[All]** Functions **MUST** use singular nouns in function names → [Script and Function Naming: Nouns](#script-and-function-naming-nouns)
 - **[All]** Modules **MUST** use PascalCase nouns (containers, not actions) → [Module Naming: Noun-Based Containers](#module-naming-noun-based-containers)
+- **[Modern]** Module manifest `Tags` key **MUST** be populated aggressively with relevant keywords for discoverability → [Module Naming: Noun-Based Containers](#module-naming-noun-based-containers)
 - **[All]** Aliases **MUST NOT** be used in code → [Do Not Use Aliases](#do-not-use-aliases)
 - **[Modern]** Modules **MUST NOT** export compatibility aliases (exception: genuine interactive shortcuts) → [Do Not Use Aliases](#do-not-use-aliases)
 - **[All]** Parameters **MUST** use PascalCase, fully descriptive names → [Parameter Naming](#parameter-naming)
@@ -65,6 +66,9 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Functions **SHOULD** provide multiple examples with input, output, and explanation → [Help Content Quality: High Standards](#help-content-quality-high-standards)
 - **[All]** Every possible output/return value **MUST** be documented in .OUTPUTS with exact type and meaning; integer status codes **MUST** include full code-to-meaning mapping; output examples **MUST** be placed in .EXAMPLE blocks → [Help Content Quality: High Standards](#help-content-quality-high-standards)
 - **[All]** Positional parameter support **MUST** be documented in .NOTES → [Help Content Quality: High Standards](#help-content-quality-high-standards)
+- **[All]** Private/internal helper functions' `.NOTES` **MUST** begin with a private-helper banner → [Private/Internal Helper Function Documentation](#privateinternal-helper-function-documentation)
+- **[Modern]** Functions omitted from module manifest `FunctionsToExport` are treated as private/internal helpers → [Private/Internal Helper Function Documentation](#privateinternal-helper-function-documentation)
+- **[All]** Positional parameter documentation for private/internal helpers **SHOULD** state it is an internal-caller contract only → [Positional Parameter Support](#positional-parameter-support)
 - **[All]** Version number **MUST** be included in .NOTES (format: Major.Minor.YYYYMMDD.Revision) → [Function and Script Versioning](#function-and-script-versioning)
 - **[All]** Version build component **MUST** be current date in YYYYMMDD format → [Function and Script Versioning](#function-and-script-versioning)
 - **[All]** Inline comments **SHOULD** focus on "why" not "what" → [Inline Comments: Purpose and Placement](#inline-comments-purpose-and-placement)
@@ -96,6 +100,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[Modern]** [Parameter(Mandatory=$true)] **SHOULD** be used only when function cannot work without value → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
 - **[Modern]** [ValidateNotNullOrEmpty()] **SHOULD** be used for optional-but-not-empty parameters and for mandatory [string] parameters whose logic depends on a non-empty value → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
 - **[Modern]** Multiple [OutputType()] **SHOULD** only be used for intentionally polymorphic returns → ["Modern Advanced" Functions/Scripts: Handling Multiple or Dynamic Output Types](#modern-advanced-functionsscripts-handling-multiple-or-dynamic-output-types)
+- **[Modern]** Subset-only positional contracts **MUST** use `PositionalBinding = $false` with explicit `[Parameter(Position = N)]` → [Positional Parameter Support](#positional-parameter-support)
 - **[All]** Functions **MUST** be atomic, reusable tools with single purpose → [Function Declaration and Structure](#function-declaration-and-structure)
 - **[All]** Polymorphic parameters (multiple incompatible types) **SHOULD** be left un-typed or [object] → [Parameter Block Design: Detailed Analysis](#parameter-block-design-detailed-analysis)
 - **[All]** [ref] **MUST** be used exclusively for output requiring write-back to caller scope → [Input/Output Contract: Reference Parameters](#inputoutput-contract-reference-parameters)
@@ -613,12 +618,16 @@ By naming the module `ObjectFlattener` (the tool) and the function `ConvertTo-Fl
 
 The discoverability strategy relies on the **Module Manifest (`.psd1`)** rather than compromising the architectural name. The `Tags` key in the manifest handles keyword searching, keeping the module name pure while ensuring findability during searches.
 
+Module manifests (`.psd1`) are a PowerShell v2.0+ feature — they do not exist in PowerShell v1.0. Manifest-specific guidance therefore cannot carry the `[All]` scope tag, which by convention means "all PowerShell versions, including v1.0." The general module naming rule remains `[All]` because PascalCase noun naming is applicable regardless of PowerShell version, while the manifest-specific `Tags` discoverability guidance is explicitly `[Modern]`.
+
 **Modules are treated as .NET Namespaces or Class Libraries (Containers), not Actions.** Therefore, Module names **MUST** be **PascalCase Nouns** or **Noun Phrases**.
 
 - **Correct:** `ObjectFlattener`, `NetworkManager`, `DataParser`
 - **Incorrect:** `FlattenObject`, `ManageNetwork`, `ParseData`
 
-Module names **MUST NOT** be compromised for the sake of keyword searching. Instead, rely on the **Module Manifest (`.psd1`)** to handle discoverability. The `Tags` key in the manifest **MUST** be populated aggressively with relevant keywords (including verbs) to ensure the module is found during searches, while keeping the architectural name pure.
+Module names **MUST NOT** be compromised for the sake of keyword searching.
+
+**[Modern]** In module-based code, the **Module Manifest (`.psd1`)** handles discoverability. The `Tags` key in the manifest **MUST** be populated aggressively with relevant keywords (including verbs) to ensure the module is found during searches, while keeping the architectural name pure.
 
 ### Do Not Use Aliases
 
@@ -892,6 +901,64 @@ Comprehensive help also demonstrates **State Transparency**: showing **exact con
 2. **Edge Case Coverage**: Examples include valid input, invalid segments, overflow conditions, excess parts.
 3. **Positional Parameter Support**: `.NOTES` explicitly documents positional ordering.
 4. **Versioning**: Includes internal version in `.NOTES` for change tracking.
+
+---
+
+### Private/Internal Helper Function Documentation
+
+Private/internal helper functions receive the same full comment-based help treatment as public/exported functions. However, without an explicit banner distinguishing them, a reader examining a function file in isolation cannot tell whether it is part of the stable public API or an internal implementation detail. This matters because:
+
+1. **Drift between file presentation and actual API surface.** When a helper's comment-based help looks identical to a public function's help, consumers may treat it as a supported entry point. If the function is later renamed, restructured, or removed during internal refactoring, those consumers encounter unexpected breakage.
+2. **Positional contracts differ in stability.** A public function's positional parameter ordering is a stable contract; an internal helper's ordering may be changed freely as the implementation evolves. Explicitly labeling the positional documentation as an internal-caller contract prevents external callers from relying on ordering that was never guaranteed.
+3. **Module manifests are not the only scoping mechanism.** While `FunctionsToExport` in a module manifest (`.psd1`) is the primary mechanism in module-based code, the concept of private/internal helpers is broader: standalone scripts, multi-function `.ps1` files, and v1.0-targeted code all have internal helpers that are not governed by a manifest. The banner rule therefore applies at the `[All]` scope.
+
+The banner is deliberately placed at the top of `.NOTES` so it is the first thing a reader encounters after the behavioral documentation sections. It does not reduce documentation quality; it adds a single, high-signal annotation that protects both the author's refactoring freedom and consumers' expectations.
+
+**[All]** If a function is intended only for internal use and is not part of the script, module, or tool's public API surface, its `.NOTES` section **MUST** begin with a clear private-helper banner. That banner **MUST** state that the function is not part of the public API surface, and **MUST** warn that parameters, return shape, and positional contract may change without notice.
+
+**[Modern]** In module-based code, a function intentionally omitted from the module manifest's `FunctionsToExport` is treated as a private/internal helper for purposes of the documentation requirements above.
+
+All other comment-based help requirements (`.SYNOPSIS`, `.DESCRIPTION`, `.PARAMETER`, `.EXAMPLE`, `.INPUTS`, `.OUTPUTS`, `.NOTES`) still apply to private/internal helpers — the banner is an addition, not a replacement.
+
+**Compliant — private/internal helper with required `.NOTES` banner:**
+
+```powershell
+function Convert-RawRecord {
+    # .SYNOPSIS
+    # Transforms a raw input record into a normalized internal format.
+    # .DESCRIPTION
+    # Parses the raw record hashtable, validates required keys, and
+    # returns a normalized [pscustomobject]. This function is used
+    # only by Import-DataSet and is not part of the public API.
+    # .PARAMETER ReferenceToResultObject
+    # Reference to store the resulting normalized object.
+    # .PARAMETER RawRecord
+    # The raw hashtable to normalize.
+    # .EXAMPLE
+    # $objResult = $null
+    # $intReturnCode = Convert-RawRecord ([ref]$objResult) $hashtableInput
+    # # $intReturnCode = 0, $objResult contains the normalized record
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    # .OUTPUTS
+    # [int] Status code: 0 = success, -1 = failure (missing keys)
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER — This function is not part of the
+    # public API surface. Parameters, return shape, and positional
+    # contract may change without notice.
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #   Position 0: ReferenceToResultObject
+    #   Position 1: RawRecord
+    # Version: 1.0.20260415.0
+    param (
+        [ref]$ReferenceToResultObject,
+        [hashtable]$RawRecord
+    )
+
+    # Implementation omitted for brevity
+}
+```
 
 ---
 
@@ -1311,6 +1378,66 @@ Guidance for this format:
 1. The header line **SHOULD** be `# This function/script supports positional parameters:` followed by each position listed on its own indented line as `#   Position N: ParameterName`.
 2. Only list parameters that are expected to be used positionally. For functions or scripts with many optional parameters, listing only the mandatory or commonly-used positional parameters is acceptable.
 3. The parameter name **SHOULD** match the declared parameter name without the `-` prefix (e.g., `VectorRows`, not `-VectorRows`), since the `.NOTES` section documents the parameter's identity, not its call syntax.
+4. **[All]** If positional parameter behavior is documented for a private/internal helper, that documentation **SHOULD** clearly state that it is an internal-caller contract only and is subject to change. For example, the header line **SHOULD** read `# This function supports positional parameters` / `# (internal-caller contract only; subject to change):` instead of the standard header.
+
+#### [Modern] Enforcing a Subset-Only Positional Contract
+
+**[Modern]** When a `[CmdletBinding()]` function or script documents only a **subset** of its parameters as positional, it **MUST** use `[CmdletBinding(PositionalBinding = $false)]` and **MUST** apply explicit `[Parameter(Position = N)]` attributes only to the parameters intended to be positional. This rule does not apply to v1.0-targeted functions, which cannot use `[CmdletBinding()]`.
+
+**Compliant — subset-only positional contract enforced:**
+
+```powershell
+function Import-DataSet {
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([pscustomobject])]
+    param (
+        [Parameter(Mandatory = $true, Position = 0)]
+        [string]$InputMode,
+
+        [Parameter(Mandatory = $true, Position = 1)]
+        [string]$OutputPath,
+
+        [Parameter()]
+        [switch]$Force,
+
+        [Parameter()]
+        [int]$RetryCount
+    )
+
+    # Only InputMode and OutputPath are positional;
+    # Force and RetryCount must always be named.
+    # ...
+}
+```
+
+**Non-compliant — default PositionalBinding contradicts documented subset contract:**
+
+```powershell
+# BAD: Documentation claims only InputMode and OutputPath are positional,
+# but CmdletBinding() defaults to PositionalBinding = $true, which silently
+# makes Force and RetryCount positional as well.
+function Import-DataSet {
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$InputMode,
+
+        [Parameter(Mandatory = $true)]
+        [string]$OutputPath,
+
+        [Parameter()]
+        [switch]$Force,
+
+        [Parameter()]
+        [int]$RetryCount
+    )
+
+    # .NOTES claims "Position 0: InputMode, Position 1: OutputPath"
+    # but all parameters accept positional input — mismatch.
+    # ...
+}
+```
 
 ---
 

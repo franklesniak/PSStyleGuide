@@ -18,11 +18,13 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Overview of Documentation Philosophy](#overview-of-documentation-philosophy)
   - [Parameter Documentation Placement: Strategic Choice](#parameter-documentation-placement-strategic-choice)
   - [Help Format Options: Comparison](#help-format-options-comparison)
+  - [Private/Internal Helper Function Documentation](#privateinternal-helper-function-documentation)
   - [Summary: Documentation as Complete Specification](#summary-documentation-as-complete-specification)
 - [Function Design Rationale](#function-design-rationale)
   - [Overview of Function Architecture](#overview-of-function-architecture)
   - [Advanced Feature Emulation (v1.0-Native)](#advanced-feature-emulation-v10-native)
   - [Options for Return Mechanism: Comparison](#options-for-return-mechanism-comparison)
+  - [Enforcing Subset-Only Positional Contracts in Modern Functions](#enforcing-subset-only-positional-contracts-in-modern-functions)
   - [Summary: Function Design as Reliability Engineering](#summary-function-design-as-reliability-engineering)
 - [Error Handling Rationale](#error-handling-rationale)
   - [Executive Summary: Error Handling Philosophy](#executive-summary-error-handling-philosophy)
@@ -127,6 +129,8 @@ By naming the module `ObjectFlattener` (the tool) and the function `ConvertTo-Fl
 
 The discoverability strategy relies on the **Module Manifest (`.psd1`)** rather than compromising the architectural name. The `Tags` key in the manifest handles keyword searching, keeping the module name pure while ensuring findability during searches.
 
+Module manifests (`.psd1`) are a PowerShell v2.0+ feature — they do not exist in PowerShell v1.0. Manifest-specific guidance therefore cannot carry the `[All]` scope tag, which by convention means "all PowerShell versions, including v1.0." The general module naming rule remains `[All]` because PascalCase noun naming is applicable regardless of PowerShell version, while the manifest-specific `Tags` discoverability guidance is explicitly `[Modern]`.
+
 ---
 
 ### Local Variable Naming: Defensive Design Philosophy
@@ -224,6 +228,20 @@ The author uses **single-line comments** (`# .SECTION`) rather than **block comm
 
 ---
 
+### Private/Internal Helper Function Documentation
+
+> For the private/internal helper documentation rules, see [Private/Internal Helper Function Documentation](STYLE_GUIDE.md#privateinternal-helper-function-documentation) in the main guide.
+
+Private/internal helper functions receive the same full comment-based help treatment as public/exported functions. However, without an explicit banner distinguishing them, a reader examining a function file in isolation cannot tell whether it is part of the stable public API or an internal implementation detail. This matters because:
+
+1. **Drift between file presentation and actual API surface.** When a helper's comment-based help looks identical to a public function's help, consumers may treat it as a supported entry point. If the function is later renamed, restructured, or removed during internal refactoring, those consumers encounter unexpected breakage.
+2. **Positional contracts differ in stability.** A public function's positional parameter ordering is a stable contract; an internal helper's ordering may be changed freely as the implementation evolves. Explicitly labeling the positional documentation as an internal-caller contract prevents external callers from relying on ordering that was never guaranteed.
+3. **Module manifests are not the only scoping mechanism.** While `FunctionsToExport` in a module manifest (`.psd1`) is the primary mechanism in module-based code, the concept of private/internal helpers is broader: standalone scripts, multi-function `.ps1` files, and v1.0-targeted code all have internal helpers that are not governed by a manifest. The banner rule therefore applies at the `[All]` scope.
+
+The banner is deliberately placed at the top of `.NOTES` so it is the first thing a reader encounters after the behavioral documentation sections. It does not reduce documentation quality; it adds a single, high-signal annotation that protects both the author's refactoring freedom and consumers' expectations.
+
+---
+
 ### Summary: Documentation as Complete Specification
 
 The documentation system is **comprehensive and complete**:
@@ -292,6 +310,19 @@ The use of explicit `return` vs. implicit output represents a **philosophical ch
 | **Implicit output (modern)** | • Pipeline composable • Concise | • Risk of extra objects • Requires v2.0+ for safety |
 
 **Conclusion**: The explicit `return` pattern is **correct and optimal** for v1.0-targeted, non-pipeline tools.
+
+---
+
+### Enforcing Subset-Only Positional Contracts in Modern Functions
+
+> For the corresponding normative rule, see [Positional Parameter Support](STYLE_GUIDE.md#positional-parameter-support) in the main guide.
+
+When `[CmdletBinding()]` is declared without specifying `PositionalBinding`, PowerShell defaults to `PositionalBinding = $true`. This default silently assigns positional slots to **every** declared parameter in the order they appear in the `param()` block. The implicit assignment has two consequences:
+
+1. **Parameter reordering or insertion creates breaking changes.** If a maintainer adds a new parameter between existing ones, or reorders the `param()` block, every positional caller that relied on the original declaration order will silently bind arguments to the wrong parameters. Because the binding change is invisible at the call site, it is difficult to detect during code review or testing.
+2. **Documentation/implementation mismatch.** When `.NOTES` documents only a subset of parameters as positional (e.g., `Position 0: InputMode`, `Position 1: OutputPath`) but the runtime actually permits positional binding for all parameters, callers may unknowingly pass values to unintended parameters. This silent divergence between the documented contract and the runtime behavior undermines trust in the function's interface.
+
+`PositionalBinding = $false` eliminates both risks by requiring the author to opt in to positional binding explicitly via `[Parameter(Position = N)]` on each intended positional parameter. Parameters without an explicit `Position` attribute become name-only, regardless of their declaration order.
 
 ---
 
