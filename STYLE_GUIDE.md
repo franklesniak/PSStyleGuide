@@ -2250,7 +2250,7 @@ For **destructive** operations—`Remove-Item`, `Move-Item`—`-LiteralPath` **M
 
 Reserve `-Path` for cases where wildcard expansion is **explicitly intended**.
 
-**Exception — `New-Item`:** `New-Item` does **not** have a `-LiteralPath` parameter (across Windows PowerShell 5.1 and PowerShell 7.x). Use `New-Item -Path` for item creation.
+**Exception — `New-Item`:** `New-Item` does **not** have a `-LiteralPath` parameter (across Windows PowerShell 5.1 and PowerShell 7.x). Use `New-Item -Path` for item creation. Because `-Path` still interprets wildcard characters, code **SHOULD** validate or reject untrusted input containing `[`, `]`, `*`, or `?` as literal characters, or use a .NET file API (e.g., `[System.IO.File]::Create()`) when literal path semantics are required.
 
 **Common cmdlets where this rule applies:** `Copy-Item`, `Get-ChildItem`, `Get-Content`, `Get-Item`, `Move-Item`, `Remove-Item`, `Set-Content`, `Test-Path`.
 

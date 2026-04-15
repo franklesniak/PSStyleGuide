@@ -773,7 +773,7 @@ For `Remove-Item` and `Move-Item`, the consequences of accidental wildcard expan
 
 #### `New-Item` Exception
 
-`New-Item` does not expose a `-LiteralPath` parameter in any released version of PowerShell (Windows PowerShell 5.1, PowerShell 7.4.x–7.6.x). Attempting `New-Item -LiteralPath` produces a `ParameterBindingException`. Because `New-Item` creates a new item rather than operating on existing file-system entries, the wildcard-injection risk is lower than for read or destructive cmdlets—the path is a target that does not yet exist, so wildcard expansion has nothing to match. Use `New-Item -Path` for all item-creation scenarios.
+`New-Item` does not expose a `-LiteralPath` parameter in any released version of PowerShell (Windows PowerShell 5.1, PowerShell 7.x). Attempting `New-Item -LiteralPath` produces a `ParameterBindingException`. Because `New-Item` creates a new item rather than deleting, moving, or modifying existing file-system entries, the wildcard-injection risk is lower than for read or destructive cmdlets, but it is not eliminated: wildcard characters supplied to `-Path` can still match existing parent directories or items and cause creation in unintended or multiple locations. Use `New-Item -Path` when the path value is trusted or validated; for untrusted input that may contain wildcard characters (`[`, `]`, `*`, `?`) as literal characters, validate or reject the input, or use an appropriate .NET API (e.g., `[System.IO.File]::Create()`, `[System.IO.Directory]::CreateDirectory()`) when literal path semantics are required.
 
 ---
 
