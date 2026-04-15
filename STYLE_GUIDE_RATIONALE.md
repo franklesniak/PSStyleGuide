@@ -771,6 +771,10 @@ Paths built from variables, `Join-Path` output, user input, environment variable
 
 For `Remove-Item` and `Move-Item`, the consequences of accidental wildcard expansion are **irreversible**—deleted files cannot be recovered (without backups), and moved files may overwrite existing targets. This is why the main guide elevates the rule from **SHOULD** to **MUST** for destructive cmdlets with variable-derived paths.
 
+#### `New-Item` Exception
+
+`New-Item` does not expose a `-LiteralPath` parameter in any released version of PowerShell (Windows PowerShell 5.1, PowerShell 7.4.x–7.6.x). Attempting `New-Item -LiteralPath` produces a `ParameterBindingException`. Because `New-Item` creates a new item rather than operating on existing file-system entries, the wildcard-injection risk is lower than for read or destructive cmdlets—the path is a target that does not yet exist, so wildcard expansion has nothing to match. Use `New-Item -Path` for all item-creation scenarios.
+
 ---
 
 ### Resolving Paths for .NET Static Methods
