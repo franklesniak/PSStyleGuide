@@ -23,6 +23,7 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Overview of Function Architecture](#overview-of-function-architecture)
   - [Advanced Feature Emulation (v1.0-Native)](#advanced-feature-emulation-v10-native)
   - [Options for Return Mechanism: Comparison](#options-for-return-mechanism-comparison)
+  - [Enforcing Subset-Only Positional Contracts in Modern Functions](#enforcing-subset-only-positional-contracts-in-modern-functions)
   - [Summary: Function Design as Reliability Engineering](#summary-function-design-as-reliability-engineering)
 - [Error Handling Rationale](#error-handling-rationale)
   - [Executive Summary: Error Handling Philosophy](#executive-summary-error-handling-philosophy)
@@ -292,6 +293,19 @@ The use of explicit `return` vs. implicit output represents a **philosophical ch
 | **Implicit output (modern)** | • Pipeline composable • Concise | • Risk of extra objects • Requires v2.0+ for safety |
 
 **Conclusion**: The explicit `return` pattern is **correct and optimal** for v1.0-targeted, non-pipeline tools.
+
+---
+
+### Enforcing Subset-Only Positional Contracts in Modern Functions
+
+> For the corresponding normative rule, see [Positional Parameter Support](STYLE_GUIDE.md#positional-parameter-support) in the main guide.
+
+When `[CmdletBinding()]` is declared without specifying `PositionalBinding`, PowerShell defaults to `PositionalBinding = $true`. This default silently assigns positional slots to **every** declared parameter in the order they appear in the `param()` block. The implicit assignment has two consequences:
+
+1. **Parameter reordering or insertion creates breaking changes.** If a maintainer adds a new parameter between existing ones, or reorders the `param()` block, every positional caller that relied on the original declaration order will silently bind arguments to the wrong parameters. Because the binding change is invisible at the call site, it is difficult to detect during code review or testing.
+2. **Documentation/implementation mismatch.** When `.NOTES` documents only a subset of parameters as positional (e.g., `Position 0: InputMode`, `Position 1: OutputPath`) but the runtime actually permits positional binding for all parameters, callers may unknowingly pass values to unintended parameters. This silent divergence between the documented contract and the runtime behavior undermines trust in the function's interface.
+
+`PositionalBinding = $false` eliminates both risks by requiring the author to opt in to positional binding explicitly via `[Parameter(Position = N)]` on each intended positional parameter. Parameters without an explicit `Position` attribute become name-only, regardless of their declaration order.
 
 ---
 

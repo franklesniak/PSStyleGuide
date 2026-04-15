@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.7.20260414.0
+**Version:** 2.8.20260415.0
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -88,6 +88,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[Modern]** [Parameter(Mandatory=$true)] **SHOULD** be used only when function cannot work without value → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
 - **[Modern]** [ValidateNotNullOrEmpty()] **SHOULD** be used for optional-but-not-empty parameters and for mandatory [string] parameters whose logic depends on a non-empty value → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
 - **[Modern]** Multiple [OutputType()] **SHOULD** only be used for intentionally polymorphic returns → ["Modern Advanced" Functions/Scripts: Handling Multiple or Dynamic Output Types](#modern-advanced-functionsscripts-handling-multiple-or-dynamic-output-types)
+- **[Modern]** Subset-only positional contracts **MUST** use `PositionalBinding = $false` with explicit `[Parameter(Position = N)]` → [Positional Parameter Support](#positional-parameter-support)
 - **[All]** Functions **MUST** be atomic, reusable tools with single purpose → [Function Declaration and Structure](#function-declaration-and-structure)
 - **[All]** Polymorphic parameters (multiple incompatible types) **SHOULD** be left un-typed or [object] → [Parameter Block Design: Detailed Analysis](#parameter-block-design-detailed-analysis)
 - **[All]** [ref] **MUST** be used exclusively for output requiring write-back to caller scope → [Input/Output Contract: Reference Parameters](#inputoutput-contract-reference-parameters)
@@ -975,6 +976,65 @@ Guidance for this format:
 1. The header line **SHOULD** be `# This function/script supports positional parameters:` followed by each position listed on its own indented line as `#   Position N: ParameterName`.
 2. Only list parameters that are expected to be used positionally. For functions or scripts with many optional parameters, listing only the mandatory or commonly-used positional parameters is acceptable.
 3. The parameter name **SHOULD** match the declared parameter name without the `-` prefix (e.g., `VectorRows`, not `-VectorRows`), since the `.NOTES` section documents the parameter's identity, not its call syntax.
+
+#### [Modern] Enforcing a Subset-Only Positional Contract
+
+**[Modern]** When a `[CmdletBinding()]` function or script documents only a **subset** of its parameters as positional, it **MUST** use `[CmdletBinding(PositionalBinding = $false)]` and **MUST** apply explicit `[Parameter(Position = N)]` attributes only to the parameters intended to be positional. This rule does not apply to v1.0-targeted functions, which cannot use `[CmdletBinding()]`.
+
+**Compliant — subset-only positional contract enforced:**
+
+```powershell
+function Import-DataSet {
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([pscustomobject])]
+    param (
+        [Parameter(Mandatory = $true, Position = 0)]
+        [string]$InputMode,
+
+        [Parameter(Mandatory = $true, Position = 1)]
+        [string]$OutputPath,
+
+        [Parameter()]
+        [switch]$Force,
+
+        [Parameter()]
+        [int]$RetryCount
+    )
+
+    # Only InputMode and OutputPath are positional;
+    # Force and RetryCount must always be named.
+    # ...
+}
+```
+
+**Non-compliant — default PositionalBinding contradicts documented subset contract:**
+
+```powershell
+# BAD: Documentation claims only InputMode and OutputPath are positional,
+# but CmdletBinding() defaults to PositionalBinding = $true, which silently
+# makes Force and RetryCount positional as well.
+function Import-DataSet {
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$InputMode,
+
+        [Parameter(Mandatory = $true)]
+        [string]$OutputPath,
+
+        [Parameter()]
+        [switch]$Force,
+
+        [Parameter()]
+        [int]$RetryCount
+    )
+
+    # .NOTES claims "Position 0: InputMode, Position 1: OutputPath"
+    # but all parameters accept positional input — mismatch.
+    # ...
+}
+```
 
 ---
 
