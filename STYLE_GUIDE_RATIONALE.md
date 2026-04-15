@@ -775,6 +775,16 @@ For `Remove-Item` and `Move-Item`, the consequences of accidental wildcard expan
 
 `New-Item` does not expose a `-LiteralPath` parameter in any released version of PowerShell (Windows PowerShell 5.1, PowerShell 7.x). Attempting `New-Item -LiteralPath` produces a `ParameterBindingException`. Because `New-Item` creates a new item rather than deleting, moving, or modifying existing file-system entries, the wildcard-injection risk is lower than for read or destructive cmdlets, but it is not eliminated: wildcard characters supplied to `-Path` can still match existing parent directories or items and cause creation in unintended or multiple locations. Use `New-Item -Path` when the path value is trusted or validated; for untrusted input that may contain wildcard characters (`[`, `]`, `*`, `?`) as literal characters, validate or reject the input, or use an appropriate .NET API (e.g., `[System.IO.File]::Create()`, `[System.IO.Directory]::CreateDirectory()`) when literal path semantics are required.
 
+#### Wildcard-Safe Directory Creation With `[System.IO.Directory]::CreateDirectory()`
+
+For directory creation specifically, `[System.IO.Directory]::CreateDirectory()` is the preferred .NET alternative when the path is variable-derived and may contain wildcard characters. Unlike `New-Item -Path ... -ItemType Directory`, `CreateDirectory()` does not interpret PowerShell wildcard characters (`[`, `]`, `*`, `?`) and therefore provides deterministic behavior regardless of what characters appear in the path.
+
+The path must be resolved to an absolute filesystem path via `$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath()` before being passed to `CreateDirectory()`, as documented in the "Resolving Paths for .NET Static Methods" rule. `GetUnresolvedProviderPathFromPSPath()` is particularly appropriate here because the target directory may not yet exist.
+
+`CreateDirectory()` is also safe to call when the directory already exists—it returns the existing `DirectoryInfo` object without error—making a preceding `Test-Path -LiteralPath` check optional but useful for clarity. The compliant example in the main guide includes the `Test-Path` guard for readability.
+
+For *file* creation with wildcard-safe semantics, the corresponding .NET API is `[System.IO.File]::Create()` or `[System.IO.StreamWriter]`, but that case is not covered by this rule. The directory-creation guidance is separated because it is the most common scenario where `New-Item -ItemType Directory` would otherwise be the idiomatic choice.
+
 ---
 
 ### Resolving Paths for .NET Static Methods
