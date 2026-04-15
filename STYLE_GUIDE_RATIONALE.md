@@ -19,7 +19,6 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Parameter Documentation Placement: Strategic Choice](#parameter-documentation-placement-strategic-choice)
   - [Help Format Options: Comparison](#help-format-options-comparison)
   - [Private/Internal Helper Function Documentation](#privateinternal-helper-function-documentation)
-  - [Module-Manifest Scope Correction](#module-manifest-scope-correction)
   - [Summary: Documentation as Complete Specification](#summary-documentation-as-complete-specification)
 - [Function Design Rationale](#function-design-rationale)
   - [Overview of Function Architecture](#overview-of-function-architecture)
@@ -130,6 +129,8 @@ By naming the module `ObjectFlattener` (the tool) and the function `ConvertTo-Fl
 
 The discoverability strategy relies on the **Module Manifest (`.psd1`)** rather than compromising the architectural name. The `Tags` key in the manifest handles keyword searching, keeping the module name pure while ensuring findability during searches.
 
+Module manifests (`.psd1`) are a PowerShell v2.0+ feature — they do not exist in PowerShell v1.0. Manifest-specific guidance therefore cannot carry the `[All]` scope tag, which by convention means "all PowerShell versions, including v1.0." The general module naming rule remains `[All]` because PascalCase noun naming is applicable regardless of PowerShell version, while the manifest-specific `Tags` discoverability guidance is explicitly `[Modern]`.
+
 ---
 
 ### Local Variable Naming: Defensive Design Philosophy
@@ -238,16 +239,6 @@ Private/internal helper functions receive the same full comment-based help treat
 3. **Module manifests are not the only scoping mechanism.** While `FunctionsToExport` in a module manifest (`.psd1`) is the primary mechanism in module-based code, the concept of private/internal helpers is broader: standalone scripts, multi-function `.ps1` files, and v1.0-targeted code all have internal helpers that are not governed by a manifest. The banner rule therefore applies at the `[All]` scope.
 
 The banner is deliberately placed at the top of `.NOTES` so it is the first thing a reader encounters after the behavioral documentation sections. It does not reduce documentation quality; it adds a single, high-signal annotation that protects both the author's refactoring freedom and consumers' expectations.
-
----
-
-### Module-Manifest Scope Correction
-
-> For the module naming rules, see [Module Naming: Noun-Based Containers](STYLE_GUIDE.md#module-naming-noun-based-containers) in the main guide.
-
-The guidance about using the module manifest (`.psd1`) `Tags` key for discoverability was previously scoped implicitly as `[All]`. Module manifests are a PowerShell v2.0+ feature — they do not exist in PowerShell v1.0. Manifest-specific guidance therefore cannot carry the `[All]` scope tag, which by convention means "all PowerShell versions, including v1.0."
-
-The correction separates the general module naming rule (which remains `[All]`, since PascalCase noun naming is applicable regardless of PowerShell version) from the manifest-specific `Tags` discoverability guidance (which is now explicitly `[Modern]`).
 
 ---
 
