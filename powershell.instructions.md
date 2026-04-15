@@ -5,7 +5,7 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 2.10.20260415.1
+**Version:** 2.10.20260415.2
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -1571,7 +1571,7 @@ if (-not $boolIsWritable) {
 
 ```powershell
 try {
-    [void](New-Item -Path $OutputPath -ItemType File -Force -ErrorAction Stop)
+    [void](New-Item -LiteralPath $OutputPath -ItemType File -Force -ErrorAction Stop)
     Remove-Item -LiteralPath $OutputPath -Force -ErrorAction Stop
 } catch {
     throw "Cannot write to '$OutputPath': $($_.Exception.Message)"
@@ -2254,7 +2254,7 @@ For **destructive** operations—`Remove-Item`, `Move-Item`—`-LiteralPath` **M
 
 Reserve `-Path` for cases where wildcard expansion is **explicitly intended**.
 
-**Common cmdlets where this rule applies:** `Test-Path`, `Get-Item`, `Get-ChildItem`, `Get-Content`, `Set-Content`, `Copy-Item`, `Move-Item`, `Remove-Item`.
+**Common cmdlets where this rule applies:** `Copy-Item`, `Get-ChildItem`, `Get-Content`, `Get-Item`, `Move-Item`, `New-Item`, `Remove-Item`, `Set-Content`, `Test-Path`.
 
 **Compliant:**
 
