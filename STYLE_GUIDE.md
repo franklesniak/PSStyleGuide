@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.9.20260415.0
+**Version:** 2.10.20260415.1
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -46,6 +46,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Code **SHOULD** use explicit scoping ($global:, $script:) → [Path and Scope Handling](#path-and-scope-handling)
 - **[All]** `-LiteralPath` **SHOULD** be used instead of `-Path` when operating on concrete (non-wildcard) paths derived from variables or `Join-Path` → [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
 - **[All]** For destructive cmdlets (`Remove-Item`, `Move-Item`), `-LiteralPath` **MUST** be used for variable-derived paths → [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
+- **[All]** Paths passed to .NET static methods **MUST** be resolved to absolute via `GetUnresolvedProviderPathFromPSPath()` first → [Resolving Paths for .NET Static Methods](#resolving-paths-for-net-static-methods)
 
 ### Documentation and Comments (Quick Reference)
 
@@ -566,6 +567,25 @@ Get-Content -Path '../config.json'
 ```powershell
 # Good — always resolves relative to the script's own directory:
 Get-Content -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath '../config.json')
+```
+
+#### Resolving Paths for .NET Static Methods
+
+**[All]** When a script or function passes a user-provided or otherwise unresolved PowerShell path to a .NET static method (for example, `[System.IO.File]::WriteAllText()`, `[System.IO.File]::WriteAllLines()`, or `[System.IO.Path]::GetFullPath()`), the path **MUST** first be converted to an absolute file-system path via `$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath()`.
+
+**Compliant:**
+
+```powershell
+# Resolve the PowerShell path before passing it to .NET
+$strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($strOutputPath)
+[System.IO.File]::WriteAllText($strOutputPath, $strContent, $objEncoding)
+```
+
+**Non-Compliant:**
+
+```powershell
+# Non-Compliant: passing a relative PowerShell path directly to a .NET method
+[System.IO.File]::WriteAllText($strOutputPath, $strContent, $objEncoding)
 ```
 
 <!-- rationale-anchor: options-for-local-variable-prefixes-analysis -->

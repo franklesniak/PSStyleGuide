@@ -48,6 +48,7 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Other: Maintainability, Extensibility, and Modernization](#other-maintainability-extensibility-and-modernization)
   - [Summary: Performance, Security, and Holistic Design](#summary-performance-security-and-holistic-design)
   - [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
+  - [Resolving Paths for .NET Static Methods](#resolving-paths-for-net-static-methods)
 - [Content Relocated from STYLE_GUIDE.md](#content-relocated-from-style_guidemd)
 
 ---
@@ -769,6 +770,20 @@ Paths built from variables, `Join-Path` output, user input, environment variable
 #### Destructive Operations Require Stronger Protection
 
 For `Remove-Item` and `Move-Item`, the consequences of accidental wildcard expansion are **irreversible**—deleted files cannot be recovered (without backups), and moved files may overwrite existing targets. This is why the main guide elevates the rule from **SHOULD** to **MUST** for destructive cmdlets with variable-derived paths.
+
+---
+
+### Resolving Paths for .NET Static Methods
+
+> For the actionable rule, see [Resolving Paths for .NET Static Methods](STYLE_GUIDE.md#resolving-paths-for-net-static-methods) in the main guide.
+
+#### Why .NET Static Methods Require Absolute Paths
+
+.NET static methods such as `[System.IO.File]::WriteAllText()`, `[System.IO.File]::WriteAllLines()`, and `[System.IO.Path]::GetFullPath()` resolve relative paths using `[System.Environment]::CurrentDirectory`, which is a process-wide property inherited from the .NET runtime. PowerShell, however, maintains its own working directory via `$PWD`, and the two can diverge silently—for example, after `Set-Location`, when running inside a module, or when a script is invoked from a different directory than expected. This mismatch means that a relative path like `.\output.txt` may resolve to a completely different directory when passed to a .NET method than when used with a native PowerShell cmdlet, producing non-deterministic behavior that is difficult to diagnose.
+
+#### Why `GetUnresolvedProviderPathFromPSPath()` Is Preferred Over `Resolve-Path`
+
+`Resolve-Path` requires that the target path already exists on the file system; if the file has not yet been created, `Resolve-Path` throws a terminating error. `$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath()` converts a PowerShell provider path (including PSDrive-relative and `$PWD`-relative paths) into an absolute file-system path *without* verifying that the path exists. This makes it the correct choice for output paths, new file creation, and any scenario where the target may not yet be present.
 
 ---
 
