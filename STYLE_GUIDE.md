@@ -145,6 +145,8 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Tests asserting property names on `[pscustomobject]` **MUST** use order-insensitive comparisons → [Testing Property Names on PSCustomObject](#testing-property-names-on-pscustomobject)
 - **[All]** Tests asserting strongly-typed array properties **MUST** check non-emptiness first, then assert the exact array type with `-is`; **MUST NOT** permit `[object[]]` fallback → [Testing Strongly-Typed Array Properties](#testing-strongly-typed-array-properties)
 - **[All]** Test `BeforeAll` dot-sourcing **MUST** use the `Split-Path` + `Join-Path` two-step pattern; multi-segment `Join-Path` forms **MUST NOT** be used → [Test File Dot-Sourcing Pattern](#test-file-dot-sourcing-pattern)
+- **[All]** Tests iterating a returned collection with `foreach` **MUST** assert non-emptiness before the loop → [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing)
+- **[All]** Tests accessing specific indices of a returned collection **MUST** assert count before any indexed access → [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing)
 
 <!-- rationale-anchor: executive-summary-author-profile -->
 
@@ -1909,6 +1911,71 @@ It "Returns success code 0 when given valid input" {
 
 ---
 
+### Defensive Assertions Before Iteration and Indexing
+
+When a test iterates or indexes into a collection returned by the function or script under test, the test **MUST** include defensive pre-assertions so that an empty or `$null` result produces a clear, immediate Pester failure instead of silently passing or generating a confusing runtime error.
+
+1. **Pre-iteration non-emptiness.** Tests that iterate a collection with `foreach ($x in $collection) { ... }` **MUST** assert `$collection | Should -Not -BeNullOrEmpty` before the `foreach`. A `foreach` over `$null` or an empty collection executes zero iterations, causing all inner assertions to be silently skipped.
+
+2. **Pre-index count assertion.** Tests that access specific indices of a returned collection (e.g., `$arrResult[0]`) **MUST** assert `$arrResult.Count | Should -Be <N>` before any indexed access when the exact count is part of the contract being tested. If exact count is not part of the contract, the test **MUST** assert a minimum-count condition that covers the highest index accessed—for example, `Should -BeGreaterThan <highest-index-accessed>` (since collections are zero-based, `$arr.Count | Should -BeGreaterThan 2` guarantees that `$arr[0]`, `$arr[1]`, and `$arr[2]` are safe to access).
+
+3. **Pre-index non-empty on nested properties.** When a test indexes into a property of a returned element (e.g., `$arrResult[0].Principals[0]`), the test **MUST** also assert `$arrResult[0].Principals | Should -Not -BeNullOrEmpty` before the inner index.
+
+4. **Ordering.** For a test that accesses `$arr[i].Prop[j]`, assertions **SHOULD** follow this order:
+   1. `$arr | Should -Not -BeNullOrEmpty` or `$arr.Count | Should -Be <N>`
+   2. `$arr[i].Prop | Should -Not -BeNullOrEmpty`
+   3. Strong-type check on `$arr[i].Prop`, if applicable
+   4. Assertions that verify the actual behavior under test
+
+**Compliant** (`foreach` — assert non-emptiness before iterating):
+
+```powershell
+It "Each ClusterActions entry includes a Principals array" {
+    # Assert
+    $script:objResult.ClusterActions | Should -Not -BeNullOrEmpty
+    foreach ($objCluster in $script:objResult.ClusterActions) {
+        $objCluster.PSObject.Properties.Name | Should -Contain 'Principals'
+        $objCluster.Principals | Should -Not -BeNullOrEmpty
+        ($objCluster.Principals -is [string[]]) | Should -BeTrue
+    }
+}
+```
+
+**Non-Compliant** (`foreach` — missing non-emptiness assertion):
+
+```powershell
+# Non-Compliant: foreach over $null or an empty collection can execute zero
+# iterations and leave the test without any evaluated inner assertions.
+It "Each ClusterActions entry includes a Principals array" {
+    # Assert
+    foreach ($objCluster in $script:objResult.ClusterActions) {
+        $objCluster.PSObject.Properties.Name | Should -Contain 'Principals'
+    }
+}
+```
+
+**Compliant** (indexed access — count and nested non-emptiness before indexing):
+
+```powershell
+# Assert
+$arrResult.Count | Should -Be 1
+$arrResult[0].Principals | Should -Not -BeNullOrEmpty
+$arrResult[0].Principals.Count | Should -Be 2
+$arrResult[0].Principals[0] | Should -Be 'userA'
+$arrResult[0].Principals[1] | Should -Be 'userB'
+```
+
+**Non-Compliant** (indexed access — no count assertion before `[0]`):
+
+```powershell
+# Non-Compliant: no count assertion before [0].
+# Assert
+$arrResult[0].Principals.Count | Should -Be 1
+$arrResult[0].Principals[0] | Should -Be 'userA'
+```
+
+---
+
 ### Testing Return Code Conventions
 
 For functions and scripts that use explicit integer status codes, tests **MUST** verify the return code conventions documented in [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes).
@@ -2080,6 +2147,7 @@ When asserting that a property on a returned object is a non-empty, strongly-typ
 **Compliant** (preferred pattern):
 
 ```powershell
+$script:objResult.ClusterActions | Should -Not -BeNullOrEmpty
 foreach ($objCluster in $script:objResult.ClusterActions) {
     $objCluster.PSObject.Properties.Name | Should -Contain 'Principals'
     $objCluster.Principals | Should -Not -BeNullOrEmpty
