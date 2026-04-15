@@ -18,6 +18,7 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Overview of Documentation Philosophy](#overview-of-documentation-philosophy)
   - [Parameter Documentation Placement: Strategic Choice](#parameter-documentation-placement-strategic-choice)
   - [Help Format Options: Comparison](#help-format-options-comparison)
+  - [Private/Internal Helper Function Documentation](#privateinternal-helper-function-documentation)
   - [Summary: Documentation as Complete Specification](#summary-documentation-as-complete-specification)
 - [Function Design Rationale](#function-design-rationale)
   - [Overview of Function Architecture](#overview-of-function-architecture)
@@ -128,6 +129,8 @@ By naming the module `ObjectFlattener` (the tool) and the function `ConvertTo-Fl
 
 The discoverability strategy relies on the **Module Manifest (`.psd1`)** rather than compromising the architectural name. The `Tags` key in the manifest handles keyword searching, keeping the module name pure while ensuring findability during searches.
 
+Module manifests (`.psd1`) are a PowerShell v2.0+ feature — they do not exist in PowerShell v1.0. Manifest-specific guidance therefore cannot carry the `[All]` scope tag, which by convention means "all PowerShell versions, including v1.0." The general module naming rule remains `[All]` because PascalCase noun naming is applicable regardless of PowerShell version, while the manifest-specific `Tags` discoverability guidance is explicitly `[Modern]`.
+
 ---
 
 ### Local Variable Naming: Defensive Design Philosophy
@@ -222,6 +225,20 @@ The author uses **single-line comments** (`# .SECTION`) rather than **block comm
 | **Block (`<# ... #>`)** | • Compact • Modern aesthetic | • **Not supported in PowerShell v1.0** (causes parser error) • Harder to edit individual lines • Risk of malformed blocks |
 
 **Finding**: Only **single-line comments** (`#`) are compatible with PowerShell v1.0. Block comments (`<# ... #>`) are valid in PowerShell v2.0+ and are discoverable by `Get-Help` in those versions, but they **MUST NOT** be used when v1.0 compatibility is required. The single-line format is **required** for the v1.0 compatibility goal.
+
+---
+
+### Private/Internal Helper Function Documentation
+
+> For the private/internal helper documentation rules, see [Private/Internal Helper Function Documentation](STYLE_GUIDE.md#privateinternal-helper-function-documentation) in the main guide.
+
+Private/internal helper functions receive the same full comment-based help treatment as public/exported functions. However, without an explicit banner distinguishing them, a reader examining a function file in isolation cannot tell whether it is part of the stable public API or an internal implementation detail. This matters because:
+
+1. **Drift between file presentation and actual API surface.** When a helper's comment-based help looks identical to a public function's help, consumers may treat it as a supported entry point. If the function is later renamed, restructured, or removed during internal refactoring, those consumers encounter unexpected breakage.
+2. **Positional contracts differ in stability.** A public function's positional parameter ordering is a stable contract; an internal helper's ordering may be changed freely as the implementation evolves. Explicitly labeling the positional documentation as an internal-caller contract prevents external callers from relying on ordering that was never guaranteed.
+3. **Module manifests are not the only scoping mechanism.** While `FunctionsToExport` in a module manifest (`.psd1`) is the primary mechanism in module-based code, the concept of private/internal helpers is broader: standalone scripts, multi-function `.ps1` files, and v1.0-targeted code all have internal helpers that are not governed by a manifest. The banner rule therefore applies at the `[All]` scope.
+
+The banner is deliberately placed at the top of `.NOTES` so it is the first thing a reader encounters after the behavioral documentation sections. It does not reduce documentation quality; it adds a single, high-signal annotation that protects both the author's refactoring freedom and consumers' expectations.
 
 ---
 
