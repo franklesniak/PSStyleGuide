@@ -1097,15 +1097,11 @@ For scripts targeting PowerShell v2.0 or later, **either approach is acceptable*
 
 ### Code Examples
 
-#### try/catch Alternative (.NET Methods) Rationale
+#### try/catch Approach Rationale
 
-The `.NET` `try/catch` alternative approach:
+The `try/catch` code example uses `.NET` static methods (`[System.IO.File]::Create()` and `[System.IO.File]::Delete()`) instead of cmdlets because `New-Item` does not support `-LiteralPath`. Since the guide requires `-LiteralPath` for variable-derived concrete paths, the cmdlet-based approach cannot be made consistent with that rule. `.NET` file APIs operate on literal path strings and do not interpret PowerShell wildcard characters, avoiding the inconsistency.
 
-- Uses `.NET` methods directly (reliable, explicit)
-- Is much shorter than a full `Test-FileWriteability` function
-- Works on PowerShell v2.0+ (.NET Framework 2.0 includes these static methods)
-- Still requires `try/catch`, so does not work on PowerShell v1.0
-- Is less idiomatic than using `New-Item`/`Remove-Item`
+The path is resolved to absolute form via `$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath()` before being passed to the `.NET` static methods. See [Resolving Paths for .NET Static Methods](STYLE_GUIDE.md#resolving-paths-for-net-static-methods) for the general rule and rationale.
 
 ### Reference Implementation
 
