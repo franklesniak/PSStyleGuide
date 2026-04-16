@@ -1572,9 +1572,9 @@ if (-not $boolIsWritable) {
 #### try/catch Approach
 
 ```powershell
-$strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputPath)
-$strWriteTestPath = Join-Path -Path ([System.IO.Path]::GetDirectoryName($strOutputPath)) -ChildPath ('.write_test_{0}.tmp' -f [Guid]::NewGuid().ToString('N'))
 try {
+    $strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputPath)
+    $strWriteTestPath = Join-Path -Path ([System.IO.Path]::GetDirectoryName($strOutputPath)) -ChildPath ('.write_test_{0}.tmp' -f [Guid]::NewGuid().ToString('N'))
     [System.IO.File]::Open($strWriteTestPath, [System.IO.FileMode]::CreateNew).Dispose()
     [System.IO.File]::Delete($strWriteTestPath)
 } catch {
