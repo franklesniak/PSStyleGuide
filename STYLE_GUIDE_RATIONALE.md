@@ -1099,7 +1099,7 @@ For scripts targeting PowerShell v2.0 or later, **either approach is acceptable*
 
 #### try/catch Approach Rationale
 
-The `try/catch` code example uses `.NET` static methods (`[System.IO.File]::Open()` and `[System.IO.File]::Delete()`) instead of cmdlets because `New-Item` does not support `-LiteralPath`. Since the guide requires `-LiteralPath` for variable-derived concrete paths, the cmdlet-based approach cannot be made consistent with that rule. `.NET` file APIs operate on literal path strings and do not interpret PowerShell wildcard characters, avoiding the inconsistency.
+The `try/catch` code example uses `.NET` static methods for both path construction (`[System.IO.Path]::Combine()`) and file operations (`[System.IO.File]::Open()` and `[System.IO.File]::Delete()`) instead of cmdlets. `New-Item` does not support `-LiteralPath`, and `Join-Path`'s `-Path` parameter accepts wildcard characters. Since the guide requires `-LiteralPath` for variable-derived concrete paths, the cmdlet-based approach cannot be made consistent with that rule. `.NET` path and file APIs operate on literal path strings and do not interpret PowerShell wildcard characters, avoiding the inconsistency.
 
 The probe writes to a GUID-based temporary filename (`.write_test_{GUID}.tmp`) in the target file's parent directory instead of probing at the actual output path. This avoids two problems:
 
