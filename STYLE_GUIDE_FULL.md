@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.11.20260416.2
+**Version:** 2.11.20260416.3
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -2022,6 +2022,8 @@ The probe writes to a GUID-based temporary filename (`.write_test_{GUID}.tmp`) i
 
 The probe uses `[System.IO.FileMode]::CreateNew` rather than `[System.IO.FileMode]::Create` or `[System.IO.File]::Create()`. `CreateNew` throws an `IOException` if the target file already exists, providing a safety net even in the vanishingly unlikely event of a GUID collision. `Create` (and `[System.IO.File]::Create()`) silently truncate an existing file, which would mask the collision and destroy the other file's contents.
 
+The `[System.IO.FileAccess]::Write` parameter is specified explicitly because the two-argument `File.Open(path, FileMode)` overload defaults to `FileAccess.ReadWrite`. Since the probe only needs to verify write permission, requesting read access is unnecessary and could cause a false negative in environments where inherited ACLs deny read on newly created files while permitting write.
+
 The path is resolved to absolute form via `$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath()` before being passed to the `.NET` static methods. See [Resolving Paths for .NET Static Methods](#resolving-paths-for-net-static-methods) for the general rule and rationale.
 
 #### .NET Approach
@@ -2043,7 +2045,7 @@ if (-not $boolIsWritable) {
 try {
     $strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputPath)
     $strWriteTestPath = [System.IO.Path]::Combine([System.IO.Path]::GetDirectoryName($strOutputPath), ('.write_test_{0}.tmp' -f [Guid]::NewGuid().ToString('N')))
-    [System.IO.File]::Open($strWriteTestPath, [System.IO.FileMode]::CreateNew).Dispose()
+    [System.IO.File]::Open($strWriteTestPath, [System.IO.FileMode]::CreateNew, [System.IO.FileAccess]::Write).Dispose()
     [System.IO.File]::Delete($strWriteTestPath)
 } catch {
     throw ("Cannot write to '{0}': {1}" -f $OutputPath, $_.Exception.Message)

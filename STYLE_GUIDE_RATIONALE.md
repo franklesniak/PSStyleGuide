@@ -1108,6 +1108,8 @@ The probe writes to a GUID-based temporary filename (`.write_test_{GUID}.tmp`) i
 
 The probe uses `[System.IO.FileMode]::CreateNew` rather than `[System.IO.FileMode]::Create` or `[System.IO.File]::Create()`. `CreateNew` throws an `IOException` if the target file already exists, providing a safety net even in the vanishingly unlikely event of a GUID collision. `Create` (and `[System.IO.File]::Create()`) silently truncate an existing file, which would mask the collision and destroy the other file's contents.
 
+The `[System.IO.FileAccess]::Write` parameter is specified explicitly because the two-argument `File.Open(path, FileMode)` overload defaults to `FileAccess.ReadWrite`. Since the probe only needs to verify write permission, requesting read access is unnecessary and could cause a false negative in environments where inherited ACLs deny read on newly created files while permitting write.
+
 The path is resolved to absolute form via `$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath()` before being passed to the `.NET` static methods. See [Resolving Paths for .NET Static Methods](STYLE_GUIDE.md#resolving-paths-for-net-static-methods) for the general rule and rationale.
 
 ### Reference Implementation

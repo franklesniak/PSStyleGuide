@@ -3,7 +3,7 @@
 ````markdown
 # PowerShell Writing Style
 
-**Version:** 2.11.20260416.2
+**Version:** 2.11.20260416.3
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -1573,7 +1573,7 @@ if (-not $boolIsWritable) {
 try {
     $strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputPath)
     $strWriteTestPath = [System.IO.Path]::Combine([System.IO.Path]::GetDirectoryName($strOutputPath), ('.write_test_{0}.tmp' -f [Guid]::NewGuid().ToString('N')))
-    [System.IO.File]::Open($strWriteTestPath, [System.IO.FileMode]::CreateNew).Dispose()
+    [System.IO.File]::Open($strWriteTestPath, [System.IO.FileMode]::CreateNew, [System.IO.FileAccess]::Write).Dispose()
     [System.IO.File]::Delete($strWriteTestPath)
 } catch {
     throw ("Cannot write to '{0}': {1}" -f $OutputPath, $_.Exception.Message)
