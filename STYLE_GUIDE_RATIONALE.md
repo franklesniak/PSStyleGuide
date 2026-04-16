@@ -1101,7 +1101,7 @@ For scripts targeting PowerShell v2.0 or later, **either approach is acceptable*
 
 The `try/catch` code example uses `.NET` static methods (`[System.IO.File]::Create()` and `[System.IO.File]::Delete()`) instead of cmdlets because `New-Item` does not support `-LiteralPath`. Since the guide requires `-LiteralPath` for variable-derived concrete paths, the cmdlet-based approach cannot be made consistent with that rule. `.NET` file APIs operate on literal path strings and do not interpret PowerShell wildcard characters, avoiding the inconsistency.
 
-The path is resolved to absolute form via `$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath()` before being passed to the `.NET` static methods. See [STYLE_GUIDE.md — Resolving Paths for .NET Static Methods](STYLE_GUIDE.md#resolving-paths-for-net-static-methods) for the general rule and rationale.
+The path is resolved to absolute form via `$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath()` before being passed to the `.NET` static methods. See [Resolving Paths for .NET Static Methods](STYLE_GUIDE.md#resolving-paths-for-net-static-methods) for the general rule and rationale.
 
 ### Reference Implementation
 

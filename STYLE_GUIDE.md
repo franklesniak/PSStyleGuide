@@ -1567,14 +1567,16 @@ if (-not $boolIsWritable) {
 #### try/catch Approach
 
 ```powershell
-$strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputPath)
 try {
+    $strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputPath)
     [System.IO.File]::Create($strOutputPath).Dispose()
     [System.IO.File]::Delete($strOutputPath)
 } catch {
     throw "Cannot write to '$OutputPath': $($_.Exception.Message)"
 }
 ```
+
+**Note**: This pattern creates and deletes a file at the target path. If a file already exists at `$OutputPath`, it will be overwritten and removed. For scripts that may encounter pre-existing files, use the comprehensive [`.NET` approach](#net-approach).
 
 ---
 
