@@ -2260,7 +2260,7 @@ Reserve `-Path` for cases where wildcard expansion is **explicitly intended**.
 ```powershell
 $strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputPath)
 if (-not (Test-Path -LiteralPath $strOutputPath)) {
-    [void][System.IO.Directory]::CreateDirectory($strOutputPath)
+    [void]([System.IO.Directory]::CreateDirectory($strOutputPath))
 }
 ```
 
