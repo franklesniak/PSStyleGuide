@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.11.20260415.0
+**Version:** 2.11.20260416.0
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -1567,22 +1567,10 @@ if (-not $boolIsWritable) {
 #### try/catch Approach
 
 ```powershell
+$strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputPath)
 try {
-    [void](New-Item -Path $OutputPath -ItemType File -Force -ErrorAction Stop)
-    Remove-Item -LiteralPath $OutputPath -Force -ErrorAction Stop
-} catch {
-    throw "Cannot write to '$OutputPath': $($_.Exception.Message)"
-}
-```
-
-**Note**: Using `-LiteralPath` with `Remove-Item` is important to avoid wildcard interpretation issues. See [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths) for the general rule.
-
-#### try/catch Alternative (.NET Methods)
-
-```powershell
-try {
-    [System.IO.File]::WriteAllText($OutputPath, '')
-    [System.IO.File]::Delete($OutputPath)
+    [System.IO.File]::Create($strOutputPath).Dispose()
+    [System.IO.File]::Delete($strOutputPath)
 } catch {
     throw "Cannot write to '$OutputPath': $($_.Exception.Message)"
 }
