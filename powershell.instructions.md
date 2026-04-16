@@ -5,7 +5,7 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 2.11.20260416.0
+**Version:** 2.11.20260416.1
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -1572,16 +1572,17 @@ if (-not $boolIsWritable) {
 #### try/catch Approach
 
 ```powershell
+$strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputPath)
+$strWriteTestPath = Join-Path -Path ([System.IO.Path]::GetDirectoryName($strOutputPath)) -ChildPath ('.write_test_{0}.tmp' -f [Guid]::NewGuid().ToString('N'))
 try {
-    $strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputPath)
-    [System.IO.File]::Create($strOutputPath).Dispose()
-    [System.IO.File]::Delete($strOutputPath)
+    [System.IO.File]::Open($strWriteTestPath, [System.IO.FileMode]::CreateNew).Dispose()
+    [System.IO.File]::Delete($strWriteTestPath)
 } catch {
-    throw "Cannot write to '$OutputPath': $($_.Exception.Message)"
+    throw ("Cannot write to '{0}': {1}" -f $OutputPath, $_.Exception.Message)
 }
 ```
 
-**Note**: This pattern creates a file at the target path and then attempts to delete it. If a file already exists at `$OutputPath`, `[System.IO.File]::Create()` may truncate or overwrite it before the delete step runs, and the delete operation can still fail. For scripts that may encounter pre-existing files, use the comprehensive [`.NET` approach](#net-approach).
+> **Warning:** File APIs with create-or-overwrite semantics (e.g., `[System.IO.File]::Create()`, `New-Item -Force`) **SHOULD NOT** be used for writeability probes unless the probe filename is guaranteed unique. Using the actual output path as the probe can destroy pre-existing data or cause false failures when the file already exists.
 
 ---
 

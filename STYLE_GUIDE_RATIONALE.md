@@ -1099,7 +1099,14 @@ For scripts targeting PowerShell v2.0 or later, **either approach is acceptable*
 
 #### try/catch Approach Rationale
 
-The `try/catch` code example uses `.NET` static methods (`[System.IO.File]::Create()` and `[System.IO.File]::Delete()`) instead of cmdlets because `New-Item` does not support `-LiteralPath`. Since the guide requires `-LiteralPath` for variable-derived concrete paths, the cmdlet-based approach cannot be made consistent with that rule. `.NET` file APIs operate on literal path strings and do not interpret PowerShell wildcard characters, avoiding the inconsistency.
+The `try/catch` code example uses `.NET` static methods (`[System.IO.File]::Open()` and `[System.IO.File]::Delete()`) instead of cmdlets because `New-Item` does not support `-LiteralPath`. Since the guide requires `-LiteralPath` for variable-derived concrete paths, the cmdlet-based approach cannot be made consistent with that rule. `.NET` file APIs operate on literal path strings and do not interpret PowerShell wildcard characters, avoiding the inconsistency.
+
+The probe writes to a GUID-based temporary filename (`.write_test_{GUID}.tmp`) in the target file's parent directory instead of probing at the actual output path. This avoids two problems:
+
+- **Data destruction**: APIs with create-or-overwrite semantics (e.g., `[System.IO.File]::Create()`, `New-Item -Force`) truncate or overwrite an existing file at the probe path, destroying pre-existing user data.
+- **False failures in overwrite workflows**: If the output file already exists and the script intends to overwrite it, probing at the exact output path with `[System.IO.FileMode]::CreateNew` would throw an `IOException` — a false negative that incorrectly reports the directory as non-writable.
+
+The probe uses `[System.IO.FileMode]::CreateNew` rather than `[System.IO.FileMode]::Create` or `[System.IO.File]::Create()`. `CreateNew` throws an `IOException` if the target file already exists, providing a safety net even in the vanishingly unlikely event of a GUID collision. `Create` (and `[System.IO.File]::Create()`) silently truncate an existing file, which would mask the collision and destroy the other file's contents.
 
 The path is resolved to absolute form via `$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath()` before being passed to the `.NET` static methods. See [Resolving Paths for .NET Static Methods](STYLE_GUIDE.md#resolving-paths-for-net-static-methods) for the general rule and rationale.
 
