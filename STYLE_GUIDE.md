@@ -1576,7 +1576,7 @@ try {
 }
 ```
 
-**Note**: This pattern creates and deletes a file at the target path. If a file already exists at `$OutputPath`, it will be overwritten and removed. For scripts that may encounter pre-existing files, use the comprehensive [`.NET` approach](#net-approach).
+**Note**: This pattern creates a file at the target path and then attempts to delete it. If a file already exists at `$OutputPath`, `[System.IO.File]::Create()` may truncate or overwrite it before the delete step runs, and the delete operation can still fail. For scripts that may encounter pre-existing files, use the comprehensive [`.NET` approach](#net-approach).
 
 ---
 
