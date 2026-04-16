@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.11.20260415.0
+**Version:** 2.11.20260416.0
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -2011,15 +2011,11 @@ Prefer `.NET` for mission-critical/unattended scripts, or where v1.0 parseabilit
 
 ### Code Examples
 
-#### try/catch Alternative (.NET Methods) Rationale
+#### try/catch Approach Rationale
 
-The `.NET` `try/catch` alternative approach:
+The `try/catch` code example uses `.NET` static methods (`[System.IO.File]::Create()` and `[System.IO.File]::Delete()`) instead of cmdlets because `New-Item` does not support `-LiteralPath`. Since the guide requires `-LiteralPath` for variable-derived concrete paths, the cmdlet-based approach cannot be made consistent with that rule. `.NET` file APIs operate on literal path strings and do not interpret PowerShell wildcard characters, avoiding the inconsistency.
 
-- Uses `.NET` methods directly (reliable, explicit)
-- Is much shorter than a full `Test-FileWriteability` function
-- Works on PowerShell v2.0+ (.NET Framework 2.0 includes these static methods)
-- Still requires `try/catch`, so does not work on PowerShell v1.0
-- Is less idiomatic than using `New-Item`/`Remove-Item`
+The path is resolved to absolute form via `$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath()` before being passed to the `.NET` static methods. See [Resolving Paths for .NET Static Methods](#resolving-paths-for-net-static-methods) for the general rule and rationale.
 
 #### .NET Approach
 
@@ -2038,25 +2034,15 @@ if (-not $boolIsWritable) {
 
 ```powershell
 try {
-    [void](New-Item -Path $OutputPath -ItemType File -Force -ErrorAction Stop)
-    Remove-Item -LiteralPath $OutputPath -Force -ErrorAction Stop
+    $strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputPath)
+    [System.IO.File]::Create($strOutputPath).Dispose()
+    [System.IO.File]::Delete($strOutputPath)
 } catch {
     throw "Cannot write to '$OutputPath': $($_.Exception.Message)"
 }
 ```
 
-**Note**: Using `-LiteralPath` with `Remove-Item` is important to avoid wildcard interpretation issues. See [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths) for the general rule.
-
-#### try/catch Alternative (.NET Methods)
-
-```powershell
-try {
-    [System.IO.File]::WriteAllText($OutputPath, '')
-    [System.IO.File]::Delete($OutputPath)
-} catch {
-    throw "Cannot write to '$OutputPath': $($_.Exception.Message)"
-}
-```
+**Note**: This pattern creates a file at the target path and then attempts to delete it. If a file already exists at `$OutputPath`, `[System.IO.File]::Create()` may truncate or overwrite it before the delete step runs, and the delete operation can still fail. For scripts that may encounter pre-existing files, use the comprehensive [`.NET` approach](#net-approach).
 
 ---
 
