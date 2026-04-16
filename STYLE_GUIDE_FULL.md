@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.10.20260415.3
+**Version:** 2.11.20260415.0
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -55,6 +55,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** `-LiteralPath` **SHOULD** be used instead of `-Path` when operating on concrete (non-wildcard) paths derived from variables or `Join-Path` → [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
 - **[All]** For destructive cmdlets (`Remove-Item`, `Move-Item`), `-LiteralPath` **MUST** be used for variable-derived paths → [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
 - **[All]** `New-Item` does **not** support `-LiteralPath`; use `-Path` with `New-Item` → [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
+- **[All]** For directory creation from variable-derived paths that may contain wildcard characters, prefer `[System.IO.Directory]::CreateDirectory()` → [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
 - **[All]** Paths passed to .NET file APIs (`System.IO.*`) **MUST** be resolved to absolute via `GetUnresolvedProviderPathFromPSPath()` first; non-FileSystem provider paths **MUST NOT** be used → [Resolving Paths for .NET Static Methods](#resolving-paths-for-net-static-methods)
 
 ### Documentation and Comments (Quick Reference)
@@ -3484,6 +3485,16 @@ For `Remove-Item` and `Move-Item`, the consequences of accidental wildcard expan
 
 `New-Item` does not expose a `-LiteralPath` parameter in any released version of PowerShell (Windows PowerShell 5.1, PowerShell 7.x). Attempting `New-Item -LiteralPath` produces a `ParameterBindingException`. Because `New-Item` creates a new item rather than deleting, moving, or modifying existing file-system entries, the wildcard-injection risk is lower than for read or destructive cmdlets, but it is not eliminated: wildcard characters supplied to `-Path` can still match existing parent directories or items and cause creation in unintended or multiple locations. Use `New-Item -Path` when the path value is trusted or validated; for untrusted input that may contain wildcard characters (`[`, `]`, `*`, `?`) as literal characters, validate or reject the input, or use an appropriate .NET API (e.g., `[System.IO.File]::Create()`, `[System.IO.Directory]::CreateDirectory()`) when literal path semantics are required.
 
+#### Wildcard-Safe Directory Creation With `[System.IO.Directory]::CreateDirectory()`
+
+For directory creation specifically, `[System.IO.Directory]::CreateDirectory()` is the preferred .NET alternative when the path is variable-derived and may contain wildcard characters. Unlike `New-Item -Path ... -ItemType Directory`, `CreateDirectory()` does not interpret PowerShell wildcard characters (`[`, `]`, `*`, `?`) and therefore provides deterministic behavior regardless of what characters appear in the path.
+
+The path must be resolved to an absolute filesystem path via `$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath()` before being passed to `CreateDirectory()`, as documented in the "Resolving Paths for .NET Static Methods" rule. `GetUnresolvedProviderPathFromPSPath()` is particularly appropriate here because the target directory may not yet exist.
+
+`CreateDirectory()` is also safe to call when the directory already exists—it returns the existing `DirectoryInfo` object without error—making a preceding `Test-Path -LiteralPath` check optional but useful for clarity. The compliant example in the main guide includes the `Test-Path` guard for readability.
+
+For *file* creation with wildcard-safe semantics, the corresponding .NET API is `[System.IO.File]::Create()` or `[System.IO.StreamWriter]`, but that case is not covered by this rule. The directory-creation guidance is separated because it is the most common scenario where `New-Item -ItemType Directory` would otherwise be the idiomatic choice.
+
 When a cmdlet supports both `-Path` and `-LiteralPath`, and the code is operating on a **single concrete path value**—not an intentionally wildcarded pattern—`-LiteralPath` **SHOULD** be used instead of `-Path`. This especially applies when the path is derived from variables, `Join-Path`, or string construction, because `-Path` interprets wildcard characters (`[`, `]`, `*`, `?`) and can silently match the wrong files or match nothing at all.
 
 For **destructive** operations—`Remove-Item`, `Move-Item`—`-LiteralPath` **MUST** be used when the path value comes from a variable or expression. Wildcard interpretation of a variable-derived path in a destructive cmdlet can silently delete or move unintended files.
@@ -3491,6 +3502,17 @@ For **destructive** operations—`Remove-Item`, `Move-Item`—`-LiteralPath` **M
 Reserve `-Path` for cases where wildcard expansion is **explicitly intended**.
 
 **Exception — `New-Item`:** `New-Item` does **not** have a `-LiteralPath` parameter (across Windows PowerShell 5.1 and PowerShell 7.x). Use `New-Item -Path` for item creation. Because `-Path` still interprets wildcard characters, code **SHOULD** validate or reject untrusted input containing `[`, `]`, `*`, or `?` as literal characters, or use a .NET file API (e.g., `[System.IO.File]::Create()`) when literal path semantics are required.
+
+**Directory creation:** When creating a directory from a variable-derived path that may contain wildcard characters (`[`, `]`, `*`, or `?`), code **SHOULD** prefer `[System.IO.Directory]::CreateDirectory()` over `New-Item -Path ... -ItemType Directory`. The path **MUST** first be resolved to an absolute filesystem path per [Resolving Paths for .NET Static Methods](#resolving-paths-for-net-static-methods).
+
+**Compliant** (wildcard-safe directory creation):
+
+```powershell
+$strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputPath)
+if (-not (Test-Path -LiteralPath $strOutputPath)) {
+    [void]([System.IO.Directory]::CreateDirectory($strOutputPath))
+}
+```
 
 **Common cmdlets where this rule applies:** `Copy-Item`, `Get-ChildItem`, `Get-Content`, `Get-Item`, `Move-Item`, `Remove-Item`, `Set-Content`, `Test-Path`.
 
