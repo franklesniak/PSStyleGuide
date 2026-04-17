@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.11.20260416.3
+**Version:** 2.11.20260416.4
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -744,6 +744,7 @@ Get-Content -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath '../config.js
 
 ```powershell
 # Resolve the PowerShell path before passing it to .NET
+$strOutputPath = '.\output.txt'
 $strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($strOutputPath)
 [System.IO.File]::WriteAllText($strOutputPath, $strContent, $objEncoding)
 ```
