@@ -26,6 +26,7 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Advanced Feature Emulation (v1.0-Native)](#advanced-feature-emulation-v10-native)
   - [Options for Return Mechanism: Comparison](#options-for-return-mechanism-comparison)
   - [Enforcing Subset-Only Positional Contracts in Modern Functions](#enforcing-subset-only-positional-contracts-in-modern-functions)
+  - [ValidateRange for Bounded Numeric Parameters](#validaterange-for-bounded-numeric-parameters)
   - [Summary: Function Design as Reliability Engineering](#summary-function-design-as-reliability-engineering)
 - [Error Handling Rationale](#error-handling-rationale)
   - [Executive Summary: Error Handling Philosophy](#executive-summary-error-handling-philosophy)
@@ -356,6 +357,33 @@ When `[CmdletBinding()]` is declared without specifying `PositionalBinding`, Pow
 2. **Documentation/implementation mismatch.** When `.NOTES` documents only a subset of parameters as positional (e.g., `Position 0: InputMode`, `Position 1: OutputPath`) but the runtime actually permits positional binding for all parameters, callers may unknowingly pass values to unintended parameters. This silent divergence between the documented contract and the runtime behavior undermines trust in the function's interface.
 
 `PositionalBinding = $false` eliminates both risks by requiring the author to opt in to positional binding explicitly via `[Parameter(Position = N)]` on each intended positional parameter. Parameters without an explicit `Position` attribute become name-only, regardless of their declaration order.
+
+---
+
+### ValidateRange for Bounded Numeric Parameters
+
+> For the corresponding normative rule, see ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](STYLE_GUIDE.md#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter) in the main guide.
+
+`[ValidateRange(min, max)]` shifts validation of bounded numeric inputs from runtime logic to the parameter-binding phase. This has several practical benefits:
+
+1. **Fail-fast with clear diagnostics.** When a caller passes an out-of-range value, PowerShell raises a descriptive `ParameterBindingValidationException` before the function body executes. Without the attribute, the invalid value propagates into downstream logic where it may trigger a confusing or misleading error far from the root cause—for example, a negative retry count entering an infinite loop, or a percentage above 100 producing nonsensical progress output.
+
+2. **Single source of truth for the valid domain.** Encoding the constraint in the attribute declaration keeps the contract visible in `Get-Help` output and in the parameter block itself, rather than burying it in conditional checks scattered through the function body. This improves discoverability for both human readers and LLM-based coding agents.
+
+3. **Consistency with other validation attributes.** The style guide already recommends `[Parameter(Mandatory = $true)]` and `[ValidateNotNullOrEmpty()]` for similar fail-fast goals. `[ValidateRange()]` extends this principle to numeric domains and follows the same design rationale: catch invalid input at the boundary, not in the interior.
+
+**Choosing bounds:**
+
+- When the domain is naturally bounded on both sides (e.g., a percentage from 0 to 100, or a port number from 1 to 65535), both bounds should be explicit.
+- When only a lower bound is meaningful (e.g., a retry count that must be non-negative but has no principled maximum), the upper bound should be the type's maximum value (`[int]::MaxValue`, `[double]::MaxValue`, etc.). This preserves the fail-fast benefit for the lower bound without imposing an artificial ceiling.
+
+**Motivating examples of delayed failures without `[ValidateRange()]`:**
+
+- A `$RetryCount` parameter set to `-1` causes a `for` loop to iterate indefinitely, eventually terminated only by a timeout or resource exhaustion—with no indication that the caller simply passed an invalid argument.
+- A `$TimeoutSeconds` parameter set to `0` is passed to `Start-Sleep`, which silently returns immediately, causing the function to report "timed out" on first check rather than explaining that the timeout value was invalid.
+- A `$PercentComplete` parameter set to `200` is passed to `Write-Progress`, which either displays a misleading progress bar or throws a cryptic error depending on the PowerShell host.
+
+In each case, `[ValidateRange()]` would have surfaced the real problem—an out-of-range argument—at parameter binding with a clear, actionable message.
 
 ---
 
