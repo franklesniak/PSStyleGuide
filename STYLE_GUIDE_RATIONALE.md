@@ -26,7 +26,7 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Advanced Feature Emulation (v1.0-Native)](#advanced-feature-emulation-v10-native)
   - [Options for Return Mechanism: Comparison](#options-for-return-mechanism-comparison)
   - [Enforcing Subset-Only Positional Contracts in Modern Functions](#enforcing-subset-only-positional-contracts-in-modern-functions)
-  - [ValidateRange for Bounded Numeric Parameters](#validaterange-for-bounded-numeric-parameters)
+  - [ValidateRange for Constrained Numeric Parameters](#validaterange-for-constrained-numeric-parameters)
   - [Summary: Function Design as Reliability Engineering](#summary-function-design-as-reliability-engineering)
 - [Error Handling Rationale](#error-handling-rationale)
   - [Executive Summary: Error Handling Philosophy](#executive-summary-error-handling-philosophy)
@@ -360,13 +360,13 @@ When `[CmdletBinding()]` is declared without specifying `PositionalBinding`, Pow
 
 ---
 
-### ValidateRange for Bounded Numeric Parameters
+### ValidateRange for Constrained Numeric Parameters
 
 > For the corresponding normative rule, see ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](STYLE_GUIDE.md#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter) in the main guide.
 
-`[ValidateRange(min, max)]` shifts validation of bounded numeric inputs from runtime logic to the parameter-binding phase. This has several practical benefits:
+`[ValidateRange(min, max)]` shifts validation of constrained numeric inputs from runtime logic to the parameter-binding phase. This has several practical benefits:
 
-1. **Fail-fast with clear diagnostics.** When a caller passes an out-of-range value, PowerShell raises a descriptive `ParameterBindingValidationException` before the function body executes. Without the attribute, the invalid value propagates into downstream logic where it may trigger a confusing or misleading error far from the root cause—for example, a negative retry count entering an infinite loop, or a percentage above 100 producing nonsensical progress output.
+1. **Fail-fast with clear diagnostics.** When a caller passes an out-of-range value, PowerShell raises a descriptive `ParameterBindingValidationException` before the function body executes. Without the attribute, the invalid value propagates into downstream logic where it may trigger a confusing or misleading error far from the root cause—for example, a negative retry count silently bypassing a retry loop, or a percentage above 100 producing nonsensical progress output.
 
 2. **Single source of truth for the valid domain.** Encoding the constraint in the attribute declaration keeps the contract visible in `Get-Help` output and in the parameter block itself, rather than burying it in conditional checks scattered through the function body. This improves discoverability for both human readers and LLM-based coding agents.
 
