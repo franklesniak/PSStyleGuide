@@ -110,7 +110,7 @@ When a string expression is composed inline and passed to a cmdlet using parenth
 Write-Warning ("foo {0}" + "bar") -f $x
 ```
 
-In this case, PowerShell's parser treats the parenthesized expression `("foo {0}" + "bar")` as the complete positional argument to `Write-Warning`. The `-f` that follows is then parsed as a *parameter token* on `Write-Warning`, not as the format operator. Depending on the cmdlet, this produces either a parameter-binding error (e.g., *"A parameter cannot be found that matches parameter name 'f'"*) or, on commands that happen to have a parameter starting with `f`, an unexpected and silent misbinding.
+In this case, PowerShell's parser treats the parenthesized expression `("foo {0}" + "bar")` as the complete argument to `Write-Warning`. The `-f` that follows is then parsed as a *parameter token* on `Write-Warning`, not as the format operator. Depending on the cmdlet, this produces either a parameter-binding error (e.g., *"A parameter cannot be found that matches parameter name 'f'"*) or, on commands that happen to have a parameter starting with `f`, an unexpected and silent misbinding.
 
 This mistake is easy to make when composing strings inline because the developer mentally groups the entire expression including `-f` as a single unit, but PowerShell's parser does not. The parentheses close the argument expression before `-f` is reached.
 
