@@ -379,7 +379,7 @@ When `[CmdletBinding()]` is declared without specifying `PositionalBinding`, Pow
 
 **Motivating examples of delayed failures without `[ValidateRange()]`:**
 
-- A `$RetryCount` parameter set to `-1` causes a `for` loop to iterate indefinitely, eventually terminated only by a timeout or resource exhaustion—with no indication that the caller simply passed an invalid argument.
+- A `$RetryCount` parameter set to `-1` silently bypasses a standard retry loop (`for ($i = 0; $i -lt $RetryCount; $i++)`) because the condition is immediately false, so the function fails on the first attempt with no retries—and the resulting error blames the downstream operation, not the invalid argument.
 - A `$TimeoutSeconds` parameter set to `0` is passed to `Start-Sleep`, which silently returns immediately, causing the function to report "timed out" on first check rather than explaining that the timeout value was invalid.
 - A `$PercentComplete` parameter set to `200` is passed to `Write-Progress`, which either displays a misleading progress bar or throws a cryptic error depending on the PowerShell host.
 
