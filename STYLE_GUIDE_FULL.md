@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.11.20260417.0
+**Version:** 2.12.20260418.0
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -139,6 +139,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** .NET method output **MUST** be suppressed with [void](...), not | Out-Null → [Suppression of Method Output](#suppression-of-method-output)
 - **[All]** `Write-Verbose` / `Write-Debug` **MUST NOT** emit raw PII, credentials, tokens, or other sensitive identifiers → [Sensitive Data in Verbose and Debug Streams](#sensitive-data-in-verbose-and-debug-streams)
 - **[Modern]** Hot-path `Write-Verbose` / `Write-Debug` with string formatting **SHOULD** be guarded behind a preference check → [Performance-Sensitive `Write-Verbose` / `Write-Debug` in Hot Paths](#performance-sensitive-write-verbose--write-debug-in-hot-paths)
+- **[All]** `-f` format operator **MUST** be applied inside the argument-expression parentheses of cmdlet calls → [String Formatting in Cmdlet Arguments (`-f` Scoping)](#string-formatting-in-cmdlet-arguments--f-scoping)
 
 ### Language Interop and .NET (Quick Reference)
 
@@ -327,6 +328,58 @@ When a variable in an expandable string (`"..."`) is immediately followed by pun
 
   ```powershell
   $strMessage = ("{0}: Error occurred" -f $SSORegion)
+  ```
+
+### String Formatting in Cmdlet Arguments (`-f` Scoping)
+
+When a string expression is composed inline and passed to a cmdlet using parentheses as the argument, a common mistake is to place the `-f` format operator *after* the closing parenthesis of the argument expression. For example:
+
+```powershell
+Write-Warning ("foo {0}" + "bar") -f $x
+```
+
+In this case, PowerShell's parser treats the parenthesized expression `("foo {0}" + "bar")` as the complete argument to `Write-Warning`. The `-f` that follows is then parsed as a *parameter token* on `Write-Warning`, not as the format operator. Depending on the cmdlet, this produces either a parameter-binding error (e.g., *"A parameter cannot be found that matches parameter name 'f'"*) or, on commands that happen to have a parameter starting with `f`, an unexpected and silent misbinding.
+
+This mistake is easy to make when composing strings inline because the developer mentally groups the entire expression including `-f` as a single unit, but PowerShell's parser does not. The parentheses close the argument expression before `-f` is reached.
+
+The preferred fix is to nest the entire format expression inside the argument-expression parentheses:
+
+```powershell
+Write-Warning (("foo {0}" + "bar") -f $x)
+```
+
+Here the outer parentheses define the argument expression, and within them the inner parentheses plus `-f` form a complete format operation. PowerShell evaluates the whole expression before passing the result to `Write-Warning`.
+
+Alternatively, assigning the formatted string to a variable before the cmdlet call avoids the nesting entirely and may improve readability for complex expressions:
+
+```powershell
+$strMessage = ("foo {0}" + "bar") -f $x
+Write-Warning $strMessage
+```
+
+In the variable-assignment case, there are no cmdlet-parameter semantics in play, so `-f` is unambiguously the format operator. This pattern is particularly useful when the format expression is long or involves multiple placeholders.
+
+When a composed string expression is passed to a cmdlet or language construct using parentheses as the argument expression (for example `Write-Warning`, `Write-Host`, `Write-Error`, `Write-Verbose`, `Write-Debug`, `Write-Output`, or `throw (...)`), any `-f` format operator **MUST** be applied inside the same parentheses that form the argument expression. Once the argument-expression parentheses close, PowerShell may parse `-f` as a parameter token rather than as the format operator.
+
+See also [Variable Delimiting in Strings](#variable-delimiting-in-strings) for broader guidance on composing strings safely.
+
+- **Non-Compliant:**
+
+  ```powershell
+  Write-Warning ("foo {0}" + "bar") -f $x
+  ```
+
+- **Compliant (Preferred):** Place the `-f` operator inside the argument-expression parentheses:
+
+  ```powershell
+  Write-Warning (("foo {0}" + "bar") -f $x)
+  ```
+
+- **Compliant (Alternative):** Assign the formatted string to a variable first:
+
+  ```powershell
+  $strMessage = ("foo {0}" + "bar") -f $x
+  Write-Warning $strMessage
   ```
 
 ### File Encoding
