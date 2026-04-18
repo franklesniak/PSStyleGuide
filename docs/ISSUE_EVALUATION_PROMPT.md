@@ -24,7 +24,7 @@ Paste the suggested issue description here.
 
 I'm not sure how I feel about this. What do you think?
 
-Remember that content for LLM-based coding agents should go into `STYLE_GUIDE.md`, whereas explanatory content, additional context, rationale, etc.--content for human consumption--should go into `STYLE_GUIDE_RATIONALE.md`. Also, if you agree that a change to `STYLE_GUIDE.md` is necessary, then a step to increment the file's version number needs to be included in the issue description.
+Remember that content for LLM-based coding agents should go into `STYLE_GUIDE.md`, whereas explanatory content, additional context, rationale, etc.—content for human consumption—should go into `STYLE_GUIDE_RATIONALE.md`. Also, if you agree that a change to `STYLE_GUIDE.md` is necessary, then a step to increment the file's version number needs to be included in the issue description.
 
 Adjust the issue description if necessary and eliminate unnecessary line breaks. Return your answer in exactly two parts, in this order:
 1. A single line in the format `Title: <suggested GitHub Issue title>`.
