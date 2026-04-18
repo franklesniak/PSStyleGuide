@@ -268,7 +268,7 @@ When a variable in an expandable string (`"..."`) is immediately followed by pun
 
 ### String Formatting in Cmdlet Arguments (`-f` Scoping)
 
-When a composed string expression is passed positionally to a cmdlet or language construct using parentheses as the argument expression (for example `Write-Warning`, `Write-Host`, `Write-Error`, `Write-Verbose`, `Write-Debug`, `Write-Output`, or `throw (...)`), any `-f` format operator **MUST** be applied inside the same parentheses that form the argument expression. Once the argument-expression parentheses close, PowerShell may parse `-f` as a parameter token rather than as the format operator.
+When a composed string expression is passed to a cmdlet or language construct using parentheses as the argument expression (for example `Write-Warning`, `Write-Host`, `Write-Error`, `Write-Verbose`, `Write-Debug`, `Write-Output`, or `throw (...)`), any `-f` format operator **MUST** be applied inside the same parentheses that form the argument expression. Once the argument-expression parentheses close, PowerShell may parse `-f` as a parameter token rather than as the format operator.
 
 See also [Variable Delimiting in Strings](#variable-delimiting-in-strings) for broader guidance on composing strings safely.
 

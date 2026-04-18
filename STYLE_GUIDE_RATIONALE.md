@@ -104,7 +104,7 @@ The `-Encoding utf8NoBOM` parameter value was introduced in PowerShell 6.0 (Core
 
 > For the actionable rule, see [String Formatting in Cmdlet Arguments (`-f` Scoping)](STYLE_GUIDE.md#string-formatting-in-cmdlet-arguments--f-scoping) in the main guide.
 
-When a string expression is composed inline and passed to a cmdlet using parentheses as the positional argument, a common mistake is to place the `-f` format operator *after* the closing parenthesis of the argument expression. For example:
+When a string expression is composed inline and passed to a cmdlet using parentheses as the argument, a common mistake is to place the `-f` format operator *after* the closing parenthesis of the argument expression. For example:
 
 ```powershell
 Write-Warning ("foo {0}" + "bar") -f $x
