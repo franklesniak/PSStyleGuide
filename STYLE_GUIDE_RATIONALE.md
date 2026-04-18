@@ -8,6 +8,7 @@ This companion document preserves the extended rationale, design philosophy, and
 - [Code Layout and Formatting Rationale](#code-layout-and-formatting-rationale)
   - [File Encoding](#file-encoding)
   - [Programmatic File Writing Encoding](#programmatic-file-writing-encoding)
+  - [String Formatting in Cmdlet Arguments (`-f` Scoping)](#string-formatting-in-cmdlet-arguments--f-scoping)
 - [Naming Rationale](#naming-rationale)
   - [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
   - [Module Naming: Noun-Based Containers](#module-naming-noun-based-containers)
@@ -98,6 +99,37 @@ The default encoding used by `Set-Content`, `Out-File`, and the `>` redirection 
 The `.NET` `System.Text.UTF8Encoding` approach is preferred for cross-version determinism because it is available in every PowerShell version (including v1.0) and produces identical output regardless of host. The constructor argument `$false` suppresses the BOM, matching the project's source file encoding convention.
 
 The `-Encoding utf8NoBOM` parameter value was introduced in PowerShell 6.0 (Core). It does not exist in Windows PowerShell 5.1, so requiring it as the standard pattern would break backward compatibility. For projects that explicitly target only PowerShell 7+, using `-Encoding utf8NoBOM` with cmdlets is an acceptable alternative.
+
+### String Formatting in Cmdlet Arguments (`-f` Scoping)
+
+> For the actionable rule, see [String Formatting in Cmdlet Arguments (`-f` Scoping)](STYLE_GUIDE.md#string-formatting-in-cmdlet-arguments--f-scoping) in the main guide.
+
+When a string expression is composed inline and passed to a cmdlet using parentheses as the positional argument, a common mistake is to place the `-f` format operator *after* the closing parenthesis of the argument expression. For example:
+
+```powershell
+Write-Warning ("foo {0}" + "bar") -f $x
+```
+
+In this case, PowerShell's parser treats the parenthesized expression `("foo {0}" + "bar")` as the complete positional argument to `Write-Warning`. The `-f` that follows is then parsed as a *parameter token* on `Write-Warning`, not as the format operator. Depending on the cmdlet, this produces either a parameter-binding error (e.g., *"A parameter cannot be found that matches parameter name 'f'"*) or, on commands that happen to have a parameter starting with `f`, an unexpected and silent misbinding.
+
+This mistake is easy to make when composing strings inline because the developer mentally groups the entire expression including `-f` as a single unit, but PowerShell's parser does not. The parentheses close the argument expression before `-f` is reached.
+
+The preferred fix is to nest the entire format expression inside the argument-expression parentheses:
+
+```powershell
+Write-Warning (("foo {0}" + "bar") -f $x)
+```
+
+Here the outer parentheses define the argument expression, and within them the inner parentheses plus `-f` form a complete format operation. PowerShell evaluates the whole expression before passing the result to `Write-Warning`.
+
+Alternatively, assigning the formatted string to a variable before the cmdlet call avoids the nesting entirely and may improve readability for complex expressions:
+
+```powershell
+$strMessage = ("foo {0}" + "bar") -f $x
+Write-Warning $strMessage
+```
+
+In the variable-assignment case, there are no cmdlet-parameter semantics in play, so `-f` is unambiguously the format operator. This pattern is particularly useful when the format expression is long or involves multiple placeholders.
 
 ---
 
