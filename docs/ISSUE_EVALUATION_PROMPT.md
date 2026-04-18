@@ -1,19 +1,16 @@
+<!-- markdownlint-disable MD013 -->
+
 # Issue Evaluation Prompt
 
-This document contains a prompt template used to evaluate proposed GitHub Issues
-for the style guide. The typical workflow is:
+This document contains a prompt template used to evaluate proposed GitHub Issues for the style guide. The typical workflow is:
 
-1. A coding agent (e.g., Claude) identifies a potential style guide improvement
-   during a code review loop and suggests a GitHub Issue description.
+1. A coding agent (e.g., Claude) identifies a potential style guide improvement during a code review loop and suggests a GitHub Issue description.
 2. The suggested description is pasted into the prompt below.
-3. The prompt is submitted to an LLM (with the repository attached for context)
-   to evaluate, refine, and finalize the issue description and title.
+3. The prompt is submitted to an LLM (with the repository attached for context) to evaluate, refine, and finalize the issue description and title.
 
 ## Prompt
 
-Copy the text inside the six-backtick code fence below and paste it into your
-LLM session. The outer six-backtick fence is only for displaying the prompt in
-this document; do not include it when you paste.
+Copy the text inside the six-backtick code fence below and paste it into your LLM session. The outer six-backtick fence is only for displaying the prompt in this document; do not include it when you paste.
 
 ``````markdown
 An expert suggested I create the following GitHub Issue. Please read `STYLE_GUIDE.md` and `STYLE_GUIDE_RATIONALE.md`, then evaluate the proposed GitHub Issue description and tell me if it should be changed:
