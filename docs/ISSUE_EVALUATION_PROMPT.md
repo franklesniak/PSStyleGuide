@@ -12,7 +12,7 @@ for the style guide. The typical workflow is:
 ## Prompt
 
 ``````markdown
-An expert suggested I create the following GitHub Issue. Please read `STYLE_GUIDE.md` and `STYLE_GUIDE_RATIONALE.md`, then evaluate the proposed GH Issue description and tell me if it should be changed:
+An expert suggested I create the following GitHub Issue. Please read `STYLE_GUIDE.md` and `STYLE_GUIDE_RATIONALE.md`, then evaluate the proposed GitHub Issue description and tell me if it should be changed:
 
 `````markdown
 Paste the suggested issue description here.
@@ -22,5 +22,5 @@ I'm not sure how I feel about this. What do you think?
 
 Remember that content for LLM-based coding agents should go into `STYLE_GUIDE.md`, whereas explanatory content, additional context, rationale, etc.--content for human consumption--should go into `STYLE_GUIDE_RATIONALE.md`. Also, if you agree that a change to `STYLE_GUIDE.md` is necessary, then a step to increment the file's version number needs to be included in the issue description.
 
-Adjust the issue description if necessary, eliminate unnecessary line breaks, return the modified GH issue description in a Markdown codefence using five backticks, and suggest a title for the GH Issue.
+Adjust the issue description if necessary, eliminate unnecessary line breaks, return the modified GitHub Issue description in a Markdown code fence using five backticks, and suggest a title for the GitHub Issue.
 ``````
