@@ -12,7 +12,7 @@ for the style guide. The typical workflow is:
 ## Prompt
 
 ``````markdown
-An expert suggested I create the following GitHub Issue. Read relevant contents in the repo, then evaluate the proposed GH Issue description and tell me if it should be changed:
+An expert suggested I create the following GitHub Issue. Please read `STYLE_GUIDE.md` and `STYLE_GUIDE_RATIONALE.md`, then evaluate the proposed GH Issue description and tell me if it should be changed:
 
 `````markdown
 Paste the suggested issue description here.
