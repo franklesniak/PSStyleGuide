@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.14.20260420.3
+**Version:** 2.14.20260420.4
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -1599,8 +1599,8 @@ function Get-Thing {
 
 ```powershell
 # Set-StrictMode is missing at file scope. If the bundled artifact fails to
-# establish strict mode, or if this file is executed or dot-sourced
-# independently, strict-mode guarantees are lost.
+# establish strict mode, or if this file is executed independently,
+# strict-mode guarantees are lost.
 function Get-Thing {
     [CmdletBinding()]
     [OutputType([string])]
