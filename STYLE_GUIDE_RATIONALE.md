@@ -1127,6 +1127,32 @@ if ($errorOccurred) {
 }
 ```
 
+### Set-StrictMode Placement for Dot-Sourced Files
+
+The placement rule for `Set-StrictMode -Version Latest` (see [Set-StrictMode Placement for Dot-Sourced Files](STYLE_GUIDE.md#set-strictmode-placement-for-dot-sourced-files) in `STYLE_GUIDE.md`) is driven by how PowerShell handles scope when a `.ps1` file is dot-sourced versus when it is executed or bundled into a module.
+
+#### Dot-Sourcing Scope Semantics
+
+When a `.ps1` file is **dot-sourced** with the `.` operator (for example, `. .\Helpers.ps1`), PowerShell does **not** create a new script scope for the file. Instead, every script-scope statement in the file executes in the **caller's scope**. This includes not only function and variable definitions — which is typically the intended effect — but also settings that modify the execution environment, such as:
+
+- `Set-StrictMode -Version Latest`
+- `$ErrorActionPreference = 'Stop'`
+- `$InformationPreference = 'Continue'`
+- `$VerbosePreference`, `$DebugPreference`, `$WarningPreference`
+- Any other preference variable assignment or environment-mutating cmdlet invoked at script scope
+
+If a dot-sourced file sets any of these at script scope, the setting silently persists in the caller's scope after the dot-source completes. The caller has no way to know the setting was changed, and the change is indistinguishable from one the caller made deliberately. This is a classic source of "spooky action at a distance" bugs: a test fixture that enables strict mode for its own helpers can flip strict mode on in the caller's script, causing unrelated code downstream to start failing on previously tolerated constructs (uninitialized variables, missing properties, and so on).
+
+By contrast, when a `.ps1` file is **executed** (for example, via `.\Helpers.ps1` or `& .\Helpers.ps1`), PowerShell creates a fresh script scope for the file. Script-scope statements affect only that scope and are discarded when the file exits. When a file is **bundled** into a module or an aggregate script artifact (for example, concatenated into a single `.psm1` or a monolithic script), the bundled artifact has its own isolated scope when it is imported (`Import-Module`) or executed (not dot-sourced), so script-scope `Set-StrictMode` calls inside the bundled source file are contained in those cases. Dot-sourcing any `.ps1` — including an individual bundled source file or a monolithic bundled artifact — still runs its script-scope statements in the caller's scope and therefore still leaks.
+
+#### Why Require `Set-StrictMode` at All in Bundled Source Files
+
+Requiring `Set-StrictMode -Version Latest` near the top of bundled source files — immediately after any PowerShell-required leading constructs such as `#requires` comments, `using` statements, and any allowed script-level `[CmdletBinding()]`/`param` block — is deliberately redundant at runtime: the bundled artifact itself typically establishes strict mode for the whole module, so the per-file call is a no-op in normal module use. The redundancy exists to preserve **file-level correctness** as a standalone property of the source file. Developers frequently run individual source files directly — to reproduce a bug, to execute a quick unit test, to diff two versions of a helper, or to iterate during authoring — and in those workflows the bundled artifact's strict-mode setting is not in effect. Keeping the directive at the start of each source file's executable body ensures that the file behaves identically whether it is loaded through the bundled artifact or executed on its own, which in turn means local reproduction of a bug cannot be obscured by a strict-mode mismatch.
+
+#### Why Forbid Script-Scope `Set-StrictMode` in Dot-Sourced Files
+
+Dot-sourced files — test fixtures, ad-hoc scripts, build tooling — are by contract supposed to *add* names (functions, variables) to the caller's scope and nothing else. Injecting strict-mode or preference-variable changes into the caller violates that contract and turns a helper file into a source of non-local behavior changes. Moving `Set-StrictMode -Version Latest` into the function body (as the first statement in `begin {}` for advanced functions that use a `begin/process/end` layout, or as the first statement in the function body otherwise) confines the setting to the function's own scope chain, so strict mode is active exactly while the function runs and is cleanly restored when the function returns. Using `begin {}` in advanced functions with named pipeline blocks ensures strict mode applies uniformly to `begin`, `process`, and `end`, and avoids re-running `Set-StrictMode` for every pipeline input. The same logic applies to any other preference variable the function needs to set: set it inside the function body, not at script scope, so the caller's environment is not silently mutated.
+
 ### Approaches
 
 #### v1.0 Parser Error Rationale
