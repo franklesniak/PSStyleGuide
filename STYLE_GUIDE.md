@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.13.20260418.0
+**Version:** 2.14.20260420.0
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -110,6 +110,8 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[Modern]** `throw "message"` and `throw ("fmt" -f $args)` **MUST NOT** be used in catch blocks intended to rethrow → [Rethrow Anti-Pattern](#rethrow-anti-pattern)
 - **[Modern]** Exception wrapping **SHOULD** use `$PSCmdlet.ThrowTerminatingError()` with the original as `InnerException` → [Wrapping Exceptions with `$PSCmdlet.ThrowTerminatingError()`](#wrapping-exceptions-with-pscmdletthrowterminatingerror)
 - **[Modern]** Variables referenced in `finally` that are assigned in `try` **MUST** be initialized before the `try` block → [Set-StrictMode Considerations for finally Blocks](#set-strictmode-considerations-for-finally-blocks)
+- **[Modern]** In files bundled into a module or other aggregate script artifact, `Set-StrictMode -Version Latest` **MUST** be placed at script scope as the first non-blank line of the file → [Set-StrictMode Placement for Dot-Sourced Files](#set-strictmode-placement-for-dot-sourced-files)
+- **[Modern]** In files intended to be dot-sourced directly into the caller's scope (test fixtures, ad-hoc scripts, build tooling), `Set-StrictMode -Version Latest` **MUST NOT** be placed at script scope; it **MUST** be placed inside the function body (inside `process {}` for advanced functions, or at the top of the function body otherwise) → [Set-StrictMode Placement for Dot-Sourced Files](#set-strictmode-placement-for-dot-sourced-files)
 
 ### File Writeability Testing (Quick Reference)
 
@@ -1561,6 +1563,90 @@ try {
 ```
 
 In this example, `$objResource` is initialized to `$null` before the `try` block. If `[SomeDisposable]::Create()` throws before the assignment completes, the `finally` block can safely check `$null -ne $objResource` without triggering a `Set-StrictMode` violation.
+
+---
+
+### Set-StrictMode Placement for Dot-Sourced Files
+
+Where `Set-StrictMode -Version Latest` belongs depends on how the `.ps1` file is consumed at runtime. A `.ps1` file that is dot-sourced executes its script-scope statements in the **caller's scope**, which means a script-scope `Set-StrictMode` call leaks into the caller and silently changes the caller's strict-mode setting. A `.ps1` file that is bundled into a module or other aggregate script artifact has its own isolated script scope, so a script-scope `Set-StrictMode` call is safely contained.
+
+**Rule (bundled files):** For files bundled into a module or other aggregate script artifact, `Set-StrictMode -Version Latest` **MUST** be placed at script scope as the first non-blank line of the file. The bundled artifact may also establish strict mode, making this redundant at runtime, but it preserves file-level correctness if the source file is ever executed or dot-sourced independently.
+
+**Rule (dot-sourced files):** For files that are not bundled and are instead intended to be dot-sourced directly into the caller's scope (for example, test fixtures, ad-hoc scripts, or build tooling), `Set-StrictMode -Version Latest` **MUST NOT** be placed at script scope. Instead, it **MUST** be placed inside the function body — inside `process {}` for advanced functions, or at the top of the function body otherwise.
+
+#### Bundled File — Compliant Example
+
+```powershell
+Set-StrictMode -Version Latest
+
+function Get-Thing {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param (
+        [string]$Name
+    )
+
+    process {
+        # ... implementation ...
+    }
+}
+```
+
+#### Bundled File — Non-Compliant Example
+
+```powershell
+# Set-StrictMode is missing at file scope. If the bundled artifact fails to
+# establish strict mode, or if this file is executed or dot-sourced
+# independently, strict-mode guarantees are lost.
+function Get-Thing {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param (
+        [string]$Name
+    )
+
+    process {
+        # ... implementation ...
+    }
+}
+```
+
+#### Dot-Sourced File — Compliant Example
+
+```powershell
+function Invoke-TestFixture {
+    [CmdletBinding()]
+    [OutputType([void])]
+    param (
+        [string]$Path
+    )
+
+    process {
+        Set-StrictMode -Version Latest
+        # ... implementation ...
+    }
+}
+```
+
+#### Dot-Sourced File — Non-Compliant Example
+
+```powershell
+# WRONG — when this file is dot-sourced, Set-StrictMode executes in the
+# caller's scope and silently changes the caller's strict-mode setting.
+Set-StrictMode -Version Latest
+
+function Invoke-TestFixture {
+    [CmdletBinding()]
+    [OutputType([void])]
+    param (
+        [string]$Path
+    )
+
+    process {
+        # ... implementation ...
+    }
+}
+```
 
 ---
 
