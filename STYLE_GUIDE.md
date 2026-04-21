@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.15.20260421.2
+**Version:** 2.15.20260421.3
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -318,7 +318,7 @@ $objUtf8NoBomEncoding = New-Object System.Text.UTF8Encoding($false)
 
 ### Line Endings for Byte-Exact Text Artifacts
 
-When a PowerShell script or test produces text output whose identity is its exact byte sequence (for example, golden baselines, snapshot fixtures, hash inputs, or signed payloads), the producer **MUST** normalize line endings to LF at serialization time. Consumers performing byte-exact comparison **MUST** read the file with `Get-Content -Raw` (or the equivalent .NET `[System.IO.File]::ReadAllText()` / `[System.IO.File]::ReadAllBytes()` API) rather than `Get-Content` without `-Raw`. For true byte-for-byte identity (for example, hash inputs and signed payloads), `[System.IO.File]::ReadAllBytes()` **MUST** be used, because `Get-Content -Raw` and `[System.IO.File]::ReadAllText()` decode bytes into a `System.String` and can mask byte-level differences such as a UTF-8 BOM or other encoding distinctions; those text-returning APIs are acceptable only when the comparison is text-level and the encoding (including BOM presence) is already fixed by convention.
+When a PowerShell script or test produces text output whose identity is its exact byte sequence (for example, golden baselines, snapshot fixtures, hash inputs, or signed payloads), the producer **MUST** normalize line endings to LF at serialization time. Consumers reading the entire file as text **MUST NOT** use `Get-Content` without `-Raw`; they **MUST** use `Get-Content -Raw` or the equivalent .NET `[System.IO.File]::ReadAllText()` API. Those text-returning APIs are acceptable only for text-level comparison when the encoding convention, including BOM presence or absence, is already fixed. For true byte-for-byte identity (for example, hash inputs and signed payloads), consumers **MUST** use `[System.IO.File]::ReadAllBytes()`, because `Get-Content -Raw` and `[System.IO.File]::ReadAllText()` decode bytes into a `System.String` and can mask byte-level differences such as a UTF-8 BOM or other encoding distinctions.
 
 Cross-version differences in `ConvertTo-Json` and other serializers can emit CRLF on some hosts and LF on others, causing byte-exact comparisons to fail unless line endings are normalized in memory before writing or comparing. The recommended pattern is to normalize CRLF to LF immediately after serialization:
 
@@ -330,8 +330,6 @@ $strJson = $strJson -replace "`r`n", "`n"
 ```
 
 `Get-Content` without `-Raw` strips line terminators and returns an array of lines rather than the original on-disk text, so it **MUST NOT** be used for byte-exact comparison. Use `Get-Content -Raw` or `[System.IO.File]::ReadAllText()` to read the decoded text as a single string when the comparison is text-level, or use `[System.IO.File]::ReadAllBytes()` when true byte-for-byte identity is required. When using the .NET APIs, paths **MUST** first be resolved to an absolute filesystem path per [Resolving Paths for .NET Static Methods](#resolving-paths-for-net-static-methods).
-
-<!-- rationale-anchor: line-endings-for-byte-exact-text-artifacts -->
 
 ## Capitalization and Naming Conventions
 
