@@ -8,6 +8,7 @@ This companion document preserves the extended rationale, design philosophy, and
 - [Code Layout and Formatting Rationale](#code-layout-and-formatting-rationale)
   - [File Encoding](#file-encoding)
   - [Programmatic File Writing Encoding](#programmatic-file-writing-encoding)
+  - [Line Endings for Byte-Exact Text Artifacts](#line-endings-for-byte-exact-text-artifacts)
   - [String Formatting in Cmdlet Arguments (`-f` Scoping)](#string-formatting-in-cmdlet-arguments--f-scoping)
 - [Naming Rationale](#naming-rationale)
   - [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
@@ -100,6 +101,18 @@ The default encoding used by `Set-Content`, `Out-File`, and the `>` redirection 
 The `.NET` `System.Text.UTF8Encoding` approach is preferred for cross-version determinism because it is available in every PowerShell version (including v1.0) and produces identical output regardless of host. The constructor argument `$false` suppresses the BOM, matching the project's source file encoding convention.
 
 The `-Encoding utf8NoBOM` parameter value was introduced in PowerShell 6.0 (Core). It does not exist in Windows PowerShell 5.1, so requiring it as the standard pattern would break backward compatibility. For projects that explicitly target only PowerShell 7+, using `-Encoding utf8NoBOM` with cmdlets is an acceptable alternative.
+
+### Line Endings for Byte-Exact Text Artifacts
+
+> For the actionable rule, see [Line Endings for Byte-Exact Text Artifacts](STYLE_GUIDE.md#line-endings-for-byte-exact-text-artifacts) in the main guide.
+
+Some PowerShell workloads produce text whose identity is its exact byte sequence: golden/snapshot test baselines, files fed into cryptographic hash functions, signed payloads, and other artifacts that are later compared byte-for-byte. For these artifacts, a single stray CRLF where an LF was expected — or vice versa — is enough to cause a hash mismatch, a signature verification failure, or a confusing snapshot diff.
+
+The built-in serializers in PowerShell do not guarantee a stable line-ending convention across hosts. In particular, `ConvertTo-Json` has historically emitted different line endings across PowerShell versions and platforms: some versions produce CRLF inside the serialized output even on Linux and macOS, while others produce LF. Code that trusts the serializer to produce a canonical byte sequence will therefore pass on one host and fail on another. The only reliable remedy at the PowerShell layer is to normalize line endings in memory after serialization and before writing or comparing, for example by replacing `` `r`n `` with `` `n `` on the serialized string. This makes the output deterministic regardless of the serializer's per-host behavior.
+
+On the read side, `Get-Content` without `-Raw` is also unsuitable for byte-exact comparison. It returns an array of lines rather than the original on-disk text, and the line terminators themselves are stripped during that split. The reconstructed string is therefore not guaranteed to equal the bytes that were written — it loses both the specific terminator used (CRLF vs LF) and any trailing newline. `Get-Content -Raw` reads the entire file into a single string and preserves its contents verbatim, which is what byte-exact comparison requires. The .NET APIs `[System.IO.File]::ReadAllText()` and `[System.IO.File]::ReadAllBytes()` offer equivalent behavior and are preferred when already working in a .NET-centric codepath, subject to the path-resolution discipline described in [Resolving Paths for .NET Static Methods](STYLE_GUIDE.md#resolving-paths-for-net-static-methods).
+
+Repository-level controls such as `.gitattributes` entries that pin committed text files to LF can also matter for artifacts stored in version control, because Git's own line-ending handling can otherwise rewrite bytes between commit and checkout. That concern sits above the PowerShell language layer and is intentionally out of scope for `STYLE_GUIDE.md`, which only covers how `.ps1` code serializes and reads byte-exact text.
 
 ### String Formatting in Cmdlet Arguments (`-f` Scoping)
 
