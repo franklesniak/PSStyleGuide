@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.14.20260420.4
+**Version:** 2.15.20260421.3
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -36,6 +36,9 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Variables in strings **SHOULD** be delimited with `${}` or `-f` operator → [Variable Delimiting in Strings](#variable-delimiting-in-strings)
 - **[All]** Source `.ps1` files **MUST** be UTF-8 without BOM by default; see [File Encoding](#file-encoding) for the Windows PowerShell/non-ASCII exception
 - **[All]** When writing text files programmatically, encoding **MUST** be specified explicitly; prefer `.NET` for cross-version UTF-8 without BOM → [Programmatic File Writing Encoding](#programmatic-file-writing-encoding)
+- **[All]** When producing byte-exact text artifacts, serializer output **MUST** be normalized to LF in memory before writing or comparing → [Line Endings for Byte-Exact Text Artifacts](#line-endings-for-byte-exact-text-artifacts)
+- **[All]** Text-level file comparison **MUST** read files with `Get-Content -Raw` or `[System.IO.File]::ReadAllText()` under a fixed encoding/BOM convention; `Get-Content` without `-Raw` **MUST NOT** be used → [Line Endings for Byte-Exact Text Artifacts](#line-endings-for-byte-exact-text-artifacts)
+- **[All]** True byte-for-byte comparison **MUST** read files with `[System.IO.File]::ReadAllBytes()`; this is required for hash/signature inputs and any other byte-exact identity check → [Line Endings for Byte-Exact Text Artifacts](#line-endings-for-byte-exact-text-artifacts)
 
 ### Capitalization and Naming Conventions (Quick Reference)
 
@@ -425,6 +428,29 @@ $objUtf8NoBomEncoding = New-Object System.Text.UTF8Encoding($false)
 `Set-Content` and similar cmdlets **MUST** include an explicit `-Encoding` parameter when writing generated artifacts, because default encoding behavior varies across PowerShell versions and can make output non-deterministic.
 
 `-Encoding utf8NoBOM` **MUST NOT** be the required cross-version pattern, because it is unavailable in Windows PowerShell 5.1. For code that explicitly targets only PowerShell 7+, it **MAY** be used.
+
+### Line Endings for Byte-Exact Text Artifacts
+
+Some PowerShell workloads produce text whose identity is its exact byte sequence: golden/snapshot test baselines, files fed into cryptographic hash functions, signed payloads, and other artifacts that are later compared byte-for-byte. For these artifacts, a single stray CRLF where an LF was expected — or vice versa — is enough to cause a hash mismatch, a signature verification failure, or a confusing snapshot diff.
+
+The built-in serializers in PowerShell do not guarantee a stable line-ending convention across hosts. In particular, `ConvertTo-Json` has historically emitted different line endings across PowerShell versions and platforms: some versions produce CRLF inside the serialized output even on Linux and macOS, while others produce LF. Code that trusts the serializer to produce a canonical byte sequence will therefore pass on one host and fail on another. The only reliable remedy at the PowerShell layer is to normalize line endings in memory after serialization and before writing or comparing, for example by replacing `` `r`n `` with `` `n `` on the serialized string. This makes the output deterministic regardless of the serializer's per-host behavior.
+
+On the read side, `Get-Content` without `-Raw` is also unsuitable for byte-exact comparison. It returns an array of lines rather than the original on-disk text, and the line terminators themselves are stripped during that split. The reconstructed string is therefore not guaranteed to equal the bytes that were written — it loses both the specific terminator used (CRLF vs LF) and any trailing newline. `Get-Content -Raw` reads the entire file into a single string and preserves the decoded text verbatim, including embedded and trailing newlines, which is what text-level identity comparison requires. It does still decode the file contents, however, so it is not a byte-for-byte read and can hide differences such as a UTF-8 BOM or other encoding-level distinctions. When true byte-exact comparison is required — most notably for cryptographic hash inputs and signed payloads — use `[System.IO.File]::ReadAllBytes()`, which returns the raw byte array with no decoding. `[System.IO.File]::ReadAllText()` is the corresponding .NET option for text-centric codepaths and shares the same decoding caveat as `Get-Content -Raw`. Both .NET APIs are subject to the path-resolution discipline described in [Resolving Paths for .NET Static Methods](#resolving-paths-for-net-static-methods).
+
+Repository-level controls such as `.gitattributes` entries that pin committed text files to LF can also matter for artifacts stored in version control, because Git's own line-ending handling can otherwise rewrite bytes between commit and checkout. That concern sits above the PowerShell language layer and is intentionally out of scope for `STYLE_GUIDE.md`, which only covers how `.ps1` code serializes and reads byte-exact text.
+
+When a PowerShell script or test produces text output whose identity is its exact byte sequence (for example, golden baselines, snapshot fixtures, hash inputs, or signed payloads), the producer **MUST** normalize line endings to LF at serialization time. Consumers reading the entire file as text **MUST NOT** use `Get-Content` without `-Raw`; they **MUST** use `Get-Content -Raw` or the equivalent .NET `[System.IO.File]::ReadAllText()` API. Those text-returning APIs are acceptable only for text-level comparison when the encoding convention, including BOM presence or absence, is already fixed. For true byte-for-byte identity (for example, hash inputs and signed payloads), consumers **MUST** use `[System.IO.File]::ReadAllBytes()`, because `Get-Content -Raw` and `[System.IO.File]::ReadAllText()` decode bytes into a `System.String` and can mask byte-level differences such as a UTF-8 BOM or other encoding distinctions.
+
+Cross-version differences in `ConvertTo-Json` and other serializers can emit CRLF on some hosts and LF on others, causing byte-exact comparisons to fail unless line endings are normalized in memory before writing or comparing. The recommended pattern is to normalize CRLF to LF immediately after serialization:
+
+```powershell
+$strJson = $objInput | ConvertTo-Json -Depth 5
+$strJson = $strJson -replace "`r`n", "`n"
+# If the artifact convention requires a trailing LF, also append one:
+# $strJson = $strJson + "`n"
+```
+
+`Get-Content` without `-Raw` strips line terminators and returns an array of lines rather than the original on-disk text, so it **MUST NOT** be used for byte-exact comparison. Use `Get-Content -Raw` or `[System.IO.File]::ReadAllText()` to read the decoded text as a single string when the comparison is text-level, or use `[System.IO.File]::ReadAllBytes()` when true byte-for-byte identity is required. When using the .NET APIs, paths **MUST** first be resolved to an absolute filesystem path per [Resolving Paths for .NET Static Methods](#resolving-paths-for-net-static-methods).
 
 ## Capitalization and Naming Conventions
 
