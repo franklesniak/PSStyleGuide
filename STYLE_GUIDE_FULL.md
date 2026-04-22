@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.15.20260421.3
+**Version:** 2.16.20260422.2
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -751,11 +751,24 @@ This prefixing is **not** a legacy artifact but a **deliberate design decision**
 - **Reduces cognitive load** when reading code without IntelliSense
 - **Prevents accidental type mismatches** in complex logic flows
 
+#### Why Ad Hoc Abbreviated Type Prefixes Are Called Out
+
+The prefix list in [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase) is intentionally **open-ended** for additional descriptive prefixes — the main guide explicitly permits prefixes like `$ref` and `$version` when they provide immediate type clarity — but **canonical** for the common built-in types it already names: `$obj` is established as the default prefix for any .NET type without a dedicated approved prefix (including enum values), and `$hashtable` is established as the canonical prefix for hashtable variables. Authors remain free to introduce *new* descriptive prefixes for types the list does not cover; what they **SHOULD NOT** do is invent *parallel abbreviated* prefixes for types the list already handles (such as `$enum…` for enums or `$hash…` for hashtables). Doing so fragments the convention: reviewers scanning code can no longer rely on a single, predictable token to identify a variable's type, and searches for `$hashtable` (or for `$obj` on enums) miss the ad hoc variants.
+
+Two specific substitutions are called out because they are the most tempting mistakes:
+
+- **`$enum…` → `$obj…`.** An enum is a .NET type without a dedicated approved prefix, so it falls under the default `$obj` bucket exactly like any other such type. Introducing a separate `$enum` prefix would imply that enums are a first-class category in the prefix list, when in fact the guide's design is for `$obj` to absorb all such types uniformly.
+- **`$hash…` → `$hashtable…`.** `$hash` is a natural-looking shortening, but the approved prefix is the fully spelled `$hashtable`. The descriptive-portion rule already forbids abbreviations in the body of a variable name; applying the same discipline to the prefix keeps the type-hinting convention internally consistent and avoids ambiguity with unrelated uses of the word "hash" (e.g., cryptographic hashes, hash codes).
+
+Consistency with the documented prefix list is what keeps the type-hinting convention useful and predictable. Every deviation that is individually "obvious" erodes the guarantee that a reader can identify a variable's type from its prefix alone.
+
 Local variables follow a **Hungarian-style notation** combining a **type-hinting prefix** with **descriptive `camelCase`**. **The descriptive portion of each name—everything after the type prefix—MUST be fully spelled out; abbreviations and shorthand are not permitted.**
 
 - **Prefixes:** `$str` (string), `$int` (integer), `$dbl` (double), `$bool` (boolean), `$arr` (array), `$obj` (object/default), `$hashtable` (hashtable), `$list` (generic list), etc.
 - **Default prefix — `obj`:** Use `$obj` for any .NET type that does not have a dedicated approved prefix above. This includes enum values (e.g., `$objActionPreference`), complex .NET reference types (e.g., `$objMemoryStream`), and `[pscustomobject]` instances (e.g., `$objResult`).
-- **Open-ended list:** The "etc." above means additional descriptive prefixes such as `$ref` and `$version` are permitted when they provide immediate type clarity (e.g., `$refLastKnownError`, `$versionPowerShell`). However, authors **SHOULD NOT** invent ad hoc abbreviated type-name prefixes (e.g., do **not** use `$enumActionPreference`—use `$objActionPreference` instead).
+- **Open-ended list:** The "etc." above means additional descriptive prefixes such as `$ref` and `$version` are permitted when they provide immediate type clarity (e.g., `$refLastKnownError`, `$versionPowerShell`). However, authors **SHOULD NOT** invent ad hoc abbreviated type-name prefixes when a canonical documented prefix already exists. Specifically:
+  - Do **not** use `$enumActionPreference`; use `$objActionPreference` instead (enum values fall under the default `$obj` prefix).
+  - Do **not** use `$hashSeen`, `$hashResult`, etc.; use `$hashtableSeen`, `$hashtableResult`, etc. instead (the canonical prefix for hashtables is `$hashtable`, not the abbreviated `$hash`).
 - **Descriptive Name:** The name **MUST** be **fully spelled out**.
 
 **Examples:**
