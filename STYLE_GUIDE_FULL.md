@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.15.20260421.3
+**Version:** 2.17.20260422.1
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -165,6 +165,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Test `BeforeAll` dot-sourcing **MUST** use the `Split-Path` + `Join-Path` two-step pattern; multi-segment `Join-Path` forms **MUST NOT** be used → [Test File Dot-Sourcing Pattern](#test-file-dot-sourcing-pattern)
 - **[All]** Tests iterating a returned collection with `foreach` **MUST** assert non-emptiness before the loop → [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing)
 - **[All]** Tests accessing specific indices of a returned collection **MUST** assert count before any indexed access → [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing)
+- **[All]** Tests asserting that a call does not throw **MUST** use `{ ... } | Should -Not -Throw` and **MUST NOT** rely on `try/catch` plus negated assertions on exception text → [Asserting Successful Execution With Should -Not -Throw](#asserting-successful-execution-with-should--not--throw)
 
 ## Executive Summary: Author Profile
 
@@ -751,11 +752,24 @@ This prefixing is **not** a legacy artifact but a **deliberate design decision**
 - **Reduces cognitive load** when reading code without IntelliSense
 - **Prevents accidental type mismatches** in complex logic flows
 
+#### Why Ad Hoc Abbreviated Type Prefixes Are Called Out
+
+The prefix list in [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase) is intentionally **open-ended** for additional descriptive prefixes — the main guide explicitly permits prefixes like `$ref` and `$version` when they provide immediate type clarity — but **canonical** for the common built-in types it already names: `$obj` is established as the default prefix for any .NET type without a dedicated approved prefix (including enum values), and `$hashtable` is established as the canonical prefix for hashtable variables. Authors remain free to introduce *new* descriptive prefixes for types the list does not cover; what they **SHOULD NOT** do is invent *parallel abbreviated* prefixes for types the list already handles (such as `$enum…` for enums or `$hash…` for hashtables). Doing so fragments the convention: reviewers scanning code can no longer rely on a single, predictable token to identify a variable's type, and searches for `$hashtable` (or for `$obj` on enums) miss the ad hoc variants.
+
+Two specific substitutions are called out because they are the most tempting mistakes:
+
+- **`$enum…` → `$obj…`.** An enum is a .NET type without a dedicated approved prefix, so it falls under the default `$obj` bucket exactly like any other such type. Introducing a separate `$enum` prefix would imply that enums are a first-class category in the prefix list, when in fact the guide's design is for `$obj` to absorb all such types uniformly.
+- **`$hash…` → `$hashtable…`.** `$hash` is a natural-looking shortening, but the approved prefix is the fully spelled `$hashtable`. The descriptive-portion rule already forbids abbreviations in the body of a variable name; applying the same discipline to the prefix keeps the type-hinting convention internally consistent and avoids ambiguity with unrelated uses of the word "hash" (e.g., cryptographic hashes, hash codes).
+
+Consistency with the documented prefix list is what keeps the type-hinting convention useful and predictable. Every deviation that is individually "obvious" erodes the guarantee that a reader can identify a variable's type from its prefix alone.
+
 Local variables follow a **Hungarian-style notation** combining a **type-hinting prefix** with **descriptive `camelCase`**. **The descriptive portion of each name—everything after the type prefix—MUST be fully spelled out; abbreviations and shorthand are not permitted.**
 
 - **Prefixes:** `$str` (string), `$int` (integer), `$dbl` (double), `$bool` (boolean), `$arr` (array), `$obj` (object/default), `$hashtable` (hashtable), `$list` (generic list), etc.
 - **Default prefix — `obj`:** Use `$obj` for any .NET type that does not have a dedicated approved prefix above. This includes enum values (e.g., `$objActionPreference`), complex .NET reference types (e.g., `$objMemoryStream`), and `[pscustomobject]` instances (e.g., `$objResult`).
-- **Open-ended list:** The "etc." above means additional descriptive prefixes such as `$ref` and `$version` are permitted when they provide immediate type clarity (e.g., `$refLastKnownError`, `$versionPowerShell`). However, authors **SHOULD NOT** invent ad hoc abbreviated type-name prefixes (e.g., do **not** use `$enumActionPreference`—use `$objActionPreference` instead).
+- **Open-ended list:** The "etc." above means additional descriptive prefixes such as `$ref` and `$version` are permitted when they provide immediate type clarity (e.g., `$refLastKnownError`, `$versionPowerShell`). However, authors **SHOULD NOT** invent ad hoc abbreviated type-name prefixes when a canonical documented prefix already exists. Specifically:
+  - Do **not** use `$enumActionPreference`; use `$objActionPreference` instead (enum values fall under the default `$obj` prefix).
+  - Do **not** use `$hashSeen`, `$hashResult`, etc.; use `$hashtableSeen`, `$hashtableResult`, etc. instead (the canonical prefix for hashtables is `$hashtable`, not the abbreviated `$hash`).
 - **Descriptive Name:** The name **MUST** be **fully spelled out**.
 
 **Examples:**
@@ -3219,6 +3233,65 @@ $arrResult[0].Principals[1] | Should -Be 'userB'
 # Assert
 $arrResult[0].Principals.Count | Should -Be 1
 $arrResult[0].Principals[0] | Should -Be 'userA'
+```
+
+---
+
+### Asserting Successful Execution With Should -Not -Throw
+
+#### Why `try/catch` plus negated assertions on exception text is a silent-pass risk
+
+A success-case test that wraps the call in `try { ... } catch { $e = $_ }` and then asserts only `$e.Exception.Message | Should -Not -Match '<pattern>'` is structurally fragile. The test passes under two very different conditions: (1) the call did not throw at all (the intended success path), and (2) the call threw for some unrelated reason and the exception message simply did not contain the negated pattern. Case (2) is a false positive: the function under test failed, but the test reports green. Worse, as the implementation evolves, the exception text can change for reasons wholly unrelated to the behavior being tested—error messages are rephrased, wrapping exceptions are added or removed, localization is introduced—and none of those changes would cause the negated assertion to fail. The test becomes a permanent green light that cannot distinguish success from a broad class of unrelated failures.
+
+#### Why `{ ... } | Should -Not -Throw` is the correct pattern for asserting success
+
+`Should -Not -Throw` evaluates the script block and fails the test on **any** exception, regardless of type, message, or origin. This is exactly the semantics required of a success-case assertion: "the call completed without throwing." There is no pattern to maintain, no message text that can drift, and no silent-pass path. A regression that introduces any new exception—expected or not, related or not—immediately produces a descriptive Pester failure that names the thrown exception, making the root cause easy to diagnose. The idiom is also self-documenting: a reader sees the script block and `Should -Not -Throw` and immediately understands that the assertion under test is "this does not throw."
+
+#### Why expected-failure tests are different and must use positive assertions
+
+Tests that verify a *specific expected failure* are the inverse problem: their purpose is to confirm that a particular exception condition is reached. These tests legitimately need to inspect exception details, but they **MUST** do so with positive assertions that fail when the expected exception is absent or different. `Should -Throw -ExpectedMessage '<pattern>'` fails both when no exception is thrown and when an exception is thrown whose message does not match the pattern—both are defects. Capturing the exception in a `catch` block and then asserting `$e.Exception.Message | Should -Match '<pattern>'` is similarly safe, because `$e` is `$null` when no exception was thrown and the positive `-Match` assertion fails on `$null`. The failure mode that must be avoided is a negated assertion (`Should -Not -Match`, `Should -Not -Be`) used as the *only* check on exception text, because any input that makes the negated predicate true—including the absence of any exception at all, or an exception with a totally unrelated message—counts as a pass.
+
+#### Motivating case
+
+This rule was added in response to a review thread on [franklesniak/PSStyleGuide#37](https://github.com/franklesniak/PSStyleGuide/pull/37) (review comment `r3121685195`), which surfaced Pester success-case tests written as `try/catch` with `Should -Not -Match` assertions on `$e.Exception.Message`. In that context, a regression that caused the function under test to throw an unrelated exception would still have produced a green test result, because the negated message assertion was satisfied by any message that did not happen to contain the forbidden substring. Codifying the `{ ... } | Should -Not -Throw` requirement prevents that silent-pass class of test from recurring.
+
+When a Pester test's purpose is to assert that a call **succeeds** — that is, completes without throwing — the test **MUST** wrap the invocation in a script block and assert it with `Should -Not -Throw`. Such tests **MUST NOT** use `try { ... } catch { $e = $_ }` followed only by negated assertions against exception text (for example, `Should -Not -Match`) as the mechanism for proving success. Negated assertions on exception text silently pass when an unrelated exception is thrown whose message does not happen to match the negated pattern, producing a green result for fundamentally broken code.
+
+Tests whose purpose is to assert a **specific expected failure** **MAY** inspect exception details, but they **MUST** do so with positive assertions that fail when the expected exception is absent or different — for example, `Should -Throw -ExpectedMessage '<pattern>'`, or `Should -Throw` followed by positive assertions such as `Should -Match` or `Should -Be` against the captured exception. Negated assertions alone on exception text **MUST NOT** be used as the sole mechanism for validating either success or expected failure.
+
+**Compliant** (success assertion — `Should -Not -Throw` fails on any exception):
+
+```powershell
+It "Completes without throwing for valid input" {
+    # Arrange
+    $strInput = 'valid-data'
+
+    # Act / Assert
+    { Convert-StringToObject -StringToConvert $strInput } | Should -Not -Throw
+}
+```
+
+**Non-Compliant** (success assertion — `try/catch` plus negated message assertion can pass on an unrelated failure):
+
+```powershell
+# Non-Compliant: if the function throws for an unrelated reason whose message
+# does not contain 'invalid', the negated -Not -Match assertion still passes
+# and the test reports success even though the call failed.
+It "Completes without throwing for valid input" {
+    # Arrange
+    $strInput = 'valid-data'
+    $e = $null
+
+    # Act
+    try {
+        Convert-StringToObject -StringToConvert $strInput
+    } catch {
+        $e = $_
+    }
+
+    # Assert
+    $e.Exception.Message | Should -Not -Match 'invalid'
+}
 ```
 
 ---

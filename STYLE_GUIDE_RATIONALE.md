@@ -1714,3 +1714,23 @@ An outer assertion like `$arrResult.Count | Should -Be 1` confirms that the top-
 #### How pre-assertions strengthen Arrange-Act-Assert
 
 The Arrange-Act-Assert pattern structures a test into setup, execution, and verification phases. Defensive pre-assertions fit naturally at the beginning of the Assert phase as *structural guards* that validate the shape and size of the result before the test proceeds to verify specific values. This layered approach ensures that each assertion failure maps to a single, unambiguous cause: a structural guard failure means the output contract was violated at a structural level, while a value assertion failure means the structure was correct but a specific value was wrong. Without these guards, a single failure can be ambiguous—did the function return the wrong value, or did it return nothing at all?
+
+### Asserting Successful Execution With Should -Not -Throw
+
+> For the normative rules, see [Asserting Successful Execution With Should -Not -Throw](STYLE_GUIDE.md#asserting-successful-execution-with-should--not--throw) in the main guide.
+
+#### Why `try/catch` plus negated assertions on exception text is a silent-pass risk
+
+A success-case test that wraps the call in `try { ... } catch { $e = $_ }` and then asserts only `$e.Exception.Message | Should -Not -Match '<pattern>'` is structurally fragile. The test passes under two very different conditions: (1) the call did not throw at all (the intended success path), and (2) the call threw for some unrelated reason and the exception message simply did not contain the negated pattern. Case (2) is a false positive: the function under test failed, but the test reports green. Worse, as the implementation evolves, the exception text can change for reasons wholly unrelated to the behavior being tested—error messages are rephrased, wrapping exceptions are added or removed, localization is introduced—and none of those changes would cause the negated assertion to fail. The test becomes a permanent green light that cannot distinguish success from a broad class of unrelated failures.
+
+#### Why `{ ... } | Should -Not -Throw` is the correct pattern for asserting success
+
+`Should -Not -Throw` evaluates the script block and fails the test on **any** exception, regardless of type, message, or origin. This is exactly the semantics required of a success-case assertion: "the call completed without throwing." There is no pattern to maintain, no message text that can drift, and no silent-pass path. A regression that introduces any new exception—expected or not, related or not—immediately produces a descriptive Pester failure that names the thrown exception, making the root cause easy to diagnose. The idiom is also self-documenting: a reader sees the script block and `Should -Not -Throw` and immediately understands that the assertion under test is "this does not throw."
+
+#### Why expected-failure tests are different and must use positive assertions
+
+Tests that verify a *specific expected failure* are the inverse problem: their purpose is to confirm that a particular exception condition is reached. These tests legitimately need to inspect exception details, but they **MUST** do so with positive assertions that fail when the expected exception is absent or different. `Should -Throw -ExpectedMessage '<pattern>'` fails both when no exception is thrown and when an exception is thrown whose message does not match the pattern—both are defects. Capturing the exception in a `catch` block and then asserting `$e.Exception.Message | Should -Match '<pattern>'` is similarly safe, because `$e` is `$null` when no exception was thrown and the positive `-Match` assertion fails on `$null`. The failure mode that must be avoided is a negated assertion (`Should -Not -Match`, `Should -Not -Be`) used as the *only* check on exception text, because any input that makes the negated predicate true—including the absence of any exception at all, or an exception with a totally unrelated message—counts as a pass.
+
+#### Motivating case
+
+This rule was added in response to a review thread on [franklesniak/PSStyleGuide#37](https://github.com/franklesniak/PSStyleGuide/pull/37) (review comment `r3121685195`), which surfaced Pester success-case tests written as `try/catch` with `Should -Not -Match` assertions on `$e.Exception.Message`. In that context, a regression that caused the function under test to throw an unrelated exception would still have produced a green test result, because the negated message assertion was satisfied by any message that did not happen to contain the forbidden substring. Codifying the `{ ... } | Should -Not -Throw` requirement prevents that silent-pass class of test from recurring.

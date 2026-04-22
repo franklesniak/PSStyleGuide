@@ -5,7 +5,7 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 2.15.20260421.3
+**Version:** 2.17.20260422.1
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -162,6 +162,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Test `BeforeAll` dot-sourcing **MUST** use the `Split-Path` + `Join-Path` two-step pattern; multi-segment `Join-Path` forms **MUST NOT** be used → [Test File Dot-Sourcing Pattern](#test-file-dot-sourcing-pattern)
 - **[All]** Tests iterating a returned collection with `foreach` **MUST** assert non-emptiness before the loop → [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing)
 - **[All]** Tests accessing specific indices of a returned collection **MUST** assert count before any indexed access → [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing)
+- **[All]** Tests asserting that a call does not throw **MUST** use `{ ... } | Should -Not -Throw` and **MUST NOT** rely on `try/catch` plus negated assertions on exception text → [Asserting Successful Execution With Should -Not -Throw](#asserting-successful-execution-with-should--not--throw)
 
 <!-- rationale-anchor: executive-summary-author-profile -->
 
@@ -562,7 +563,9 @@ Local variables follow a **Hungarian-style notation** combining a **type-hinting
 
 - **Prefixes:** `$str` (string), `$int` (integer), `$dbl` (double), `$bool` (boolean), `$arr` (array), `$obj` (object/default), `$hashtable` (hashtable), `$list` (generic list), etc.
 - **Default prefix — `obj`:** Use `$obj` for any .NET type that does not have a dedicated approved prefix above. This includes enum values (e.g., `$objActionPreference`), complex .NET reference types (e.g., `$objMemoryStream`), and `[pscustomobject]` instances (e.g., `$objResult`).
-- **Open-ended list:** The "etc." above means additional descriptive prefixes such as `$ref` and `$version` are permitted when they provide immediate type clarity (e.g., `$refLastKnownError`, `$versionPowerShell`). However, authors **SHOULD NOT** invent ad hoc abbreviated type-name prefixes (e.g., do **not** use `$enumActionPreference`—use `$objActionPreference` instead).
+- **Open-ended list:** The "etc." above means additional descriptive prefixes such as `$ref` and `$version` are permitted when they provide immediate type clarity (e.g., `$refLastKnownError`, `$versionPowerShell`). However, authors **SHOULD NOT** invent ad hoc abbreviated type-name prefixes when a canonical documented prefix already exists. Specifically:
+  - Do **not** use `$enumActionPreference`; use `$objActionPreference` instead (enum values fall under the default `$obj` prefix).
+  - Do **not** use `$hashSeen`, `$hashResult`, etc.; use `$hashtableSeen`, `$hashtableResult`, etc. instead (the canonical prefix for hashtables is `$hashtable`, not the abbreviated `$hash`).
 - **Descriptive Name:** The name **MUST** be **fully spelled out**.
 
 **Examples:**
@@ -2135,6 +2138,49 @@ $arrResult[0].Principals[1] | Should -Be 'userB'
 # Assert
 $arrResult[0].Principals.Count | Should -Be 1
 $arrResult[0].Principals[0] | Should -Be 'userA'
+```
+
+---
+
+### Asserting Successful Execution With Should -Not -Throw
+
+When a Pester test's purpose is to assert that a call **succeeds** — that is, completes without throwing — the test **MUST** wrap the invocation in a script block and assert it with `Should -Not -Throw`. Such tests **MUST NOT** use `try { ... } catch { $e = $_ }` followed only by negated assertions against exception text (for example, `Should -Not -Match`) as the mechanism for proving success. Negated assertions on exception text silently pass when an unrelated exception is thrown whose message does not happen to match the negated pattern, producing a green result for fundamentally broken code.
+
+Tests whose purpose is to assert a **specific expected failure** **MAY** inspect exception details, but they **MUST** do so with positive assertions that fail when the expected exception is absent or different — for example, `Should -Throw -ExpectedMessage '<pattern>'`, or `Should -Throw` followed by positive assertions such as `Should -Match` or `Should -Be` against the captured exception. Negated assertions alone on exception text **MUST NOT** be used as the sole mechanism for validating either success or expected failure.
+
+**Compliant** (success assertion — `Should -Not -Throw` fails on any exception):
+
+```powershell
+It "Completes without throwing for valid input" {
+    # Arrange
+    $strInput = 'valid-data'
+
+    # Act / Assert
+    { Convert-StringToObject -StringToConvert $strInput } | Should -Not -Throw
+}
+```
+
+**Non-Compliant** (success assertion — `try/catch` plus negated message assertion can pass on an unrelated failure):
+
+```powershell
+# Non-Compliant: if the function throws for an unrelated reason whose message
+# does not contain 'invalid', the negated -Not -Match assertion still passes
+# and the test reports success even though the call failed.
+It "Completes without throwing for valid input" {
+    # Arrange
+    $strInput = 'valid-data'
+    $e = $null
+
+    # Act
+    try {
+        Convert-StringToObject -StringToConvert $strInput
+    } catch {
+        $e = $_
+    }
+
+    # Assert
+    $e.Exception.Message | Should -Not -Match 'invalid'
+}
 ```
 
 ---
