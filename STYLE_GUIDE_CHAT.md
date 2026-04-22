@@ -3,7 +3,7 @@
 ````markdown
 # PowerShell Writing Style
 
-**Version:** 2.17.20260422.1
+**Version:** 2.17.20260422.2
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -2144,7 +2144,7 @@ $arrResult[0].Principals[0] | Should -Be 'userA'
 
 When a Pester test's purpose is to assert that a call **succeeds** — that is, completes without throwing — the test **MUST** wrap the invocation in a script block and assert it with `Should -Not -Throw`. Such tests **MUST NOT** use `try { ... } catch { $e = $_ }` followed only by negated assertions against exception text (for example, `Should -Not -Match`) as the mechanism for proving success. Negated assertions on exception text silently pass when an unrelated exception is thrown whose message does not happen to match the negated pattern, producing a green result for fundamentally broken code.
 
-Tests whose purpose is to assert a **specific expected failure** **MAY** inspect exception details, but they **MUST** do so with positive assertions that fail when the expected exception is absent or different — for example, `Should -Throw -ExpectedMessage '<pattern>'`, or `Should -Throw` followed by positive assertions such as `Should -Match` or `Should -Be` against the captured exception. Negated assertions alone on exception text **MUST NOT** be used as the sole mechanism for validating either success or expected failure.
+Tests whose purpose is to assert a **specific expected failure** **MAY** inspect exception details, but they **MUST** do so with positive assertions that fail when the expected exception is absent or different — for example, `Should -Throw -ExpectedMessage '<pattern>'`, or `Should -Throw -PassThru` (which returns the thrown `ErrorRecord`) or an explicit `try { ... } catch { $e = $_ }` to capture the exception, followed by positive assertions such as `Should -Match` or `Should -Be` against the captured object. `Should -Throw` without `-PassThru` does **not** implicitly expose the thrown exception; a capture mechanism is required before any follow-up assertion. Negated assertions alone on exception text **MUST NOT** be used as the sole mechanism for validating either success or expected failure.
 
 **Compliant** (success assertion — `Should -Not -Throw` fails on any exception):
 
@@ -2178,6 +2178,43 @@ It "Completes without throwing for valid input" {
 
     # Assert
     $e.Exception.Message | Should -Not -Match 'invalid'
+}
+```
+
+**Compliant** (expected-failure assertion — capture with `-PassThru` and assert positively):
+
+```powershell
+It "Throws a specific error for invalid input" {
+    # Arrange
+    $strInput = 'bad-data'
+
+    # Act
+    $errorRecord = { Convert-StringToObject -StringToConvert $strInput } |
+        Should -Throw -PassThru
+
+    # Assert
+    $errorRecord.Exception.Message | Should -Match 'invalid'
+}
+```
+
+**Compliant** (expected-failure assertion — capture with `try/catch` and assert positively):
+
+```powershell
+It "Throws a specific error for invalid input" {
+    # Arrange
+    $strInput = 'bad-data'
+    $e = $null
+
+    # Act
+    try {
+        Convert-StringToObject -StringToConvert $strInput
+    } catch {
+        $e = $_
+    }
+
+    # Assert — positive assertion fails when $e is $null (no exception thrown)
+    $e | Should -Not -BeNullOrEmpty
+    $e.Exception.Message | Should -Match 'invalid'
 }
 ```
 
