@@ -1,6 +1,6 @@
 # PowerShell Writing Style
 
-**Version:** 2.16.20260422.2
+**Version:** 2.17.20260422.3
 
 **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
@@ -165,6 +165,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Test `BeforeAll` dot-sourcing **MUST** use the `Split-Path` + `Join-Path` two-step pattern; multi-segment `Join-Path` forms **MUST NOT** be used → [Test File Dot-Sourcing Pattern](#test-file-dot-sourcing-pattern)
 - **[All]** Tests iterating a returned collection with `foreach` **MUST** assert non-emptiness before the loop → [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing)
 - **[All]** Tests accessing specific indices of a returned collection **MUST** assert count before any indexed access → [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing)
+- **[All]** Tests asserting that a call does not throw **MUST** use `{ ... } | Should -Not -Throw` and **MUST NOT** rely on `try/catch` plus negated assertions on exception text → [Asserting Successful Execution With Should -Not -Throw](#asserting-successful-execution-with-should--not--throw)
 
 ## Executive Summary: Author Profile
 
@@ -3232,6 +3233,106 @@ $arrResult[0].Principals[1] | Should -Be 'userB'
 # Assert
 $arrResult[0].Principals.Count | Should -Be 1
 $arrResult[0].Principals[0] | Should -Be 'userA'
+```
+
+---
+
+### Asserting Successful Execution With Should -Not -Throw
+
+#### Why `try/catch` plus negated assertions on exception text is a silent-pass risk
+
+A success-case test that wraps the call in `try { ... } catch { $e = $_ }` and then asserts only `$e.Exception.Message | Should -Not -Match '<pattern>'` is structurally fragile. The test passes under two very different conditions: (1) the call did not throw at all (the intended success path), and (2) the call threw for some unrelated reason and the exception message simply did not contain the negated pattern. Case (2) is a false positive: the function under test failed, but the test reports green. Worse, as the implementation evolves, the exception text can change for reasons wholly unrelated to the behavior being tested—error messages are rephrased, wrapping exceptions are added or removed, localization is introduced—and none of those changes would cause the negated assertion to fail. The test becomes a permanent green light that cannot distinguish success from a broad class of unrelated failures.
+
+#### Why `{ ... } | Should -Not -Throw` is the correct pattern for asserting success
+
+`Should -Not -Throw` evaluates the script block and fails the test on **any** exception, regardless of type, message, or origin. This is exactly the semantics required of a success-case assertion: "the call completed without throwing." There is no pattern to maintain, no message text that can drift, and no silent-pass path. A regression that introduces any new exception—expected or not, related or not—immediately produces a descriptive Pester failure that names the thrown exception, making the root cause easy to diagnose. The idiom is also self-documenting: a reader sees the script block and `Should -Not -Throw` and immediately understands that the assertion under test is "this does not throw."
+
+#### Why expected-failure tests are different and must use positive assertions
+
+Tests that verify a *specific expected failure* are the inverse problem: their purpose is to confirm that a particular exception condition is reached. These tests legitimately need to inspect exception details, but their follow-up assertions on the captured exception **MUST** fail when the expected exception is absent or different. `Should -Throw -ExpectedMessage '<pattern>'` fails both when no exception is thrown and when an exception is thrown whose message does not match the pattern—both are defects. Capturing the exception in a `catch` block and then asserting `$e.Exception.Message | Should -Match '<pattern>'` is similarly safe, because `$e` is `$null` when no exception was thrown and the `-Match` assertion fails on `$null`. The failure mode that must be avoided is a negated assertion against exception **text** (`Should -Not -Match`, `Should -Not -Be` against `$e.Exception.Message`) used as the *only* check, because any input that makes the negated predicate true—including the absence of any exception at all, or an exception with a totally unrelated message—counts as a pass. A presence-guard assertion such as `$e | Should -Not -BeNullOrEmpty` against the captured `ErrorRecord` itself is not subject to this failure mode: it fails precisely when `$e` is `$null`, which is the "expected exception absent" case, and is therefore explicitly permitted — and recommended — as a structural guard before dereferencing `$e.Exception`.
+
+#### How to capture the thrown exception for follow-up assertions
+
+`Should -Throw` on its own does not implicitly expose the thrown exception to subsequent statements, so any follow-up assertion against the exception needs an explicit capture mechanism. Pester 5 supports two idioms. The first is `Should -Throw -PassThru`, which evaluates the script block, asserts that it throws, and returns the thrown `ErrorRecord` as its output so it can be assigned to a variable and inspected—for example, `$errorRecord = { ... } | Should -Throw -PassThru; $errorRecord.Exception.Message | Should -Match '<pattern>'`. The second is the classic `try { ... } catch { $e = $_ }` pattern, in which the caught `$_` is an `ErrorRecord` whose `Exception` property exposes the same detail; a presence-guard assertion such as `$e | Should -Not -BeNullOrEmpty` followed by `$e.Exception.Message | Should -Match '<pattern>'` is safe because both assertions fail when `$e` is `$null`. Both idioms are acceptable; the critical constraint is that the follow-up assertions on the captured exception fail when the expected exception is absent or different. Assertions that satisfy this constraint include both positive predicates on exception detail (`Should -Match`, `Should -Be`, `Should -BeOfType`, etc.) and the presence guard `Should -Not -BeNullOrEmpty` against the captured `ErrorRecord` itself — despite using `-Not`, the presence guard fails precisely in the absent-exception case and is therefore consistent with (and complementary to) the rule. What **MUST NOT** be used as the sole follow-up check is a negated predicate against exception **text** (e.g., `$e.Exception.Message | Should -Not -Match '<pattern>'`), because that assertion is silently satisfied by any exception whose message does not match — including unrelated exceptions and the absence of an exception altogether.
+
+#### Motivating case
+
+This rule was added in response to a review thread on [franklesniak/PSStyleGuide#37](https://github.com/franklesniak/PSStyleGuide/pull/37) (review comment `r3121685195`), which surfaced Pester success-case tests written as `try/catch` with `Should -Not -Match` assertions on `$e.Exception.Message`. In that context, a regression that caused the function under test to throw an unrelated exception would still have produced a green test result, because the negated message assertion was satisfied by any message that did not happen to contain the forbidden substring. Codifying the `{ ... } | Should -Not -Throw` requirement prevents that silent-pass class of test from recurring.
+
+When a Pester test's purpose is to assert that a call **succeeds** — that is, completes without throwing — the test **MUST** wrap the invocation in a script block and assert it with `Should -Not -Throw`. Such tests **MUST NOT** use `try { ... } catch { $e = $_ }` followed only by negated assertions against exception text (for example, `Should -Not -Match`) as the mechanism for proving success. Negated assertions on exception text silently pass when an unrelated exception is thrown whose message does not happen to match the negated pattern, producing a green result for fundamentally broken code.
+
+Tests whose purpose is to assert a **specific expected failure** **MAY** inspect exception details, but follow-up assertions on the captured exception **MUST** fail when the expected exception is absent or different — for example, `Should -Throw -ExpectedMessage '<pattern>'`, or `Should -Throw -PassThru` (which returns the thrown `ErrorRecord`) or an explicit `try { ... } catch { $e = $_ }` to capture the exception, followed by assertions such as `Should -Match` or `Should -Be` against the captured object. A presence guard that fails when no exception was captured — specifically `$e | Should -Not -BeNullOrEmpty` immediately after a `try/catch` capture — **IS** permitted (and **SHOULD** be used before dereferencing `$e.Exception`) because it fails when `$e` is `$null`, which is the "expected exception absent" case. `Should -Throw` without `-PassThru` does **not** implicitly expose the thrown exception; a capture mechanism is required before any follow-up assertion. Negated assertions against exception **text** (for example, `$e.Exception.Message | Should -Not -Match '<pattern>'`) **MUST NOT** be used as the sole mechanism for validating either success or expected failure, because any exception whose message does not match the negated pattern — including an unrelated exception — will silently satisfy the assertion.
+
+**Compliant** (success assertion — `Should -Not -Throw` fails on any exception):
+
+```powershell
+It "Completes without throwing for valid input" {
+    # Arrange
+    $strInput = 'valid-data'
+
+    # Act / Assert
+    { Convert-StringToObject -StringToConvert $strInput } | Should -Not -Throw
+}
+```
+
+**Non-Compliant** (success assertion — `try/catch` plus negated message assertion can pass on an unrelated failure):
+
+```powershell
+# Non-Compliant: if the function throws for an unrelated reason whose message
+# does not contain 'invalid', the negated -Not -Match assertion still passes
+# and the test reports success even though the call failed.
+It "Completes without throwing for valid input" {
+    # Arrange
+    $strInput = 'valid-data'
+    $e = $null
+
+    # Act
+    try {
+        Convert-StringToObject -StringToConvert $strInput
+    } catch {
+        $e = $_
+    }
+
+    # Assert
+    $e.Exception.Message | Should -Not -Match 'invalid'
+}
+```
+
+**Compliant** (expected-failure assertion — capture with `-PassThru` and assert positively):
+
+```powershell
+It "Throws a specific error for invalid input" {
+    # Arrange
+    $strInput = 'bad-data'
+
+    # Act
+    $errorRecord = { Convert-StringToObject -StringToConvert $strInput } |
+        Should -Throw -PassThru
+
+    # Assert
+    $errorRecord.Exception.Message | Should -Match 'invalid'
+}
+```
+
+**Compliant** (expected-failure assertion — capture with `try/catch` and assert positively):
+
+```powershell
+It "Throws a specific error for invalid input" {
+    # Arrange
+    $strInput = 'bad-data'
+    $e = $null
+
+    # Act
+    try {
+        Convert-StringToObject -StringToConvert $strInput
+    } catch {
+        $e = $_
+    }
+
+    # Assert — positive assertion fails when $e is $null (no exception thrown)
+    $e | Should -Not -BeNullOrEmpty
+    $e.Exception.Message | Should -Match 'invalid'
+}
 ```
 
 ---
