@@ -3,11 +3,18 @@ applyTo:  "**/*.ps1"
 description: "PowerShell coding standards"
 ---
 
+<!-- markdownlint-disable MD013 -->
+
 # PowerShell Writing Style
 
-**Version:** 2.17.20260422.3
+**Version:** 2.18.20260509.0
 
-**Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
+## Metadata
+
+- **Status:** Active
+- **Owner:** Repository Maintainers
+- **Last Updated:** 2026-05-09
+- **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Keywords
 

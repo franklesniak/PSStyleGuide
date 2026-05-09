@@ -28,6 +28,24 @@ Place the following content in `STYLE_GUIDE_RATIONALE.md`:
 
 When a rule is added or changed in `STYLE_GUIDE.md`, add or update corresponding rationale in `STYLE_GUIDE_RATIONALE.md` when useful.
 
+### Operational metadata in consumer-facing guide files
+
+Consumer-facing guide files **may** include a concise top-of-document metadata block when the fields help humans, tooling, or LLM-based coding agents identify how to consume the document.
+
+For `STYLE_GUIDE.md`, the allowed metadata fields are:
+
+- `Status`
+- `Owner`
+- `Last Updated`
+- `Scope`
+
+Operational metadata is subject to the following constraints:
+
+- Metadata must remain concise and operational.
+- Extended explanation, history, tradeoffs, and rationale still belong in `STYLE_GUIDE_RATIONALE.md` or other contributor-facing files.
+- Consumer-facing guide files still must not cross-reference other repository files (see [No-cross-referencing norm](#no-cross-referencing-norm)).
+- Do not add a `Related` field or other cross-reference-oriented metadata to consumer-facing guide metadata.
+
 ## No-cross-referencing norm
 
 Consumer-facing style guide files must not cross-reference other files in this repository, including each other. The consumer-facing files are:
