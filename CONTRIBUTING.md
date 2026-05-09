@@ -1,3 +1,5 @@
+<!-- markdownlint-disable MD013 -->
+
 # Contributing to PSStyleGuide
 
 Thank you for your interest in contributing to the PSStyleGuide repository! This document describes the conventions used in this project to help you place new content in the right location.
