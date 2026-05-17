@@ -7,13 +7,13 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 2.18.20260509.0
+**Version:** 2.19.20260517.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-05-09
+- **Last Updated:** 2026-05-17
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Keywords
@@ -72,6 +72,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Comment-based help **MUST** use single-line comments (#) with dotted keywords (.SYNOPSIS, .DESCRIPTION, etc.) → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
 - **[v1.0]** Block comments (`<# ... #>`) **MUST NOT** be used — they cause parser errors in PowerShell v1.0; use single-line comments (`#`) instead → [Help Format Options: Comparison](#help-format-options-comparison)
 - **[All]** Comment-based help **MUST** include sections: .SYNOPSIS, .DESCRIPTION, .PARAMETER (one per parameter, if any), .EXAMPLE, .INPUTS, .OUTPUTS, .NOTES → [Comment-Based Help: Structure and Format](#comment-based-help-structure-and-format)
+- **[All]** Comment-based help **MUST** use exactly one comment blank line between top-level help sections → [Comment-Based Help Spacing](#comment-based-help-spacing)
 - **[All]** Explanatory or output-description lines within `.EXAMPLE` blocks **MUST** use double `#` (`# # <text>`) so that `Get-Help` renders them as valid PowerShell comments (`# <text>`) → [Inline Comments Within `.EXAMPLE` Blocks](#inline-comments-within-example-blocks)
 - **[All]** Functions **SHOULD** provide multiple examples with input, output, and explanation → [Help Content Quality: High Standards](#help-content-quality-high-standards)
 - **[All]** Every possible output/return value **MUST** be documented in .OUTPUTS with exact type and meaning; integer status codes **MUST** include full code-to-meaning mapping; output examples **MUST** be placed in .EXAMPLE blocks → [Help Content Quality: High Standards](#help-content-quality-high-standards)
@@ -674,22 +675,31 @@ All functions **MUST** include **full comment-based help** using **single-line c
 ```powershell
 # .SYNOPSIS
 # Processes a string input with flexible handling of non-standard formats.
+#
 # .DESCRIPTION
 # Attempts direct processing. On failure, iteratively handles problematic segments...
+#
 # .PARAMETER ReferenceToResultObject
 # Reference to store the resulting object.
+#
 # .EXAMPLE
 # $result = $null; $extras = @('','','','',''); $status = Process-String ([ref]$result) ([ref]$extras) 'input-string'
+#
 # # $status = 4, $result = processed value, $extras[3] = 'leftover'
+#
 # .INPUTS
 # None. You can't pipe objects to this function.
+#
 # .OUTPUTS
 # [int] Status code: 0=success, 1-5=partial success with extras, -1=failure
+#
 # .NOTES
 # This function/script supports positional parameters:
+#
 #   Position 0: ReferenceToResultObject
 #   Position 1: ReferenceArrayOfExtraStrings
 #   Position 2: InputString
+#
 # Version: 1.0.20250218.0
 ```
 
@@ -701,7 +711,65 @@ All functions **MUST** include **full comment-based help** using **single-line c
 > [Positional Parameter Support](#positional-parameter-support) for full
 > guidance.
 
-#### Inline Comments Within `.EXAMPLE` Blocks
+### Comment-Based Help Spacing
+
+A **comment blank line** is a line inside comment-based help that contains only
+the comment marker (`#`), with the same indentation as the surrounding help
+block. For function-level help, the comment blank line is indented with the help
+block:
+
+```powershell
+function Get-Example {
+    # .SYNOPSIS
+    # Does something.
+    #
+    # .DESCRIPTION
+    # Does something in more detail.
+    param ()
+}
+```
+
+Comment-based help **MUST** use exactly one comment blank line between
+top-level help sections. Top-level help sections include `.SYNOPSIS`,
+`.DESCRIPTION`, `.PARAMETER`, `.EXAMPLE`, `.INPUTS`, `.OUTPUTS`, and `.NOTES`.
+A comment blank line **MUST NOT** appear before the first help keyword.
+Consecutive `.PARAMETER` sections **MUST** be separated by exactly one comment
+blank line. Consecutive `.EXAMPLE` sections **MUST** be separated by exactly one
+comment blank line.
+
+A comment blank line **SHOULD NOT** appear immediately after a dotted help
+keyword when the section content begins on the next line. Wrapped lines
+belonging to the same paragraph **MUST NOT** be separated by comment blank
+lines.
+
+Inside `.EXAMPLE` sections, executable sample code **SHOULD** be separated from
+explanatory rendered-comment lines by exactly one comment blank line. The
+existing requirement that explanatory or output-description lines use exactly
+`# # <text>` remains unchanged:
+
+```powershell
+# .EXAMPLE
+# $arrResult = @(Get-Example)
+#
+# # Returns zero or more example objects.
+```
+
+Within `.NOTES`, distinct note groups **SHOULD** be separated by exactly one
+comment blank line, especially positional parameter documentation, additional
+note text, private/internal helper banners, and version metadata:
+
+```powershell
+# .NOTES
+# This script supports positional parameters:
+#
+#   Position 0: RootDirectoryPath
+#
+# Parameters without a listed position must be named.
+#
+# Version: 1.0.20260517.0
+```
+
+### Inline Comments Within `.EXAMPLE` Blocks
 
 When writing explanatory or output-description lines within a `.EXAMPLE` section of comment-based help, use **double `#`** — that is, `# # <text>`. The first `#` is the standard comment-based help line prefix (required for all help content). The second `#` creates a PowerShell comment within the rendered example output so that:
 
@@ -713,6 +781,7 @@ When writing explanatory or output-description lines within a `.EXAMPLE` section
 ```powershell
 # .EXAMPLE
 # $arrRows = @(ConvertTo-VectorRow -Counts $arrCounts -FeatureIndexObject $objIndex)
+#
 # # $arrRows[0].PrincipalKey = 'user-abc'
 # # $arrRows[0].Vector = [double[]] (fixed-length array)
 ```
@@ -730,6 +799,7 @@ $arrRows = @(ConvertTo-VectorRow -Counts $arrCounts -FeatureIndexObject $objInde
 ```powershell
 # .EXAMPLE
 # $arrRows = @(ConvertTo-VectorRow -Counts $arrCounts -FeatureIndexObject $objIndex)
+#
 # Returns vector row objects with PrincipalKey, Vector, and TotalActions.
 ```
 
@@ -747,6 +817,7 @@ The non-compliant form renders bare prose that (a) is not valid PowerShell, (b) 
 ```powershell
 # .EXAMPLE
 # $arrRows = @(ConvertTo-VectorRow -Counts $arrCounts -FeatureIndexObject $objIndex)
+#
 # # # Returns vector row objects with PrincipalKey and Vector.
 ```
 
@@ -784,30 +855,41 @@ All other comment-based help requirements (`.SYNOPSIS`, `.DESCRIPTION`, `.PARAME
 function Convert-RawRecord {
     # .SYNOPSIS
     # Transforms a raw input record into a normalized internal format.
+    #
     # .DESCRIPTION
     # Parses the raw record hashtable, validates required keys, and
     # returns a normalized [pscustomobject]. This function is used
     # only by Import-DataSet and is not part of the public API.
+    #
     # .PARAMETER ReferenceToResultObject
     # Reference to store the resulting normalized object.
+    #
     # .PARAMETER RawRecord
     # The raw hashtable to normalize.
+    #
     # .EXAMPLE
     # $objResult = $null
     # $intReturnCode = Convert-RawRecord ([ref]$objResult) $hashtableInput
+    #
     # # $intReturnCode = 0, $objResult contains the normalized record
+    #
     # .INPUTS
     # None. You can't pipe objects to this function.
+    #
     # .OUTPUTS
     # [int] Status code: 0 = success, -1 = failure (missing keys)
+    #
     # .NOTES
     # PRIVATE/INTERNAL HELPER — This function is not part of the
     # public API surface. Parameters, return shape, and positional
     # contract may change without notice.
+    #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
+    #
     #   Position 0: ReferenceToResultObject
     #   Position 1: RawRecord
+    #
     # Version: 1.0.20260415.0
     param (
         [ref]$ReferenceToResultObject,
@@ -849,8 +931,10 @@ For distributable helper functions, the structure **MUST** be: function declarat
 function Get-Example {
     # .SYNOPSIS
     # Example function with license
+    #
     # .DESCRIPTION
     # This demonstrates the correct placement of param() before license.
+    #
     # .NOTES
     # Version: 1.0.20260109.0
 
@@ -1040,12 +1124,30 @@ This exception applies when:
 function Test-PathExists {
     # .SYNOPSIS
     # Tests whether a path exists.
+    #
     # .DESCRIPTION
     # Returns $true if the path exists, $false otherwise.
+    #
     # .PARAMETER Path
     # The path to test.
+    #
+    # .EXAMPLE
+    # $boolPathExists = Test-PathExists -Path 'C:\Temp'
+    #
+    # # $boolPathExists is $true when the path exists.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
     # .OUTPUTS
     # [bool] $true if the path exists, $false otherwise.
+    #
+    # .NOTES
+    # This function supports positional parameters:
+    #
+    #   Position 0: Path
+    #
+    # Version: 1.0.20260517.0
     param (
         [string]$Path
     )
@@ -1110,8 +1212,10 @@ When a function or script supports positional parameters, the `.NOTES` section *
 ```powershell
 # .NOTES
 # This function/script supports positional parameters:
+#
 #   Position 0: VectorRows
 #   Position 1: KMeansResult
+#
 # Version: 1.0.20250218.0
 ```
 
@@ -1336,9 +1440,10 @@ To ensure the result is **always** an array (even if empty or with a single item
 
 ```powershell
 # .EXAMPLE
+# $arrPrincipals = @(Expand-TrustPrincipal -PrincipalNode $statement.Principal)
+#
 # # This example shows how to safely call the function and guarantee the
 # # result is an array, even if only one principal is returned.
-# $arrPrincipals = @(Expand-TrustPrincipal -PrincipalNode $statement.Principal)
 ```
 
 ---
@@ -1547,13 +1652,34 @@ A modern function **MAY** intentionally handle an exception without re-throwing 
 ```powershell
 # Non-throwing wrapper with documented contract
 function Convert-SafelyFromJson {
+    # .SYNOPSIS
+    # Converts a JSON string to an object without throwing on invalid input.
+    #
     # .DESCRIPTION
     # Attempts to convert a JSON string to an object. This function does
     # NOT throw on invalid input; instead it returns $null and logs the
     # error to the Debug stream. Callers MUST check the return value.
     #
+    # .PARAMETER JsonString
+    # JSON string to convert.
+    #
+    # .EXAMPLE
+    # $objResult = Convert-SafelyFromJson -JsonString '{"name":"example"}'
+    #
+    # # $objResult is a converted object on success, or $null on failure.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
     # .OUTPUTS
     # [object] on success; $null on failure.
+    #
+    # .NOTES
+    # This function supports positional parameters:
+    #
+    #   Position 0: JsonString
+    #
+    # Version: 1.0.20260517.0
     [CmdletBinding()]
     [OutputType([object])]
     param (
