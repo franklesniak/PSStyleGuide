@@ -18,6 +18,7 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Summary: Naming as Defensive Architecture](#summary-naming-as-defensive-architecture)
 - [Documentation Rationale](#documentation-rationale)
   - [Overview of Documentation Philosophy](#overview-of-documentation-philosophy)
+  - [Comment-Based Help Spacing](#comment-based-help-spacing)
   - [Parameter Documentation Placement: Strategic Choice](#parameter-documentation-placement-strategic-choice)
   - [Help Format Options: Comparison](#help-format-options-comparison)
   - [Private/Internal Helper Function Documentation](#privateinternal-helper-function-documentation)
@@ -229,6 +230,24 @@ Every function—**including nested private helpers**—receives **identical tre
 1. **End users** (via `Get-Help`)
 2. **Script maintainers** (via inline context)
 3. **Code reviewers** (via complete behavioral contracts)
+
+---
+
+### Comment-Based Help Spacing
+
+> For the spacing rule, see [Comment-Based Help Spacing](STYLE_GUIDE.md#comment-based-help-spacing) in the main guide.
+
+Dense comment-based help blocks are technically valid, but they make section
+boundaries harder to scan. A single comment blank line between top-level help
+sections preserves the complete inline help contract while giving readers a
+reliable visual rhythm for `.SYNOPSIS`, `.DESCRIPTION`, `.PARAMETER`,
+`.EXAMPLE`, `.INPUTS`, `.OUTPUTS`, and `.NOTES`.
+
+The rule uses a line containing only `#` instead of a true empty physical line
+because the separator remains part of the comment-based help block. This keeps
+the source visually separated without implying a break in the help content, and
+it preserves predictable `Get-Help` rendering across Windows PowerShell and
+PowerShell 7+.
 
 ---
 
