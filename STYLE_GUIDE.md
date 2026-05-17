@@ -706,7 +706,7 @@ All functions **MUST** include **full comment-based help** using **single-line c
 > [Positional Parameter Support](#positional-parameter-support) for full
 > guidance.
 
-#### Comment-Based Help Spacing
+### Comment-Based Help Spacing
 
 A **comment blank line** is a line inside comment-based help that contains only
 the comment marker (`#`), with the same indentation as the surrounding help
@@ -764,7 +764,7 @@ note text, private/internal helper banners, and version metadata:
 # Version: 1.0.20260517.0
 ```
 
-#### Inline Comments Within `.EXAMPLE` Blocks
+### Inline Comments Within `.EXAMPLE` Blocks
 
 When writing explanatory or output-description lines within a `.EXAMPLE` section of comment-based help, use **double `#`** — that is, `# # <text>`. The first `#` is the standard comment-based help line prefix (required for all help content). The second `#` creates a PowerShell comment within the rendered example output so that:
 
