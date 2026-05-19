@@ -2,7 +2,7 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.19.20260519.3
+**Version:** 2.19.20260519.4
 
 ## Metadata
 
@@ -2596,7 +2596,7 @@ CI workflow runs often need a PowerShell `run:` step that performs both test dis
 
 The Pester configuration `Run.Path` value and the discovery step's path **MUST** be derived from a single source of truth, such as a workflow-level `env:` value like `PESTER_TEST_ROOT`, so the discovery scope and execution scope cannot drift apart.
 
-The discovery step **SHOULD** guard against a missing test root using `Test-Path -LiteralPath` so projects that have not yet created or have intentionally removed the `tests/` directory still see a clean "no test files" skip rather than a workflow error. `Get-ChildItem ... -ErrorAction SilentlyContinue` **MAY** be used as an alternative, but it is **NOT** equivalent: `SilentlyContinue` also suppresses non-existence-related errors such as permission or IO failures, which can mask genuine CI problems as a clean skip. A `Test-Path` guard followed by `Get-ChildItem` without `-ErrorAction SilentlyContinue` is preferred.
+The discovery step **SHOULD** guard against a missing test root using `Test-Path -LiteralPath ... -PathType Container` so projects that have not yet created or have intentionally removed the `tests/` directory still see a clean "no test files" skip rather than a workflow error. Using `-PathType Container` keeps the skip scoped to "the test root is a missing directory"; a bare `Test-Path` would also succeed when the path resolves to a file (for example a mis-set `PESTER_TEST_ROOT`), masking a real misconfiguration as a clean skip. `Get-ChildItem ... -ErrorAction SilentlyContinue` **MAY** be used as an alternative, but it is **NOT** equivalent: `SilentlyContinue` also suppresses non-existence-related errors such as permission or IO failures, which can mask genuine CI problems as a clean skip. A `Test-Path` guard followed by `Get-ChildItem` without `-ErrorAction SilentlyContinue` is preferred.
 
 **Compliant** (single env-var-driven test root for discovery and execution):
 
@@ -2609,7 +2609,7 @@ The discovery step **SHOULD** guard against a missing test root using `Test-Path
     $strPesterTestRoot = Join-Path -Path $env:GITHUB_WORKSPACE -ChildPath $env:PESTER_TEST_ROOT
     $arrPesterTestFiles = @()
 
-    if (Test-Path -LiteralPath $strPesterTestRoot) {
+    if (Test-Path -LiteralPath $strPesterTestRoot -PathType Container) {
         $arrPesterTestFiles = @(
             Get-ChildItem -LiteralPath $strPesterTestRoot -Filter '*.Tests.ps1' -Recurse -File
         )
