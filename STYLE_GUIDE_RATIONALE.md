@@ -1714,7 +1714,7 @@ A single source of truth, such as `PESTER_TEST_ROOT`, keeps the workflow honest.
 
 Downstream consumers often adopt a style guide or reusable workflow before they have created PowerShell tests. Some projects intentionally remove a `tests/` directory during early scaffolding, documentation-only work, or staged migrations. In those cases, a hard workflow failure from `Get-ChildItem` is mostly noise: it says the directory is absent, not that the code failed a test.
 
-A `Test-Path -LiteralPath` guard, or an equivalent `Get-ChildItem` call with `-ErrorAction SilentlyContinue`, lets the workflow produce a clear "no test files" skip. That keeps CI output actionable while still making the absence of owned Pester tests visible to maintainers.
+A `Test-Path -LiteralPath` guard lets the workflow produce a clear "no test files" skip when the directory is absent. That keeps CI output actionable while still making the absence of owned Pester tests visible to maintainers. `Get-ChildItem` with `-ErrorAction SilentlyContinue` is an alternative shape, but it is not equivalent: `SilentlyContinue` will also suppress non-existence-related errors such as permission or IO failures, converting genuine CI problems into a silent "no tests" skip. Preferring `Test-Path` followed by `Get-ChildItem` without `-ErrorAction SilentlyContinue` keeps the skip narrowly scoped to "directory is missing," while still surfacing real enumeration failures as workflow errors.
 
 ### Testing Strongly-Typed Array Properties
 
