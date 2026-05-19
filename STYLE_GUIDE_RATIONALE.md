@@ -1667,6 +1667,8 @@ repository/
 
 ### Running Pester Tests
 
+> For the actionable rule, see [Running Pester Tests](STYLE_GUIDE.md#running-pester-tests) in the main guide.
+
 **Basic invocation:**
 
 ```powershell
@@ -1695,6 +1697,24 @@ $objPesterConfig.TestResult.Enabled = $true
 $objPesterConfig.TestResult.OutputPath = 'test-results.xml'
 Invoke-Pester -Configuration $objPesterConfig
 ```
+
+#### Why CI Pester discovery must be scoped to the project test root
+
+A CI workflow that discovers tests from the repository root can produce a misleading green result by finding tests the project does not actually own. For example, a repository can contain `samples/template/Example.Tests.ps1` from a starter project while the real `tests/` directory is missing. A root scan such as `Get-ChildItem -Path . -Filter '*.Tests.ps1' -Recurse` will find and execute the sample test, so CI reports that Pester passed even though the project's real test suite is absent.
+
+Scoping discovery to `tests/` or to the project's documented test root converts that situation into the intended signal: either the owned tests run, or the workflow reports that no owned Pester tests were found. It also prevents vendored modules, dependencies, scaffolding, and examples from changing the test surface area behind the project's back.
+
+#### Why discovery and execution need a single test-root source of truth
+
+Pester discovery and Pester execution are two halves of one contract. If discovery scans `tests/` but `$config.Run.Path` later points at `.`, the workflow's preflight output no longer describes what Pester actually runs. The inverse is also risky: discovery can say test files exist in one directory while execution runs a narrower or entirely different directory and silently skips the files that justified the step.
+
+A single source of truth, such as `PESTER_TEST_ROOT`, keeps the workflow honest. The same value defines what "this project's tests" means for both the preflight check and the Pester configuration, so a later path change is made once instead of being duplicated across separate script fragments.
+
+#### Why missing test roots should skip cleanly
+
+Downstream consumers often adopt a style guide or reusable workflow before they have created PowerShell tests. Some projects intentionally remove a `tests/` directory during early scaffolding, documentation-only work, or staged migrations. In those cases, a hard workflow failure from `Get-ChildItem` is mostly noise: it says the directory is absent, not that the code failed a test.
+
+A `Test-Path -LiteralPath` guard, or an equivalent `Get-ChildItem` call with `-ErrorAction SilentlyContinue`, lets the workflow produce a clear "no test files" skip. That keeps CI output actionable while still making the absence of owned Pester tests visible to maintainers.
 
 ### Testing Strongly-Typed Array Properties
 
