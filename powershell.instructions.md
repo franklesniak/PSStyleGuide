@@ -7,13 +7,13 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 2.19.20260517.0
+**Version:** 2.19.20260519.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-05-17
+- **Last Updated:** 2026-05-19
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Keywords
@@ -171,6 +171,8 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Tests iterating a returned collection with `foreach` **MUST** assert non-emptiness before the loop → [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing)
 - **[All]** Tests accessing specific indices of a returned collection **MUST** assert count before any indexed access → [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing)
 - **[All]** Tests asserting that a call does not throw **MUST** use `{ ... } | Should -Not -Throw` and **MUST NOT** rely on `try/catch` plus negated assertions on exception text → [Asserting Successful Execution With Should -Not -Throw](#asserting-successful-execution-with-should--not--throw)
+- **[All]** CI Pester discovery and execution **MUST** be scoped to the project-owned `tests/` tree or documented test root, not the repository root → [Running Pester Tests](#running-pester-tests)
+- **[All]** CI Pester discovery and the Pester configuration `Run.Path` **MUST** share one test-root source of truth and **SHOULD** guard missing test roots cleanly → [Running Pester Tests](#running-pester-tests)
 
 <!-- rationale-anchor: executive-summary-author-profile -->
 
@@ -2589,7 +2591,66 @@ Context "When external service is unavailable" {
 
 ### Running Pester Tests
 
-Use `Invoke-Pester -Path tests/ -Output Detailed` for standard test runs.
+For local developer runs, use the documented project test root directly:
+
+```powershell
+Invoke-Pester -Path tests/ -Output Detailed
+```
+
+CI workflow runs often need a PowerShell `run:` step that performs both test discovery and Pester execution. In those steps, CI Pester discovery (`Get-ChildItem ... -Filter '*.Tests.ps1' -Recurse`) and execution (the Pester configuration `Run.Path`) **MUST** be scoped to the project-owned `tests/` tree or to the project's documented test root. They **MUST NOT** scan from the repository root, because root-level scanning can sweep up unrelated tests, including starter, sample, template, vendored, or dependency `*.Tests.ps1` files, and produce a misleading green test signal.
+
+The Pester configuration `Run.Path` value and the discovery step's path **MUST** be derived from a single source of truth, such as a workflow-level `env:` value like `PESTER_TEST_ROOT`, so the discovery scope and execution scope cannot drift apart.
+
+The discovery step **SHOULD** guard against a missing test root using `Test-Path -LiteralPath ... -PathType Container` so projects that have not yet created or have intentionally removed the `tests/` directory still see a clean "no test files" skip rather than a workflow error. Using `-PathType Container` keeps the skip scoped to "the test root is a missing directory"; a bare `Test-Path` would also succeed when the path resolves to a file (for example a mis-set `PESTER_TEST_ROOT`), masking a real misconfiguration as a clean skip. `Get-ChildItem ... -ErrorAction SilentlyContinue` **MAY** be used as an alternative, but it is **NOT** equivalent: `SilentlyContinue` also suppresses non-existence-related errors such as permission or IO failures, which can mask genuine CI problems as a clean skip. A `Test-Path` guard followed by `Get-ChildItem` without `-ErrorAction SilentlyContinue` is preferred.
+
+**Compliant** (single env-var-driven test root for discovery and execution):
+
+```yaml
+- name: Run Pester tests
+  shell: pwsh
+  env:
+    PESTER_TEST_ROOT: tests
+  run: |
+    $strPesterTestRoot = Join-Path -Path $env:GITHUB_WORKSPACE -ChildPath $env:PESTER_TEST_ROOT
+    $arrPesterTestFiles = @()
+
+    if (Test-Path -LiteralPath $strPesterTestRoot -PathType Container) {
+        $arrPesterTestFiles = @(
+            Get-ChildItem -LiteralPath $strPesterTestRoot -Filter '*.Tests.ps1' -Recurse -File
+        )
+    }
+
+    if ($arrPesterTestFiles.Count -eq 0) {
+        Write-Output ("No Pester test files found under '{0}'." -f $strPesterTestRoot)
+        exit 0
+    }
+
+    $objPesterConfiguration = New-PesterConfiguration
+    $objPesterConfiguration.Run.Path = $strPesterTestRoot
+    $objPesterConfiguration.Output.Verbosity = 'Detailed'
+    Invoke-Pester -Configuration $objPesterConfiguration
+```
+
+**Non-compliant** (repository-root discovery and execution):
+
+```yaml
+- name: Run Pester tests
+  shell: pwsh
+  run: |
+    $arrPesterTestFiles = @(
+        Get-ChildItem -Path . -Filter '*.Tests.ps1' -Recurse -File
+    )
+
+    if ($arrPesterTestFiles.Count -eq 0) {
+        Write-Output "No Pester test files found."
+        exit 0
+    }
+
+    $objPesterConfiguration = New-PesterConfiguration
+    $objPesterConfiguration.Run.Path = '.'
+    $objPesterConfiguration.Output.Verbosity = 'Detailed'
+    Invoke-Pester -Configuration $objPesterConfiguration
+```
 
 ## Performance, Security, and Other
 
