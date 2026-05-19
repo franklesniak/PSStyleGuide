@@ -2,7 +2,7 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.19.20260519.4
+**Version:** 2.19.20260519.0
 
 ## Metadata
 
