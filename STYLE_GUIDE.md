@@ -2,7 +2,7 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.19.20260519.0
+**Version:** 2.19.20260519.1
 
 ## Metadata
 
@@ -167,7 +167,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Tests accessing specific indices of a returned collection **MUST** assert count before any indexed access → [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing)
 - **[All]** Tests asserting that a call does not throw **MUST** use `{ ... } | Should -Not -Throw` and **MUST NOT** rely on `try/catch` plus negated assertions on exception text → [Asserting Successful Execution With Should -Not -Throw](#asserting-successful-execution-with-should--not--throw)
 - **[All]** CI Pester discovery and execution **MUST** be scoped to the project-owned `tests/` tree or documented test root, not the repository root → [Running Pester Tests](#running-pester-tests)
-- **[All]** CI Pester discovery and `$config.Run.Path` **MUST** share one test-root source of truth and **SHOULD** guard missing test roots cleanly → [Running Pester Tests](#running-pester-tests)
+- **[All]** CI Pester discovery and the Pester configuration `Run.Path` **MUST** share one test-root source of truth and **SHOULD** guard missing test roots cleanly → [Running Pester Tests](#running-pester-tests)
 
 <!-- rationale-anchor: executive-summary-author-profile -->
 
@@ -2592,9 +2592,9 @@ For local developer runs, use the documented project test root directly:
 Invoke-Pester -Path tests/ -Output Detailed
 ```
 
-CI workflow runs often need a PowerShell `run:` step that performs both test discovery and Pester execution. In those steps, CI Pester discovery (`Get-ChildItem ... -Filter '*.Tests.ps1' -Recurse`) and execution (`$config.Run.Path`) **MUST** be scoped to the project-owned `tests/` tree or to the project's documented test root. They **MUST NOT** scan from the repository root, because root-level scanning can sweep up unrelated tests, including starter, sample, template, vendored, or dependency `*.Tests.ps1` files, and produce a misleading green test signal.
+CI workflow runs often need a PowerShell `run:` step that performs both test discovery and Pester execution. In those steps, CI Pester discovery (`Get-ChildItem ... -Filter '*.Tests.ps1' -Recurse`) and execution (the Pester configuration `Run.Path`) **MUST** be scoped to the project-owned `tests/` tree or to the project's documented test root. They **MUST NOT** scan from the repository root, because root-level scanning can sweep up unrelated tests, including starter, sample, template, vendored, or dependency `*.Tests.ps1` files, and produce a misleading green test signal.
 
-The Pester `$config.Run.Path` value and the discovery step's path **MUST** be derived from a single source of truth, such as a workflow-level `env:` value like `PESTER_TEST_ROOT`, so the discovery scope and execution scope cannot drift apart.
+The Pester configuration `Run.Path` value and the discovery step's path **MUST** be derived from a single source of truth, such as a workflow-level `env:` value like `PESTER_TEST_ROOT`, so the discovery scope and execution scope cannot drift apart.
 
 The discovery step **SHOULD** guard against a missing test root using `Test-Path -LiteralPath`, or equivalently `Get-ChildItem ... -ErrorAction SilentlyContinue`, so projects that have not yet created or have intentionally removed the `tests/` directory still see a clean "no test files" skip rather than a workflow error.
 

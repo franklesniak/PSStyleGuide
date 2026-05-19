@@ -1706,7 +1706,7 @@ Scoping discovery to `tests/` or to the project's documented test root converts 
 
 #### Why discovery and execution need a single test-root source of truth
 
-Pester discovery and Pester execution are two halves of one contract. If discovery scans `tests/` but `$config.Run.Path` later points at `.`, the workflow's preflight output no longer describes what Pester actually runs. The inverse is also risky: discovery can say test files exist in one directory while execution runs a narrower or entirely different directory and silently skips the files that justified the step.
+Pester discovery and Pester execution are two halves of one contract. If discovery scans `tests/` but the Pester configuration `Run.Path` later points at `.`, the workflow's preflight output no longer describes what Pester actually runs. The inverse is also risky: discovery can say test files exist in one directory while execution runs a narrower or entirely different directory and silently skips the files that justified the step.
 
 A single source of truth, such as `PESTER_TEST_ROOT`, keeps the workflow honest. The same value defines what "this project's tests" means for both the preflight check and the Pester configuration, so a later path change is made once instead of being duplicated across separate script fragments.
 
