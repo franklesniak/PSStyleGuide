@@ -1534,6 +1534,12 @@ $listAttached = New-Object System.Collections.Generic.List[PSCustomObject]
 $listAttached = New-Object System.Collections.Generic.List[object]
 ```
 
+**Avoiding PowerShell Array `+=` in Accumulation Loops:** PowerShell arrays are fixed-size. When code uses `$arrOutput += $objItem` inside a loop, PowerShell must allocate a new array and copy all existing elements on every append. Those repeated copies add up as the collection grows: 1 + 2 + ... + n copies, which makes the loop O(n^2) instead of linear.
+
+`System.Collections.Generic.List[T]` is the correct in-memory accumulation structure because appends are amortized O(1). The list can grow without reallocating and copying every element for every single `.Add()` call. A final `.ToArray()` conversion is justified only at a boundary where an array is actually part of the required contract, such as a strongly typed array property, a legacy API call, or a documented return/reference-output shape.
+
+Wrapping `List[T].Add()` in `[void](...)` is defensive consistency with the guide's broader method-output suppression style, not a technical requirement for `List[T]`: `List[T].Add()` and `.AddRange()` return `void`. This differs from the deprecated `System.Collections.ArrayList.Add()` method, which returns the new element index as an `[int]` and can pollute the success stream if not suppressed.
+
 **Advantages**:
 
 - **v1.0 compatible** → `[regex]` class exists in .NET 2.0
