@@ -2,13 +2,13 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.19.20260519.0
+**Version:** 2.20.20260604.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-05-19
+- **Last Updated:** 2026-06-04
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Keywords
@@ -159,6 +159,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 
 - **[All]** `System.Collections.ArrayList` is deprecated and **MUST NOT** be used in new code; use `System.Collections.Generic.List[T]` instead → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
 - **[All]** Generic collections **MUST** provide specific type T (List[PSCustomObject], not List[object]) → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
+- **[All]** Code **MUST NOT** grow PowerShell arrays with `+=` inside accumulation loops; use `System.Collections.Generic.List[T]` when an in-memory collection is required → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
 
 ### Testing (Quick Reference)
 
@@ -2796,6 +2797,12 @@ $listAttached = New-Object System.Collections.Generic.List[PSCustomObject]
 $listAttached = New-Object System.Collections.Generic.List[object]
 ```
 
+**Avoiding PowerShell Array `+=` in Accumulation Loops:** PowerShell arrays are fixed-size. When code uses `$arrOutput += $objItem` inside a loop, PowerShell must allocate a new array and copy all existing elements on every append. Those repeated copies add up as the collection grows: 1 + 2 + ... + n copies, which makes the loop O(n^2) instead of linear.
+
+`System.Collections.Generic.List[T]` is the correct in-memory accumulation structure because appends are amortized O(1). The list can grow without reallocating and copying every element for every single `.Add()` call. A final `.ToArray()` conversion is justified only at a boundary where an array is actually part of the required contract, such as a strongly typed array property, a legacy API call, or a documented return/reference-output shape.
+
+Wrapping `List[T].Add()` in `[void](...)` is defensive consistency with the guide's broader method-output suppression style, not a technical requirement for `List[T]`: `List[T].Add()` and `.AddRange()` return `void`. This differs from the deprecated `System.Collections.ArrayList.Add()` method, which returns the new element index as an `[int]` and can pollute the success stream if not suppressed.
+
 **Advantages**:
 
 - **v1.0 compatible** → `[regex]` class exists in .NET 2.0
@@ -2818,6 +2825,23 @@ $list = New-Object System.Collections.ArrayList
 ```
 
 **Typed Generic Collections:** The specific type `T` **MUST** be provided if known (e.g., `[PSCustomObject]`, `[string]`), not `[object]`.
+
+**PowerShell Array Accumulation:** Code **MUST NOT** grow a PowerShell array with `+=` inside an accumulation loop. PowerShell arrays are fixed-size, so each `+=` creates a new array and copies the existing elements. When a collection must be accumulated in memory, code **MUST** use `System.Collections.Generic.List[T]` with `.Add()` or `.AddRange()`, and convert to an array with `.ToArray()` only at a boundary where an array is actually required. This rule complements, and does not weaken, the requirement that modern functions stream output when streaming is the correct contract.
+
+```powershell
+# Compliant
+$listOutput = New-Object System.Collections.Generic.List[PSCustomObject]
+foreach ($objItem in $InputObject) {
+    [void]($listOutput.Add($objItem))
+}
+$arrOutput = $listOutput.ToArray()
+
+# Non-Compliant
+$arrOutput = @()
+foreach ($objItem in $InputObject) {
+    $arrOutput += $objItem
+}
+```
 
 ---
 
