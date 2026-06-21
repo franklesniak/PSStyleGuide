@@ -7,13 +7,13 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 2.20.20260604.0
+**Version:** 2.20.20260621.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-06-04
+- **Last Updated:** 2026-06-21
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Keywords
@@ -82,6 +82,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Positional parameter documentation for private/internal helpers **SHOULD** state it is an internal-caller contract only → [Positional Parameter Support](#positional-parameter-support)
 - **[All]** Version number **MUST** be included in .NOTES (format: Major.Minor.YYYYMMDD.Revision) → [Function and Script Versioning](#function-and-script-versioning)
 - **[All]** Version build component **MUST** be current date in YYYYMMDD format → [Function and Script Versioning](#function-and-script-versioning)
+- **[All]** `.NOTES` `Revision` **MUST** reset to `0` when `Major`, `Minor`, or `Build` changes; otherwise increment (`N + 1`) for same-day updates → [Function and Script Versioning](#function-and-script-versioning)
 - **[All]** Inline comments **SHOULD** focus on "why" not "what" → [Inline Comments: Purpose and Placement](#inline-comments-purpose-and-placement)
 - **[All]** Code **SHOULD** use #region / #endregion for logical code folding → [Structural Documentation: Regions and Licensing](#structural-documentation-regions-and-licensing)
 - **[All]** The param() block **MUST** be placed before license region (if applicable) → [Structural Documentation: Regions and Licensing](#structural-documentation-regions-and-licensing)
@@ -960,6 +961,8 @@ function Get-Example {
 
 All distributable functions and scripts **MUST** include a version number in the `.NOTES` section of their comment-based help. This version number provides critical change tracking and **MUST** follow a strict, `[System.Version]`-compatible format: `Major.Minor.Build.Revision`.
 
+For this section, the **previously published version** means the most recent `.NOTES` version published for the same distributable function or script before this change. In repository work, this is the version already on the branch the change lands on, not an in-progress value produced earlier in the same change. For a brand-new function or script, there is no previously published version.
+
 - **`Major`**: Increment the **Major** version (e.g., `1.0.20251103.0` to `2.0.20251230.0`) **any time a breaking change is introduced**. Breaking changes include:
   - Removing or renaming a function, parameter, or public interface
   - Changing parameter types in incompatible ways
@@ -971,11 +974,16 @@ All distributable functions and scripts **MUST** include a version number in the
   - Enhancing existing functionality without changing interfaces
   - Performance improvements that don't affect behavior
 - **`Build`**: This component **MUST** be an integer in the format **`YYYYMMDD`**, representing the date the code was last modified. This date **MUST** be updated to the **current date** for *any* modification, however minor.
-- **`Revision`**: This component is typically `0` for the first commit of the day. It **SHOULD** be **bumped any time a minor change is made on the same date a change has already been made**. Revisions are typically reserved for:
-  - Trivial edits (typos, formatting, comments)
-  - Bug fixes that don't change functionality
+- **`Revision`**: This component is typically `0` for the first published version of a given distributable function or script at a given `Major.Minor.Build`. It counts same-day published updates of the same function or script relative to the previously published version, not work-in-progress iterations or commits. When a `.NOTES` version is assigned or updated, after applying the required `Major`, `Minor`, and `Build` values above, `Revision` **MUST** be `0` if the resulting `Major.Minor.Build` differs from the previously published version's `Major.Minor.Build` or if there is no previously published version. If the previously published version already records the same `Major.Minor.Build` at revision `N`, `Revision` **MUST** be `N + 1`. Same-day updates at the same `Major.Minor.Build` that increment `Revision` can include, but are not limited to:
+  - Trivial edits, such as typos, formatting, or comment fixes
+  - Bug fixes that do not require a `Major` or `Minor` version bump
   - Documentation-only updates
-  - Multiple commits on the same day
+
+| Case | Previously published version | This change | Reason |
+| --- | --- | --- | --- |
+| Same-day update | `1.2.20260619.0` | `1.2.20260619.1` | Same `Major.Minor.Build`, so `N + 1`. |
+| Same-day breaking change | `1.2.20260619.1` | `2.0.20260619.0` | `Major` changed, so reset to `0`. |
+| Next-day update | `1.2.20260619.1` | `1.2.20260620.0` | `Build` date changed, so reset to `0`. |
 
 **Compliant Example:**
 
@@ -985,6 +993,8 @@ All distributable functions and scripts **MUST** include a version number in the
 ```
 
 This example assumes that the current date is December 30, 2025. In any code you write, use the current date in place of December 30, 2025.
+
+<!-- rationale-anchor: function-and-script-versioning-revision-counting -->
 
 ---
 

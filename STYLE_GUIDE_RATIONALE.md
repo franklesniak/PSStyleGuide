@@ -22,6 +22,7 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Parameter Documentation Placement: Strategic Choice](#parameter-documentation-placement-strategic-choice)
   - [Help Format Options: Comparison](#help-format-options-comparison)
   - [Private/Internal Helper Function Documentation](#privateinternal-helper-function-documentation)
+  - [Function and Script Versioning: Revision Counting](#function-and-script-versioning-revision-counting)
   - [Summary: Documentation as Complete Specification](#summary-documentation-as-complete-specification)
 - [Function Design Rationale](#function-design-rationale)
   - [Overview of Function Architecture](#overview-of-function-architecture)
@@ -305,6 +306,18 @@ Private/internal helper functions receive the same full comment-based help treat
 3. **Module manifests are not the only scoping mechanism.** While `FunctionsToExport` in a module manifest (`.psd1`) is the primary mechanism in module-based code, the concept of private/internal helpers is broader: standalone scripts, multi-function `.ps1` files, and v1.0-targeted code all have internal helpers that are not governed by a manifest. The banner rule therefore applies at the `[All]` scope.
 
 The banner is deliberately placed at the top of `.NOTES` so it is the first thing a reader encounters after the behavioral documentation sections. It does not reduce documentation quality; it adds a single, high-signal annotation that protects both the author's refactoring freedom and consumers' expectations.
+
+---
+
+### Function and Script Versioning: Revision Counting
+
+> For the normative revision rule, see [Function and Script Versioning](STYLE_GUIDE.md#function-and-script-versioning) in the main guide.
+
+The `.NOTES` version is consumed by `[System.Version]` comparison and used as provenance for a distributable function or script. A nondeterministic `Revision` value can make otherwise ordered versions ambiguous or incorrectly ordered, so the reset and increment calculation is a **MUST** rather than a **SHOULD**. RFC 2119 reserves imperatives for interoperation requirements and behavior whose inconsistency can cause harm; ambiguous version ordering is that kind of harm. The requirement is scoped to the calculation performed when a version is assigned or updated. It does not dictate how often a project publishes or versions a function or script.
+
+`Revision` is the lowest-precedence component in the repository's `[System.Version]`-compatible `Major.Minor.Build.Revision` policy. It resets to `0` whenever any higher-order component changes: `Major`, `Minor`, or `Build`. If the previously published version already carries the same `Major.Minor.Build` at revision `N`, the next published same-day update for that same function or script uses `N + 1`. This is repository policy, informed by Semantic Versioning's reset-by-higher-precedence pattern by analogy and applied to the lowest-precedence `System.Version` component.
+
+The **previously published version** is the most recent `.NOTES` version published for that same distributable function or script before the current change. In pull-request workflows, that means the version recorded on the base branch the change merges into. Because the base branch can receive other changes before a pull request merges, evaluate the value when finalizing the change rather than when starting branch work. If automated merge machinery, such as a merge queue, changes the target branch after finalization, treat any resulting provenance drift as follow-up work instead of complicating the author-facing rule. For a brand-new function or script, there is no previously published version, so `Revision` starts at `0`.
 
 ---
 
