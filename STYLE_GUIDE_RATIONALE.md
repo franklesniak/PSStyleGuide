@@ -1684,6 +1684,24 @@ repository/
 
 > **Note:** Pester 5.x requires PowerShell 3.0+ to execute tests. However, v1.0-compatible scripts can still be tested with Pester—simply run the tests on a modern PowerShell version (e.g., pwsh 7.x on a CI platform like `ubuntu-latest`). The test files themselves will use modern Pester syntax, but the scripts under test can target any PowerShell version.
 
+### PSScriptAnalyzer CI Diagnostic Output
+
+> For the actionable rule, see [PSScriptAnalyzer CI Diagnostic Output](STYLE_GUIDE.md#psscriptanalyzer-ci-diagnostic-output) in the main guide.
+
+`Invoke-ScriptAnalyzer` returns `DiagnosticRecord` objects by default; it does not provide a built-in switch that emits GitHub Actions workflow annotations or Azure Pipelines logged issues. `-EnableExit` controls exit behavior, but translation from analyzer records to CI diagnostics belongs to the integration that writes the log commands. Those records include fields such as `ScriptPath` and severity values such as `Information`, `Warning`, `Error`, and `ParseError`, so the integration has enough structured data to format host-specific output deliberately.
+
+GitHub Actions and Azure Pipelines consume different log command syntaxes. GitHub Actions workflow commands use forms such as `::notice`, `::warning`, and `::error` with comma-delimited properties and message data after `::`. Azure Pipelines logging commands use `##vso[task.logissue ...]` with semicolon-delimited properties. A command string that is valid for one host is ordinary log text to the other, so the selected syntax must follow the active host rather than a generic "CI" assumption.
+
+Host detection should be explicit and conservative. GitHub Actions can be identified with `GITHUB_ACTIONS=true`, and path translation often also needs `GITHUB_WORKSPACE`. Azure Pipelines can be identified with `TF_BUILD=True` and/or Azure Pipelines `SYSTEM_*` variables. If these signals are missing, ambiguous, or contradictory, plain PSScriptAnalyzer output is the safest result because it preserves the finding without pretending to create host-native annotations.
+
+Dynamic command fields must be escaped according to the selected host syntax before the command is written. GitHub Actions workflow-command properties and message data use percent-encoding rules such as `%25`, `%0D`, `%0A`, `%3A`, and `%2C` in the relevant command fields. Azure Pipelines logging commands use a different escaping contract, including `%AZP25`, `%0A`, `%0D`, `%3B`, and `%5D` for percent signs, newlines, carriage returns, semicolons, and closing brackets. Escaping must cover paths, line numbers, rule names, titles, and diagnostic messages because any one of those values can contain characters that corrupt the command.
+
+File paths also need host-aware formatting. GitHub Actions workflow commands support a `file` property on `notice`, `warning`, and `error` commands, and GitHub examples use repository paths such as `app.js`. For GitHub Actions workflow commands, repository-relative paths are the safest portable form. Absolute paths under `GITHUB_WORKSPACE` may be normalized by the runner to workspace-relative paths, but paths outside the workspace should not be relied on for repository annotations. GitHub Checks API annotations use a required `path` value such as `assets/css/main.css`; this path should be repository-relative. Azure Pipelines logging-command guidance says file paths should be absolute, so `sourcepath` should be normalized to an absolute path before emitting `task.logissue`. PSScriptAnalyzer `DiagnosticRecord.ScriptPath` is the path of the analyzed file and may need translation before being emitted as a host-native diagnostic.
+
+Severity mapping should be explicit. GitHub Actions can represent warnings and errors; informational findings can be notices if the integration intentionally supports that mapping. Azure Pipelines `task.logissue` supports `type=error` and `type=warning`, so informational findings should remain plain output or be included in summaries or artifacts. PSScriptAnalyzer `ParseError` should map to an error or failure diagnostic.
+
+GitHub documents multiple annotation surfaces with different limits. Problem matchers document GitHub Actions display limits of 10 warning, 10 error, and 10 notice annotations per step, 50 annotations per job, and 50 annotations per run. The Checks API accepts a maximum of 50 annotations per API request and separately notes GitHub Actions warning/error per-step limits. Because analyzer output can exceed these display surfaces, annotations should complement plain output, summaries, or artifacts rather than replace them.
+
 ### Running Pester Tests
 
 > For the actionable rule, see [Running Pester Tests](STYLE_GUIDE.md#running-pester-tests) in the main guide.

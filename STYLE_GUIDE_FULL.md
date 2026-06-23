@@ -2,13 +2,13 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.20.20260621.0
+**Version:** 2.21.20260623.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-06-21
+- **Last Updated:** 2026-06-23
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Keywords
@@ -176,6 +176,8 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Tests iterating a returned collection with `foreach` **MUST** assert non-emptiness before the loop → [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing)
 - **[All]** Tests accessing specific indices of a returned collection **MUST** assert count before any indexed access → [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing)
 - **[All]** Tests asserting that a call does not throw **MUST** use `{ ... } | Should -Not -Throw` and **MUST NOT** rely on `try/catch` plus negated assertions on exception text → [Asserting Successful Execution With Should -Not -Throw](#asserting-successful-execution-with-should--not--throw)
+- **[All]** PSScriptAnalyzer CI integrations that emit host-native diagnostics **MUST** use the active CI host's command format → [PSScriptAnalyzer CI Diagnostic Output](#psscriptanalyzer-ci-diagnostic-output)
+- **[All]** Host-neutral, local, and interactive PSScriptAnalyzer runs **SHOULD** use plain output; ambiguous, missing, or contradictory host detection **MUST** fall back to plain output → [PSScriptAnalyzer CI Diagnostic Output](#psscriptanalyzer-ci-diagnostic-output)
 - **[All]** CI Pester discovery and execution **MUST** be scoped to the project-owned `tests/` tree or documented test root, not the repository root → [Running Pester Tests](#running-pester-tests)
 - **[All]** CI Pester discovery and the Pester configuration `Run.Path` **MUST** share one test-root source of truth and **SHOULD** guard missing test roots cleanly → [Running Pester Tests](#running-pester-tests)
 
@@ -3767,6 +3769,30 @@ Context "When external service is unavailable" {
 - Mock cmdlets and external commands that introduce dependencies (network, file system, cloud services)
 - Mock at the narrowest scope possible (prefer `Context`-level mocks over `Describe`-level)
 - Use `Assert-MockCalled` to verify expected interactions when appropriate
+
+---
+
+### PSScriptAnalyzer CI Diagnostic Output
+
+`Invoke-ScriptAnalyzer` returns `DiagnosticRecord` objects by default; it does not provide a built-in switch that emits GitHub Actions workflow annotations or Azure Pipelines logged issues. `-EnableExit` controls exit behavior, but translation from analyzer records to CI diagnostics belongs to the integration that writes the log commands. Those records include fields such as `ScriptPath` and severity values such as `Information`, `Warning`, `Error`, and `ParseError`, so the integration has enough structured data to format host-specific output deliberately.
+
+GitHub Actions and Azure Pipelines consume different log command syntaxes. GitHub Actions workflow commands use forms such as `::notice`, `::warning`, and `::error` with comma-delimited properties and message data after `::`. Azure Pipelines logging commands use `##vso[task.logissue ...]` with semicolon-delimited properties. A command string that is valid for one host is ordinary log text to the other, so the selected syntax must follow the active host rather than a generic "CI" assumption.
+
+Host detection should be explicit and conservative. GitHub Actions can be identified with `GITHUB_ACTIONS=true`, and path translation often also needs `GITHUB_WORKSPACE`. Azure Pipelines can be identified with `TF_BUILD=True` and/or Azure Pipelines `SYSTEM_*` variables. If these signals are missing, ambiguous, or contradictory, plain PSScriptAnalyzer output is the safest result because it preserves the finding without pretending to create host-native annotations.
+
+Dynamic command fields must be escaped according to the selected host syntax before the command is written. GitHub Actions workflow-command properties and message data use percent-encoding rules such as `%25`, `%0D`, `%0A`, `%3A`, and `%2C` in the relevant command fields. Azure Pipelines logging commands use a different escaping contract, including `%AZP25`, `%0A`, `%0D`, `%3B`, and `%5D` for percent signs, newlines, carriage returns, semicolons, and closing brackets. Escaping must cover paths, line numbers, rule names, titles, and diagnostic messages because any one of those values can contain characters that corrupt the command.
+
+File paths also need host-aware formatting. GitHub Actions workflow commands support a `file` property on `notice`, `warning`, and `error` commands, and GitHub examples use repository paths such as `app.js`. For GitHub Actions workflow commands, repository-relative paths are the safest portable form. Absolute paths under `GITHUB_WORKSPACE` may be normalized by the runner to workspace-relative paths, but paths outside the workspace should not be relied on for repository annotations. GitHub Checks API annotations use a required `path` value such as `assets/css/main.css`; this path should be repository-relative. Azure Pipelines logging-command guidance says file paths should be absolute, so `sourcepath` should be normalized to an absolute path before emitting `task.logissue`. PSScriptAnalyzer `DiagnosticRecord.ScriptPath` is the path of the analyzed file and may need translation before being emitted as a host-native diagnostic.
+
+Severity mapping should be explicit. GitHub Actions can represent warnings and errors; informational findings can be notices if the integration intentionally supports that mapping. Azure Pipelines `task.logissue` supports `type=error` and `type=warning`, so informational findings should remain plain output or be included in summaries or artifacts. PSScriptAnalyzer `ParseError` should map to an error or failure diagnostic.
+
+GitHub documents multiple annotation surfaces with different limits. Problem matchers document GitHub Actions display limits of 10 warning, 10 error, and 10 notice annotations per step, 50 annotations per job, and 50 annotations per run. The Checks API accepts a maximum of 50 annotations per API request and separately notes GitHub Actions warning/error per-step limits. Because analyzer output can exceed these display surfaces, annotations should complement plain output, summaries, or artifacts rather than replace them.
+
+When a PSScriptAnalyzer CI integration emits host-native diagnostics in addition to or instead of plain analyzer output, it **MUST** use the command format for the active CI host. GitHub Actions annotations **MUST** use GitHub Actions workflow commands such as `::warning file=...,line=...::...` or `::error file=...,line=...::...`. Azure Pipelines issues **MUST** use Azure Pipelines logging commands such as `##vso[task.logissue type=warning;sourcepath=...;linenumber=...]...` or `##vso[task.logissue type=error;sourcepath=...;linenumber=...]...`. These command syntaxes **MUST NOT** be interchanged.
+
+When a command string includes dynamic values such as file paths, line numbers, rule names, messages, or titles, those values **MUST** be formatted, escaped, or encoded according to the active host's command syntax before they are written to the log. File paths **SHOULD** be emitted in the form the active host expects so that diagnostics resolve to the correct file.
+
+Host-neutral, local, and interactive runs **SHOULD** use plain PSScriptAnalyzer output unless the active CI host is explicitly known. If host detection is ambiguous, missing, or contradictory, the integration **MUST** use plain PSScriptAnalyzer output and **MUST NOT** emit host-native diagnostic commands.
 
 ---
 
