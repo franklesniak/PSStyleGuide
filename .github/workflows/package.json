@@ -6,7 +6,7 @@
   "scripts": {
     "lint:md": "cd ../.. && markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#.github/workflows/node_modules\" --config .github/workflows/.markdownlint.jsonc",
     "lint:md:nested": "node lint-nested-markdown.js",
-    "prepare": "husky install || true"
+    "prepare": "node install-husky.mjs"
   },
   "repository": {
     "type": "git",
