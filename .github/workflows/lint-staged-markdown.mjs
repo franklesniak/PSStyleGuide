@@ -43,6 +43,10 @@ const toAbsolutePosixPath = (repoRelativePath) => resolve(repoRoot, repoRelative
 let stagedMarkdownPaths;
 
 try {
+  // Git pathspec wildcards match across directory separators, unlike shell globs,
+  // so the `*.md` pathspec selects staged Markdown in every subdirectory (e.g.
+  // docs/ISSUE_EVALUATION_PROMPT.md, samples/*.md), not just the repository root.
+  // See https://git-scm.com/docs/gitglossary (def_pathspec).
   stagedMarkdownPaths = parseNulDelimitedPaths(
     runGit(['diff', '--cached', '--name-only', '--diff-filter=ACMR', '-z', '--', '*.md'])
   );
