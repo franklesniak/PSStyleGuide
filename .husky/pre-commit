@@ -1,21 +1,20 @@
 #!/bin/sh
 
-# Get list of staged markdown files
-STAGED_MD_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.md$' || true)
-
-if [ -n "$STAGED_MD_FILES" ]; then
-  echo "Running markdownlint on staged files..."
-  npx markdownlint-cli2 $STAGED_MD_FILES
-  LINT_EXIT_CODE=$?
-  
-  if [ $LINT_EXIT_CODE -ne 0 ]; then
-    echo ""
-    echo "❌ Markdownlint failed. Please fix the errors above before committing."
-    echo "To see all errors: npm run lint:md"
-    exit 1
-  fi
-  
-  echo "✅ Markdownlint passed for staged files."
+if ! command -v node >/dev/null 2>&1; then
+  echo "pre-commit: Node.js is required to lint staged Markdown but was not found on PATH." >&2
+  echo "If you use a Node version manager with a GUI Git client, add its initialization to" >&2
+  echo "~/.config/husky/init.sh, which Husky sources before running hooks." >&2
+  echo "To bypass this one commit only, use: git commit --no-verify" >&2
+  exit 1
 fi
 
-exit 0
+if ! node -e "process.exit(Number(process.versions.node.split('.')[0]) >= 20 ? 0 : 1)" >/dev/null 2>&1; then
+  echo "pre-commit: Node.js 20 or newer is required to lint staged Markdown." >&2
+  echo "Current version: $(node -v 2>/dev/null || echo unknown)" >&2
+  echo "If you use a Node version manager with a GUI Git client, add its initialization to" >&2
+  echo "~/.config/husky/init.sh, which Husky sources before running hooks." >&2
+  echo "To bypass this one commit only, use: git commit --no-verify" >&2
+  exit 1
+fi
+
+node .github/workflows/lint-staged-markdown.mjs
