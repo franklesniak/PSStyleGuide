@@ -7,13 +7,13 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 2.20.20260621.0
+**Version:** 2.21.20260623.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-06-21
+- **Last Updated:** 2026-06-23
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Keywords
@@ -173,6 +173,8 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Tests iterating a returned collection with `foreach` **MUST** assert non-emptiness before the loop → [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing)
 - **[All]** Tests accessing specific indices of a returned collection **MUST** assert count before any indexed access → [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing)
 - **[All]** Tests asserting that a call does not throw **MUST** use `{ ... } | Should -Not -Throw` and **MUST NOT** rely on `try/catch` plus negated assertions on exception text → [Asserting Successful Execution With Should -Not -Throw](#asserting-successful-execution-with-should--not--throw)
+- **[All]** PSScriptAnalyzer CI integrations that emit host-native diagnostics **MUST** use the active CI host's command format → [PSScriptAnalyzer CI Diagnostic Output](#psscriptanalyzer-ci-diagnostic-output)
+- **[All]** Host-neutral, local, and interactive PSScriptAnalyzer runs **SHOULD** use plain output; ambiguous, missing, or contradictory host detection **MUST** fall back to plain output → [PSScriptAnalyzer CI Diagnostic Output](#psscriptanalyzer-ci-diagnostic-output)
 - **[All]** CI Pester discovery and execution **MUST** be scoped to the project-owned `tests/` tree or documented test root, not the repository root → [Running Pester Tests](#running-pester-tests)
 - **[All]** CI Pester discovery and the Pester configuration `Run.Path` **MUST** share one test-root source of truth and **SHOULD** guard missing test roots cleanly → [Running Pester Tests](#running-pester-tests)
 
@@ -2614,6 +2616,16 @@ Context "When external service is unavailable" {
 - Mock cmdlets and external commands that introduce dependencies (network, file system, cloud services)
 - Mock at the narrowest scope possible (prefer `Context`-level mocks over `Describe`-level)
 - Use `Assert-MockCalled` to verify expected interactions when appropriate
+
+---
+
+### PSScriptAnalyzer CI Diagnostic Output
+
+When a PSScriptAnalyzer CI integration emits host-native diagnostics in addition to or instead of plain analyzer output, it **MUST** use the command format for the active CI host. GitHub Actions annotations **MUST** use GitHub Actions workflow commands such as `::warning file=...,line=...::...` or `::error file=...,line=...::...`. Azure Pipelines issues **MUST** use Azure Pipelines logging commands such as `##vso[task.logissue type=warning;sourcepath=...;linenumber=...]...` or `##vso[task.logissue type=error;sourcepath=...;linenumber=...]...`. These command syntaxes **MUST NOT** be interchanged.
+
+When a command string includes dynamic values such as file paths, line numbers, rule names, messages, or titles, those values **MUST** be formatted, escaped, or encoded according to the active host's command syntax before they are written to the log. File paths **SHOULD** be emitted in the form the active host expects so that diagnostics resolve to the correct file.
+
+Host-neutral, local, and interactive runs **SHOULD** use plain PSScriptAnalyzer output unless the active CI host is explicitly known. If host detection is ambiguous, missing, or contradictory, the integration **MUST** use plain PSScriptAnalyzer output and **MUST NOT** emit host-native diagnostic commands.
 
 ---
 
