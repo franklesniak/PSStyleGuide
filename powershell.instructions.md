@@ -7,13 +7,13 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 2.21.20260623.0
+**Version:** 2.22.20260629.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-06-23
+- **Last Updated:** 2026-06-29
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Keywords
@@ -77,9 +77,9 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Functions **SHOULD** provide multiple examples with input, output, and explanation → [Help Content Quality: High Standards](#help-content-quality-high-standards)
 - **[All]** Every possible output/return value **MUST** be documented in .OUTPUTS with exact type and meaning; integer status codes **MUST** include full code-to-meaning mapping; output examples **MUST** be placed in .EXAMPLE blocks → [Help Content Quality: High Standards](#help-content-quality-high-standards)
 - **[All]** Positional parameter support **MUST** be documented in .NOTES → [Help Content Quality: High Standards](#help-content-quality-high-standards)
-- **[All]** Private/internal helper functions' `.NOTES` **MUST** begin with a private-helper banner → [Private/Internal Helper Function Documentation](#privateinternal-helper-function-documentation)
-- **[Modern]** Functions omitted from module manifest `FunctionsToExport` are treated as private/internal helpers → [Private/Internal Helper Function Documentation](#privateinternal-helper-function-documentation)
-- **[All]** Positional parameter documentation for private/internal helpers **SHOULD** state it is an internal-caller contract only → [Positional Parameter Support](#positional-parameter-support)
+- **[All]** Script/module/tool-specific private/internal helper functions' `.NOTES` **MUST** begin with a private-helper banner; distributable/vendored helpers with a per-function license region and clear cross-project reuse intent are exempt → [Private/Internal Helper Function Documentation](#privateinternal-helper-function-documentation)
+- **[Modern]** Functions omitted from module manifest `FunctionsToExport` are treated as private/internal helpers unless the distributable/vendored-helper exemption applies → [Private/Internal Helper Function Documentation](#privateinternal-helper-function-documentation)
+- **[All]** Positional parameter documentation for script/module/tool-specific private/internal helpers **SHOULD** state it is an internal-caller contract only; distributable/vendored helpers document a stable distributable contract → [Positional Parameter Support](#positional-parameter-support)
 - **[All]** Version number **MUST** be included in .NOTES (format: Major.Minor.YYYYMMDD.Revision) → [Function and Script Versioning](#function-and-script-versioning)
 - **[All]** Version build component **MUST** be current date in YYYYMMDD format → [Function and Script Versioning](#function-and-script-versioning)
 - **[All]** `.NOTES` `Revision` **MUST** reset to `0` when `Major`, `Minor`, or `Build` changes; otherwise increment (`N + 1`) for same-day updates → [Function and Script Versioning](#function-and-script-versioning)
@@ -102,6 +102,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[v1.0]** Functions **MUST** return single integer status code (0=success, 1-5=partial, -1=failure) → [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes)
 - **[v1.0]** Exception: Test-* functions **MAY** return Boolean when no practical error handling needed → [Return Semantics: Explicit Status Codes](#return-semantics-explicit-status-codes)
 - **[v1.0]** Positional parameters **SHOULD** be supported for v1.0 usability → [Positional Parameter Support](#positional-parameter-support)
+- **[All]** One positional message/payload argument to covered `Write-*` cmdlets is an allowed syntax exception; additional options **SHOULD** be named → [Positional Parameter Support](#positional-parameter-support)
 - **[v1.0]** v1.0-targeted functions **MUST** use trap-based error handling (not try/catch) → [Core Error Suppression Mechanism](#core-error-suppression-mechanism)
 - **[Modern]** Modern functions and scripts **MUST** use [CmdletBinding()] attribute → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
 - **[Modern]** Modern functions and scripts **MUST** use [OutputType()] declaring singular primary type → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
@@ -849,9 +850,13 @@ Lines within `.EXAMPLE` blocks that are intended to render as PowerShell comment
 
 ### Private/Internal Helper Function Documentation
 
-**[All]** If a function is intended only for internal use and is not part of the script, module, or tool's public API surface, its `.NOTES` section **MUST** begin with a clear private-helper banner. That banner **MUST** state that the function is not part of the public API surface, and **MUST** warn that parameters, return shape, and positional contract may change without notice.
+**[All]** If a function exists only to serve a specific script, module, or tool and is not part of that script, module, or tool's public API surface, its `.NOTES` section **MUST** begin with a clear private-helper banner. That banner **MUST** state that the function is not part of the public API surface, and **MUST** warn that parameters, return shape, and positional contract may change without notice.
 
-**[Modern]** In module-based code, a function intentionally omitted from the module manifest's `FunctionsToExport` is treated as a private/internal helper for purposes of the documentation requirements above.
+**[Modern]** In module-based code, a function intentionally omitted from the module manifest's `FunctionsToExport` is treated as a private/internal helper for purposes of the documentation requirements above unless the distributable/vendored-helper exemption applies.
+
+A **distributable/vendored helper** is a reusable helper function that carries its own per-function `#region License` block and has clear cross-project reuse intent rather than existing as script/module/tool-specific glue. A per-function license region is a strong distributability signal for this exemption, but it is not standalone proof: if reuse intent is unclear, document the function's distributable intent or treat the function as a script/module/tool-specific internal helper. A `Version:` line by itself is not sufficient for the exemption, because ordinary internal helpers also carry version metadata.
+
+Distributable/vendored helpers are exempt from the `PRIVATE/INTERNAL HELPER` banner, even when placed under `Private/` and omitted from `FunctionsToExport`. When they document positional parameters, they document a stable distributable contract rather than using the private-helper "internal-caller contract only; subject to change" header. Export visibility and API stability are separate concerns; an unexported helper can still have a stable distributable contract.
 
 All other comment-based help requirements (`.SYNOPSIS`, `.DESCRIPTION`, `.PARAMETER`, `.EXAMPLE`, `.INPUTS`, `.OUTPUTS`, `.NOTES`) still apply to private/internal helpers — the banner is an addition, not a replacement.
 
@@ -901,6 +906,57 @@ function Convert-RawRecord {
         [ref]$ReferenceToResultObject,
         [hashtable]$RawRecord
     )
+
+    # Implementation omitted for brevity
+}
+```
+
+**Compliant - distributable/vendored helper exempt from the private-helper banner:**
+
+```powershell
+function Convert-DelimitedRecord {
+    # .SYNOPSIS
+    # Converts one delimited record into a normalized object.
+    #
+    # .DESCRIPTION
+    # Parses a delimited record using a caller-provided delimiter and returns
+    # a normalized [pscustomobject]. This helper is versioned and licensed for
+    # reuse across projects, so its parameter order is a stable distributable
+    # contract even when a consuming module does not export it.
+    #
+    # .PARAMETER RecordText
+    # The delimited record text to parse.
+    #
+    # .PARAMETER Delimiter
+    # The delimiter that separates fields in the record.
+    #
+    # .EXAMPLE
+    # $objRecord = Convert-DelimitedRecord 'alpha,beta' ','
+    #
+    # # Returns a normalized record object.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [pscustomobject] Normalized record object.
+    #
+    # .NOTES
+    # This distributable helper supports positional parameters
+    # (stable distributable contract):
+    #
+    #   Position 0: RecordText
+    #   Position 1: Delimiter
+    #
+    # Version: 1.0.20260629.0
+    param (
+        [string]$RecordText,
+        [string]$Delimiter
+    )
+
+    #region License ########################################################
+    # MIT License or other per-function license text.
+    #endregion License ########################################################
 
     # Implementation omitted for brevity
 }
@@ -1212,7 +1268,19 @@ Process-String ([ref]$r) ([ref]$e) $str
 Process-String ([ref]$r) ([ref]$e) $str $psver
 ```
 
-**Important distinction:** While functions **SHOULD** support positional parameters in their declarations (for flexibility and v1.0 usability), function **calls** throughout the codebase **SHOULD** use named parameters for clarity and maintainability. The PSScriptAnalyzer configuration enforces this via the `PSAvoidUsingPositionalParameters` rule.
+**Important distinction:** While functions **SHOULD** support positional parameters in their declarations (for flexibility and v1.0 usability), function **calls** throughout the codebase **SHOULD** use named parameters for clarity and maintainability. PSScriptAnalyzer's `PSAvoidUsingPositionalParameters` rule is documented as flagging commands called with three or more positional parameters.
+
+**[All]** As an explicit syntax exception to the general preference that calls use named parameters, one positional message/payload argument passed to a covered `Write-*` cmdlet is idiomatic and acceptable when the cmdlet is available in the target runtime and otherwise permitted by this guide. Because this uses only one positional message/payload argument, it is below the documented analyzer threshold described above. Additional options **SHOULD** be named:
+
+```powershell
+Write-Warning 'No managed devices were returned.'
+Write-Error 'Invalid object' -ErrorId B1 -TargetObject $_
+Write-Information 'Scan complete.' -Tags 'Audit'
+```
+
+The covered allow-list is `Write-Verbose`, `Write-Warning`, `Write-Debug`, `Write-Error`, and `Write-Information` (the last only when targeting PowerShell 5.0+ and otherwise permitted by this guide). For `Write-Error`, this exception covers the default message form (`Write-Error 'message'`) only; positional `-Exception` and positional `-ErrorRecord` payloads remain governed by the general named-parameter preference. For `Write-Error`, cmdlet-specific options such as `-Category`, `-ErrorId`, and `-TargetObject` **SHOULD** be named. For `Write-Information`, cmdlet-specific options such as `-Tags` **SHOULD** be named. Common parameters supported by the target runtime, such as `-WarningAction` and, on PowerShell 5.0+, `-InformationAction`, **SHOULD** likewise be named as common parameters.
+
+This exception does not cover `Write-Output`, `Write-Host`, or `Write-Progress`, and no other stream-writing cmdlets are included by implication. A blanket "always `-Message`" rule is not adopted because the canonical first message/payload parameter varies across the family, and `Write-Output` has no `-Message` parameter or alias. This clarifies call syntax only; it does not change existing output rules, including v1.0 explicit return-code patterns, modern streaming-output guidance, success-stream guidance, or the `Write-Host` prohibition.
 
 This enables:
 
@@ -1239,7 +1307,7 @@ Guidance for this format:
 1. The header line **SHOULD** be `# This function/script supports positional parameters:` followed by each position listed on its own indented line as `#   Position N: ParameterName`.
 2. Only list parameters that are expected to be used positionally. For functions or scripts with many optional parameters, listing only the mandatory or commonly-used positional parameters is acceptable.
 3. The parameter name **SHOULD** match the declared parameter name without the `-` prefix (e.g., `VectorRows`, not `-VectorRows`), since the `.NOTES` section documents the parameter's identity, not its call syntax.
-4. **[All]** If positional parameter behavior is documented for a private/internal helper, that documentation **SHOULD** clearly state that it is an internal-caller contract only and is subject to change. For example, the header line **SHOULD** read `# This function supports positional parameters` / `# (internal-caller contract only; subject to change):` instead of the standard header.
+4. **[All]** If positional parameter behavior is documented for a script/module/tool-specific private/internal helper, that documentation **SHOULD** clearly state that it is an internal-caller contract only and is subject to change. For example, the header line **SHOULD** read `# This function supports positional parameters` / `# (internal-caller contract only; subject to change):` instead of the standard header. Distributable/vendored helpers are exempt from this private-helper header and **SHOULD** document positional parameters as a stable distributable contract instead.
 
 #### [Modern] Enforcing a Subset-Only Positional Contract
 
