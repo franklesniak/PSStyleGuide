@@ -29,6 +29,7 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Advanced Feature Emulation (v1.0-Native)](#advanced-feature-emulation-v10-native)
   - [Options for Return Mechanism: Comparison](#options-for-return-mechanism-comparison)
   - [Enforcing Subset-Only Positional Contracts in Modern Functions](#enforcing-subset-only-positional-contracts-in-modern-functions)
+  - [One Positional Write Cmdlet Message/Payload Argument](#one-positional-write-cmdlet-messagepayload-argument)
   - [ValidateRange for Constrained Numeric Parameters](#validaterange-for-constrained-numeric-parameters)
   - [Summary: Function Design as Reliability Engineering](#summary-function-design-as-reliability-engineering)
 - [Error Handling Rationale](#error-handling-rationale)
@@ -305,6 +306,12 @@ Private/internal helper functions receive the same full comment-based help treat
 2. **Positional contracts differ in stability.** A public function's positional parameter ordering is a stable contract; an internal helper's ordering may be changed freely as the implementation evolves. Explicitly labeling the positional documentation as an internal-caller contract prevents external callers from relying on ordering that was never guaranteed.
 3. **Module manifests are not the only scoping mechanism.** While `FunctionsToExport` in a module manifest (`.psd1`) is the primary mechanism in module-based code, the concept of private/internal helpers is broader: standalone scripts, multi-function `.ps1` files, and v1.0-targeted code all have internal helpers that are not governed by a manifest. The banner rule therefore applies at the `[All]` scope.
 
+The review distinction behind this rule is between module-specific implementation glue and vendored reusable helpers. A helper that exists only so one script, module, or tool can do its work is an implementation detail even when it has excellent help. A vendored helper, by contrast, may be kept unexported by a consuming module while still carrying a stable, versioned, reusable contract of its own. Export visibility and API stability are therefore related but not identical.
+
+`FunctionsToExport` and `Export-ModuleMember` control which members a module exports to callers. They do not prove that a reusable helper is unstable, and they do not hide source code or prevent a reader from copying, reviewing, or invoking an unexported implementation. This is why a function omitted from `FunctionsToExport` remains a private-helper signal for module-specific code, but not an absolute classification rule for vendored/distributable helpers.
+
+The exemption test uses two signals together: a per-function `#region License` block and clear cross-project reuse intent. The license region is strong evidence that the function is carried as a distributable unit with its own provenance, but it is not enough by itself because boilerplate can be copied without a real reusable contract. Conversely, a `Version:` line alone is insufficient because ordinary internal helpers also carry version metadata for change tracking. If reuse intent is unclear in review, the author should either document the distributable intent or apply the private-helper banner and internal-caller positional wording.
+
 The banner is deliberately placed at the top of `.NOTES` so it is the first thing a reader encounters after the behavioral documentation sections. It does not reduce documentation quality; it adds a single, high-signal annotation that protects both the author's refactoring freedom and consumers' expectations.
 
 ---
@@ -402,6 +409,40 @@ When `[CmdletBinding()]` is declared without specifying `PositionalBinding`, Pow
 2. **Documentation/implementation mismatch.** When `.NOTES` documents only a subset of parameters as positional (e.g., `Position 0: InputMode`, `Position 1: OutputPath`) but the runtime actually permits positional binding for all parameters, callers may unknowingly pass values to unintended parameters. This silent divergence between the documented contract and the runtime behavior undermines trust in the function's interface.
 
 `PositionalBinding = $false` eliminates both risks by requiring the author to opt in to positional binding explicitly via `[Parameter(Position = N)]` on each intended positional parameter. Parameters without an explicit `Position` attribute become name-only, regardless of their declaration order.
+
+---
+
+### One Positional Write Cmdlet Message/Payload Argument
+
+> For the corresponding normative rule, see [Positional Parameter Support](STYLE_GUIDE.md#positional-parameter-support) in the main guide.
+
+The guide keeps the general preference for named arguments at call sites, but it treats one positional message/payload argument to a small allow-list of `Write-*` cmdlets as an idiomatic syntax exception. Microsoft Learn shows positional message/payload examples for these cmdlets and also uses named-parameter examples on some pages. It also shows the mixed shape the guide endorses: one positional message plus named options, such as `Write-Error "Invalid object" -ErrorId B1 -TargetObject $_` and `Write-Warning "This is only a test warning." -WarningAction Inquire`.
+
+PSScriptAnalyzer's `PSAvoidUsingPositionalParameters` rule is documented as an Information-severity rule that detects commands called with three or more positional parameters. The guide cites that documented threshold rather than asserting exact runtime behavior, and the exception remains intentionally narrower than the general named-argument preference.
+
+The first message/payload parameter is not named consistently across the relevant command family:
+
+| Cmdlet | First message/payload parameter for the discussed form | `-Message` binding | Availability and boundary notes |
+| --- | --- | --- | --- |
+| `Write-Verbose` | `-Message` at Position 0 | Real parameter | Listed in the archived Windows PowerShell 1.0 cmdlet set; covered by the syntax exception when otherwise permitted. |
+| `Write-Warning` | `-Message` at Position 0 | Real parameter | Listed in the archived Windows PowerShell 1.0 cmdlet set; covered by the syntax exception when otherwise permitted. |
+| `Write-Debug` | `-Message` at Position 0 | Real parameter | Listed in the archived Windows PowerShell 1.0 cmdlet set; covered by the syntax exception when otherwise permitted. |
+| `Write-Error` | Default `NoException` parameter set: `-Message` at Position 0 | Real parameter | Listed in the archived Windows PowerShell 1.0 cmdlet set; only the default message form is covered. `-Exception` and `-ErrorRecord` are also Position 0 in other parameter sets, but those payloads are outside this syntax exception. |
+| `Write-Information` | `-MessageData` at Position 0 | `Message` and `Msg` aliases | Introduced with the Information stream in Windows PowerShell 5.0; covered only for targets that support it and when otherwise permitted. `-Tags` is cmdlet-specific. |
+| `Write-Output` | `-InputObject` at Position 0 | No `-Message` parameter or alias | Listed in the archived Windows PowerShell 1.0 cmdlet set; not covered. Use remains governed by the guide's output and success-stream rules. |
+| `Write-Host` | `-Object` at Position 0 | `Message` and `Msg` aliases | Listed in the archived Windows PowerShell 1.0 cmdlet set; discussed only for parameter-name comparison because the guide prohibits `Write-Host`. |
+
+This variation is why the guide does not adopt a blanket "always `-Message`" rule. Such a rule would be wrong for `Write-Information`, meaningless for `Write-Output`, and misleading for `Write-Host`, which remains prohibited.
+
+Additional options should be named regardless of whether they are cmdlet-specific or common parameters. `-Category`, `-ErrorId`, and `-TargetObject` are `Write-Error` parameters; `-Tags` is a `Write-Information` parameter. `-WarningAction` and, on PowerShell 5.0+, `-InformationAction` are common parameters supported by the target runtime rather than parameters specific to `Write-Warning` or `Write-Information`, but the same "name additional options" guidance applies.
+
+`Write-Information` writes structured data to the Information stream and is distinct from the prohibited `Write-Host`, which the guide bans for host-only display. Allow-listing `Write-Information` when the target runtime supports it therefore does not conflict with prohibiting `Write-Host`.
+
+Excluding `Write-Output` from this idiom does not create a named-parameter requirement for `Write-Output` calls. Any use of `Write-Output` remains governed by the guide's output and success-stream rules, including the preference for returning or emitting success-stream objects according to the surrounding function model.
+
+`Write-Progress` is also outside the exception. Its positional parameters (`Activity` at Position 0, `Status` at Position 1, and `Id` at Position 2) describe progress state rather than a simple one-message/payload idiom.
+
+For availability, use the archived Windows PowerShell 1.0 cmdlet list as archived evidence that `Write-Output`, `Write-Error`, `Write-Warning`, `Write-Verbose`, `Write-Debug`, and `Write-Host` existed in that runtime. `Write-Information` and the Information stream were introduced in Windows PowerShell 5.0. The current `about_Output_Streams` table is useful stream documentation, but it should not be used by itself to infer cmdlet availability because it documents output streams and associated write cmdlets, not the full historical cmdlet set for every target runtime.
 
 ---
 
