@@ -7,14 +7,22 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 2.22.20260629.0
+**Version:** 2.23.20260726.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-06-29
+- **Last Updated:** 2026-07-26
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
+
+## Applicability and Portability
+
+- This guide is self-contained and intended for standalone use or vendoring into another repository.
+- Apply each requirement according to its scope tag and any explicit conditions.
+- Requirements tied to an optional toolchain, file type, or repository feature apply when the adopting project uses or intentionally adopts that surface.
+- Additional repository-wide instructions in the adopting repository continue to apply; this guide creates no exception to them.
+- Resolve actual conflicts through the adopting repository's documented precedence rules.
 
 ## Keywords
 
