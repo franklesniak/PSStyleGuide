@@ -5,6 +5,8 @@ This companion document preserves the extended rationale, design philosophy, and
 ## Table of Contents
 
 - [Executive Summary: Author Profile](#executive-summary-author-profile)
+- [Applicability and Portability Rationale](#applicability-and-portability-rationale)
+  - [Applicability and Portability](#applicability-and-portability)
 - [Code Layout and Formatting Rationale](#code-layout-and-formatting-rationale)
   - [File Encoding](#file-encoding)
   - [Programmatic File Writing Encoding](#programmatic-file-writing-encoding)
@@ -68,6 +70,20 @@ The author's code writing style can be characterized as a highly disciplined "Po
 This explains the systematic avoidance of features introduced in v2.0 or later in v1.0-targeted scripts, such as advanced functions with the [CmdletBinding()] attribute, structured try/catch error handling, common parameters like -Verbose or -Debug, begin/process/end blocks, and modern output streams. Instead, the style relies on PowerShell's foundational mechanics, such as simple function declarations, strongly typed param blocks, explicit return statements for single values, and a custom error detection pattern using trap statements and global preference toggling.
 
 Within these constraints, the author adheres closely to community best practices for readability, naming, documentation, and maintainability. Functions are designed as reusable tools with a single purpose—e.g., performing targeted data transformations or validations. Outputs are explicit and controlled: a status code (e.g., an integer indicating full success, partial success, or failure) is typically returned, while complex results are passed via reference parameters only when necessary to modify data in the caller's scope, avoiding unnecessary use of [ref] for read-only objects since it provides no performance benefits in PowerShell. Error handling is "fail-controlled," suppressing issues to allow graceful recovery without halting execution. The code is robust, thoroughly documented, and predictable across versions, making it ideal for tools in legacy or mixed environments. Performance is balanced with readability, favoring script constructs over pipelines. If the v1.0 constraint were lifted (e.g., due to modern dependencies), the style would evolve to incorporate features like pipeline-friendly objects and structured errors while retaining strong typing and documentation for clarity.
+
+---
+
+## Applicability and Portability Rationale
+
+### Applicability and Portability
+
+> For the operational guidance, see [Applicability and Portability](STYLE_GUIDE.md#applicability-and-portability) in the main guide.
+
+The style guide is maintained as an independent, self-contained standard so the same text remains usable by itself and when vendored into different repositories. Vendoring the guide adds its applicable requirements to an adopting project's instructions; it does not make those independently maintained requirements interpretations of another document. Two documents may contain overlapping rules because they address the same engineering concern or converge on the same practice. That overlap, even at the same normative level, does not by itself show that either document derives its authority or meaning from the other.
+
+Repository-specific provenance mappings, citations, and file references are integration details. They depend on the adopting repository's actual instruction set, paths, versions, and precedence model, so they belong in that repository's integration guidance. Keeping those mappings downstream prevents stale or inapplicable dependencies from entering the portable guide and allows standalone consumers to apply it without companion files.
+
+Applicable instructions normally accumulate: matching or complementary rules can all be followed. The adopting repository's precedence rules are needed only when requirements actually conflict and cannot be satisfied together. This distinction preserves both the guide's independent authority and the adopting repository's control over its own instruction hierarchy.
 
 ---
 

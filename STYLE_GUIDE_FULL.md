@@ -2,14 +2,28 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.22.20260629.0
+**Version:** 2.23.20260726.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-06-29
+- **Last Updated:** 2026-07-26
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
+
+## Applicability and Portability
+
+The style guide is maintained as an independent, self-contained standard so the same text remains usable by itself and when vendored into different repositories. Vendoring the guide adds its applicable requirements to an adopting project's instructions; it does not make those independently maintained requirements interpretations of another document. Two documents may contain overlapping rules because they address the same engineering concern or converge on the same practice. That overlap, even at the same normative level, does not by itself show that either document derives its authority or meaning from the other.
+
+Repository-specific provenance mappings, citations, and file references are integration details. They depend on the adopting repository's actual instruction set, paths, versions, and precedence model, so they belong in that repository's integration guidance. Keeping those mappings downstream prevents stale or inapplicable dependencies from entering the portable guide and allows standalone consumers to apply it without companion files.
+
+Applicable instructions normally accumulate: matching or complementary rules can all be followed. The adopting repository's precedence rules are needed only when requirements actually conflict and cannot be satisfied together. This distinction preserves both the guide's independent authority and the adopting repository's control over its own instruction hierarchy.
+
+- This guide is self-contained and intended for standalone use or vendoring into another repository.
+- Apply each requirement according to its scope tag and any explicit conditions.
+- Requirements tied to an optional toolchain, file type, or repository feature apply when the adopting project uses or intentionally adopts that surface.
+- Additional repository-wide instructions in the adopting repository continue to apply; this guide creates no exception to them.
+- Resolve actual conflicts through the adopting repository's documented precedence rules.
 
 ## Keywords
 
