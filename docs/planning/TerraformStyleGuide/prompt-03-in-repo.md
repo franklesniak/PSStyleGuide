@@ -15,7 +15,8 @@ And given the state of the [`PSStyleGuide` repo](github.com/franklesniak/PSStyle
 
 - `docs\planning\PSStyleGuide\01PSStyleGuideP1.md`
 - `docs\planning\PSStyleGuide\02PSStyleGuideP2.md`
+- `docs\planning\PSStyleGuide\03PSStyleGuideP3.md`
 
 (again, assume these issues are worked on one at a time, sequentially, in the order they are listed)
 
-What feedback would you have, if any, for the person that drafted the P1/P2/etc. GitHub Issues slate? Record your answer in `docs\planning\PSStyleGuide\slate-criticism.md`. If the file already exists, overwrite the existing file (do not append it).
+What feedback would you have, if any, for the person that drafted the P1/P2/P3/etc. GitHub Issues slate? Record your answer in `docs\planning\PSStyleGuide\slate-criticism.md`. If the file already exists, overwrite the existing file (do not append it).

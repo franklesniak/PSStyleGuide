@@ -15,5 +15,6 @@ I'm not asking you to critique these, but as an FYI: here is a similar proposed 
 
 - `docs\planning\PSStyleGuide\01PSStyleGuideP1.md`
 - `docs\planning\PSStyleGuide\02PSStyleGuideP2.md`
+- `docs\planning\PSStyleGuide\03PSStyleGuideP3.md`
 
 As you review, please record your thoughts to `docs\planning\artifacts\current-findings.md` (overwrite the existing file if one is present). Write to the file as you're working; this will help protect you from context window compaction.

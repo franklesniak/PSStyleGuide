@@ -15,6 +15,7 @@ I'm not asking you to critique these, but as an FYI: here is a similar proposed 
 
 - `docs\planning\PSStyleGuide\01PSStyleGuideP1.md`
 - `docs\planning\PSStyleGuide\02PSStyleGuideP2.md`
+- `docs\planning\PSStyleGuide\03PSStyleGuideP3.md`
 
 ---
 

@@ -26,5 +26,6 @@ Then, please use the information about each finding and the option selected to a
 
 - `docs\planning\PSStyleGuide\01PSStyleGuideP1.md`
 - `docs\planning\PSStyleGuide\02PSStyleGuideP2.md`
+- `docs\planning\PSStyleGuide\02PSStyleGuideP3.md`
 
 If there are multiple GitHub Issues, ensure you list them in the order in which they should be executed/worked. Do not label the issue(s) as revisions or draw attention to what you've changed, as I'll be handing the information off to someone else, and I don't want to confuse them.
