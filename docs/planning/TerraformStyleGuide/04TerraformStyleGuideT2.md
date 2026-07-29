@@ -38,11 +38,16 @@ At implementation start, confirm the prerequisite issue established:
   (`.github/workflows/Expand-StyleGuideCandidateArtifact.ps1`), and versioned
   permanent helper harness
   (`.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1`).
-- Local cross-edition validation that verifies each available edition's output before another edition runs.
+- Local cross-edition validation that asserts Desktop exactly 5.1 or Core major
+  7 and invokes each harness/generator target in that same child `-Command`
+  process before verifying that edition's output.
 - Unfiltered `main` coverage for pull requests and pushes.
 - Every nonlocal action in `.github/workflows/build.yml` and
   `.github/workflows/markdownlint.yml` pinned to a verified full commit SHA with
   an adjacent release comment.
+- The dated action baseline uses checkout v7.0.1, setup-node v7.0.0,
+  upload-artifact v7.0.1, and download-artifact v8.0.1 at the exact full SHAs
+  selected by T1, subject to T1's immediate pre-implementation reverification.
 - Review-only weekly Dependabot version updates for the `github-actions`
   ecosystem, with no auto-merge.
 - Immutable candidate ID/digest propagation from a read-only preparation job that declares `archive: true`.
@@ -57,13 +62,19 @@ At implementation start, confirm the prerequisite issue established:
   filesystem volume/share root through each protected path; and repeated
   component validation at the helper's archive-open, candidate-creation, and
   post-extraction boundaries.
-- Independent comparison of the retained ZIP's SHA-256 with the propagated
-  upload digest before opening the archive, and validation of the full manifest
-  before creating the candidate directory.
+- Exactly one retained ZIP stream opened with `FileMode.Open`,
+  `FileAccess.Read`, and `FileShare.Read`, hashed with
+  `Get-FileHash -InputStream`, compared with the propagated upload digest,
+  rewound, and used for the only read-only `ZipArchive`, with continuous
+  lifetime and deterministic disposal before cleanup.
 - The exact tracked permanent harness as the sole definition of the
   deterministic fixture suite, including digest-mismatch, diagnostic-context,
   root-separation, strict-descendant, ancestor/component-indirection, and
-  post-extraction cleanup cases.
+  separate post-extraction BOM and CR cases.
+- Case-specific rejection outcomes for initially absent, preexisting,
+  helper-created ordinary, and unsafe cleanup states, including direct
+  deterministic exercise of the exact named production cleanup function and
+  fail-closed retention diagnostics.
 - The tracked harness running against the exact helper in the Ubuntu
   pull-request verification job and in all four Windows pull-request cells
   before merge.
@@ -87,6 +98,10 @@ At implementation start, confirm the prerequisite issue established:
   - `.github/workflows/build.yml`; and
   - `.github/workflows/markdownlint.yml`.
 - Passing LF, CRLF, lone-CR, propagated-digest rejection, malformed-transport, stale-ref, and lease evidence.
+- A real linked npm-remediation issue that owns the separately recorded
+  seven-node nested-tooling advisory baseline without expanding T1 or T2. If
+  repository policy required that issue to run before T1, confirm T1 and this
+  issue were rebaselined after it merged.
 
 ## Affected files
 
@@ -159,7 +174,24 @@ State that:
 - AWS CLI and configured credentials are required.
 - Discovery requires `s3:ListBucketVersions`.
 - Retrieval of a selected version requires `s3:GetObjectVersion`.
-- The procedure applies to a versioning-capable general-purpose bucket.
+- S3 Versioning is disabled by default. A recoverable non-null historical
+  version requires Versioning to have been enabled before that desired object
+  write.
+- The bucket may currently be `Enabled` or `Suspended`; suspension preserves
+  already retained versions but causes later writes to use the `null` version
+  semantics.
+- Objects that predate first enablement are not retroactively given unique
+  version IDs; they use the `null` version ID until a later write.
+- Prior enablement does not guarantee recovery. Lifecycle expiration or an
+  explicit permanent version deletion may have removed the desired version.
+- The operator must deliberately select a still-existing exact-key version
+  returned by discovery. If exact-key discovery returns no usable version,
+  stop: this procedure has no recoverable S3 version to retrieve.
+- Do not enable or suspend bucket Versioning as part of recovery. Establish the
+  prerequisite through the owner/administrator or existing operational
+  evidence; do not make `get-bucket-versioning` mandatory because AWS reserves
+  that status operation to the bucket owner.
+- The procedure applies only to a general-purpose bucket.
 - Directory buckets do not support S3 Versioning or `ListObjectVersions`.
 - Directory-bucket `GetObject` accepts only the `null` version ID, so directory buckets are outside this historical recovery procedure.
 - SSE-S3 requires no KMS authorization.
@@ -391,6 +423,7 @@ Use:
 
 ```bash
 (
+  set +x
   umask 077
 
   TFC_RESPONSE_PATH=${TFC_RESPONSE_PATH:?Set TFC_RESPONSE_PATH to a new absolute path in a protected directory for this response page.}
@@ -452,6 +485,13 @@ EOF
 
 Explain:
 
+- `set +x` is intentionally the first command inside the subshell, before any
+  assignment, parameter expansion, or secret-bearing here-document. It disables
+  an inherited Bash xtrace state before the synthetic or real token can expand.
+- The subshell boundary preserves the parent shell's prior tracing state after
+  the block exits. The block cannot protect a token already exposed by an
+  external wrapper, parent-shell assignment, process launcher, or prior
+  command; tracing must also be controlled at those boundaries.
 - All required values are validated before the response file is created, so an unset input does not leave a misleading empty file.
 - The `[ -e "$TFC_RESPONSE_PATH" ] || [ -L "$TFC_RESPONSE_PATH" ]` preflight rejects every existing entry and a dangling final symbolic link.
 - `set -C` enables Bash's `noclobber` option, and `exec 3> "$TFC_RESPONSE_PATH"` opens the exact requested path before any network request. If that exclusive create fails, curl does not run.
@@ -476,7 +516,8 @@ Explain:
 - The operator must inspect the protected response using a trusted local JSON viewer.
 - The operator must continue with fresh response paths until `meta.pagination.next-page` is `null`.
 - Every page file contains sensitive hosted URLs and must remain outside Git, logs, tickets, chat, and unprotected artifacts.
-- Do not use `set -x` or another tracing facility.
+- Do not re-enable xtrace or use another tracing facility anywhere in the
+  subshell.
 - Do not add an automatic `jq` loop or rollback command.
 
 ### 8. Treat recovered state as sensitive
@@ -694,6 +735,28 @@ Confirm:
 - Pagination continues until `next-page` is `null`.
 - Generated artifacts match sources.
 
+### Prove inherited xtrace cannot disclose the HCP token
+
+Run a synthetic negative test against the exact finalized HCP subshell:
+
+1. Start a child Bash process with xtrace already enabled.
+2. Supply a conspicuous synthetic token sentinel, synthetic organization and
+   workspace names, and a fresh path beneath a protected test-only directory.
+   Never use a real token.
+3. Replace `curl` with a test-only stub that consumes its standard-input
+   configuration, records that it was invoked, writes harmless JSON through
+   the already-open response descriptor, and cannot make a network request.
+4. Capture the child's complete stdout and stderr, including xtrace output.
+5. Require the first traced command inside the subshell to be `set +x`.
+6. Require the synthetic token sentinel to be absent from all captured output.
+7. Require the stub to have run, the exact requested response path to have been
+   used, and the block to have returned zero.
+8. Remove only the test-owned protected directory after the assertions.
+
+The test must fail if `set +x` is removed, moved after any assignment or
+expansion, or if the sentinel appears. It must not contact HCP Terraform or any
+other network endpoint.
+
 ### Pull-request evidence
 
 Confirm:
@@ -741,7 +804,14 @@ If preparation reports changes, investigate source/artifact synchronization. Do 
 - Azure explicitly disables overwrite.
 - GCS explicitly uses no-clobber.
 - AWS performs an immediate nonexistence check.
-- S3 prerequisites and bucket-class scope are accurate.
+- S3 states that Versioning is disabled by default; the desired non-null
+  version must have been written after enablement; currently enabled and
+  suspended buckets may retain versions; pre-enable objects have `null` IDs;
+  lifecycle or permanent deletion may remove versions; empty exact-key
+  discovery means no recovery; and recovery never enables or suspends
+  Versioning.
+- S3 prerequisites and general-purpose bucket scope are accurate without
+  imposing owner-only `get-bucket-versioning` on a delegated recovery operator.
 - General-purpose KMS retrieval guidance identifies `kms:Decrypt`.
 - Directory-bucket KMS text is reconciled without implying version recovery.
 - Azure requires Blob Versioning on a supported non-HNS account.
@@ -750,6 +820,11 @@ If preparation reports changes, investigate source/artifact synchronization. Do 
 - HCP filters exact organization/workspace and `finalized`.
 - HCP handles HTTP failures and manual pagination.
 - HCP token data is supplied through `--config -`, not an expanded argument.
+- `set +x` is the first command in the HCP subshell, no later command re-enables
+  tracing, and the parent shell's trace state remains scoped outside the
+  subshell.
+- The inherited-xtrace synthetic sentinel test passes without a real token or
+  network access.
 - HCP responses are written through a pre-opened Bash `noclobber` descriptor to the exact requested fresh protected path.
 - HCP does not silently select an alternate output filename when the requested path is occupied.
 - HCP curl failures retain an explicitly invalid empty or partial protected file and direct the operator to use a fresh path.
@@ -774,11 +849,14 @@ If preparation reports changes, investigate source/artifact synchronization. Do 
 - Do not add an HCP rollback or automatic pagination loop.
 - Do not add SSE-C recovery.
 - Do not prescribe OS-specific deletion.
-- Do not modify the prerequisite issue's files:
+- Do not modify any of the prerequisite issue's seven files:
   - `.gitattributes`
-  - `.github/workflows/Generate-StyleGuideArtifacts.ps1`
+  - `.github/dependabot.yml`
   - `.github/workflows/Expand-StyleGuideCandidateArtifact.ps1`
+  - `.github/workflows/Generate-StyleGuideArtifacts.ps1`
+  - `.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1`
   - `.github/workflows/build.yml`
+  - `.github/workflows/markdownlint.yml`
 - Do not modify `.github/copilot-instructions.md`.
 - Do not hand-edit generated artifacts.
 - Do not run Terraform CLI validation.
@@ -796,6 +874,8 @@ If preparation reports changes, investigate source/artifact synchronization. Do 
 - [curl CVE-2022-27778: `--no-clobber` uses numbered alternative filenames](https://curl.se/docs/CVE-2022-27778.html)
 - [AWS CLI `list-object-versions`](https://docs.aws.amazon.com/cli/latest/reference/s3api/list-object-versions.html)
 - [AWS `ListObjectVersions`](https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectVersions.html)
+- [AWS S3 Versioning](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html)
+- [AWS `GetBucketVersioning`](https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketVersioning.html)
 - [AWS required permissions](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-with-s3-policy-actions.html)
 - [AWS general-purpose SSE-KMS permissions](https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html#sse-kms-permissions)
 - [AWS KMS key policies](https://docs.aws.amazon.com/kms/latest/developerguide/key-policies.html)

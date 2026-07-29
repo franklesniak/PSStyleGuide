@@ -22,7 +22,9 @@ Make generation byte-deterministic and establish a safe, least-privileged synchr
 - Using one shared, versioned PowerShell helper with explicit checkout and
   trusted-temporary roots for candidate digest verification, archive
   validation, and extraction on Windows and Ubuntu.
-- Passing preparation's propagated upload digest to that helper, which independently compares it with the retained ZIP's SHA-256 before opening the archive.
+- Passing preparation's propagated upload digest to that helper, which
+  independently compares it with the retained ZIP stream's SHA-256 before
+  constructing `ZipArchive`.
 - Defining the deterministic fixture suite once in a tracked, versioned
   PowerShell harness and running that exact harness against the exact helper in
   the Ubuntu pull-request job, all four Windows pull-request cells, all four
@@ -321,8 +323,8 @@ The helper must validate in this order:
 3. working-path strict-descendant relationships and every existing component;
 4. exact download-directory contents and retained archive-file type;
 5. candidate-parent safety and candidate-leaf absence;
-6. retained-archive digest;
-7. ZIP readability and complete manifest;
+6. one retained-archive stream open and digest;
+7. rewind that same stream, then ZIP readability and complete manifest;
 8. repeated component, containment, parent, and leaf checks;
 9. one-time candidate creation and extraction; and
 10. exhaustive post-extraction inspection.
@@ -342,23 +344,42 @@ The helper must require:
 - That entry and its complete component chain identify a regular,
   non-reparse-point file.
 
-Do not attempt ZIP parsing in this phase. Hash the retained regular file first,
-then validate it by opening it as a ZIP only after the expected-digest contract
-succeeds. Do not require a `.zip` filename extension. The retained file's name
-comes from the download's Content-Disposition header and may be the literal
-fallback name `artifact`.
+Do not attempt ZIP parsing in this phase. After the path/type contract succeeds,
+open the retained regular file exactly once as required below. Hash that stream
+first, then rewind and validate the same continuously held stream as a ZIP only
+after the expected-digest contract succeeds. Do not require a `.zip` filename
+extension. The retained file's name comes from the download's
+Content-Disposition header and may be the literal fallback name `artifact`.
 
 #### Expected-digest contract
 
-Before opening the archive, the helper must:
+Before constructing `ZipArchive`, the helper must:
 
 1. Repeat the applicable component and containment checks.
-2. Calculate the retained ZIP's SHA-256 with
-   `Get-FileHash -Algorithm SHA256`.
-3. Compare the actual and expected digests using ordinal, case-insensitive
+2. Open the retained ordinary file exactly once with `FileMode.Open`,
+   `FileAccess.Read`, and `FileShare.Read`.
+3. Require that exact `FileStream` to be readable and seekable.
+4. Pass it to `Get-FileHash -InputStream -Algorithm SHA256`.
+5. Require exactly one non-null hash result containing one valid 64-hex
+   SHA-256 value.
+6. Compare the actual and expected digests using ordinal, case-insensitive
    equality.
-4. Fail before opening the archive if they differ.
-5. Record the expected and actual digests, archive path, labels, and phase.
+7. Fail before constructing `ZipArchive` if they differ.
+8. Set that same stream's position to zero.
+9. Construct exactly one read-mode `ZipArchive` over that same stream with
+   deliberate `leaveOpen` behavior.
+10. Keep the stream and archive continuously alive through complete manifest
+    validation and extraction.
+11. Dispose the archive before the stream and dispose both before cleanup.
+12. Record the expected and actual digests, archive path, labels, and phase.
+
+Do not hash by path and reopen it. Do not copy the archive to memory or another
+staging file. `FileShare.Read` permits benign later readers while denying
+ordinary later write/delete sharing where the platform enforces those
+semantics. The held handle binds hashing and ZIP processing to one stream; it
+does not replace the complete component checks or the protected,
+job-owned/no-competing-writer model and must not be described as a universal
+OS-native sandbox.
 
 The expected value is always the propagated `artifact-digest` output of the pinned upload action, which is a bare hexadecimal SHA-256 string. Never supply the `sha256:`-prefixed form that appears in download-action logs and artifact API metadata.
 
@@ -410,12 +431,34 @@ The helper must:
 7. Create the leaf exactly once.
 8. Never delete and recreate it.
 9. Refuse to reuse or follow an existing leaf.
-10. Track whether this invocation created the candidate leaf. If any later phase
-    fails, first dispose every stream/archive, then remove only the ordinary
-    files and empty directory created by this invocation. Revalidate the
-    candidate envelope before cleanup; never follow or recursively delete an
-    unexpected/reparse entry. Preserve the original failure, add any cleanup
-    failure, and return nonzero.
+10. Track an exact ownership journal containing only the candidate directory
+    and ordinary files created by this invocation.
+11. If any later phase fails, first dispose the archive and retained file
+    stream, then invoke one named cleanup function defined in this exact
+    production helper.
+12. Before deleting anything, that function must revalidate the complete
+    candidate envelope, exhaustively enumerate the candidate's immediate
+    children, require the exact journaled set, and revalidate every journaled
+    child as the expected ordinary non-reparse-point file without following
+    links.
+13. Only after that complete pre-deletion pass may it delete the known
+    helper-created files nonrecursively and remove the proven empty ordinary
+    helper-created directory.
+14. If an entry is missing, replaced, extra, unreadable, a link, a reparse
+    point, or otherwise uncertain, stop cleanup. Never use recursive or
+    wildcard deletion and never traverse the entry.
+15. Preserve the original failure, add a stable cleanup phase, retained path,
+    offending entry when safely available, and any cleanup exception, then
+    return nonzero.
+
+Place the helper's function definitions before its main entry-point invocation.
+When and only when the helper is dot-sourced, use the ordinary PowerShell
+invocation context to define those functions and return before the main entry
+point. Do not add a definition-only/test switch, environment backdoor, or
+alternate artifact-expansion entry point. The harness may dot-source the
+resolved exact helper once with fixture-safe values for its existing mandatory
+parameters solely to invoke the named cleanup function. Production execution
+continues to use the five mandatory and three optional parameters above.
 
 A digest or manifest failure must leave the candidate leaf nonexistent. A
 post-creation failure must remove the helper-created leaf before returning
@@ -474,8 +517,11 @@ must:
 - Create all fixture state beneath one unique runner-temporary root.
 - Invoke the production helper as a child script through the documented public
   parameters.
-- Never copy, dot-source, or reimplement the helper's digest, path,
-  containment, archive, manifest, lifecycle, or extraction logic.
+- For the deterministic unsafe-cleanup fixture only, dot-source the same
+  resolved helper once through its documented definition-only behavior, then
+  invoke the exact named production cleanup function.
+- Never otherwise copy, dot-source, or reimplement the helper's digest, path,
+  containment, archive, manifest, lifecycle, cleanup, or extraction logic.
 - Change working directory during at least one valid case.
 - Return nonzero for every unexpected result, diagnostic, filesystem state, or
   cleanup failure.
@@ -502,7 +548,9 @@ The suite must use stable case identifiers and this outcome contract:
 | Directory entry or file/directory collision | Reject | Fail after ZIP open but before candidate-leaf creation or entry extraction. |
 | Empty central-directory name using a reviewed fixed raw fixture | Reject | Fail after ZIP open but before candidate-leaf creation or entry extraction. |
 | Invalid or truncated ZIP | Reject | Fail during ZIP open/read before candidate-leaf creation. |
-| Exact manifest with a BOM or CR byte in extracted content | Reject | Fail during post-extraction validation, safely remove the helper-created candidate leaf, and report any cleanup failure. |
+| Exact manifest with a UTF-8 BOM in extracted content | Reject | Fail during post-extraction validation, safely remove the helper-created candidate leaf, and report any cleanup failure. |
+| Exact manifest with a CR byte in extracted content | Reject | Fail during post-extraction validation, safely remove the helper-created candidate leaf, and report any cleanup failure. |
+| Deterministic unsafe cleanup state at the exact owned leaf | Reject and retain | Invoke the exact production cleanup function after replacing or mutating the journaled leaf into an unsafe state; refuse deletion, retain the path, and report both the primary failure and stable cleanup diagnostics. |
 | Hidden extra entry in the download directory | Reject | Fail before selecting or opening an archive. |
 | Existing candidate file or directory | Reject | Fail before ZIP extraction and never reuse the leaf. |
 | Candidate symlink/reparse point or dangling candidate link | Reject | Fail before ZIP extraction and never follow the leaf. |
@@ -518,11 +566,34 @@ The suite must use stable case identifiers and this outcome contract:
 
 For each rejection fixture:
 
-- Require the helper to fail.
-- Require the destination directory to remain nonexistent.
+- Require the helper or direct cleanup-function fixture, as applicable, to fail.
+- Capture the relevant initial state before invocation and assert the required
+  final state before the harness's unconditional `finally` teardown. The
+  harness teardown is not evidence that production cleanup succeeded.
 - Require no write outside the fixture root.
-- Require the digest-mismatch fixture to fail before the archive is opened.
-- Include the case and offending entry in diagnostics when available.
+- Require the digest-mismatch fixture to fail before a `ZipArchive` is
+  constructed or read, after hashing the already-open retained stream.
+- Include the stable case identifier, failure phase, and offending entry in
+  diagnostics when available.
+
+Apply these per-case destination outcomes rather than one global
+"destination absent" rule:
+
+| Rejection-state class | Representative cases | Required final state before harness teardown |
+| --- | --- | --- |
+| Initially absent; rejected before helper creation | Digest mismatch, malformed manifest, invalid ZIP, invalid roots, and outside-root paths | The candidate leaf remains absent. |
+| Preexisting leaf | Existing file, directory, link, reparse point, or dangling link | The preexisting object remains in place and is not followed, traversed, reused, or mutated. |
+| Helper-created ordinary owned leaf | Separate post-extraction BOM and CR cases and any deterministic ordinary post-creation failure | The exact journaled leaf is safely removed nonrecursively; unrelated sentinels remain unchanged. |
+| Unsafe or ownership-uncertain cleanup state | Direct deterministic substitution/mutation of the exact journaled leaf before calling the production cleanup function | The path is retained; cleanup stops without recursion or traversal; diagnostics preserve the primary failure and add the stable cleanup phase, retained path, unsafe entry when safely available, and cleanup exception when present. |
+
+The deterministic unsafe-cleanup fixture must use the one permitted
+definition-only dot-source operation without running the main entry point, and
+must invoke the same named cleanup function used by the production failure
+path. It must not copy or reimplement cleanup logic or add another public
+expansion interface. Its mandatory cross-platform unsafe state is an unexpected,
+unjournaled ordinary immediate child, so the fail-closed oracle never depends on
+link-creation privileges. Add a link/reparse substitution variant where the
+runner supports it.
 
 For each successful archive fixture:
 
@@ -536,7 +607,12 @@ For every fixture:
 - Assert the expected success or rejection explicitly; an exception without the matching phase/postcondition assertion is not a complete oracle.
 - Require named sentinels outside the intended fixture destination to remain
   absent or unchanged.
-- Do not silently count an unavailable symlink/reparse fixture as passing. Fail the cell or emit an explicit, narrowly justified platform skip while ensuring the same case executes successfully on another required runner.
+- Do not silently count an unavailable symlink/reparse fixture as passing. An
+  expected inability to create one particular link form may produce a stable,
+  narrowly justified case-level skip, but an unexpected setup failure fails the
+  cell. At least one real component-or-leaf symbolic-link/reparse fixture must
+  execute and prove rejection on Ubuntu, and at least one must execute and prove
+  rejection on Windows; a platform-wide link-fixture skip is prohibited.
 
 These are production contract self-tests exercising the exact tracked helper,
 not a bypass or alternate extraction implementation. Pull-request Ubuntu
@@ -587,13 +663,13 @@ an adjacent release comment.
 As of 2026-07-29, use:
 
 ```yaml
-uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 ```
 
 for every checkout step in both workflows;
 
 ```yaml
-uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
 ```
 
 for the markdown-lint setup step;
@@ -622,10 +698,15 @@ Immediately before implementation:
 8. Preserve markdown lint's existing Node/package behavior; action pinning does
    not authorize a dependency, lint-rule, or cache-semantics change.
 
-Checkout v6 stores persisted credentials under `RUNNER_TEMP` rather than
-`.git/config`; ordinary authenticated Git commands continue to work. Prove the
-writer's authenticated push and successful post-job cleanup in the controlled
-drill.
+Checkout v7 carries forward v6's persisted-credential placement under
+`RUNNER_TEMP` rather than `.git/config`, updates the action to the Node 24
+runtime, and includes the v7 ESM/fork and security-dependency changes. Ordinary
+authenticated Git commands must continue to work. Prove the writer's
+authenticated push and successful post-job credential cleanup in the controlled
+drill. If runner or relied-on input/output verification discovers a real,
+documented v7 incompatibility, retain v6 only as an explicitly approved
+compatibility ceiling with the evidence recorded; do not retain v6 merely
+because it was the prior pin.
 
 Create `.github/dependabot.yml` containing:
 
@@ -644,6 +725,41 @@ comment, runtime, input/output compatibility, and workflow evidence before
 merging it. Dependabot visibility does not replace immutable execution-time
 pins or human review.
 
+#### Track nested npm advisory remediation without expanding this issue
+
+The nested Markdown-lint toolchain has a separate dependency-security concern.
+As of 2026-07-29, running
+`npm audit --package-lock-only --json` from `.github/workflows` reports seven
+affected package nodes: five high severity and two moderate severity. The
+reported package names are:
+
+- `brace-expansion`
+- `js-yaml`
+- `linkify-it`
+- `markdown-it`
+- `markdownlint-cli2`
+- `minimatch`
+- `picomatch`
+
+This issue must not modify `.github/workflows/package.json`,
+`.github/workflows/package-lock.json`, the Node version, or lint behavior.
+Instead, file a real, separately reviewable npm-remediation issue and link it
+from this subsection before T1 closes. That issue owns:
+
+- dependency and lockfile changes;
+- an npm Dependabot entry for directory `/.github/workflows`, if selected after
+  repository-policy review;
+- documented disposition of every advisory reported by a fresh `npm audit`;
+- clean-install validation with `npm ci`; and
+- both the repository-root and `.github/workflows` Markdown-lint commands.
+
+The default execution order is T1, T2, then the npm-remediation issue, because
+T1 and T2 intentionally preserve the nested toolchain. If repository policy
+prohibits proceeding while high-severity advisories are open, move the separate
+npm issue before T1 and rebaseline both T1 and T2 against its merged dependency
+and lockfile state before implementation. A comment, draft, or unlinked
+placeholder does not satisfy this tracking requirement.
+
 #### Digest integrity
 
 Every production download must explicitly set:
@@ -661,7 +777,13 @@ Two complementary protections apply:
    - It throws when the actual digest differs and behavior is `error`.
    - Successful controlled and post-merge logs show the expected artifact ID/digest and completed download.
    - A version-matched upstream negative test may be cited when available, but is not a repository acceptance blocker.
-2. **Independent protection.** Every Windows push cell, and the writer whenever `has_changes=true`, passes preparation's propagated `artifact-digest` output to the shared helper, which independently compares the retained ZIP's SHA-256 with that value before opening the archive, per the helper's expected-digest contract. This protection is exercised by the propagated-digest rejection drill below and by the digest-mismatch self-test fixture.
+2. **Independent protection.** Every Windows push cell, and the writer whenever
+   `has_changes=true`, passes preparation's propagated `artifact-digest` output
+   to the shared helper, which independently hashes the retained stream,
+   compares it with that value, rewinds it, and uses it to construct the only
+   `ZipArchive`, per the helper's expected-digest contract. This protection is
+   exercised by the propagated-digest rejection drill below and by the
+   digest-mismatch self-test fixture.
 
 ### 8. Pull-request verification
 
@@ -1012,19 +1134,129 @@ $arrArtifactPaths = @(
     'STYLE_GUIDE_FULL.md'
 )
 
+$strChildCommand = @'
+$ErrorActionPreference = 'Stop'
+
+try {
+    $strExpectedEdition = $env:TERRAFORM_STYLE_GUIDE_EXPECTED_PSEDITION
+    $strExpectedMajor = $env:TERRAFORM_STYLE_GUIDE_EXPECTED_PSMAJOR
+    $strExpectedMinor = $env:TERRAFORM_STYLE_GUIDE_EXPECTED_PSMINOR
+    $strTarget = $env:TERRAFORM_STYLE_GUIDE_VALIDATION_TARGET
+
+    if ([string]::IsNullOrWhiteSpace($strExpectedEdition)) {
+        throw 'The expected PSEdition was not supplied.'
+    }
+
+    $intExpectedMajor = 0
+
+    if (-not [int]::TryParse($strExpectedMajor, [ref]$intExpectedMajor)) {
+        throw 'The expected PowerShell major version is invalid.'
+    }
+
+    if ($PSVersionTable.PSEdition -cne $strExpectedEdition) {
+        throw (
+            "Expected PSEdition {0}; observed {1}." -f
+            $strExpectedEdition,
+            $PSVersionTable.PSEdition
+        )
+    }
+
+    if ($PSVersionTable.PSVersion.Major -ne $intExpectedMajor) {
+        throw (
+            "Expected PowerShell major version {0}; observed {1}." -f
+            $intExpectedMajor,
+            $PSVersionTable.PSVersion.Major
+        )
+    }
+
+    if (-not [string]::IsNullOrEmpty($strExpectedMinor)) {
+        $intExpectedMinor = 0
+
+        if (-not [int]::TryParse($strExpectedMinor, [ref]$intExpectedMinor)) {
+            throw 'The expected PowerShell minor version is invalid.'
+        }
+
+        if ($PSVersionTable.PSVersion.Minor -ne $intExpectedMinor) {
+            throw (
+                "Expected PowerShell minor version {0}; observed {1}." -f
+                $intExpectedMinor,
+                $PSVersionTable.PSVersion.Minor
+            )
+        }
+    }
+
+    switch -CaseSensitive ($strTarget) {
+        'Harness' {
+            & './.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1' `
+                -HelperPath './.github/workflows/Expand-StyleGuideCandidateArtifact.ps1'
+        }
+
+        'Generator' {
+            & './.github/workflows/Generate-StyleGuideArtifacts.ps1'
+        }
+
+        default {
+            throw ("Unknown validation target: {0}" -f $strTarget)
+        }
+    }
+
+    if (-not $?) {
+        throw ("Validation target failed: {0}" -f $strTarget)
+    }
+}
+catch {
+    [Console]::Error.WriteLine($_.Exception.Message)
+    exit 1
+}
+
+exit 0
+'@
+
 $arrEditionCommands = @(
     [pscustomobject]@{
-        Label = 'PowerShell 7'
-        Name = 'pwsh'
+        Label           = 'PowerShell 7'
+        Name            = 'pwsh'
+        ExpectedEdition = 'Core'
+        ExpectedMajor   = 7
+        ExpectedMinor   = $null
     }
     [pscustomobject]@{
-        Label = 'Windows PowerShell 5.1'
-        Name = 'powershell'
+        Label           = 'Windows PowerShell 5.1'
+        Name            = 'powershell'
+        ExpectedEdition = 'Desktop'
+        ExpectedMajor   = 5
+        ExpectedMinor   = 1
     }
 )
 
+$arrChildEnvironmentNames = @(
+    'TERRAFORM_STYLE_GUIDE_EXPECTED_PSEDITION'
+    'TERRAFORM_STYLE_GUIDE_EXPECTED_PSMAJOR'
+    'TERRAFORM_STYLE_GUIDE_EXPECTED_PSMINOR'
+    'TERRAFORM_STYLE_GUIDE_VALIDATION_TARGET'
+)
+
+$htOriginalChildEnvironment = @{}
+
+foreach ($strEnvironmentName in $arrChildEnvironmentNames) {
+    $objEnvironmentItem = Get-Item `
+        -LiteralPath ("Env:{0}" -f $strEnvironmentName) `
+        -ErrorAction SilentlyContinue
+
+    $htOriginalChildEnvironment[$strEnvironmentName] = [pscustomobject]@{
+        Exists = $null -ne $objEnvironmentItem
+        Value = if ($null -eq $objEnvironmentItem) {
+            $null
+        }
+        else {
+            $objEnvironmentItem.Value
+        }
+    }
+}
+
 $intValidatedEditionCount = 0
 
+try {
 foreach ($objEditionCommand in $arrEditionCommands) {
     $objResolvedCommand = Get-Command `
         -Name $objEditionCommand.Name `
@@ -1041,11 +1273,20 @@ foreach ($objEditionCommand in $arrEditionCommands) {
         continue
     }
 
-    & $objResolvedCommand.Path `
-        -NoLogo `
-        -NoProfile `
-        -File './.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1' `
-        -HelperPath './.github/workflows/Expand-StyleGuideCandidateArtifact.ps1'
+    Set-Item `
+        -LiteralPath 'Env:TERRAFORM_STYLE_GUIDE_EXPECTED_PSEDITION' `
+        -Value ([string]$objEditionCommand.ExpectedEdition)
+    Set-Item `
+        -LiteralPath 'Env:TERRAFORM_STYLE_GUIDE_EXPECTED_PSMAJOR' `
+        -Value ([string]$objEditionCommand.ExpectedMajor)
+    Set-Item `
+        -LiteralPath 'Env:TERRAFORM_STYLE_GUIDE_EXPECTED_PSMINOR' `
+        -Value ([string]$objEditionCommand.ExpectedMinor)
+    Set-Item `
+        -LiteralPath 'Env:TERRAFORM_STYLE_GUIDE_VALIDATION_TARGET' `
+        -Value 'Harness'
+
+    & $objResolvedCommand.Path -NoLogo -NoProfile -Command $strChildCommand
 
     $intHarnessExitCode = $LASTEXITCODE
 
@@ -1057,10 +1298,11 @@ foreach ($objEditionCommand in $arrEditionCommands) {
         )
     }
 
-    & $objResolvedCommand.Path `
-        -NoLogo `
-        -NoProfile `
-        -File './.github/workflows/Generate-StyleGuideArtifacts.ps1'
+    Set-Item `
+        -LiteralPath 'Env:TERRAFORM_STYLE_GUIDE_VALIDATION_TARGET' `
+        -Value 'Generator'
+
+    & $objResolvedCommand.Path -NoLogo -NoProfile -Command $strChildCommand
 
     $intGeneratorExitCode = $LASTEXITCODE
 
@@ -1156,11 +1398,33 @@ foreach ($objEditionCommand in $arrEditionCommands) {
 if ($intValidatedEditionCount -eq 0) {
     throw 'Neither required PowerShell edition is available for local validation.'
 }
+}
+finally {
+    foreach ($strEnvironmentName in $arrChildEnvironmentNames) {
+        $objOriginalEnvironment = $htOriginalChildEnvironment[$strEnvironmentName]
+        $strEnvironmentPath = "Env:{0}" -f $strEnvironmentName
+
+        if ($objOriginalEnvironment.Exists) {
+            Set-Item `
+                -LiteralPath $strEnvironmentPath `
+                -Value $objOriginalEnvironment.Value
+        }
+        else {
+            Remove-Item `
+                -LiteralPath $strEnvironmentPath `
+                -ErrorAction SilentlyContinue
+        }
+    }
+}
 ```
 
-Each available edition completes the exact tracked helper harness and verifies
-its generated outputs before another edition can overwrite them. CI remains
-responsible for mandatory coverage of both editions.
+The fixed child command treats expected edition/version values and target
+selection only as data; it does not interpolate them as code. Each available
+edition asserts its identity and invokes the exact tracked helper harness in one
+child process, then does the same for the generator in another child process
+before the parent verifies that edition's generated outputs. The parent restores
+all four environment variables even on failure. CI remains responsible for
+mandatory coverage of both editions.
 
 ### Verify working-tree scope, stage, renormalize, and verify the staged set
 
@@ -1417,11 +1681,21 @@ Observe the first natural unrelated-file-only `main` push; do not create a synth
   adjacent version comment.
 - Review-only weekly Dependabot GitHub Actions updates are configured without
   auto-merge.
+- A real, separately reviewable issue for the seven-node nested npm advisory
+  baseline is filed and linked before T1 closes; dependency or lockfile changes
+  remain outside T1.
 - Preparation declares `archive: true` and exposes one nonempty immutable ID/digest pair.
 - Production downloads use immutable IDs, `skip-decompress: true`, and `digest-mismatch: error`.
 - Pinned-source/configuration evidence establishes fatal native mismatch behavior without an infeasible live corruption drill.
 - The shared helper is the only candidate extraction implementation.
-- The helper independently compares the retained ZIP's SHA-256 with the propagated upload digest before opening the archive.
+- The helper opens the selected ZIP exactly once with `FileMode.Open`,
+  `FileAccess.Read`, and `FileShare.Read`; hashes that same retained stream with
+  `Get-FileHash -InputStream`; requires exactly one valid digest; compares it
+  with the propagated upload digest; rewinds it; and constructs the only
+  read-only `ZipArchive` over that same stream.
+- The archive is disposed before the retained stream, and both are disposed
+  before cleanup. Path-based hashing, reopening the ZIP, and memory or
+  staging-file copies are prohibited.
 - The helper accepts and independently validates explicit checkout and
   trusted-temporary roots rather than deriving either boundary from ambient
   process state.
@@ -1442,9 +1716,16 @@ Observe the first natural unrelated-file-only `main` push; do not create a synth
 - Every exact filesystem-entry assertion uses exhaustive enumeration that includes hidden/system entries.
 - Existing files, directories, symlinks, reparse points, and dangling links at the candidate leaf are rejected before extraction.
 - The candidate leaf is absent until digest and manifest validation succeed.
-  Pre-creation failures leave it absent; post-creation failures safely remove
-  the helper-created leaf or explicitly report a fail-closed cleanup failure and
-  retained path.
+- Rejection postconditions are case-specific and are asserted before harness
+  teardown: pre-creation failures leave an initially absent leaf absent;
+  preexisting leaves remain unchanged and are never followed; ordinary
+  helper-created journaled leaves are safely removed nonrecursively; and an
+  unsafe or ownership-uncertain cleanup state is retained with the primary
+  failure plus stable cleanup diagnostics.
+- The tracked harness definition-only loads and directly exercises the exact
+  named production cleanup function for a deterministic unsafe-cleanup fixture,
+  without copying the implementation or adding another public expansion
+  interface.
 - Only the four exact entries are accepted.
 - Archive metadata is ignored.
 - Extracted results are exactly four regular, non-reparse-point files.
@@ -1454,14 +1735,17 @@ Observe the first natural unrelated-file-only `main` push; do not create a synth
   exact tracked harness against the exact tracked helper before merge.
 - Every Windows push cell runs the suite and production helper on every push; the synchronization job runs them whenever `has_changes=true` and is skipped when `has_changes=false`.
 - Helper invocations and their edition/version assertions occur in the same explicit-shell process; edition-neutral steps never invoke the helper.
-- Every rejection fixture satisfies its specified failure phase and leaves the candidate leaf absent; the digest-mismatch fixture fails before the archive is opened.
+- Every rejection fixture satisfies its specified failure phase and
+  case-specific final-state contract; the digest-mismatch fixture fails before
+  a `ZipArchive` is constructed or read after hashing the same held stream.
 - The normal and external-attributes archive fixtures extract exactly four
   ordinary files; the external-attributes case proves archive metadata is
   ignored rather than restored.
 - Duplicate, case-colliding, nested, traversal, absolute, drive-qualified,
   directory, empty-name, missing, extra, file/directory-collision,
-  hidden-extra-download-entry, existing/dangling-leaf, invalid-ZIP,
-  post-extraction BOM/CR cleanup, digest-mismatch, metadata-ignored,
+  hidden-extra-download-entry, existing/dangling-leaf, invalid-ZIP, separate
+  post-extraction BOM and CR cleanup, deterministic unsafe-cleanup retention,
+  digest-mismatch, metadata-ignored,
   root-overlap, outside-trusted-root, sibling-prefix, case-variant,
   provider-qualified, ancestor/component-link, omitted-label, supplied-label,
   and empty-label cases are covered.
@@ -1475,7 +1759,11 @@ Observe the first natural unrelated-file-only `main` push; do not create a synth
 - The synchronization commit is a single child of `github.sha`.
 - The writer validates one canonical `TARGET_REF` against `GITHUB_REF`, proves `EXPECTED_SHA` is the checkout's complete repository-native commit object ID, uses both values unchanged for remote preflight and `HEAD:<full-ref>`, and applies the exact expected-SHA lease.
 - No prohibited force or retry behavior exists.
-- Local validation verifies each available edition immediately after that edition runs, and CI supplies mandatory coverage for both editions.
+- Local validation asserts Desktop exactly 5.1 or Core major 7 and invokes each
+  harness/generator target in the same child `-Command` process, verifies each
+  available edition immediately after it runs, restores its temporary
+  environment data, and leaves CI responsible for mandatory coverage of both
+  editions.
 - Before staging, the complete changed-path set is exactly the seven
   implementation files.
 - After staging and renormalization, the cached path set is exactly those same
@@ -1493,7 +1781,10 @@ Observe the first natural unrelated-file-only `main` push; do not create a synth
 - [Microsoft Learn: `about_Preference_Variables`](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_preference_variables)
 - [Microsoft Learn: `about_Environment_Variables`](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_environment_variables)
 - [Microsoft Learn: `about_Comment_Based_Help`](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_comment_based_help)
-- [Microsoft Learn: `Get-FileHash`](https://learn.microsoft.com/powershell/module/microsoft.powershell.utility/get-filehash)
+- [Microsoft Learn: `Get-FileHash` in Windows PowerShell 5.1](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/get-filehash?view=powershell-5.1)
+- [Microsoft Learn: PowerShell editions](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_powershell_editions)
+- [Microsoft Learn: `pwsh` command-line interface](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pwsh)
+- [Microsoft Learn: `powershell.exe` command-line interface](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_powershell_exe?view=powershell-5.1)
 - [Microsoft Learn: `Get-ChildItem`](https://learn.microsoft.com/powershell/module/microsoft.powershell.management/get-childitem)
 - [Microsoft Learn: `Resolve-Path`](https://learn.microsoft.com/powershell/module/microsoft.powershell.management/resolve-path)
 - [`.NET UTF8Encoding`](https://learn.microsoft.com/dotnet/api/system.text.utf8encoding.-ctor)
@@ -1503,6 +1794,8 @@ Observe the first natural unrelated-file-only `main` push; do not create a synth
 - [`.NET FileAttributes`](https://learn.microsoft.com/dotnet/api/system.io.fileattributes)
 - [`Path.GetFullPath`](https://learn.microsoft.com/dotnet/api/system.io.path.getfullpath)
 - [`FileMode`](https://learn.microsoft.com/dotnet/api/system.io.filemode)
+- [`File.Open`](https://learn.microsoft.com/en-us/dotnet/api/system.io.file.open)
+- [`FileShare`](https://learn.microsoft.com/en-us/dotnet/api/system.io.fileshare)
 - [`ZipArchive.Entries`](https://learn.microsoft.com/dotnet/api/system.io.compression.ziparchive.entries)
 - [`ZipArchive.CreateEntry`](https://learn.microsoft.com/dotnet/api/system.io.compression.ziparchive.createentry)
 - [`ZipArchiveEntry.Open`](https://learn.microsoft.com/dotnet/api/system.io.compression.ziparchiveentry.open)
@@ -1522,9 +1815,13 @@ Observe the first natural unrelated-file-only `main` push; do not create a synth
 - [GitHub Docs: Evaluate expressions in workflows and actions](https://docs.github.com/en/actions/reference/workflows-and-actions/expressions)
 - [GitHub secure-use reference](https://docs.github.com/en/actions/reference/security/secure-use)
 - [GitHub Docs: Keep actions up to date with Dependabot](https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/secure-your-dependencies/auto-update-actions)
+- [GitHub Docs: Configure Dependabot version updates](https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/secure-your-dependencies/configure-version-updates)
 - [GitHub Docs: Dependabot-supported GitHub Actions references](https://docs.github.com/en/code-security/reference/supply-chain-security/supported-ecosystems-and-repositories#github-actions)
-- [`checkout` v6.1.0 release](https://github.com/actions/checkout/releases/tag/v6.1.0)
-- [`setup-node` v6.5.0 release](https://github.com/actions/setup-node/releases/tag/v6.5.0)
+- [npm Docs: `npm audit`](https://docs.npmjs.com/cli/v11/commands/npm-audit/)
+- [`checkout` v7.0.1 release](https://github.com/actions/checkout/releases/tag/v7.0.1)
+- [`checkout` v7.0.1 commit](https://github.com/actions/checkout/commit/3d3c42e5aac5ba805825da76410c181273ba90b1)
+- [`setup-node` v7.0.0 release](https://github.com/actions/setup-node/releases/tag/v7.0.0)
+- [`setup-node` v7.0.0 commit](https://github.com/actions/setup-node/commit/820762786026740c76f36085b0efc47a31fe5020)
 - [`upload-artifact` v7.0.1 README](https://github.com/actions/upload-artifact/blob/v7.0.1/README.md)
 - [`download-artifact` v8.0.1 inputs](https://github.com/actions/download-artifact/blob/v8.0.1/action.yml)
 - [`download-artifact` v8.0.1 implementation](https://github.com/actions/download-artifact/blob/v8.0.1/src/download-artifact.ts)
