@@ -4,12 +4,15 @@
 
 The revised slate is substantially stronger than the earlier T1/T2 draft. The
 T1/T1A/T1B split gives generator serialization, the candidate validator, and
-the write-enabled workflow separate review boundaries. T2 and T4 now separate
-provider-version retrieval from destructive state operations. T3 is a real
-dependency-governance issue rather than an incidental package bump.
+the write-enabled workflow separate review boundaries. It now has a direct
+layer-for-layer counterpart in PSStyleGuide P1/P1A/P1B, which makes the stated
+cross-repository unification goal testable without requiring a shared runtime
+package. T2 and T4 separate provider-version retrieval from destructive state
+operations. T3 is a real dependency-governance issue rather than an incidental
+package bump.
 
-Keep the intentional H1 titles, the T1/T1A/T1B/T2/T3/T4 naming, and the default
-linear order:
+Keep the intentional H1 titles, the T1/T1A/T1B/T2/T3/T4 naming, and the
+stipulated linear order:
 
 1. T1;
 2. T1A;
@@ -19,19 +22,24 @@ linear order:
 6. T4.
 
 I would not split the slate further before handoff. I would, however, correct
-the findings below. The highest-priority defects are T1's mismatch with the
-actual CRLF-bearing planning branch, T1/T1B's under-specified workflow policy,
-T1B's undefined matrix-attestation aggregation, T3's npm-audit identity model,
-and T4's untested PowerShell promise.
+the findings below. The highest-priority defects are the unresolved alternate
+T3-first sequence, T1's mismatch with the actual CRLF-bearing planning branch,
+T1/T1B's under-specified workflow and credential policy, T1B's undefined
+matrix-attestation aggregation, T3's npm-audit identity model, and T4's
+untested PowerShell promise.
 
 | Finding | Issue(s) | Priority |
 | --- | --- | --- |
+| S-01 | Whole slate | High |
 | T1-01 | T1 | Blocker if the planning branch is the implementation base |
 | T1-02 | T1, T1B | High |
 | T1-03 | T1, T1B | High |
+| T1-04 | T1 | High |
 | T1B-01 | T1B | High |
+| T1B-02 | T1, T1B | High |
 | T1A-01 | T1, T1A, T1B | Medium |
 | T1A-02 | T1A | Medium |
+| T1A-03 | T1A, T1B | High |
 | T2-01 | T2 | High |
 | T3-01 | T3 | High |
 | T3-02 | T3 | High |
@@ -48,10 +56,12 @@ This review considered:
 - [T3](05TerraformStyleGuideT3.md);
 - [T4](06TerraformStyleGuideT4.md);
 - the revised [PSStyleGuide P1](../PSStyleGuide/01PSStyleGuideP1.md),
+  [P1A](../PSStyleGuide/01aPSStyleGuideP1A.md),
+  [P1B](../PSStyleGuide/01bPSStyleGuideP1B.md),
   [P2](../PSStyleGuide/02PSStyleGuideP2.md), and
   [P3](../PSStyleGuide/03PSStyleGuideP3.md) contracts;
 - TerraformStyleGuide planning commit
-  [`490bfe19ecf7c7007a8cf7db59888986a3637ac9`](https://github.com/franklesniak/TerraformStyleGuide/commit/490bfe19ecf7c7007a8cf7db59888986a3637ac9);
+  [`4c7bb1cecc9c392dd9b95db9387e81645d97c888`](https://github.com/franklesniak/TerraformStyleGuide/commit/4c7bb1cecc9c392dd9b95db9387e81645d97c888);
 - TerraformStyleGuide `main` commit
   [`6ee3f57b2b71b885a5927b770dde47532944de62`](https://github.com/franklesniak/TerraformStyleGuide/commit/6ee3f57b2b71b885a5927b770dde47532944de62);
 - the current generator, workflows, hook, package manifest, and lockfile;
@@ -60,6 +70,14 @@ This review considered:
 - a fresh `npm audit --package-lock-only --json` run on 2026-07-29 with Node
   26.5.0 and npm 11.7.0. Those runtime versions were used only to inspect the
   current audit response, not as proposed T3 support evidence.
+
+The six supplied T issue bodies match TerraformStyleGuide planning commit
+`4c7bb1cecc9c392dd9b95db9387e81645d97c888` after normalizing their CRLF
+checkout bytes to LF. The sibling TerraformStyleGuide worktree contains later
+uncommitted issue-draft edits; this review uses the six supplied bodies and
+that exact committed snapshot as its reproducible review basis. The four
+reviewed action release tags also still resolve to the full commits named by
+T1/T1B.
 
 The live baseline still supports the slate's general purpose:
 
@@ -73,6 +91,41 @@ The live baseline still supports the slate's general purpose:
   properties.
 
 ## Findings
+
+### S-01: Resolve the advisory policy before filing one linear dependency graph
+
+The requested operating assumption is one-at-a-time execution in the listed
+order. T1, T2, and T3 nevertheless preserve a second graph in which T3 can run
+first if policy prohibits carrying the current high-severity findings. That is
+a reasonable planning question, but it is not a deterministic filed issue
+sequence:
+
+- T1 calls T3 an optional predecessor;
+- T2 conditionally consumes either T1's Node 24 state or T3's final runtime
+  state;
+- T3 can depend on T2 or become T1's predecessor; and
+- T4 always depends on both T2 and T3.
+
+The current audit has real high findings, so this is not a theoretical branch.
+Leaving the choice until implementation makes blocked-by relationships,
+affected-file baselines, action-role inventories, Node/npm expectations, and
+supersession evidence conditional.
+
+PSStyleGuide P3 resolves the equivalent sequencing question by naming one
+linear prerequisite chain. TerraformStyleGuide should be equally
+deterministic.
+
+Recommended correction:
+
+1. Decide the repository/organization advisory rule before filing.
+2. Under the stipulated order, record an explicit risk acceptance that permits
+   T1/T1A/T1B/T2 to execute before T3, then remove the alternate-first text.
+3. If that acceptance cannot be made, move and renumber the complete T3 issue
+   before T1 and rewrite every dependency and baseline once.
+4. Do not perform a partial package update outside T3 or maintain two live
+   dependency graphs in the final issue bodies.
+
+This does not require splitting T3. It requires choosing one sequence.
 
 ### T1-01: Reconcile the LF migration with the actual implementation base
 
@@ -130,11 +183,11 @@ define policy from the same result. An approved action can be moved to the
 wrong job, given a weaker input, or duplicated in a newly blessed role without
 violating a prior normative inventory.
 
-P1 now has the stronger pattern that should be shared behaviorally: one
-authoritative role table keyed by workflow, job ID, stable step ID, and action
-repository, with the exact SHA, release annotation, condition, and complete
-allowed input set. The table drives exact set equality and all negative
-fixtures.
+P1 and P1B now have the stronger pattern that should be shared behaviorally:
+one temporary and then one final authoritative role table keyed by workflow,
+job ID, stable step ID, and action repository, with the exact SHA, release
+annotation, condition, and complete allowed input set. Each table drives exact
+set equality and all negative fixtures.
 
 Recommended correction:
 
@@ -190,6 +243,43 @@ Recommended correction:
 This is a cross-edition correctness contract, not merely a writer hardening
 detail.
 
+### T1-04: Make generator convergence an executable, reciprocal contract
+
+T1 says to obtain an unambiguous filesystem destination with
+`GetUnresolvedProviderPathFromPSPath`, but it does not prescribe the complete
+input/provider contract. Microsoft's API documentation states that the
+unresolved-path API can accept wildcard-bearing input and leaves wildcard
+characters unresolved. The one-result overload also does not itself prove the
+FileSystem provider or turn “multiple resolution” into a meaningful check.
+
+T1 should align with the corresponding P1 behavior:
+
+1. reject null/empty, wildcard-bearing, relative, and ambiguous destination
+   input before calling a .NET filesystem API;
+2. use the overload that returns provider/drive metadata and require the
+   FileSystem provider;
+3. produce exactly one absolute provider-internal path;
+4. normalize the complete final payload once;
+5. serialize once with `UTF8Encoding($false)` and `WriteAllText`; and
+6. report the captured destination plus underlying exception on failure.
+
+T1 also has no generator-layer reciprocal comparison. T1A compares validator
+behavior with PSStyleGuide, and T1B extends that matrix for workflows, but the
+generator foundation itself is merely described as an intended unification
+goal.
+
+Add a P1↔T1 matrix at implementation start and before merge covering complete
+payload boundaries, destination/provider rules, encoding/newline behavior,
+script metadata, native exits, generated-byte evidence, Node/action
+foundations, and deliberate repository-specific differences. Record exact
+commits and classify every row as `same`, `intentional difference`, or
+`blocker`. T1A should then add a P1A↔T1A validator matrix, and T1B should add a
+P1B↔T1B writer matrix, rather than beginning comparison in the middle of the
+slate.
+
+Artifact names, frontmatter contents, and repository paths can remain
+intentional differences. Unexplained generator byte/error differences cannot.
+
 ### T1B-01: Define a collision-free four-cell attestation channel
 
 T1B's approval job must verify:
@@ -221,6 +311,51 @@ Using four unique matrix-output names is sufficient if implemented exactly.
 Four explicit jobs or four immutable success-attestation artifacts can also
 work, but the latter changes the action-role table and artifact-retention
 contract. Do not use one shared “matrix result” output.
+
+P1B already defines the reusable static-output pattern:
+`attestation_desktop_lf`, `attestation_desktop_crlf`,
+`attestation_core_lf`, and `attestation_core_crlf`. TerraformStyleGuide may use
+repository-appropriate names, but it should preserve the same collision-free
+identity and exact-key-set behavior.
+
+### T1B-02: Reconcile exact-push credential claims with job-scoped permissions
+
+T1's temporary writer and T1B's final writer both give their job
+`contents: write`, disable checkout persistence, and say the write credential
+is exposed only for the exact push.
+
+`persist-credentials: false` prevents checkout from leaving its token
+configured for later Git commands; it does not shorten the lifetime or
+permissions of the job's `GITHUB_TOKEN`. GitHub creates that token before the
+job, applies `permissions` at workflow/job—not step—scope, and warns that an
+action can access `github.token` even when the workflow does not explicitly
+pass it. The current wording therefore promises a stronger credential
+boundary than GitHub's job token provides.
+
+Choose and specify one honest design:
+
+- If the job-scoped write `GITHUB_TOKEN` remains, say that it exists for the
+  complete minimal writer job. Limit the enforceable guarantee to no persisted
+  Git credential and no explicit token materialization into a process/file
+  except the push. Minimize and fully allowlist every step that can run in that
+  job.
+- For a true push-step-only write credential, keep the job token read-only and
+  pass a separately governed, environment-protected, least-privileged
+  credential only in the push step. Define its issuer, repository/ref scope,
+  rotation/revocation, approval, masking, and negative tests. Account for any
+  new secret or token-minting action in the affected files and exact role
+  table.
+- A minimal final write job is also defensible, but the issue must specify
+  exactly what cryptographic evidence it trusts from the read-only
+  revalidation job and must not imply that job permissions vary by step.
+
+Whichever model is selected, test the actual boundary and update both T1's
+temporary publication contract and T1B's final contract consistently.
+
+P1B selects the first model and states its boundary honestly: the write-capable
+job token exists for the whole minimal writer job, while checkout persistence
+and explicit token materialization are prohibited except for the exact push.
+Using that same model in T1/T1B would reduce cross-repository policy drift.
 
 ### T1A-01: Define the script-version metadata that later issues validate
 
@@ -260,15 +395,46 @@ both forbidden forms fail before filesystem work.
 
 Recommended correction:
 
-- Add one explicit-null ID for each optional label.
+- Add one explicit-null ID for each optional label. P1A uses `X-01..03` for
+  empty values and `X-04..06` for explicit null values; matching that stable
+  division would make the reciprocal matrix mechanical.
 - Require the stable `parameter` phase, exact rejected parameter name,
   candidate absence, and proof that download enumeration/archive open did not
   start.
 - Keep the three empty-string cases. Null and empty can share the same
   rejection result, but not the same test input.
-- Add these cases to the reciprocal P1/Terraform comparison. If P1 keeps a
-  narrower empty-only public contract, classify that difference explicitly
-  rather than claiming the contracts are identical.
+- Add these cases to the reciprocal P1A↔T1A comparison and require exact
+  agreement on omission, empty, and explicit-null behavior.
+
+### T1A-03: Give the harness an exact context-manager dependency
+
+The permanent harness accepts only mandatory `HelperPath`, yet T1A requires
+every fixture to live under a context created by the production
+`New-StyleGuideCandidateInvocationContext` function. That function is defined
+in a different new script. The issue never says how the harness locates,
+loads, or version-checks that script.
+
+Without a public input, an implementation must derive a sibling path, depend
+on caller session state, search an ambient location, or reimplement context
+creation. Each option weakens T1A's “exact tracked production code” claim and
+makes T1B's workflow invocation ambiguous.
+
+Recommended correction:
+
+- Add mandatory scalar `ContextManagerPath` to the harness, matching P1A's
+  explicit `HelperPath` plus `ContextManagerPath` contract.
+- Resolve both supplied paths once as exact tracked ordinary non-reparse
+  files, validate their expected script versions, and dot-source only those
+  resolved paths.
+- Reject missing, relative, wildcard, wrong-provider, substituted, or duplicate
+  identities before fixture creation.
+- Make every local and T1B workflow call pass both exact paths.
+- Add a stable negative case for a wrong/substituted context-manager path and
+  prove no fixture root is created.
+
+Do not fold caller-context functions into the archive helper merely to avoid a
+second explicit dependency; their separate ownership and cleanup roles are a
+strength.
 
 ### T2-01: Make the displayed provider blocks satisfy T2's own shell contract
 
@@ -359,6 +525,11 @@ selects Node, not one exact npm CLI. Node 22 and Node 24 can arrive with
 different bundled npm versions, so the issue must either define how the same
 npm is selected in every cell or stop promising one npm across cells.
 
+P3 makes both choices executable: it uses a finite Node semver union and
+installs/asserts one exact npm CLI in every cell, with one normative lockfile
+producer. T3 should reuse that policy shape unless TerraformStyleGuide records
+a repository-specific reason to differ.
+
 Recommended correction:
 
 - Express the reviewed Node lines as an exact semver union. For a final 22/24
@@ -419,16 +590,20 @@ use `-backup=<fresh-protected-path>` only for the supported local-state form.
 
 ## Recommended disposition
 
-After the corrections above, the slate is handoff-ready without changing its
-default order:
+First choose one advisory-policy order as required by S-01. Under the prompt's
+stipulated sequence, record the risk decision that permits the existing
+findings to remain until T3 and keep:
 
-1. **T1** — first reconcile the exact base commit, then make generator bytes,
-   LF policy, temporary workflow roles, action pins, native-command behavior,
-   and script metadata exact.
-2. **T1A** — add the helper/context/harness with explicit null-label cases and
-   defined versions.
+1. **T1** — reconcile the exact base commit, then make generator destinations/
+   bytes, LF policy, temporary workflow roles, action pins, native-command
+   behavior, credential claims, script metadata, and the P1↔T1 comparison
+   exact.
+2. **T1A** — add the helper/context/harness with explicit empty and null-label
+   cases and defined versions, pass the exact context-manager path into the
+   harness, and complete the P1A↔T1A matrix.
 3. **T1B** — replace the temporary role table atomically, define the four-cell
-   attestation channel, and activate the immutable candidate/writer topology.
+   attestation channel, choose an accurate credential-lifetime model, and
+   activate the immutable candidate/writer topology with a P1B↔T1B matrix.
 4. **T2** — make the seven Bash blocks internally complete and permanently
    test their exact snapshots, destinations, identifiers, and secret handling.
 5. **T3** — remediate packages with audit-native identities, fail-closed graph
@@ -437,11 +612,9 @@ default order:
 6. **T4** — consolidate destructive-state guidance and either test the
    PowerShell equivalent fully or narrow the copyable contract to Bash.
 
-Keep T3's existing policy gate: if a real repository or organization policy
-forbids carrying the current high findings through T1/T1A/T1B/T2, execute the
-complete T3 issue first and rebaseline every later issue on its exact merge
-commit. Do not introduce an informal partial package update or another
-unmodeled sequence.
+If a real policy forbids carrying the current high findings through T2, do not
+call T3 an optional exception inside this sequence. Move/renumber the complete
+T3 issue, rewrite all dependencies, and hand off that single alternate slate.
 
 When the drafts are filed, replace title-only dependency references with the
 actual issue URLs and GitHub blocked-by relationships. Preserve exact merge
@@ -453,7 +626,8 @@ commit links for implementation evidence.
 - The T1/T1A/T1B decomposition and exact prerequisite commits.
 - Complete-payload normalization immediately before BOM-less UTF-8
   serialization.
-- Behavior-first P1/Terraform convergence without a shared runtime package.
+- Behavior-first comparison of P1/P1A/P1B with T1/T1A/T1B without a shared
+  runtime package.
 - The same-stream artifact digest/ZIP identity.
 - Full-component containment/link checks and fail-closed journal cleanup.
 - Stable adversarial helper IDs and real link/reparse coverage on both OS
@@ -470,10 +644,14 @@ commit links for implementation evidence.
 
 ## Primary references
 
-- [TerraformStyleGuide reviewed planning commit](https://github.com/franklesniak/TerraformStyleGuide/commit/490bfe19ecf7c7007a8cf7db59888986a3637ac9)
+- [TerraformStyleGuide reviewed planning commit](https://github.com/franklesniak/TerraformStyleGuide/commit/4c7bb1cecc9c392dd9b95db9387e81645d97c888)
+- [TerraformStyleGuide reviewed `main` commit](https://github.com/franklesniak/TerraformStyleGuide/commit/6ee3f57b2b71b885a5927b770dde47532944de62)
 - [Git: `gitattributes`](https://git-scm.com/docs/gitattributes)
+- [PowerShell unresolved provider path API](https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.pathintrinsics.getunresolvedproviderpathfrompspath)
 - [GitHub Actions workflow syntax: matrix job outputs](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#using-job-outputs-in-a-matrix-job)
 - [GitHub Actions contexts: matrix strategy metadata](https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#strategy-context)
+- [GitHub: use `GITHUB_TOKEN` for authentication](https://docs.github.com/en/actions/tutorials/authenticate-with-github_token)
+- [GitHub Actions workflow token permissions](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#permissions)
 - [PowerShell preference variables](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_preference_variables)
 - [npm: `npm audit`](https://docs.npmjs.com/cli/v11/commands/npm-audit/)
 - [npm: `package.json` engines](https://docs.npmjs.com/cli/v11/configuring-npm/package-json#engines)

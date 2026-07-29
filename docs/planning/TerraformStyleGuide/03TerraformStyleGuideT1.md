@@ -9,16 +9,30 @@ external action to a reviewed full commit SHA, and add review-only GitHub
 Actions dependency updates.
 
 This issue establishes foundations only. It does not add the candidate ZIP
-validator or activate the new artifact-promotion writer.
+validator or activate the new artifact-promotion writer. It also establishes
+the reciprocal generator-layer contract with PSStyleGuide without introducing
+a shared cross-repository runtime dependency.
 
 ## Execution order
 
-This is the first issue in the TerraformStyleGuide slate.
+This is the first issue in the default TerraformStyleGuide slate order.
+
+Before implementation, record a dated repository-policy decision for the
+current npm advisory state. The record must name the audit command/tool
+versions, high-severity findings, decision owner, evidence date, accepted
+waiting period, and selected order.
+
+- If policy permits the findings to remain temporarily, use the default order.
+- If policy requires immediate remediation, implement **Remediate Markdown lint
+  dependency advisories and add npm update governance** first. Then record that
+  issue's actual merge commit and rebaseline this issue's Node, action,
+  workflow, package, affected-file, and validation assumptions before editing.
 
 After it merges:
 
 1. implement **Add a fail-closed cross-platform style-guide candidate
-   validator** against this exact merge commit; then
+   validator** against T1's actual merge commit and record that consumed commit
+   in the T1A issue/pull request; then
 2. implement **Promote generated style-guide artifacts through a
    least-privileged verified writer** against both exact prerequisite commits.
 
@@ -141,10 +155,6 @@ disposition, npm update policy, and contributor minimum belong to
 **Remediate Markdown lint dependency advisories and add npm update
 governance**.
 
-If repository policy prohibits carrying the current high-severity advisories,
-execute that npm issue first and rebaseline this issue to its exact merge
-commit.
-
 ### 5. Pin and allowlist the current external actions
 
 Immediately before implementation, resolve these release tags from their
@@ -222,8 +232,16 @@ least-privilege split:
 - put the existing direct commit/push behavior in a separate job that is
   eligible only for a push to `main`;
 - give only that push-only job `contents: write`;
-- disable persisted checkout credentials everywhere and expose its write
-  credential only for the existing exact push step;
+- disable persisted checkout credentials everywhere;
+- retain a credential-free HTTPS origin and prohibit credential-bearing remote
+  URLs, credential helpers, command arguments, and persisted Git config;
+- bind `github.token` as a masked environment secret only on the exact push
+  step;
+- inside that step, construct one Basic authorization header in memory and
+  expose it to only the `git push` child through process-scoped
+  `GIT_CONFIG_COUNT`, `GIT_CONFIG_KEY_0`, and `GIT_CONFIG_VALUE_0`;
+- clear the token/header/config environment in `finally` and run every
+  preflight, diff, ref/object, and post-push diagnostic without it;
 - prohibit new secrets or external actions; and
 - document that T1B replaces this temporary direct-publication job with the
   final unfiltered artifact, matrix, approval, and exact-lease topology.
@@ -232,6 +250,10 @@ The temporary push-only job must still start from the exact triggering SHA,
 stage only the four generated artifacts, and stop on any other changed path.
 It does not claim the immutable-candidate, four-local identity, or exact-lease
 properties that T1B will establish.
+
+Call this job the **temporary pre-promotion writer** in workflow comments and
+evidence. T1B must delete, not disable or retain as fallback, every temporary
+generation/commit/push step. Version control is the rollback mechanism.
 
 The Markdown workflow remains read-only and runs for every pull request
 targeting `main`.
@@ -265,6 +287,30 @@ identical hashes before merge.
 Add controlled temporary fixtures proving CRLF and lone CR are converted to LF
 at each complete-payload boundary. Restore test-owned state in `finally`.
 
+### Reciprocal PSStyleGuide generator-layer matrix
+
+At implementation start and again before merge, record the exact reviewed
+PSStyleGuide commit and the current generator-layer location (the exact P1
+section or its eventual P1 generator issue identifier). Compare:
+
+| Contract row | Required evidence |
+| --- | --- |
+| public generator parameters | names, types, defaults, omission rules |
+| destination resolution | one filesystem path; wildcard, provider, missing, and multi-match behavior |
+| content assembly | source order, wrapper/frontmatter, and final payload |
+| byte serialization | CRLF/lone-CR normalization, LF, UTF-8 without BOM, final-newline behavior |
+| write boundary | exactly one explicit complete-payload write per artifact |
+| failure destination state | preexisting/absent destination postcondition and diagnostics |
+| edition/host tests | Windows PowerShell 5.1 and PowerShell 7 evidence |
+
+For every row, record PS evidence, Terraform evidence, status (`same`,
+`intentional difference`, or `blocker`), and rationale. Identical
+security/error/byte behavior is the default. Repository paths, manifest names,
+and workflow topology may differ intentionally. Every deliberate difference
+requires a repository-specific reason and stable evidence; every unexplained
+difference blocks merge. Add a short human-readable summary above the complete
+matrix. Store it in the pull request or a tracked planning artifact.
+
 ### Node and lint
 
 From `.github/workflows`:
@@ -288,6 +334,10 @@ Prove:
   repository, duplicate use, extra workflow, and swapped role;
 - Dependabot has exactly one permitted entry;
 - workflow permissions did not broaden; and
+- the push credential is referenced only by the exact temporary push step,
+  never appears in a remote/config/argument/log, and every diagnostic is
+  credential-free;
+- exactly one temporary contents-writing push path exists; and
 - generated artifact blobs are unchanged.
 
 ### Exact scope gate
@@ -320,8 +370,13 @@ intentional paths.
 - [ ] Dependabot has exactly one review-only GitHub Actions entry for `/`.
 - [ ] No new writer, candidate download, helper, approval job, secret, or
       external action is activated.
+- [ ] The temporary writer uses only process-scoped environment-backed HTTP
+      authorization for the exact push and stores no credential.
+- [ ] The reciprocal generator-layer matrix has no unexplained blocker.
 - [ ] The exact working/staged path gates contain only the five affected files.
-- [ ] The pull request records the exact merge commit consumed by T1A.
+- [ ] T1A is required to record and validate this issue's actual merge commit;
+      this pull request records its reviewed head and successor handoff, not an
+      unknowable future merge commit.
 
 ## Non-goals
 

@@ -16,8 +16,10 @@ recursively deleting it.
 ## Dependency
 
 Implement only after **Make artifact generation byte-deterministic and
-standardize repository text checkouts on LF** merges. Record and validate the
-exact prerequisite merge commit before work.
+standardize repository text checkouts on LF** merges. Record and validate T1's
+actual merge commit before work. This issue records its reviewed head and
+requires T1B to consume its eventual merge commit; it does not claim to know
+that future value.
 
 The next issue, **Promote generated style-guide artifacts through a
 least-privileged verified writer**, activates these scripts in workflows.
@@ -267,8 +269,13 @@ Enforce before extraction:
 - at most 32 MiB retained archive length; and
 - no negative, overflowed, inconsistent, or unreadable length.
 
-Count actual copied bytes and stop at the same per-entry/total limits. A
-declared length is not trusted proof of actual output.
+“At most” is inclusive. Accumulate declared and actual lengths with checked
+64-bit arithmetic. Count actual copied bytes and stop on the first byte that
+would exceed the same per-entry/total limits. A declared length is not trusted
+proof of actual output. Tests generate large ordinary fixtures
+streamingly/sparsely beneath the disposable context; do not commit large
+expanded blobs. Use fixed reviewed raw ZIP bytes, with recorded SHA-256 and
+construction rationale, only for metadata states `ZipArchive` cannot create.
 
 ### 8. Create and extract only fresh ordinary files
 
@@ -317,37 +324,128 @@ nothing further, retain the path, and emit primary plus cleanup diagnostics.
 ### 10. Implement the permanent stable-ID harness
 
 `Test-Expand-StyleGuideCandidateArtifact.ps1` accepts mandatory scalar
-`HelperPath`. It resolves that exact tracked helper once as an ordinary
-non-reparse file and uses the absolute path for every child-script invocation.
-It creates every fixture beneath one new caller context and cleans only proven
-owned fixture state in `finally`.
+`HelperPath` and `ContextManagerPath`. It resolves both exact tracked scripts
+once as ordinary non-reparse files, requires their expected version markers,
+and uses only those normalized absolute paths for child-script invocations.
+For each path, reject missing, relative, wildcard, non-filesystem-provider,
+multiple-resolution, wrong-type, untracked, and reparse resolutions. A
+filesystem-provider-qualified absolute path is valid. The harness creates every
+fixture beneath one context produced by the exact supplied context manager and
+cleans only proven owned fixture state in `finally`.
 
 The harness may dot-source the helper once for the deterministic cleanup cases
 and call `Remove-StyleGuideCandidateInvocationState`. It may not reimplement
 path, digest, archive, manifest, extraction, or cleanup logic.
 
 Every case emits its stable ID, platform, phase, expected/actual outcome,
-initial candidate state, final candidate state before harness teardown,
-required diagnostics, and outside-sentinel result.
+initial candidate state, final candidate and caller-context state before
+harness teardown, required diagnostics, and outside-sentinel result. The
+harness contains matching machine-readable metadata and fails for a missing,
+duplicate, unexpected, or multiply emitted applicable ID. IDs are append-only:
+do not renumber a surviving behavior.
 
-Mandatory IDs:
+Unless a row states success, its exact oracle is a nonzero failure in the named
+phase, no unproved deletion, unchanged outside sentinel, and candidate/context
+state exactly as stated. Parameter/download failures perform no archive work.
 
-| IDs | Mandatory coverage |
-| --- | --- |
-| `V-01..02` | exact valid archive; valid archive with symlink-like external attributes ignored |
-| `P-01..02` | checkout sibling-prefix; filesystem-provider-qualified absolute path |
-| `D-01..02` | digest failure with all labels; equivalent failure with all labels omitted/`unavailable` |
-| `Z-01` | invalid/truncated ZIP with matching digest |
-| `M-01..14` | missing, extra, exact duplicate, case collision, both nesting separators, both traversal separators, leading slash, leading backslash, drive qualification, directory entry, file/directory collision, raw empty name |
-| `E-01..10` | outside root, equal roots, each overlap direction, relative, non-filesystem provider, Windows/Linux case behavior, root/ancestor link, below-root link, hidden/system extra download entry |
-| `L-01..04` | preexisting file, directory, live link/reparse leaf, dangling link |
-| `B-01..02` | post-extraction BOM and CR |
-| `K-01..02` | mandatory unjournaled ordinary child retention; supported link/reparse substitution retention |
-| `X-01..03` | explicitly empty `ArtifactId`, `RunId`, and `RunAttempt` |
-
-Each slash direction, overlap direction, leaf type, and explicit-empty label is
-an independent row. Use a fixed reviewed raw ZIP for `M-14` if `ZipArchive`
-cannot create the empty-name fixture.
+| ID | Fixture/invocation | Exact pre-teardown oracle |
+| --- | --- | --- |
+| `V-01` | exact four-entry valid archive | success; four exact files; both production cleanups succeed |
+| `V-02` | valid entries with symlink-like external attributes | success; attributes ignored; four ordinary files |
+| `P-01` | checkout sibling-prefix path | `containment`; candidate absent |
+| `P-02` | filesystem-provider-qualified absolute inputs | success; normalized paths equal native-path control |
+| `D-01` | digest mismatch with all labels supplied | `digest`; candidate absent; all labels in diagnostics |
+| `D-02` | same mismatch with all labels omitted | `digest`; candidate absent; labels are `unavailable` |
+| `D-03` | 63-hex expected digest | `parameter`; candidate absent; archive unopened |
+| `D-04` | 64 characters containing nonhex | `parameter`; candidate absent; archive unopened |
+| `D-05` | `sha256:`-prefixed digest | `parameter`; candidate absent; archive unopened |
+| `Z-01` | invalid/truncated ZIP with matching digest | `archive`; candidate absent |
+| `M-01` | one required entry missing | `manifest`; candidate absent |
+| `M-02` | one extra entry | `manifest`; candidate absent |
+| `M-03` | exact duplicate name | `manifest`; candidate absent |
+| `M-04` | case-insensitive name collision | `manifest`; candidate absent |
+| `M-05` | nested name using `/` | `manifest`; candidate absent |
+| `M-06` | nested name using `\` | `manifest`; candidate absent |
+| `M-07` | traversal name using `/` | `manifest`; candidate absent |
+| `M-08` | traversal name using `\` | `manifest`; candidate absent |
+| `M-09` | leading `/` | `manifest`; candidate absent |
+| `M-10` | leading `\` | `manifest`; candidate absent |
+| `M-11` | drive-qualified name | `manifest`; candidate absent |
+| `M-12` | directory entry | `manifest`; candidate absent |
+| `M-13` | file/directory collision | `manifest`; candidate absent |
+| `M-14` | fixed reviewed raw ZIP with empty name | `manifest`; candidate absent; fixture SHA recorded |
+| `E-01` | download/candidate outside trusted root | `containment`; candidate absent |
+| `E-02` | checkout and trusted roots equal | `root`; candidate absent |
+| `E-03` | checkout contains trusted root | `root`; candidate absent |
+| `E-04` | trusted root contains checkout | `root`; candidate absent |
+| `E-05` | relative working/root path | `parameter`; candidate absent |
+| `E-06` | non-filesystem provider path | `parameter`; candidate absent |
+| `E-07` | Windows case-variant containment | Windows ordinal-ignore-case oracle |
+| `E-08` | Linux case-variant containment | Linux ordinal oracle |
+| `E-09` | root or ancestor link/reparse component | `root`; candidate absent |
+| `E-10` | below-root link/reparse component | applicable path phase; candidate absent |
+| `E-11` | hidden/system extra download entry | `download`; candidate absent |
+| `E-12` | wildcard root/working path | `parameter`; candidate absent |
+| `E-13` | multiple-resolution path | `parameter`; candidate absent |
+| `E-14` | missing required root/path | applicable path phase; candidate absent |
+| `E-15` | file where directory required | applicable path phase; candidate absent |
+| `L-01` | preexisting ordinary candidate file | `destination`; leaf unchanged |
+| `L-02` | preexisting candidate directory | `destination`; leaf unchanged |
+| `L-03` | live link/reparse candidate leaf | `destination`; target and leaf unchanged |
+| `L-04` | dangling link candidate leaf | `destination`; link unchanged |
+| `B-01` | extracted file begins with UTF-8 BOM | `post-extraction`; owned partial removed |
+| `B-02` | extracted file contains `0x0D` | `post-extraction`; owned partial removed |
+| `K-01` | unjournaled ordinary candidate child | `cleanup`; candidate retained; delete nothing further |
+| `K-02` | supported link/reparse substitution | `cleanup`; candidate retained; target unchanged |
+| `K-03` | repeated candidate cleanup after safe removal | success/no-op; no unrelated deletion |
+| `K-04` | primary failure then candidate-cleanup failure | both reasons reported; uncertain state retained |
+| `C-01` | normal caller-context teardown | success; journaled entries removed deepest first |
+| `C-02` | repeated caller-context teardown | success/no-op under disposed-context contract |
+| `C-03` | unjournaled ordinary context entry | `cleanup`; entire uncertain context retained |
+| `C-04` | link/reparse substitution in context | `cleanup`; context/target retained unchanged |
+| `C-05` | missing/unreadable journaled context entry | `cleanup`; no further deletion |
+| `C-06` | primary failure then caller-cleanup failure | primary prominent; cleanup and retained root reported |
+| `C-07` | proven partial ordinary ownership journal | success; only journaled entries removed nonrecursively |
+| `C-08` | candidate cleanup then context cleanup | success; exact production lifecycles invoked in order |
+| `R-01` | entry one byte below 8 MiB | manifest passes; content oracle continues |
+| `R-02` | entry exactly 8 MiB | inclusive boundary passes |
+| `R-03` | declared entry one byte above 8 MiB | `manifest`; candidate absent |
+| `R-04` | actual entry exceeds permitted/declared bytes | `extraction`; stop at first excess; owned partial removed |
+| `R-05` | declared total one byte below 32 MiB | manifest passes |
+| `R-06` | declared total exactly 32 MiB | inclusive boundary passes |
+| `R-07` | declared total one byte above 32 MiB | `manifest`; candidate absent |
+| `R-08` | actual cumulative output exceeds 32 MiB | `extraction`; stop at first excess; owned partial removed |
+| `R-09` | retained archive exactly 32 MiB | inclusive archive boundary proceeds |
+| `R-10` | retained archive one byte above 32 MiB | pre-ZIP limit failure; candidate absent |
+| `R-11` | raw ZIP with negative/inconsistent length state | `manifest`; candidate absent; fixture SHA recorded |
+| `R-12` | length arithmetic overflow fixture | `manifest`; checked overflow; candidate absent |
+| `R-13` | retained archive one byte below 32 MiB | archive boundary proceeds |
+| `W-01` | empty download directory | `download`; candidate absent |
+| `W-02` | two top-level download entries | `download`; candidate absent |
+| `W-03` | directory as sole download entry | `download`; candidate absent |
+| `W-04` | link/reparse as sole download entry | `download`; target unchanged; candidate absent |
+| `W-05` | unreadable/unclassifiable download entry | `download`; candidate absent |
+| `S-01` | missing helper script path | harness input failure before context creation |
+| `S-02` | wildcard helper path | harness input failure before context creation |
+| `S-03` | non-filesystem helper path | harness input failure before context creation |
+| `S-04` | multiple-resolution helper path | harness input failure before context creation |
+| `S-05` | reparse/untracked helper path | harness input failure before context creation |
+| `S-06` | missing context-manager path | harness input failure before context creation |
+| `S-07` | wildcard context-manager path | harness input failure before context creation |
+| `S-08` | non-filesystem context-manager path | harness input failure before context creation |
+| `S-09` | multiple-resolution context-manager path | harness input failure before context creation |
+| `S-10` | reparse/untracked context-manager path | harness input failure before context creation |
+| `S-11` | both scripts provider-qualified and valid | exact tracked versions resolve and proceed |
+| `X-01` | explicit empty `ArtifactId` | `parameter`; candidate absent |
+| `X-02` | explicit empty `RunId` | `parameter`; candidate absent |
+| `X-03` | explicit empty `RunAttempt` | `parameter`; candidate absent |
+| `X-04` | explicit null `ArtifactId` | `parameter`; candidate absent |
+| `X-05` | explicit null `RunId` | `parameter`; candidate absent |
+| `X-06` | explicit null `RunAttempt` | `parameter`; candidate absent |
+| `X-07` | valid nonempty labels | selected failure preserves exact label text |
+| `X-08` | array/object supplied as `ArtifactId` | native binding or `parameter` failure; no filesystem work |
+| `X-09` | array/object supplied as `RunId` | native binding or `parameter` failure; no filesystem work |
+| `X-10` | array/object supplied as `RunAttempt` | native binding or `parameter` failure; no filesystem work |
 
 Required postconditions:
 
@@ -359,6 +457,10 @@ Required postconditions:
 - unrelated sentinels remain unchanged; and
 - digest mismatch occurs before ZIP construction.
 
+Both production cleanup lifecycles must be exercised independently and in one
+combined failure path. A primary failure followed by cleanup failure reports
+both without replacing the primary reason.
+
 A narrowly justified link-primitive skip names the case, platform, and reason
 and is not a pass. At least one real link/reparse rejection must execute on
 each OS family.
@@ -366,7 +468,9 @@ each OS family.
 ## Reciprocal PSStyleGuide comparison
 
 At implementation start and before merge, compare the then-current
-PSStyleGuide P1 issue/implementation and this issue across:
+PSStyleGuide **candidate-validation layer** and this issue. Record the exact PS
+commit and current location: the P1 candidate-validation section or its
+eventual P1A identifier. Compare:
 
 - public parameters and omission/empty rules;
 - archive identity and digest;
@@ -376,10 +480,11 @@ PSStyleGuide P1 issue/implementation and this issue across:
 - diagnostics/stable IDs/skips/postconditions; and
 - platform/edition support.
 
-For each row record P1 evidence, Terraform evidence, status (`same`,
-`intentional difference`, `blocker`), and rationale. Repository paths,
+For each row record PS candidate-layer evidence, Terraform evidence, status
+(`same`, `intentional difference`, `blocker`), and rationale. Repository paths,
 manifest filenames/bytes, and workflow topology may differ intentionally.
-Unexplained security/error behavior differences block merge.
+Unexplained security/error behavior differences block merge. The semantic
+layer name remains stable if PS planning files are renamed or split.
 
 Store the completed matrix in the pull request or a tracked planning artifact.
 The repositories remain self-contained; do not introduce a shared runtime
@@ -404,6 +509,8 @@ Also perform static checks proving:
 - no ambient root derivation from current directory or GitHub environment;
 - one definition of each exact cleanup function;
 - normal helper and harness call the same candidate cleanup;
+- the harness resolves the supplied helper and context-manager paths once and
+  invokes only those exact tracked versions;
 - every exact enumeration includes hidden/system entries;
 - only the three affected files changed/staged; and
 - generator outputs/workflows remain unchanged.
@@ -431,11 +538,19 @@ prove it is absent from the final changed/staged path set.
 - [ ] Post-extraction BOM/CR/type/content checks pass.
 - [ ] Every mandatory stable ID has one explicit oracle and pre-teardown
       postcondition.
+- [ ] The machine-readable harness inventory exactly equals the normative
+      one-row-per-ID table, with no renumbered surviving behavior.
+- [ ] Declared and actual resource boundaries pass below/exact cases and reject
+      above/overflow/deceptive cases as specified.
+- [ ] Both cleanup lifecycles pass independent and combined
+      primary-plus-cleanup-failure cases.
 - [ ] Real link/reparse rejection executes on both OS families.
-- [ ] The reciprocal P1/Terraform matrix has no unexplained blocker.
+- [ ] The reciprocal PS candidate-validation-layer/Terraform matrix has no
+      unexplained blocker.
 - [ ] The final path gate contains exactly the three affected files.
 - [ ] No production workflow consumes the new scripts yet.
-- [ ] The pull request records the exact T1A merge commit consumed by T1B.
+- [ ] T1B is required to record and validate this issue's actual merge commit;
+      this pull request records its reviewed head and successor handoff.
 
 ## Non-goals
 

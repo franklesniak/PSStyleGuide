@@ -1,6 +1,9 @@
 # Make the non-compliant blank-line example visibly distinct
 
-> **Dependency:** Implement this issue only after **Make artifact generation byte-deterministic across PowerShell editions and hosts** has merged. When both issues have been filed, record the GitHub blocked-by relationship using the actual prerequisite issue.
+> **Dependency:** Implement this issue only after **Promote generated
+> style-guide artifacts through a least-privileged verified writer** (P1B) has
+> merged. When the issues have been filed, record the real blocked-by
+> relationship to P1B.
 
 ## Summary
 
@@ -14,63 +17,33 @@ This originated from the cross-repository work tracked in [franklesniak/copilot-
 
 ## Prerequisite
 
-Complete and merge **P1: Make artifact generation byte-deterministic across
-PowerShell editions and hosts** before starting. Base P2 on that merged result.
-At filing, replace this title-only draft reference with P1's actual issue URL
-and mark P2 blocked by P1 using GitHub's issue relationship.
+Complete and merge P1B before starting. P1B already depends on exact P1 and
+P1A merge commits, so it is P2's one final prerequisite. At filing, replace
+the title-only reference with P1B's actual issue URL and mark P2 blocked by
+P1B.
 
-At implementation start, confirm these P1 interfaces and invariants:
+At implementation start, record P1B's exact merge commit and confirm these
+enduring interfaces/invariants:
 
-- All four generator payloads canonicalize CRLF/lone CR to LF and serialize
-  through resolved paths with BOM-less `UTF8Encoding($false)`;
-  `#Requires -Version 5.1` and `* text=auto eol=lf` remain.
-- The versioned
-  `.github/workflows/Expand-StyleGuideCandidateArtifact.ps1` and
-  `.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1` are the only
-  candidate extraction implementation and permanent fixture owner.
-- Both events cover every `main` pull request/push without path filters, use
-  least-privilege job permissions, and pin checkout, setup-node, upload, and
-  download actions to the approved repository/full-SHA/version tuples with
-  exact workflow/job/stable-step roles, conditions, and complete allowed input
-  sets through the single-source action-role validator.
-- Markdown validation asserts Node major 24, disables automatic
-  package-manager caching, and passes the existing clean install, outer lint,
-  and nested lint commands.
-- Push preparation uploads one immutable `archive: true` candidate and
-  propagates one nonempty artifact ID and 64-hex digest.
-- Every started push consumer selects that exact ID, uses
-  `skip-decompress: true` and `digest-mismatch: error`, creates one unique
-  job-owned trusted temporary root, and passes separate download/candidate
-  paths to the helper.
-- The helper validates mutually separate roots and every existing component
-  from the filesystem volume/share root, repeats the checks at security
-  boundaries, states the job-owned/no-competing-writer model, opens the archive
-  once with `FileShare.Read`, hashes/rewinds/parses that same stream, validates
-  the complete manifest before creation, preserves pre-existing state, and
-  performs fail-closed cleanup of invocation-created output through the exact
-  ownership journal and named production cleanup function.
-- Optional artifact/run labels distinguish omitted, supplied, and explicitly
-  empty values, and the permanent stable-ID table proves their exact
-  diagnostics.
-- The permanent harness definition-only invokes the exact named production
-  cleanup function for its mandatory unsafe ordinary-child fixture, and at
-  least one real component-or-leaf link rejection executes on both Ubuntu and
-  Windows.
-- Pull-request evidence runs the harness under Ubuntu PowerShell 7 and only the
-  two Windows LF cells because helper behavior is source-EOL-independent;
-  neither CRLF cell repeats it. Every four-cell push consumer runs the harness
-  and production helper.
-- Local validation asserts Desktop exactly 5.1 or Core major 7 in the same
-  child process that invokes each harness/generator target.
-- P1's controlled `has_changes=true` synchronization drill—not P2's expected
-  no-drift merge—proves writer integration, and its propagated-digest,
-  malformed-transport, unrelated-trigger, stale-preflight, and exact-lease
-  drills pass without touching `main`.
-- `.github/dependabot.yml` contains the review-only weekly GitHub Actions entry
-  and remains outside P2's affected files.
+- P1's one destination/serialization boundary, BOM-less LF bytes,
+  cross-edition idempotence, script metadata, Node 24/action foundations, and
+  exact LF checkout policy.
+- P1A's exact helper/context/harness versions, same-stream digest/ZIP identity,
+  complete component/path checks, exact four-file manifest, declared/actual
+  resource ceilings, fresh extraction, explicit-null/empty diagnostics, and
+  separate nonrecursive caller/candidate cleanup owners.
+- P1B's unfiltered read-only validation, immutable artifact ID plus bare
+  digest, Ubuntu plus four Windows cells, exact four unique attestations,
+  `always()` terminal approval, at-use regeneration, four-value writer
+  identity, exact remote preflight/parent/lease/refspec, nonpersisted
+  credentials, bounded diagnostics, and sole final action-role table.
+- The complete P1↔T1, P1A↔T1A, and P1B↔T1B matrices have no unexplained
+  blocker.
+- `.github/dependabot.yml` contains exactly the merged review-only GitHub
+  Actions entry and remains outside P2's affected files.
 
-P1 is the source of truth for those implementation details; P2 does not reopen
-or restate their algorithms.
+P1/P1A/P1B remain the source of truth. P2 consumes their merged interfaces and
+does not restate or change their algorithms.
 
 **P3: Remediate Markdown lint dependency advisories and add npm update
 governance** follows P2. It is not a P2 prerequisite, and its package changes
@@ -663,7 +636,10 @@ After merge to `main`, confirm:
 9. The write-enabled synchronization job skips.
 10. No bot synchronization commit is created.
 
-The synchronization consumer's helper integration is established by the prerequisite issue's controlled `has_changes=true` write-path evidence and static inspection; this issue's expected no-drift push skips the synchronization job and executes none of its steps.
+The synchronization consumer's helper/context integration is established by
+P1B's controlled `has_changes=true` write-path evidence and static inspection;
+this issue's expected no-drift push skips the writer and executes none of its
+steps.
 
 If preparation reports changes, treat that as a source/artifact synchronization failure. Do not accept a recovery commit as this issue's expected outcome.
 
@@ -712,11 +688,16 @@ If preparation reports changes, treat that as a source/artifact synchronization 
 - The canonical validator uses the local ordinal-count script block, not an undocumented named function, and the fenced command parses in Windows PowerShell 5.1 and PowerShell 7.
 - Lint, whitespace, and generator-idempotency checks pass.
 - Pull-request Ubuntu verification and its PowerShell 7 helper harness pass.
-- The four-cell pull-request Windows matrix, both LF-cell helper-harness executions, and both lone-CR probes pass.
+- The four-cell pull-request Windows matrix, all four production
+  helper/context/harness executions, exact unique attestations, and inherited
+  P1 lone-CR probes pass.
 - Post-merge consumers use the approved pinned artifact actions.
 - The native digest configuration and the helper's independent digest comparison pass.
-- All four Windows push cells run the tracked deterministic helper harness and production helper.
-- Static inspection and P1's controlled `has_changes=true` drill prove that a started synchronization job runs the same harness/helper sequence before mutation.
+- All four Windows push cells run the exact tracked helper/context/harness and
+  compare the selected fixture's generated bytes to the immutable candidate.
+- Static inspection and P1B's controlled `has_changes=true` drill prove that a
+  started writer runs the exact harness/helper/context/regeneration sequence
+  before mutation.
 - Every production helper invocation receives explicit checkout/trusted roots and caller-owned artifact/run context.
 - The post-merge push matrix validates the exact immutable candidate through
   unique job-owned roots, `FileShare.Read`, the same-held-stream digest/archive

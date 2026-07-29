@@ -35,7 +35,8 @@ At implementation start, verify these merged enduring invariants:
 - the permanent helper harness passes in Ubuntu and all four Windows cells;
 - all external actions equal the merged exact role allowlist;
 - workflows are unfiltered and read-only except the exact-lease writer; and
-- the final reciprocal P1/Terraform matrix and CI run are linked.
+- the final reciprocal generator, candidate-validation, and writer-layer
+  matrices and CI run are linked.
 
 Consume the merged public interfaces and evidence. Do not restate or alter
 helper parameters, cleanup internals, case IDs, workflow roles, or writer
@@ -46,7 +47,7 @@ runtime/package contract rather than the default Node 24 prerequisite.
 
 ## Affected files
 
-Exactly these eight files may change:
+Exactly these nine files may change:
 
 Source files:
 
@@ -63,7 +64,8 @@ Generated files:
 Permanent test integration:
 
 - `.github/workflows/Test-StateRecoveryExamples.sh` — add;
-- `.github/workflows/markdownlint.yml`.
+- `.github/workflows/markdownlint.yml`; and
+- `.github/workflows/Validate-WorkflowPolicy.mjs`.
 
 Do not hand-edit generated files.
 
@@ -99,17 +101,38 @@ state mutation.
 
 For AWS, Azure, and GCS recovery:
 
-- require Bash or a compatible POSIX environment;
+- require Bash through an explicit shebang/runtime guard; select and document
+  the minimum Bash version available on the supported hosted Ubuntu runner;
 - assign each input once before validation;
 - require `RECOVERY_PATH` to be a new absolute POSIX file path;
 - require a protected parent outside version-controlled worktrees and shared
   world-readable temporary locations;
 - use a new path for every attempt;
-- use a subshell and `umask 077`;
+- use a subshell, `set -euo pipefail`, and `umask 077`;
 - reject the destination before provider invocation when
   `[ -e "$RECOVERY_PATH" ] || [ -L "$RECOVERY_PATH" ]`;
-- keep `${RECOVERY_PATH:?...}` in the provider command;
-- use provider-native no-overwrite flags when available; and
+- create one private invocation directory on the destination filesystem with
+  `mktemp -d` beneath the validated protected parent;
+- give the provider one exact absent temporary leaf, not `RECOVERY_PATH`;
+- capture provider failure inside an explicit `if` so strict mode cannot bypass
+  cleanup;
+- on provider failure, delete only the exact journaled partial when the
+  invocation directory contains exactly that ordinary non-link file; remove
+  the now-empty invocation directory nonrecursively;
+- if the partial/root is missing, substituted, linked, unreadable, or contains
+  any unjournaled entry, retain the entire uncertain invocation root and report
+  it as invalid sensitive state;
+- on success, require one nonempty ordinary non-link temporary file, validate
+  it with `terraform show -json`, and publish to the still-absent
+  `RECOVERY_PATH` with GNU
+  `ln --no-target-directory` as a same-filesystem no-replace hard link; never
+  use `--force`, `--backup`, or directory-target semantics;
+- verify temporary/final byte equality, remove only the temporary link and
+  empty invocation directory, and leave one validated final file;
+- fail closed and retain the validated temporary file if no-replace hard-link
+  publication is unsupported;
+- use provider-native no-overwrite flags for the temporary leaf where
+  available; and
 - never auto-select a version.
 
 Explain that `test -e` follows links and can be false for a dangling final
@@ -117,6 +140,19 @@ link, while `test -L` identifies the link. The preflight is not an atomic
 filesystem lock. The model requires a protected parent with no competing
 writer, and the operator remains responsible for choosing a location outside
 Git and inappropriate shared storage.
+
+The final postcondition is exact:
+
+- success: `RECOVERY_PATH` is one validated ordinary non-link file and the
+  private invocation directory is absent;
+- ordinary provider/validation failure: `RECOVERY_PATH` is absent and every
+  proven owned ordinary partial is removed; or
+- ownership/publication uncertainty: `RECOVERY_PATH` is never overwritten,
+  the exact uncertain private root is retained, and the command fails with
+  cleanup plus primary diagnostics.
+
+No recovery block recursively removes, follows, retries into, or reuses a
+failed destination.
 
 Recovered state, API pages, signed/Archivist URLs, and provider diagnostics can
 contain plaintext secrets. Keep them out of Git, logs, issues, tickets, chat,
@@ -165,27 +201,99 @@ Final recovery body:
 
 ```bash
 (
+  set -euo pipefail
   umask 077
 
-  case "${RECOVERY_PATH:?Set RECOVERY_PATH to a new absolute path in a protected directory outside version control.}" in
-    /*) ;;
-    *)
-      printf '%s\n' 'RECOVERY_PATH must be an absolute POSIX path.' >&2
-      exit 1
-      ;;
-  esac
+  download_selected_state() {
+    local destination=$1
+    aws s3api get-object \
+      --bucket acme-corp-terraform-state \
+      --key environments/prod/terraform.tfstate \
+      --version-id "${VERSION_ID:?Set VERSION_ID to the exact S3 VersionId selected for recovery.}" \
+      "$destination"
+  }
 
-  if [ -e "$RECOVERY_PATH" ] || [ -L "$RECOVERY_PATH" ]; then
-    printf 'Refusing to overwrite or follow an existing recovery destination: %s\n' \
-      "$RECOVERY_PATH" >&2
+  recovery_path=${RECOVERY_PATH:?Set RECOVERY_PATH to a new absolute path in a protected directory outside version control.}
+  [[ $recovery_path == /* ]] || {
+    printf '%s\n' 'RECOVERY_PATH must be an absolute POSIX path.' >&2
     exit 1
+  }
+  recovery_parent=${recovery_path%/*}
+  [[ -n $recovery_parent ]] || recovery_parent=/
+  [[ -d $recovery_parent && ! -L $recovery_parent ]] || {
+    printf 'Recovery parent must be an ordinary protected directory: %s\n' \
+      "$recovery_parent" >&2
+    exit 1
+  }
+  [[ ! -e $recovery_path && ! -L $recovery_path ]] || {
+    printf 'Refusing an existing recovery destination: %s\n' "$recovery_path" >&2
+    exit 1
+  }
+
+  recovery_root=$(mktemp -d -- "$recovery_parent/.state-recovery.XXXXXXXX")
+  recovery_temp=$recovery_root/candidate.tfstate
+  published=0
+  retain_on_failure=0
+
+  cleanup_recovery() {
+    local primary_status=$?
+    trap - EXIT HUP INT TERM
+    shopt -s nullglob dotglob
+    local entries=("$recovery_root"/*)
+    if (( published != 0 || retain_on_failure != 0 )); then
+      printf 'Retained invalid or uncertain sensitive recovery state: %s\n' \
+        "$recovery_root" >&2
+    elif (( ${#entries[@]} == 0 )); then
+      if ! rmdir -- "$recovery_root"; then
+        printf 'Retained cleanup-raced sensitive recovery root: %s\n' \
+          "$recovery_root" >&2
+      fi
+    elif (( ${#entries[@]} == 1 )) &&
+      [[ ${entries[0]} == "$recovery_temp" &&
+        -f $recovery_temp && ! -L $recovery_temp ]]; then
+      if rm -- "$recovery_temp"; then
+        if ! rmdir -- "$recovery_root"; then
+          printf 'Retained cleanup-raced sensitive recovery root: %s\n' \
+            "$recovery_root" >&2
+        fi
+      else
+        printf 'Retained undeletable sensitive recovery state: %s\n' \
+          "$recovery_root" >&2
+      fi
+    else
+      printf 'Retained ownership-uncertain sensitive recovery state: %s\n' \
+        "$recovery_root" >&2
+    fi
+    exit "$primary_status"
+  }
+  trap cleanup_recovery EXIT HUP INT TERM
+
+  if download_selected_state "$recovery_temp"; then
+    :
+  else
+    provider_status=$?
+    exit "$provider_status"
   fi
 
-  aws s3api get-object \
-    --bucket acme-corp-terraform-state \
-    --key environments/prod/terraform.tfstate \
-    --version-id "${VERSION_ID:?Set VERSION_ID to the exact S3 VersionId selected for recovery.}" \
-    "${RECOVERY_PATH:?Set RECOVERY_PATH to a new absolute path in a protected directory outside version control.}"
+  shopt -s nullglob dotglob
+  recovery_entries=("$recovery_root"/*)
+  (( ${#recovery_entries[@]} == 1 ))
+  [[ ${recovery_entries[0]} == "$recovery_temp" ]]
+  [[ -f $recovery_temp && ! -L $recovery_temp && -s $recovery_temp ]]
+  terraform show -json "$recovery_temp" >/dev/null
+  if ! ln --no-target-directory -- "$recovery_temp" "$recovery_path"; then
+    retain_on_failure=1
+    printf 'No-replace publication failed; final path was not overwritten: %s\n' \
+      "$recovery_path" >&2
+    exit 1
+  fi
+  published=1
+  [[ -f $recovery_path && ! -L $recovery_path ]]
+  cmp -- "$recovery_temp" "$recovery_path"
+  rm -- "$recovery_temp"
+  rmdir -- "$recovery_root"
+  published=0
+  trap - EXIT HUP INT TERM
 )
 ```
 
@@ -222,30 +330,102 @@ Final recovery body:
 
 ```bash
 (
+  set -euo pipefail
   umask 077
 
-  case "${RECOVERY_PATH:?Set RECOVERY_PATH to a new absolute path in a protected directory outside version control.}" in
-    /*) ;;
-    *)
-      printf '%s\n' 'RECOVERY_PATH must be an absolute POSIX path.' >&2
-      exit 1
-      ;;
-  esac
+  download_selected_state() {
+    local destination=$1
+    az storage blob download \
+      --account-name stacmeterraform \
+      --container-name tfstate \
+      --name environments/prod/terraform.tfstate \
+      --version-id "${AZURE_VERSION_ID:?Set AZURE_VERSION_ID to the exact Azure blob version ID selected for recovery.}" \
+      --file "$destination" \
+      --overwrite false \
+      --auth-mode login
+  }
 
-  if [ -e "$RECOVERY_PATH" ] || [ -L "$RECOVERY_PATH" ]; then
-    printf 'Refusing to overwrite or follow an existing recovery destination: %s\n' \
-      "$RECOVERY_PATH" >&2
+  recovery_path=${RECOVERY_PATH:?Set RECOVERY_PATH to a new absolute path in a protected directory outside version control.}
+  [[ $recovery_path == /* ]] || {
+    printf '%s\n' 'RECOVERY_PATH must be an absolute POSIX path.' >&2
     exit 1
+  }
+  recovery_parent=${recovery_path%/*}
+  [[ -n $recovery_parent ]] || recovery_parent=/
+  [[ -d $recovery_parent && ! -L $recovery_parent ]] || {
+    printf 'Recovery parent must be an ordinary protected directory: %s\n' \
+      "$recovery_parent" >&2
+    exit 1
+  }
+  [[ ! -e $recovery_path && ! -L $recovery_path ]] || {
+    printf 'Refusing an existing recovery destination: %s\n' "$recovery_path" >&2
+    exit 1
+  }
+
+  recovery_root=$(mktemp -d -- "$recovery_parent/.state-recovery.XXXXXXXX")
+  recovery_temp=$recovery_root/candidate.tfstate
+  published=0
+  retain_on_failure=0
+
+  cleanup_recovery() {
+    local primary_status=$?
+    trap - EXIT HUP INT TERM
+    shopt -s nullglob dotglob
+    local entries=("$recovery_root"/*)
+    if (( published != 0 || retain_on_failure != 0 )); then
+      printf 'Retained invalid or uncertain sensitive recovery state: %s\n' \
+        "$recovery_root" >&2
+    elif (( ${#entries[@]} == 0 )); then
+      if ! rmdir -- "$recovery_root"; then
+        printf 'Retained cleanup-raced sensitive recovery root: %s\n' \
+          "$recovery_root" >&2
+      fi
+    elif (( ${#entries[@]} == 1 )) &&
+      [[ ${entries[0]} == "$recovery_temp" &&
+        -f $recovery_temp && ! -L $recovery_temp ]]; then
+      if rm -- "$recovery_temp"; then
+        if ! rmdir -- "$recovery_root"; then
+          printf 'Retained cleanup-raced sensitive recovery root: %s\n' \
+            "$recovery_root" >&2
+        fi
+      else
+        printf 'Retained undeletable sensitive recovery state: %s\n' \
+          "$recovery_root" >&2
+      fi
+    else
+      printf 'Retained ownership-uncertain sensitive recovery state: %s\n' \
+        "$recovery_root" >&2
+    fi
+    exit "$primary_status"
+  }
+  trap cleanup_recovery EXIT HUP INT TERM
+
+  if download_selected_state "$recovery_temp"; then
+    :
+  else
+    provider_status=$?
+    exit "$provider_status"
   fi
 
-  az storage blob download \
-    --account-name stacmeterraform \
-    --container-name tfstate \
-    --name environments/prod/terraform.tfstate \
-    --version-id "${AZURE_VERSION_ID:?Set AZURE_VERSION_ID to the exact Azure blob version ID selected for recovery.}" \
-    --file "${RECOVERY_PATH:?Set RECOVERY_PATH to a new absolute path in a protected directory outside version control.}" \
-    --overwrite false \
-    --auth-mode login
+  shopt -s nullglob dotglob
+  recovery_entries=("$recovery_root"/*)
+  (( ${#recovery_entries[@]} == 1 ))
+  [[ ${recovery_entries[0]} == "$recovery_temp" ]]
+  [[ -f $recovery_temp && ! -L $recovery_temp && -s $recovery_temp ]]
+  terraform show -json "$recovery_temp" >/dev/null
+  if ! ln --no-target-directory -- "$recovery_temp" "$recovery_path"; then
+    retain_on_failure=1
+    printf 'No-replace publication failed; final path was not overwritten: %s\n' \
+      "$recovery_path" >&2
+    exit 1
+  fi
+  published=1
+  [[ -f $recovery_path && ! -L $recovery_path ]]
+  cmp -- "$recovery_temp" "$recovery_path"
+  rm -- "$recovery_temp"
+  rmdir -- "$recovery_root"
+  published=0
+  trap - EXIT HUP INT TERM
 )
 ```
 
@@ -279,31 +459,103 @@ Final recovery body:
 
 ```bash
 (
+  set -euo pipefail
   umask 077
 
-  case "${RECOVERY_PATH:?Set RECOVERY_PATH to a new absolute path in a protected directory outside version control.}" in
-    /*) ;;
-    *)
-      printf '%s\n' 'RECOVERY_PATH must be an absolute POSIX path.' >&2
-      exit 1
-      ;;
-  esac
-
-  if [ -e "$RECOVERY_PATH" ] || [ -L "$RECOVERY_PATH" ]; then
-    printf 'Refusing to overwrite or follow an existing recovery destination: %s\n' \
-      "$RECOVERY_PATH" >&2
-    exit 1
-  fi
-
-  if ! [[ "$GCS_GENERATION" =~ ^[1-9][0-9]*$ ]]; then
+  if ! [[ ${GCS_GENERATION-} =~ ^[1-9][0-9]*$ ]]; then
     printf '%s\n' 'GCS_GENERATION must be a canonical positive decimal.' >&2
     exit 1
   fi
 
-  gcloud storage cp \
-    --no-clobber \
-    "gs://acme-corp-terraform-state/environments/prod/terraform.tfstate#${GCS_GENERATION}" \
-    "${RECOVERY_PATH:?Set RECOVERY_PATH to a new absolute path in a protected directory outside version control.}"
+  download_selected_state() {
+    local destination=$1
+    gcloud storage cp \
+      --no-clobber \
+      "gs://acme-corp-terraform-state/environments/prod/terraform.tfstate#${GCS_GENERATION}" \
+      "$destination"
+  }
+
+  recovery_path=${RECOVERY_PATH:?Set RECOVERY_PATH to a new absolute path in a protected directory outside version control.}
+  [[ $recovery_path == /* ]] || {
+    printf '%s\n' 'RECOVERY_PATH must be an absolute POSIX path.' >&2
+    exit 1
+  }
+  recovery_parent=${recovery_path%/*}
+  [[ -n $recovery_parent ]] || recovery_parent=/
+  [[ -d $recovery_parent && ! -L $recovery_parent ]] || {
+    printf 'Recovery parent must be an ordinary protected directory: %s\n' \
+      "$recovery_parent" >&2
+    exit 1
+  }
+  [[ ! -e $recovery_path && ! -L $recovery_path ]] || {
+    printf 'Refusing an existing recovery destination: %s\n' "$recovery_path" >&2
+    exit 1
+  }
+
+  recovery_root=$(mktemp -d -- "$recovery_parent/.state-recovery.XXXXXXXX")
+  recovery_temp=$recovery_root/candidate.tfstate
+  published=0
+  retain_on_failure=0
+
+  cleanup_recovery() {
+    local primary_status=$?
+    trap - EXIT HUP INT TERM
+    shopt -s nullglob dotglob
+    local entries=("$recovery_root"/*)
+    if (( published != 0 || retain_on_failure != 0 )); then
+      printf 'Retained invalid or uncertain sensitive recovery state: %s\n' \
+        "$recovery_root" >&2
+    elif (( ${#entries[@]} == 0 )); then
+      if ! rmdir -- "$recovery_root"; then
+        printf 'Retained cleanup-raced sensitive recovery root: %s\n' \
+          "$recovery_root" >&2
+      fi
+    elif (( ${#entries[@]} == 1 )) &&
+      [[ ${entries[0]} == "$recovery_temp" &&
+        -f $recovery_temp && ! -L $recovery_temp ]]; then
+      if rm -- "$recovery_temp"; then
+        if ! rmdir -- "$recovery_root"; then
+          printf 'Retained cleanup-raced sensitive recovery root: %s\n' \
+            "$recovery_root" >&2
+        fi
+      else
+        printf 'Retained undeletable sensitive recovery state: %s\n' \
+          "$recovery_root" >&2
+      fi
+    else
+      printf 'Retained ownership-uncertain sensitive recovery state: %s\n' \
+        "$recovery_root" >&2
+    fi
+    exit "$primary_status"
+  }
+  trap cleanup_recovery EXIT HUP INT TERM
+
+  if download_selected_state "$recovery_temp"; then
+    :
+  else
+    provider_status=$?
+    exit "$provider_status"
+  fi
+
+  shopt -s nullglob dotglob
+  recovery_entries=("$recovery_root"/*)
+  (( ${#recovery_entries[@]} == 1 ))
+  [[ ${recovery_entries[0]} == "$recovery_temp" ]]
+  [[ -f $recovery_temp && ! -L $recovery_temp && -s $recovery_temp ]]
+  terraform show -json "$recovery_temp" >/dev/null
+  if ! ln --no-target-directory -- "$recovery_temp" "$recovery_path"; then
+    retain_on_failure=1
+    printf 'No-replace publication failed; final path was not overwritten: %s\n' \
+      "$recovery_path" >&2
+    exit 1
+  fi
+  published=1
+  [[ -f $recovery_path && ! -L $recovery_path ]]
+  cmp -- "$recovery_temp" "$recovery_path"
+  rm -- "$recovery_temp"
+  rmdir -- "$recovery_root"
+  published=0
+  trap - EXIT HUP INT TERM
 )
 ```
 
@@ -425,7 +677,10 @@ The script must:
 - extract only fenced-block bodies without evaluating surrounding Markdown;
 - run `bash -n` on each exact body;
 - execute in one new owned sandbox with a closed test `PATH`;
-- provide non-network `aws`, `az`, `gcloud`, `curl`, and supporting stubs;
+- provide non-network `aws`, `az`, `gcloud`, `curl`, `terraform`, and
+  supporting remote/tool stubs;
+- exercise real same-filesystem `ln`, ordinary-file classification, cleanup,
+  and competing-final behavior; do not stub the no-replace primitive;
 - fail every unexpected executable/network attempt;
 - capture each stub call as a NUL-delimited argv record and ordered call log;
   and
@@ -443,6 +698,35 @@ Mandatory common cases:
 - documented partial-file retention/removal;
 - exact owned cleanup; and
 - no token/state bytes in stdout/stderr/call logs.
+
+Mandatory provider-download lifecycle IDs are append-only and each has one
+machine-readable harness row:
+
+| ID | Stub/filesystem setup | Exact oracle |
+| --- | --- | --- |
+| `AWS-PART-01` | nonzero, no output | final absent; empty private root removed |
+| `AWS-PART-02` | nonzero, ordinary partial | final absent; exact partial/root removed |
+| `AWS-PART-03` | nonzero, substituted/extra entry | final absent; uncertain root retained |
+| `AWS-PART-04` | zero, invalid state | final absent; ordinary temporary state removed |
+| `AWS-PART-05` | zero, valid state | one validated final; private root absent |
+| `AWS-PART-06` | existing/racing final | provider skipped or publication refuses; existing bytes unchanged |
+| `AZURE-PART-01` | nonzero, no output | final absent; empty private root removed |
+| `AZURE-PART-02` | nonzero, ordinary partial | final absent; exact partial/root removed |
+| `AZURE-PART-03` | nonzero, substituted/extra entry | final absent; uncertain root retained |
+| `AZURE-PART-04` | zero, invalid state | final absent; ordinary temporary state removed |
+| `AZURE-PART-05` | zero, valid state | one validated final; private root absent |
+| `AZURE-PART-06` | existing/racing final | provider skipped or publication refuses; existing bytes unchanged |
+| `GCS-PART-01` | nonzero, no output | final absent; empty private root removed |
+| `GCS-PART-02` | nonzero, ordinary partial | final absent; exact partial/root removed |
+| `GCS-PART-03` | nonzero, substituted/extra entry | final absent; uncertain root retained |
+| `GCS-PART-04` | zero, invalid state | final absent; ordinary temporary state removed |
+| `GCS-PART-05` | zero, valid state | one validated final; private root absent |
+| `GCS-PART-06` | existing/racing final | provider skipped or publication refuses; existing bytes unchanged |
+
+Each row also asserts provider argv/version ID, phase/status, temporary/final
+state, required diagnostics, and unchanged outside sentinels. The harness
+rejects missing, duplicate, unexpected, or multiply emitted applicable IDs.
+Shared fixture functions are permitted; provider identity is not collapsed.
 
 Provider cases:
 
@@ -468,18 +752,21 @@ Provider cases:
 A case passes only with the intended reason and postcondition; any nonzero exit
 is not sufficient.
 
-Invoke the exact harness as a stable step in the existing Ubuntu
-`.github/workflows/markdownlint.yml` job after clean install and both lint
-surfaces. Preserve merged:
+Invoke the exact harness as a stable step in the callable Ubuntu
+`.github/workflows/markdownlint.yml` validation workflow after clean install
+and both lint surfaces. The T1B event-owning `build.yml` job therefore gates
+the same event SHA on this result. Preserve merged:
 
 - hosted Node 24 and disabled automatic package-manager cache;
 - exact action pins/role allowlist;
 - read-only permissions;
-- unfiltered triggers;
+- the local `workflow_call` boundary and event-owner triggers;
 - helper harness step; and
 - one ordinary Ubuntu job.
 
-Do not add an external action or a separate workflow.
+Do not add an external action or a separate workflow. Update the exact
+step/job/role fixtures in `Validate-WorkflowPolicy.mjs` atomically; do not add a
+cross-workflow `needs` edge.
 
 ## Local validation
 
@@ -499,8 +786,8 @@ Then:
 4. prove generated artifacts match source and rerun idempotently;
 5. prove package, lockfile, hook, Node policy, lint config, helper/context/
    harness, build workflow, and Dependabot are unchanged;
-6. require the complete working path set to equal the eight affected files;
-7. stage exactly those eight paths;
+6. require the complete working path set to equal the nine affected files;
+7. stage exactly those nine paths;
 8. require cached path equality and LF/BOM/CR policy;
 9. rerun validation from staged content; and
 10. prove no further generator diff.
@@ -530,12 +817,18 @@ and either correct no-op or exact-lease writer behavior.
       short-lived protected config, or artifacts.
 - [ ] Every exact block passes syntax and mandatory non-network behavioral
       cases in the tracked harness.
-- [ ] The permanent harness runs in ordinary read-only Ubuntu CI.
+- [ ] Every AWS/Azure/GCS `*-PART-*` row proves the exact success, ordinary
+      failure cleanup, uncertainty retention, and existing/racing-final
+      postcondition.
+- [ ] The permanent harness runs in the callable same-run read-only Ubuntu
+      validation gate.
 - [ ] Both source files and all four generated files advance consistently and
       pass LF/BOM/lint/idempotence checks.
 - [ ] Local npm validation uses one resolved pair and restores `CI`.
 - [ ] The adjacent destructive-state inventory is explicit and linked to T4.
-- [ ] The changed/staged set equals the eight affected files.
+- [ ] The workflow-policy validator recognizes the exact new stable step
+      without changing the T1B event/permission/writer topology.
+- [ ] The changed/staged set equals the nine affected files.
 
 ## Non-goals
 
@@ -562,3 +855,6 @@ and either correct no-op or exact-lease writer behavior.
 - [HCP Terraform in Europe](https://developer.hashicorp.com/terraform/cloud-docs/europe)
 - [curl config-file grammar](https://curl.se/docs/manpage.html)
 - [GNU Bash manual](https://www.gnu.org/software/bash/manual/bash.html)
+- [GNU ln](https://www.gnu.org/software/coreutils/manual/html_node/ln-invocation.html)
+- [GNU mktemp](https://www.gnu.org/software/coreutils/manual/html_node/mktemp-invocation.html)
+- [Terraform show](https://developer.hashicorp.com/terraform/cli/commands/show)
