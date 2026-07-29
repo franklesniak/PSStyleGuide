@@ -22,17 +22,21 @@ At implementation start, confirm:
 - Writes use resolved paths and BOM-less `UTF8Encoding($false)`.
 - `#Requires -Version 5.1` remains.
 - `.gitattributes` still contains `* text=auto eol=lf`.
-- The generator and `.github/workflows/Expand-StyleGuideCandidateArtifact.ps1` have recorded script versions.
+- The generator, `.github/workflows/Expand-StyleGuideCandidateArtifact.ps1`, and `.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1` have recorded script versions.
 - Every pull request targeting `main` runs read-only Ubuntu and Windows verification.
 - Every push to `main` runs the push pipeline.
 - Neither event has a path filter.
+- Every checkout in the build and Markdown lint workflows uses the approved Node 24 full commit SHA with a matching release comment.
 - Artifact actions are pinned to approved full commit SHAs with matching release comments.
 - Push preparation declares `archive: true`, uploads one immutable candidate, and exposes its ID and SHA-256 digest.
 - Push consumers download only by immutable ID.
 - Native downloads use `skip-decompress: true` and `digest-mismatch: error`.
 - The versioned shared archive-validation helper is the only candidate extraction implementation.
-- Every push consumer passes preparation's propagated upload digest to the helper, which independently compares it with the retained ZIP's SHA-256 before opening the archive.
-- Every push consumer runs the deterministic fixture self-test suite against that exact helper on every run, including the digest-mismatch fixture.
+- The helper receives explicit checkout and trusted temporary roots, confines candidate paths beneath the trusted root and outside the checkout, rejects filesystem indirection, and accepts artifact/run labels only from callers.
+- Every push consumer passes preparation's propagated artifact ID and upload digest to the helper, which independently compares the retained ZIP's SHA-256 with the digest before opening the archive.
+- One tracked, versioned harness owns the deterministic fixture suite.
+- Pull-request verification runs that harness under Ubuntu PowerShell 7 and the two Windows editions in the LF cells.
+- Every push consumer runs that same harness against the exact helper on every run, including digest-mismatch and path-envelope fixtures.
 - The helper validates the full ZIP manifest before creating or writing the candidate directory.
 - The Windows topology contains four actual edition × fixture-EOL cells.
 - Each Windows cell validates only its assigned edition and EOL.
@@ -66,7 +70,7 @@ The generated artifacts must change only through regeneration.
 
 Keep the Compliant heading and fenced block unchanged and copy-ready.
 
-Use content materially equivalent to:
+Use exactly:
 
 **Non-Compliant (blank line contains spaces; visualization only):**
 
@@ -91,8 +95,11 @@ Requirements:
 - Preserve the existing rule and requirement levels.
 - Do not store literal trailing whitespace.
 - Do not add downstream-specific guidance.
+- Preserve this complete canonical snippet exactly once in `STYLE_GUIDE.md` and, after regeneration, exactly once in each generated artifact.
 
 ### 2. Extend `STYLE_GUIDE_RATIONALE.md`
+
+Extend the existing `### Blank Line Usage` section under `## Content Relocated from STYLE_GUIDE.md`; do not create a second Blank Line Usage section.
 
 Explain generically that:
 
@@ -104,6 +111,8 @@ Explain generically that:
 
 Keep operational guidance concise in `STYLE_GUIDE.md` and extended reasoning in `STYLE_GUIDE_RATIONALE.md`.
 
+Do not duplicate the operational Non-Compliant heading or canonical fenced example in the rationale.
+
 ### 3. Advance metadata
 
 At finalization, reread Version and Last Updated from the target branch.
@@ -113,8 +122,7 @@ At finalization, reread Version and Last Updated from the target branch.
 3. Set Revision to `0` when `Major.Minor.Build` changes.
 4. If that `Major.Minor.Build` already exists at Revision `N`, use `N + 1`.
 5. Recompute if the target branch or UTC date changes.
-6. Add the matching top rationale changelog row.
-7. Commit metadata with the source change.
+6. Commit metadata with the source change.
 
 Drift-only snapshot: if the target remains `2.23.20260726.0` with Last Updated `2026-07-26`, and implementation occurs on 2026-07-28 UTC, use `2.24.20260728.0` and `2026-07-28`. Otherwise recompute.
 
@@ -267,20 +275,100 @@ if ($intGitExitCode -ne 0) {
 ```powershell
 $ErrorActionPreference = 'Stop'
 
-$arrTouchedPaths = @(
+$arrGuideBearingPaths = @(
     'STYLE_GUIDE.md'
-    'STYLE_GUIDE_RATIONALE.md'
     'copilot-instructions.md'
     'powershell.instructions.md'
     'STYLE_GUIDE_CHAT.md'
     'STYLE_GUIDE_FULL.md'
 )
 
+$strRationalePath = 'STYLE_GUIDE_RATIONALE.md'
+
+$arrTouchedPaths = @(
+    $arrGuideBearingPaths
+    $strRationalePath
+)
+
 $arrExpectedStagedPaths = @($arrTouchedPaths | Sort-Object)
 
 $strMiddleDot = [string][char]0x00B7
-$strVisualizationLine = "`n" + ($strMiddleDot * 4) + "`n"
-$strNonCompliantMarker = 'Non-Compliant (blank line contains spaces'
+
+$arrCanonicalSnippetLines = @(
+    '**Non-Compliant (blank line contains spaces; visualization only):**'
+    ''
+    'Each `·` on line 3 below is an explanatory substitute for one literal U+0020 SPACE on the otherwise blank line. The dots **MUST NOT** be copied into PowerShell code.'
+    ''
+    '```text'
+    '{'
+    '    Invoke-SomeCmdlet'
+    ($strMiddleDot * 4)
+    '    Invoke-AnotherCmdlet'
+    '}'
+    '```'
+    ''
+    'The four represented spaces are not allowed. A compliant blank line contains no characters.'
+)
+
+$strCanonicalSnippet = $arrCanonicalSnippetLines -join "`n"
+$strNonCompliantMarker = $arrCanonicalSnippetLines[0]
+
+function Get-OrdinalOccurrenceCount {
+    param (
+        [Parameter(Mandatory)]
+        [string]$Content,
+
+        [Parameter(Mandatory)]
+        [string]$Needle
+    )
+
+    if ($Needle.Length -eq 0) {
+        throw 'Cannot count occurrences of an empty string.'
+    }
+
+    $intCount = 0
+    $intOffset = 0
+
+    while ($intOffset -le ($Content.Length - $Needle.Length)) {
+        $intIndex = $Content.IndexOf(
+            $Needle,
+            $intOffset,
+            [StringComparison]::Ordinal
+        )
+
+        if ($intIndex -lt 0) {
+            break
+        }
+
+        $intCount++
+        $intOffset = $intIndex + $Needle.Length
+    }
+
+    $intCount
+}
+
+$strLegacyVisualizationLine = "`n" + ($strMiddleDot * 4) + "`n"
+
+$strSyntheticFalsePositive = @(
+    $strNonCompliantMarker
+    ''
+    '```text'
+    'WRONG'
+    '```'
+    ''
+    'Unrelated example:'
+    ($strMiddleDot * 4)
+    'End'
+) -join "`n"
+
+if (
+    -not $strSyntheticFalsePositive.Contains($strLegacyVisualizationLine) -or
+    (Get-OrdinalOccurrenceCount `
+        -Content $strSyntheticFalsePositive `
+        -Needle $strCanonicalSnippet) -ne 0
+) {
+    throw 'Canonical-snippet validator self-test failed.'
+}
 
 & pwsh `
     -NoLogo `
@@ -318,15 +406,58 @@ foreach ($strTouchedPath in $arrTouchedPaths) {
 
     $strContent = [System.IO.File]::ReadAllText($strAbsolutePath)
 
-    if ($strContent.Contains($strNonCompliantMarker)) {
-        if (-not $strContent.Contains($strVisualizationLine)) {
-            throw (
-                "File contains the Non-Compliant example but not the exact " +
-                "four-middle-dot visualization line: {0}" -f
-                $strTouchedPath
-            )
-        }
+    if ([regex]::IsMatch($strContent, '(?m)[\x20\x09]+$')) {
+        throw ("File contains trailing whitespace: {0}" -f $strTouchedPath)
     }
+}
+
+foreach ($strGuideBearingPath in $arrGuideBearingPaths) {
+    $strAbsolutePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
+        $strGuideBearingPath
+    )
+
+    $strContent = [System.IO.File]::ReadAllText($strAbsolutePath)
+
+    $intSnippetCount = Get-OrdinalOccurrenceCount `
+        -Content $strContent `
+        -Needle $strCanonicalSnippet
+
+    $intMarkerCount = Get-OrdinalOccurrenceCount `
+        -Content $strContent `
+        -Needle $strNonCompliantMarker
+
+    if ($intSnippetCount -ne 1 -or $intMarkerCount -ne 1) {
+        throw (
+            ("Canonical Non-Compliant example count mismatch in {0}; " +
+            "expected snippet/marker counts 1/1, actual {1}/{2}.") -f
+            $strGuideBearingPath,
+            $intSnippetCount,
+            $intMarkerCount
+        )
+    }
+}
+
+$strRationaleAbsolutePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
+    $strRationalePath
+)
+
+$strRationaleContent = [System.IO.File]::ReadAllText($strRationaleAbsolutePath)
+
+$intRationaleSnippetCount = Get-OrdinalOccurrenceCount `
+    -Content $strRationaleContent `
+    -Needle $strCanonicalSnippet
+
+$intRationaleMarkerCount = Get-OrdinalOccurrenceCount `
+    -Content $strRationaleContent `
+    -Needle $strNonCompliantMarker
+
+if ($intRationaleSnippetCount -ne 0 -or $intRationaleMarkerCount -ne 0) {
+    throw (
+        ("The rationale must explain the convention without duplicating the " +
+        "operational example; snippet/marker counts were {0}/{1}.") -f
+        $intRationaleSnippetCount,
+        $intRationaleMarkerCount
+    )
 }
 
 git diff --exit-code -- $arrTouchedPaths
@@ -390,10 +521,11 @@ Confirm:
 - The dots are explicitly identified as documentation substitutes that must not be copied.
 - No touched line has literal trailing whitespace.
 - No touched file contains a carriage-return byte.
-- Every touched file that contains the Non-Compliant example contains the exact four-middle-dot visualization line.
-- The rationale explains the durability and portability reasons.
+- The complete canonical snippet and its exact heading marker each occur exactly once in `STYLE_GUIDE.md` and each of the four generated artifacts.
+- `STYLE_GUIDE_RATIONALE.md` contains neither the canonical snippet nor its exact operational heading.
+- The rationale's existing `### Blank Line Usage` section explains the durability and portability reasons without creating a duplicate section.
 - No downstream-specific assumption appears.
-- Version, Last Updated, and changelog metadata agree.
+- Version and Last Updated agree with the finalized target baseline and UTC implementation date.
 - All four generated artifacts match the authoritative sources.
 - No touched file begins with `EF BB BF`.
 - The working-tree and staged-path sets are each exactly the two sources and four generated artifacts.
@@ -403,9 +535,9 @@ Confirm:
 While the pull request is open, confirm:
 
 1. Verification runs because every pull request targeting `main` is covered.
-2. The read-only Ubuntu job passes.
+2. The read-only Ubuntu job passes, including the tracked helper harness under PowerShell 7.
 3. The Windows matrix displays and completes four distinct edition/EOL cells against committed `HEAD`.
-4. The two LF cells complete lone-CR sanitation under their assigned editions.
+4. The two LF cells complete the tracked helper harness and lone-CR sanitation under their assigned editions; neither CRLF cell repeats the helper suite.
 5. Diagnostic upload uses the approved pinned upload action.
 6. Push-only preparation, approval, and synchronization jobs skip.
 7. No pull-request job has `contents: write`.
@@ -419,7 +551,7 @@ After merge to `main`, confirm:
 3. It exposes a nonempty ID and 64-hex digest.
 4. Every Windows push cell downloads that exact ID using the approved pinned download action.
 5. Native digest behavior is `error`.
-6. Every cell runs the deterministic helper self-test and invokes the shared helper, which independently rehashes the retained ZIP against the propagated digest and validates the manifest before safe extraction.
+6. Every cell runs the tracked deterministic helper harness and invokes the shared helper with explicit checkout/trusted roots and caller-owned artifact/run context; the helper independently rehashes the retained ZIP against the propagated digest and validates the manifest before safe extraction.
 7. The read-only approval job succeeds only after all four cells.
 8. Because sources and generated artifacts were committed together, preparation reports `has_changes=false`.
 9. The write-enabled synchronization job skips.
@@ -438,7 +570,9 @@ If preparation reports changes, treat that as a source/artifact synchronization 
 - Do not modify `.gitattributes`.
 - Do not modify `.github/workflows/Generate-StyleGuideArtifacts.ps1`.
 - Do not modify `.github/workflows/Expand-StyleGuideCandidateArtifact.ps1`.
+- Do not modify `.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1`.
 - Do not modify `.github/workflows/build.yml`.
+- Do not modify `.github/workflows/markdownlint.yml`.
 - Do not modify `.github/copilot-instructions.md`.
 - Do not modify `CONTRIBUTING.md`.
 - Do not hand-edit generated artifacts.
@@ -447,11 +581,12 @@ If preparation reports changes, treat that as a source/artifact synchronization 
 ## Acceptance criteria
 
 - The two examples visibly differ.
-- The middle-dot visualization is exact and safely explained.
+- The complete canonical Non-Compliant snippet is exact and safely explained.
 - Its third line contains exactly four U+00B7 characters and nothing else.
 - The Compliant example remains unchanged.
 - No literal trailing whitespace is introduced.
-- Rationale remains generic and portable.
+- The canonical snippet and exact operational heading each occur exactly once in `STYLE_GUIDE.md` and each generated artifact.
+- The rationale's existing `### Blank Line Usage` section remains generic and portable and does not duplicate the canonical snippet or operational heading.
 - Metadata is recalculated at finalization with the Minor component incremented.
 - Both sources and all four generated artifacts are committed together.
 - Every validation block starts with `$ErrorActionPreference = 'Stop'`.
@@ -460,13 +595,14 @@ If preparation reports changes, treat that as a source/artifact synchronization 
 - After staging, the cached path set is exactly the same six files.
 - No touched file begins with a UTF-8 BOM.
 - No touched file contains a carriage-return byte.
-- Every touched file containing the Non-Compliant example contains the exact four-middle-dot line.
+- The canonical validator rejects a wrong target block even when an unrelated four-middle-dot line is present.
 - Lint, whitespace, and generator-idempotency checks pass.
-- Pull-request Ubuntu verification passes.
-- The four-cell pull-request Windows matrix and both lone-CR probes pass.
+- Pull-request Ubuntu verification and its PowerShell 7 helper harness pass.
+- The four-cell pull-request Windows matrix, both LF-cell helper-harness executions, and both lone-CR probes pass.
 - Post-merge consumers use the approved pinned artifact actions.
 - The native digest configuration and the helper's independent digest comparison pass.
-- Deterministic helper self-tests pass in every consumer.
+- The tracked deterministic helper harness passes in every consumer.
+- Every production helper invocation receives explicit checkout/trusted roots and caller-owned artifact/run context.
 - The post-merge push matrix validates the exact immutable candidate after pre-extraction manifest validation.
 - Post-merge preparation reports no candidate changes.
 - Synchronization skips and no recovery commit is created.
@@ -488,8 +624,12 @@ If preparation reports changes, treat that as a source/artifact synchronization 
 - [npm Docs: `npm ci`](https://docs.npmjs.com/cli/commands/npm-ci)
 - [GitHub Docs: Workflow syntax](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax)
 - [GitHub Docs: Secure use reference](https://docs.github.com/en/actions/reference/security/secure-use)
-- [GitHub: `actions/upload-artifact` v7 contract](https://raw.githubusercontent.com/actions/upload-artifact/v7/action.yml)
-- [GitHub: `actions/download-artifact` v8 contract](https://raw.githubusercontent.com/actions/download-artifact/v8/action.yml)
-- [GitHub: `actions/download-artifact` v8 implementation](https://raw.githubusercontent.com/actions/download-artifact/v8/src/download-artifact.ts)
+- [GitHub: `actions/upload-artifact` v7.0.1 exact metadata](https://raw.githubusercontent.com/actions/upload-artifact/043fb46d1a93c77aae656e7c1c64a875d1fc6a0a/action.yml)
+- [GitHub: `actions/upload-artifact` v7.0.1 exact README](https://raw.githubusercontent.com/actions/upload-artifact/043fb46d1a93c77aae656e7c1c64a875d1fc6a0a/README.md)
+- [GitHub: `actions/upload-artifact` v7.0.1 release](https://github.com/actions/upload-artifact/releases/tag/v7.0.1)
+- [GitHub: `actions/download-artifact` v8.0.1 exact metadata](https://raw.githubusercontent.com/actions/download-artifact/3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c/action.yml)
+- [GitHub: `actions/download-artifact` v8.0.1 exact README](https://raw.githubusercontent.com/actions/download-artifact/3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c/README.md)
+- [GitHub: `actions/download-artifact` v8.0.1 exact implementation](https://raw.githubusercontent.com/actions/download-artifact/3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c/src/download-artifact.ts)
+- [GitHub: `actions/download-artifact` v8.0.1 release](https://github.com/actions/download-artifact/releases/tag/v8.0.1)
 - [franklesniak/copilot-repo-template#851](https://github.com/franklesniak/copilot-repo-template/issues/851)
 - [franklesniak/copilot-repo-template#852](https://github.com/franklesniak/copilot-repo-template/pull/852)
