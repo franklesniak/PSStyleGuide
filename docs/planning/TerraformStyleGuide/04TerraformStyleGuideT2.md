@@ -1,224 +1,155 @@
 # Make state-version discovery and recovery examples copy-safe with guarded identifiers
 
-> **Dependency:** Implement only after "Make artifact generation byte-deterministic and standardize repository text checkouts on LF" has merged. Record the GitHub blocked-by relationship using the actual prerequisite issue.
-
 ## Summary
 
-The S3 recovery example currently combines discovery and retrieval and uses an unquoted `<VERSION_ID>` placeholder. In a POSIX shell, angle brackets are redirection syntax.
+Make four provider-specific state-version surfaces safe to copy:
 
-Make the state-version examples copy-safe by:
+1. Amazon S3 object-version discovery/retrieval;
+2. Azure Blob version discovery/retrieval;
+3. Google Cloud Storage generation discovery/retrieval; and
+4. HCP Terraform state-version API discovery into protected response files.
 
-- Separating discovery from recovery.
-- Requiring deliberate version selection.
-- Guarding and quoting every selected identifier.
-- Filtering exact state objects.
-- Requiring protected, absolute recovery destinations.
-- Mechanically refusing to overwrite an existing recovery file.
-- Applying restrictive file-creation permissions.
-- Documenting provider-specific versioning applicability.
-- Replacing `gsutil` with `gcloud storage`.
-- Correcting and paginating the HCP Terraform state-version request.
-- Keeping the HCP bearer token out of process arguments.
-- Writing secret-bearing HCP responses to fresh protected files.
-- Treating recovered state and Archivist URLs as secrets.
+Separate discovery from recovery, require deliberate exact-version selection,
+guard every identifier, write only fresh protected destinations, use
+provider-native no-clobber controls where available, and permanently execute
+the exact finalized Bash blocks with non-network stubs.
 
-Keep `STYLE_GUIDE.md` concise and operational. Put shell mechanics, provider limitations, AWS bucket-class reconciliation, pagination details, and extended security rationale in `STYLE_GUIDE_RATIONALE.md`.
+“Every destination” in this issue means every destination introduced or
+modified by this issue. Manual backups and destructive state mutation have a
+separate filing: **Make manual state backup and destructive recovery guidance
+copy-safe**.
 
-The guidance must remain repository-generic.
+## Dependency
 
-## Prerequisite verification
+Implement only after **Promote generated style-guide artifacts through a
+least-privileged verified writer** merges. Record the real blocked-by
+relationship and exact merge commit.
 
-At implementation start, confirm the prerequisite issue established:
+At implementation start, verify these merged enduring invariants:
 
-- CRLF/lone-CR canonicalization to LF.
-- Resolved BOM-less UTF-8 writes.
-- `#Requires -Version 5.1`.
-- `* text=auto eol=lf`.
-- A versioned generator, versioned shared archive-validation helper
-  (`.github/workflows/Expand-StyleGuideCandidateArtifact.ps1`), and versioned
-  permanent helper harness
-  (`.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1`).
-- A reciprocal PSStyleGuide/TerraformStyleGuide generator-convergence record
-  covering shared serialization algorithms/invariants, intentional
-  repository-specific differences, and the current first/second-implementation
-  handoff without a cross-repository runtime dependency.
-- Local cross-edition validation that asserts Desktop exactly 5.1 or Core major
-  7 and invokes each harness/generator target in that same child `-Command`
-  process before verifying that edition's output.
-- Unfiltered `main` coverage for pull requests and pushes.
-- Every nonlocal action in `.github/workflows/build.yml` and
-  `.github/workflows/markdownlint.yml` pinned to a verified full commit SHA with
-  an adjacent release comment.
-- The dated action baseline uses checkout v7.0.1, setup-node v7.0.0,
-  upload-artifact v7.0.1, and download-artifact v8.0.1 at the exact full SHAs
-  selected by T1, subject to T1's immediate pre-implementation reverification.
-- Review-only weekly Dependabot version updates for the `github-actions`
-  ecosystem, with no auto-merge.
-- Immutable candidate ID/digest propagation from a read-only preparation job that declares `archive: true`.
-- Download by ID with `skip-decompress: true` and fatal native digest handling.
-- The shared helper as the only candidate extraction implementation, with five
-  mandatory scalar parameters (`CheckoutRoot`, `TrustedTemporaryRoot`,
-  `DownloadDirectory`, `CandidateDirectory`, and `ExpectedDigest`) and three
-  optional diagnostic labels (`ArtifactId`, `RunId`, and `RunAttempt`).
-- Caller-supplied, independently validated, mutually non-overlapping checkout
-  and trusted-temporary roots; strict-descendant working paths; rejection of
-  reparse points and other indirection in every existing component from the
-  filesystem volume/share root through each protected path; and repeated
-  component validation at the helper's archive-open, candidate-creation, and
-  post-extraction boundaries.
-- Exactly one retained ZIP stream opened with `FileMode.Open`,
-  `FileAccess.Read`, and `FileShare.Read`, hashed with
-  `Get-FileHash -InputStream`, compared with the propagated upload digest,
-  rewound, and used for the only read-only `ZipArchive`, with continuous
-  lifetime and deterministic disposal before cleanup.
-- The exact tracked permanent harness as the sole definition of the
-  deterministic fixture suite, including digest-mismatch, diagnostic-context,
-  root-separation, strict-descendant, ancestor/component-indirection, and
-  separate post-extraction BOM and CR cases.
-- Case-specific rejection outcomes for initially absent, preexisting,
-  helper-created ordinary, and unsafe cleanup states, including direct
-  deterministic exercise of the exact named production cleanup function and
-  fail-closed retention diagnostics.
-- The tracked harness running against the exact helper in the Ubuntu
-  pull-request verification job and in all four Windows pull-request cells
-  before merge.
-- The same tracked harness running in all four Windows push cells on every push
-  run, and in the synchronization writer whenever that conditional writer
-  executes.
-- Every production helper invocation receiving the explicit checkout root,
-  trusted-temporary root, download path, reserved candidate path, propagated
-  digest, artifact ID, run ID, and run attempt.
-- Each Windows helper invocation bound to the cell's assigned edition by a mutually exclusive step whose explicit shell is `powershell` for Desktop 5.1 or `pwsh` for Core 7, with the edition asserted in the same process immediately before the suite.
-- A Windows topology that is an actual four-cell edition × fixture-EOL cross-product, with the two LF cells supplying lone-CR sanitation coverage.
-- Read-only approval after the complete matrix.
-- A sole exact-lease writer.
-- The seven prerequisite implementation paths as the complete pre-stage
-  working-tree set and complete staged set:
-  - `.gitattributes`;
-  - `.github/dependabot.yml`;
-  - `.github/workflows/Expand-StyleGuideCandidateArtifact.ps1`;
-  - `.github/workflows/Generate-StyleGuideArtifacts.ps1`;
-  - `.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1`;
-  - `.github/workflows/build.yml`; and
-  - `.github/workflows/markdownlint.yml`.
-- Passing LF, CRLF, lone-CR, propagated-digest rejection, malformed-transport, stale-ref, and lease evidence.
-- A real linked npm-remediation issue that treats the separately recorded
-  seven-node nested-tooling result as a dated baseline and owns:
-  - final dependency, lockfile, and affected-file selection;
-  - one coherent package/Node/workflow/hook policy, currently expected to prove
-    the final dependency minimum and preferred Node 24 LTS baseline;
-  - clean installation plus actual Terraform hook positive, outer-negative,
-    nested-negative, and tooling-failure evidence in isolated Git state;
-  - every current advisory URL/dependency path and any structured, owned,
-    expiring residual-risk record;
-  - the npm Dependabot policy decision and exact resulting one- or two-entry
-    review-only configuration; and
-  - explicit replacement of T1/T2's intermediate Dependabot and
-    implementation-time path-set gates while preserving nonsuperseded behavior.
-  If repository policy required that issue to run before T1, confirm T1 and
-  this issue were rebaselined after its dependency, Node, hook, workflow,
-  Dependabot, and lockfile changes merged.
+- generator output is LF and BOM-less under supported PowerShell editions;
+- hosted Markdown validation uses exact Node 24;
+- candidate transport uses immutable artifact ID plus propagated digest;
+- the production helper enforces exact manifest, containment/link rejection,
+  caller-owned context, and fail-closed cleanup;
+- the permanent helper harness passes in Ubuntu and all four Windows cells;
+- all external actions equal the merged exact role allowlist;
+- workflows are unfiltered and read-only except the exact-lease writer; and
+- the final reciprocal P1/Terraform matrix and CI run are linked.
+
+Consume the merged public interfaces and evidence. Do not restate or alter
+helper parameters, cleanup internals, case IDs, workflow roles, or writer
+behavior here.
+
+If npm remediation ran first due to advisory policy, use its exact merged
+runtime/package contract rather than the default Node 24 prerequisite.
 
 ## Affected files
 
+Exactly these eight files may change:
+
 Source files:
 
-- `STYLE_GUIDE.md`
-- `STYLE_GUIDE_RATIONALE.md`
+- `STYLE_GUIDE.md`;
+- `STYLE_GUIDE_RATIONALE.md`.
 
 Generated files:
 
-- `copilot-instructions.md`
-- `terraform.instructions.md`
-- `STYLE_GUIDE_CHAT.md`
-- `STYLE_GUIDE_FULL.md`
+- `copilot-instructions.md`;
+- `terraform.instructions.md`;
+- `STYLE_GUIDE_CHAT.md`;
+- `STYLE_GUIDE_FULL.md`.
+
+Permanent test integration:
+
+- `.github/workflows/Test-StateRecoveryExamples.sh` — add;
+- `.github/workflows/markdownlint.yml`.
 
 Do not hand-edit generated files.
 
-## Requested changes
+## Exact scope inventory
 
-### 1. Keep source roles distinct
+Add stable invisible marker pairs around every finalized owned Bash block.
+Use these IDs exactly and do not nest markers:
 
-In `STYLE_GUIDE.md`, include:
+| ID | Surface |
+| --- | --- |
+| `SR-AWS-DISCOVERY` | exact-key S3 version discovery |
+| `SR-AWS-RECOVERY` | selected S3 version retrieval |
+| `SR-AZURE-DISCOVERY` | exact-name Azure version discovery |
+| `SR-AZURE-RECOVERY` | selected Azure version retrieval |
+| `SR-GCS-DISCOVERY` | exact-object GCS generation discovery |
+| `SR-GCS-RECOVERY` | selected GCS generation retrieval |
+| `SR-HCP-DISCOVERY` | one protected, paginated HCP API response |
 
-- Operational prerequisites.
-- Provider applicability.
-- Separate discovery and recovery.
-- Deliberate selection.
-- Guarded commands.
-- No-overwrite behavior.
-- Concise AWS KMS and directory-bucket guidance.
-- Protected destinations.
-- Sensitive-state handling.
+The issue must inventory but not change/validate these adjacent workflows:
 
-In `STYLE_GUIDE_RATIONALE.md`, explain:
+- every `terraform state pull > ...` direct-redirection backup;
+- every `terraform state push`;
+- `terraform state rm`;
+- local corruption recovery using `mv`;
+- overlapping older S3/provider examples; and
+- destructive rollback guidance
 
-- Shell behavior.
-- Guard limitations.
-- Provider versioning limitations.
-- AWS documentation reconciliation.
-- Destination and overwrite mechanics.
-- Restrictive creation permissions.
-- HCP token/response handling.
-- Pagination.
-- Security rationale.
+in both `STYLE_GUIDE.md` and `STYLE_GUIDE_RATIONALE.md`. Link each location to
+the destructive-state follow-up. Do not claim this issue authorizes or tests
+state mutation.
 
-### 2. Define the common recovery-destination contract
+## Common destination contract
 
-For AWS, Azure, and GCS:
+For AWS, Azure, and GCS recovery:
 
-- Require Bash or another POSIX-compatible shell.
-- Require `RECOVERY_PATH` to identify a new file.
-- Require POSIX absolute-path syntax.
-- Require a protected parent directory outside every version-controlled working tree and outside shared world-readable temporary locations.
-- Require a fresh path for every recovery.
-- Set `umask 077` in a subshell.
-- Refuse to run if the final destination is any existing filesystem entry or a symbolic link, including a dangling symbolic link, by checking `[ -e "$RECOVERY_PATH" ] || [ -L "$RECOVERY_PATH" ]`.
-- Keep the `${RECOVERY_PATH:?...}` guard directly in the provider command.
-- Explain that parameter expansion validates presence, while the surrounding checks validate absolute syntax and nonexistence.
-- Explain that POSIX `test -e` follows symbolic links and can be false for a dangling final link, while `test -L` recognizes the link itself; both tests are therefore required.
-- Explain that "outside version control" remains a deliberate operator decision; the example does not attempt to discover every enclosing repository or resolve every symlink topology.
-- Explain that the AWS preflight is not an atomic filesystem lock. The protected parent and lack of competing writers are part of the model.
-- Use provider-native no-overwrite controls where available.
+- require Bash or a compatible POSIX environment;
+- assign each input once before validation;
+- require `RECOVERY_PATH` to be a new absolute POSIX file path;
+- require a protected parent outside version-controlled worktrees and shared
+  world-readable temporary locations;
+- use a new path for every attempt;
+- use a subshell and `umask 077`;
+- reject the destination before provider invocation when
+  `[ -e "$RECOVERY_PATH" ] || [ -L "$RECOVERY_PATH" ]`;
+- keep `${RECOVERY_PATH:?...}` in the provider command;
+- use provider-native no-overwrite flags when available; and
+- never auto-select a version.
 
-Because recovery runs inside a subshell, `exit 1` exits only that recovery block rather than an interactive parent shell.
+Explain that `test -e` follows links and can be false for a dangling final
+link, while `test -L` identifies the link. The preflight is not an atomic
+filesystem lock. The model requires a protected parent with no competing
+writer, and the operator remains responsible for choosing a location outside
+Git and inappropriate shared storage.
 
-### 3. Harden S3 discovery and recovery
+Recovered state, API pages, signed/Archivist URLs, and provider diagnostics can
+contain plaintext secrets. Keep them out of Git, logs, issues, tickets, chat,
+and unprotected artifacts. Limit access, use fresh paths, validate a selected
+version before operational use, and follow organizational retention/deletion
+policy.
 
-State that:
+## Provider requirements
 
-- AWS CLI and configured credentials are required.
-- Discovery requires `s3:ListBucketVersions`.
-- Retrieval of a selected version requires `s3:GetObjectVersion`.
-- S3 Versioning is disabled by default. A recoverable non-null historical
-  version requires Versioning to have been enabled before that desired object
-  write.
-- The bucket may currently be `Enabled` or `Suspended`; suspension preserves
-  already retained versions but causes later writes to use the `null` version
-  semantics.
-- Objects that predate first enablement are not retroactively given unique
-  version IDs; they use the `null` version ID until a later write.
-- Prior enablement does not guarantee recovery. Lifecycle expiration or an
-  explicit permanent version deletion may have removed the desired version.
-- The operator must deliberately select a still-existing exact-key version
-  returned by discovery. If exact-key discovery returns no usable version,
-  stop: this procedure has no recoverable S3 version to retrieve.
-- Do not enable or suspend bucket Versioning as part of recovery. Establish the
-  prerequisite through the owner/administrator or existing operational
-  evidence; do not make `get-bucket-versioning` mandatory because AWS reserves
-  that status operation to the bucket owner.
-- The procedure applies only to a general-purpose bucket.
-- Directory buckets do not support S3 Versioning or `ListObjectVersions`.
-- Directory-bucket `GetObject` accepts only the `null` version ID, so directory buckets are outside this historical recovery procedure.
-- SSE-S3 requires no KMS authorization.
-- General-purpose SSE-KMS and DSSE-KMS retrieval requires applicable `kms:Decrypt` authorization.
-- `kms:GenerateDataKey` appears on general-purpose upload/destination paths, not this historical download path.
-- Directory-bucket SSE-KMS guidance requires both `kms:GenerateDataKey` and `kms:Decrypt` for ordinary operations, but that is not a directory-bucket version-recovery path.
-- Effective authorization may involve identity policies, key policies, grants, encryption mode, and account topology.
-- SSE-C uses a different header-based process and is outside this example.
-- Current AWS sources must be rechecked immediately before implementation.
+### Amazon S3
 
-Use exact-key discovery:
+Document:
+
+- AWS CLI/configured credentials;
+- discovery permission `s3:ListBucketVersions`;
+- retrieval permission `s3:GetObjectVersion`;
+- Versioning must have been enabled before the recoverable write;
+- `Enabled` versus `Suspended` and `null` version semantics;
+- lifecycle expiration/permanent deletion can remove old versions;
+- exact-key empty results mean stop;
+- recovery does not enable/suspend Versioning;
+- general-purpose buckets only;
+- directory buckets do not support Versioning/ListObjectVersions and accept
+  only `null` in their GetObject version path;
+- SSE-S3 needs no KMS authorization;
+- general-purpose SSE-KMS/DSSE-KMS retrieval may need `kms:Decrypt`;
+- `kms:GenerateDataKey` belongs to applicable upload/destination paths, not
+  this historical download;
+- SSE-C is outside this example; and
+- current AWS bucket-class/KMS documentation must be rechecked immediately
+  before implementation.
+
+Final discovery body:
 
 ```bash
 aws s3api list-object-versions \
@@ -228,17 +159,16 @@ aws s3api list-object-versions \
   --output table
 ```
 
-Require the operator to inspect the exact key and metadata and deliberately set `VERSION_ID`.
+Require deliberate setting of `VERSION_ID`.
 
-Use:
+Final recovery body:
 
 ```bash
 (
   umask 077
 
   case "${RECOVERY_PATH:?Set RECOVERY_PATH to a new absolute path in a protected directory outside version control.}" in
-    /*)
-      ;;
+    /*) ;;
     *)
       printf '%s\n' 'RECOVERY_PATH must be an absolute POSIX path.' >&2
       exit 1
@@ -259,51 +189,21 @@ Use:
 )
 ```
 
-The AWS CLI has no provider-native no-clobber option for `s3api get-object`, so the protected parent, fresh path, and immediate preflight are mandatory.
+AWS has no `s3api get-object` no-clobber flag. The protected parent, fresh path,
+and immediate preflight are mandatory.
 
-### 4. Explain shell and AWS behavior in the rationale
+### Azure Blob Storage
 
-Explain:
+Document:
 
-- Unquoted angle brackets are redirection operators.
-- `${parameter:?word}` is POSIX parameter expansion.
-- It fails for unset or empty values.
-- It prevents the containing command from running.
-- Bash leaves the interactive parent shell open.
-- The guard does not verify that an identifier is the intended version.
+- Azure CLI/authentication;
+- applicable blob-read permission;
+- `Storage Blob Data Reader` as a suitable predefined role;
+- Blob Versioning enabled on a supported account; and
+- hierarchical-namespace accounts do not currently support Blob Versioning
+  and are outside this version-ID procedure.
 
-Add a dated AWS reconciliation:
-
-1. `ListObjectVersions` is unsupported for directory buckets.
-2. S3 Versioning is unsupported there, and `GetObject` accepts only `null`.
-3. General-purpose permission tables identify `kms:Decrypt` for KMS-encrypted retrieval.
-4. General-purpose SSE-KMS guidance identifies `kms:Decrypt` for downloads and `kms:GenerateDataKey` for uploads.
-5. Directory-bucket `GetObject` and dedicated directory-bucket KMS guidance require both actions for ordinary SSE-KMS access.
-6. The pages describe different bucket classes and operations.
-7. The general-purpose example therefore follows general-purpose retrieval guidance.
-8. No directory-bucket version-recovery command may be added.
-
-Explain destination handling:
-
-- State can contain plaintext secrets.
-- Relative paths inherit the current directory.
-- Shared temporary directories can expose state.
-- A restrictive `umask` limits newly created permissions.
-- The preflight and provider-native options refuse existing destinations.
-- The operator still must choose the correct protected location.
-
-### 5. Harden Azure Blob Storage recovery
-
-Require:
-
-- Azure CLI and authentication.
-- Applicable blob-read permission.
-- `Storage Blob Data Reader` as one suitable predefined role.
-- A POSIX-compatible shell.
-- Blob Versioning enabled on a supported account.
-- A statement that hierarchical-namespace accounts do not currently support Blob Versioning and are outside this version-ID procedure.
-
-Use discovery:
+Final discovery body:
 
 ```bash
 az storage blob list \
@@ -316,17 +216,16 @@ az storage blob list \
   --output table
 ```
 
-Require deliberate selection of `AZURE_VERSION_ID`.
+Require deliberate setting of `AZURE_VERSION_ID`.
 
-Use:
+Final recovery body:
 
 ```bash
 (
   umask 077
 
   case "${RECOVERY_PATH:?Set RECOVERY_PATH to a new absolute path in a protected directory outside version control.}" in
-    /*)
-      ;;
+    /*) ;;
     *)
       printf '%s\n' 'RECOVERY_PATH must be an absolute POSIX path.' >&2
       exit 1
@@ -350,26 +249,22 @@ Use:
 )
 ```
 
-`--overwrite false` is defense in depth in addition to the common preflight; the Azure CLI documents the download command's `--overwrite` default as true.
+`--overwrite false` is defense in depth; the common preflight remains required.
 
-### 6. Modernize GCS recovery
+### Google Cloud Storage
 
-Require:
+Document:
 
-- Google Cloud CLI and authentication.
-- `storage.objects.list` and `storage.objects.get`.
-- `Storage Object Viewer` as one suitable predefined role.
-- A POSIX-compatible shell.
-- Object Versioning enabled on the bucket.
+- Google Cloud CLI/authentication;
+- `storage.objects.list` and `storage.objects.get`;
+- `Storage Object Viewer` as a suitable predefined role;
+- Object Versioning enabled;
+- this procedure retrieves versions retained through Object Versioning;
+- soft delete is separate and not enumerated by
+  `gcloud storage ls --all-versions`; and
+- no soft-delete restoration is added.
 
-State concisely:
-
-- This procedure retrieves generations retained through Object Versioning.
-- Cloud Storage soft delete is a separate retention and recovery mechanism.
-- `gcloud storage ls --all-versions` must not be presented as enumerating soft-deleted objects.
-- No soft-delete restoration procedure is added in this issue.
-
-Use:
+Final discovery body:
 
 ```bash
 gcloud storage ls \
@@ -378,17 +273,16 @@ gcloud storage ls \
   gs://acme-corp-terraform-state/environments/prod/terraform.tfstate
 ```
 
-Require deliberate selection of the exact numeric `generation`.
+Require deliberate setting of exact `GCS_GENERATION`.
 
-Use:
+Final recovery body:
 
 ```bash
 (
   umask 077
 
   case "${RECOVERY_PATH:?Set RECOVERY_PATH to a new absolute path in a protected directory outside version control.}" in
-    /*)
-      ;;
+    /*) ;;
     *)
       printf '%s\n' 'RECOVERY_PATH must be an absolute POSIX path.' >&2
       exit 1
@@ -401,511 +295,270 @@ Use:
     exit 1
   fi
 
+  if ! [[ "$GCS_GENERATION" =~ ^[1-9][0-9]*$ ]]; then
+    printf '%s\n' 'GCS_GENERATION must be a canonical positive decimal.' >&2
+    exit 1
+  fi
+
   gcloud storage cp \
     --no-clobber \
-    "gs://acme-corp-terraform-state/environments/prod/terraform.tfstate#${GCS_GENERATION:?Set GCS_GENERATION to the exact GCS generation selected for recovery.}" \
+    "gs://acme-corp-terraform-state/environments/prod/terraform.tfstate#${GCS_GENERATION}" \
     "${RECOVERY_PATH:?Set RECOVERY_PATH to a new absolute path in a protected directory outside version control.}"
 )
 ```
 
-`--no-clobber` is defense in depth in addition to the common preflight.
+Validate the generation before constructing the source argument or calling
+gcloud. Do not trim, convert with shell arithmetic, accept locale digits, or
+auto-select a live/latest value. Pass the reviewed decimal string unchanged.
 
-Do not select a generation automatically.
+### HCP Terraform
 
-### 7. Correct and secure HCP Terraform discovery
-
-Use `HCP Terraform (formerly Terraform Cloud)` on first use.
-
-Direct operators to the workspace's `States` tab.
+Use `HCP Terraform (formerly Terraform Cloud)` on first mention. Direct
+operators to the workspace `States` tab as the ordinary UI path.
 
 For the API:
 
-- Require Bash and curl.
-- Use `GET /state-versions`.
-- Require the organization and workspace-name filters.
-- Filter `status=finalized`.
-- Use explicit manual pagination.
-- Do not use `/workspaces/<WORKSPACE_ID>/state-versions`.
-- Require an API token authorized to read state versions.
-- Treat the token as a secret.
-- Treat every response page as a secret because it contains Archivist URLs.
-- State that HashiCorp documents those URLs as secret-bearing and valid for a limited time.
-- Disable shell tracing.
-- Do not expand the token into a curl command-line argument.
-- Do not print the raw response into ordinary terminal output.
-- Require a fresh protected response file for each page.
+- require Bash and resolved curl;
+- use `GET /api/v2/state-versions`;
+- require organization/workspace filters;
+- filter `status=finalized`;
+- use explicit `page[number]` and fixed maximum `page[size]=100`;
+- require a token authorized to read state versions;
+- use only `app.terraform.io` or `app.eu.terraform.io`;
+- keep Terraform Enterprise hosts out of scope;
+- never put the token on curl's command line;
+- disable inherited xtrace before any secret expansion;
+- ignore ambient curl configuration;
+- write one protected response page per request; and
+- retain failed empty/partial response files as invalid sensitive evidence,
+  retrying only with a fresh path.
 
-Use:
+The finalized block must implement these exact validation rules before config
+or response-file creation:
 
-```bash
-(
-  set +x
-  umask 077
+- `TFC_HOST` is exactly `app.terraform.io` or `app.eu.terraform.io`;
+- `TFC_PAGE_NUMBER` matches `^[1-9][0-9]*$`;
+- organization and workspace are nonempty, contain no controls, and satisfy
+  the then-current documented HCP name grammar;
+- `TFC_TOKEN` is nonempty and contains no CR, LF, control byte, double quote,
+  or backslash; and
+- `TFC_RESPONSE_PATH` is an absolute POSIX fresh path for which neither
+  `-e` nor `-L` is true.
 
-  TFC_RESPONSE_PATH=${TFC_RESPONSE_PATH:?Set TFC_RESPONSE_PATH to a new absolute path in a protected directory for this response page.}
-  TFC_TOKEN=${TFC_TOKEN:?Set TFC_TOKEN to an HCP Terraform API token that can read state versions.}
-  TFC_WORKSPACE_NAME=${TFC_WORKSPACE_NAME:?Set TFC_WORKSPACE_NAME to the exact HCP Terraform workspace name.}
-  TFC_ORGANIZATION_NAME=${TFC_ORGANIZATION_NAME:?Set TFC_ORGANIZATION_NAME to the exact HCP Terraform organization name.}
-  TFC_PAGE_NUMBER=${TFC_PAGE_NUMBER:-1}
+The block must:
 
-  case "$TFC_RESPONSE_PATH" in
-    /*)
-      ;;
-    *)
-      printf '%s\n' 'TFC_RESPONSE_PATH must be an absolute POSIX path.' >&2
-      exit 1
-      ;;
-  esac
+1. make `set +x` its first command inside a subshell;
+2. use `umask 077`;
+3. create one random, absent, mode-0600 curl config in an owned protected
+   temporary directory;
+4. write one option per physical config line, including the validated quoted
+   bearer header and JSON API content type;
+5. open the exact response path with Bash `noclobber` before curl;
+6. invoke curl with `--disable` first, explicit
+   `--config "$TFC_CURL_CONFIG_PATH"`, `--fail --silent --show-error --get`,
+   URL-encoded filters/page values, and exact
+   `"https://${TFC_HOST}/api/v2/state-versions"`;
+7. capture curl's exit immediately and close the response descriptor;
+8. remove only the exact ordinary owned config file and empty config directory
+   without recursion or link following;
+9. restore the parent shell's xtrace state by leaving the subshell; and
+10. never print the token or raw response.
 
-  if [ -e "$TFC_RESPONSE_PATH" ] || [ -L "$TFC_RESPONSE_PATH" ]; then
-    printf 'Refusing to overwrite or follow an existing HCP response file: %s\n' \
-      "$TFC_RESPONSE_PATH" >&2
-    exit 1
-  fi
+Use curl's `--data-urlencode` for values; percent-encode the bracketed query
+parameter names as required. Do not use curl output `--no-clobber`, because it
+can select an alternative filename. Continue with fresh response paths until
+`meta.pagination.next-page` is null. Do not add an automatic `jq` loop or state
+rollback command.
 
-  set -C
-  exec 3> "$TFC_RESPONSE_PATH" || {
-    printf 'Unable to create new HCP response file without overwriting: %s\n' \
-      "$TFC_RESPONSE_PATH" >&2
-    exit 1
-  }
-  set +C
+Curl config quoted parameters interpret backslash escapes. Rejecting
+quote/backslash/control bytes before writing the file is a required
+authorization boundary, not an optional hygiene check.
 
-  curl -q \
-    --config - \
-    --fail \
-    --silent \
-    --show-error \
-    --get \
-    --data-urlencode "filter%5Bworkspace%5D%5Bname%5D=$TFC_WORKSPACE_NAME" \
-    --data-urlencode "filter%5Borganization%5D%5Bname%5D=$TFC_ORGANIZATION_NAME" \
-    --data-urlencode "filter%5Bstatus%5D=finalized" \
-    --data-urlencode "page%5Bnumber%5D=$TFC_PAGE_NUMBER" \
-    --data-urlencode "page%5Bsize%5D=100" \
-    https://app.terraform.io/api/v2/state-versions \
-    >&3 <<EOF
-header = "Authorization: Bearer $TFC_TOKEN"
-header = "Content-Type: application/vnd.api+json"
-EOF
+## Source roles and generated output
 
-  curl_exit_code=$?
-  exec 3>&-
+`STYLE_GUIDE.md` stays concise and operational:
 
-  if [ "$curl_exit_code" -ne 0 ]; then
-    printf 'curl failed with exit code %s; the protected response file may be empty or partial and must not be treated as valid: %s\n' \
-      "$curl_exit_code" "$TFC_RESPONSE_PATH" >&2
-    exit "$curl_exit_code"
-  fi
-)
-```
+- prerequisites/applicability;
+- separated discovery/recovery;
+- deliberate selection;
+- guarded commands;
+- fresh protected destinations;
+- no-clobber behavior; and
+- concise sensitive-state warnings.
 
-Explain:
+`STYLE_GUIDE_RATIONALE.md` owns:
 
-- `set +x` is intentionally the first command inside the subshell, before any
-  assignment, parameter expansion, or secret-bearing here-document. It disables
-  an inherited Bash xtrace state before the synthetic or real token can expand.
-- The subshell boundary preserves the parent shell's prior tracing state after
-  the block exits. The block cannot protect a token already exposed by an
-  external wrapper, parent-shell assignment, process launcher, or prior
-  command; tracing must also be controlled at those boundaries.
-- All required values are validated before the response file is created, so an unset input does not leave a misleading empty file.
-- The `[ -e "$TFC_RESPONSE_PATH" ] || [ -L "$TFC_RESPONSE_PATH" ]` preflight rejects every existing entry and a dangling final symbolic link.
-- `set -C` enables Bash's `noclobber` option, and `exec 3> "$TFC_RESPONSE_PATH"` opens the exact requested path before any network request. If that exclusive create fails, curl does not run.
-- `umask 077` restricts permissions on the newly created response file.
-- `-q` is the first option and disables automatic reading of the user's default curl configuration.
-- `--config -` reads sensitive header configuration from standard input.
-- The token therefore does not appear in curl's ordinary argument list.
-- An unquoted here-document is intentional so the guarded token expands.
-- Curl writes its response to already-open file descriptor 3 while standard input remains available to `--config -`.
-- The example captures curl's exit status immediately and closes file descriptor 3 before evaluating that status.
-- `--fail` makes HTTP 400-and-later responses fail.
-- `--silent --show-error` removes progress while retaining errors.
-- `--get` moves encoded data into the query string.
-- Curl expects the `name` portion of `name=content` to be pre-encoded, hence `%5B` and `%5D`.
-- Values are encoded by curl.
-- `finalized` excludes pending and discarded uploads.
-- `TFC_PAGE_NUMBER` defaults to 1.
-- Page size 100 is the documented maximum.
-- Curl's `--no-clobber` output behavior is not used: curl can choose a numbered alternative filename rather than failing on the exact requested path, which would violate this contract.
-- If curl fails after the exact path is created, the empty or partial protected file is deliberately retained, is not valid response data, and must be handled according to organizational retention and secure-deletion policy; retry with a fresh path.
-- Exact-path no-clobber protection assumes a protected parent directory with no competing writer able to remove or replace entries during the operation.
-- The operator must inspect the protected response using a trusted local JSON viewer.
-- The operator must continue with fresh response paths until `meta.pagination.next-page` is `null`.
-- Every page file contains sensitive hosted URLs and must remain outside Git, logs, tickets, chat, and unprotected artifacts.
-- Do not re-enable xtrace or use another tracing facility anywhere in the
-  subshell.
-- Do not add an automatic `jq` loop or rollback command.
-
-### 8. Treat recovered state as sensitive
-
-State provider-neutrally:
-
-- Recovered state can contain plaintext secrets.
-- Keep it outside Git, issues, tickets, chat, logs, and unprotected artifacts.
-- Limit local access.
-- Do not reuse recovery paths.
-- Validate the selected version before using the file for any operational recovery.
-- These examples retrieve a copy; they do not overwrite active backend state.
-- Follow organizational retention and secure-deletion requirements.
-- Do not prescribe an OS-specific deletion command.
-
-### 9. Advance guide version and metadata
+- angle-bracket redirection and `${parameter:?word}` behavior;
+- `-e`/`-L`, subshell, `umask`, and non-atomic guard limits;
+- AWS general-purpose/directory-bucket/KMS reconciliation;
+- Azure hierarchical-namespace limitation;
+- GCS Object Versioning versus soft delete and generation grammar;
+- HCP host/page/curl-config/token/xtrace/response mechanics;
+- provider-specific least privilege; and
+- the exact out-of-scope destructive-state inventory/T4 link.
 
 Immediately before finalization:
 
-1. Re-read the current guide version.
-2. Increment Minor.
-3. Use the UTC implementation date.
-4. Reset Revision to `0`.
-5. Update `Last Updated`.
-6. Add a matching top rationale changelog row.
+1. re-read the current guide version;
+2. increment Minor;
+3. use the UTC implementation date;
+4. reset Revision to `0`;
+5. update `Last Updated`; and
+6. add a matching top rationale changelog row.
 
-The changelog must mention:
+Run the merged generator once from exact source. Never edit generated files
+directly. Prove all four generated outputs are LF, BOM-less, CR-free, current,
+and idempotent.
 
-- Exact-object discovery.
-- Guarded identifiers.
-- Protected, no-clobber recovery destinations.
-- Restrictive creation permissions.
-- AWS bucket-class/KMS reconciliation.
-- Azure versioning applicability.
-- GCS Object Versioning and soft-delete distinction.
-- `gcloud storage`.
-- HCP endpoint, finalized filtering, pagination, token transport, and protected response files.
-- Sensitive recovered-state handling.
+## Permanent exact-block harness
 
-### 10. Regenerate generated artifacts
+Create `.github/workflows/Test-StateRecoveryExamples.sh`.
 
-After the prerequisite issue has merged:
+The script must:
 
-```powershell
-$ErrorActionPreference = 'Stop'
+- be LF/BOM-less and start with an explicit Bash shebang;
+- record a test version;
+- accept exact source paths;
+- validate one-to-one equality among the issue inventory, source markers,
+  extracted bodies, generated copies, and tests;
+- fail on missing, duplicate, nested, malformed, or unexpected markers;
+- extract only fenced-block bodies without evaluating surrounding Markdown;
+- run `bash -n` on each exact body;
+- execute in one new owned sandbox with a closed test `PATH`;
+- provide non-network `aws`, `az`, `gcloud`, `curl`, and supporting stubs;
+- fail every unexpected executable/network attempt;
+- capture each stub call as a NUL-delimited argv record and ordered call log;
+  and
+- assert exact rejection message/code and filesystem postcondition for every
+  case.
 
-& pwsh `
-    -NoLogo `
-    -NoProfile `
-    -File './.github/workflows/Generate-StyleGuideArtifacts.ps1'
+Mandatory common cases:
 
-$intGeneratorExitCode = $LASTEXITCODE
+- missing, empty, relative, existing file, existing directory, live link, and
+  dangling-link destination before provider invocation;
+- successful fresh absolute destinations containing spaces and shell
+  metacharacters;
+- restrictive mode;
+- provider success/failure;
+- documented partial-file retention/removal;
+- exact owned cleanup; and
+- no token/state bytes in stdout/stderr/call logs.
 
-if ($intGeneratorExitCode -ne 0) {
-    throw (
-        "Generator failed with exit code {0}." -f
-        $intGeneratorExitCode
-    )
-}
-```
+Provider cases:
 
-Commit all four generated artifacts with the two source documents. Do not defer them to synchronization.
+- exact S3 key filter, unchanged `VERSION_ID`, expected flags, and no provider
+  call before validation;
+- exact Azure filter, unchanged `AZURE_VERSION_ID`, `--overwrite false`, and
+  expected auth mode;
+- exact GCS object, `--all-versions`, `--no-clobber`, and unchanged generation;
+- GCS positive one-/20-digit generations and rejection of empty, zero, signs,
+  whitespace, leading zero, decimal/exponent/comma, Unicode digit, `#`, slash,
+  query/shell metacharacter, and alphabetic text;
+- both HCP hosts;
+- rejected arbitrary host, scheme, port, path, userinfo, and enterprise host;
+- page empty/zero/negative/plus/space/leading-zero/query/control values;
+- token empty/CR/LF/quote/backslash/control;
+- inherited xtrace;
+- exact curl config mode/content and argv;
+- absence of ambient `.curlrc`;
+- simulated curl/HTTP failure with invalid partial response;
+- config cleanup and response retention; and
+- zero token bytes in any observable evidence.
 
-## Validation
+A case passes only with the intended reason and postcondition; any nonzero exit
+is not sufficient.
 
-Run from the repository root.
+Invoke the exact harness as a stable step in the existing Ubuntu
+`.github/workflows/markdownlint.yml` job after clean install and both lint
+surfaces. Preserve merged:
 
-Every PowerShell block must:
+- hosted Node 24 and disabled automatic package-manager cache;
+- exact action pins/role allowlist;
+- read-only permissions;
+- unfiltered triggers;
+- helper harness step; and
+- one ordinary Ubuntu job.
 
-- Begin with `$ErrorActionPreference = 'Stop'`.
-- Define every variable it consumes.
-- Check every native command's exit code immediately.
+Do not add an external action or a separate workflow.
 
-### Generate, lint, and check whitespace
+## Local validation
 
-```powershell
-$ErrorActionPreference = 'Stop'
+Resolve one Node and npm application pair. Prove npm's actual
+`process.execPath`/`process.versions.node` matches the selected Node and exact
+merged major (Node 24 in default order). Record paths and full versions.
 
-npm --prefix .github/workflows ci
-$intNpmExitCode = $LASTEXITCODE
-if ($intNpmExitCode -ne 0) {
-    throw ("npm ci failed with exit code {0}." -f $intNpmExitCode)
-}
+Save whether process `CI` exists and its exact value. Set `CI=true` only around
+clean `npm ci`; in `finally`, restore the prior value exactly or remove it.
+Use the same resolved npm application for outer and nested lint.
 
-& pwsh `
-    -NoLogo `
-    -NoProfile `
-    -File './.github/workflows/Generate-StyleGuideArtifacts.ps1'
+Then:
 
-$intGeneratorExitCode = $LASTEXITCODE
-if ($intGeneratorExitCode -ne 0) {
-    throw ("Generator failed with exit code {0}." -f $intGeneratorExitCode)
-}
+1. run the generator;
+2. run the exact Bash harness;
+3. run all content/marker/inventory assertions;
+4. prove generated artifacts match source and rerun idempotently;
+5. prove package, lockfile, hook, Node policy, lint config, helper/context/
+   harness, build workflow, and Dependabot are unchanged;
+6. require the complete working path set to equal the eight affected files;
+7. stage exactly those eight paths;
+8. require cached path equality and LF/BOM/CR policy;
+9. rerun validation from staged content; and
+10. prove no further generator diff.
 
-npm --prefix .github/workflows run lint:md
-$intNpmExitCode = $LASTEXITCODE
-if ($intNpmExitCode -ne 0) {
-    throw ("Markdown lint failed with exit code {0}." -f $intNpmExitCode)
-}
-
-npm --prefix .github/workflows run lint:md:nested
-$intNpmExitCode = $LASTEXITCODE
-if ($intNpmExitCode -ne 0) {
-    throw ("Nested Markdown lint failed with exit code {0}." -f $intNpmExitCode)
-}
-
-git diff --check
-$intGitExitCode = $LASTEXITCODE
-if ($intGitExitCode -ne 0) {
-    throw ("git diff --check failed with exit code {0}." -f $intGitExitCode)
-}
-```
-
-### Verify working-tree scope and stage exactly six files
-
-```powershell
-$ErrorActionPreference = 'Stop'
-
-$arrExpectedStagedPaths = @(
-    'STYLE_GUIDE.md'
-    'STYLE_GUIDE_RATIONALE.md'
-    'copilot-instructions.md'
-    'terraform.instructions.md'
-    'STYLE_GUIDE_CHAT.md'
-    'STYLE_GUIDE_FULL.md'
-) | Sort-Object
-
-$arrStatusLines = @(
-    git status `
-        --porcelain=v1 `
-        --untracked-files=all `
-        --ignore-submodules=none `
-        -- .
-)
-$intGitExitCode = $LASTEXITCODE
-
-if ($intGitExitCode -ne 0) {
-    throw (
-        "Unable to read working-tree status; git exited with {0}." -f
-        $intGitExitCode
-    )
-}
-
-$arrChangedPaths = @(
-    $arrStatusLines |
-        ForEach-Object {
-            if ($_ -notmatch '^..\s+') {
-                throw ("Unexpected porcelain status record: {0}" -f $_)
-            }
-
-            $_ -replace '^..\s+', ''
-        } |
-        Sort-Object -Unique
-)
-
-$arrWorkingTreeDifferences = @(
-    Compare-Object `
-        -ReferenceObject $arrExpectedStagedPaths `
-        -DifferenceObject $arrChangedPaths `
-        -CaseSensitive
-)
-
-if ($arrWorkingTreeDifferences.Count -ne 0) {
-    throw (
-        "The working-tree path set is not exactly the two sources and four " +
-        "generated artifacts. Status: {0}" -f
-        ($arrStatusLines -join '; ')
-    )
-}
-
-git add -- $arrExpectedStagedPaths
-$intGitExitCode = $LASTEXITCODE
-
-if ($intGitExitCode -ne 0) {
-    throw ("git add failed with exit code {0}." -f $intGitExitCode)
-}
-```
-
-### Rerun and verify the staged result
-
-Rerun the generator, then require:
-
-- `git diff --exit-code -- <six paths>` returns 0.
-- `git diff --cached --check` returns 0.
-- The staged path set exactly equals the six expected paths.
-- No touched file starts with `EF BB BF`.
-- No touched file contains a `0x0D` byte.
-
-### Content confirmation
-
-Confirm:
-
-- Exact-object filters.
-- Quoted, guarded identifiers.
-- Absolute-path checks plus `[ -e ] || [ -L ]` rejection of every existing destination and every dangling final symbolic link.
-- `umask 077` in every recovery block.
-- Azure `--overwrite false`.
-- GCS `--no-clobber`.
-- No automatic selection.
-- S3 general-purpose-bucket scope.
-- Directory-bucket exclusion.
-- Accurate AWS KMS reconciliation.
-- Azure HNS exclusion.
-- GCS Object Versioning scope and soft-delete distinction.
-- HCP token absent from command arguments.
-- HCP raw output written through a pre-opened exact-path no-clobber descriptor to a fresh protected file, with explicit empty/partial-file handling on curl failure.
-- Pagination continues until `next-page` is `null`.
-- Generated artifacts match sources.
-
-### Prove inherited xtrace cannot disclose the HCP token
-
-Run a synthetic negative test against the exact finalized HCP subshell:
-
-1. Start a child Bash process with xtrace already enabled.
-2. Supply a conspicuous synthetic token sentinel, synthetic organization and
-   workspace names, and a fresh path beneath a protected test-only directory.
-   Never use a real token.
-3. Replace `curl` with a test-only stub that consumes its standard-input
-   configuration, records that it was invoked, writes harmless JSON through
-   the already-open response descriptor, and cannot make a network request.
-4. Capture the child's complete stdout and stderr, including xtrace output.
-5. Require the first traced command inside the subshell to be `set +x`.
-6. Require the synthetic token sentinel to be absent from all captured output.
-7. Require the stub to have run, the exact requested response path to have been
-   used, and the block to have returned zero.
-8. Remove only the test-owned protected directory after the assertions.
-
-The test must fail if `set +x` is removed, moved after any assignment or
-expansion, or if the sentinel appears. It must not contact HCP Terraform or any
-other network endpoint.
-
-### Pull-request evidence
-
-Confirm:
-
-1. Verification runs for every pull request targeting `main`.
-2. Read-only Ubuntu passes.
-3. The Windows matrix displays and completes four distinct edition/EOL cells.
-4. The two LF cells complete lone-CR sanitation under their assigned editions.
-5. Every nonlocal action in both workflows uses its approved full-SHA pin with
-   an adjacent release comment, and the review-only weekly GitHub Actions
-   Dependabot configuration remains present.
-6. Push jobs skip.
-7. No pull-request job has write permission.
-
-### Post-merge push evidence
-
-Confirm:
-
-1. Read-only preparation runs.
-2. One immutable candidate is uploaded with nonempty ID/digest.
-3. Every Windows push cell downloads the same ID.
-4. Every Windows push cell reports `success`, runs the exact tracked permanent
-   harness, and invokes the shared archive helper with explicit checkout and
-   trusted-temporary roots, explicit download and candidate paths, the
-   propagated digest, and the artifact/run diagnostic labels.
-5. Native digest-mismatch behavior is `error`, and the helper's independent digest comparison passes.
-6. Approval succeeds after the complete matrix.
-7. Preparation reports `has_changes=false`.
-8. The conditional writer reports `skipped`; none of its steps, including the
-   tracked permanent harness or helper invocation, executes on this no-drift
-   run. Its explicit-root, explicit-path, digest, diagnostic-label, and
-   full-component path-safety integration remains evidenced by the prerequisite
-   issue's controlled `has_changes=true` write-path run and static inspection.
-9. No bot synchronization commit is created.
-
-If preparation reports changes, investigate source/artifact synchronization. Do not accept a recovery commit as this issue's expected outcome.
+Store pull-request evidence for the permanent shell step, existing helper
+harness, full Windows matrix, immutable artifact, approval, and absence of a
+writer. After merge, store the push run proving all matrices, exact artifact,
+and either correct no-op or exact-lease writer behavior.
 
 ## Acceptance criteria
 
-- Discovery and recovery are separate.
-- Every provider requires deliberate version selection.
-- Every selected identifier is quoted and guarded.
-- Every recovery destination is nonempty, absolute, protected, new, and no-clobber; every final symbolic link, including a dangling link, is rejected.
-- Every recovery block uses `umask 077`.
-- Azure explicitly disables overwrite.
-- GCS explicitly uses no-clobber.
-- AWS performs an immediate nonexistence check.
-- S3 states that Versioning is disabled by default; the desired non-null
-  version must have been written after enablement; currently enabled and
-  suspended buckets may retain versions; pre-enable objects have `null` IDs;
-  lifecycle or permanent deletion may remove versions; empty exact-key
-  discovery means no recovery; and recovery never enables or suspends
-  Versioning.
-- S3 prerequisites and general-purpose bucket scope are accurate without
-  imposing owner-only `get-bucket-versioning` on a delegated recovery operator.
-- General-purpose KMS retrieval guidance identifies `kms:Decrypt`.
-- Directory-bucket KMS text is reconciled without implying version recovery.
-- Azure requires Blob Versioning on a supported non-HNS account.
-- GCS requires Object Versioning and distinguishes soft delete.
-- HCP uses `/api/v2/state-versions`.
-- HCP filters exact organization/workspace and `finalized`.
-- HCP handles HTTP failures and manual pagination.
-- HCP token data is supplied through `--config -`, not an expanded argument.
-- `set +x` is the first command in the HCP subshell, no later command re-enables
-  tracing, and the parent shell's trace state remains scoped outside the
-  subshell.
-- The inherited-xtrace synthetic sentinel test passes without a real token or
-  network access.
-- HCP responses are written through a pre-opened Bash `noclobber` descriptor to the exact requested fresh protected path.
-- HCP does not silently select an alternate output filename when the requested path is occupied.
-- HCP curl failures retain an explicitly invalid empty or partial protected file and direct the operator to use a fresh path.
-- Archivist URLs and recovered state are identified as secrets.
-- No automatic selection, rollback, or `jq` loop is introduced.
-- Version/date/changelog metadata agree.
-- All four generated artifacts are committed with the sources.
-- Before staging, the complete changed-path set is exactly the six affected files.
-- After staging, the cached path set is exactly the same six files.
-- No touched file begins with a BOM.
-- No touched file contains a carriage-return byte.
-- Post-merge preparation reports `has_changes=false`.
-- No downstream-specific assumption is introduced.
+- [ ] The exact owned surface is seven stable marked Bash blocks covering four
+      provider surfaces.
+- [ ] Every destination introduced/modified here is fresh, absolute,
+      protected, restrictive, and guarded against file/directory/live/dangling
+      link overwrite.
+- [ ] Discovery and recovery remain separate and selection is deliberate.
+- [ ] S3 exact-key, bucket-class, versioning, KMS, and permission guidance is
+      internally consistent.
+- [ ] Azure exact-name, role, versioning, HNS, and `--overwrite false`
+      guidance is correct.
+- [ ] GCS uses `gcloud storage`, distinguishes Object Versioning/soft delete,
+      and requires canonical positive generation passed unchanged.
+- [ ] HCP uses the correct state-versions endpoint, filters, pagination, closed
+      US/EU hosts, protected config/response files, and closed token grammar.
+- [ ] No token appears in command arguments, trace, logs, files other than the
+      short-lived protected config, or artifacts.
+- [ ] Every exact block passes syntax and mandatory non-network behavioral
+      cases in the tracked harness.
+- [ ] The permanent harness runs in ordinary read-only Ubuntu CI.
+- [ ] Both source files and all four generated files advance consistently and
+      pass LF/BOM/lint/idempotence checks.
+- [ ] Local npm validation uses one resolved pair and restores `CI`.
+- [ ] The adjacent destructive-state inventory is explicit and linked to T4.
+- [ ] The changed/staged set equals the eight affected files.
 
 ## Non-goals
 
-- Do not automate version selection.
-- Do not overwrite active backend state.
-- Do not add directory-bucket recovery.
-- Do not add Azure HNS alternate recovery.
-- Do not add GCS soft-delete restoration.
-- Do not add an HCP rollback or automatic pagination loop.
-- Do not add SSE-C recovery.
-- Do not prescribe OS-specific deletion.
-- Do not modify any of the prerequisite issue's seven files:
-  - `.gitattributes`
-  - `.github/dependabot.yml`
-  - `.github/workflows/Expand-StyleGuideCandidateArtifact.ps1`
-  - `.github/workflows/Generate-StyleGuideArtifacts.ps1`
-  - `.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1`
-  - `.github/workflows/build.yml`
-  - `.github/workflows/markdownlint.yml`
-- Do not modify `.github/copilot-instructions.md`.
-- Do not hand-edit generated artifacts.
-- Do not run Terraform CLI validation.
+- Destructive `terraform state push`, `state rm`, or rollback.
+- Manual `terraform state pull` backup publication.
+- Local corruption-file moves.
+- Enabling/disabling provider versioning.
+- GCS soft-delete restoration.
+- HCP Terraform Enterprise/custom hosts.
+- Automatic version selection or pagination loops.
+- Prescribing OS-specific secure deletion.
+- Package/lockfile/hook/runtime-policy changes.
+- Helper, artifact, approval, or writer redesign.
 
 ## References
 
-- [POSIX parameter expansion](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_06_02)
-- [POSIX `test`](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/test.html)
-- [GNU Bash redirections](https://www.gnu.org/software/bash/manual/html_node/Redirections.html)
-- [GNU Bash `set` and `noclobber`](https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html)
-- [GNU Bash parameter expansion](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html)
-- [Curl FAQ: protecting credentials](https://curl.se/docs/faq.html)
-- [Curl known risks](https://curl.se/docs/knownrisks.html)
-- [Curl manual](https://curl.se/docs/manpage.html)
-- [curl CVE-2022-27778: `--no-clobber` uses numbered alternative filenames](https://curl.se/docs/CVE-2022-27778.html)
-- [AWS CLI `list-object-versions`](https://docs.aws.amazon.com/cli/latest/reference/s3api/list-object-versions.html)
-- [AWS `ListObjectVersions`](https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectVersions.html)
-- [AWS S3 Versioning](https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html)
-- [AWS `GetBucketVersioning`](https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketVersioning.html)
-- [AWS required permissions](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-with-s3-policy-actions.html)
-- [AWS general-purpose SSE-KMS permissions](https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html#sse-kms-permissions)
-- [AWS KMS key policies](https://docs.aws.amazon.com/kms/latest/developerguide/key-policies.html)
-- [AWS `GetObject`](https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html)
-- [AWS CLI `get-object`](https://docs.aws.amazon.com/cli/latest/reference/s3api/get-object.html)
-- [AWS directory-bucket SSE-KMS](https://docs.aws.amazon.com/AmazonS3/latest/userguide/s3-express-UsingKMSEncryption.html)
-- [AWS directory-bucket naming](https://docs.aws.amazon.com/AmazonS3/latest/userguide/directory-bucket-naming-rules.html)
-- [Azure Blob Versioning](https://learn.microsoft.com/en-us/azure/storage/blobs/versioning-overview)
-- [Azure CLI blob commands](https://learn.microsoft.com/en-us/cli/azure/storage/blob?view=azure-cli-latest)
-- [Azure CLI data authorization](https://learn.microsoft.com/en-us/azure/storage/blobs/authorize-data-operations-cli)
-- [Azure built-in roles](https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles)
-- [Google Cloud Object Versioning](https://docs.cloud.google.com/storage/docs/object-versioning)
-- [Google Cloud versioned-object operations](https://docs.cloud.google.com/storage/docs/using-versioned-objects)
-- [Google Cloud `gsutil` status](https://docs.cloud.google.com/storage/docs/gsutil)
-- [`gcloud storage ls`](https://docs.cloud.google.com/sdk/gcloud/reference/storage/ls)
-- [`gcloud storage cp`](https://docs.cloud.google.com/sdk/gcloud/reference/storage/cp)
-- [Google Cloud Storage IAM](https://cloud.google.com/storage/docs/access-control/iam)
+- [AWS S3 ListObjectVersions](https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectVersions.html)
+- [AWS S3 GetObject permissions](https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html)
+- [Azure Blob versions](https://learn.microsoft.com/azure/storage/blobs/versioning-overview)
+- [Azure blob download CLI](https://learn.microsoft.com/cli/azure/storage/blob#az-storage-blob-download)
+- [Google Cloud versioned objects](https://cloud.google.com/storage/docs/using-versioned-objects)
+- [gcloud storage cp](https://cloud.google.com/sdk/gcloud/reference/storage/cp)
 - [HCP Terraform state versions API](https://developer.hashicorp.com/terraform/cloud-docs/api-docs/state-versions)
-- [HCP Terraform API authentication and pagination](https://developer.hashicorp.com/terraform/cloud-docs/api-docs)
-- [HCP Terraform workspace state](https://developer.hashicorp.com/terraform/cloud-docs/workspaces/state)
-- [Terraform sensitive data](https://developer.hashicorp.com/terraform/language/manage-sensitive-data)
-- [GitHub Actions job conditions](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-jobs-with-conditions)
-- [GitHub Actions `needs` context](https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#needs-context)
-- [copilot-repo-template#851](https://github.com/franklesniak/copilot-repo-template/issues/851)
-- [copilot-repo-template#852](https://github.com/franklesniak/copilot-repo-template/pull/852)
+- [HCP Terraform in Europe](https://developer.hashicorp.com/terraform/cloud-docs/europe)
+- [curl config-file grammar](https://curl.se/docs/manpage.html)
+- [GNU Bash manual](https://www.gnu.org/software/bash/manual/bash.html)

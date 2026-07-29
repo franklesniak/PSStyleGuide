@@ -2,74 +2,53 @@
 
 ## Summary
 
-`.github/workflows/Generate-StyleGuideArtifacts.ps1` currently writes generated artifacts with edition-dependent PowerShell encoding behavior. Windows PowerShell 5.1 writes `UTF8` with a BOM, while PowerShell 7 writes BOM-less UTF-8. The supported generator can therefore emit different bytes depending on the executing edition.
+Make the style-guide generator emit identical UTF-8 bytes under Windows
+PowerShell 5.1 and PowerShell 7, and establish LF as the repository checkout
+policy. Move the Markdown workflow to hosted Node 24, pin every currently used
+external action to a reviewed full commit SHA, and add review-only GitHub
+Actions dependency updates.
 
-The repository also lacks a version-controlled line-ending policy, so Git configuration, operating system defaults, or editors can supply CRLF working files even though committed blobs use LF.
+This issue establishes foundations only. It does not add the candidate ZIP
+validator or activate the new artifact-promotion writer.
 
-Make generation byte-deterministic and establish a safe, least-privileged synchronization pipeline by:
+## Execution order
 
-- Canonicalizing CRLF and lone CR to LF in every complete final payload immediately before serialization.
-- Writing with resolved paths and explicit BOM-less `.NET` UTF-8 encoding.
-- Adding `* text=auto eol=lf`.
-- Recording versions for the generator, archive-validation helper, and
-  permanent helper-test harness.
-- Pinning every external action in both workflows to an approved full commit
-  SHA and enabling review-only weekly Dependabot updates for GitHub Actions.
-- Running verification for every pull request targeting `main`.
-- Running the push pipeline for every push to `main`.
-- Preparing one immutable synchronization candidate in a read-only job.
-- Downloading by immutable artifact ID with the pinned action, `skip-decompress: true`, and `digest-mismatch: error`.
-- Using one shared, versioned PowerShell helper with explicit checkout and
-  trusted-temporary roots for candidate digest verification, archive
-  validation, and extraction on Windows and Ubuntu.
-- Passing preparation's propagated upload digest to that helper, which
-  independently compares it with the retained ZIP stream's SHA-256 before
-  constructing `ZipArchive`.
-- Defining the deterministic fixture suite once in a tracked, versioned
-  PowerShell harness and running that exact harness against the exact helper in
-  the Ubuntu pull-request job, all four Windows pull-request cells, all four
-  Windows push cells, and the synchronization writer whenever
-  `has_changes=true`.
-- Rejecting symbolic-link/reparse-point indirection throughout every existing
-  absolute path component used by the helper.
-- Validating the ZIP manifest before creating an extraction directory.
-- Validating the exact candidate in an actual four-cell edition × fixture-EOL Windows matrix.
-- Approving the candidate only after the complete Windows matrix succeeds.
-- Giving write permission only to the final synchronization job.
-- Proving candidate, destination, staged, and committed blob identity.
-- Pushing with an exact expected-SHA lease and explicit full-ref destination.
-- Retaining diagnostic artifacts after ordinary pull-request failures but not cancellation.
-- Requiring local validation to verify each available PowerShell edition before another edition can overwrite its output.
-- Refusing to stage from a working tree containing any path other than the seven
-  implementation files.
-- Proving that every final writer removes lone CR characters without claiming CR-only source compatibility.
+This is the first issue in the TerraformStyleGuide slate.
 
-This issue is a prerequisite for "Make state-version discovery and recovery examples copy-safe with guarded identifiers." Complete and merge this issue first.
+After it merges:
+
+1. implement **Add a fail-closed cross-platform style-guide candidate
+   validator** against this exact merge commit; then
+2. implement **Promote generated style-guide artifacts through a
+   least-privileged verified writer** against both exact prerequisite commits.
+
+Record real GitHub blocked-by relationships when the issues are filed.
 
 ## Affected files
 
-- `.gitattributes` — add.
-- `.github/dependabot.yml` — add.
-- `.github/workflows/Expand-StyleGuideCandidateArtifact.ps1` — add.
-- `.github/workflows/Generate-StyleGuideArtifacts.ps1`
-- `.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1` — add.
-- `.github/workflows/build.yml`
-- `.github/workflows/markdownlint.yml`
+Exactly these five implementation files may change:
 
-The following generated artifacts must be regenerated during validation but remain byte-for-byte unchanged:
+- `.gitattributes` — add;
+- `.github/dependabot.yml` — add;
+- `.github/workflows/Generate-StyleGuideArtifacts.ps1`;
+- `.github/workflows/build.yml`; and
+- `.github/workflows/markdownlint.yml`.
 
-- `copilot-instructions.md`
-- `terraform.instructions.md`
-- `STYLE_GUIDE_CHAT.md`
-- `STYLE_GUIDE_FULL.md`
+The generator must regenerate these four artifacts during validation, but their
+final bytes must remain unchanged:
+
+- `copilot-instructions.md`;
+- `terraform.instructions.md`;
+- `STYLE_GUIDE_CHAT.md`; and
+- `STYLE_GUIDE_FULL.md`.
 
 Do not hand-edit generated artifacts.
 
 ## Requested changes
 
-### 1. Normalize complete payloads at the serialization boundary
+### 1. Normalize each complete payload at the serialization boundary
 
-Use this mapping:
+The complete payloads are:
 
 | Function | Complete final payload |
 | --- | --- |
@@ -78,84 +57,42 @@ Use this mapping:
 | `New-StyleGuideChatVersion` | `$strWrappedContent` |
 | `New-StyleGuideFullVersion` | `$strOutput` |
 
-Immediately before encoding each complete payload, use:
+Immediately before encoding each payload, use the applicable value in:
 
 ```powershell
-$strNormalizedContent = <complete final payload> -replace "`r`n?", "`n"
+$strNormalizedContent = <complete-final-payload> -replace "`r`n?", "`n"
 ```
-
-Replace the explanatory placeholder with the applicable variable.
 
 Requirements:
 
-- Normalize after all transformations and concatenations.
-- Convert CRLF to one LF.
-- Convert lone CR to one LF.
-- Leave existing LF unchanged.
-- Preserve `New-StyleGuideFullVersion`'s existing split/join behavior.
-- Do not normalize after writing.
-- Do not claim semantic compatibility with CR-only source documents.
+- normalize after every transformation and concatenation;
+- convert CRLF to one LF;
+- convert lone CR to one LF;
+- preserve existing LF;
+- preserve `New-StyleGuideFullVersion`'s existing split/join semantics;
+- do not normalize after writing; and
+- do not claim semantic support for CR-only source documents.
 
-The generator's frontmatter is already constructed by joining an array with `` "`n" ``; that construction is correct and must not be modified for symmetry with any other repository.
+### 2. Replace edition-dependent writes
 
-### 2. Replace all four artifact write sites
+At each of the four final write sites:
 
-Replace each artifact-writing `Set-Content` call with:
+1. obtain one unambiguous filesystem path with
+   `GetUnresolvedProviderPathFromPSPath`;
+2. reject wildcard, non-filesystem-provider, and multiple-resolution inputs;
+3. create `System.Text.UTF8Encoding($false)` explicitly;
+4. write the complete normalized string with a .NET API;
+5. do not append an implicit final newline; and
+6. capture and report the destination on failure.
 
-```powershell
-$strNormalizedContent = <complete final payload> -replace "`r`n?", "`n"
-$objUtf8NoBomEncoding = New-Object System.Text.UTF8Encoding($false)
-$strResolvedDestinationPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
-    $DestinationPath
-)
+The implementation may use `File.WriteAllText` after path validation. Do not
+use `Set-Content`, `Out-File`, or a host-dependent default encoding for final
+artifacts.
 
-[System.IO.File]::WriteAllText(
-    $strResolvedDestinationPath,
-    $strNormalizedContent,
-    $objUtf8NoBomEncoding
-)
-```
+Record one updated generator version using the repository's UTC version
+convention. Retain `#Requires -Version 5.1`.
 
-After implementation:
-
-- All four complete payloads are normalized.
-- All four writes use `WriteAllText`.
-- No artifact-writing `Set-Content` remains.
-- No newline is appended implicitly.
-
-#### Coordinate generator convergence with PSStyleGuide
-
-Treat generator unification as shared algorithms, invariants, and failure
-semantics rather than a requirement for line-for-line identity. Both
-repositories remain self-contained and independently implementable. Do not add
-a cross-repository runtime import, shared module/action, or hard release-order
-dependency in this issue.
-
-Use this convergence contract:
-
-| Generator area | Shared target | Intentional repository-specific difference |
-| --- | --- | --- |
-| Final serialization boundary | Normalize each complete final payload with ``-replace "`r`n?", "`n"`` immediately before encoding. Resolve the destination, use `UTF8Encoding($false)` and `WriteAllText`, and append no implicit newline. | Complete-payload variable names may differ. |
-| Common artifact functions | Preserve equivalent behavior and failure semantics for the Copilot, Chat, and Full artifact functions. | Guide-specific transformation logic inside the Full artifact function may differ. |
-| Instructions artifact | Use the same serialization primitive and frontmatter-construction principles. | Function name, output filename, `applyTo`, description, and guide content are Terraform- or PowerShell-specific. |
-| Frontmatter | Use an LF-joined array with explicitly reviewed spacing and final-LF behavior. | T1 already has the LF-joined representation; P1 migrates a here-string. |
-| Serialization abstraction | Keep all final write boundaries behaviorally equivalent. If a private serialization helper is introduced, coordinate the same contract in both issues. | Equivalent inline boundaries are acceptable; private helper names need not match. Do not create a one-repository-only abstraction silently. |
-| Script policy | Preserve `#Requires -Version 5.1` and the same `.NOTES` version-calculation policy. | Starting versions may differ. |
-| Repository text policy | Treat LF producer correctness and LF checkout policy as complementary controls. | T1 adds `.gitattributes`; PSStyleGuide already has it. |
-| Validation | Prove Desktop 5.1/Core 7 and LF/CRLF producer equivalence with raw-byte checks. | Artifact names and separately governed Node/package work remain repository-specific. |
-
-Immediately before implementation, inspect the merged/current PSStyleGuide
-generator, the current P1 issue, and any completed P1 evidence. If P1 has not
-landed, record this matrix in the T1 pull request as the handoff baseline for
-the P1 implementer. If P1 has landed, compare T1 against the implemented P1
-behavior rather than only its earlier draft.
-
-Classify every observed difference as repository-specific content, a
-deliberately accepted design difference, or a defect/follow-up. Silence does
-not make a difference intentional. Do not compare final guide bytes across the
-repositories because the guide content is intentionally different.
-
-### 3. Add the repository-wide LF policy
+### 3. Establish the LF checkout policy
 
 Create root `.gitattributes` containing exactly:
 
@@ -163,584 +100,91 @@ Create root `.gitattributes` containing exactly:
 * text=auto eol=lf
 ```
 
-This means:
-
-- Git automatically classifies text and binary files.
-- Text is normalized to LF in the index.
-- Text is checked out with LF regardless of platform or `core.autocrlf`.
-- Binary files are not normalized.
-- Later, more-specific rules may override the default when technically justified.
-
-`git add --renormalize .` reapplies clean filters to tracked index entries. It does not add untracked files and does not rewrite existing working-tree bytes. Staging, renormalization, and the exact staged-set verification are performed by the validation block below.
-
-If renormalization stages a path other than the seven implementation files,
-investigate it. Do not commit unexplained mass normalization.
-
-### 4. Record workflow-script versions
-
-All three PowerShell files must contain a top-level comment-based-help `.NOTES`
-version.
-
-For a new or still-unversioned script, use:
-
-```text
-Version: 1.0.YYYYMMDD.0
-```
-
-Replace `YYYYMMDD` with the implementation's current UTC date.
-
-If the generator has acquired a version before implementation:
-
-1. Increment Major for a breaking interface or behavior-contract change.
-2. Increment Minor for a nonbreaking feature or behavior addition.
-3. Treat this serialization correction as fix-class; do not increment Major or Minor solely for it.
-4. Set Build to the current UTC date.
-5. Reset Revision to `0` when `Major.Minor.Build` changes.
-6. If that `Major.Minor.Build` already exists at Revision `N`, use `N + 1`.
-
-Do not change the Terraform style guide's version, `Last Updated`, or rationale changelog in this issue.
-
-### 5. Run both events without path filters
-
-Retain:
-
-```yaml
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-```
-
-Do not add `paths` or `paths-ignore` to either event.
-
-Every pull request targeting `main` must instantiate verification, and every push to `main` must instantiate the push pipeline.
-
-Do not rely on workflow concurrency for correctness. A stale writer must be rejected by exact-SHA checks and the final lease; a newer push run handles the newer commit.
-
-Retain `[skip ci]` in the bot commit message only as a compatibility convention. The `GITHUB_TOKEN` trigger rule, not the commit text, prevents recursive workflow execution.
-
-### 6. Add one shared archive-validation and extraction helper
-
-Create:
-
-```text
-.github/workflows/Expand-StyleGuideCandidateArtifact.ps1
-```
-
-Design the helper and its permanent harness against the corresponding proposed
-PSStyleGuide surface: use the same public parameter names, diagnostic-label
-semantics, explicit-root model, and separate-harness architecture. The
-normative requirements below govern TerraformStyleGuide even if the other
-proposal has not yet adopted the same full-component path rule. The four
-expected manifest names and workflow artifact names are repository-specific.
-
-The repositories remain self-contained. Immediately before implementation,
-compare the two issue descriptions. Coordinate the same full-component path
-contract in both repositories or document any remaining difference explicitly.
-Never claim that only manifest names differ unless the public interfaces,
-trust-boundary rules, validation order, diagnostics, and harness contracts
-actually match.
-
-The script must:
-
-- Declare `#Requires -Version 5.1`.
-- Record its script version.
-- Accept these mandatory scalar parameters:
-  - `CheckoutRoot`;
-  - `TrustedTemporaryRoot`;
-  - `DownloadDirectory`;
-  - `CandidateDirectory`; and
-  - `ExpectedDigest`.
-- Accept these optional scalar diagnostic-label parameters:
-  - `ArtifactId`;
-  - `RunId`; and
-  - `RunAttempt`.
-- Resolve filesystem paths before using `.NET` static methods.
-- Work under Windows PowerShell 5.1 and PowerShell 7 on Windows and Ubuntu.
-- Load required compression assemblies explicitly under Windows PowerShell 5.1.
-- Treat the checkout and temporary roots as caller-supplied claims that the
-  helper must independently validate; do not read either boundary from the
-  current directory, the helper location, `GITHUB_WORKSPACE`, `RUNNER_TEMP`, or
-  other mutable ambient state.
-
-For path comparisons:
-
-- Reject wildcards, relative paths, non-filesystem providers, and ambiguous
-  multiple resolutions.
-- Accept rooted native or filesystem-provider-qualified absolute paths only.
-- Convert every accepted PowerShell path to one deterministic absolute
-  filesystem-provider path before passing it to `.NET`.
-- Use separator-aware strict-descendant checks; a sibling prefix such as
-  `TerraformStyleGuide-other` is not inside `TerraformStyleGuide`.
-- Use ordinal-ignore-case comparison on Windows and ordinal comparison on
-  non-Windows.
-- Use `Directory.EnumerateFileSystemEntries` for every exact
-  filesystem-entry assertion. Materialize each enumeration once before
-  counting or inspecting it.
-- If PowerShell enumeration is used for supporting diagnostics, require
-  `Get-ChildItem -LiteralPath ... -Force`; plain `Get-ChildItem` is prohibited
-  for an exact-count decision.
-
-#### Root and full-component trust contract
-
-The helper must:
-
-1. Require `CheckoutRoot` and `TrustedTemporaryRoot` to each resolve to exactly
-   one existing ordinary filesystem directory.
-2. Require the checkout and trusted temporary roots to be mutually
-   non-overlapping: neither may equal or contain the other.
-3. Require `DownloadDirectory` and `CandidateDirectory` to be strict
-   descendants of the trusted temporary root and outside the checkout.
-4. Build the lexical absolute component sequence from the filesystem
-   volume/share root through every existing component of:
-   - both declared roots;
-   - the download directory and retained archive;
-   - the existing candidate parent; and
-   - each candidate path after creation.
-5. Obtain each component's attributes through an API available under Windows
-   PowerShell 5.1 and reject:
-   - `FileAttributes.ReparsePoint`;
-   - a symbolic link, junction, Windows volume-mount/reparse entry, or
-     dangling entry;
-   - an unexpected file where a directory is required;
-   - an unexpected directory where a regular file is required; and
-   - any attribute, enumeration, or resolution failure.
-6. Never follow a link merely to classify the component as safe.
-7. Repeat the relevant full-component, containment, type, parent, and leaf
-   checks immediately before opening the archive, immediately before creating
-   the candidate directory, and after extraction before returning paths.
-
-The supported operating model is a GitHub-hosted runner with
-runner-controlled ancestors, a job-owned checkout, one unique job-owned trusted
-temporary root, and no competing writer capable of replacing entries during
-the helper call. Repeated validation narrows time-of-check/time-of-use risk; it
-does not claim an OS-native directory-handle guarantee.
-
-#### Parameter and diagnostic contract
-
-Before filesystem or archive processing:
-
-1. Require `ExpectedDigest` to match `^[0-9A-Fa-f]{64}$`.
-2. Reject an explicitly supplied null or empty optional diagnostic label.
-3. Use `$PSBoundParameters` to distinguish an omitted label from an invalid
-   explicitly supplied value.
-4. Treat diagnostic labels only as caller-supplied context. Never use them for
-   selection, authorization, path construction, or digest trust, and never
-   invent a value.
-
-Represent every omitted label as `unavailable`. Stable diagnostics must include:
-
-- validation phase;
-- artifact ID, run ID, and run attempt, supplied or unavailable;
-- normalized checkout and trusted-temporary roots;
-- normalized download and candidate paths;
-- expected digest;
-- actual digest once computed;
-- retained archive path once selected; and
-- offending entry or destination when applicable.
-
-Use stable phase identifiers covering parameter, root, containment, download,
-digest, archive, manifest, destination, extraction, post-extraction, and
-cleanup failures. Preserve the precise underlying failure and return nonzero.
-
-#### Validation order
-
-The helper must validate in this order:
-
-1. parameter shapes and diagnostic-label semantics;
-2. both roots, every existing root component, and root separation;
-3. working-path strict-descendant relationships and every existing component;
-4. exact download-directory contents and retained archive-file type;
-5. candidate-parent safety and candidate-leaf absence;
-6. one retained-archive stream open and digest;
-7. rewind that same stream, then ZIP readability and complete manifest;
-8. repeated component, containment, parent, and leaf checks;
-9. one-time candidate creation and extraction; and
-10. exhaustive post-extraction inspection.
-
-No earlier phase may create the candidate leaf. A failure before candidate
-creation must leave it nonexistent.
-
-#### Download-directory contract
-
-The helper must require:
-
-- The download directory is an existing ordinary directory beneath the trusted
-  temporary root.
-- Its complete existing component chain satisfies the trust contract.
-- Exhaustive top-level enumeration contains exactly one filesystem entry,
-  including hidden or system entries.
-- That entry and its complete component chain identify a regular,
-  non-reparse-point file.
-
-Do not attempt ZIP parsing in this phase. After the path/type contract succeeds,
-open the retained regular file exactly once as required below. Hash that stream
-first, then rewind and validate the same continuously held stream as a ZIP only
-after the expected-digest contract succeeds. Do not require a `.zip` filename
-extension. The retained file's name comes from the download's
-Content-Disposition header and may be the literal fallback name `artifact`.
-
-#### Expected-digest contract
-
-Before constructing `ZipArchive`, the helper must:
-
-1. Repeat the applicable component and containment checks.
-2. Open the retained ordinary file exactly once with `FileMode.Open`,
-   `FileAccess.Read`, and `FileShare.Read`.
-3. Require that exact `FileStream` to be readable and seekable.
-4. Pass it to `Get-FileHash -InputStream -Algorithm SHA256`.
-5. Require exactly one non-null hash result containing one valid 64-hex
-   SHA-256 value.
-6. Compare the actual and expected digests using ordinal, case-insensitive
-   equality.
-7. Fail before constructing `ZipArchive` if they differ.
-8. Set that same stream's position to zero.
-9. Construct exactly one read-mode `ZipArchive` over that same stream with
-   deliberate `leaveOpen` behavior.
-10. Keep the stream and archive continuously alive through complete manifest
-    validation and extraction.
-11. Dispose the archive before the stream and dispose both before cleanup.
-12. Record the expected and actual digests, archive path, labels, and phase.
-
-Do not hash by path and reopen it. Do not copy the archive to memory or another
-staging file. `FileShare.Read` permits benign later readers while denying
-ordinary later write/delete sharing where the platform enforces those
-semantics. The held handle binds hashing and ZIP processing to one stream; it
-does not replace the complete component checks or the protected,
-job-owned/no-competing-writer model and must not be described as a universal
-OS-native sandbox.
-
-The expected value is always the propagated `artifact-digest` output of the pinned upload action, which is a bare hexadecimal SHA-256 string. Never supply the `sha256:`-prefixed form that appears in download-action logs and artifact API metadata.
-
-#### Manifest contract
-
-Before creating the candidate destination directory, require exactly these four ordinal, root-level, non-directory entry names:
-
-```text
-copilot-instructions.md
-terraform.instructions.md
-STYLE_GUIDE_CHAT.md
-STYLE_GUIDE_FULL.md
-```
-
-Reject:
-
-- Missing or extra entries.
-- Empty entry names.
-- Directory entries.
-- Exact duplicates.
-- Case-insensitive duplicates or collisions.
-- `/` or `\` separators.
-- Nested paths.
-- `.` or `..` traversal.
-- Absolute or drive-qualified paths.
-- File/directory collisions.
-- Any name other than the four exact ordinal names.
-
-Complete manifest validation before creating or writing the candidate
-directory.
-
-#### Destination-directory lifecycle
-
-The caller creates the unique trusted temporary root and may create the
-candidate's protected parent beneath it. The candidate leaf itself must have no
-filesystem entry.
-
-The helper must:
-
-1. Resolve the candidate leaf path from its resolved existing parent without creating it.
-2. Prove the parent and leaf are strict descendants of the trusted temporary
-   root and outside checkout.
-3. Validate every existing component through the parent.
-4. Enumerate the parent exhaustively and reject any entry with the candidate
-   leaf name using the operating system's filesystem comparison, including an
-   existing file, directory, symlink, reparse point, or dangling link.
-5. Validate the digest, complete archive, and manifest.
-6. Repeat the complete component, containment, parent, and leaf checks.
-7. Create the leaf exactly once.
-8. Never delete and recreate it.
-9. Refuse to reuse or follow an existing leaf.
-10. Track an exact ownership journal containing only the candidate directory
-    and ordinary files created by this invocation.
-11. If any later phase fails, first dispose the archive and retained file
-    stream, then invoke one named cleanup function defined in this exact
-    production helper.
-12. Before deleting anything, that function must revalidate the complete
-    candidate envelope, exhaustively enumerate the candidate's immediate
-    children, require the exact journaled set, and revalidate every journaled
-    child as the expected ordinary non-reparse-point file without following
-    links.
-13. Only after that complete pre-deletion pass may it delete the known
-    helper-created files nonrecursively and remove the proven empty ordinary
-    helper-created directory.
-14. If an entry is missing, replaced, extra, unreadable, a link, a reparse
-    point, or otherwise uncertain, stop cleanup. Never use recursive or
-    wildcard deletion and never traverse the entry.
-15. Preserve the original failure, add a stable cleanup phase, retained path,
-    offending entry when safely available, and any cleanup exception, then
-    return nonzero.
-
-Place the helper's function definitions before its main entry-point invocation.
-When and only when the helper is dot-sourced, use the ordinary PowerShell
-invocation context to define those functions and return before the main entry
-point. Do not add a definition-only/test switch, environment backdoor, or
-alternate artifact-expansion entry point. The harness may dot-source the
-resolved exact helper once with fixture-safe values for its existing mandatory
-parameters solely to invoke the named cleanup function. Production execution
-continues to use the five mandatory and three optional parameters above.
-
-A digest or manifest failure must leave the candidate leaf nonexistent. A
-post-creation failure must remove the helper-created leaf before returning
-unless fail-closed cleanup itself encounters an unsafe or unreadable entry; that
-cleanup failure and the retained path must then be explicit in diagnostics.
-
-#### Extraction contract
-
-For each permitted entry:
-
-1. Resolve the destination with `GetFullPath`.
-2. Prove it is an immediate child of the candidate root.
-3. Open the destination with `FileMode.CreateNew`, write access, and no sharing.
-4. Copy only the entry stream.
-5. Dispose all streams and archives deterministically.
-
-Do not restore:
-
-- Symlink information.
-- Unix file types or modes.
-- Windows attributes.
-- Timestamps.
-- Any other ZIP metadata.
-
-ZIP external attributes are not a rejection criterion. Safety comes from creating fresh regular files in a fresh directory.
-
-After extraction:
-
-- Repeat full-component and containment validation.
-- Enumerate the candidate directory exhaustively with `Directory.EnumerateFileSystemEntries`.
-- Require exactly the four expected root-level paths.
-- Require every path to be a regular, non-reparse-point file.
-- Reject every BOM and CR byte.
-- Return or log the four resolved candidate paths.
-
-No workflow step may call an automatic ZIP extraction API for this candidate.
-
-#### Tracked permanent helper self-test
-
-Create:
-
-```text
-.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1
-```
-
-This harness is the sole definition of the deterministic fixture suite. It
-must:
-
-- Declare `#Requires -Version 5.1`.
-- Record its script version.
-- Accept the exact tracked production-helper path through a mandatory scalar
-  `HelperPath` parameter.
-- Resolve `HelperPath` once to an existing regular, non-reparse-point
-  filesystem file before changing location, and use that absolute path for
-  every invocation.
-- Create all fixture state beneath one unique runner-temporary root.
-- Invoke the production helper as a child script through the documented public
-  parameters.
-- For the deterministic unsafe-cleanup fixture only, dot-source the same
-  resolved helper once through its documented definition-only behavior, then
-  invoke the exact named production cleanup function.
-- Never otherwise copy, dot-source, or reimplement the helper's digest, path,
-  containment, archive, manifest, lifecycle, cleanup, or extraction logic.
-- Change working directory during at least one valid case.
-- Return nonzero for every unexpected result, diagnostic, filesystem state, or
-  cleanup failure.
-- Clean the complete fixture root in `finally`.
-
-The Ubuntu pull-request job, every Windows pull-request cell, every Windows
-push cell, and the synchronization writer whenever `has_changes=true` must
-invoke this exact tracked harness against the exact tracked production helper.
-The suite must use stable case identifiers and this outcome contract:
-
-| Fixture class | Expected result | Required phase and postcondition |
+Do not add language-specific exceptions in this issue.
+
+Use `git add --renormalize .` only in the controlled validation worktree.
+Before staging, record current Git attributes and path sets. After staging,
+prove the cached path set is exactly the five affected files and that no
+generated artifact changed.
+
+### 4. Use exact hosted Node 24
+
+In `.github/workflows/markdownlint.yml`:
+
+- use the reviewed setup-node action commit from the action table below;
+- configure:
+
+  ```yaml
+  with:
+    node-version: '24'
+    package-manager-cache: false
+  ```
+
+- resolve the actual Node process before installation;
+- require exact major 24 and log the full Node and npm versions;
+- run a clean `npm ci`;
+- run the unchanged outer Markdown lint command;
+- run the unchanged nested-Markdown lint command; and
+- classify the native exit of each phase.
+
+Do not change:
+
+- `.github/workflows/package.json`;
+- `.github/workflows/package-lock.json`;
+- `.husky/pre-commit`;
+- lint configuration;
+- lint script names; or
+- repository contributor/runtime-floor policy.
+
+The final package versions, `engines.node`, hook runtime guard, advisory
+disposition, npm update policy, and contributor minimum belong to
+**Remediate Markdown lint dependency advisories and add npm update
+governance**.
+
+If repository policy prohibits carrying the current high-severity advisories,
+execute that npm issue first and rebaseline this issue to its exact merge
+commit.
+
+### 5. Pin and allowlist the current external actions
+
+Immediately before implementation, resolve these release tags from their
+official repositories and retain the output in the pull request. If a tag no
+longer resolves to the listed commit, stop and review the upstream change
+instead of silently substituting another commit.
+
+| Action | Required full commit SHA | Reviewed release |
 | --- | --- | --- |
-| Exact valid archive with its correct digest | Success | Extract exactly the four expected ordinary, non-reparse-point files with expected bytes. |
-| Exact valid archive with one entry carrying symlink-like external attributes | Success | Extract exactly four ordinary, non-reparse-point files; restore no link, type, mode, timestamp, or other ZIP metadata. |
-| Exact valid archive with omitted diagnostic labels | Success | Extract safely and record every omitted label as unavailable. |
-| Induced failure with all diagnostic labels supplied | Reject | Fail in the induced phase and preserve the exact supplied labels. |
-| Explicitly empty optional diagnostic label | Reject | Fail during parameter validation before filesystem/archive processing. Exercise each optional label. |
-| Valid exact archive with a deliberately altered, well-formed 64-hex expected digest | Reject | Fail before opening the ZIP and before candidate-leaf creation. |
-| Missing or extra archive entry | Reject | Fail after ZIP open but before candidate-leaf creation or entry extraction. |
-| Exact duplicate or case-only collision | Reject | Fail after ZIP open but before candidate-leaf creation or entry extraction. |
-| Forward- or backslash-nested path | Reject | Fail after ZIP open but before candidate-leaf creation or entry extraction. |
-| Forward or backward traversal | Reject | Fail after ZIP open but before candidate-leaf creation or entry extraction. |
-| Leading-slash, leading-backslash, or drive-qualified name | Reject | Fail after ZIP open but before candidate-leaf creation or entry extraction. |
-| Directory entry or file/directory collision | Reject | Fail after ZIP open but before candidate-leaf creation or entry extraction. |
-| Empty central-directory name using a reviewed fixed raw fixture | Reject | Fail after ZIP open but before candidate-leaf creation or entry extraction. |
-| Invalid or truncated ZIP | Reject | Fail during ZIP open/read before candidate-leaf creation. |
-| Exact manifest with a UTF-8 BOM in extracted content | Reject | Fail during post-extraction validation, safely remove the helper-created candidate leaf, and report any cleanup failure. |
-| Exact manifest with a CR byte in extracted content | Reject | Fail during post-extraction validation, safely remove the helper-created candidate leaf, and report any cleanup failure. |
-| Deterministic unsafe cleanup state at the exact owned leaf | Reject and retain | Invoke the exact production cleanup function after replacing or mutating the journaled leaf into an unsafe state; refuse deletion, retain the path, and report both the primary failure and stable cleanup diagnostics. |
-| Hidden extra entry in the download directory | Reject | Fail before selecting or opening an archive. |
-| Existing candidate file or directory | Reject | Fail before ZIP extraction and never reuse the leaf. |
-| Candidate symlink/reparse point or dangling candidate link | Reject | Fail before ZIP extraction and never follow the leaf. |
-| Either declared root equal to or containing the other | Reject | Fail during root/containment validation before archive selection. |
-| Download or candidate path outside the trusted temporary root | Reject | Fail during containment validation before archive selection or leaf creation. |
-| Checkout-sibling prefix path | Success as an outside-checkout classification fixture | Prove the separator-aware check does not misclassify a sibling such as `<checkout>-other` as inside the checkout. |
-| Windows case-variant containment path | Classify using Windows filesystem comparison | Prove ordinal-ignore-case containment on Windows. |
-| Relative or non-filesystem-provider path | Reject | Fail during parameter/root validation. |
-| Filesystem-provider-qualified absolute path | Success as a path-classification fixture | Prove supported provider qualification resolves to the intended absolute filesystem path. |
-| Reparse/symbolic-link root or ancestor component | Reject | Fail during full-component validation before archive selection or leaf creation. |
+| `actions/checkout` | `3d3c42e5aac5ba805825da76410c181273ba90b1` | `v7.0.1` |
+| `actions/setup-node` | `820762786026740c76f36085b0efc47a31fe5020` | `v7.0.0` |
+| `actions/upload-artifact` | `043fb46d1a93c77aae656e7c1c64a875d1fc6a0a` | `v7.0.1` |
 
-`ZipArchive.CreateEntry` may be used for constructible cases. Because it rejects an empty name at creation time, use a deterministic reviewed raw fixture for that case.
+Every `uses:` line must contain the exact full SHA plus the matching release
+annotation. Tags, branches, abbreviated hashes, dynamic `uses:`, remote
+reusable workflows, unreviewed Docker actions, and other external repositories
+are prohibited.
 
-For each rejection fixture:
+The implementation-time verifier must parse all tracked workflow YAML and
+require exact multiset equality for the current workflow roles:
 
-- Require the helper or direct cleanup-function fixture, as applicable, to fail.
-- Capture the relevant initial state before invocation and assert the required
-  final state before the harness's unconditional `finally` teardown. The
-  harness teardown is not evidence that production cleanup succeeded.
-- Require no write outside the fixture root.
-- Require the digest-mismatch fixture to fail before a `ZipArchive` is
-  constructed or read, after hashing the already-open retained stream.
-- Include the stable case identifier, failure phase, and offending entry in
-  diagnostics when available.
+| Workflow | Role | Action | Expected count |
+| --- | --- | --- | ---: |
+| `build.yml` | read-only verification checkout | `actions/checkout` | 1 |
+| `build.yml` | current push-only synchronization checkout | `actions/checkout` | 1 |
+| `build.yml` | verification artifact upload | `actions/upload-artifact` | 1 |
+| `markdownlint.yml` | repository checkout | `actions/checkout` | 1 |
+| `markdownlint.yml` | hosted Node setup | `actions/setup-node` | 1 |
 
-Apply these per-case destination outcomes rather than one global
-"destination absent" rule:
+Each observed row includes workflow path, job ID, stable step role, repository,
+full SHA, release annotation, and count. Reject missing, duplicate, swapped,
+and extra uses. The verifier is offline; live upstream resolution belongs to
+the reviewed update process.
 
-| Rejection-state class | Representative cases | Required final state before harness teardown |
-| --- | --- | --- |
-| Initially absent; rejected before helper creation | Digest mismatch, malformed manifest, invalid ZIP, invalid roots, and outside-root paths | The candidate leaf remains absent. |
-| Preexisting leaf | Existing file, directory, link, reparse point, or dangling link | The preexisting object remains in place and is not followed, traversed, reused, or mutated. |
-| Helper-created ordinary owned leaf | Separate post-extraction BOM and CR cases and any deterministic ordinary post-creation failure | The exact journaled leaf is safely removed nonrecursively; unrelated sentinels remain unchanged. |
-| Unsafe or ownership-uncertain cleanup state | Direct deterministic substitution/mutation of the exact journaled leaf before calling the production cleanup function | The path is retained; cleanup stops without recursion or traversal; diagnostics preserve the primary failure and add the stable cleanup phase, retained path, unsafe entry when safely available, and cleanup exception when present. |
+The later writer-activation issue must replace this exact current-role table
+atomically with its final workflow/role/count table.
 
-The deterministic unsafe-cleanup fixture must use the one permitted
-definition-only dot-source operation without running the main entry point, and
-must invoke the same named cleanup function used by the production failure
-path. It must not copy or reimplement cleanup logic or add another public
-expansion interface. Its mandatory cross-platform unsafe state is an unexpected,
-unjournaled ordinary immediate child, so the fail-closed oracle never depends on
-link-creation privileges. Add a link/reparse substitution variant where the
-runner supports it.
+### 6. Add review-only GitHub Actions updates
 
-For each successful archive fixture:
-
-- Require successful extraction.
-- Require exactly the four expected root-level regular files.
-- Require expected bytes, no BOM or CR, and no restored archive metadata.
-
-For every fixture:
-
-- Compute the actual archive digest except for the deliberately altered expected-digest case.
-- Assert the expected success or rejection explicitly; an exception without the matching phase/postcondition assertion is not a complete oracle.
-- Require named sentinels outside the intended fixture destination to remain
-  absent or unchanged.
-- Do not silently count an unavailable symlink/reparse fixture as passing. An
-  expected inability to create one particular link form may produce a stable,
-  narrowly justified case-level skip, but an unexpected setup failure fails the
-  cell. At least one real component-or-leaf symbolic-link/reparse fixture must
-  execute and prove rejection on Ubuntu, and at least one must execute and prove
-  rejection on Windows; a platform-wide link-fixture skip is prohibited.
-
-These are production contract self-tests exercising the exact tracked helper,
-not a bypass or alternate extraction implementation. Pull-request Ubuntu
-verification, all four pull-request Windows cells, all four push Windows cells,
-and the writer whenever `has_changes=true` collectively exercise both
-operating-system families before merge and at use time.
-
-### 7. Use least-privileged, immutable candidate transport
-
-Remove workflow-level `contents: write`.
-
-Only the synchronization writer may declare:
-
-```yaml
-permissions:
-  contents: write
-```
-
-All other jobs must use no more than:
-
-```yaml
-permissions:
-  contents: read
-```
-
-#### Native-command contract
-
-Every custom PowerShell `run:` block must:
-
-- Use an explicit `powershell` or `pwsh` shell.
-- Begin with `$ErrorActionPreference = 'Stop'`.
-- Capture `$LASTEXITCODE` immediately after every native command.
-- Require exit code `0` unless another allowed set is explicitly documented.
-- Treat Git diff exit code `1` as an ordinary difference only where documented.
-- Treat every other diff exit code as command failure.
-- Require `git ls-remote --exit-code` to return `0`; exit `2` is failure.
-- Validate parsed output count and shape.
-- Include command purpose and exit code in failures.
-
-Do not rely on `$PSNativeCommandUseErrorActionPreference`.
-
-#### External-action pins and update visibility
-
-Every nonlocal `uses:` reference in `.github/workflows/build.yml` and
-`.github/workflows/markdownlint.yml` must use a verified full commit SHA with
-an adjacent release comment.
-
-As of 2026-07-29, use:
-
-```yaml
-uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-```
-
-for every checkout step in both workflows;
-
-```yaml
-uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-```
-
-for the markdown-lint setup step;
-
-```yaml
-uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-```
-
-for every artifact upload; and:
-
-```yaml
-uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-```
-
-Immediately before implementation:
-
-1. Verify each SHA in the official action repository.
-2. Verify the adjacent version comment.
-3. Check for a newer required security release.
-4. Verify the selected action metadata, Node runtime, runner compatibility, and
-   every input/output used by these workflows.
-5. If changed, update the SHA, comment, references, and evidence together.
-6. Do not use a branch or movable tag.
-7. Do not select a download release lacking `artifact-ids`,
-   `skip-decompress`, or `digest-mismatch`.
-8. Preserve markdown lint's existing Node/package behavior; action pinning does
-   not authorize a dependency, lint-rule, or cache-semantics change.
-
-Checkout v7 carries forward v6's persisted-credential placement under
-`RUNNER_TEMP` rather than `.git/config`, updates the action to the Node 24
-runtime, and includes the v7 ESM/fork and security-dependency changes. Ordinary
-authenticated Git commands must continue to work. Prove the writer's
-authenticated push and successful post-job credential cleanup in the controlled
-drill. If runner or relied-on input/output verification discovers a real,
-documented v7 incompatibility, retain v6 only as an explicitly approved
-compatibility ceiling with the evidence recorded; do not retain v6 merely
-because it was the prior pin.
-
-Create `.github/dependabot.yml` containing:
+Create `.github/dependabot.yml` with normalized exact content equivalent to:
 
 ```yaml
 version: 2
@@ -751,1279 +195,151 @@ updates:
       interval: weekly
 ```
 
-Dependabot version updates must remain review-only. Do not add auto-merge.
-Review each proposed action update's upstream release, full SHA, version
-comment, runtime, input/output compatibility, and workflow evidence before
-merging it. Dependabot visibility does not replace immutable execution-time
-pins or human review.
-
-#### Track nested npm advisory remediation without expanding this issue
-
-The nested Markdown-lint toolchain has a separate dependency-security concern.
-As of 2026-07-29, running
-`npm audit --package-lock-only --json` from `.github/workflows` reports seven
-affected package nodes: five high severity and two moderate severity. The
-reported package names are:
-
-- `brace-expansion`
-- `js-yaml`
-- `linkify-it`
-- `markdown-it`
-- `markdownlint-cli2`
-- `minimatch`
-- `picomatch`
-
-The current repository also selects Node 20 in
-`.github/workflows/markdownlint.yml`, installs
-`markdownlint-cli2@0.20.0`/`markdownlint@0.40.0`, has no project
-`engines.node`, and admits any available `npm` in `.husky/pre-commit`. The
-current `markdownlint-cli2@0.23.2` candidate and its
-`markdownlint@0.41.1` dependency both declare Node `>=22`; upstream explicitly
-removed Node 20 support in `markdownlint-cli2` 0.23.0, and Node 20 is
-end-of-life. These are dated planning facts. The remediation issue must requery
-the final package metadata, changelog, Node release status, lockfile, audit, and
-repository use sites rather than freezing these versions as its implementation
-oracle.
-
-This issue must not modify `.github/workflows/package.json`,
-`.github/workflows/package-lock.json`, the Node version, or lint behavior.
-Instead, file a real, separately reviewable npm-remediation issue and link it
-from this subsection before T1 closes.
-
-##### Required linked-issue ownership
-
-The linked issue owns:
-
-- final dependency and lockfile selection after reviewing registry metadata,
-  changelogs, resolved versions, integrity values, and dependency paths;
-- one coherent Node policy derived from the final dependency tree;
-- a matching `engines.node` declaration;
-- the Markdown workflow's Node selection;
-- an early actual-version check and stable remediation message in
-  `.husky/pre-commit`, while preserving its GUI/version-manager guidance;
-- an npm Dependabot decision for directory `/.github/workflows`;
-- complete current advisory disposition;
-- clean-install, positive, negative, and real-hook integration evidence; and
-- explicit replacement of the intermediate T1/T2 gates that its final state
-  necessarily supersedes.
-
-The expected current policy is a final package minimum of Node 22 with Node 24
-as the preferred/default hosted LTS baseline. Validate both the selected
-minimum and Node 24. If final package metadata changes the minimum, update the
-policy and evidence coherently; do not claim support for an untested runtime
-merely because an open semver range admits it. `devEngines` may supplement
-`engines.node` only after the selected npm versions and cross-platform behavior
-are verified. It must not replace the hook check or CI evidence.
-
-At minimum, affected-file discovery must consider:
-
-- `.github/workflows/package.json`;
-- `.github/workflows/package-lock.json`;
-- `.github/workflows/markdownlint.yml`;
-- `.husky/pre-commit`;
-- `.github/dependabot.yml`; and
-- every test or fixture path required by the selected validation design.
-
-This is a candidate set, not permission to change every path and not an
-exhaustive final set. The linked issue must derive and validate its exact
-working/staged path set from the final design.
-
-##### Required executable evidence
-
-Use a disposable clone/worktree or equivalently isolated Git index so negative
-fixtures and hook execution cannot disturb the implementation index. Resolve
-every cleanup target inside the disposable root and remove only test-owned
-state.
-
-At the selected Node minimum and Node 24, require:
-
-1. `npm ci`.
-2. Repository-root outer Markdown lint.
-3. `.github/workflows` nested fenced-Markdown lint.
-4. The exact tracked `.husky/pre-commit` behavior for:
-   - no staged Markdown → success without lint execution;
-   - staged compliant Markdown → outer and nested success;
-   - a staged deterministic outer violation → rejection with the expected rule
-     and fixture path;
-   - a staged deterministic nested fenced-Markdown violation → rejection with
-     the expected nested rule, file, and depth/context; and
-   - absent/broken tooling or another deterministic startup failure → the
-     stable tooling diagnostic, never a false negative-test pass.
-5. At least one real Git/Husky-installed smoke invocation in the disposable
-   repository, or documented equivalent evidence that the exact installed
-   shell path was exercised.
-
-Generate invalid outer and nested fixtures ephemerally in the isolated
-repository and remove them in `finally`. Keep the tracked samples positive; do
-not refer to a nonexistent “existing negative fixture.” Capture every Git, npm,
-Node, hook, outer-lint, and nested-lint exit status immediately. Distinguish a
-lint result from an import, configuration, or startup failure.
-
-##### Required audit and residual-risk evidence
-
-Rerun `npm audit --package-lock-only --json` and capture every current
-moderate/high/critical advisory URL and affected dependency path. Treat the
-seven package nodes above only as a dated comparison baseline; one node may
-have multiple advisories or paths.
-
-Prefer a clean result. Any unavoidable residual must have one structured,
-durably recorded issue/PR entry containing:
-
-- exact advisory URL;
-- exact affected package/dependency path;
-- nonempty named owner;
-- invariant `YYYY-MM-DD` UTC expiration date;
-- real follow-up GitHub issue URL; and
-- concise rationale.
-
-Mechanically reject duplicate advisory/path records, blank fields, invalid or
-expired dates, non-issue follow-up values, current findings without approvals,
-approvals absent from the current audit, and approvals remaining after a clean
-audit. Derive the approved set from the structured records and require exact
-set equality. Clearly label any human review rather than claiming a script
-proved it. Do not use unreviewed `npm audit fix --force`.
-
-##### Dependabot final state and supersession
-
-If repository-policy review selects npm Dependabot, validate normalized exact
-final content containing precisely:
-
-1. weekly review-only `github-actions` updates for `/`; and
-2. weekly review-only npm updates for `/.github/workflows`.
-
-Reject duplicate or extra ecosystems/directories, malformed schedules, loss of
-the T1 entry, and auto-approval or auto-merge mechanisms in the changed scope.
-If policy rejects npm Dependabot, record the rationale and validate the retained
-one-entry state instead of claiming a two-entry state.
-
-The linked issue must say explicitly:
-
-- its final Dependabot assertion supersedes T1's implementation-time
-  exact-one-entry assertion if the npm entry is added;
-- its own exact affected-file gate supersedes T1's seven-file and T2's six-file
-  implementation-time working/staged-set gates; and
-- all nonsuperseded generator, helper/harness, permission, immutable action-pin,
-  artifact, workflow-security, and Markdown-behavior checks remain green.
-
-The default execution order is T1, T2, then the npm-remediation issue, because
-T1 and T2 intentionally preserve the nested toolchain. If repository policy
-prohibits proceeding while high-severity advisories are open, move the separate
-npm issue before T1 and rebaseline both T1 and T2 against its merged dependency
-Node, hook, workflow, Dependabot, and lockfile state before implementation. A
-comment, draft, or unlinked placeholder does not satisfy this tracking
-requirement.
-
-#### Digest integrity
-
-Every production download must explicitly set:
-
-```yaml
-skip-decompress: true
-digest-mismatch: error
-```
-
-Two complementary protections apply:
-
-1. **Native protection.** The pinned download action obtains the artifact's digest from GitHub metadata, passes it as the expected hash, and fails the action when the computed digest differs and behavior is `error`. Do not attempt a live drill that corrupts GitHub's artifact service to induce a native mismatch; record static evidence instead:
-   - The final workflow uses the approved full SHA and the two explicit inputs.
-   - The pinned action source obtains `artifact.digest` from GitHub metadata and passes it as the expected hash.
-   - It throws when the actual digest differs and behavior is `error`.
-   - Successful controlled and post-merge logs show the expected artifact ID/digest and completed download.
-   - A version-matched upstream negative test may be cited when available, but is not a repository acceptance blocker.
-2. **Independent protection.** Every Windows push cell, and the writer whenever
-   `has_changes=true`, passes preparation's propagated `artifact-digest` output
-   to the shared helper, which independently hashes the retained stream,
-   compares it with that value, rewinds it, and uses it to construct the only
-   `ZipArchive`, per the helper's expected-digest contract. This protection is
-   exercised by the propagated-digest rejection drill below and by the
-   digest-mismatch self-test fixture.
-
-### 8. Pull-request verification
-
-#### Ubuntu verification
-
-The pull-request Ubuntu job must:
-
-- Run only for `pull_request`.
-- Use `ubuntu-latest`.
-- Use `contents: read`.
-- Check out the exact event SHA.
-- Run the exact tracked permanent harness against the exact tracked helper under
-  `shell: pwsh`, assert Core major version 7 in that same process, and clean the
-  runner-temporary fixture root in `finally`.
-- Run the generator with `pwsh`.
-- Compare all four artifacts logically and by raw blob identity with `HEAD`.
-- Upload exactly four diagnostic artifacts after success or ordinary failure, but not cancellation.
-- Use an attempt-qualified name containing `github.run_id` and `github.run_attempt`.
-- Set `overwrite: false`.
-- Never commit or push.
-
-Use:
-
-```yaml
-if: ${{ !cancelled() }}
-```
-
-A stale-artifact message must instruct the contributor to regenerate, review, and commit all four artifacts.
-
-#### Four-cell Windows validation topology
-
-Implement separate pull-request and push Windows matrix jobs using:
-
-```yaml
-strategy:
-  fail-fast: false
-  matrix:
-    edition:
-      - desktop
-      - core
-    fixture_eol:
-      - lf
-      - crlf
-```
-
-Every cell must use:
-
-```yaml
-runs-on: windows-latest
-permissions:
-  contents: read
-```
-
-No Windows cell may stage, commit, or push.
-
-Use these rules:
-
-- `shell: powershell` when `matrix.edition == 'desktop'`;
-- `shell: pwsh` when `matrix.edition == 'core'`;
-- `shell: pwsh` for edition-neutral fixture preparation and inspection.
-
-Implement helper execution as two mutually exclusive steps rather than a `pwsh` dispatcher:
-
-- The Desktop step uses `if: ${{ matrix.edition == 'desktop' }}` and `shell: powershell`.
-- The Core step uses `if: ${{ matrix.edition == 'core' }}` and `shell: pwsh`.
-- Each step asserts its required edition/version and invokes the self-test in that same process.
-- On push, that same edition-specific step invokes the production helper immediately after its self-test.
-- No edition-neutral `pwsh` step may dot-source, call, or launch `Expand-StyleGuideCandidateArtifact.ps1`.
-
-Each cell must:
-
-1. Check out the exact event SHA.
-2. Prove `HEAD` equals the expected SHA.
-3. Prove the fresh checkout of `STYLE_GUIDE.md`,
-   `STYLE_GUIDE_RATIONALE.md`, the generator, helper, and harness contains at
-   least one LF and no CR.
-4. For push validation:
-   - depend on preparation;
-   - download preparation's exact ID;
-   - create one unique trusted temporary root outside checkout;
-   - create the download directory beneath that root and reserve a separate,
-     initially nonexistent candidate path beneath it;
-   - retain the downloaded archive in that directory with no automatic
-     extraction.
-5. In the edition-specific helper step:
-   - validate only the assigned edition:
-     - `desktop`: `PSEdition == 'Desktop'` and version exactly 5.1;
-     - `core`: `PSEdition == 'Core'` and major version 7;
-   - run the exact tracked permanent harness against the exact tracked helper on
-     both events;
-   - on push, invoke the shared helper with explicit checkout/trusted roots,
-     download/candidate paths, propagated digest, artifact ID, run ID, and run
-     attempt to validate and safely extract the exact candidate before
-     generation.
-6. Prepare only the assigned source fixture:
-   - `lf`: retain and prove BOM-less LF with no CR;
-   - `crlf`: convert `STYLE_GUIDE.md`, `STYLE_GUIDE_RATIONALE.md`, and the generator using `UTF8Encoding($false)`, `ReadAllText`, and `WriteAllText`, then prove at least one CRLF, no bare LF, no lone CR, and no BOM. Do not stage or restore fixtures between the CRLF setup and the cell's generator run.
-7. Run the generator once under the assigned edition.
-8. Apply the complete diagnostic-preserving artifact contract.
-9. Include event, edition, version, fixture EOL, artifact path, and push artifact ID in failures.
-
-The required normative cells are:
-
-| Fixture EOL | Windows PowerShell 5.1 | PowerShell 7 |
-| --- | --- | --- |
-| LF | Required | Required |
-| CRLF | Required | Required |
-
-##### Diagnostic-preserving artifact contract
-
-After the normative generator run:
-
-1. Run:
-   - pull request: artifact-only `git diff --exit-code` against `HEAD`;
-   - push: artifact-by-artifact `git diff --no-index --exit-code` against the safely extracted candidate.
-2. Store exit code 1 as an ordinary logical difference.
-3. Treat every other nonzero exit as command failure.
-4. Read generated raw bytes.
-5. Diagnose BOM and CR before generic mismatch.
-6. Resolve raw identities:
-   - pull request: working-tree `git hash-object --no-filters` versus `git rev-parse HEAD:<path>`;
-   - push: generated `git hash-object --no-filters` versus candidate `git hash-object --no-filters`.
-7. If logical and raw identities differ, report a stale/logical mismatch and include the logical diff.
-8. If the raw identity differs while the logical comparison is clean, report a raw-only difference hidden by Git conversion.
-9. If the stored logical comparison differed, fail after completing all byte diagnostics.
-
-##### Lone-CR sanitation probe
-
-Run this only in the two `fixture_eol == 'lf'` cells, after the normative LF comparison:
-
-1. Restore `STYLE_GUIDE.md`, `STYLE_GUIDE_RATIONALE.md`, and the generator to BOM-less LF.
-2. In `STYLE_GUIDE.md`, find an LF with non-newline characters immediately before and after it.
-3. Replace exactly that LF with one CR.
-4. Write using `UTF8Encoding($false)`.
-5. Read the persisted bytes and prove:
-   - no BOM;
-   - exactly one `0x0D`;
-   - no `0x0D 0x0A`.
-6. Run the generator under the cell's assigned edition.
-7. Require all four outputs to be BOM-less and contain no `0x0D`.
-8. Do not compare sanitation outputs with `HEAD` or the push candidate.
-9. Do not upload sanitation outputs.
-
-Passing this probe proves writer sanitation only. It does not claim CR-only source compatibility.
-
-### 9. Push preparation, validation, approval, and writing
-
-#### Read-only preparation
-
-The push-preparation job must:
-
-- Run only on `push`.
-- Use `ubuntu-latest` and `contents: read`.
-- Check out and verify `github.sha`.
-- Run the generator with `pwsh`.
-- Inspect only the four generated paths.
-- Reject BOM or CR bytes.
-- Determine `has_changes` without treating ordinary differences as command failure.
-- Upload exactly the four explicit paths in one immutable archive.
-- Never stage, commit, or push.
-
-Use an attempt-qualified name, for example:
-
-```text
-style-guide-candidate-${{ github.run_id }}-${{ github.run_attempt }}
-```
-
-Configure:
-
-- The approved pinned upload action.
-- `archive: true`.
-- Four explicit file paths.
-- No wildcard or directory upload.
-- `overwrite: false`.
-- `if-no-files-found: error`.
-
-Expose nonempty outputs:
-
-- `has_changes`
-- `candidate_artifact_name`
-- `candidate_artifact_id`
-- `candidate_artifact_digest`
-
-Source the ID and digest from the upload step's `artifact-id` and `artifact-digest` outputs. The ID is the authoritative selector; the name is diagnostic only.
-
-#### Push Windows matrix
-
-Every push cell must:
-
-- Depend on preparation.
-- Download the exact preparation artifact ID.
-- Use the approved pinned download action.
-- Set `skip-decompress: true`.
-- Set `digest-mismatch: error`.
-- Run the exact tracked permanent harness and invoke the shared helper with
-  explicit checkout/trusted roots, download/candidate paths, propagated digest,
-  artifact ID, run ID, and run attempt in the cell's explicit edition-specific
-  step.
-- Validate the safely extracted candidate rather than an independently regenerated candidate.
-- Never stage, commit, or push.
-
-All four cells must succeed.
-
-#### Read-only approval
-
-The approval job must:
-
-- Depend on preparation and the complete four-cell Windows matrix.
-- Use no more than `contents: read`.
-- Run only after every dependency succeeds.
-- Require nonempty artifact ID and digest.
-- Copy exactly:
-  - `has_changes`
-  - `validated_candidate_artifact_id`
-  - `validated_candidate_artifact_digest`
-- Never download, regenerate, stage, commit, or push.
-
-#### Write-enabled synchronization
-
-The writer must:
-
-- Run only for push.
-- Depend on approval.
-- Run only when `has_changes == 'true'`.
-- Be the sole `contents: write` job.
-- Use `ubuntu-latest`.
-- Check out and verify the exact triggering SHA.
-- Never regenerate.
-- Download only the approved artifact ID.
-- Use `skip-decompress: true` and `digest-mismatch: error`.
-- Create one unique trusted temporary root outside checkout, create the
-  download directory beneath it, and reserve a separate initially nonexistent
-  candidate path beneath it.
-- Run the exact tracked permanent harness against the exact tracked helper.
-- Invoke the same shared helper with explicit checkout/trusted roots,
-  download/candidate paths, approved digest, artifact ID, run ID, and run
-  attempt.
-- Copy and stage only the four approved files.
-- Never fetch, merge, rebase, amend, or retry.
-
-Configure the writer with:
-
-```yaml
-env:
-  TARGET_REF: ${{ github.ref }}
-  EXPECTED_SHA: ${{ github.sha }}
-```
-
-Keep target validation, remote preflight, copying, staging, commit creation, and push in one complete PowerShell `run:` block. Before copying:
-
-1. Copy `$env:TARGET_REF` to `$strTargetRef` and `$env:EXPECTED_SHA` to `$strExpectedSha`.
-2. Require both local values to be nonempty.
-3. Require `$strTargetRef` to begin with `refs/heads/`.
-4. Require `$strTargetRef` to equal `$env:GITHUB_REF` using ordinal comparison.
-5. Require `$strExpectedSha` to equal `$env:GITHUB_SHA` using ordinal, case-insensitive comparison.
-6. Resolve the checked-out commit with `git rev-parse --verify "HEAD^{commit}"`, capture `$LASTEXITCODE` immediately, require exactly one complete hexadecimal object ID, and require it to equal `$strExpectedSha`. This establishes the repository's native full object-ID length without accepting an abbreviation or hard-coding one hash algorithm.
-7. Run `git ls-remote --exit-code --refs origin $strTargetRef`, capture `$LASTEXITCODE` immediately, and require zero.
-8. Parse exactly one `<object-id><TAB><ref>` line.
-9. Require the returned ref to equal `$strTargetRef` and the returned object ID to equal `$strExpectedSha`.
-
-Use `$strTargetRef` and `$strExpectedSha` unchanged for the later lease and destination refspec. Do not re-read another ref source.
-
-For each artifact:
-
-1. Reject candidate BOM and CR.
-2. Calculate the candidate blob with `git hash-object --no-filters`.
-3. Copy to the tracked destination.
-4. Recheck destination BOM and CR.
-5. Calculate the destination blob.
-6. Require candidate and destination blob identity.
-
-Then:
-
-1. Stage exactly the four artifacts.
-2. Run `git diff --cached --check`.
-3. Require the exact staged path set.
-4. Resolve every stage-0 blob with `git rev-parse --verify ":<path>"`.
-5. Require every staged blob to equal the candidate blob.
-6. Configure the existing bot identity.
-7. Commit with the existing `[skip ci]` message.
-8. Require the synchronization commit's sole parent to equal `github.sha`.
-9. Resolve every committed blob with `git rev-parse --verify "HEAD:<path>"`.
-10. Require every committed blob to equal the candidate blob.
-
-Push in that same PowerShell block using:
-
-```powershell
-& git push `
-    "--force-with-lease=$($strTargetRef):$($strExpectedSha)" `
-    origin `
-    "HEAD:$($strTargetRef)"
-$intGitExitCode = $LASTEXITCODE
-
-if ($intGitExitCode -ne 0) {
-    throw (
-        ("Synchronization push was rejected with exit code {0}. The exact " +
-        "expected-SHA lease did not permit the target update; a newer " +
-        "main-branch push run must perform synchronization.") -f
-        $intGitExitCode
-    )
-}
-```
-
-The parentheses around the complete concatenated message are required because `-f` binds more tightly than `+`.
-
-Prohibit:
-
-- `--force`
-- Leading `+` refspecs
-- Bare `--force-with-lease`
-- A lease without an expected object
-- Bare `git push`
-- An implicit destination
-- Retry or adaptation to newer history
-
-### 10. Change nothing else
-
-- Keep `#Requires -Version 5.1` on the generator.
-- Keep `Get-Content -Raw -Encoding UTF8`.
-- Do not rename generator functions or parameters.
-- Do not change source Markdown.
-- Do not change guide version/date/changelog metadata.
-- Do not introduce a PAT or broad secret.
-- Do not add another write-enabled job.
-- Do not add speculative `.gitattributes` exceptions.
-- Do not claim CR-only source compatibility.
-- Do not use cache, a permanent test branch, external storage, or independent regeneration for candidate transport.
-- Do not weaken or retry the exact-lease push.
-- Do not change markdown-lint dependencies, Node version, lint rules, event
-  coverage, or behavior beyond the exact action pins.
-- Do not configure Dependabot for another ecosystem or add auto-merge.
-- Do not modify any path outside the seven affected implementation files.
-- Keep all four generated artifacts byte-for-byte unchanged.
+Use the repository's approved weekday/time/timezone fields if maintainers
+require them. The final normalized configuration must contain exactly one
+`github-actions` entry for `/`, no duplicate update blocks, and no automatic
+approval or merge behavior.
+
+Dependabot proposals do not authorize an action upgrade. Each upgrade must
+re-establish official repository/release provenance and update the `uses:`
+lines, release annotations, exact-role allowlist, and negative fixtures
+atomically.
+
+The later npm issue replaces this intermediate one-entry invariant with exactly
+two entries by adding npm at `/.github/workflows`.
+
+### 7. Isolate current publication and record its boundary
+
+This issue must not activate a new download action, candidate helper, approval
+job, or artifact-promotion writer. Preserve the current build workflow's
+functional generation/publication behavior with an explicit temporary
+least-privilege split:
+
+- set workflow/top-level permissions to `contents: read`;
+- run one verification job on applicable pull requests and pushes;
+- let that job check out, generate, compare, and upload current generated
+  files without credentials or repository writes;
+- put the existing direct commit/push behavior in a separate job that is
+  eligible only for a push to `main`;
+- give only that push-only job `contents: write`;
+- disable persisted checkout credentials everywhere and expose its write
+  credential only for the existing exact push step;
+- prohibit new secrets or external actions; and
+- document that T1B replaces this temporary direct-publication job with the
+  final unfiltered artifact, matrix, approval, and exact-lease topology.
+
+The temporary push-only job must still start from the exact triggering SHA,
+stage only the four generated artifacts, and stop on any other changed path.
+It does not claim the immutable-candidate, four-local identity, or exact-lease
+properties that T1B will establish.
+
+The Markdown workflow remains read-only and runs for every pull request
+targeting `main`.
 
 ## Validation
 
-### Local cross-edition validation
+Run validation from a clean disposable clone or worktree. Do not let one
+edition overwrite the evidence produced by another.
 
-Run from the repository root:
+### Generator byte matrix
 
-```powershell
-$ErrorActionPreference = 'Stop'
+For each available supported edition:
 
-$arrArtifactPaths = @(
-    'copilot-instructions.md'
-    'terraform.instructions.md'
-    'STYLE_GUIDE_CHAT.md'
-    'STYLE_GUIDE_FULL.md'
-)
+- Windows PowerShell exactly 5.1;
+- PowerShell Core major 7 on Windows; and
+- PowerShell Core major 7 on Ubuntu;
 
-$strChildCommand = @'
-$ErrorActionPreference = 'Stop'
+perform:
 
-try {
-    $strExpectedEdition = $env:TERRAFORM_STYLE_GUIDE_EXPECTED_PSEDITION
-    $strExpectedMajor = $env:TERRAFORM_STYLE_GUIDE_EXPECTED_PSMAJOR
-    $strExpectedMinor = $env:TERRAFORM_STYLE_GUIDE_EXPECTED_PSMINOR
-    $strTarget = $env:TERRAFORM_STYLE_GUIDE_VALIDATION_TARGET
+1. record executable path, edition, full version, OS, and Git version;
+2. start from exact committed source and artifact bytes;
+3. run the exact generator;
+4. capture all four output SHA-256 values;
+5. prove no UTF-8 BOM and no `0x0D` byte;
+6. prove a second run is byte-for-byte idempotent; and
+7. compare hashes across every executed edition.
 
-    if ([string]::IsNullOrWhiteSpace($strExpectedEdition)) {
-        throw 'The expected PSEdition was not supplied.'
-    }
+At minimum, Windows PowerShell 5.1 and one PowerShell 7 run must produce
+identical hashes before merge.
 
-    $intExpectedMajor = 0
+Add controlled temporary fixtures proving CRLF and lone CR are converted to LF
+at each complete-payload boundary. Restore test-owned state in `finally`.
 
-    if (-not [int]::TryParse($strExpectedMajor, [ref]$intExpectedMajor)) {
-        throw 'The expected PowerShell major version is invalid.'
-    }
+### Node and lint
 
-    if ($PSVersionTable.PSEdition -cne $strExpectedEdition) {
-        throw (
-            "Expected PSEdition {0}; observed {1}." -f
-            $strExpectedEdition,
-            $PSVersionTable.PSEdition
-        )
-    }
+From `.github/workflows`:
 
-    if ($PSVersionTable.PSVersion.Major -ne $intExpectedMajor) {
-        throw (
-            "Expected PowerShell major version {0}; observed {1}." -f
-            $intExpectedMajor,
-            $PSVersionTable.PSVersion.Major
-        )
-    }
+1. resolve and record one Node/npm application pair;
+2. require the observed Node major to be 24;
+3. save the caller's `CI` environment state;
+4. set process-scoped `CI=true` only for `npm ci`;
+5. restore the prior `CI` value or absence in `finally`;
+6. run both existing lint scripts with the same npm application; and
+7. prove package, lockfile, hook, and lint configuration are unchanged.
 
-    if (-not [string]::IsNullOrEmpty($strExpectedMinor)) {
-        $intExpectedMinor = 0
+### Git and workflow policy
 
-        if (-not [int]::TryParse($strExpectedMinor, [ref]$intExpectedMinor)) {
-            throw 'The expected PowerShell minor version is invalid.'
-        }
+Prove:
 
-        if ($PSVersionTable.PSVersion.Minor -ne $intExpectedMinor) {
-            throw (
-                "Expected PowerShell minor version {0}; observed {1}." -f
-                $intExpectedMinor,
-                $PSVersionTable.PSVersion.Minor
-            )
-        }
-    }
+- `.gitattributes` has exact required content;
+- tracked text blobs and the five staged files contain no CR byte;
+- all external actions equal the exact role allowlist;
+- negative fixtures reject a mutable tag, arbitrary 40-hex SHA, wrong
+  repository, duplicate use, extra workflow, and swapped role;
+- Dependabot has exactly one permitted entry;
+- workflow permissions did not broaden; and
+- generated artifact blobs are unchanged.
 
-    switch -CaseSensitive ($strTarget) {
-        'Harness' {
-            & './.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1' `
-                -HelperPath './.github/workflows/Expand-StyleGuideCandidateArtifact.ps1'
-        }
+### Exact scope gate
 
-        'Generator' {
-            & './.github/workflows/Generate-StyleGuideArtifacts.ps1'
-        }
+Before staging, require the complete changed/untracked path set to equal the
+five affected files. After `git add --renormalize .`, require the cached path
+set to equal the same five paths. Fail on every additional path, including a
+generated artifact.
 
-        default {
-            throw ("Unknown validation target: {0}" -f $strTarget)
-        }
-    }
-
-    if (-not $?) {
-        throw ("Validation target failed: {0}" -f $strTarget)
-    }
-}
-catch {
-    [Console]::Error.WriteLine($_.Exception.Message)
-    exit 1
-}
-
-exit 0
-'@
-
-$arrEditionCommands = @(
-    [pscustomobject]@{
-        Label           = 'PowerShell 7'
-        Name            = 'pwsh'
-        ExpectedEdition = 'Core'
-        ExpectedMajor   = 7
-        ExpectedMinor   = $null
-    }
-    [pscustomobject]@{
-        Label           = 'Windows PowerShell 5.1'
-        Name            = 'powershell'
-        ExpectedEdition = 'Desktop'
-        ExpectedMajor   = 5
-        ExpectedMinor   = 1
-    }
-)
-
-$arrChildEnvironmentNames = @(
-    'TERRAFORM_STYLE_GUIDE_EXPECTED_PSEDITION'
-    'TERRAFORM_STYLE_GUIDE_EXPECTED_PSMAJOR'
-    'TERRAFORM_STYLE_GUIDE_EXPECTED_PSMINOR'
-    'TERRAFORM_STYLE_GUIDE_VALIDATION_TARGET'
-)
-
-$htOriginalChildEnvironment = @{}
-
-foreach ($strEnvironmentName in $arrChildEnvironmentNames) {
-    $objEnvironmentItem = Get-Item `
-        -LiteralPath ("Env:{0}" -f $strEnvironmentName) `
-        -ErrorAction SilentlyContinue
-
-    $htOriginalChildEnvironment[$strEnvironmentName] = [pscustomobject]@{
-        Exists = $null -ne $objEnvironmentItem
-        Value = if ($null -eq $objEnvironmentItem) {
-            $null
-        }
-        else {
-            $objEnvironmentItem.Value
-        }
-    }
-}
-
-$intValidatedEditionCount = 0
-
-try {
-foreach ($objEditionCommand in $arrEditionCommands) {
-    $objResolvedCommand = Get-Command `
-        -Name $objEditionCommand.Name `
-        -CommandType Application `
-        -ErrorAction SilentlyContinue |
-        Select-Object -First 1
-
-    if ($null -eq $objResolvedCommand) {
-        Write-Warning (
-            "{0} is unavailable locally; CI must supply this coverage." -f
-            $objEditionCommand.Label
-        )
-
-        continue
-    }
-
-    Set-Item `
-        -LiteralPath 'Env:TERRAFORM_STYLE_GUIDE_EXPECTED_PSEDITION' `
-        -Value ([string]$objEditionCommand.ExpectedEdition)
-    Set-Item `
-        -LiteralPath 'Env:TERRAFORM_STYLE_GUIDE_EXPECTED_PSMAJOR' `
-        -Value ([string]$objEditionCommand.ExpectedMajor)
-    Set-Item `
-        -LiteralPath 'Env:TERRAFORM_STYLE_GUIDE_EXPECTED_PSMINOR' `
-        -Value ([string]$objEditionCommand.ExpectedMinor)
-    Set-Item `
-        -LiteralPath 'Env:TERRAFORM_STYLE_GUIDE_VALIDATION_TARGET' `
-        -Value 'Harness'
-
-    & $objResolvedCommand.Path -NoLogo -NoProfile -Command $strChildCommand
-
-    $intHarnessExitCode = $LASTEXITCODE
-
-    if ($intHarnessExitCode -ne 0) {
-        throw (
-            "Helper harness failed under {0} with exit code {1}." -f
-            $objEditionCommand.Label,
-            $intHarnessExitCode
-        )
-    }
-
-    Set-Item `
-        -LiteralPath 'Env:TERRAFORM_STYLE_GUIDE_VALIDATION_TARGET' `
-        -Value 'Generator'
-
-    & $objResolvedCommand.Path -NoLogo -NoProfile -Command $strChildCommand
-
-    $intGeneratorExitCode = $LASTEXITCODE
-
-    if ($intGeneratorExitCode -ne 0) {
-        throw (
-            "Generator failed under {0} with exit code {1}." -f
-            $objEditionCommand.Label,
-            $intGeneratorExitCode
-        )
-    }
-
-    git diff --exit-code HEAD -- $arrArtifactPaths
-    $intGitExitCode = $LASTEXITCODE
-
-    if ($intGitExitCode -ne 0) {
-        throw (
-            "Artifacts generated by {0} differ from HEAD; git exited with {1}." -f
-            $objEditionCommand.Label,
-            $intGitExitCode
-        )
-    }
-
-    foreach ($strArtifactPath in $arrArtifactPaths) {
-        $strAbsolutePath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
-            $strArtifactPath
-        )
-
-        $arrBytes = [System.IO.File]::ReadAllBytes($strAbsolutePath)
-
-        if (
-            $arrBytes.Length -ge 3 -and
-            $arrBytes[0] -eq 0xEF -and
-            $arrBytes[1] -eq 0xBB -and
-            $arrBytes[2] -eq 0xBF
-        ) {
-            throw (
-                "{0} generated a UTF-8 BOM in {1}." -f
-                $objEditionCommand.Label,
-                $strArtifactPath
-            )
-        }
-
-        if ([Array]::IndexOf($arrBytes, [byte]0x0D) -ge 0) {
-            throw (
-                "{0} generated a carriage return in {1}." -f
-                $objEditionCommand.Label,
-                $strArtifactPath
-            )
-        }
-
-        $arrWorkingHashOutput = @(
-            & git hash-object --no-filters -- $strArtifactPath
-        )
-        $intGitExitCode = $LASTEXITCODE
-
-        if ($intGitExitCode -ne 0) {
-            throw (
-                "Unable to hash {0} after {1}; git exited with {2}." -f
-                $strArtifactPath,
-                $objEditionCommand.Label,
-                $intGitExitCode
-            )
-        }
-
-        $arrCommittedHashOutput = @(
-            & git rev-parse --verify "HEAD:$strArtifactPath"
-        )
-        $intGitExitCode = $LASTEXITCODE
-
-        if ($intGitExitCode -ne 0) {
-            throw (
-                "Unable to resolve HEAD:{0}; git exited with {1}." -f
-                $strArtifactPath,
-                $intGitExitCode
-            )
-        }
-
-        if (
-            ($arrWorkingHashOutput -join "`n").Trim() -cne
-            ($arrCommittedHashOutput -join "`n").Trim()
-        ) {
-            throw (
-                "Raw bytes generated by {0} differ from HEAD: {1}" -f
-                $objEditionCommand.Label,
-                $strArtifactPath
-            )
-        }
-    }
-
-    $intValidatedEditionCount++
-}
-
-if ($intValidatedEditionCount -eq 0) {
-    throw 'Neither required PowerShell edition is available for local validation.'
-}
-}
-finally {
-    foreach ($strEnvironmentName in $arrChildEnvironmentNames) {
-        $objOriginalEnvironment = $htOriginalChildEnvironment[$strEnvironmentName]
-        $strEnvironmentPath = "Env:{0}" -f $strEnvironmentName
-
-        if ($objOriginalEnvironment.Exists) {
-            Set-Item `
-                -LiteralPath $strEnvironmentPath `
-                -Value $objOriginalEnvironment.Value
-        }
-        else {
-            Remove-Item `
-                -LiteralPath $strEnvironmentPath `
-                -ErrorAction SilentlyContinue
-        }
-    }
-}
-```
-
-The fixed child command treats expected edition/version values and target
-selection only as data; it does not interpolate them as code. Each available
-edition asserts its identity and invokes the exact tracked helper harness in one
-child process, then does the same for the generator in another child process
-before the parent verifies that edition's generated outputs. The parent restores
-all four environment variables even on failure. CI remains responsible for
-mandatory coverage of both editions.
-
-### Verify the generator-convergence record
-
-In the T1 pull request, record:
-
-1. The current PSStyleGuide generator commit and P1 issue revision inspected,
-   or an explicit statement that P1 had not landed when T1 implementation
-   began.
-2. The implemented T1 behavior for every shared row in the generator
-   convergence matrix.
-3. Every observed difference, classified as repository-specific content,
-   deliberately accepted design, or a defect with a real follow-up.
-4. Whether both repositories use equivalent inline serialization boundaries or
-   equivalent private helpers.
-5. The local raw-byte and cross-edition evidence that proves T1's shared
-   serialization invariants without comparing repository-specific final guide
-   bytes.
-
-If T1 is the second implementation, resolve unexplained divergence before
-merge. If T1 is first, make this record the explicit handoff baseline for P1.
-This evidence does not make either repository a runtime or release dependency
-of the other.
-
-### Verify working-tree scope, stage, renormalize, and verify the staged set
-
-```powershell
-$ErrorActionPreference = 'Stop'
-
-$arrExpectedStagedPaths = @(
-    '.gitattributes'
-    '.github/dependabot.yml'
-    '.github/workflows/Expand-StyleGuideCandidateArtifact.ps1'
-    '.github/workflows/Generate-StyleGuideArtifacts.ps1'
-    '.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1'
-    '.github/workflows/build.yml'
-    '.github/workflows/markdownlint.yml'
-) | Sort-Object
-
-$arrStatusLines = @(
-    git status `
-        --porcelain=v1 `
-        --untracked-files=all `
-        --ignore-submodules=none `
-        -- .
-)
-$intGitExitCode = $LASTEXITCODE
-
-if ($intGitExitCode -ne 0) {
-    throw (
-        "Unable to read working-tree status; git exited with {0}." -f
-        $intGitExitCode
-    )
-}
-
-$arrChangedPaths = @(
-    $arrStatusLines |
-        ForEach-Object {
-            if ($_ -notmatch '^..\s+') {
-                throw ("Unexpected porcelain status record: {0}" -f $_)
-            }
-
-            $_ -replace '^..\s+', ''
-        } |
-        Sort-Object -Unique
-)
-
-$arrWorkingTreeDifferences = @(
-    Compare-Object `
-        -ReferenceObject $arrExpectedStagedPaths `
-        -DifferenceObject $arrChangedPaths `
-        -CaseSensitive
-)
-
-if ($arrWorkingTreeDifferences.Count -ne 0) {
-    throw (
-        "The working-tree path set is not exactly the seven implementation " +
-        "files. Status: {0}" -f
-        ($arrStatusLines -join '; ')
-    )
-}
-
-git add -- `
-    .gitattributes `
-    .github/dependabot.yml `
-    .github/workflows/Expand-StyleGuideCandidateArtifact.ps1 `
-    .github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1
-$intGitExitCode = $LASTEXITCODE
-
-if ($intGitExitCode -ne 0) {
-    throw ("git add failed with exit code {0}." -f $intGitExitCode)
-}
-
-git add --renormalize .
-$intGitExitCode = $LASTEXITCODE
-
-if ($intGitExitCode -ne 0) {
-    throw ("git add --renormalize failed with exit code {0}." -f $intGitExitCode)
-}
-
-git add -- $arrExpectedStagedPaths
-$intGitExitCode = $LASTEXITCODE
-
-if ($intGitExitCode -ne 0) {
-    throw ("git add failed with exit code {0}." -f $intGitExitCode)
-}
-
-git diff --cached --check
-$intGitExitCode = $LASTEXITCODE
-
-if ($intGitExitCode -ne 0) {
-    throw (
-        "git diff --cached --check failed with exit code {0}." -f
-        $intGitExitCode
-    )
-}
-
-$arrStagedPaths = @(git diff --cached --name-only)
-$intGitExitCode = $LASTEXITCODE
-
-if ($intGitExitCode -ne 0) {
-    throw (
-        "Unable to list staged paths; git exited with {0}." -f
-        $intGitExitCode
-    )
-}
-
-$arrStagedPaths = @($arrStagedPaths | Sort-Object)
-
-$arrStagedDifferences = @(
-    Compare-Object `
-        -ReferenceObject $arrExpectedStagedPaths `
-        -DifferenceObject $arrStagedPaths `
-        -CaseSensitive
-)
-
-if ($arrStagedDifferences.Count -ne 0) {
-    throw (
-        "Unexpected staged path set after renormalization; investigate " +
-        "before committing: {0}" -f
-        ($arrStagedPaths -join ', ')
-    )
-}
-
-git ls-files --eol
-$intGitExitCode = $LASTEXITCODE
-
-if ($intGitExitCode -ne 0) {
-    throw ("git ls-files --eol failed with exit code {0}." -f $intGitExitCode)
-}
-
-$arrStagedPaths
-```
-
-Use `git check-attr text eol` on representative text files and require `text: auto`, `eol: lf`.
-
-### Verify external-action pins and Dependabot configuration
-
-Inspect both workflow files and require every nonlocal `uses:` reference to
-contain exactly one 40-hex full commit SHA and an adjacent nonempty version
-comment. Reject a branch, tag, shortened SHA, missing comment, or malformed
-reference.
-
-Require `.github/dependabot.yml` to parse as the selected version-2 weekly
-`github-actions` configuration for directory `/`, with no auto-merge mechanism.
-Confirm the selected checkout, setup-node, upload, and download SHAs still
-belong to their official repositories and satisfy the relied-on metadata
-contracts.
-
-### Pull-request evidence
-
-Confirm:
-
-1. Every pull request targeting `main` runs.
-2. Ubuntu verification is read-only and runs the exact tracked permanent harness
-   against the exact tracked helper under PowerShell 7.
-3. The Windows matrix displays and completes four distinct edition/EOL cells.
-4. Every Windows cell runs the exact tracked permanent harness against the exact
-   tracked helper in the same process as its assigned edition assertion: Desktop
-   5.1 under `powershell`, Core 7 under `pwsh`.
-5. No edition-neutral fixture step invokes the helper.
-6. The two LF cells run lone-CR sanitation under their assigned editions.
-7. Diagnostic upload runs after ordinary failure but not cancellation.
-8. Diagnostic names contain run ID and attempt.
-9. No pull-request job has write permission.
-10. Push-only jobs skip.
-11. Every external action in both workflow files uses an approved full SHA
-    with an adjacent version comment.
-12. Every production download is by ID with both integrity inputs.
-13. Dependabot is configured for review-only weekly GitHub Actions updates.
-14. Static review confirms no event path filters and no prohibited push form.
-
-### Controlled temporary-branch evidence
-
-Use a uniquely named temporary branch. Temporarily add only that exact branch to the push branch filter.
-
-1. Commit one stale generated artifact so `has_changes=true`.
-2. Push.
-3. Confirm one immutable candidate with nonempty ID/digest.
-4. Confirm all four Windows cells download the same ID, run the exact tracked
-   harness (including digest, diagnostic-label, root, and component-link
-   fixtures), and invoke the shared helper with explicit roots, paths, digest,
-   and caller-owned diagnostic labels.
-5. Confirm approval propagates the same ID/digest only after the complete matrix.
-6. Confirm only the writer has write permission.
-7. Confirm the writer runs the exact tracked harness and invokes the same
-   helper with explicit roots, paths, digest, and caller-owned diagnostic
-   labels.
-8. Confirm candidate, destination, index, and commit blob identity.
-9. Confirm the synchronization commit's parent is the triggering SHA.
-10. Confirm `TARGET_REF` equals `GITHUB_REF`, the same validated local target ref is used for preflight, lease, and refspec, and the exact expected-SHA lease is applied.
-11. Confirm only four artifacts are committed.
-12. Confirm no recursive workflow run.
-
-#### Propagated-digest rejection drill
-
-1. Use the successful controlled branch.
-2. Replace only the expected-digest value supplied to the shared helper with a known-wrong, well-formed 64-hex value.
-3. Leave the pinned download action, immutable ID, and real artifact unchanged.
-4. Confirm the action's native download succeeds against GitHub's metadata.
-5. Confirm the helper fails before opening the ZIP, running manifest validation, or creating the candidate directory.
-6. Do not describe this as a native action mismatch.
-7. Remove the test-only value afterward.
-
-#### Malformed-transport drill
-
-1. In the temporary branch only, create a prebuilt malformed ZIP.
-2. Upload that single ZIP with the approved upload action and `archive: false`. Note that with `archive: false` the file's name becomes the artifact name and the `name` input is ignored; this is harmless because selection is by immutable ID.
-3. Propagate its immutable ID and digest as the candidate.
-4. Confirm every Windows cell fails inside the shared helper before candidate-directory creation.
-5. Confirm approval and the writer skip.
-6. Do not require that rejected artifact to reach the writer; the writer uses
-   the same helper and is separately exercised by the exact tracked harness and
-   the successful write drill.
-
-Also perform:
-
-- Unrelated-file-only trigger check.
-- Preflight stale-ref rejection before copying/staging.
-- Exact-lease rejection after local commit but before remote update.
-- Manual rerun proving a new attempt-qualified artifact name.
-
-Do not attempt to corrupt GitHub's artifact service to induce a native digest mismatch. Record the pinned-source/configuration evidence instead.
-
-Delete the temporary branch and remove every test-only mutation.
-
-### Post-merge evidence
-
-After merge:
-
-1. The `main` push starts the pipeline.
-2. Preparation uploads one immutable candidate.
-3. All four Windows cells validate it through the exact tracked harness and
-   shared helper under their assigned editions, using explicit roots and
-   caller-owned diagnostic labels.
-4. Preparation reports `has_changes=false`.
-5. Approval succeeds.
-6. Writer skips.
-7. No bot commit is created.
-8. Both events retain only the `main` branch filter and no path filters.
-
-This no-drift run proves the four read-only Windows consumers and the expected writer skip. The writer's helper integration and `has_changes=true` path are proved by the controlled temporary-branch synchronization drill and static inspection; none of the skipped writer's steps are described as having executed here.
-
-Observe the first natural unrelated-file-only `main` push; do not create a synthetic `main` commit solely for observation.
+After all validation, run the generator and lint once more from the exact
+staged content and require an empty worktree/index delta beyond those five
+intentional paths.
 
 ## Acceptance criteria
 
-- All four payloads normalize CRLF/lone CR to LF at serialization.
-- All writes use resolved paths, `UTF8Encoding($false)`, and `WriteAllText`.
-- The existing LF-joined frontmatter construction is unchanged.
-- The generator-convergence matrix records every shared algorithm/invariant and
-  intentional repository-specific difference without creating a
-  cross-repository runtime or hard release dependency.
-- The T1 pull request records the current PSStyleGuide/P1 baseline inspected,
-  classifies every observed generator difference, and supplies the reciprocal
-  handoff or second-implementation drift evidence.
-- `.gitattributes` contains exactly `* text=auto eol=lf`.
-- Renormalization produces no unexplained path.
-- Generator, helper, and harness versions are correctly recorded.
-- Both events cover `main` without path filters.
-- Only the writer has `contents: write`.
-- Every external action in both workflow files uses an approved full SHA and
-  adjacent version comment.
-- Review-only weekly Dependabot GitHub Actions updates are configured without
-  auto-merge.
-- A real, separately reviewable issue for the dated seven-node nested npm
-  advisory baseline is filed and linked before T1 closes; dependency, lockfile,
-  Node, hook, and lint-behavior changes remain outside T1.
-- The linked npm issue owns one coherent final package/Node/workflow/hook
-  policy; clean installation and actual-hook positive/negative/tooling-failure
-  evidence at the selected minimum and Node 24; complete current advisory/path
-  disposition; any structured, owned, expiring residual record; the npm
-  Dependabot policy decision and exact resulting configuration; and explicit
-  supersession of T1/T2's intermediate Dependabot and path-set gates.
-- Preparation declares `archive: true` and exposes one nonempty immutable ID/digest pair.
-- Production downloads use immutable IDs, `skip-decompress: true`, and `digest-mismatch: error`.
-- Pinned-source/configuration evidence establishes fatal native mismatch behavior without an infeasible live corruption drill.
-- The shared helper is the only candidate extraction implementation.
-- The helper opens the selected ZIP exactly once with `FileMode.Open`,
-  `FileAccess.Read`, and `FileShare.Read`; hashes that same retained stream with
-  `Get-FileHash -InputStream`; requires exactly one valid digest; compares it
-  with the propagated upload digest; rewinds it; and constructs the only
-  read-only `ZipArchive` over that same stream.
-- The archive is disposed before the retained stream, and both are disposed
-  before cleanup. Path-based hashing, reopening the ZIP, and memory or
-  staging-file copies are prohibited.
-- The helper accepts and independently validates explicit checkout and
-  trusted-temporary roots rather than deriving either boundary from ambient
-  process state.
-- The checkout and trusted-temporary roots are mutually non-overlapping, and
-  download and candidate paths are strict descendants of the trusted temporary
-  root and outside checkout.
-- Every existing absolute component from the filesystem root through both
-  declared roots and working paths is checked and rejects symbolic-link or
-  reparse-point indirection.
-- Relevant component, containment, parent, leaf, and type checks repeat
-  immediately before archive open, immediately before candidate creation, and
-  after extraction.
-- The protected, job-owned, no-competing-writer residual race model is stated
-  without claiming OS-native handle guarantees.
-- Optional artifact/run diagnostic labels distinguish omitted from explicitly
-  empty values, are never invented, and appear with stable failure phases.
-- Separator-aware, OS-appropriate path comparison rejects the checkout while accepting a checkout-sibling prefix as outside.
-- Every exact filesystem-entry assertion uses exhaustive enumeration that includes hidden/system entries.
-- Existing files, directories, symlinks, reparse points, and dangling links at the candidate leaf are rejected before extraction.
-- The candidate leaf is absent until digest and manifest validation succeed.
-- Rejection postconditions are case-specific and are asserted before harness
-  teardown: pre-creation failures leave an initially absent leaf absent;
-  preexisting leaves remain unchanged and are never followed; ordinary
-  helper-created journaled leaves are safely removed nonrecursively; and an
-  unsafe or ownership-uncertain cleanup state is retained with the primary
-  failure plus stable cleanup diagnostics.
-- The tracked harness definition-only loads and directly exercises the exact
-  named production cleanup function for a deterministic unsafe-cleanup fixture,
-  without copying the implementation or adding another public expansion
-  interface.
-- Only the four exact entries are accepted.
-- Archive metadata is ignored.
-- Extracted results are exactly four regular, non-reparse-point files.
-- One tracked, versioned harness is the sole deterministic fixture-suite
-  definition.
-- Ubuntu pull-request verification and every pull-request Windows cell run that
-  exact tracked harness against the exact tracked helper before merge.
-- Every Windows push cell runs the suite and production helper on every push; the synchronization job runs them whenever `has_changes=true` and is skipped when `has_changes=false`.
-- Helper invocations and their edition/version assertions occur in the same explicit-shell process; edition-neutral steps never invoke the helper.
-- Every rejection fixture satisfies its specified failure phase and
-  case-specific final-state contract; the digest-mismatch fixture fails before
-  a `ZipArchive` is constructed or read after hashing the same held stream.
-- The normal and external-attributes archive fixtures extract exactly four
-  ordinary files; the external-attributes case proves archive metadata is
-  ignored rather than restored.
-- Duplicate, case-colliding, nested, traversal, absolute, drive-qualified,
-  directory, empty-name, missing, extra, file/directory-collision,
-  hidden-extra-download-entry, existing/dangling-leaf, invalid-ZIP, separate
-  post-extraction BOM and CR cleanup, deterministic unsafe-cleanup retention,
-  digest-mismatch, metadata-ignored,
-  root-overlap, outside-trusted-root, sibling-prefix, case-variant,
-  provider-qualified, ancestor/component-link, omitted-label, supplied-label,
-  and empty-label cases are covered.
-- An end-to-end malformed raw ZIP is rejected before extraction.
-- The Windows topology is an actual four-cell edition × EOL matrix with `fail-fast: false`.
-- Each cell runs only its assigned edition and EOL.
-- The two LF cells run lone-CR sanitation under their assigned editions.
-- Approval runs only after the complete matrix.
-- The writer downloads only the approved candidate.
-- Candidate, destination, index, and commit blobs match.
-- The synchronization commit is a single child of `github.sha`.
-- The writer validates one canonical `TARGET_REF` against `GITHUB_REF`, proves `EXPECTED_SHA` is the checkout's complete repository-native commit object ID, uses both values unchanged for remote preflight and `HEAD:<full-ref>`, and applies the exact expected-SHA lease.
-- No prohibited force or retry behavior exists.
-- Local validation asserts Desktop exactly 5.1 or Core major 7 and invokes each
-  harness/generator target in the same child `-Command` process, verifies each
-  available edition immediately after it runs, restores its temporary
-  environment data, and leaves CI responsible for mandatory coverage of both
-  editions.
-- Before staging, the complete changed-path set is exactly the seven
-  implementation files.
-- After staging and renormalization, the cached path set is exactly those same
-  seven files.
-- LF, CRLF, and lone-CR sanitation evidence passes.
-- Controlled synchronization, propagated-digest rejection, malformed-transport, unrelated-trigger, stale-preflight, and exact-lease drills pass without touching `main`.
-- Test-only mutations are removed.
-- Exactly seven implementation files change.
-- Generated artifacts remain byte-for-byte unchanged.
+- [ ] All four complete payloads normalize CRLF and lone CR immediately before
+      explicit BOM-less UTF-8 serialization.
+- [ ] Windows PowerShell 5.1 and PowerShell 7 produce identical artifact bytes.
+- [ ] Repeated generation is byte-idempotent and the four committed generated
+      artifacts remain unchanged.
+- [ ] `.gitattributes` contains exactly `* text=auto eol=lf`.
+- [ ] Hosted Markdown validation runs on actual Node major 24 with automatic
+      setup-node package-manager caching disabled.
+- [ ] Clean installation and both unchanged lint surfaces pass.
+- [ ] The package manifest, lockfile, hook, and lint policy do not change.
+- [ ] Every current external action equals its exact official
+      repository/SHA/workflow-role/count allowlist row.
+- [ ] Mutable, arbitrary, swapped, duplicate, missing, and extra action
+      fixtures fail offline.
+- [ ] Dependabot has exactly one review-only GitHub Actions entry for `/`.
+- [ ] No new writer, candidate download, helper, approval job, secret, or
+      external action is activated.
+- [ ] The exact working/staged path gates contain only the five affected files.
+- [ ] The pull request records the exact merge commit consumed by T1A.
+
+## Non-goals
+
+- Candidate ZIP parsing or extraction.
+- Caller temporary-root ownership.
+- Permanent helper harness implementation.
+- Artifact download/promotion or writer redesign.
+- Package or lockfile upgrades.
+- Declaring the final contributor Node minimum.
+- Changing hook or lint semantics.
+- Hand-editing generated outputs.
 
 ## References
 
-- [PowerShell character encoding](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_character_encoding)
-- [Microsoft Learn: `about_Operator_Precedence`](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_operator_precedence)
-- [Microsoft Learn: `about_Preference_Variables`](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_preference_variables)
-- [Microsoft Learn: `about_Environment_Variables`](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_environment_variables)
-- [Microsoft Learn: `about_Comment_Based_Help`](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_comment_based_help)
-- [Microsoft Learn: `Get-FileHash` in Windows PowerShell 5.1](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/get-filehash?view=powershell-5.1)
-- [Microsoft Learn: PowerShell editions](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_powershell_editions)
-- [Microsoft Learn: `pwsh` command-line interface](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pwsh)
-- [Microsoft Learn: `powershell.exe` command-line interface](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_powershell_exe?view=powershell-5.1)
-- [Microsoft Learn: `Get-ChildItem`](https://learn.microsoft.com/powershell/module/microsoft.powershell.management/get-childitem)
-- [Microsoft Learn: `Resolve-Path`](https://learn.microsoft.com/powershell/module/microsoft.powershell.management/resolve-path)
-- [`.NET UTF8Encoding`](https://learn.microsoft.com/dotnet/api/system.text.utf8encoding.-ctor)
-- [`File.WriteAllText`](https://learn.microsoft.com/dotnet/api/system.io.file.writealltext)
-- [`File.ReadAllBytes`](https://learn.microsoft.com/dotnet/api/system.io.file.readallbytes)
-- [`Directory.EnumerateFileSystemEntries`](https://learn.microsoft.com/dotnet/api/system.io.directory.enumeratefilesystementries)
-- [`.NET FileAttributes`](https://learn.microsoft.com/dotnet/api/system.io.fileattributes)
-- [`Path.GetFullPath`](https://learn.microsoft.com/dotnet/api/system.io.path.getfullpath)
-- [`FileMode`](https://learn.microsoft.com/dotnet/api/system.io.filemode)
-- [`File.Open`](https://learn.microsoft.com/en-us/dotnet/api/system.io.file.open)
-- [`FileShare`](https://learn.microsoft.com/en-us/dotnet/api/system.io.fileshare)
-- [`ZipArchive.Entries`](https://learn.microsoft.com/dotnet/api/system.io.compression.ziparchive.entries)
-- [`ZipArchive.CreateEntry`](https://learn.microsoft.com/dotnet/api/system.io.compression.ziparchive.createentry)
-- [`ZipArchiveEntry.Open`](https://learn.microsoft.com/dotnet/api/system.io.compression.ziparchiveentry.open)
-- [`ZipArchiveEntry.FullName`](https://learn.microsoft.com/dotnet/api/system.io.compression.ziparchiveentry.fullname)
-- [`ZipArchiveEntry.ExternalAttributes`](https://learn.microsoft.com/dotnet/api/system.io.compression.ziparchiveentry.externalattributes)
-- [Git attributes](https://git-scm.com/docs/gitattributes)
-- [Git `status`](https://git-scm.com/docs/git-status)
-- [Git `add --renormalize`](https://git-scm.com/docs/git-add#Documentation/git-add.txt---renormalize)
-- [Git `hash-object`](https://git-scm.com/docs/git-hash-object)
-- [Git `rev-parse`](https://git-scm.com/docs/git-rev-parse)
-- [Git `ls-remote`](https://git-scm.com/docs/git-ls-remote)
-- [Git push and exact leases](https://git-scm.com/docs/git-push)
-- [GitHub Actions workflow syntax](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax)
-- [GitHub Actions variables](https://docs.github.com/en/actions/reference/workflows-and-actions/variables)
-- [GitHub Actions job conditions](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-jobs-with-conditions)
-- [GitHub Actions `needs`](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idneeds)
-- [GitHub Docs: Evaluate expressions in workflows and actions](https://docs.github.com/en/actions/reference/workflows-and-actions/expressions)
-- [GitHub secure-use reference](https://docs.github.com/en/actions/reference/security/secure-use)
-- [GitHub Docs: Keep actions up to date with Dependabot](https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/secure-your-dependencies/auto-update-actions)
-- [GitHub Docs: Configure Dependabot version updates](https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/secure-your-dependencies/configure-version-updates)
-- [GitHub Docs: Dependabot-supported GitHub Actions references](https://docs.github.com/en/code-security/reference/supply-chain-security/supported-ecosystems-and-repositories#github-actions)
-- [npm Docs: `npm audit`](https://docs.npmjs.com/cli/v11/commands/npm-audit/)
-- [npm Docs: `package.json` `engines` and `devEngines`](https://docs.npmjs.com/cli/v11/configuring-npm/package-json#engines)
 - [Node.js release status](https://nodejs.org/en/about/previous-releases)
-- [`markdownlint-cli2` v0.23.2 package metadata](https://github.com/DavidAnson/markdownlint-cli2/blob/v0.23.2/package.json)
-- [`markdownlint` v0.41.1 package metadata](https://github.com/DavidAnson/markdownlint/blob/v0.41.1/package.json)
-- [`markdownlint-cli2` changelog](https://github.com/DavidAnson/markdownlint-cli2/blob/v0.23.2/CHANGELOG.md)
-- [`markdownlint-cli2` exit codes](https://github.com/DavidAnson/markdownlint-cli2/blob/v0.20.0/README.md#exit-codes)
-- [Git `githooks`](https://git-scm.com/docs/githooks)
-- [Husky Node version-manager and GUI guidance](https://typicode.github.io/husky/how-to.html#node-version-managers-and-guis)
-- [GitHub Dependabot options reference](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference)
-- [`checkout` v7.0.1 release](https://github.com/actions/checkout/releases/tag/v7.0.1)
-- [`checkout` v7.0.1 commit](https://github.com/actions/checkout/commit/3d3c42e5aac5ba805825da76410c181273ba90b1)
-- [`setup-node` v7.0.0 release](https://github.com/actions/setup-node/releases/tag/v7.0.0)
-- [`setup-node` v7.0.0 commit](https://github.com/actions/setup-node/commit/820762786026740c76f36085b0efc47a31fe5020)
-- [`upload-artifact` v7.0.1 README](https://github.com/actions/upload-artifact/blob/v7.0.1/README.md)
-- [`download-artifact` v8.0.1 inputs](https://github.com/actions/download-artifact/blob/v8.0.1/action.yml)
-- [`download-artifact` v8.0.1 implementation](https://github.com/actions/download-artifact/blob/v8.0.1/src/download-artifact.ts)
-- [GitHub `GITHUB_TOKEN` trigger behavior](https://docs.github.com/en/actions/concepts/security/github_token)
-- [PSStyleGuide generator](https://github.com/franklesniak/PSStyleGuide/blob/main/.github/workflows/Generate-StyleGuideArtifacts.ps1)
-- [PSStyleGuide `.gitattributes`](https://github.com/franklesniak/PSStyleGuide/blob/main/.gitattributes)
-- [PSStyleGuide Function and Script Versioning](https://github.com/franklesniak/PSStyleGuide/blob/main/STYLE_GUIDE.md#function-and-script-versioning)
-- [copilot-repo-template#851](https://github.com/franklesniak/copilot-repo-template/issues/851)
-- [copilot-repo-template#852](https://github.com/franklesniak/copilot-repo-template/pull/852)
+- [setup-node](https://github.com/actions/setup-node)
+- [GitHub secure use reference](https://docs.github.com/en/actions/reference/security/secure-use)
+- [Git attributes](https://git-scm.com/docs/gitattributes)
+- [git add](https://git-scm.com/docs/git-add)
+- [PowerShell about character encoding](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_character_encoding)
+- [Dependabot options](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference)
