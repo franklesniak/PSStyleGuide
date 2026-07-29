@@ -98,6 +98,12 @@ The 2026-07-29 comparison baseline is:
 | Moderate | 2 | `markdown-it`, `markdownlint-cli2` |
 | Low | 0 | — |
 
+Those seven values are vulnerability-property counts. The same dated response
+contains fourteen object advisory records. Record vulnerability properties,
+object advisories, and distinct `(Package, AdvisoryUrl)` disposition keys as
+separate units. Treat all three dated values as a comparison baseline, not as
+the expected implementation-time final set.
+
 npm proposed `markdownlint-cli2@0.23.2` for the direct chain at review time and
 classified that as semver-major relative to the current pre-1.0 range. Treat
 that only as a time-stamped candidate, not an instruction to install an
@@ -129,8 +135,17 @@ Then:
 7. do not suppress or lower the audit threshold merely to obtain a passing
    command.
 
-Determine the highest minimum Node major required by the final selected direct
-dependency tree. Set that same minimum in:
+Inspect the Node engine constraint for every package in the complete resolved
+direct and transitive tree, plus the selected npm CLI. Evaluate the combined
+semver constraints rather than looking only at direct dependencies or a simple
+numeric floor. Select the lowest supported LTS major that the complete reviewed
+tree admits, and require:
+
+```text
+selected minimum <= 24
+```
+
+Set that same minimum admission floor in:
 
 - `.github/workflows/package.json` as `engines.node`;
 - `.husky/pre-commit`; and
@@ -138,10 +153,28 @@ dependency tree. Set that same minimum in:
 
 Update both guard messages together. For the review-time candidate, the
 selected minimum is Node 22. If implementation-time releases require a higher
-minimum, use that higher value and rebaseline the tests. Retain exact Node 24
-in `markdownlint.yml` and in full-corpus hosted validation. Prove the staged
-integration under both the selected minimum and Node 24; do not claim a lower
-supported major without executing it.
+minimum no greater than 24, use that higher value and rebaseline the tests. A
+candidate whose constraints exclude Node 24 is incompatible with this issue:
+select another safe candidate, redesign the hosted runtime in separately
+reviewed scope, or disposition an otherwise unavoidable advisory.
+
+Retain exact Node 24 in `markdownlint.yml` and in full-corpus hosted
+validation. Treat `engines.node: >=<minimum>` and the two guards as a minimum
+admission rule. The executed support evidence names the selected supported LTS
+minimum and Node 24; it does not claim that every intervening, EOL, or future
+major has been tested.
+
+When the selected minimum is below 24, run two independently clean runtime
+cells:
+
+- selected minimum; and
+- Node 24.
+
+In each cell, record exact Node/npm versions, set
+`npm_config_engine_strict=true`, prohibit `--force`, run fresh `npm ci`,
+`npm ls --all`, both production lint commands, and the tracked harness. Restore
+the previous environment value afterward. If the selected minimum is 24, one
+clean Node 24 cell may satisfy both roles when the evidence says so explicitly.
 
 If no safe current upgrade removes an advisory, record:
 
@@ -195,11 +228,13 @@ The harness must:
 - declare the PowerShell version it actually supports and run on Windows and
   Ubuntu;
 - resolve the exact tracked `lint-staged-markdown.mjs`,
-  `lint-nested-markdown.js`, configuration, Node executable, npm executable,
-  and repository root before changing location;
+  `.husky/pre-commit`, `lint-nested-markdown.js`, configuration, Node
+  executable, npm executable, POSIX shell used for the hook, and repository
+  root before changing location;
 - use a unique test-owned temporary root and an isolated Git index or
   disposable repository/worktree;
 - never stage, unstage, rewrite, or commit through the implementation index;
+- use test-owned `node` and npm/npx sentinel shims for synthetic guard cases;
 - check every Git, Node, and npm exit immediately;
 - distinguish staged lint exit 1 from tooling/startup exit 2; and
 - remove only test-owned paths in `finally`, preserving the primary failure and
@@ -216,15 +251,20 @@ Implement these stable cases:
 | `F-01` | Existing positive outer and nested sample corpus | Both production npm commands pass |
 | `F-02` | Deterministic temporary outer violation | Outer command fails with exact rule and fixture path; tooling startup is not accepted |
 | `F-03` | Deterministic temporary fenced/nested violation | Nested command fails with exact rule, fixture path, and nested depth/context; tooling startup is not accepted |
+| `N-01` | Manifest and both production guards | One exact selected minimum and reviewed stable diagnostics |
+| `N-02` | Staged JavaScript guard at selected minimum and synthetic below-minimum major | Minimum accepted; below-minimum rejected with exact diagnostic before npm/npx/lint sentinel |
+| `N-03` | Complete `.husky/pre-commit` at selected minimum and synthetic below-minimum major | Minimum reaches the exact staged script; below-minimum rejects before npm/npx/lint sentinel |
 
 The selected rule/fixtures must be stable under the repository's reviewed
 configuration and must not depend on a package's default rule set.
 
 Invoke this exact tracked harness from `markdownlint.yml` after `npm ci` under
 hosted Node 24. Also run it locally on Windows under the selected minimum Node
-major and Node 24. Use Ubuntu hosted evidence for Node 24; if selected-minimum
-Ubuntu evidence is not added to CI, record a separate local/container result
-without weakening the hosted Node 24 gate.
+major and Node 24. The harness must receive the selected minimum explicitly;
+its synthetic guard cases do not require an EOL Node 20 executable. Use Ubuntu
+hosted evidence for Node 24; if selected-minimum Ubuntu evidence is not added to
+CI, record a separate local/container result without weakening the hosted
+Node 24 gate.
 
 ### 5. Add review-only weekly npm update governance
 
@@ -252,10 +292,15 @@ merging.
 
 Run from the repository root under PowerShell 7 or Windows PowerShell 5.1 with
 Node major 24 active. Set `$intSelectedMinimumNodeMajor` to the reviewed
-manifest/guard minimum. Keep `$arrApprovedResiduals` empty for a clean result.
-Add an object only for a separately approved residual disposition. Each object
-must identify one exact advisory/package/path combination, owner, unexpired UTC
-deadline, public follow-up issue, and rationale. The validation rejects partial,
+manifest/guard minimum. This block owns Node 24 audit/disposition evidence and
+its clean Node 24 runtime cell. Run the separate complete selected-minimum cell
+specified after the block when the minimum is lower than 24.
+
+Keep `$arrApprovedResiduals` and `$arrRecordedAuditNodes` empty for a clean
+result. Add one approval per exact `(Package, AdvisoryUrl)` residual key. Add
+one package-keyed audit-node record containing the complete exact `nodes` set
+for every package that remains vulnerable. These are separate collections;
+`npm explain` remains diagnostic context. The validation rejects partial,
 duplicate, unexpected, expired, or stale records:
 
 ```powershell
@@ -263,19 +308,34 @@ $ErrorActionPreference = 'Stop'
 
 $intSelectedMinimumNodeMajor = 22
 
+if (
+    $intSelectedMinimumNodeMajor -notin @(22, 24)
+) {
+    throw 'The selected supported LTS minimum must be Node 22 or Node 24.'
+}
+
 $arrApprovedResiduals = @(
     # [pscustomobject]@{
     #     AdvisoryUrl = 'https://github.com/advisories/GHSA-xxxx-xxxx-xxxx'
     #     Package = 'package-name'
-    #     DependencyPath = (
-    #         '.github/workflows > parent@1.2.3 > package-name@4.5.6'
-    #     )
     #     Owner = '@named-owner'
     #     ExpiresUtc = '2026-08-31T23:59:59Z'
     #     IssueUrl = (
     #         'https://github.com/franklesniak/PSStyleGuide/issues/123'
     #     )
+    #     OwnerAcceptanceEvidence = (
+    #         'Where the named owner explicitly accepted this disposition.'
+    #     )
     #     Rationale = 'Why no safe fix exists and the bounded mitigation.'
+    # }
+)
+
+$arrRecordedAuditNodes = @(
+    # [pscustomobject]@{
+    #     Package = 'package-name'
+    #     AuditNodePaths = @(
+    #         'node_modules/package-name'
+    #     )
     # }
 )
 
@@ -343,9 +403,29 @@ if (
 
 $blnCiWasDefined = Test-Path -LiteralPath 'Env:CI'
 $strPreviousCi = [string]$env:CI
+$blnEngineStrictWasDefined = Test-Path -LiteralPath 'Env:npm_config_engine_strict'
+$strPreviousEngineStrict = [string]$env:npm_config_engine_strict
 
 try {
     $env:CI = 'true'
+    $env:npm_config_engine_strict = 'true'
+
+    $arrEngineStrictOutput = @(
+        & $objNpmCommand.Path config get engine-strict
+    )
+    $intNpmExitCode = $LASTEXITCODE
+
+    if (
+        $intNpmExitCode -ne 0 -or
+        $arrEngineStrictOutput.Count -ne 1 -or
+        ([string]$arrEngineStrictOutput[0]).Trim() -cne 'true'
+    ) {
+        throw (
+            "Unable to establish engine-strict=true; output/exit were {0}/{1}." -f
+            ($arrEngineStrictOutput -join '; '),
+            $intNpmExitCode
+        )
+    }
 
     & $objNpmCommand.Path --prefix .github/workflows ci
     $intNpmExitCode = $LASTEXITCODE
@@ -360,6 +440,15 @@ finally {
     }
     else {
         Remove-Item -LiteralPath 'Env:CI' -ErrorAction SilentlyContinue
+    }
+
+    if ($blnEngineStrictWasDefined) {
+        $env:npm_config_engine_strict = $strPreviousEngineStrict
+    }
+    else {
+        Remove-Item `
+            -LiteralPath 'Env:npm_config_engine_strict' `
+            -ErrorAction SilentlyContinue
     }
 }
 
@@ -401,13 +490,18 @@ catch {
 
 if (
     $null -eq $objAudit -or
+    $objAudit.PSObject.Properties.Name -notcontains 'auditReportVersion' -or
+    [string]$objAudit.auditReportVersion -cne '2' -or
     $objAudit.PSObject.Properties.Name -notcontains 'metadata' -or
     $objAudit.PSObject.Properties.Name -notcontains 'vulnerabilities' -or
     $null -eq $objAudit.metadata -or
     $null -eq $objAudit.vulnerabilities -or
     $objAudit.metadata.PSObject.Properties.Name -notcontains 'vulnerabilities'
 ) {
-    throw 'npm audit JSON is missing metadata.vulnerabilities or vulnerabilities.'
+    throw (
+        'npm audit JSON is not the reviewed report-version-2 ' +
+        'metadata/vulnerabilities shape.'
+    )
 }
 
 $objSeverityCounts = [ordered]@{}
@@ -453,24 +547,170 @@ if (
     throw 'npm audit severity counts are invalid or do not sum to total.'
 }
 
-$arrAffectedPackageNames = @(
-    $objAudit.vulnerabilities.PSObject.Properties.Name |
-        Sort-Object -Unique
+$arrRecognizedSeverities = @(
+    'info'
+    'low'
+    'moderate'
+    'high'
+    'critical'
 )
+$objDerivedSeverityCounts = [ordered]@{
+    info = 0L
+    low = 0L
+    moderate = 0L
+    high = 0L
+    critical = 0L
+}
+$arrVulnerabilityProperties = @(
+    $objAudit.vulnerabilities.PSObject.Properties
+)
+$arrAffectedPackageNames = @(
+    $arrVulnerabilityProperties.Name |
+        Sort-Object
+)
+$arrDuplicatePackageNames = @(
+    $arrAffectedPackageNames |
+        Group-Object -CaseSensitive |
+        Where-Object { $_.Count -ne 1 }
+)
+
+if (
+    $arrDuplicatePackageNames.Count -ne 0 -or
+    $arrVulnerabilityProperties.Count -ne $lngReportedTotal
+) {
+    throw (
+        "npm audit property set disagrees with metadata total {0}: {1}" -f
+        $lngReportedTotal,
+        ($arrAffectedPackageNames -join ', ')
+    )
+}
+
+$arrAllAdvisoryRecords = @()
 $arrAdvisoryRecords = @()
 $arrViaDependencyLinks = @()
+$arrEffectsLinks = @()
+$arrAuditNodeRecords = @()
 
-foreach (
-    $objVulnerabilityProperty in
-    $objAudit.vulnerabilities.PSObject.Properties
-) {
+foreach ($objVulnerabilityProperty in $arrVulnerabilityProperties) {
     $strPackageName = [string]$objVulnerabilityProperty.Name
+    $objVulnerability = $objVulnerabilityProperty.Value
+    $arrRequiredVulnerabilityFields = @(
+        'name'
+        'severity'
+        'isDirect'
+        'via'
+        'effects'
+        'range'
+        'nodes'
+        'fixAvailable'
+    )
 
-    if ([string]::IsNullOrWhiteSpace($strPackageName)) {
-        throw 'npm audit contains an unnamed vulnerable package node.'
+    if (
+        [string]::IsNullOrWhiteSpace($strPackageName) -or
+        $null -eq $objVulnerability
+    ) {
+        throw 'npm audit contains an unnamed or null vulnerability property.'
     }
 
-    foreach ($objVia in @($objVulnerabilityProperty.Value.via)) {
+    foreach ($strRequiredField in $arrRequiredVulnerabilityFields) {
+        if (
+            $objVulnerability.PSObject.Properties.Name -cnotcontains
+                $strRequiredField
+        ) {
+            throw (
+                "npm audit vulnerability '{0}' is missing field '{1}'." -f
+                $strPackageName,
+                $strRequiredField
+            )
+        }
+    }
+
+    if ([string]$objVulnerability.name -cne $strPackageName) {
+        throw (
+            "npm audit property/name mismatch: {0}/{1}." -f
+            $strPackageName,
+            $objVulnerability.name
+        )
+    }
+
+    $strNodeSeverity = [string]$objVulnerability.severity
+
+    if ($arrRecognizedSeverities -cnotcontains $strNodeSeverity) {
+        throw (
+            "npm audit vulnerability '{0}' has unknown severity '{1}'." -f
+            $strPackageName,
+            $strNodeSeverity
+        )
+    }
+
+    $objDerivedSeverityCounts[$strNodeSeverity]++
+
+    if ($objVulnerability.isDirect -isnot [bool]) {
+        throw (
+            "npm audit vulnerability '{0}' has non-Boolean isDirect." -f
+            $strPackageName
+        )
+    }
+
+    if ([string]::IsNullOrWhiteSpace([string]$objVulnerability.range)) {
+        throw (
+            "npm audit vulnerability '{0}' has an empty range." -f
+            $strPackageName
+        )
+    }
+
+    foreach ($strArrayField in @('via', 'effects', 'nodes')) {
+        if ($objVulnerability.$strArrayField -isnot [System.Array]) {
+            throw (
+                "npm audit vulnerability '{0}' field '{1}' is not an array." -f
+                $strPackageName,
+                $strArrayField
+            )
+        }
+    }
+
+    $arrNormalizedNodePaths = @(
+        foreach ($objNodePath in @($objVulnerability.nodes)) {
+            $strNodePath = [string]$objNodePath
+            $strNormalizedNodePath = $strNodePath -replace '\\', '/'
+
+            if (
+                [string]::IsNullOrWhiteSpace($strNodePath) -or
+                $strNormalizedNodePath -notmatch '^node_modules/' -or
+                $strNormalizedNodePath -match '(?:^|/)\.\.?(?:/|$)' -or
+                $strNormalizedNodePath -match '//'
+            ) {
+                throw (
+                    "npm audit vulnerability '{0}' has invalid node path '{1}'." -f
+                    $strPackageName,
+                    $strNodePath
+                )
+            }
+
+            $strNormalizedNodePath
+        }
+    )
+
+    if (
+        $arrNormalizedNodePaths.Count -eq 0 -or
+        @(
+            $arrNormalizedNodePaths |
+                Group-Object -CaseSensitive |
+                Where-Object { $_.Count -ne 1 }
+        ).Count -ne 0
+    ) {
+        throw (
+            "npm audit vulnerability '{0}' has empty or duplicate nodes." -f
+            $strPackageName
+        )
+    }
+
+    $arrAuditNodeRecords += [pscustomobject]@{
+        Package = $strPackageName
+        AuditNodePaths = @($arrNormalizedNodePaths | Sort-Object)
+    }
+
+    foreach ($objVia in @($objVulnerability.via)) {
         if ($objVia -is [string]) {
             if ([string]::IsNullOrWhiteSpace([string]$objVia)) {
                 throw (
@@ -488,24 +728,74 @@ foreach (
 
         if (
             $null -eq $objVia -or
-            [string]::IsNullOrWhiteSpace([string]$objVia.url) -or
-            [string]::IsNullOrWhiteSpace([string]$objVia.severity) -or
+            [string]$objVia.url -notmatch (
+                '^https://github\.com/advisories/' +
+                'GHSA-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}$'
+            ) -or
+            $arrRecognizedSeverities -cnotcontains [string]$objVia.severity -or
             [string]::IsNullOrWhiteSpace([string]$objVia.range)
         ) {
             throw (
-                "npm audit contains an incomplete advisory for '{0}'." -f
+                "npm audit contains an invalid advisory for '{0}'." -f
                 $strPackageName
             )
         }
 
-        if ($objVia.severity -in @('moderate', 'high', 'critical')) {
-            $arrAdvisoryRecords += [pscustomobject]@{
-                Package = $strPackageName
-                AdvisoryUrl = [string]$objVia.url
-                Severity = [string]$objVia.severity
-                VulnerableRange = [string]$objVia.range
-            }
+        $objAdvisoryRecord = [pscustomobject]@{
+            Package = $strPackageName
+            AdvisoryUrl = [string]$objVia.url
+            Severity = [string]$objVia.severity
+            VulnerableRange = [string]$objVia.range
         }
+        $arrAllAdvisoryRecords += $objAdvisoryRecord
+
+        if ($objVia.severity -in @('moderate', 'high', 'critical')) {
+            $arrAdvisoryRecords += $objAdvisoryRecord
+        }
+    }
+
+    foreach ($objEffect in @($objVulnerability.effects)) {
+        if ([string]::IsNullOrWhiteSpace([string]$objEffect)) {
+            throw (
+                "npm audit contains an empty effects link for '{0}'." -f
+                $strPackageName
+            )
+        }
+
+        $arrEffectsLinks += [pscustomobject]@{
+            Package = $strPackageName
+            Effect = [string]$objEffect
+        }
+    }
+
+    if ($objVulnerability.fixAvailable -isnot [bool]) {
+        $objFix = $objVulnerability.fixAvailable
+
+        if (
+            $null -eq $objFix -or
+            [string]::IsNullOrWhiteSpace([string]$objFix.name) -or
+            [string]$objFix.version -notmatch '^\d+\.\d+\.\d+(?:[-+].+)?$' -or
+            $objFix.isSemVerMajor -isnot [bool]
+        ) {
+            throw (
+                "npm audit vulnerability '{0}' has invalid fixAvailable." -f
+                $strPackageName
+            )
+        }
+    }
+}
+
+foreach ($strSeverity in $arrRecognizedSeverities) {
+    if (
+        [long]$objDerivedSeverityCounts[$strSeverity] -ne
+            [long]$objSeverityCounts[$strSeverity]
+    ) {
+        throw (
+            "npm audit derived/metadata severity mismatch for '{0}': {1}/{2}." -f
+            $strSeverity,
+            $objDerivedSeverityCounts[$strSeverity],
+            $objSeverityCounts[$strSeverity]
+        )
     }
 }
 
@@ -517,6 +807,120 @@ foreach ($objViaLink in $arrViaDependencyLinks) {
             $objViaLink.Dependency
         )
     }
+}
+
+foreach ($objEffectsLink in $arrEffectsLinks) {
+    if ($arrAffectedPackageNames -cnotcontains $objEffectsLink.Effect) {
+        throw (
+            "npm audit effects link '{0} -> {1}' has no package node." -f
+            $objEffectsLink.Package,
+            $objEffectsLink.Effect
+        )
+    }
+
+    $arrReciprocalViaLinks = @(
+        $arrViaDependencyLinks |
+            Where-Object {
+                $_.Package -ceq $objEffectsLink.Effect -and
+                $_.Dependency -ceq $objEffectsLink.Package
+            }
+    )
+
+    if ($arrReciprocalViaLinks.Count -ne 1) {
+        throw (
+            "npm audit effects/via edge is not reciprocal: {0} -> {1}." -f
+            $objEffectsLink.Package,
+            $objEffectsLink.Effect
+        )
+    }
+}
+
+$strAuditNodeRecordsJson = ConvertTo-Json `
+    -InputObject @($arrAuditNodeRecords) `
+    -Depth 5 `
+    -Compress
+$blnAuditNodesEnvWasDefined = Test-Path `
+    -LiteralPath 'Env:P3_AUDIT_NODE_RECORDS_JSON'
+$strPreviousAuditNodesEnv = [string]$env:P3_AUDIT_NODE_RECORDS_JSON
+
+try {
+    $env:P3_AUDIT_NODE_RECORDS_JSON = $strAuditNodeRecordsJson
+    $arrLockResolutionOutput = @(
+        & $objNodeCommand.Path -e @'
+const fs = require("fs");
+const lock = JSON.parse(
+  fs.readFileSync(".github/workflows/package-lock.json", "utf8")
+);
+const records = JSON.parse(process.env.P3_AUDIT_NODE_RECORDS_JSON);
+const resolved = [];
+for (const record of records) {
+  for (const nodePath of record.AuditNodePaths) {
+    const entry = lock.packages && lock.packages[nodePath];
+    if (!entry || typeof entry.version !== "string" || !entry.version) {
+      throw new Error(`Audit node does not resolve in lockfile: ${nodePath}`);
+    }
+    const marker = "/node_modules/";
+    const markerIndex = nodePath.lastIndexOf(marker);
+    const leaf = markerIndex >= 0
+      ? nodePath.slice(markerIndex + marker.length)
+      : nodePath.slice("node_modules/".length);
+    if (leaf !== record.Package) {
+      throw new Error(
+        `Audit node/package mismatch: ${record.Package}/${nodePath}`
+      );
+    }
+    resolved.push({
+      package: record.Package,
+      nodePath,
+      version: entry.version
+    });
+  }
+}
+process.stdout.write(JSON.stringify(resolved));
+'@
+    )
+    $intNodeExitCode = $LASTEXITCODE
+
+    if ($intNodeExitCode -ne 0 -or $arrLockResolutionOutput.Count -ne 1) {
+        throw (
+            "Unable to resolve audit nodes in package-lock.json; exit: {0}." -f
+            $intNodeExitCode
+        )
+    }
+
+    try {
+        $arrResolvedAuditNodes = @(
+            ($arrLockResolutionOutput -join "`n") |
+                ConvertFrom-Json
+        )
+    }
+    catch {
+        throw (
+            "Audit-node lockfile resolution returned invalid JSON: {0}" -f
+            $_.Exception.Message
+        )
+    }
+}
+finally {
+    if ($blnAuditNodesEnvWasDefined) {
+        $env:P3_AUDIT_NODE_RECORDS_JSON = $strPreviousAuditNodesEnv
+    }
+    else {
+        Remove-Item `
+            -LiteralPath 'Env:P3_AUDIT_NODE_RECORDS_JSON' `
+            -ErrorAction SilentlyContinue
+    }
+}
+
+$intExpectedResolvedNodeCount = @(
+    $arrAuditNodeRecords |
+        ForEach-Object {
+            @($_.AuditNodePaths)
+        }
+).Count
+
+if ($arrResolvedAuditNodes.Count -ne $intExpectedResolvedNodeCount) {
+    throw 'Audit-node lockfile resolution count is incomplete.'
 }
 
 function Get-NormalizedExplainPaths {
@@ -537,6 +941,21 @@ function Get-NormalizedExplainPaths {
     }
 
     $strNodeLabel = '{0}@{1}' -f $strNodeName, $strNodeVersion
+
+    if (
+        $Node.PSObject.Properties.Name -notcontains 'dependents' -or
+        $null -eq $Node.dependents
+    ) {
+        return @($strNodeLabel)
+    }
+
+    if ($Node.dependents -isnot [System.Array]) {
+        throw (
+            "npm explain node '{0}' has non-array dependents." -f
+            $strNodeLabel
+        )
+    }
+
     $arrDependents = @($Node.dependents)
 
     if ($arrDependents.Count -eq 0) {
@@ -546,11 +965,26 @@ function Get-NormalizedExplainPaths {
     $arrPaths = @()
 
     foreach ($objDependent in $arrDependents) {
-        if ($null -eq $objDependent.from) {
+        if (
+            $null -eq $objDependent -or
+            $objDependent.PSObject.Properties.Name -notcontains 'from' -or
+            $null -eq $objDependent.from
+        ) {
             throw ("npm explain node '{0}' has no from object." -f $strNodeLabel)
         }
 
         if ([string]::IsNullOrWhiteSpace([string]$objDependent.from.name)) {
+            if (
+                [string]::IsNullOrWhiteSpace(
+                    [string]$objDependent.from.location
+                )
+            ) {
+                throw (
+                    "npm explain node '{0}' has an invalid root object." -f
+                    $strNodeLabel
+                )
+            }
+
             $arrPaths += '.github/workflows > {0}' -f $strNodeLabel
             continue
         }
@@ -616,16 +1050,37 @@ foreach ($strAffectedPackageName in $arrAffectedPackageNames) {
     $objExplainPathsByPackage[$strAffectedPackageName] = $arrNormalizedPaths
 }
 
-$arrApprovalUrls = @(
-    $arrApprovedResiduals |
+function Get-ResidualApprovalKey {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory)]
+        [object]$Record
+    )
+
+    return '{0}|{1}' -f $Record.Package, $Record.AdvisoryUrl
+}
+
+$arrActualResidualKeys = @(
+    $arrAdvisoryRecords |
         ForEach-Object {
-            [string]$_.AdvisoryUrl
-        }
+            Get-ResidualApprovalKey -Record $_
+        } |
+        Sort-Object
+)
+$arrDuplicateActualResidualKeys = @(
+    $arrActualResidualKeys |
+        Group-Object -CaseSensitive |
+        Where-Object { $_.Count -ne 1 }
 )
 
-if (@($arrApprovalUrls | Sort-Object -Unique).Count -ne $arrApprovalUrls.Count) {
-    throw 'Approved residual dispositions contain a duplicate advisory URL.'
+if ($arrDuplicateActualResidualKeys.Count -ne 0) {
+    throw (
+        "npm audit contains duplicate package/advisory keys: {0}" -f
+        ($arrDuplicateActualResidualKeys.Name -join ', ')
+    )
 }
+
+$arrApprovalKeys = @()
 
 foreach ($objApproval in $arrApprovedResiduals) {
     foreach (
@@ -633,15 +1088,15 @@ foreach ($objApproval in $arrApprovedResiduals) {
         @(
             'AdvisoryUrl'
             'Package'
-            'DependencyPath'
             'Owner'
             'ExpiresUtc'
             'IssueUrl'
+            'OwnerAcceptanceEvidence'
             'Rationale'
         )
     ) {
         if (
-            $objApproval.PSObject.Properties.Name -notcontains
+            $objApproval.PSObject.Properties.Name -cnotcontains
                 $strRequiredField -or
             [string]::IsNullOrWhiteSpace(
                 [string]$objApproval.$strRequiredField
@@ -655,8 +1110,10 @@ foreach ($objApproval in $arrApprovedResiduals) {
     }
 
     if (
-        [string]$objApproval.AdvisoryUrl -notmatch
-            '^https://github\.com/advisories/GHSA-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}$'
+        [string]$objApproval.AdvisoryUrl -notmatch (
+            '^https://github\.com/advisories/' +
+            'GHSA-[0-9a-z]{4}-[0-9a-z]{4}-[0-9a-z]{4}$'
+        )
     ) {
         throw (
             "Residual advisory URL is not canonical: {0}" -f
@@ -665,24 +1122,70 @@ foreach ($objApproval in $arrApprovedResiduals) {
     }
 
     if (
-        [string]$objApproval.IssueUrl -notmatch
-            '^https://github\.com/[^/]+/[^/]+/issues/[1-9][0-9]*$'
+        [string]$objApproval.IssueUrl -notmatch (
+            '^https://github\.com/franklesniak/' +
+            'PSStyleGuide/issues/(?<IssueNumber>[1-9][0-9]*)$'
+        )
     ) {
-        throw ("Residual issue URL is invalid: {0}" -f $objApproval.IssueUrl)
+        throw (
+            "Residual issue URL is not a PSStyleGuide issue URL: {0}" -f
+            $objApproval.IssueUrl
+        )
     }
 
+    $strIssueNumber = $Matches.IssueNumber
     $dtoExpiry = [datetimeoffset]::MinValue
+    $objInvariantCulture = [Globalization.CultureInfo]::InvariantCulture
+    $objDateStyles = (
+        [Globalization.DateTimeStyles]::AssumeUniversal -bor
+        [Globalization.DateTimeStyles]::AdjustToUniversal
+    )
+
     if (
-        [string]$objApproval.ExpiresUtc -notmatch 'Z$' -or
-        -not [datetimeoffset]::TryParse(
+        -not [datetimeoffset]::TryParseExact(
             [string]$objApproval.ExpiresUtc,
+            'yyyy-MM-dd''T''HH:mm:ss''Z''',
+            $objInvariantCulture,
+            $objDateStyles,
             [ref]$dtoExpiry
         ) -or
         $dtoExpiry -le [datetimeoffset]::UtcNow
     ) {
         throw (
-            "Residual expiry must be a future UTC instant: {0}" -f
+            "Residual expiry must be one future invariant UTC instant: {0}" -f
             $objApproval.ExpiresUtc
+        )
+    }
+
+    $objIssue = $null
+
+    try {
+        $objIssue = Invoke-RestMethod `
+            -Method Get `
+            -Uri (
+                'https://api.github.com/repos/franklesniak/' +
+                'PSStyleGuide/issues/{0}' -f $strIssueNumber
+            ) `
+            -Headers @{
+                Accept = 'application/vnd.github+json'
+                'X-GitHub-Api-Version' = '2026-03-10'
+            }
+    }
+    catch {
+        throw (
+            "Residual issue is not publicly retrievable: {0}: {1}" -f
+            $objApproval.IssueUrl,
+            $_.Exception.Message
+        )
+    }
+
+    if (
+        [string]$objIssue.html_url -cne [string]$objApproval.IssueUrl -or
+        $objIssue.PSObject.Properties.Name -contains 'pull_request'
+    ) {
+        throw (
+            "Residual follow-up is missing, mismatched, or a pull request: {0}" -f
+            $objApproval.IssueUrl
         )
     }
 
@@ -705,27 +1208,114 @@ foreach ($objApproval in $arrApprovedResiduals) {
     if (
         -not $objExplainPathsByPackage.ContainsKey(
             [string]$objApproval.Package
-        ) -or
-        $objExplainPathsByPackage[[string]$objApproval.Package] -cnotcontains
-            [string]$objApproval.DependencyPath
+        )
     ) {
         throw (
-            "Residual dependency path is not an npm explain path: {0}" -f
-            $objApproval.DependencyPath
+            "Residual package has no npm explain context: {0}" -f
+            $objApproval.Package
+        )
+    }
+
+    $arrApprovalKeys += Get-ResidualApprovalKey -Record $objApproval
+}
+
+$arrDuplicateApprovalKeys = @(
+    $arrApprovalKeys |
+        Group-Object -CaseSensitive |
+        Where-Object { $_.Count -ne 1 }
+)
+
+if ($arrDuplicateApprovalKeys.Count -ne 0) {
+    throw (
+        "Approved residuals contain duplicate composite keys: {0}" -f
+        ($arrDuplicateApprovalKeys.Name -join ', ')
+    )
+}
+
+$arrResidualAdvisoryDifferences = @(
+    Compare-Object `
+        -ReferenceObject @($arrApprovalKeys | Sort-Object) `
+        -DifferenceObject $arrActualResidualKeys `
+        -CaseSensitive
+)
+
+$arrRecordedNodePackageNames = @(
+    $arrRecordedAuditNodes |
+        ForEach-Object {
+            [string]$_.Package
+        }
+)
+$arrDuplicateRecordedNodePackages = @(
+    $arrRecordedNodePackageNames |
+        Group-Object -CaseSensitive |
+        Where-Object { $_.Count -ne 1 }
+)
+$arrNodePackageDifferences = @(
+    Compare-Object `
+        -ReferenceObject @($arrAffectedPackageNames | Sort-Object) `
+        -DifferenceObject @($arrRecordedNodePackageNames | Sort-Object) `
+        -CaseSensitive
+)
+
+if (
+    $arrDuplicateRecordedNodePackages.Count -ne 0 -or
+    $arrNodePackageDifferences.Count -ne 0
+) {
+    throw 'Recorded audit-node package set is not exact.'
+}
+
+foreach ($objActualNodeRecord in $arrAuditNodeRecords) {
+    $arrMatchingRecordedNodes = @(
+        $arrRecordedAuditNodes |
+            Where-Object {
+                [string]$_.Package -ceq $objActualNodeRecord.Package
+            }
+    )
+
+    if (
+        $arrMatchingRecordedNodes.Count -ne 1 -or
+        $arrMatchingRecordedNodes[0].PSObject.Properties.Name -cnotcontains
+            'AuditNodePaths' -or
+        $arrMatchingRecordedNodes[0].AuditNodePaths -isnot [System.Array]
+    ) {
+        throw (
+            "Recorded audit nodes are malformed for '{0}'." -f
+            $objActualNodeRecord.Package
+        )
+    }
+
+    $arrRecordedNodePaths = @(
+        $arrMatchingRecordedNodes[0].AuditNodePaths |
+            ForEach-Object {
+                ([string]$_) -replace '\\', '/'
+            }
+    )
+    $arrDuplicateRecordedNodePaths = @(
+        $arrRecordedNodePaths |
+            Group-Object -CaseSensitive |
+            Where-Object { $_.Count -ne 1 }
+    )
+    $arrNodePathDifferences = @(
+        Compare-Object `
+            -ReferenceObject @(
+                $objActualNodeRecord.AuditNodePaths |
+                    Sort-Object
+            ) `
+            -DifferenceObject @($arrRecordedNodePaths | Sort-Object) `
+            -CaseSensitive
+    )
+
+    if (
+        $arrDuplicateRecordedNodePaths.Count -ne 0 -or
+        $arrNodePathDifferences.Count -ne 0
+    ) {
+        throw (
+            "Recorded audit node-path set is not exact for '{0}'." -f
+            $objActualNodeRecord.Package
         )
     }
 }
 
-$arrActualResidualAdvisoryUrls = @(
-    $arrAdvisoryRecords.AdvisoryUrl |
-        Sort-Object -Unique
-)
-$arrResidualAdvisoryDifferences = @(
-    Compare-Object `
-        -ReferenceObject @($arrApprovalUrls | Sort-Object -Unique) `
-        -DifferenceObject $arrActualResidualAdvisoryUrls `
-        -CaseSensitive
-)
 $lngActionableCount = (
     $objSeverityCounts.moderate +
     $objSeverityCounts.high +
@@ -747,20 +1337,21 @@ if (
     $arrResidualAdvisoryDifferences.Count -ne 0 -or
     (
         $intAuditExitCode -eq 1 -and
-        $arrActualResidualAdvisoryUrls.Count -eq 0
+        $arrActualResidualKeys.Count -eq 0
     )
 ) {
     throw (
         ("npm audit residual set is not exactly approved. Exit: {0}; " +
-        "critical/high/moderate/total: {1}/{2}/{3}/{4}; approved: {5}; " +
-        "actual: {6}.") -f
+        "critical/high/moderate/property-total/object-advisories: " +
+        "{1}/{2}/{3}/{4}/{5}; approved keys: {6}; actual keys: {7}.") -f
         $intAuditExitCode,
         $objSeverityCounts.critical,
         $objSeverityCounts.high,
         $objSeverityCounts.moderate,
         $lngReportedTotal,
-        ($arrApprovalUrls -join ', '),
-        ($arrActualResidualAdvisoryUrls -join ', ')
+        $arrAllAdvisoryRecords.Count,
+        ($arrApprovalKeys -join ', '),
+        ($arrActualResidualKeys -join ', ')
     )
 }
 
@@ -784,11 +1375,124 @@ if ($intNpmExitCode -ne 0) {
     )
 }
 
-& '.github/workflows/Test-LintStagedMarkdown.ps1'
+& '.github/workflows/Test-LintStagedMarkdown.ps1' `
+    -SelectedMinimumNodeMajor $intSelectedMinimumNodeMajor
 ```
 
-Run that tracked harness again on Windows under the selected minimum Node major.
-Its hosted workflow execution supplies the Ubuntu/Node 24 result.
+If `$intSelectedMinimumNodeMajor` is lower than 24, activate that exact major in
+a fresh shell and run this complete second cell from the repository root:
+
+```powershell
+$ErrorActionPreference = 'Stop'
+
+$intSelectedMinimumNodeMajor = 22
+
+if ($intSelectedMinimumNodeMajor -notin @(22, 24)) {
+    throw 'The selected supported LTS minimum must be Node 22 or Node 24.'
+}
+
+$objNodeCommand = Get-Command node -CommandType Application -ErrorAction Stop |
+    Select-Object -First 1
+$objNpmCommand = Get-Command npm -CommandType Application -ErrorAction Stop |
+    Select-Object -First 1
+$strNodeVersion = [string](
+    & $objNodeCommand.Path -p 'process.versions.node'
+)
+$intNodeExitCode = $LASTEXITCODE
+
+if (
+    $intNodeExitCode -ne 0 -or
+    $strNodeVersion -notmatch (
+        '^{0}\.' -f $intSelectedMinimumNodeMajor
+    )
+) {
+    throw (
+        "Selected-minimum cell has the wrong Node version: {0}/{1}." -f
+        $strNodeVersion,
+        $intNodeExitCode
+    )
+}
+
+$blnCiWasDefined = Test-Path -LiteralPath 'Env:CI'
+$strPreviousCi = [string]$env:CI
+$blnEngineStrictWasDefined = Test-Path `
+    -LiteralPath 'Env:npm_config_engine_strict'
+$strPreviousEngineStrict = [string]$env:npm_config_engine_strict
+
+try {
+    $env:CI = 'true'
+    $env:npm_config_engine_strict = 'true'
+
+    $arrEngineStrictOutput = @(
+        & $objNpmCommand.Path config get engine-strict
+    )
+    $intNpmExitCode = $LASTEXITCODE
+
+    if (
+        $intNpmExitCode -ne 0 -or
+        $arrEngineStrictOutput.Count -ne 1 -or
+        ([string]$arrEngineStrictOutput[0]).Trim() -cne 'true'
+    ) {
+        throw 'Selected-minimum cell did not establish engine-strict=true.'
+    }
+
+    & $objNpmCommand.Path --prefix .github/workflows ci
+    $intNpmExitCode = $LASTEXITCODE
+
+    if ($intNpmExitCode -ne 0) {
+        throw (
+            "Selected-minimum npm ci failed with exit {0}." -f
+            $intNpmExitCode
+        )
+    }
+}
+finally {
+    if ($blnCiWasDefined) {
+        $env:CI = $strPreviousCi
+    }
+    else {
+        Remove-Item -LiteralPath 'Env:CI' -ErrorAction SilentlyContinue
+    }
+
+    if ($blnEngineStrictWasDefined) {
+        $env:npm_config_engine_strict = $strPreviousEngineStrict
+    }
+    else {
+        Remove-Item `
+            -LiteralPath 'Env:npm_config_engine_strict' `
+            -ErrorAction SilentlyContinue
+    }
+}
+
+$arrNpmCommandArguments = @(
+    ,@('--prefix', '.github/workflows', 'ls', '--all')
+    ,@('--prefix', '.github/workflows', 'run', 'lint:md')
+    ,@('--prefix', '.github/workflows', 'run', 'lint:md:nested')
+)
+
+foreach ($arrNpmArguments in $arrNpmCommandArguments) {
+    & $objNpmCommand.Path @arrNpmArguments
+    $intNpmExitCode = $LASTEXITCODE
+
+    if ($intNpmExitCode -ne 0) {
+        throw (
+            "Selected-minimum npm command failed with exit {0}: {1}" -f
+            $intNpmExitCode,
+            ($arrNpmArguments -join ' ')
+        )
+    }
+}
+
+& '.github/workflows/Test-LintStagedMarkdown.ps1' `
+    -SelectedMinimumNodeMajor $intSelectedMinimumNodeMajor
+```
+
+If the selected minimum is 24, do not run a duplicate cell; record that the
+Node 24 audit/runtime block satisfied both roles. Preserve the exact resolved
+engine constraints and both runtime cells' Node/npm versions in pull-request
+evidence. The hosted workflow supplies the mandatory Ubuntu/Node 24 result;
+record selected-minimum Windows evidence and an Ubuntu/container result if that
+minimum is not a hosted cell.
 
 Then verify the exact final Dependabot content and implementation scope:
 
@@ -923,10 +1627,14 @@ if ($arrStagedDifferences.Count -ne 0) {
 ```
 
 In the pull request, preserve the implementation-time Node/npm versions,
-before/after audit JSON summaries, object advisory records, string `via` links,
-normalized `npm explain` paths, and any residual disposition. Confirm the
-pinned Node 24 Markdown workflow completes clean installation, both production
-lint commands, and the tracked harness on Windows and Ubuntu. Confirm the P1
+before/after raw audit JSON and report version, vulnerability-property severity
+counts, object advisory records/count, string `via` and `effects` links,
+audit-node paths and resolved lockfile versions, `fixAvailable` shapes,
+normalized `npm explain` context, and any residual disposition. Preserve owner
+acceptance evidence separately from the syntactic owner field. Confirm the
+pinned Node 24 Markdown workflow completes strict clean installation, both
+production lint commands, and the tracked harness on Windows and Ubuntu.
+Confirm the selected-minimum clean cell when distinct. Confirm the P1
 generator/build workflow remains green and no generated artifact changes.
 
 P3 intentionally supersedes only P1's one-entry Dependabot final-state check,
@@ -939,25 +1647,39 @@ documentation-content acceptance criteria remain applicable.
 ## Acceptance criteria
 
 - The issue records the implementation-time before/after Node, npm, direct
-  dependency, transitive dependency, audit, object-advisory, string-`via`, and
-  normalized dependency-path graph.
-- Every implementation-time moderate/high/critical advisory path is absent
-  from the final lockfile or has one exact, nonduplicate structured disposition
-  with a matching package/path, named owner, future UTC expiry, public follow-up
-  issue, and rationale.
+  dependency, transitive dependency, raw audit, report-version,
+  vulnerability-property, object-advisory, `via`/`effects`, audit-node,
+  lockfile-version, `fixAvailable`, and normalized explain graph.
+- Vulnerability-property counts, object-advisory counts, and distinct
+  `(Package, AdvisoryUrl)` disposition-key counts are reported separately and
+  reconciled only with their matching units.
+- Every implementation-time moderate/high/critical package/advisory key is
+  absent from the final lockfile or has one exact, nonduplicate structured
+  disposition with a matching package/URL, named owner, separately recorded
+  owner acceptance, exact future UTC expiry, publicly retrievable PSStyleGuide
+  issue that is not a pull request, and rationale.
+- Every remaining vulnerable package has one exact, nonempty, duplicate-free
+  recorded `AuditNodePaths` set equal to the audit property; each path resolves
+  to the matching package/version lockfile entry. Explain chains remain
+  diagnostic context and are not residual identity.
 - Audit validation accepts only exit 0 or vulnerability exit 1, validates the
-  required JSON objects and nonnegative severity totals, and rejects graph,
-  approval, expiry, clean-result, and exit/count inconsistencies.
-- The selected dependency tree supports Node 24; `engines.node` and both local
-  guards use the highest selected minimum Node major. The staged integration is
-  executed under that minimum and Node 24.
-- Node major 24, the recorded npm version, `npm ci`, and `npm ls --all` succeed
-  from a clean dependency state.
+  reviewed report-version-2 shapes, derives metadata counts from vulnerability
+  properties, validates all advisory severities/ranges, nodes, edges, and
+  remediation shapes, and rejects graph, approval, expiry, clean-result, and
+  exit/count inconsistencies.
+- The complete selected direct/transitive tree and npm CLI admit both the
+  selected supported LTS minimum and Node 24. `engines.node` and both local
+  guards use one exact minimum admission floor without claiming unexecuted
+  future/intervening runtime coverage.
+- Every distinct runtime role performs fresh `npm ci` with
+  `engine-strict=true` and no `--force`, `npm ls --all`, both production lint
+  commands, and the tracked harness. Hosted Node 24 remains mandatory.
 - Both production full-lint commands pass the existing positive outer and
   nested samples.
-- The tracked harness passes `S-01` through `S-04` and `F-01` through `F-03`.
-  Its temporary negative fixtures fail for the exact expected lint rule and
-  context, never merely because tooling failed to start.
+- The tracked harness passes `S-01` through `S-04`, `F-01` through `F-03`, and
+  `N-01` through `N-03`. Its temporary lint violations fail for the expected
+  rule/context, both production guards agree, and synthetic below-minimum cases
+  reject before npm/npx/lint tooling can run.
 - Manifest and lockfile diffs contain only deliberately reviewed registry
   packages and no unexpected scripts, Git/local dependencies, registry hosts,
   integrity changes, or engine drift.
@@ -974,11 +1696,14 @@ documentation-content acceptance criteria remain applicable.
 
 ## References
 
-- [Prompt-02 primary-source research record](../artifacts/prompt-02-primary-source-research.md)
+- [Prompt-02 primary-source research record](https://github.com/franklesniak/PSStyleGuide/blob/c3f17cc98e4901928d707c83b48e25a0d9a09a3d/docs/planning/artifacts/prompt-02-primary-source-research.md)
 - [npm: `npm audit`](https://docs.npmjs.com/cli/commands/npm-audit)
 - [npm: `npm explain`](https://docs.npmjs.com/cli/commands/npm-explain)
+- [npm: `engine-strict`](https://docs.npmjs.com/cli/v11/using-npm/config/#engine-strict)
 - [npm: `package-lock.json`](https://docs.npmjs.com/cli/configuring-npm/package-lock-json)
 - [Node.js release status](https://nodejs.org/en/about/previous-releases)
+- [GitHub Docs: Get an issue](https://docs.github.com/en/rest/issues/issues#get-an-issue)
+- [Microsoft Learn: `DateTimeOffset.TryParseExact`](https://learn.microsoft.com/dotnet/api/system.datetimeoffset.tryparseexact)
 - [GitHub Docs: Configure Dependabot version updates](https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/secure-your-dependencies/configuring-dependabot-version-updates)
 - [GitHub Docs: Dependabot options reference](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference)
 - [markdownlint-cli2 package manifest at v0.23.2](https://github.com/DavidAnson/markdownlint-cli2/blob/v0.23.2/package.json)

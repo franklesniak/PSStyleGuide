@@ -14,9 +14,10 @@ This originated from the cross-repository work tracked in [franklesniak/copilot-
 
 ## Prerequisite
 
-Complete and merge
-[P1: Make artifact generation byte-deterministic across PowerShell editions and hosts](01PSStyleGuideP1.md)
-before starting. Base P2 on that merged result.
+Complete and merge **P1: Make artifact generation byte-deterministic across
+PowerShell editions and hosts** before starting. Base P2 on that merged result.
+At filing, replace this title-only draft reference with P1's actual issue URL
+and mark P2 blocked by P1 using GitHub's issue relationship.
 
 At implementation start, confirm these P1 interfaces and invariants:
 
@@ -30,7 +31,8 @@ At implementation start, confirm these P1 interfaces and invariants:
 - Both events cover every `main` pull request/push without path filters, use
   least-privilege job permissions, and pin checkout, setup-node, upload, and
   download actions to the approved repository/full-SHA/version tuples with
-  matching workflow roles through the exact allowlist validator.
+  exact workflow/job/stable-step roles, conditions, and complete allowed input
+  sets through the single-source action-role validator.
 - Markdown validation asserts Node major 24, disables automatic
   package-manager caching, and passes the existing clean install, outer lint,
   and nested lint commands.
@@ -70,9 +72,10 @@ At implementation start, confirm these P1 interfaces and invariants:
 P1 is the source of truth for those implementation details; P2 does not reopen
 or restate their algorithms.
 
-[P3: Remediate Markdown lint dependency advisories and add npm update governance](03PSStyleGuideP3.md)
-follows P2. It is not a P2 prerequisite, and its package changes must not be
-silently folded into this issue.
+**P3: Remediate Markdown lint dependency advisories and add npm update
+governance** follows P2. It is not a P2 prerequisite, and its package changes
+must not be silently folded into this issue. At filing, replace this title-only
+draft reference with P3's actual issue URL wherever P2 delegates npm ownership.
 
 ## Affected files
 

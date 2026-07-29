@@ -1,1520 +1,1077 @@
-# PSStyleGuide current findings evaluation
+# Evaluation of open PSStyleGuide issue-slate findings
 
-## Evaluation method and scope
+## Scope and method
 
-This file evaluates every finding in
-`docs/planning/artifacts/current-findings.md` serially. No finding is skipped
-because it is low-impact, already satisfied, or conditional; in those cases,
-“preserve the current state” is evaluated as a real option.
+This evaluation covers every finding section in
+`docs/planning/artifacts/current-findings.md` that affects the PSStyleGuide P1,
+P2, or P3 issue slate. It also records explicit no-change dispositions for the
+denied scheduling proposal and the cross-repository convergence finding so no
+finding is silently skipped.
 
-Each section contains:
+The prompt names `02PSStyleGuideP3.md`; the repository's actual P3 draft is
+`docs/planning/PSStyleGuide/03PSStyleGuideP3.md`. This evaluation and the later
+revision use that existing P3 file.
 
-1. exhaustive practical options and meaningful permutations;
-2. a finding-specific weighted rubric;
-3. a 1–5 scoring table, where 1 is poor and 5 is excellent;
-4. the weighted score out of 100, calculated as
-   `sum(weight × score / 5)`; and
-5. one implementation-ready selection.
+Findings are evaluated in this order:
 
-Technical correctness, security, evidence quality, and legitimate operator or
-contributor usability receive more weight than churn, implementation
-difficulty, or preservation of the current file count.
+1. C-01 — P1 action-role exactness.
+2. C-02 — P3 Node support proof.
+3. C-03 — P3 residual approval identity.
+4. C-04 — P3 audit metadata/graph consistency.
+5. C-05 — filing-time reference durability.
+6. C-06 — proposed P1 → P3 → P2 fallback.
+7. I-P3-01 — vulnerable-package versus advisory counts.
+8. I-P3-02 — runtime support set versus unbounded claims.
+9. I-P1-01 — one source of truth for the P1 action inventory.
+10. I-XR-01 — preserve behavioral P1/T1 convergence.
 
-The prompt names `02PSStyleGuideP3.md`, but the established slate and current
-worktree contain `03PSStyleGuideP3.md`; `02PSStyleGuideP2.md` already owns
-sequence number 02. This evaluation therefore treats
-`03PSStyleGuideP3.md` as the intended P3 target. Creating a duplicate
-`02PSStyleGuideP3.md` would make ordering and downstream handoff ambiguous.
+Each section enumerates options, defines a finding-specific weighted rubric,
+scores the options, and gives a cold-reader implementation decision. Scores use
+a 1–5 scale, where 5 is best. Weighted totals are out of 100.
 
-## C-01: Rebaseline P1's convergence matrix against final T1
-
-### Options
-
-#### Option A — Retain the current matrix
-
-Leave P1's “stronger same-stream choice” and public-interface-only fixture
-claims unchanged. This minimizes editing but knowingly hands downstream
-implementers two false statements about current T1.
-
-#### Option B — Correct only the two stale matrix cells
-
-Change Archive identity to a shared held-stream invariant and add the narrow
-definition-only production-cleanup exception to Permanent fixtures. This fixes
-today's text but supplies no defense against either draft changing again.
-
-#### Option C — Correct the cells and add an implementation-start divergence check
-
-Apply Option B, then require the implementation that starts second to compare
-the then-current P1/T1 contracts and record every intentional difference in the
-issue/PR evidence. Keep both repositories self-contained and make manifest
-names, artifact names, and diagnostics explicitly repository-specific.
-
-#### Option D — Force identity through a shared runtime component
-
-Replace behavioral coordination with a shared module/action consumed by both
-repositories. This can prevent drift, but introduces packaging, provenance,
-versioning, rollout, cross-edition, and availability dependencies that neither
-issue currently designs.
-
-### Evaluation rubric
-
-| Criterion | Weight | Why it matters for this finding |
-| --- | ---: | --- |
-| Factual accuracy against current T1 | 35 | A downstream issue must not start from a false contract. |
-| Preservation of shared security invariants | 25 | Stream identity and cleanup testing protect the artifact boundary. |
-| Cold-reader clarity | 15 | The author should understand shared versus repository-specific behavior without reconstructing history. |
-| Resistance to future cross-draft drift | 15 | P1 and T1 may be filed or implemented at different times. |
-| Repository independence and scope control | 10 | Coordination must not create an undesigned runtime dependency. |
-
-### Scoring
-
-| Option | Accuracy (35) | Security (25) | Clarity (15) | Drift resistance (15) | Independence (10) | Weighted total |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Retain | 1 | 1 | 1 | 1 | 5 | 28 |
-| B — Correct cells | 5 | 5 | 4 | 2 | 5 | 88 |
-| C — Correct plus recheck | 5 | 5 | 5 | 5 | 5 | **100** |
-| D — Shared runtime | 5 | 4 | 2 | 4 | 1 | 75 |
-
-### Selected option
-
-Select **Option C**.
-
-In P1:
-
-1. Rewrite Archive identity as a deliberately shared invariant: one retained
-   file stream opened with `FileMode.Open`, `FileAccess.Read`, and
-   `FileShare.Read`; hash; exact digest comparison; rewind; the only
-   `ZipArchive`; continuous lifetime through extraction; deterministic
-   disposal.
-2. Rewrite Permanent fixtures to say ordinary archive/path cases use the
-   production helper's public expansion interface, while one unsafe-cleanup
-   case may definition-only load and invoke the exact named production cleanup
-   function.
-3. Keep filenames, manifests, artifact names, labels, and fixture placement as
-   explicit repository-specific choices.
-4. Require the implementation that starts second to reread the current other
-   issue/merged evidence and record any divergence.
-5. State that this comparison creates no runtime or filing dependency.
-
-## C-02: Add a generator-specific convergence contract
+## C-01 — Make P1's action-role validator exact
 
 ### Options
 
-#### Option A — Rely on scattered generator requirements
+#### Option A — Exact workflow/repository counts only
 
-Keep normalization, encoding, frontmatter, and validation requirements in
-their existing sections and assume implementers will infer P1/T1 convergence.
+Keep the current line scanner, replace every lower-bound comparison with an
+exact count, and enumerate the final count for each action repository in each
+workflow. Correct the stale checkout sentence.
 
-#### Option B — Add a short prose convergence statement
+This closes the extra-occurrence defect but still cannot prove that a counted
+action occurs in the intended job or step. A duplicate in one build job can
+still mask an absent role in another build job.
 
-State that both generators should behave equivalently at serialization
-boundaries, without defining the compared surfaces or intentional differences.
+#### Option B — One role table plus a fail-closed structural scanner
 
-#### Option C — Add an explicit behavioral generator matrix
+Define one normative table keyed by:
 
-Define shared targets for complete-payload normalization, resolved paths,
-BOM-less encoding, write primitives, implicit-newline behavior, common
-artifact functions, frontmatter principles, script-version policy, repository
-text policy, and cross-edition/raw-byte validation. Give repository-specific
-values and transforms their own column. Keep implementations local.
+```text
+workflow | job ID | stable step ID | action repository
+```
 
-#### Option D — Option C plus coordinated private serializer abstractions
+Give every external-action step a stable `id`. For each table row, record its
+exact SHA, adjacent version comment, and security-relevant `with` values.
+Replace all independent allowlists/count maps with a scanner that tracks the
+current workflow, job, and step by indentation, recognizes only P1's approved
+ordinary block form, and fails if it encounters aliases, folded/multiline
+action values, reusable-job `uses`, duplicate IDs, or another form it cannot
+classify exactly. Compare observed and expected role keys as exact sets.
 
-Require each repository to introduce an equivalently contracted private
-serialization helper so the four write sites do not repeat the primitive.
-This reduces local duplication but expands both issues and makes coordination
-of function shape part of the initial implementation.
+Continue to use actual GitHub workflow runs for authoritative YAML parsing and
+execution. The local scanner proves the repository-specific policy.
 
-#### Option E — Publish one shared generator library/action now
+#### Option C — One role table plus a general YAML parser
 
-Centralize the generator or serializer in a third artifact consumed by both
-repositories. This maximizes code reuse but adds versioning, provenance,
-availability, cross-repository rollout, and compatibility work.
+Use the same authoritative table as Option B, but load each workflow with a
+standards-aware YAML library and walk the parsed jobs/steps tree. This gives the
+strongest general YAML handling.
+
+Permutations include adding a direct Node YAML dependency, requiring a
+PowerShell YAML module, vendoring a parser, or downloading a pinned tool. Each
+adds a dependency or bootstrap surface to P1, conflicts with P1's package-file
+exclusion, or complicates Windows PowerShell 5.1 support.
+
+#### Option D — External workflow linter plus a custom policy check
+
+Run a pinned `actionlint`-class tool for syntax and expression checks, then use
+a smaller role-table policy validator for exact repository placement and
+inputs. This improves syntax diagnostics but still needs custom policy logic
+and introduces another executable with provenance, update, and platform
+management requirements.
+
+#### Option E — Generate workflows from a machine-readable manifest
+
+Make the role table the source for generated workflow YAML, then verify that
+the checked-in workflows equal generated output. This can make role drift
+impossible, but it turns P1 into a workflow-generation project and makes manual
+workflow review and emergency editing harder.
+
+#### Option F — Rely on GitHub runs and manual review
+
+Remove the exact static claim and retain only full-SHA scanning, actual workflow
+runs, and reviewer inspection of job placement. This minimizes code but gives
+the weakest repeatable proof and does not satisfy P1/P2's stated exactness.
 
 ### Evaluation rubric
 
-| Criterion | Weight | Why it matters for this finding |
-| --- | ---: | --- |
-| Observable generator equivalence | 30 | The user's stated objective is thoughtful generator unification. |
-| Cross-edition byte correctness | 25 | Determinism is the primary purpose of P1/T1. |
-| Clarity of intentional differences | 20 | PowerShell- and Terraform-specific values must not be erased. |
-| Long-term drift detection | 15 | Future changes should expose divergence instead of silently accumulating it. |
-| Initial scope and implementation burden | 10 | Churn matters, but less than correctness and maintainability. |
+The rubric is specific to external-action policy enforcement:
+
+- **Security exactness (SE), 30%:** detects missing, extra, misplaced, or
+  input-weakened action roles. This is the highest weight because action
+  placement affects credentials, data exposure, and repository mutation.
+- **Configuration recognition (CR), 20%:** associates a role with the correct
+  YAML job and step without silently misreading unsupported syntax.
+- **Single-source maintainability (MA), 15%:** minimizes independent normative
+  inventories that can drift.
+- **Platform operability (PO), 10%:** works in P1's required PowerShell and
+  runner environments.
+- **Diagnostic usability (DI), 10%:** gives a new contributor an exact missing,
+  extra, malformed, or mismatched role.
+- **Dependency/provenance exposure (DE), 8%:** avoids adding an ungoverned
+  parser or executable to solve the policy check.
+- **Scope and churn (SC), 7%:** stays within P1 without unnecessary workflow
+  architecture changes. This is deliberately weighted below correctness.
 
 ### Scoring
 
-| Option | Equivalence (30) | Correctness (25) | Differences (20) | Drift (15) | Burden (10) | Weighted total |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Scattered requirements | 1 | 3 | 1 | 1 | 5 | 38 |
-| B — Prose statement | 3 | 4 | 3 | 2 | 5 | 66 |
-| C — Behavioral matrix | 5 | 5 | 5 | 5 | 4 | **98** |
-| D — Matrix plus private helpers | 5 | 5 | 4 | 5 | 2 | 90 |
-| E — Shared package/action | 5 | 5 | 3 | 5 | 1 | 84 |
+Ratings are 1–5. The weighted total applies the percentages above.
+
+| Option | SE | CR | MA | PO | DI | DE | SC | Total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A | 3 | 2 | 3 | 5 | 3 | 5 | 5 | 66 |
+| B | 5 | 4 | 5 | 5 | 5 | 5 | 4 | 95 |
+| C | 5 | 5 | 4 | 3 | 5 | 2 | 2 | 84 |
+| D | 4 | 5 | 3 | 3 | 4 | 2 | 2 | 73 |
+| E | 5 | 5 | 3 | 2 | 3 | 4 | 1 | 77 |
+| F | 2 | 1 | 2 | 4 | 2 | 5 | 5 | 49 |
 
 ### Selected option
 
-Select **Option C**.
+**Select Option B.**
 
-Add a separate generator convergence matrix to P1 with these rows:
+For a cold implementer:
 
-- serialization boundary;
-- common Copilot, Chat, and Full artifact functions;
-- instructions artifact;
-- frontmatter construction;
-- script versioning;
-- repository text policy; and
-- validation/evidence.
+1. Finalize stable job IDs and give every external-action step a unique,
+   stable step `id`.
+2. Create one table containing all six checkout roles, both upload roles, both
+   download roles, and the one setup-node role.
+3. Put the exact action repository, full SHA, version comment, and
+   security-relevant inputs in that same table.
+4. Replace the separate approved-action table, observed minimum-count table,
+   and setup-node special case with one structural scan.
+5. Make the scanner fail on duplicate IDs, unknown external actions, an action
+   in an unlisted role, a missing expected role, an extra role, any tuple/input
+   mismatch, or workflow syntax it cannot classify.
+6. Compare expected and observed role keys with case-sensitive exact set
+   equality.
+7. Correct “the two checkout occurrences” and make P1 acceptance language say
+   that the static check proves the exact supported workflow form and role
+   inventory.
+8. Retain real GitHub runs as syntax and execution proof.
+9. Refresh P2's prerequisite description after this P1 wording is final.
 
-For each row, name the shared observable target and the intentional
-PSStyleGuide/TerraformStyleGuide difference. State explicitly that unification
-currently means algorithms, bytes, failure semantics, and evidence—not a
-runtime import or forced line-for-line identity. Do not require a new private
-helper in P1; if both implementations later choose one, coordinate it as a
-separate design decision.
+This provides exact policy evidence without adding a package or tool dependency
+to P1.
 
-## C-03: Deterministically test the exact production cleanup function
+## C-02 — Make P3 prove its Node support contract
 
 ### Options
 
-#### Option A — Keep outcome-only cleanup requirements
+#### Option A — Retain Node 24 validation and rerun only the harness at minimum
 
-Retain “removed or cleanup failure reported” and rely on ordinary BOM/CR
-failures to cover successful cleanup. The unsafe branch remains unexecuted.
+Keep P3 substantially as written: run the copyable validation block on Node 24
+and rerun `Test-LintStagedMarkdown.ps1` under the selected minimum. This is the
+least churn, but it does not prove clean installation, the full lint commands,
+or the complete Husky hook at the lower runtime.
 
-#### Option B — Add an indirect workflow cleanup-failure drill
+#### Option B — Two complete runtime cells using default npm engine behavior
 
-Try to induce a filesystem failure around a complete helper invocation. This
-tests an end-to-end path, but timing, permissions, and platform differences can
-make the unsafe state nondeterministic and may not prove the exact deletion
-algorithm.
+Run fresh `npm ci`, `npm ls --all`, both lint commands, and the tracked harness
+at the selected minimum and Node 24. This substantially improves behavioral
+coverage, but npm documents `engines` as advisory by default. A dependency with
+an incompatible declaration could produce a warning and still install.
 
-#### Option C — Name, journal, and directly test production cleanup
+#### Option C — Full-tree constraints, strict clean cells, and guard/hook tests
 
-Put cleanup in one named production function, keep an exact ownership journal,
-perform a complete pre-deletion safety pass, and permit the harness to load
-definitions without running main. A mandatory cross-platform fixture inserts
-an unjournaled ordinary child, calls that exact function, and proves retention,
-no traversal, and combined diagnostics. Add link/reparse variants only where
-the primitive is available.
+Define the contract as a minimum floor plus named validated LTS majors. Inspect
+every resolved direct/transitive Node engine range and its semver intersection.
+Require the selected minimum and Node 24 to be members. In each distinct named
+cell, run a fresh install with `npm_config_engine_strict=true`, prohibit
+`--force`, then run `npm ls --all`, both production lint commands, and the
+tracked harness.
 
-#### Option D — Make link/reparse substitution the only unsafe fixture
+Extend the harness to verify manifest/guard agreement, both stable guard
+messages, accepted-runtime behavior, below-minimum fail-fast behavior, and the
+complete `.husky/pre-commit` path using test-owned shims/sentinels. Keep hosted
+Node 24 mandatory; record a separate selected-minimum Windows and Ubuntu or
+container result if it is not a second hosted CI cell.
 
-Directly test the production function, but require a link replacement as the
-mandatory unsafe state. This is security-relevant but fragile on Windows
-runners where link creation may require privileges or a specific primitive.
+#### Option D — Raise the only supported runtime to Node 24
 
-#### Option E — Redesign around OS directory handles
+Set the manifest and both guards to Node 24 and validate one clean Node 24 cell.
+This is internally simple and truthful, but it removes a still-supported Node
+22 local-development path even when the selected tree works there. It also
+does not meet the issue's stated goal of using the actual dependency floor.
 
-Replace repeated path validation and the no-competing-writer model with
-platform-specific handle-relative deletion. This could narrow races further,
-but Windows PowerShell 5.1/Linux portability and implementation complexity
-would become a new project.
+#### Option E — Declare and test every numeric major in a bounded interval
+
+Use a range such as `>=22 <25` and execute Node 22, 23, and 24. This makes
+“interval” literal, but adds an EOL Node 23 gate and creates security,
+maintenance, and availability problems without user value.
+
+#### Option F — Test every currently non-EOL Node release line
+
+Build a matrix for Node 22, Node 24, and current Node 26, updating it whenever
+Node's lifecycle changes. This gives broad ecosystem evidence but changes P3
+from a dependency remediation into a rolling runtime-support program and
+couples the issue to the short Current release phase.
 
 ### Evaluation rubric
 
-| Criterion | Weight | Why it matters for this finding |
-| --- | ---: | --- |
-| Fail-closed deletion safety | 35 | Cleanup must not turn a primary failure into unsafe recursive deletion. |
-| Deterministic executable evidence | 25 | The unsafe branch must run reliably on supported platforms. |
-| Identity with production behavior | 20 | A copied test algorithm does not prove the real cleanup path. |
-| Diagnostic preservation | 10 | Operators need both the primary cause and retained unsafe state. |
-| Cross-platform implementation cost | 10 | Complexity matters after safety and proof are satisfied. |
+This rubric evaluates runtime-support truthfulness:
+
+- **Claim accuracy (CA), 25%:** the manifest, prose, and evidence claim only
+  runtimes actually established.
+- **Dependency compatibility (DC), 20%:** checks the complete resolved tree and
+  npm tooling, not only direct packages or successful imports.
+- **Guard boundary proof (GB), 15%:** proves both guards and the complete hook
+  accept/reject at the correct boundary before tooling starts.
+- **Reproducible clean execution (RE), 15%:** uses frozen clean installs and all
+  production lint surfaces in each claimed cell.
+- **Developer usability (DU), 10%:** gives contributors clear supported
+  runtimes and useful diagnostics without requiring EOL software.
+- **Lifecycle resilience (LR), 8%:** remains sensible as Node release status
+  changes.
+- **Scope and churn (SC), 7%:** limits incidental P3 changes. This remains
+  subordinate to truthful compatibility.
 
 ### Scoring
 
-| Option | Safety (35) | Evidence (25) | Production identity (20) | Diagnostics (10) | Cost (10) | Weighted total |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Outcome only | 2 | 1 | 2 | 2 | 5 | 41 |
-| B — Indirect drill | 3 | 3 | 2 | 3 | 4 | 58 |
-| C — Named function/direct ordinary fixture | 5 | 5 | 5 | 5 | 4 | **98** |
-| D — Mandatory link substitution | 5 | 3 | 5 | 5 | 2 | 84 |
-| E — OS-handle redesign | 5 | 4 | 4 | 4 | 1 | 81 |
+| Option | CA | DC | GB | RE | DU | LR | SC | Total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A | 2 | 2 | 2 | 2 | 3 | 3 | 5 | 48 |
+| B | 4 | 4 | 3 | 5 | 4 | 4 | 4 | 80 |
+| C | 5 | 5 | 5 | 5 | 5 | 5 | 3 | 97 |
+| D | 5 | 4 | 5 | 5 | 2 | 3 | 3 | 84 |
+| E | 3 | 5 | 5 | 5 | 1 | 1 | 1 | 70 |
+| F | 4 | 5 | 4 | 5 | 4 | 2 | 2 | 81 |
 
 ### Selected option
 
-Select **Option C**.
+**Select Option C.**
 
-P1 must require:
+For a cold implementer:
 
-1. an exact journal containing only the candidate directory and ordinary files
-   created by the invocation;
-2. one named cleanup function used by the production failure path;
-3. archive, entry, and retained file-stream disposal before cleanup;
-4. a complete revalidation and immediate-child/journal equality pass before
-   the first deletion;
-5. individual, nonrecursive file deletion followed by removal of the
-   proven-empty directory;
-6. immediate stop and retention on any missing, extra, replaced, linked,
-   reparse, unreadable, or uncertain state; and
-7. preservation of the primary failure plus phase `cleanup`, retained path,
-   safely available offending entry, and cleanup exception.
+1. After choosing the final lockfile, enumerate every resolved package engine
+   constraint, not only direct dependencies.
+2. Evaluate the semver intersection. Record why the selected minimum and Node
+   24 are both admitted. Reject a candidate that excludes Node 24.
+3. Treat `engines.node` as the local minimum declaration. State separately
+   that the executed evidence covers the selected supported LTS minimum and
+   hosted Node 24; do not call this a continuous numeric interval.
+4. Split the current validation so it can run as a reusable cell instead of
+   hard-coding Node 24 before every command.
+5. For each distinct cell, establish the exact Node and npm versions, set
+   `npm_config_engine_strict=true`, prohibit `--force`, run fresh `npm ci`,
+   `npm ls --all`, both production lint commands, and the tracked harness, then
+   restore any prior environment value.
+6. If the minimum is 24, explicitly record that the one clean cell satisfies
+   both roles.
+7. Extend the harness with stable cases for manifest/guard equality, both
+   accepted paths, both rejected paths, exact diagnostics, fail-fast sentinels,
+   and complete `.husky/pre-commit` delegation.
+8. Use synthetic versions rather than installing EOL Node 20 for negative
+   tests.
+9. Keep the hosted Node 24 gate. Preserve Windows evidence for the actual hook
+   environment and record selected-minimum Ubuntu/container evidence if CI
+   remains Node 24-only.
 
-Add one stable mandatory case for an unexpected ordinary child and optional
-link/reparse substitution variants where supported. The harness may
-definition-only load the function; it must not copy cleanup, add a test switch,
-or expose another extraction API.
+The strict install is essential: default npm behavior can warn instead of
+failing for dependency engine mismatches.
 
-## C-04: Verify local PowerShell identity inside each child
+## C-03 — Align P3 residual approval identity with the audited risk
 
 ### Options
 
-#### Option A — Keep executable-name labels
+#### Option A — Keep URL identity and require every explain path
 
-Continue treating `pwsh` as Core 7 and `powershell` as Desktop 5.1 based only
-on the resolved command name.
+Retain one approval per unique advisory URL, but require the approval to list
+all normalized `npm explain` chains for its package. This improves path
+visibility but still assumes one URL globally identifies the risk and still
+cannot prove which advisory applies to which installed node.
 
-#### Option B — Probe the executable in a separate child
+#### Option B — Audit-native package/advisory keys plus separate node evidence
 
-Run a version command first, then start another child with `-File` for the
-harness/generator. This catches an obvious wrong executable but does not bind
-the reported identity to the process that produced the evidence.
+Use exact `(Package, AdvisoryUrl)` composite keys for actual and approved
+residual sets. Separately record, by package, the exact sorted nonempty
+`AuditNodePaths` set from the vulnerability property's `nodes`. Keep normalized
+`npm explain` output as reviewer context and never claim the response maps each
+advisory object to each node.
 
-#### Option C — Use an interpolated same-child command string
+Use exact expiry parsing and require evidence that the follow-up URL resolves
+to a public non-pull-request issue in `franklesniak/PSStyleGuide`. Record owner
+acceptance as manual review evidence.
 
-Build a dynamic `-Command` string that asserts the edition/version and invokes
-the target. This couples identity and work, but quoting paths and embedding
-values as code create avoidable injection and portability risks.
+#### Option C — Advisory/package/node tuples with semver evaluation
 
-#### Option D — Use a fixed same-child command with expected values as data
+Build actual and approved tuples as
+`(Package, AdvisoryUrl, AuditNodePath)`. Resolve the installed version for each
+node from the lockfile and use semver-correct range evaluation to include only
+advisories that apply to that version. Run `npm explain` by exact folder for
+each tuple.
 
-Pass expected edition, version, target path, and helper path through
-PSStyleGuide-specific environment variables. A fixed `-Command` prelude reads
-and validates them, asserts `$PSVersionTable`, invokes the target in that same
-process, and exits nonzero on any failure. The parent checks `$LASTEXITCODE`
-immediately and restores every variable in `finally`.
+This is more granular, but it adds a semver evaluator and substantial mapping
+logic to a one-off issue validator. It is justified only if per-installed-node
+approval is an explicit governance requirement.
 
-#### Option E — Add a tracked child-bootstrap script
+#### Option D — Package-wide residual approvals
 
-Create another repository script that performs Option D. This is reusable and
-testable, but adds a permanent implementation file solely for local validation
-when a fixed command is sufficient.
+Approve one vulnerable package property with its aggregate severity and all
+node paths, without listing individual advisory URLs. This is easy to review
+but can hide a newly added advisory under an existing package approval.
+
+#### Option E — Prohibit every residual finding
+
+Require final audit exit 0 with no moderate/high/critical findings and remove
+the approval mechanism. This is the smallest exact residual set and strongest
+default security outcome, but it provides no governed path when a registry
+finding has no safe current fix or a policy-approved temporary exception is
+necessary.
+
+#### Option F — Delegate residual identity to an external risk system
+
+Require every finding to exist in a vulnerability-management platform and
+store only its external record URL in P3 evidence. This can improve enterprise
+governance, but creates a new external dependency, may not be publicly
+reviewable, and does not eliminate the need to reconcile npm's actual set.
 
 ### Evaluation rubric
 
-| Criterion | Weight | Why it matters for this finding |
-| --- | ---: | --- |
-| Edition/version identity proof | 35 | Evidence must establish Desktop 5.1 or Core 7, not a filename convention. |
-| Coupling identity to executed work | 25 | A probe in a different process is indirect. |
-| Quoting and data/code separation | 15 | Local paths and values must not become dynamic code. |
-| Exit/failure propagation | 15 | The parent must not mistake child startup or target failure for success. |
-| Copy/paste usability | 10 | A new contributor should be able to run the validation safely. |
+This rubric evaluates exception identity and governance:
+
+- **Audit provenance fidelity (AP), 25%:** keys approvals only with
+  relationships the selected audit response directly establishes.
+- **Residual completeness (RC), 20%:** exact equality detects a new, missing,
+  duplicate, or stale residual.
+- **Tree-shape resilience (TR), 15%:** handles duplicate installed packages and
+  several advisories without conflation.
+- **Governance strength (GS), 15%:** provides exact expiry, issue, ownership,
+  and review evidence.
+- **Reviewer comprehension (RV), 10%:** lets a cold security reviewer
+  understand what is approved and what is contextual.
+- **Implementation reliability (IR), 8%:** avoids fragile mappings or
+  unjustified range calculations.
+- **Scope and churn (SC), 7%:** fits P3. This is lower than provenance and
+  completeness.
 
 ### Scoring
 
-| Option | Identity (35) | Coupling (25) | Data safety (15) | Failure propagation (15) | Usability (10) | Weighted total |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Labels | 1 | 1 | 4 | 3 | 5 | 43 |
-| B — Separate probe | 3 | 2 | 4 | 4 | 4 | 63 |
-| C — Interpolated same-child | 5 | 5 | 2 | 4 | 3 | 84 |
-| D — Fixed command/data variables | 5 | 5 | 5 | 5 | 4 | **98** |
-| E — Tracked bootstrap | 5 | 5 | 5 | 5 | 2 | 94 |
+| Option | AP | RC | TR | GS | RV | IR | SC | Total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A | 3 | 3 | 3 | 4 | 3 | 4 | 5 | 67 |
+| B | 5 | 5 | 5 | 5 | 5 | 5 | 4 | 99 |
+| C | 5 | 5 | 5 | 5 | 3 | 2 | 1 | 86 |
+| D | 2 | 2 | 2 | 3 | 4 | 5 | 5 | 56 |
+| E | 5 | 5 | 5 | 3 | 4 | 5 | 2 | 88 |
+| F | 4 | 4 | 5 | 5 | 2 | 2 | 1 | 75 |
 
 ### Selected option
 
-Select **Option D**.
+**Select Option B.**
 
-Rewrite P1's local cross-edition block so each resolved executable starts two
-same-child tasks:
+For a cold implementer:
 
-1. assert expected edition/version, then run the exact tracked harness against
-   the exact helper;
-2. assert the same expected edition/version, then run the generator.
+1. Replace `DependencyPath` in each approval identity with exact `Package` and
+   `AdvisoryUrl` fields.
+2. Construct the actual residual set from every disposition-requiring object
+   advisory as a case-sensitive composite key, not URL alone.
+3. Reject duplicate composite keys and require exact equality between approved
+   and actual composite-key sets.
+4. Build a separate package-keyed record whose `AuditNodePaths` exactly equals
+   the normalized, sorted, duplicate-free `nodes` array for that vulnerability
+   property.
+5. Preserve `npm explain` chains for each package and, where useful, exact
+   folder, but label them diagnostic context.
+6. Do not cross-product package advisories and node paths.
+7. Parse expiry with one documented invariant UTC format, explicit
+   `DateTimeStyles`, and `TryParseExact`; require it to be in the future.
+8. Require follow-up URLs to target exactly
+   `franklesniak/PSStyleGuide/issues/<number>`.
+9. Require either an API check or recorded manual evidence that the URL is
+   publicly retrievable and is not a pull request.
+10. Record explicit owner acceptance separately from the nonempty owner field.
 
-Use fixed PSStyleGuide-prefixed environment-variable names for expected
-edition, expected major/minor, target, and helper. Reject missing values;
-require Desktop exactly 5.1 or Core major 7 before target invocation; write
-expected and observed identity into failures; return an explicit nonzero exit;
-check it immediately in the parent; and restore/remove all variables in
-`finally`. Do not use a separate probe as edition evidence.
+If organizational policy later requires per-node approval, adopt Option C in
+separately reviewed scope with a real semver implementation. Do not silently
+turn package-level audit evidence into per-advisory node mappings.
 
-## C-05: Require real link coverage on both operating-system families
+## C-04 — Reconcile P3 audit metadata with the graph
 
 ### Options
 
-#### Option A — Retain unrestricted named skips
+#### Option A — Retain metadata self-consistency only
 
-Keep stable case-level skip records but allow every link fixture to skip on an
-OS family if setup reports unavailable capability or privilege.
+Keep the current five severity parses and require their sum to equal metadata
+total. This proves that metadata is internally arithmetically consistent, but
+not that it describes the enumerated graph.
 
-#### Option B — Require one real rejection per OS family
+#### Option B — Add property count and severity reconciliation
 
-Require at least one actual component-or-leaf symbolic-link test on Ubuntu and
-one actual component-or-leaf link/reparse test on Windows. Keep narrowly
-justified case-level skips for additional unavailable link forms; fail
-unexpected setup errors and prohibit platform-wide skips.
+Require vulnerability property count to equal total, validate each property
+severity, and derive severity counts from properties. This closes the principal
+metadata gap but leaves node paths, edges, advisory shapes, and remediation
+shapes only partially checked.
 
-#### Option C — Require every link fixture everywhere
+#### Option C — Validate every consumed graph shape and relationship
 
-Eliminate skips and require ancestor, below-root, leaf, dangling-leaf, and
-cleanup-substitution link cases on every runner. Coverage is broad, but Windows
-privilege/filesystem differences make the suite brittle.
+Record the exact npm version and audit report version. Validate the expected
+top-level objects; every vulnerability property's key/name, severity,
+`isDirect`, range, `via`, `effects`, `nodes`, and `fixAvailable` shapes; exact
+metadata/property count equality; lockfile resolution for every node path; and
+edge consistency for the selected observed schema. Validate all object
+advisories before selecting those that require disposition.
 
-#### Option D — Replace real links with ZIP external-attribute fixtures
+Allow additive fields to remain in raw evidence, but fail if a field the
+validator consumes is missing, changes type, or violates a recorded invariant.
 
-Use symlink-like ZIP metadata as the only cross-platform evidence. This proves
-that extraction creates ordinary files, but it does not exercise filesystem
-component or leaf indirection.
+#### Option D — Enforce an exact generated JSON Schema
 
-#### Option E — Build platform-specific privileged link test jobs
+Capture one audit response, generate a closed JSON Schema, and reject any
+response with additional or changed fields. This is mechanically strict but
+confuses harmless additive npm output with a security failure, becomes tightly
+coupled to one patch release, and still needs semantic cross-field checks.
 
-Use dedicated Windows/Linux setup and privileges to execute every real link
-form. This maximizes coverage but expands workflow permissions, runner
-assumptions, and operational cost.
+#### Option E — Use npm internals or an external audit library
+
+Call Arborist/metavulnerability internals or another library to construct a
+typed graph instead of validating CLI JSON. This may expose richer objects but
+relies on an internal or additional API with its own version/provenance
+surface. It is unnecessary for a one-issue evidence validator.
+
+#### Option F — Preserve raw JSON and rely on human review
+
+Check only command exit and nonempty parseable JSON, then require a reviewer to
+inspect the saved report. Raw evidence is valuable, but manual review alone is
+not repeatable exact-set enforcement and is prone to overlooking stale
+approvals or graph inconsistencies.
 
 ### Evaluation rubric
 
-| Criterion | Weight | Why it matters for this finding |
-| --- | ---: | --- |
-| Real filesystem-indirection evidence | 35 | The helper claims rejection of links/reparse points in actual paths. |
-| Deterministic hosted-runner behavior | 25 | Required CI must be reliable rather than privilege-sensitive. |
-| Honest skip semantics | 20 | Missing setup capability must not be reported as passing security coverage. |
-| Cross-platform portability | 10 | Both supported OS families need meaningful proof. |
-| Workflow/maintenance cost | 10 | Extra privileged jobs should be justified by incremental assurance. |
+This rubric evaluates audit graph validation:
+
+- **Inconsistency detection (ID), 25%:** detects metadata/graph disagreement,
+  malformed nodes, bad edges, and ignored severities.
+- **Fail-closed schema use (FS), 20%:** rejects changes to every relied-upon
+  shape without falsely claiming an eternal npm schema.
+- **Lockfile traceability (LT), 15%:** ties audit node paths to the reviewed
+  resolved package/version tree.
+- **Upgrade reviewability (UR), 15%:** produces a clear deliberate review point
+  when npm output evolves.
+- **Diagnostic quality (DQ), 10%:** identifies the exact field, property, path,
+  or edge that failed.
+- **Maintenance stability (MS), 8%:** avoids excessive coupling to harmless
+  additive fields or undocumented internals.
+- **Scope and churn (SC), 7%:** remains implementable in P3, below correctness
+  in weight.
 
 ### Scoring
 
-| Option | Real evidence (35) | Determinism (25) | Skip honesty (20) | Portability (10) | Cost (10) | Weighted total |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Unrestricted skips | 1 | 2 | 1 | 5 | 5 | 41 |
-| B — One mandatory per family | 5 | 5 | 5 | 5 | 4 | **98** |
-| C — Every form everywhere | 5 | 2 | 4 | 2 | 2 | 69 |
-| D — Metadata only | 2 | 5 | 5 | 5 | 5 | 79 |
-| E — Privileged jobs | 5 | 5 | 5 | 4 | 1 | 90 |
+| Option | ID | FS | LT | UR | DQ | MS | SC | Total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A | 3 | 2 | 1 | 3 | 3 | 5 | 5 | 56 |
+| B | 4 | 3 | 3 | 4 | 4 | 5 | 4 | 75 |
+| C | 5 | 5 | 5 | 5 | 5 | 4 | 3 | 96 |
+| D | 5 | 5 | 5 | 2 | 3 | 1 | 1 | 75 |
+| E | 5 | 4 | 5 | 3 | 4 | 2 | 1 | 78 |
+| F | 2 | 1 | 1 | 2 | 2 | 5 | 5 | 42 |
 
 ### Selected option
 
-Select **Option B**.
+**Select Option C.**
 
-P1 must say that acceptance requires:
+For a cold implementer, perform these checks before residual comparison:
 
-- one real component-or-leaf symlink rejection on Ubuntu;
-- one real component-or-leaf link/reparse rejection on Windows;
-- a stable ID/platform/reason record for any additional skipped form;
-- no platform-wide link-fixture skip; and
-- a failed cell for unexpected setup failure.
+1. Record Node, npm, raw audit JSON, exit code, and
+   `auditReportVersion`; require the reviewed report version.
+2. Require `metadata.vulnerabilities` and a nonnull object-valued
+   `vulnerabilities`.
+3. For every vulnerability property, require its value's `name` to equal the
+   property key and require recognized shapes for severity, `isDirect`, range,
+   `via`, `effects`, `nodes`, and `fixAvailable`.
+4. Derive property-level severity counts and require exact equality with all
+   five metadata counts and total. Do not derive these counts from advisory
+   objects.
+5. Require each `nodes` set to be nonempty, normalized, and duplicate-free.
+   Resolve each path to the corresponding `package-lock.json` `packages`
+   entry, package name, and exact version.
+6. Require every string `via` target and every `effects` target to name an
+   enumerated vulnerability property.
+7. For the selected npm/report schema, require each `effects` edge to have the
+   observed reciprocal string `via` edge. If npm changes that contract, fail
+   with a schema-review diagnostic rather than silently accepting it.
+8. Validate every object advisory's canonical URL, recognized severity, and
+   nonempty range before filtering by the disposition threshold. Reject an
+   unknown severity.
+9. Accept `fixAvailable` only as a Boolean or a reviewed object with validated
+   package name, version, and Boolean semver-major marker.
+10. Preserve additive unknown fields in raw evidence, but never consume an
+    unvalidated field.
 
-Keep the ZIP external-attribute success case because it proves a different
-property: metadata is not restored as a filesystem link.
+This gives exact semantic checks without the brittleness of a closed
+sample-generated schema.
 
-## C-06: Align or explain pull-request harness placement
+## C-05 — Replace planning-file references when issues are filed
 
 ### Options
 
-#### Option A — Keep two LF cells without rationale
+#### Option A — Keep repository-relative planning links
 
-Retain current behavior and the generic statement that placement may differ.
+Leave P1/P2/P3 as currently written. This is convenient while browsing the
+draft directory but produces issue-body links whose resolution context and
+target branch differ from the source files.
 
-#### Option B — Keep two LF cells and document the coverage model
+#### Option B — Create in execution order, then backfill real relationships
 
-Explain that the helper is independent of source fixture EOL, so Ubuntu
-PowerShell 7 plus Windows Desktop/Core LF cells provide platform/edition
-coverage; CRLF cells test generator EOL equivalence only. Preserve all-four
-push-consumer harness execution.
+Prepare issue bodies without local planning-path links. File P1, P2, and P3 in
+execution order. As each number becomes available, insert the actual issue URL
+where ownership or dependency is discussed and create GitHub's blocked-by
+relationships. After P3 exists, backfill its actual URL into the P1/P2
+delegation text.
 
-#### Option C — Run the full helper suite in all four Windows PR cells
+Replace the research artifact link with an exact commit permalink or remove it
+in favor of direct primary sources.
 
-Match T1's placement exactly and gain redundant EOL-axis executions at the cost
-of additional CI minutes and slower feedback.
+#### Option C — Use repository-root blob links
 
-#### Option D — Move helper tests to dedicated non-matrix jobs
+Convert each planning link to a GitHub path rooted at the repository or default
+branch. This may render from an issue, but it still points to planning documents
+rather than the real work items and a branch link is mutable.
 
-Separate helper platform/edition coverage from generator EOL coverage. This is
-conceptually clean but changes workflow topology and dependency wiring more
-than the finding requires.
+#### Option D — Leave explicit issue-number placeholders
 
-#### Option E — Run extra cells only when helper files change
+Put tokens such as `PSSTYLE-P1-ISSUE-URL` in each body and require the filer to
+replace them. This makes the missing data obvious but risks publishing literal
+placeholders and still needs a backfill workflow.
 
-Use path-sensitive conditional coverage. This reduces cost but complicates
-unfiltered PR guarantees and can miss interactions when workflow or runtime
-files change.
+#### Option E — Publish planning documents on `main`
+
+Merge the planning files to the default branch and link issues to those stable
+paths. This makes the files accessible, but branch content remains mutable and
+duplicates the issue as the source of truth.
+
+#### Option F — File in reverse order to know every downstream number
+
+Create P3, then P2, then P1 so upstream bodies can include downstream issue
+numbers immediately; add blocked-by relationships after all exist. The work
+order can still be P1 → P2 → P3, but reverse issue numbering is less intuitive
+and does not eliminate editing the dependency relationships.
 
 ### Evaluation rubric
 
-| Criterion | Weight | Why it matters for this finding |
-| --- | ---: | --- |
-| Actual helper coverage sufficiency | 35 | Both platforms/editions and required fixtures must execute. |
-| Assurance gained per CI cost | 20 | Redundant EOL-axis runs should provide material evidence. |
-| P1/T1 comparability | 20 | Differences should be understandable during coordinated implementation. |
-| Downstream workflow clarity | 15 | Job intent should be obvious to a cold reader. |
-| Feedback time and runner use | 10 | CI cost is secondary but still operationally relevant. |
+This rubric evaluates durable issue handoff:
+
+- **Reference durability (RD), 25%:** links identify the intended immutable
+  evidence or live issue over time.
+- **Dependency truth (DT), 20%:** GitHub visibly represents P1 → P2 → P3.
+- **Cold-reader navigation (CN), 15%:** a downstream implementer can move
+  directly among real issues and evidence.
+- **Historical reproducibility (HR), 15%:** cited research can be retrieved in
+  the exact reviewed state.
+- **Filing reliability (FR), 10%:** minimizes forgotten placeholders and
+  partially populated relationships.
+- **Draft usability (DU), 8%:** remains workable before issue numbers exist.
+- **Scope and churn (SC), 7%:** limits administrative edits, below durability
+  and truth.
 
 ### Scoring
 
-| Option | Coverage (35) | Signal/cost (20) | Comparability (20) | Clarity (15) | Runtime (10) | Weighted total |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Undocumented two-cell | 4 | 5 | 2 | 1 | 5 | 69 |
-| B — Documented two-cell | 5 | 5 | 4 | 5 | 5 | **96** |
-| C — Four-cell symmetry | 5 | 2 | 5 | 5 | 2 | 82 |
-| D — Dedicated jobs | 5 | 3 | 3 | 4 | 3 | 77 |
-| E — Conditional expansion | 4 | 3 | 3 | 2 | 3 | 64 |
+| Option | RD | DT | CN | HR | FR | DU | SC | Total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A | 1 | 2 | 3 | 1 | 5 | 5 | 5 | 50 |
+| B | 5 | 5 | 5 | 5 | 4 | 4 | 4 | 95 |
+| C | 3 | 2 | 4 | 2 | 4 | 5 | 4 | 63 |
+| D | 2 | 3 | 3 | 3 | 2 | 4 | 5 | 57 |
+| E | 4 | 3 | 4 | 2 | 3 | 5 | 2 | 67 |
+| F | 5 | 5 | 4 | 5 | 3 | 4 | 3 | 89 |
 
 ### Selected option
 
-Select **Option B**.
+**Select Option B.**
 
-Retain P1's Ubuntu plus two-Windows-LF pull-request helper placement. Add a
-convergence-matrix note and topology explanation that this is deliberate
-platform/edition coverage, not edition × EOL helper coverage. CRLF cells remain
-generator-only because the helper consumes constructed ZIP/path fixtures, not
-source EOL variants. Keep the harness mandatory in all four push cells and in
-the writer whenever it starts.
+For a cold filer:
 
-## C-07: Refresh P2's prerequisite snapshot
+1. Use each document's H1 as its issue title and body heading.
+2. Create P1 first, P2 second, and P3 third so issue numbering follows work
+   order.
+3. Immediately after P2 exists, mark P2 blocked by P1 using GitHub's issue
+   relationship and put P1's actual issue URL in P2's prerequisite text.
+4. Immediately after P3 exists, mark P3 blocked by P2 and put P2's actual issue
+   URL in P3's prerequisite text.
+5. Backfill P3's actual URL wherever P1 or P2 delegates npm work.
+6. Verify the final issue bodies contain no
+   `docs/planning/PSStyleGuide/...` links or unresolved placeholders.
+7. Use a full commit-SHA permalink for any retained planning research record.
+   If that exact artifact is not accessible to the intended reviewers, remove
+   it and keep the direct primary-source references.
+8. Verify the issue relationship UI or API reports exactly P2 blocked by P1
+   and P3 blocked by P2.
+
+The draft revisions should remove repository-relative planning links now while
+retaining clear filing instructions for the actual relationships.
+
+## C-06 — Proposed P1 → P3 → P2 fallback
 
 ### Options
 
-#### Option A — Leave the current snapshot
+#### Option A — Unconditional P1 → P2 → P3
 
-Allow P2 to describe the pre-correction P1 contract. This is immediately stale
-after selected C-01/C-03/C-04/C-05 changes.
+Remove P3's policy exception and always follow the stipulated order. This is
+simple and preserves baselines, but could knowingly conflict with a real
+organization rule that prohibits carrying high findings.
 
-#### Option B — Copy final P1 in extensive detail
+#### Option B — Default P1 → P2 → P3 with one policy-driven rebaseline
 
-Duplicate cleanup algorithms, fixtures, local bootstrap, and link rules into
-P2. This is explicit but creates a second normative specification that can
-drift.
+Retain the stipulated sequence. At filing and implementation, verify the actual
+repository/organization vulnerability policy. Only if that policy forbids the
+default sequence, make the complete P3 remediation the real prerequisite,
+perform it before P1/P2, and rebaseline all affected P1/P2 assumptions.
 
-#### Option C — Keep a concise invariant summary plus normative P1 link
+#### Option C — Advance P3 after P1 whenever P2 is delayed
 
-After P1 is final, update only the gates P2 genuinely depends on and state that
-merged P1 is the implementation source of truth. Add the new held-stream,
-named-cleanup/direct-test, mandatory-link, same-child-edition, and exact-pin
-invariants without copying algorithms.
+Use P1 → P3 → P2 based on elapsed time or project-management concern. This
+violates the requested sequence and creates an unmodeled baseline in which P2
+must reinterpret P3's later-package supersession language.
 
-#### Option D — Add an executable prerequisite conformance script to P2
+#### Option D — Always perform P3 first
 
-Have P2 mechanically inspect the merged workflow/helper before documentation
-work begins. This can strengthen evidence but adds a new validator surface and
-still needs a human-readable dependency summary.
+Use P3 → P1 → P2 because the current audit has high findings. This prioritizes
+remediation but discards the requested work order even when policy permits it
+and forces broad P1/P2 rebaselining.
 
-#### Option E — Remove the snapshot and keep only the P1 link
+#### Option E — Parallelize P2 and P3 after P1
 
-Avoid all duplication, but make a cold implementer reconstruct which P1
-properties are necessary for P2's validation and post-merge expectations.
+Start P2 and P3 concurrently, then reconcile. This directly violates the
+one-at-a-time requirement and creates overlapping edits to validation and
+package assumptions.
 
 ### Evaluation rubric
 
-| Criterion | Weight | Why it matters for this finding |
-| --- | ---: | --- |
-| Accuracy against final P1 | 30 | P2 must start only after the actual prerequisite exists. |
-| Resistance to copied-contract drift | 25 | P1 remains the normative implementation owner. |
-| Cold-start implementer usability | 20 | P2 should expose the gates it relies on. |
-| Single source of normative truth | 15 | Algorithms should not have two owners. |
-| P2 scope preservation | 10 | Prerequisite text should not reopen generator work. |
+This rubric evaluates issue sequencing:
+
+- **User-order fidelity (UF), 30%:** honors the explicit one-at-a-time
+  P1 → P2 → P3 requirement.
+- **Baseline integrity (BI), 25%:** each issue starts from the predecessor state
+  its validation and supersession text assumes.
+- **Policy responsiveness (PR), 20%:** can comply with an actual vulnerability
+  policy without hand-waving.
+- **Coordination clarity (CC), 10%:** gives the project manager and implementer
+  one unambiguous decision rule.
+- **Delivery predictability (DP), 8%:** avoids surprise rebases and overlapping
+  work.
+- **Scope and churn (SC), 7%:** limits rework, below correctness and policy.
 
 ### Scoring
 
-| Option | Accuracy (30) | Drift (25) | Usability (20) | Source of truth (15) | Scope (10) | Weighted total |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Leave stale | 1 | 1 | 2 | 3 | 5 | 38 |
-| B — Copy details | 5 | 2 | 4 | 1 | 2 | 63 |
-| C — Concise summary/link | 5 | 5 | 5 | 5 | 5 | **100** |
-| D — Conformance script | 5 | 5 | 3 | 4 | 2 | 83 |
-| E — Link only | 4 | 5 | 2 | 5 | 5 | 82 |
+| Option | UF | BI | PR | CC | DP | SC | Total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A | 5 | 5 | 2 | 5 | 5 | 5 | 88 |
+| B | 5 | 5 | 5 | 5 | 4 | 4 | 97 |
+| C | 1 | 3 | 3 | 2 | 2 | 2 | 43 |
+| D | 1 | 4 | 5 | 3 | 3 | 1 | 58 |
+| E | 1 | 2 | 3 | 1 | 2 | 2 | 36 |
 
 ### Selected option
 
-Select **Option C**.
+**Select Option B.**
 
-After P1 revisions are complete, refresh P2's prerequisite bullets to name:
+No new P1 → P3 → P2 branch should be added. Keep the current P3 ordering rule:
 
-- the shared same-held-stream P1/T1 invariant;
-- the journaled named cleanup function and direct fail-closed fixture;
-- at least one real link/reparse rejection per OS family;
-- the same-child Desktop 5.1/Core 7 local proof; and
-- exact approved action tuple validation.
+1. Default to P1 → P2 → P3.
+2. Check the actual governing policy at filing and implementation time.
+3. Do not reorder for a hypothetical risk or schedule delay.
+4. If the policy truly forbids the default order, perform the complete P3
+   dependency/hook change first or file it as the real prerequisite.
+5. After that exception merges, rebaseline every affected P1/P2 Node, npm,
+   lockfile, path-set, validation, and supersession assumption.
+6. Record the policy source and the decision.
 
-Keep the existing statement that P1 is the source of truth. Do not reproduce
-cleanup, path, or child-bootstrap algorithms in P2.
+The issue slate already expresses this option. Preserve it and do not
+incorporate the supplied criticism's P1 → P3 → P2 scheduling suggestion.
 
-## C-08: Assert Node 24 before P2's local npm commands
+## I-P3-01 — Separate vulnerable-package counts from advisory counts
 
 ### Options
 
-#### Option A — Rely on hosted CI
+#### Option A — Add one terminology sentence
 
-Let local `npm ci` and lint use any Node on `PATH`; depend on the post-push
-workflow for exact Node 24 evidence.
+State that metadata counts vulnerable package properties while object advisory
+records are counted separately. This is clear but does not require mechanical
+reconciliation of the two collections.
 
-#### Option B — Add a prose prerequisite
+#### Option B — Define and validate both counting units
 
-Tell the implementer to activate Node 24, but do not make the copyable block
-verify it.
+Name three distinct units in P3:
 
-#### Option C — Add a simple `node --version` regex
+- vulnerability properties counted by metadata;
+- object advisory records counted from object-valued `via` members; and
+- distinct disposition keys counted as `(Package, AdvisoryUrl)`.
 
-Run the command by name and require output beginning `v24.`. This is better
-than prose but does not resolve the exact executable or validate output shape
-as carefully as P1.
+Record all three before and after remediation. Reconcile metadata only with
+property severities, validate every object advisory separately, and compare
+only distinct disposition keys with approvals.
 
-#### Option D — Reuse P1's resolved-command Node/npm bootstrap
+#### Option C — Hard-code the current fourteen advisories in the issue
 
-Resolve one `node` and one `npm` application, query
-`process.versions.node`, require exactly one major-24 value, set/restore `CI`
-around clean installation, and invoke all npm commands through the resolved
-npm path with immediate exit checks.
+Add a dated table containing every current package/URL/severity/range record.
+This is useful review context, but registry data may change before P3 starts and
+the table can be mistaken for a permanent expected set.
 
-#### Option E — Run validation in a Node 24 container/version manager
+#### Option D — Count only unique advisory URLs
 
-Provision a controlled runtime locally. This is reproducible but introduces
-another required tool, filesystem/UID concerns, and a validation environment
-different from the documented native workflow.
+Collapse object advisories across packages and use the unique URL count
+everywhere. This loses package context and can hide one advisory affecting
+several package properties.
+
+#### Option E — Commit a raw audit snapshot as a normative fixture
+
+Add the current audit JSON to the repository and test the validator against it.
+This gives excellent parser regression coverage but creates another affected
+file and may encourage treating a dated registry response as the final
+expected audit result.
+
+#### Option F — Remove all dated counts
+
+Require only implementation-time dynamic discovery. This avoids stale numbers
+but removes useful proof that the issue addresses the observed current defect.
 
 ### Evaluation rubric
 
-| Criterion | Weight | Why it matters for this finding |
-| --- | ---: | --- |
-| Exact runtime evidence | 35 | P2 claims Node 24 compatibility, not generic modern Node success. |
-| Consistent executable binding | 20 | Version query and npm work should use the intended toolchain. |
-| Environment restoration/failure handling | 15 | Copyable validation must not leak `CI` or ignore native exits. |
-| New-developer usability | 20 | Failure should immediately explain the required runtime. |
-| P2 scope fit | 10 | The fix should not introduce a new environment platform. |
+This rubric evaluates audit-count semantics:
+
+- **Unit correctness (UC), 30%:** never conflates package properties,
+  advisories, and approval identities.
+- **Mechanical drift detection (MD), 20%:** new or missing records cannot hide
+  behind another count.
+- **Reviewer clarity (RC), 20%:** security and business reviewers can explain
+  each number.
+- **Evidence completeness (EC), 15%:** before/after records support the
+  remediation decision.
+- **Temporal resilience (TR), 8%:** dated context cannot silently become a
+  stale expected final set.
+- **Scope and churn (SC), 7%:** fits P3, below correctness.
 
 ### Scoring
 
-| Option | Runtime (35) | Binding (20) | Environment (15) | Usability (20) | Scope (10) | Weighted total |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Hosted only | 1 | 3 | 3 | 5 | 5 | 58 |
-| B — Prose | 2 | 3 | 4 | 5 | 5 | 68 |
-| C — Simple query | 4 | 3 | 4 | 4 | 5 | 78 |
-| D — P1 bootstrap | 5 | 5 | 5 | 4 | 5 | **96** |
-| E — Container/manager | 5 | 5 | 4 | 2 | 2 | 79 |
+| Option | UC | MD | RC | EC | TR | SC | Total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A | 4 | 3 | 5 | 3 | 5 | 5 | 80 |
+| B | 5 | 5 | 5 | 5 | 5 | 4 | 99 |
+| C | 5 | 4 | 4 | 5 | 2 | 2 | 83 |
+| D | 2 | 2 | 3 | 2 | 3 | 4 | 48 |
+| E | 5 | 5 | 4 | 5 | 3 | 1 | 87 |
+| F | 1 | 1 | 2 | 1 | 5 | 5 | 36 |
 
 ### Selected option
 
-Select **Option D**.
+**Select Option B.**
 
-Replace the opening of P2's generate/lint block with P1's exact local Node 24
-bootstrap. Require one Node major-24 result before `npm ci`; run install with
-`CI=true` and restore the prior environment value in `finally`; then use the
-same resolved npm command for outer and nested lint. Keep the existing
-generator, whitespace, and exit-code checks.
+For a cold implementer:
 
-## C-09: Remove P2's stale metadata snapshot
+1. Add explicit definitions near P3's baseline and validation:
+   `metadata.vulnerabilities.total` counts vulnerability properties, not
+   advisory objects.
+2. Record the dated baseline as seven properties and fourteen object
+   advisories, while saying both are implementation-time dynamic evidence.
+3. Derive metadata severity counts from property-level severities.
+4. Validate and count every object advisory independently.
+5. Derive the residual approval set from distinct
+   `(Package, AdvisoryUrl)` keys.
+6. Report all three counts in diagnostics and pull-request evidence.
+7. Do not require the final run to preserve the dated seven/fourteen values;
+   require it to be internally consistent and exactly dispositioned.
+
+This clarification composes directly with the selected C-03 and C-04 designs.
+
+## I-P3-02 — Define support as a set, not an accidentally unbounded claim
 
 ### Options
 
-#### Option A — Retain the expired conditional example
+#### Option A — Minimum admission rule plus named validation set
 
-Keep `2.24.20260728.0` with its recomputation warning.
+Keep `engines.node` and both guards as an exact lower-bound rule such as
+`>=22`. Describe it as the minimum admitted local-tooling version, not as a
+claim that every future major has been tested. Separately name the executed
+support evidence: the selected LTS minimum and hosted Node 24.
 
-#### Option B — Refresh the example to today's baseline/date
+This follows conventional package-engine practice and keeps future Node
+versions from being rejected solely because they were released later. It
+requires precise language distinguishing “admitted by the floor” from
+“explicitly validated.”
 
-Provide a new concrete value. It will become stale again when implementation
-date or target metadata changes.
+#### Option B — Exact union of validated LTS major lines
 
-#### Option C — Remove the snapshot
+Use a disjunctive range such as `>=22 <23 || >=24 <25` and make both guards
+match it. This is the most literal tested-support set, but it rejects Node 26
+and requires coordinated manifest/guard edits whenever another LTS line is
+accepted.
 
-Keep only the normative target-branch/current-UTC algorithm and acceptance
-requirements.
+#### Option C — Bounded continuous range
 
-#### Option D — Replace values with placeholders
+Use `>=22 <25` and test the endpoints. This still admits EOL Node 23, so it does
+not solve the mismatch between a numeric interval and the actual LTS support
+policy.
 
-Show `Major.Minor.YYYYMMDD.Revision` and `<current UTC date>`. This illustrates
-shape but duplicates the already clear numbered algorithm.
+#### Option D — Node 24 only
 
-#### Option E — Add a copyable metadata calculator
+Use `>=24 <25` and validate one runtime. This is simple and exact but needlessly
+rejects Node 22 when the selected dependency tree and hook work there.
 
-Compute the new version from parsed target content and UTC time. This can be
-precise, but version-policy parsing and concurrent target changes still need
-human finalization and increase P2's validator surface.
+#### Option E — Remove `engines.node`
+
+Treat the hook and staged-script guards as the only runtime policy. This avoids
+range semantics but removes the package-manager-visible compatibility signal
+and creates two independent sources of truth.
+
+#### Option F — Add npm `devEngines` as an exact enforcement layer
+
+Keep broad `engines.node`, add an exact `devEngines.runtime` rule, and align the
+guards with it. This can make npm fail early, but `devEngines` behavior depends
+on newer npm versions and introduces a second manifest runtime construct that
+must remain synchronized.
 
 ### Evaluation rubric
 
-| Criterion | Weight | Why it matters for this finding |
-| --- | ---: | --- |
-| Final metadata correctness | 35 | The committed version/date must reflect the actual target and UTC date. |
-| Resistance to accidental copying | 25 | A concrete stale value is operationally hazardous. |
-| Normative algorithm clarity | 20 | The author must understand Minor/Build/Revision behavior. |
-| Implementer convenience | 10 | Examples or automation can reduce calculation effort. |
-| Editorial simplicity | 10 | This is a documentation issue, so unnecessary machinery has a cost. |
+This rubric evaluates support-policy communication:
+
+- **Semantic honesty (SH), 30%:** prose clearly distinguishes admission,
+  validation, and lifecycle support.
+- **Contributor compatibility (CC), 20%:** avoids rejecting a usable
+  environment without a security or correctness reason.
+- **Policy consistency (PC), 15%:** manifest and both guards express one
+  understandable rule.
+- **Lifecycle manageability (LM), 15%:** does not require emergency edits for
+  every Node release while still enabling deliberate support updates.
+- **Evidence alignment (EA), 10%:** acceptance criteria name only executed
+  runtime evidence.
+- **Tooling portability (TP), 5%:** works with the selected Node/npm range.
+- **Scope and churn (SC), 5%:** fits P3; this is intentionally the lowest
+  weight.
 
 ### Scoring
 
-| Option | Correctness (35) | Copy safety (25) | Clarity (20) | Convenience (10) | Simplicity (10) | Weighted total |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Retain | 3 | 1 | 3 | 5 | 5 | 58 |
-| B — Refresh concrete value | 2 | 2 | 3 | 5 | 4 | 54 |
-| C — Remove snapshot | 5 | 5 | 5 | 3 | 5 | **96** |
-| D — Placeholders | 4 | 4 | 4 | 4 | 4 | 80 |
-| E — Calculator | 5 | 5 | 4 | 3 | 2 | 86 |
+| Option | SH | CC | PC | LM | EA | TP | SC | Total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A | 4 | 5 | 5 | 5 | 4 | 5 | 5 | 92 |
+| B | 5 | 3 | 5 | 2 | 5 | 5 | 3 | 81 |
+| C | 3 | 2 | 4 | 2 | 2 | 5 | 3 | 56 |
+| D | 5 | 2 | 5 | 4 | 5 | 5 | 4 | 84 |
+| E | 2 | 4 | 3 | 4 | 4 | 5 | 4 | 66 |
+| F | 5 | 4 | 4 | 2 | 5 | 2 | 1 | 77 |
 
 ### Selected option
 
-Select **Option C**.
+**Select Option A.**
 
-Delete the drift-only snapshot paragraph. Preserve the six normative steps:
-reread target Version/Last Updated, increment Minor, use current UTC Build/date,
-reset or increment Revision correctly, recompute after target/date drift, and
-commit metadata with the source change.
+For a cold implementer:
 
-## C-10: Resolve P3's Node-engine and staged-hook mismatch
+1. Keep one exact lower-bound string in `engines.node`, derived from the
+   selected tree's reviewed minimum.
+2. Make `.husky/pre-commit` and `lint-staged-markdown.mjs` enforce that same
+   lower bound and message.
+3. Call this the “minimum admitted local-tooling major,” not the “complete
+   supported interval.”
+4. In validation and acceptance, list the exact runtime majors executed:
+   selected supported LTS minimum and Node 24.
+5. State that a lower-bound range does not mean every future major has received
+   explicit test evidence.
+6. Do not claim Node 23 as a supported target merely because it is numerically
+   between the two tested LTS lines.
+7. If repository policy later requires rejection of every untested or EOL
+   major, adopt Option B as a deliberate policy change and update all three
+   guards plus their tests together.
+
+This choice balances conventional minimum-version behavior with truthful test
+claims. C-02's strict cells still prove the two named runtime roles.
+
+## I-P1-01 — Make the action inventory the single source of truth
 
 ### Options
 
-#### Option A — Keep P3's three-file scope and Node 20 guards
+#### Option A — Keep several tables and cross-check them
 
-Install the selected dependency tree without changing the hook/runtime
-contract. With the known candidate, explicitly admitted Node 20 contributors
-would run unsupported packages.
+Retain approved repositories, required counts, and one-off checks as separate
+structures, then add validation that their keys agree. This detects some drift
+but preserves redundant normative data and complicated reconciliation.
 
-#### Option B — Select an older Node-20-compatible dependency tree
+#### Option B — One in-script normative role table
 
-Constrain upgrades to packages that preserve Node 20. This improves contributor
-compatibility, but may leave known advisory paths or force outdated direct
-versions despite Node 20 being end-of-life.
+Create one ordered collection of role records. Each record contains workflow
+path/name, job ID, step ID, repository, SHA, version comment, and required
+security-sensitive inputs. Derive approved repositories, expected role keys,
+counts, tuples, input checks, and diagnostics only from this collection.
 
-#### Option C — Support the selected package minimum locally and Node 24 in CI
+#### Option C — Infer the expected inventory from the workflows
 
-Expand P3 to `.husky/pre-commit` and `lint-staged-markdown.mjs`; set both
-guards/messages and `package.json.engines.node` to the maximum minimum required
-by the selected direct tree (currently `>=22`); retain exact Node 24 in the
-workflow/full-corpus validation; and test the selected minimum plus Node 24.
+Scan the workflows and treat whatever roles are present as the expected set,
+then validate only pins and comments. This removes duplication but makes the
+configuration under test define its own policy; an unintended added role
+becomes automatically approved.
 
-#### Option D — Require Node 24 everywhere
+#### Option D — Generate workflows from the role table
 
-Expand the same files but set every local and package guard to `>=24`. This
-creates one simple policy and matches hosted validation, but excludes supported
-Node 22 contributors unnecessarily if the final package tree still supports
-22.
+Use one manifest to render all external-action steps or complete workflows.
+This makes the source authoritative but introduces a generation lifecycle and
+reduces direct workflow readability.
 
-#### Option E — Create a separate Node-policy prerequisite
+#### Option E — Add a separate machine-readable policy file
 
-File and merge a hook/runtime-policy issue before P3, then rebaseline P3.
-Separation may aid review but lengthens the dependency chain for a compatibility
-change inseparable from the selected package engine floor.
+Store the role table as committed JSON/YAML and have a validator consume it.
+This cleanly separates data and code and may support future tooling, but adds a
+seventh P1 affected file and another format/parser surface for a small fixed
+inventory.
+
+#### Option F — Put policy annotations beside workflow steps
+
+Add structured comments near each `uses` step and have the validator parse
+them. This improves locality but allows deletion of an action and its annotation
+together unless another independent inventory still exists.
 
 ### Evaluation rubric
 
-| Criterion | Weight | Why it matters for this finding |
-| --- | ---: | --- |
-| Runtime/package technical correctness | 30 | Admitted runtimes must satisfy every selected package engine. |
-| Contributor usability across supported Node LTS lines | 25 | Local hooks should not exclude a supported runtime without benefit. |
-| One coherent policy across guards/manifest/workflow | 20 | Conflicting floors create confusing failures. |
-| Executable minimum-and-hosted evidence | 15 | Declared compatibility must be tested, not inferred. |
-| Issue-chain and file-scope cost | 10 | Scope matters only after compatibility is coherent. |
+This rubric evaluates policy-source architecture:
+
+- **Drift resistance (DR), 30%:** one edit cannot silently redefine or omit an
+  expected action role.
+- **Audit readability (AR), 20%:** a reviewer can inspect one complete
+  normative inventory.
+- **Diagnostic coherence (DC), 15%:** all mismatch messages use the same role
+  identity and expected values.
+- **Implementation simplicity (IS), 15%:** avoids reconciliation or generation
+  machinery that obscures the policy.
+- **Extension safety (ES), 10%:** future deliberate action roles have one
+  obvious update path.
+- **Dependency independence (DI), 5%:** needs no new parser or tool.
+- **Scope and churn (SC), 5%:** remains inside P1's existing validation
+  surface.
 
 ### Scoring
 
-| Option | Correctness (30) | Usability (25) | Policy (20) | Evidence (15) | Scope (10) | Weighted total |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Keep Node 20 guards | 1 | 5 | 1 | 1 | 5 | 48 |
-| B — Preserve Node 20 tree | 2 | 5 | 3 | 2 | 4 | 63 |
-| C — Selected minimum + Node 24 | 5 | 5 | 5 | 5 | 3 | **96** |
-| D — Node 24 everywhere | 5 | 3 | 5 | 5 | 3 | 86 |
-| E — Separate prerequisite | 5 | 4 | 5 | 5 | 1 | 87 |
+| Option | DR | AR | DC | IS | ES | DI | SC | Total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A | 2 | 3 | 3 | 5 | 4 | 5 | 5 | 66 |
+| B | 5 | 5 | 5 | 4 | 5 | 5 | 4 | 96 |
+| C | 1 | 3 | 3 | 4 | 4 | 5 | 4 | 56 |
+| D | 5 | 3 | 3 | 1 | 4 | 4 | 1 | 67 |
+| E | 5 | 5 | 5 | 3 | 5 | 4 | 2 | 90 |
+| F | 3 | 3 | 4 | 4 | 3 | 5 | 3 | 68 |
 
 ### Selected option
 
-Select **Option C**.
+**Select Option B.**
 
-Expand P3's affected files to include `.husky/pre-commit` and
-`.github/workflows/lint-staged-markdown.mjs`. At implementation time:
+For a cold implementer:
 
-1. determine the highest minimum Node major required by the final selected
-   direct dependency tree;
-2. require that major consistently in both guards/messages and
-   `package.json.engines.node`;
-3. for the known 0.23.2/0.41.1 candidate, use Node `>=22`;
-4. retain exact Node 24 for the hosted workflow and full-corpus validation;
-5. run staged integration evidence at the selected minimum and Node 24; and
-6. fail/rebaseline if implementation-time releases raise the engine floor.
+1. Define one ordered array of action-role records in P1's copyable validator.
+2. Include every expected placement, tuple, comment, and required input in the
+   record itself.
+3. Derive the repository allowlist by selecting the records' distinct
+   repositories.
+4. Derive expected composite role keys and any human-readable counts from the
+   records.
+5. Match each observed external-action step to exactly one record.
+6. Produce missing, extra, duplicate, tuple, and input diagnostics from that
+   record and observed step.
+7. Delete the separate approved-action map, required-occurrence map, and
+   setup-node special case.
+8. Never infer policy from the observed workflows themselves.
 
-Do not knowingly install an unsupported tree or keep an end-of-life Node 20
-policy merely to preserve three-file scope.
+This is the data architecture used by selected C-01 Option B; it does not add a
+new affected file.
 
-## C-11: Execute the staged-lint API contract
+## I-XR-01 — Preserve behavioral P1/T1 convergence
 
 ### Options
 
-#### Option A — Trust static upstream API inspection
+#### Option A — Preserve repository-local implementations and shared contracts
 
-Rely on the presence of exported `main` and `nonFileContents` in 0.23.2.
-This does not exercise repository configuration, path conversion, Git index
-reads, diagnostics, or exit mapping.
+Keep P1's current generator and helper convergence matrices, repository-local
+scripts, implementation-time comparison, and explicit difference
+classification. Link the exact T1 issue/commit evidence inspected.
 
-#### Option B — Require manual spot checks
+#### Option B — Require the same private helper design in both repositories
 
-Have the implementer stage one good and one bad file in their working clone.
-This risks disturbing the implementation index and is neither repeatable nor
-complete.
+Coordinate a repository-local serialization helper and require equivalent
+function boundaries/names in P1 and T1. This may reduce local code duplication
+but constrains implementation before either repository has produced stable
+evidence.
 
-#### Option C — Put a temporary test recipe only in P3
+#### Option C — Create a shared module or reusable action now
 
-Provide a copyable isolated-worktree script in the issue description. It can
-cover all cases without a permanent file, but the regression suite disappears
-after implementation and hosted CI cannot call the exact same test later.
+Move generator serialization or candidate validation into one shared runtime
+dependency. This maximizes code reuse but adds release, pinning, provenance,
+availability, cross-edition, and coordinated-rollout requirements outside P1.
 
-#### Option D — Add a tracked cross-platform staged-lint harness
+#### Option D — Require line-for-line copied implementations
 
-Create `.github/workflows/Test-LintStagedMarkdown.ps1`. It builds a disposable
-clone or isolated index, invokes the exact production
-`lint-staged-markdown.mjs`, and covers no files, compliant, lint-invalid, index
-versus working-tree divergence, and startup-failure distinction. Invoke it in
-the Node 24 Markdown workflow and require local Windows plus selected-minimum
-Node evidence.
+Keep repositories independent but copy the exact code and use diffs to detect
+divergence. Guide-specific functions, artifact names, and harness placement
+make those diffs noisy, so textual identity can obscure behavioral equivalence.
 
-#### Option E — Refactor staged lint into a library with unit tests
+#### Option E — Publish a shared external contract test suite
 
-Split Git/index and markdownlint integration into exported functions and adopt
-a JavaScript test framework. This can improve unit isolation but changes the
-production design and adds test dependencies during a security update.
+Create a third artifact or repository containing fixtures that both
+implementations consume. This can prove convergence, but adds its own
+versioning and provenance problem before the local contracts have stabilized.
 
-### Evaluation rubric
+#### Option F — Remove cross-repository coordination
 
-| Criterion | Weight | Why it matters for this finding |
-| --- | ---: | --- |
-| Proof of real Git-index behavior | 30 | The staged hook exists specifically to lint index bytes. |
-| Durable regression protection | 25 | A future dependency update can break the same API again. |
-| Windows/Linux and Node-policy coverage | 20 | The hook is contributor-facing across platforms/runtimes. |
-| Isolation from the implementation index | 15 | Validation must not corrupt or rewrite the change being reviewed. |
-| Added production/test complexity | 10 | New files are justified only by lasting evidence value. |
-
-### Scoring
-
-| Option | Real behavior (30) | Durability (25) | Platforms (20) | Isolation (15) | Complexity (10) | Weighted total |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Static inspection | 1 | 1 | 2 | 5 | 5 | 44 |
-| B — Manual spot checks | 3 | 1 | 3 | 3 | 5 | 54 |
-| C — Temporary recipe | 5 | 2 | 4 | 5 | 4 | 79 |
-| D — Tracked harness | 5 | 5 | 5 | 5 | 2 | **94** |
-| E — Library/unit refactor | 5 | 5 | 5 | 4 | 1 | 89 |
-
-### Selected option
-
-Select **Option D**.
-
-Expand P3 to add
-`.github/workflows/Test-LintStagedMarkdown.ps1` and modify
-`.github/workflows/markdownlint.yml` only enough to run that tracked harness
-after the clean install under hosted Node 24.
-
-The harness must:
-
-1. declare/verify its supported PowerShell runtime and resolve the exact
-   production script;
-2. create a unique test-owned disposable repository beneath a safe temporary
-   parent;
-3. copy only the production script/config/package context required or use an
-   isolated worktree/index without touching the implementation index;
-4. prove no staged Markdown returns 0;
-5. prove compliant staged Markdown returns 0;
-6. prove a known Markdown violation returns lint exit 1 with exact rule/path,
-   not startup exit 2;
-7. make working-tree content differ from staged content and prove staged bytes
-   are authoritative;
-8. check every Git/Node exit immediately; and
-9. remove only its own temporary state in `finally`.
-
-Run the exact harness in Ubuntu CI on Node 24 and locally on Windows at the
-selected minimum Node major and Node 24. If practical, also run local Ubuntu
-minimum-major evidence; at minimum the production package's engine and
-selected-minimum install must be separately proved.
-
-## C-12: Replace the nonexistent negative-fixture claim
-
-### Options
-
-#### Option A — Keep referring to existing negative samples
-
-Leave the acceptance criterion unverifiable because no such tracked file
-exists.
-
-#### Option B — Add permanent outer and nested negative sample files
-
-Create reviewed fixtures under `samples`. They are visible and reusable, but
-the repository's normal all-Markdown lint commands would need explicit
-exclusions or the tracked repository would fail by design.
-
-#### Option C — Generate deterministic negatives inside the tracked harness
-
-Extend the selected C-11 harness to create test-owned outer and fenced/nested
-Markdown violations, run the exact production commands/APIs, assert exact
-rules and context, and remove fixtures in `finally`. Keep the existing positive
-sample corpus unchanged.
-
-#### Option D — Put temporary-negative commands only in the issue
-
-Generate/remove deterministic files during implementation without a tracked
-harness. This proves the upgrade once but loses future regression evidence.
-
-#### Option E — Mutate an existing positive sample temporarily
-
-Edit/stage/restore a positive fixture. This reduces new fixture design but risks
-worktree/index contamination and couples negative evidence to restoration
-correctness.
+Let each repository solve serialization and artifact security independently.
+This reduces coordination but abandons the user's unification objective and
+invites preventable behavioral divergence.
 
 ### Evaluation rubric
 
-| Criterion | Weight | Why it matters for this finding |
-| --- | ---: | --- |
-| Exact expected-failure semantics | 30 | Startup failure must not masquerade as lint rejection. |
-| Outer and nested surface coverage | 25 | P3 promises both lint paths remain fail-closed. |
-| Deterministic repeatability | 20 | The same rule/context should fail on every validation run. |
-| Repository corpus cleanliness | 10 | Permanent intentionally-invalid Markdown complicates normal lint. |
-| Future regression value | 15 | Dependency updates can change rules, APIs, or diagnostics later. |
+This rubric evaluates cross-repository convergence strategy:
+
+- **Behavioral convergence (BC), 25%:** establishes the same observable byte,
+  failure, path, archive, and diagnostic invariants.
+- **Repository independence (RI), 20%:** either repository can build, validate,
+  and recover without the other.
+- **Rollout safety (RS), 15%:** parallel work and different merge times cannot
+  break a runtime dependency.
+- **Security/provenance simplicity (SP), 15%:** avoids adding an artifact whose
+  integrity and updates require new controls.
+- **Long-term maintainability (LM), 10%:** produces useful comparison evidence
+  without noisy false differences.
+- **Cold-reader clarity (CC), 8%:** intentional similarities and differences
+  are explicit.
+- **Scope and churn (SC), 7%:** stays within P1; lower than correctness.
 
 ### Scoring
 
-| Option | Failure proof (30) | Surface coverage (25) | Repeatability (20) | Corpus (10) | Durability (15) | Weighted total |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Keep claim | 1 | 1 | 1 | 5 | 1 | 28 |
-| B — Permanent negatives | 5 | 5 | 5 | 2 | 5 | 94 |
-| C — Harness-generated negatives | 5 | 5 | 5 | 5 | 5 | **100** |
-| D — Issue-only temporaries | 5 | 5 | 3 | 5 | 2 | 83 |
-| E — Mutate positives | 3 | 3 | 2 | 4 | 2 | 55 |
+| Option | BC | RI | RS | SP | LM | CC | SC | Total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A | 5 | 5 | 5 | 5 | 4 | 5 | 5 | 98 |
+| B | 5 | 4 | 3 | 4 | 4 | 3 | 3 | 79 |
+| C | 5 | 1 | 2 | 2 | 5 | 3 | 1 | 57 |
+| D | 4 | 5 | 3 | 4 | 2 | 2 | 2 | 71 |
+| E | 5 | 3 | 3 | 3 | 4 | 3 | 1 | 69 |
+| F | 1 | 5 | 5 | 5 | 2 | 3 | 5 | 71 |
 
 ### Selected option
 
-Select **Option C**.
-
-Use the tracked C-11 harness to create and clean deterministic temporary:
-
-- outer Markdown with one selected enabled rule violation; and
-- nested fenced Markdown with one selected enabled nested rule violation.
-
-Require the exact fixture path, rule ID, nested file/depth context, and lint
-exit 1. Treat import/config/startup exit 2 or missing diagnostics as failure.
-Run the existing positive sample corpus and require success. Remove every
-reference to “existing negative fixtures” unless permanent negative files are
-actually added later.
-
-## C-13: Define how P3 supersedes P1/P2 intermediate gates
-
-### Options
-
-#### Option A — Keep “P1 and P2 validation remain green”
-
-Leave an impossible blanket acceptance statement even though P3 intentionally
-changes P1's exact Dependabot content and a different affected-path set.
-
-#### Option B — Narrow the sentence only
-
-Say “nonsuperseded behavior remains green” without naming the superseded gates
-or mechanically validating the final governance file.
-
-#### Option C — Add an explicit supersession contract and exact final validator
-
-List preserved behavioral gates, identify P1's one-entry Dependabot and earlier
-implementation path sets as superseded, define P3's final affected set, and
-compare normalized `.github/dependabot.yml` content with exactly the two
-approved review-only entries.
-
-#### Option D — Move npm Dependabot governance to a later P4
-
-Keep P3 dependency-only so P1's one-entry file survives P3. This restores one
-intermediate assertion but separates remediation from the update governance
-intended to prevent recurrence.
-
-#### Option E — Parse Dependabot YAML semantically
-
-Use a YAML parser/schema to validate two logical entries regardless of
-formatting. This is flexible but adds a parser dependency or environment
-assumption to the security validation and can accept formatting/extra-key
-variation beyond the exact intended file.
-
-### Evaluation rubric
-
-| Criterion | Weight | Why it matters for this finding |
-| --- | ---: | --- |
-| Truthfulness of final acceptance | 30 | An issue must not require mutually exclusive states. |
-| Mechanical governance proof | 25 | The final update channels must be exact and review-only. |
-| Preservation of nonsuperseded behavior | 20 | P3 must not regress generator/workflow/lint contracts. |
-| Reviewer auditability | 15 | Preserved versus replaced gates should be explicit. |
-| Issue-sequence/scope efficiency | 10 | Extra issues or dependencies should deliver material value. |
-
-### Scoring
-
-| Option | Truth (30) | Governance proof (25) | Regression (20) | Auditability (15) | Scope (10) | Weighted total |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Blanket green | 1 | 1 | 2 | 1 | 5 | 32 |
-| B — Wording only | 4 | 2 | 4 | 3 | 5 | 69 |
-| C — Supersession + exact validator | 5 | 5 | 5 | 5 | 4 | **98** |
-| D — Move to P4 | 5 | 5 | 4 | 4 | 1 | 85 |
-| E — Semantic YAML parser | 5 | 4 | 5 | 4 | 2 | 86 |
-
-### Selected option
-
-Select **Option C**.
-
-P3 must explicitly state:
-
-- P1/P2 generator, artifact, permission, immutable-action, helper/harness,
-  source/generated no-drift, and lint-behavior gates remain;
-- P3 supersedes P1's exact-one-Dependabot-entry assertion;
-- P3's final affected-path set supersedes P1/P2's implementation-time path
-  sets only for P3 implementation; and
-- P2 source/generated bytes remain unchanged.
-
-Add a normalized ordinal comparison requiring exactly:
-
-1. weekly review-only `github-actions` updates for `/`; and
-2. weekly review-only npm updates for `/.github/workflows`.
-
-Reject missing/duplicate/extra entries, different directories/ecosystems or
-schedules, and auto-merge/auto-approval in the changed scope.
-
-## C-14: Structure residual-advisory dispositions
-
-### Options
-
-#### Option A — Keep a URL-only array
-
-Continue claiming owner/date/path/follow-up validation without representing
-those values.
-
-#### Option B — Use structured inline records plus durable PR/issue evidence
-
-Represent URL, dependency path, owner, UTC expiry, and real follow-up issue in
-the validation block. Mechanically validate every field and exact set equality,
-then copy the reviewed table into durable PR/issue evidence. Keep the array
-empty for a clean audit.
-
-#### Option C — Add a tracked exceptions file and continuous CI enforcement
-
-Store structured exceptions in the repository and make workflow audit
-validation enforce expiry on every run. This gives durable automation but
-expands P3 into ongoing vulnerability-policy infrastructure and requires
-careful handling when the audit changes.
-
-#### Option D — Prohibit all residual findings
-
-Require audit exit 0 with no exception mechanism. This is strongest when fixes
-exist, but can make P3 impossible to complete if a newly published reachable
-advisory has no safe release or mitigation.
-
-#### Option E — Store exceptions only in an external risk system
-
-Use a security/GRC ticket as source of truth. This can improve organizational
-workflow, but the repository validator cannot independently prove the record
-without an integration and access model.
-
-### Evaluation rubric
-
-| Criterion | Weight | Why it matters for this finding |
-| --- | ---: | --- |
-| Completeness of risk decision data | 30 | URL alone cannot support an accountable exception. |
-| Machine-verifiable correspondence to audit | 25 | Missing, duplicate, unrelated, or stale approvals must fail. |
-| Expiry and follow-up enforceability | 20 | Temporary acceptance must not become permanent by neglect. |
-| Durable reviewer/auditor evidence | 15 | The decision must survive local command history. |
-| Operational burden proportionality | 10 | A one-time remediation should not accidentally create a new platform. |
-
-### Scoring
-
-| Option | Completeness (30) | Verification (25) | Expiry (20) | Audit trail (15) | Burden (10) | Weighted total |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — URL array | 1 | 2 | 1 | 2 | 5 | 36 |
-| B — Structured inline + durable evidence | 5 | 5 | 5 | 4 | 4 | **95** |
-| C — Tracked/continuous exceptions | 5 | 5 | 5 | 5 | 2 | 94 |
-| D — No residual ever | 5 | 5 | 5 | 5 | 1 | 92 |
-| E — External system only | 5 | 3 | 5 | 5 | 2 | 84 |
-
-### Selected option
-
-Select **Option B**, with clean audit as the default.
-
-Replace the URL array with records containing:
-
-- exact advisory URL;
-- affected package and dependency path;
-- nonempty named owner;
-- invariant UTC expiry date;
-- real HTTPS follow-up issue URL; and
-- concise reachability/mitigation rationale.
-
-The validator must reject duplicate URLs, empty fields, invalid/expired dates,
-non-issue URLs, approvals unrelated to the current audit/path, missing current
-findings, and records remaining after a clean result. Require exact current
-moderate/high/critical URL equality and record the reviewed table in the
-implementation PR/issue. If ongoing exceptions become common, create a
-separate tracked-policy/continuous-enforcement issue rather than silently
-expanding P3.
-
-## C-15: Treat every advisory URL as dynamic evidence
-
-### Options
-
-#### Option A — Keep six individual References as the effective baseline
-
-This is incomplete even today and conflates package-node count with advisory
-count.
-
-#### Option B — Freeze all 14 currently observed URLs in P3
-
-This is complete for the 2026-07-29 observation but becomes stale when npm or
-the advisory database changes.
-
-#### Option C — Capture a dynamic normalized before/after advisory graph
-
-Keep the dated seven-package-node severity table for comparison. At
-implementation, traverse the complete audit graph and record every package,
-object advisory URL/severity/range, string-valued dependency link, dependency
-path, and remediation before and after the update. Mark References as
-illustrative.
-
-#### Option D — Option C plus attach raw audit JSON
-
-Preserve normalized evidence and the full raw command output as a PR artifact
-or attachment. This aids forensic review but creates an additional storage and
-retention dependency.
-
-#### Option E — Replace evidence with live advisory links only
-
-Link to npm/GitHub pages and rely on reviewers to reconstruct the graph. That
-is not reproducible and loses the exact implementation-time state.
-
-### Evaluation rubric
-
-| Criterion | Weight | Why it matters for this finding |
-| --- | ---: | --- |
-| Complete advisory/dependency graph | 30 | Package-node and advisory counts are different security facts. |
-| Temporal correctness | 25 | Advisory data can change between drafting and implementation. |
-| Reproducible before/after evidence | 20 | Reviewers need to see what the update actually removed or retained. |
-| Reviewer comprehensibility | 15 | Normalized tables are easier to audit than raw nested JSON. |
-| Evidence storage burden | 10 | Durability matters, but a new artifact service is not automatically needed. |
-
-### Scoring
-
-| Option | Completeness (30) | Temporal (25) | Reproducibility (20) | Clarity (15) | Burden (10) | Weighted total |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Six references | 1 | 1 | 2 | 4 | 5 | 41 |
-| B — Freeze 14 | 5 | 1 | 3 | 3 | 3 | 62 |
-| C — Dynamic normalized graph | 5 | 5 | 5 | 5 | 4 | **98** |
-| D — Graph plus raw attachment | 5 | 5 | 5 | 5 | 3 | 96 |
-| E — Live links only | 2 | 2 | 1 | 2 | 5 | 42 |
-
-### Selected option
-
-Select **Option C**.
-
-Keep P3's dated seven-package-node table, explicitly label individual
-References as illustrative, and require a complete normalized audit graph at
-implementation time. Record before/after:
-
-- Node and npm versions;
-- audit exit and severity totals;
-- every affected package node;
-- every object advisory URL, severity, vulnerable range, and fix;
-- every string-valued dependency link;
-- all resolved dependency paths from `npm explain`; and
-- the final disposition.
-
-Do not encode 14 as a future expected count. The implementation evidence must
-derive counts from that run and explain changes from the dated baseline.
-
-## C-16: Retain P1 → P2 → P3 and record blocked-by relationships
-
-### Options
-
-#### Option A — Keep prose ordering only
-
-Leave dependency text in issue bodies but create no GitHub relationship.
-
-#### Option B — Preserve the order and add real blocked-by links after filing
-
-File the issues with their H1 titles, then update P2 to block on the actual P1
-issue and P3 to block on the actual P2 issue. Keep the relative planning links
-as drafting context.
-
-#### Option C — Combine all work into one issue
-
-One issue guarantees order internally but mixes generator/workflow security,
-documentation semantics, and a pre-1.0 dependency migration into one large
-review/rollback unit.
-
-#### Option D — Run P1/P2/P3 in parallel
-
-Reduce calendar time but allow P2 to regenerate against a moving generator and
-P3 to change the lint baseline while earlier evidence is still being produced.
-
-#### Option E — Track order only in a project/milestone
-
-Use external planning metadata without issue-level blocked-by relationships.
-This can aid portfolio reporting but is less visible to someone opening one
-issue directly.
-
-### Evaluation rubric
-
-| Criterion | Weight | Why it matters for this finding |
-| --- | ---: | --- |
-| Technical dependency correctness | 30 | Each issue assumes the prior merged baseline. |
-| Downstream handoff clarity | 25 | The implementer must know what can start now. |
-| GitHub-native traceability | 20 | Real relationships should replace placeholder references. |
-| Resistance to accidental out-of-order work | 15 | Planning metadata should enforce, not merely suggest, sequence. |
-| Coordination overhead | 10 | Relationships should remain simple to maintain. |
-
-### Scoring
-
-| Option | Dependency (30) | Handoff (25) | Traceability (20) | Order safety (15) | Overhead (10) | Weighted total |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Prose only | 4 | 3 | 1 | 2 | 5 | 59 |
-| B — Real blocked-by chain | 5 | 5 | 5 | 5 | 4 | **98** |
-| C — Combine | 5 | 2 | 3 | 5 | 1 | 69 |
-| D — Parallel | 1 | 2 | 2 | 1 | 5 | 37 |
-| E — Project only | 4 | 4 | 3 | 4 | 3 | 74 |
-
-### Selected option
-
-Select **Option B**.
-
-Keep the issue descriptions ordered P1, P2, P3. After filing:
-
-1. add the actual P1 issue as P2's blocker;
-2. add the actual P2 issue as P3's blocker;
-3. replace no H1 title with “revision” language;
-4. use no invented issue number; and
-5. ensure the final handoff lists the three issues in execution order.
-
-## C-17: Coordinate P1/T1 without a runtime dependency
-
-### Options
-
-#### Option A — Implement independently with no comparison
-
-Allow both repositories to solve similar problems separately and accept drift.
-
-#### Option B — Perform an informal implementation-time diff
-
-Ask maintainers to compare scripts without a defined behavioral contract or
-recorded outcome.
-
-#### Option C — Use reciprocal behavioral matrices and a second-mover check
-
-Maintain repository-local scripts while defining shared generator/helper
-invariants, intentional differences, and evidence. Whichever implementation
-starts second rereads the first merged/current contract and records divergence.
-
-#### Option D — Use a Git submodule or copied vendored script
-
-Create a cross-repository source dependency. This adds update coordination and
-still requires local artifact/manifest specialization.
-
-#### Option E — Publish a shared versioned module/action
-
-Centralize behavior with immutable consumption. This may be appropriate later,
-but needs package ownership, provenance, cross-edition compatibility, release,
-rollback, and synchronized adoption design.
-
-### Evaluation rubric
-
-| Criterion | Weight | Why it matters for this finding |
-| --- | ---: | --- |
-| Accurate behavioral convergence | 30 | Equivalent security/serialization outcomes are the current goal. |
-| Repository autonomy and availability | 25 | One repository must not break because another is unavailable or moving. |
-| Coordinated rollout/rollback safety | 20 | Shared changes should not create asymmetric half-migrations. |
-| Long-term maintenance/drift visibility | 15 | Intentional differences must stay explicit. |
-| Near-term deliverability | 10 | P1/T1 should remain implementable without a new product. |
-
-### Scoring
-
-| Option | Convergence (30) | Autonomy (25) | Rollout (20) | Maintenance (15) | Delivery (10) | Weighted total |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Independent | 1 | 5 | 1 | 2 | 5 | 51 |
-| B — Informal diff | 3 | 5 | 2 | 3 | 4 | 68 |
-| C — Matrices/second mover | 5 | 5 | 5 | 5 | 4 | **98** |
-| D — Submodule/vendor | 5 | 2 | 2 | 3 | 1 | 59 |
-| E — Shared package/action | 5 | 3 | 3 | 5 | 1 | 74 |
-
-### Selected option
-
-Select **Option C**.
-
-Implement C-01 and C-02's matrices in P1, retain repository-local code, and
-require a dated second-mover comparison in implementation evidence. Shared
-areas are serialization, public helper parameters, archive identity, path
-security, lifecycle, diagnostics, fixtures, and artifact transport. Explicit
-differences include manifests, filenames, frontmatter values, guide transforms,
-Node work, and existing `.gitattributes` state. Any future shared package/action
-must be a separately designed follow-up.
-
-## C-18: Keep T2 provider-recovery content out of P2/P3
-
-### Options
-
-#### Option A — Preserve current separation and explicit non-goals
-
-Keep P2 focused on the blank-line documentation defect and P3 on lint
-dependencies/governance. Mention T2 only as a parallel sequence context, not
-as content to implement.
-
-#### Option B — Summarize T2 provider work in P2's prerequisite
-
-Give cross-repository context, but burden a documentation issue with unrelated
-S3/Azure/GCS/HCP operational security.
-
-#### Option C — Copy T2 recovery requirements into P2
-
-Turn P2 into a multi-repository/provider issue with unrelated sources,
-credentials, shell examples, and validation.
-
-#### Option D — Add only a non-normative link to T2
-
-This is harmless but less explicit than preserving the current non-goal and can
-suggest a dependency where none exists.
-
-#### Option E — Merge the PSStyleGuide and TerraformStyleGuide slates
-
-Coordinate everything in shared issues. This destroys repository ownership and
-creates cross-repository completion dependencies.
-
-### Evaluation rubric
-
-| Criterion | Weight | Why it matters for this finding |
-| --- | ---: | --- |
-| Relevance to P2/P3 objectives | 35 | Provider recovery does not repair PowerShell documentation or npm tooling. |
-| Implementer cognitive load | 25 | Unrelated cloud contracts obscure the task's actual acceptance gates. |
-| Security-risk isolation | 20 | Provider credentials/state handling deserves its own review surface. |
-| Cross-repository conceptual clarity | 10 | Parallel sequencing should not be mistaken for content identity. |
-| Change/coordination cost | 10 | No-op preservation should win when the current state is correct. |
-
-### Scoring
-
-| Option | Relevance (35) | Cognitive load (25) | Isolation (20) | Clarity (10) | Cost (10) | Weighted total |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Preserve separation | 5 | 5 | 5 | 5 | 5 | **100** |
-| B — Summarize T2 | 3 | 3 | 4 | 4 | 4 | 68 |
-| C — Copy T2 | 1 | 1 | 1 | 2 | 1 | 22 |
-| D — Link only | 4 | 4 | 5 | 4 | 5 | 86 |
-| E — Merge slates | 1 | 1 | 1 | 1 | 1 | 20 |
-
-### Selected option
-
-Select **Option A**.
-
-No new T2 content belongs in P1/P2/P3. Preserve P2/P3's existing file and
-topic boundaries. In P2's prerequisite, state only that T2 is not imported and
-that each repository's documentation issue depends on its own generator
-baseline. This finding requires preservation, not scope expansion.
-
-## C-19: Define a policy-driven ordering exception
-
-### Options
-
-#### Option A — Ignore policy until implementation fails
-
-Proceed P1 → P2 → P3 even if a known organizational/repository policy forbids
-open high findings.
-
-#### Option B — Always move P3 before P1
-
-Minimize advisory exposure immediately, but force P1/P2 rebaselining and change
-the prompt's requested sequence even when no policy requires it.
-
-#### Option C — Add a filing/start gate with two explicit valid sequences
-
-Confirm applicable security policy before filing/starting. Default to
-P1 → P2 → P3. If policy forbids carrying the findings, perform the
-dependency/hook remediation first, then rebaseline P1/P2 against its merged
-Node/package state and record the exception.
-
-#### Option D — Fold dependency remediation into P1
-
-Avoid ordering delay by mixing the package migration, hook policy, generator,
-workflow, artifact security, and governance in one issue.
-
-#### Option E — Pause all slate work until every advisory is externally fixed
-
-Eliminate acceptance decisions but can block indefinitely on upstream packages
-and prevents unrelated security hardening.
-
-### Evaluation rubric
-
-| Criterion | Weight | Why it matters for this finding |
-| --- | ---: | --- |
-| Actual policy compliance | 35 | A documented mandatory policy outranks planning convenience. |
-| Reduction of vulnerable-parser exposure | 25 | Pull-request Markdown reaches the affected toolchain. |
-| Coherent P1/P2 baseline | 20 | Earlier issues should not validate against a dependency state that immediately changes. |
-| Decision/audit clarity | 15 | Reviewers need the reason for default or exceptional order. |
-| Calendar efficiency | 5 | Speed matters, but cannot override policy or coherent evidence. |
-
-### Scoring
-
-| Option | Policy (35) | Exposure (25) | Baseline (20) | Clarity (15) | Schedule (5) | Weighted total |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Ignore | 1 | 1 | 5 | 2 | 5 | 43 |
-| B — Always P3 first | 5 | 5 | 3 | 4 | 2 | 86 |
-| C — Conditional gate | 5 | 5 | 5 | 5 | 4 | **99** |
-| D — Fold into P1 | 3 | 4 | 1 | 2 | 3 | 54 |
-| E — Pause all | 5 | 5 | 1 | 2 | 1 | 71 |
-
-### Selected option
-
-Select **Option C**.
-
-Add an ordering note to P3 and the slate handoff:
-
-- confirm repository/organization vulnerability policy at filing and again at
-  implementation start;
-- absent a prohibition, retain P1 → P2 → P3;
-- if high findings cannot remain open, file/perform the P3 package/hook work
-  first (or a renamed prerequisite with the same full scope), then rebaseline
-  all P1/P2 Node, package, validation, and path assumptions after merge; and
-- record the policy source and ordering decision in issue relationships/PR
-  evidence.
-
-Do not reorder merely because a hypothetical policy might exist.
-
-## I-P1-01: Make the action-pin verifier enforce approved tuples
-
-### Options
-
-#### Option A — Keep the generic 40-hex/version regex
-
-Continue accepting any external action repository, any lowercase 40-hex
-commit, and any semantic-looking comment.
-
-#### Option B — Compare complete expected `uses:` lines
-
-Hard-code every approved line and require exact occurrences. This is strong but
-can be awkward when the same action appears multiple times or indentation/step
-placement changes.
-
-#### Option C — Parse and validate an exact action allowlist with occurrence rules
-
-Extract nonlocal `uses:` references into repository, SHA, and adjacent version
-comment. Map each approved action to its exact SHA/comment, reject unknown
-tuples, and require expected workflow/occurrence coverage. Keep a separate
-implementation-time upstream metadata/release review.
-
-#### Option D — Resolve every action commit online during local validation
-
-Query GitHub for repo/commit/tag correspondence each time. This adds network,
-authentication/rate-limit, and mutable remote-state dependencies to a local
-static gate.
-
-#### Option E — Adopt a third-party action pinning scanner
-
-Use a supply-chain tool to detect mutable refs. Such tools may verify full-SHA
-shape but still need repository-specific approved-version policy and their own
-installation/provenance.
-
-### Evaluation rubric
-
-| Criterion | Weight | Why it matters for this finding |
-| --- | ---: | --- |
-| Exact approved provenance proof | 35 | A full SHA is not necessarily the reviewed SHA. |
-| Resistance to repository/SHA/comment substitution | 25 | An attacker or mistake must not satisfy a shape-only gate. |
-| Missing/unknown/occurrence detection | 20 | The complete intended action surface must be present and only that surface. |
-| Maintainability during approved updates | 10 | SHA/comment changes should be one clear policy update. |
-| Validator simplicity/portability | 10 | The gate runs locally without a new dependency. |
-
-### Scoring
-
-| Option | Provenance (35) | Substitution (25) | Completeness (20) | Maintenance (10) | Simplicity (10) | Weighted total |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Generic regex | 1 | 1 | 2 | 5 | 5 | 40 |
-| B — Exact lines | 5 | 5 | 4 | 3 | 4 | 90 |
-| C — Parsed exact allowlist | 5 | 5 | 5 | 5 | 4 | **98** |
-| D — Online resolution | 5 | 5 | 4 | 2 | 2 | 84 |
-| E — Third-party scanner | 5 | 4 | 4 | 3 | 1 | 79 |
-
-### Selected option
-
-Select **Option C**.
-
-Rewrite P1's pin validator around an exact map:
-
-- `actions/checkout` →
-  `3d3c42e5aac5ba805825da76410c181273ba90b1`, `v7.0.1`;
-- `actions/setup-node` →
-  `820762786026740c76f36085b0efc47a31fe5020`, `v7.0.0`;
-- `actions/upload-artifact` →
-  `043fb46d1a93c77aae656e7c1c64a875d1fc6a0a`, `v7.0.1`; and
-- `actions/download-artifact` →
-  `3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c`, `v8.0.1`.
-
-Parse each nonlocal `uses:` line, require an allowed repository with its exact
-SHA/comment, and fail unknown/missing/mismatched references. Require checkout
-in both workflows, setup-node only where intended, and upload/download in the
-build workflow's required roles. Reverify official commit metadata and newer
-security releases immediately before implementation; the local allowlist
-proves the checked-in result, not continued upstream freshness.
-
-## I-P3-01: Close P3's npm audit command and schema boundary
-
-### Options
-
-#### Option A — Keep the current URL-set logic
-
-Allow any nonzero audit exit to pass if the extracted URL set equals approvals,
-do not query npm version, and assume JSON member shape.
-
-#### Option B — Constrain exit codes only
-
-Require clean or documented vulnerability exits, but retain unvalidated JSON
-shape and incomplete Node/npm evidence.
-
-#### Option C — Validate tools, exit semantics, JSON shape, counts, and graph
-
-Resolve/query one Node and npm application; require exact Node policy; classify
-audit exit as clean, vulnerability, or command error; parse one JSON object;
-validate required members and integral counts; traverse object/string `via`
-records and dependency paths; then apply structured exception equality.
-
-#### Option D — Replace npm audit with a third-party scanner
-
-Use another vulnerability engine/SBOM scanner. This can add insight but changes
-the advisory source, identity model, installation/provenance, and acceptance
-semantics rather than fixing the current npm boundary.
-
-#### Option E — Add a formal checked-in JSON Schema and validator dependency
-
-Validate npm output with a dedicated schema tool. This is rigorous but npm's
-output can evolve, and adding another package to the package-remediation issue
-creates a recursive dependency/provenance burden.
-
-### Evaluation rubric
-
-| Criterion | Weight | Why it matters for this finding |
-| --- | ---: | --- |
-| Command-error versus vulnerability discrimination | 30 | A scanner failure must never count as an approved finding. |
-| Audit JSON structural integrity | 25 | Security decisions require validated fields and numeric totals. |
-| Tool/version and graph evidence completeness | 20 | Reproducibility needs Node, npm, packages, URLs, and paths. |
-| Compatibility with npm's supported output model | 15 | The validator should be strict without inventing a fragile private schema. |
-| Implementation/dependency burden | 10 | New scanners or schema packages need strong justification. |
-
-### Scoring
-
-| Option | Exit semantics (30) | Structure (25) | Evidence (20) | Compatibility (15) | Burden (10) | Weighted total |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Current logic | 1 | 2 | 2 | 3 | 5 | 43 |
-| B — Exit codes only | 4 | 2 | 3 | 4 | 5 | 68 |
-| C — Complete inline validation | 5 | 5 | 5 | 5 | 4 | **98** |
-| D — Third-party scanner | 5 | 4 | 5 | 3 | 1 | 81 |
-| E — Formal schema dependency | 5 | 5 | 5 | 4 | 2 | 91 |
-
-### Selected option
-
-Select **Option C**.
-
-P3's primary validation must:
-
-1. query and record exactly one Node version and one npm version;
-2. require the selected Node policy and use the same resolved npm executable;
-3. capture stdout and exit immediately from
-   `audit --package-lock-only --audit-level=moderate --json`;
-4. accept exit 0 only for a clean result and the documented vulnerability exit
-   only when structured approvals exactly match; reject every other exit;
-5. require one JSON object with `metadata.vulnerabilities` and
-   `vulnerabilities`;
-6. require nonnegative integral critical/high/moderate/low/total counts and
-   internal consistency;
-7. traverse object advisories plus string dependency links and associate the
-   complete graph with `npm explain` paths; and
-8. apply C-14's duplicate, field, expiry, follow-up, clean-state, and exact-set
-   rules.
-
-Keep the dated audit table as comparison evidence. Do not hard-code today's
-advisory count as the only accepted future shape.
-
-## Selected slate-level outcome
-
-All 21 findings have now been evaluated before issue editing. The selected
-slate remains:
-
-1. P1 — deterministic generator and secure workflow/artifact baseline;
-2. P2 — blank-line documentation correction and regeneration; and
-3. P3 — dependency remediation, staged-lint regression coverage, Node-floor
-   alignment, and final npm governance.
-
-The only ordering exception is the documented policy gate in C-19.
+**Select Option A.**
+
+For a cold implementer:
+
+1. Preserve P1's generator convergence matrix and candidate-helper convergence
+   matrix.
+2. Keep every implementation and harness repository-local.
+3. Immediately before P1 implementation, inspect the then-current T1 issue or
+   merged implementation and record its exact issue, pull request, or commit
+   permalink.
+4. Compare serialization boundaries, encoded bytes, newline behavior, failure
+   behavior, public helper parameters, validation order, path/archive trust
+   rules, diagnostics, and harness evidence.
+5. Classify every difference as guide-specific content, a deliberately accepted
+   design difference, or a defect/follow-up.
+6. Do not compare final guide bytes across repositories.
+7. Do not introduce a shared package, module, submodule, reusable action, or
+   merge-order dependency in P1.
+8. Consider shared code only in a later proposal after both local
+   implementations have stable evidence.
+
+No substantive P1 convergence redesign is required. C-05's immutable-link rule
+should make the implementation-time comparison record durable.
+
+## Selected-option implementation map
+
+- **P1:** implement C-01 Option B and I-P1-01 Option B; preserve I-XR-01
+  Option A; apply C-05 filing cleanup.
+- **P2:** refresh the P1 prerequisite snapshot after the action validator is
+  final; apply C-05 filing cleanup; otherwise preserve the issue.
+- **P3:** implement C-02 Option C, C-03 Option B, C-04 Option C,
+  I-P3-01 Option B, and I-P3-02 Option A; preserve C-06 Option B; apply C-05
+  filing cleanup.

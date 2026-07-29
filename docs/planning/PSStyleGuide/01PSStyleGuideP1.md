@@ -687,12 +687,14 @@ Do not rely on `$PSNativeCommandUseErrorActionPreference`.
 As of 2026-07-29, use:
 
 ```yaml
+id: checkout_repository
 uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 ```
 
 for every checkout step in both `.github/workflows/build.yml` and `.github/workflows/markdownlint.yml`;
 
 ```yaml
+id: setup_node
 uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
 with:
   node-version: '24'
@@ -710,6 +712,28 @@ and:
 ```yaml
 uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
 ```
+
+Use `prepare_push_candidate`, `approve_push_candidate`, and
+`synchronize_generated_artifacts` consistently in job dependencies and output
+expressions. The approval job contains no external action.
+
+Every checkout role must use:
+
+```yaml
+with:
+  ref: ${{ github.sha }}
+  persist-credentials: false
+```
+
+except `synchronize_generated_artifacts`, which must explicitly use
+`persist-credentials: true` so its one authenticated production push retains
+checkout's protected persisted credential. Do not add another checkout input.
+
+The validator's `$arrExpectedActionRoles` collection below is the sole
+normative action-role inventory. Each record supplies the workflow, job ID,
+stable step ID, repository, immutable SHA, release comment, exact condition,
+and complete input set. Do not duplicate any subset as a prose table,
+repository allowlist, occurrence table, or one-off setup-node rule.
 
 Immediately before implementation:
 
@@ -737,10 +761,11 @@ with automatic package-manager caching disabled. Do not alter those commands or
 update `package.json`/`package-lock.json` in this issue unless Node 24
 compatibility testing proves a narrowly necessary correction.
 
-The current npm advisories are owned by the separately scoped P3 issue,
-`docs/planning/PSStyleGuide/03PSStyleGuideP3.md`, which follows P2. Read-only
-workflow permissions reduce blast radius but do not remediate vulnerable
-Markdown parsing code.
+The current npm advisories are owned by the separately scoped
+**P3: Remediate Markdown lint dependency advisories and add npm update
+governance**, which follows P2. At filing, replace that title-only draft
+reference with P3's actual issue URL. Read-only workflow permissions reduce
+blast radius but do not remediate vulnerable Markdown parsing code.
 
 Changing checkout, setup-node, the installed Node version, cache behavior,
 explicit permissions, the named artifact actions, and review-only Actions
@@ -770,7 +795,7 @@ replace immutable execution-time pins or human review.
 
 #### Pull-request Ubuntu verification
 
-The Ubuntu pull-request job must:
+Implement this as job `verify_pull_request_ubuntu`. It must:
 
 - Run only for `pull_request`.
 - Use `ubuntu-latest`.
@@ -788,6 +813,7 @@ Use:
 
 ```yaml
 - name: Upload canonical generated artifacts
+  id: upload_pull_request_artifacts
   if: ${{ !cancelled() }}
   uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
   with:
@@ -807,7 +833,7 @@ A stale-artifact error must instruct the contributor to run the generator, revie
 
 #### Read-only push preparation
 
-The preparation job must:
+Implement this as job `prepare_push_candidate`. It must:
 
 - Run only for `push`.
 - Use `ubuntu-latest`.
@@ -881,6 +907,7 @@ Every started push consumer must:
 
    ```yaml
    - name: Download synchronization candidate archive
+     id: download_candidate
      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
      with:
        artifact-ids: ${{ <validated artifact ID> }}
@@ -913,7 +940,8 @@ shared-helper section above.
 
 #### Four-cell Windows validation topology
 
-Implement separate pull-request and push Windows matrix jobs using:
+Implement pull-request job `verify_pull_request_windows` and push job
+`verify_push_windows` using:
 
 ```yaml
 strategy:
@@ -1018,7 +1046,7 @@ Passing this probe proves writer sanitation only. It does not claim CR-only sour
 
 #### Read-only candidate approval
 
-Add one non-matrix push-only approval job that:
+Add one non-matrix push-only job named `approve_push_candidate` that:
 
 - Depends directly on preparation and the complete four-cell push matrix.
 - Has no more than `contents: read`.
@@ -1033,7 +1061,8 @@ Add one non-matrix push-only approval job that:
 
 #### Write-enabled synchronization
 
-The synchronization job must:
+Implement the synchronization job as
+`synchronize_generated_artifacts`. It must:
 
 - Run only for `push`.
 - Depend on approval.
@@ -1150,7 +1179,8 @@ Do not use:
 - In `.github/workflows/markdownlint.yml`, change only checkout, setup-node, `node-version`, `package-manager-cache`, and explicit `contents: read` unless Node 24 compatibility validation proves another change is required.
 - Do not update the Markdown package manifest or lockfile; P3 owns the current
   dependency advisories after P2.
-- Do not pin or migrate any action other than the two checkout occurrences, setup-node, and the artifact actions named in this issue.
+- Do not pin or migrate any action outside the exact roles in
+  `$arrExpectedActionRoles`.
 - In `.github/dependabot.yml`, add only the review-only weekly
   `github-actions` entry specified above. Do not add npm updates, auto-merge,
   auto-approval, or organization-policy configuration.
@@ -1810,149 +1840,764 @@ if ($strActualDependabot -cne $strExpectedDependabot) {
     )
 }
 
-$hashtableApprovedActions = @{
-    'actions/checkout' = [pscustomobject]@{
+$strArtifactPathInput = @(
+    'copilot-instructions.md'
+    'powershell.instructions.md'
+    'STYLE_GUIDE_CHAT.md'
+    'STYLE_GUIDE_FULL.md'
+) -join "`n"
+
+$arrExpectedActionRoles = @(
+    [pscustomobject]@{
+        Workflow = 'build'
+        Path = '.github/workflows/build.yml'
+        Job = 'verify_pull_request_ubuntu'
+        Step = 'checkout_repository'
+        Repository = 'actions/checkout'
         Sha = '3d3c42e5aac5ba805825da76410c181273ba90b1'
         Version = 'v7.0.1'
-        AllowedWorkflows = @('build', 'markdownlint')
+        IfCondition = ''
+        Inputs = [ordered]@{
+            ref = '${{ github.sha }}'
+            'persist-credentials' = 'false'
+        }
     }
-    'actions/setup-node' = [pscustomobject]@{
-        Sha = '820762786026740c76f36085b0efc47a31fe5020'
-        Version = 'v7.0.0'
-        AllowedWorkflows = @('markdownlint')
-    }
-    'actions/upload-artifact' = [pscustomobject]@{
+    [pscustomobject]@{
+        Workflow = 'build'
+        Path = '.github/workflows/build.yml'
+        Job = 'verify_pull_request_ubuntu'
+        Step = 'upload_pull_request_artifacts'
+        Repository = 'actions/upload-artifact'
         Sha = '043fb46d1a93c77aae656e7c1c64a875d1fc6a0a'
         Version = 'v7.0.1'
-        AllowedWorkflows = @('build')
+        IfCondition = '${{ !cancelled() }}'
+        Inputs = [ordered]@{
+            name = (
+                'style-guide-artifacts-pr-${{ github.run_id }}-' +
+                '${{ github.run_attempt }}'
+            )
+            'if-no-files-found' = 'error'
+            overwrite = 'false'
+            path = $strArtifactPathInput
+        }
     }
-    'actions/download-artifact' = [pscustomobject]@{
+    [pscustomobject]@{
+        Workflow = 'build'
+        Path = '.github/workflows/build.yml'
+        Job = 'verify_pull_request_windows'
+        Step = 'checkout_repository'
+        Repository = 'actions/checkout'
+        Sha = '3d3c42e5aac5ba805825da76410c181273ba90b1'
+        Version = 'v7.0.1'
+        IfCondition = ''
+        Inputs = [ordered]@{
+            ref = '${{ github.sha }}'
+            'persist-credentials' = 'false'
+        }
+    }
+    [pscustomobject]@{
+        Workflow = 'build'
+        Path = '.github/workflows/build.yml'
+        Job = 'prepare_push_candidate'
+        Step = 'checkout_repository'
+        Repository = 'actions/checkout'
+        Sha = '3d3c42e5aac5ba805825da76410c181273ba90b1'
+        Version = 'v7.0.1'
+        IfCondition = ''
+        Inputs = [ordered]@{
+            ref = '${{ github.sha }}'
+            'persist-credentials' = 'false'
+        }
+    }
+    [pscustomobject]@{
+        Workflow = 'build'
+        Path = '.github/workflows/build.yml'
+        Job = 'prepare_push_candidate'
+        Step = 'upload_candidate'
+        Repository = 'actions/upload-artifact'
+        Sha = '043fb46d1a93c77aae656e7c1c64a875d1fc6a0a'
+        Version = 'v7.0.1'
+        IfCondition = ''
+        Inputs = [ordered]@{
+            name = (
+                'style-guide-candidate-${{ github.run_id }}-' +
+                '${{ github.run_attempt }}'
+            )
+            'if-no-files-found' = 'error'
+            overwrite = 'false'
+            archive = 'true'
+            path = $strArtifactPathInput
+        }
+    }
+    [pscustomobject]@{
+        Workflow = 'build'
+        Path = '.github/workflows/build.yml'
+        Job = 'verify_push_windows'
+        Step = 'checkout_repository'
+        Repository = 'actions/checkout'
+        Sha = '3d3c42e5aac5ba805825da76410c181273ba90b1'
+        Version = 'v7.0.1'
+        IfCondition = ''
+        Inputs = [ordered]@{
+            ref = '${{ github.sha }}'
+            'persist-credentials' = 'false'
+        }
+    }
+    [pscustomobject]@{
+        Workflow = 'build'
+        Path = '.github/workflows/build.yml'
+        Job = 'verify_push_windows'
+        Step = 'download_candidate'
+        Repository = 'actions/download-artifact'
         Sha = '3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c'
         Version = 'v8.0.1'
-        AllowedWorkflows = @('build')
+        IfCondition = ''
+        Inputs = [ordered]@{
+            'artifact-ids' = (
+                '${{ needs.prepare_push_candidate.outputs.' +
+                'candidate_artifact_id }}'
+            )
+            path = '${{ steps.candidate_paths.outputs.download_directory }}'
+            'skip-decompress' = 'true'
+            'digest-mismatch' = 'error'
+        }
     }
+    [pscustomobject]@{
+        Workflow = 'build'
+        Path = '.github/workflows/build.yml'
+        Job = 'synchronize_generated_artifacts'
+        Step = 'checkout_repository'
+        Repository = 'actions/checkout'
+        Sha = '3d3c42e5aac5ba805825da76410c181273ba90b1'
+        Version = 'v7.0.1'
+        IfCondition = ''
+        Inputs = [ordered]@{
+            ref = '${{ github.sha }}'
+            'persist-credentials' = 'true'
+        }
+    }
+    [pscustomobject]@{
+        Workflow = 'build'
+        Path = '.github/workflows/build.yml'
+        Job = 'synchronize_generated_artifacts'
+        Step = 'download_candidate'
+        Repository = 'actions/download-artifact'
+        Sha = '3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c'
+        Version = 'v8.0.1'
+        IfCondition = ''
+        Inputs = [ordered]@{
+            'artifact-ids' = (
+                '${{ needs.approve_push_candidate.outputs.' +
+                'validated_candidate_artifact_id }}'
+            )
+            path = '${{ steps.candidate_paths.outputs.download_directory }}'
+            'skip-decompress' = 'true'
+            'digest-mismatch' = 'error'
+        }
+    }
+    [pscustomobject]@{
+        Workflow = 'markdownlint'
+        Path = '.github/workflows/markdownlint.yml'
+        Job = 'markdownlint'
+        Step = 'checkout_repository'
+        Repository = 'actions/checkout'
+        Sha = '3d3c42e5aac5ba805825da76410c181273ba90b1'
+        Version = 'v7.0.1'
+        IfCondition = ''
+        Inputs = [ordered]@{
+            ref = '${{ github.sha }}'
+            'persist-credentials' = 'false'
+        }
+    }
+    [pscustomobject]@{
+        Workflow = 'markdownlint'
+        Path = '.github/workflows/markdownlint.yml'
+        Job = 'markdownlint'
+        Step = 'setup_node'
+        Repository = 'actions/setup-node'
+        Sha = '820762786026740c76f36085b0efc47a31fe5020'
+        Version = 'v7.0.0'
+        IfCondition = ''
+        Inputs = [ordered]@{
+            'node-version' = '''24'''
+            'package-manager-cache' = 'false'
+        }
+    }
+)
+
+function Get-ActionRolePositionKey {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory)]
+        [object]$Role
+    )
+
+    return '{0}|{1}|{2}' -f $Role.Workflow, $Role.Job, $Role.Step
 }
 
-$hashtableWorkflowPaths = @{
-    build = '.github/workflows/build.yml'
-    markdownlint = '.github/workflows/markdownlint.yml'
-}
+function Get-WorkflowExternalActionRole {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory)]
+        [string]$WorkflowName,
 
-$hashtableObservedCounts = @{}
-
-foreach ($strWorkflowName in $hashtableWorkflowPaths.Keys) {
-    $strWorkflowPath = $hashtableWorkflowPaths[$strWorkflowName]
+        [Parameter(Mandatory)]
+        [string]$WorkflowPath
+    )
 
     $strAbsoluteWorkflowPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
-        $strWorkflowPath
+        $WorkflowPath
+    )
+    $arrLines = [System.IO.File]::ReadAllLines($strAbsoluteWorkflowPath)
+
+    if (@($arrLines | Where-Object { $_ -match "`t" }).Count -ne 0) {
+        throw ("Workflow contains a tab: {0}" -f $WorkflowPath)
+    }
+
+    $arrAllUsesLineNumbers = @(
+        for ($intLineIndex = 0; $intLineIndex -lt $arrLines.Count; $intLineIndex++) {
+            if (
+                $arrLines[$intLineIndex] -match
+                    '(?<![A-Za-z0-9_-])(?:"uses"|''uses''|uses)\s*:'
+            ) {
+                $intLineIndex + 1
+            }
+        }
     )
 
-    $arrUsesLines = @(
-        [System.IO.File]::ReadAllLines($strAbsoluteWorkflowPath) |
-            Where-Object { $_ -match '^\s*uses:\s+' }
-    )
+    $arrJobHeaders = @()
+    $blnInsideJobs = $false
 
-    foreach ($strUsesLine in $arrUsesLines) {
-        if ($strUsesLine -match '^\s*uses:\s+\./') {
+    for ($intLineIndex = 0; $intLineIndex -lt $arrLines.Count; $intLineIndex++) {
+        $strLine = $arrLines[$intLineIndex]
+
+        if ($strLine -ceq 'jobs:') {
+            if ($blnInsideJobs) {
+                throw ("Workflow has duplicate jobs keys: {0}" -f $WorkflowPath)
+            }
+
+            $blnInsideJobs = $true
             continue
         }
 
-        if (
-            $strUsesLine -cnotmatch (
-                '^\s*uses:\s+' +
-                '(?<Repository>[^@\s]+)@' +
-                '(?<Sha>[0-9a-f]{40})\s+' +
-                '#\s+(?<Version>v[0-9]+\.[0-9]+\.[0-9]+)\s*$'
-            )
-        ) {
-            throw (
-                "Unable to parse an exact external action tuple in {0}: {1}" -f
-                $strWorkflowPath,
-                $strUsesLine
-            )
+        if (-not $blnInsideJobs) {
+            continue
         }
 
-        $strRepository = $Matches.Repository
-
-        if (-not $hashtableApprovedActions.ContainsKey($strRepository)) {
-            throw (
-                "Unapproved external action repository in {0}: {1}" -f
-                $strWorkflowPath,
-                $strRepository
-            )
+        if ($strLine -match '^[^\s#]') {
+            $blnInsideJobs = $false
+            continue
         }
 
-        $objApprovedAction = $hashtableApprovedActions[$strRepository]
-
-        if (
-            $Matches.Sha -cne $objApprovedAction.Sha -or
-            $Matches.Version -cne $objApprovedAction.Version
-        ) {
-            throw (
-                ("External action tuple mismatch in {0}; repository/SHA/" +
-                "version were {1}/{2}/{3}.") -f
-                $strWorkflowPath,
-                $strRepository,
-                $Matches.Sha,
-                $Matches.Version
-            )
+        if ($strLine -match '^  (?<Job>[a-z][a-z0-9_]*)\s*:\s*$') {
+            $arrJobHeaders += [pscustomobject]@{
+                Job = $Matches.Job
+                Start = $intLineIndex
+            }
         }
-
-        if ($strWorkflowName -cnotin $objApprovedAction.AllowedWorkflows) {
-            throw (
-                "Action {0} is not approved in workflow {1}." -f
-                $strRepository,
-                $strWorkflowName
-            )
-        }
-
-        $strCountKey = '{0}|{1}' -f $strWorkflowName, $strRepository
-
-        if (-not $hashtableObservedCounts.ContainsKey($strCountKey)) {
-            $hashtableObservedCounts[$strCountKey] = 0
-        }
-
-        $hashtableObservedCounts[$strCountKey]++
-    }
-}
-
-$hashtableRequiredOccurrences = @{
-    'build|actions/checkout' = 1
-    'build|actions/upload-artifact' = 1
-    'build|actions/download-artifact' = 1
-    'markdownlint|actions/checkout' = 1
-    'markdownlint|actions/setup-node' = 1
-}
-
-foreach ($strCountKey in $hashtableRequiredOccurrences.Keys) {
-    $intObservedCount = if ($hashtableObservedCounts.ContainsKey($strCountKey)) {
-        [int]$hashtableObservedCounts[$strCountKey]
-    }
-    else {
-        0
     }
 
-    $intRequiredMinimum = [int]$hashtableRequiredOccurrences[$strCountKey]
+    $arrDuplicateJobIds = @(
+        $arrJobHeaders |
+            Group-Object -CaseSensitive -Property Job |
+            Where-Object { $_.Count -ne 1 }
+    )
 
-    if ($intObservedCount -lt $intRequiredMinimum) {
+    if ($arrDuplicateJobIds.Count -ne 0) {
         throw (
-            "Required action role {0} is missing; expected at least {1}, found {2}." -f
-            $strCountKey,
-            $intRequiredMinimum,
-            $intObservedCount
+            "Workflow has duplicate job IDs: {0}: {1}" -f
+            $WorkflowPath,
+            ($arrDuplicateJobIds.Name -join ', ')
         )
     }
+
+    $arrObservedRoles = @()
+    $arrParsedUsesLineNumbers = @()
+
+    for ($intJobIndex = 0; $intJobIndex -lt $arrJobHeaders.Count; $intJobIndex++) {
+        $objJob = $arrJobHeaders[$intJobIndex]
+        $intJobEnd = if ($intJobIndex + 1 -lt $arrJobHeaders.Count) {
+            $arrJobHeaders[$intJobIndex + 1].Start - 1
+        }
+        else {
+            $arrLines.Count - 1
+        }
+
+        $arrStepsKeys = @(
+            for (
+                $intLineIndex = $objJob.Start + 1;
+                $intLineIndex -le $intJobEnd;
+                $intLineIndex++
+            ) {
+                if ($arrLines[$intLineIndex] -ceq '    steps:') {
+                    $intLineIndex
+                }
+            }
+        )
+
+        if ($arrStepsKeys.Count -gt 1) {
+            throw (
+                "Job has duplicate steps keys: {0}|{1}" -f
+                $WorkflowPath,
+                $objJob.Job
+            )
+        }
+
+        if ($arrStepsKeys.Count -eq 0) {
+            continue
+        }
+
+        $intStepsStart = $arrStepsKeys[0]
+        $arrStepStarts = @(
+            for (
+                $intLineIndex = $intStepsStart + 1;
+                $intLineIndex -le $intJobEnd;
+                $intLineIndex++
+            ) {
+                if ($arrLines[$intLineIndex] -match '^      -(?:\s|$)') {
+                    $intLineIndex
+                }
+            }
+        )
+
+        $arrExternalStepIds = @()
+
+        for (
+            $intStepIndex = 0;
+            $intStepIndex -lt $arrStepStarts.Count;
+            $intStepIndex++
+        ) {
+            $intStepStart = $arrStepStarts[$intStepIndex]
+            $intStepEnd = if ($intStepIndex + 1 -lt $arrStepStarts.Count) {
+                $arrStepStarts[$intStepIndex + 1] - 1
+            }
+            else {
+                $intJobEnd
+            }
+
+            $arrUsesIndices = @(
+                for (
+                    $intLineIndex = $intStepStart;
+                    $intLineIndex -le $intStepEnd;
+                    $intLineIndex++
+                ) {
+                    if ($arrLines[$intLineIndex] -match '^        uses\s*:') {
+                        $intLineIndex
+                    }
+                }
+            )
+
+            if ($arrUsesIndices.Count -eq 0) {
+                continue
+            }
+
+            if ($arrUsesIndices.Count -ne 1) {
+                throw (
+                    "Action step has a duplicate uses key: {0}|{1}|line {2}" -f
+                    $WorkflowPath,
+                    $objJob.Job,
+                    ($intStepStart + 1)
+                )
+            }
+
+            $intUsesIndex = $arrUsesIndices[0]
+            $arrParsedUsesLineNumbers += $intUsesIndex + 1
+            $strUsesLine = $arrLines[$intUsesIndex]
+
+            if ($strUsesLine -match '^        uses:\s+\./') {
+                continue
+            }
+
+            if (
+                $strUsesLine -cnotmatch (
+                    '^        uses:\s+' +
+                    '(?<Repository>[^@\s]+)@' +
+                    '(?<Sha>[0-9a-f]{40})\s+' +
+                    '#\s+(?<Version>v[0-9]+\.[0-9]+\.[0-9]+)\s*$'
+                )
+            ) {
+                throw (
+                    "External action tuple is unsupported: {0}|line {1}: {2}" -f
+                    $WorkflowPath,
+                    ($intUsesIndex + 1),
+                    $strUsesLine
+                )
+            }
+
+            $strRepository = $Matches.Repository
+            $strSha = $Matches.Sha
+            $strVersion = $Matches.Version
+            $arrIdValues = @(
+                for (
+                    $intLineIndex = $intStepStart;
+                    $intLineIndex -le $intStepEnd;
+                    $intLineIndex++
+                ) {
+                    if ($arrLines[$intLineIndex] -match '^        id:\s*(?<Id>.+?)\s*$') {
+                        $Matches.Id
+                    }
+                }
+            )
+
+            if (
+                $arrIdValues.Count -ne 1 -or
+                $arrIdValues[0] -cnotmatch '^[a-z][a-z0-9_]*$'
+            ) {
+                throw (
+                    "External action step needs one stable ID: {0}|{1}|line {2}" -f
+                    $WorkflowPath,
+                    $objJob.Job,
+                    ($intStepStart + 1)
+                )
+            }
+
+            $strStepId = $arrIdValues[0]
+            $arrExternalStepIds += $strStepId
+            $arrIfValues = @(
+                for (
+                    $intLineIndex = $intStepStart;
+                    $intLineIndex -le $intStepEnd;
+                    $intLineIndex++
+                ) {
+                    if ($arrLines[$intLineIndex] -match '^        if:\s*(?<If>.+?)\s*$') {
+                        $Matches.If
+                    }
+                }
+            )
+
+            if ($arrIfValues.Count -gt 1) {
+                throw (
+                    "External action step has duplicate if keys: {0}|{1}|{2}" -f
+                    $WorkflowPath,
+                    $objJob.Job,
+                    $strStepId
+                )
+            }
+
+            $strIfCondition = if ($arrIfValues.Count -eq 1) {
+                $arrIfValues[0]
+            }
+            else {
+                ''
+            }
+
+            $arrWithIndices = @(
+                for (
+                    $intLineIndex = $intStepStart;
+                    $intLineIndex -le $intStepEnd;
+                    $intLineIndex++
+                ) {
+                    if ($arrLines[$intLineIndex] -match '^        with\s*:') {
+                        $intLineIndex
+                    }
+                }
+            )
+
+            if ($arrWithIndices.Count -ne 1) {
+                throw (
+                    "External action step needs one block-form with map: {0}|{1}|{2}" -f
+                    $WorkflowPath,
+                    $objJob.Job,
+                    $strStepId
+                )
+            }
+
+            $intWithIndex = $arrWithIndices[0]
+
+            if ($arrLines[$intWithIndex] -cne '        with:') {
+                throw (
+                    "External action with map must use block form: {0}|{1}|{2}" -f
+                    $WorkflowPath,
+                    $objJob.Job,
+                    $strStepId
+                )
+            }
+
+            $hashtableInputs = [ordered]@{}
+            $intInputIndex = $intWithIndex + 1
+
+            while ($intInputIndex -le $intStepEnd) {
+                $strInputLine = $arrLines[$intInputIndex]
+
+                if ($strInputLine -match '^\s*$') {
+                    $intInputIndex++
+                    continue
+                }
+
+                if ($strInputLine -notmatch '^          ') {
+                    break
+                }
+
+                if (
+                    $strInputLine -cnotmatch (
+                        '^          (?<Key>[a-z][a-z0-9-]*):' +
+                        '\s*(?<Value>.*?)\s*$'
+                    )
+                ) {
+                    throw (
+                        "Unsupported action input syntax: {0}|line {1}: {2}" -f
+                        $WorkflowPath,
+                        ($intInputIndex + 1),
+                        $strInputLine
+                    )
+                }
+
+                $strInputKey = $Matches.Key
+                $strInputValue = $Matches.Value
+
+                if ($hashtableInputs.Contains($strInputKey)) {
+                    throw (
+                        "Duplicate action input: {0}|{1}|{2}|{3}" -f
+                        $WorkflowPath,
+                        $objJob.Job,
+                        $strStepId,
+                        $strInputKey
+                    )
+                }
+
+                if ($strInputValue -ceq '|') {
+                    $arrBlockLines = @()
+                    $intInputIndex++
+
+                    while (
+                        $intInputIndex -le $intStepEnd -and
+                        $arrLines[$intInputIndex] -match '^            (?<Content>.*)$'
+                    ) {
+                        $arrBlockLines += $Matches.Content
+                        $intInputIndex++
+                    }
+
+                    if ($arrBlockLines.Count -eq 0) {
+                        throw (
+                            "Empty action input block: {0}|{1}|{2}|{3}" -f
+                            $WorkflowPath,
+                            $objJob.Job,
+                            $strStepId,
+                            $strInputKey
+                        )
+                    }
+
+                    $hashtableInputs[$strInputKey] = $arrBlockLines -join "`n"
+                    continue
+                }
+
+                if ([string]::IsNullOrWhiteSpace($strInputValue)) {
+                    throw (
+                        "Empty action input: {0}|{1}|{2}|{3}" -f
+                        $WorkflowPath,
+                        $objJob.Job,
+                        $strStepId,
+                        $strInputKey
+                    )
+                }
+
+                $hashtableInputs[$strInputKey] = $strInputValue
+                $intInputIndex++
+            }
+
+            $arrObservedRoles += [pscustomobject]@{
+                Workflow = $WorkflowName
+                Path = $WorkflowPath
+                Job = $objJob.Job
+                Step = $strStepId
+                Repository = $strRepository
+                Sha = $strSha
+                Version = $strVersion
+                IfCondition = $strIfCondition
+                Inputs = $hashtableInputs
+            }
+        }
+
+        $arrDuplicateStepIds = @(
+            $arrExternalStepIds |
+                Group-Object -CaseSensitive |
+                Where-Object { $_.Count -ne 1 }
+        )
+
+        if ($arrDuplicateStepIds.Count -ne 0) {
+            throw (
+                "Job has duplicate external-action step IDs: {0}|{1}: {2}" -f
+                $WorkflowPath,
+                $objJob.Job,
+                ($arrDuplicateStepIds.Name -join ', ')
+            )
+        }
+    }
+
+    $arrUnparsedUsesLines = @(
+        Compare-Object `
+            -ReferenceObject $arrAllUsesLineNumbers `
+            -DifferenceObject $arrParsedUsesLineNumbers
+    )
+
+    if ($arrUnparsedUsesLines.Count -ne 0) {
+        throw (
+            "Workflow contains an unsupported uses form: {0}: {1}" -f
+            $WorkflowPath,
+            ($arrUnparsedUsesLines.InputObject -join ', ')
+        )
+    }
+
+    return $arrObservedRoles
 }
 
-if (
-    $hashtableObservedCounts.ContainsKey(
-        'markdownlint|actions/setup-node'
-    ) -and
-    $hashtableObservedCounts[
-        'markdownlint|actions/setup-node'
-    ] -ne 1
+$arrDuplicateExpectedPositions = @(
+    $arrExpectedActionRoles |
+        Group-Object `
+            -CaseSensitive `
+            -Property { Get-ActionRolePositionKey -Role $_ } |
+        Where-Object { $_.Count -ne 1 }
+)
+
+if ($arrDuplicateExpectedPositions.Count -ne 0) {
+    throw (
+        "Expected action inventory has duplicate positions: {0}" -f
+        ($arrDuplicateExpectedPositions.Name -join ', ')
+    )
+}
+
+$arrObservedActionRoles = @()
+
+foreach (
+    $objWorkflowGroup in
+    $arrExpectedActionRoles |
+        Group-Object -CaseSensitive -Property Workflow
 ) {
-    throw 'markdownlint.yml must contain exactly one approved setup-node step.'
+    $arrWorkflowPaths = @(
+        $objWorkflowGroup.Group.Path |
+            Sort-Object -Unique
+    )
+
+    if ($arrWorkflowPaths.Count -ne 1) {
+        throw (
+            "Expected workflow has multiple paths: {0}: {1}" -f
+            $objWorkflowGroup.Name,
+            ($arrWorkflowPaths -join ', ')
+        )
+    }
+
+    $arrObservedActionRoles += @(
+        Get-WorkflowExternalActionRole `
+            -WorkflowName $objWorkflowGroup.Name `
+            -WorkflowPath $arrWorkflowPaths[0]
+    )
+}
+
+$arrExpectedPositionKeys = @(
+    $arrExpectedActionRoles |
+        ForEach-Object {
+            Get-ActionRolePositionKey -Role $_
+        } |
+        Sort-Object
+)
+$arrObservedPositionKeys = @(
+    $arrObservedActionRoles |
+        ForEach-Object {
+            Get-ActionRolePositionKey -Role $_
+        } |
+        Sort-Object
+)
+$arrPositionDifferences = @(
+    Compare-Object `
+        -ReferenceObject $arrExpectedPositionKeys `
+        -DifferenceObject $arrObservedPositionKeys `
+        -CaseSensitive
+)
+
+if ($arrPositionDifferences.Count -ne 0) {
+    throw (
+        "External action role set mismatch: {0}" -f
+        (
+            @(
+                $arrPositionDifferences |
+                    ForEach-Object {
+                        '{0}:{1}' -f $_.SideIndicator, $_.InputObject
+                    }
+            ) -join ', '
+        )
+    )
+}
+
+foreach ($objExpectedRole in $arrExpectedActionRoles) {
+    $strPositionKey = Get-ActionRolePositionKey -Role $objExpectedRole
+    $arrMatchingObservedRoles = @(
+        $arrObservedActionRoles |
+            Where-Object {
+                (Get-ActionRolePositionKey -Role $_) -ceq $strPositionKey
+            }
+    )
+
+    if ($arrMatchingObservedRoles.Count -ne 1) {
+        throw (
+            "External action position is not unique: {0}" -f
+            $strPositionKey
+        )
+    }
+
+    $objObservedRole = $arrMatchingObservedRoles[0]
+
+    foreach (
+        $strPropertyName in
+        @('Repository', 'Sha', 'Version', 'IfCondition')
+    ) {
+        if (
+            [string]$objObservedRole.$strPropertyName -cne
+                [string]$objExpectedRole.$strPropertyName
+        ) {
+            throw (
+                "External action {0} mismatch at {1}; expected/actual: {2}/{3}" -f
+                $strPropertyName,
+                $strPositionKey,
+                $objExpectedRole.$strPropertyName,
+                $objObservedRole.$strPropertyName
+            )
+        }
+    }
+
+    $arrExpectedInputNames = @(
+        $objExpectedRole.Inputs.Keys |
+            Sort-Object
+    )
+    $arrObservedInputNames = @(
+        $objObservedRole.Inputs.Keys |
+            Sort-Object
+    )
+    $arrInputNameDifferences = @(
+        Compare-Object `
+            -ReferenceObject $arrExpectedInputNames `
+            -DifferenceObject $arrObservedInputNames `
+            -CaseSensitive
+    )
+
+    if ($arrInputNameDifferences.Count -ne 0) {
+        throw (
+            "External action input set mismatch at {0}: {1}" -f
+            $strPositionKey,
+            (
+                @(
+                    $arrInputNameDifferences |
+                        ForEach-Object {
+                            '{0}:{1}' -f $_.SideIndicator, $_.InputObject
+                        }
+                ) -join ', '
+            )
+        )
+    }
+
+    foreach ($strInputName in $arrExpectedInputNames) {
+        if (
+            [string]$objExpectedRole.Inputs[$strInputName] -cne
+                [string]$objObservedRole.Inputs[$strInputName]
+        ) {
+            throw (
+                "External action input mismatch at {0}|{1}; expected/actual: {2}/{3}" -f
+                $strPositionKey,
+                $strInputName,
+                $objExpectedRole.Inputs[$strInputName],
+                $objObservedRole.Inputs[$strInputName]
+            )
+        }
+    }
 }
 ```
 
@@ -2108,13 +2753,14 @@ After merge:
 - Pull-request jobs are read-only and stale artifacts fail.
 - Every checkout in `build.yml` and `markdownlint.yml` uses the approved
   checkout v7 Node 24 full commit SHA with a matching comment, and the exact
-  repository/SHA/comment allowlist validator rejects substitutions.
+  role validator rejects a missing, extra, duplicate, misplaced, malformed, or
+  input-weakened action step.
 - `markdownlint.yml` uses the approved setup-node v7 full commit SHA, installs Node 24 with automatic package-manager caching disabled, declares `contents: read`, and passes its unchanged outer and nested lint commands.
 - Local and hosted validation assert Node major 24 before a clean install and
   both existing Markdown lint commands.
 - Artifact uploads and downloads use approved full commit SHAs with matching
-  comments; every expected action role is present only in its approved
-  workflow.
+  comments; `$arrExpectedActionRoles` proves the exact role set, placement,
+  tuple, condition, and complete allowed input sets.
 - Preparation declares `archive: true` and exposes one nonempty immutable ID/digest pair.
 - All four Windows push cells always download only by that ID, run the tracked harness, and invoke the helper.
 - Synchronization downloads only by that ID, runs the tracked harness, and invokes the helper only when `has_changes=true` and the job starts.
