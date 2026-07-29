@@ -18,4 +18,4 @@ And given the state of the [`PSStyleGuide` repo](github.com/franklesniak/PSStyle
 
 (again, assume these issues are worked on one at a time, sequentially, in the order they are listed)
 
-What feedback would you have, if any, for the person that drafted the P1/P2/etc. GitHub Issues slate? Record your answer in `docs\planning\PSStyleGuide\slate-criticism.md`.
+What feedback would you have, if any, for the person that drafted the P1/P2/etc. GitHub Issues slate? Record your answer in `docs\planning\PSStyleGuide\slate-criticism.md`. If the file already exists, overwrite the existing file (do not append it).

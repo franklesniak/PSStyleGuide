@@ -18,4 +18,4 @@ And given the state of the [`TerraformStyleGuide` repo](github.com/franklesniak/
 
 (again, assume these issues are worked on one at a time, sequentially, in the order they are listed)
 
-What feedback would you have, if any, for the person that drafted the T1/T2/etc. GitHub Issues slate? Record your answer in `docs\planning\TerraformStyleGuide\slate-criticism.md`.
+What feedback would you have, if any, for the person that drafted the T1/T2/etc. GitHub Issues slate? Record your answer in `docs\planning\TerraformStyleGuide\slate-criticism.md`. If the file already exists, overwrite the existing file (do not append it).
