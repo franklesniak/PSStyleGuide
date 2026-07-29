@@ -26,27 +26,33 @@ At implementation start, confirm:
 - Every pull request targeting `main` runs read-only Ubuntu and Windows verification.
 - Every push to `main` runs the push pipeline.
 - Neither event has a path filter.
-- Every checkout in the build and Markdown lint workflows uses the approved Node 24 full commit SHA with a matching release comment.
+- Every checkout in the build and Markdown lint workflows uses the approved checkout v7 Node 24 full commit SHA with a matching release comment.
+- The Markdown lint workflow uses the approved setup-node v7 full commit SHA, installs Node 24 with automatic package-manager caching disabled, declares `contents: read`, and passes its unchanged outer and nested lint commands.
 - Artifact actions are pinned to approved full commit SHAs with matching release comments.
 - Push preparation declares `archive: true`, uploads one immutable candidate, and exposes its ID and SHA-256 digest.
-- Push consumers download only by immutable ID.
+- All four Windows push cells always download only by immutable ID, run the tracked harness, and invoke the helper.
+- Synchronization performs the same sequence only when `has_changes=true` and its job starts; it is skipped at the job level on the expected no-drift run.
 - Native downloads use `skip-decompress: true` and `digest-mismatch: error`.
 - The versioned shared archive-validation helper is the only candidate extraction implementation.
 - The helper receives explicit checkout and trusted temporary roots, confines candidate paths beneath the trusted root and outside the checkout, rejects filesystem indirection, and accepts artifact/run labels only from callers.
-- Every push consumer passes preparation's propagated artifact ID and upload digest to the helper, which independently compares the retained ZIP's SHA-256 with the digest before opening the archive.
+- Every started push consumer passes preparation's propagated artifact ID and upload digest to the helper, which hashes the exact held archive stream, compares that digest before parsing, rewinds the stream, and constructs `ZipArchive` over the same bytes.
+- Every security-sensitive exact count/set uses exhaustive .NET directory enumeration, including a candidate-parent leaf check that rejects files, directories, links/reparse points, and dangling links immediately before creation.
 - One tracked, versioned harness owns the deterministic fixture suite.
 - Pull-request verification runs that harness under Ubuntu PowerShell 7 and the two Windows editions in the LF cells.
-- Every push consumer runs that same harness against the exact helper on every run, including digest-mismatch and path-envelope fixtures.
+- Every started push consumer runs that same harness against the exact helper before production helper use.
+- The harness implements the normative stable-ID oracle table, including expected phase, candidate-leaf postcondition, diagnostics, and exact success path/type/byte assertions.
 - The helper validates the full ZIP manifest before creating or writing the candidate directory.
 - The Windows topology contains four actual edition × fixture-EOL cells.
 - Each Windows cell validates only its assigned edition and EOL.
 - The two LF cells run lone-CR sanitation under their assigned editions.
 - A read-only approval job exposes the candidate only after all four push cells succeed.
 - The sole write job verifies candidate, destination, staged, and committed blob IDs.
-- The write job uses `HEAD:<full-ref>` and an exact expected-SHA `--force-with-lease`.
+- The write job validates `TARGET_REF`/`EXPECTED_SHA` against GitHub's built-ins once, proves one native `HEAD^{commit}` and one exact remote record, reuses those locals, and uses `HEAD:<full-ref>` with an exact expected-SHA `--force-with-lease`.
 - Unconditional force updates are prohibited.
 - Stale committed artifacts fail pull-request verification.
 - The controlled synchronization, propagated-digest rejection, unrelated-trigger, stale-preflight, and exact-lease evidence has passed without creating a synthetic `main` commit.
+
+The Markdown dependency-lock advisories are separately tracked maintenance work. They are not silently folded into P2 and do not weaken this prerequisite's Node 24 lint-compatibility requirement.
 
 ## Affected files
 
@@ -313,12 +319,13 @@ $arrCanonicalSnippetLines = @(
 $strCanonicalSnippet = $arrCanonicalSnippetLines -join "`n"
 $strNonCompliantMarker = $arrCanonicalSnippetLines[0]
 
-function Get-OrdinalOccurrenceCount {
+$scriptGetOrdinalOccurrenceCount = {
     param (
         [Parameter(Mandatory)]
         [string]$Content,
 
         [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
         [string]$Needle
     )
 
@@ -344,7 +351,7 @@ function Get-OrdinalOccurrenceCount {
         $intOffset = $intIndex + $Needle.Length
     }
 
-    $intCount
+    return $intCount
 }
 
 $strLegacyVisualizationLine = "`n" + ($strMiddleDot * 4) + "`n"
@@ -363,7 +370,7 @@ $strSyntheticFalsePositive = @(
 
 if (
     -not $strSyntheticFalsePositive.Contains($strLegacyVisualizationLine) -or
-    (Get-OrdinalOccurrenceCount `
+    (& $scriptGetOrdinalOccurrenceCount `
         -Content $strSyntheticFalsePositive `
         -Needle $strCanonicalSnippet) -ne 0
 ) {
@@ -418,11 +425,11 @@ foreach ($strGuideBearingPath in $arrGuideBearingPaths) {
 
     $strContent = [System.IO.File]::ReadAllText($strAbsolutePath)
 
-    $intSnippetCount = Get-OrdinalOccurrenceCount `
+    $intSnippetCount = & $scriptGetOrdinalOccurrenceCount `
         -Content $strContent `
         -Needle $strCanonicalSnippet
 
-    $intMarkerCount = Get-OrdinalOccurrenceCount `
+    $intMarkerCount = & $scriptGetOrdinalOccurrenceCount `
         -Content $strContent `
         -Needle $strNonCompliantMarker
 
@@ -443,11 +450,11 @@ $strRationaleAbsolutePath = $ExecutionContext.SessionState.Path.GetUnresolvedPro
 
 $strRationaleContent = [System.IO.File]::ReadAllText($strRationaleAbsolutePath)
 
-$intRationaleSnippetCount = Get-OrdinalOccurrenceCount `
+$intRationaleSnippetCount = & $scriptGetOrdinalOccurrenceCount `
     -Content $strRationaleContent `
     -Needle $strCanonicalSnippet
 
-$intRationaleMarkerCount = Get-OrdinalOccurrenceCount `
+$intRationaleMarkerCount = & $scriptGetOrdinalOccurrenceCount `
     -Content $strRationaleContent `
     -Needle $strNonCompliantMarker
 
@@ -551,13 +558,13 @@ After merge to `main`, confirm:
 3. It exposes a nonempty ID and 64-hex digest.
 4. Every Windows push cell downloads that exact ID using the approved pinned download action.
 5. Native digest behavior is `error`.
-6. Every cell runs the tracked deterministic helper harness and invokes the shared helper with explicit checkout/trusted roots and caller-owned artifact/run context; the helper independently rehashes the retained ZIP against the propagated digest and validates the manifest before safe extraction.
+6. Every cell runs the tracked deterministic helper harness and invokes the shared helper with explicit checkout/trusted roots and caller-owned artifact/run context; the helper hashes and parses one held stream, exhaustively validates paths/manifest before candidate creation, and safely extracts the exact permitted bytes.
 7. The read-only approval job succeeds only after all four cells.
 8. Because sources and generated artifacts were committed together, preparation reports `has_changes=false`.
 9. The write-enabled synchronization job skips.
 10. No bot synchronization commit is created.
 
-The synchronization consumer's helper integration is established by the prerequisite issue's controlled write-path evidence and static inspection; this issue's no-drift push does not execute the writer.
+The synchronization consumer's helper integration is established by the prerequisite issue's controlled `has_changes=true` write-path evidence and static inspection; this issue's expected no-drift push skips the synchronization job and executes none of its steps.
 
 If preparation reports changes, treat that as a source/artifact synchronization failure. Do not accept a recovery commit as this issue's expected outcome.
 
@@ -596,16 +603,18 @@ If preparation reports changes, treat that as a source/artifact synchronization 
 - No touched file begins with a UTF-8 BOM.
 - No touched file contains a carriage-return byte.
 - The canonical validator rejects a wrong target block even when an unrelated four-middle-dot line is present.
+- The canonical validator uses the local ordinal-count script block, not an undocumented named function, and the fenced command parses in Windows PowerShell 5.1 and PowerShell 7.
 - Lint, whitespace, and generator-idempotency checks pass.
 - Pull-request Ubuntu verification and its PowerShell 7 helper harness pass.
 - The four-cell pull-request Windows matrix, both LF-cell helper-harness executions, and both lone-CR probes pass.
 - Post-merge consumers use the approved pinned artifact actions.
 - The native digest configuration and the helper's independent digest comparison pass.
-- The tracked deterministic helper harness passes in every consumer.
+- All four Windows push cells run the tracked deterministic helper harness and production helper.
+- Static inspection and P1's controlled `has_changes=true` drill prove that a started synchronization job runs the same harness/helper sequence before mutation.
 - Every production helper invocation receives explicit checkout/trusted roots and caller-owned artifact/run context.
-- The post-merge push matrix validates the exact immutable candidate after pre-extraction manifest validation.
+- The post-merge push matrix validates the exact immutable candidate through the same-held-stream digest/archive contract, exhaustive enumeration, and pre-creation manifest validation.
 - Post-merge preparation reports no candidate changes.
-- Synchronization skips and no recovery commit is created.
+- Synchronization skips at the job level, none of its steps run, and no recovery commit is created.
 - No unrelated or downstream-specific change is introduced.
 
 ## References
@@ -624,6 +633,8 @@ If preparation reports changes, treat that as a source/artifact synchronization 
 - [npm Docs: `npm ci`](https://docs.npmjs.com/cli/commands/npm-ci)
 - [GitHub Docs: Workflow syntax](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax)
 - [GitHub Docs: Secure use reference](https://docs.github.com/en/actions/reference/security/secure-use)
+- [GitHub: `actions/checkout` v7.0.1 exact metadata](https://raw.githubusercontent.com/actions/checkout/3d3c42e5aac5ba805825da76410c181273ba90b1/action.yml)
+- [GitHub: `actions/setup-node` v7.0.0 exact metadata](https://raw.githubusercontent.com/actions/setup-node/820762786026740c76f36085b0efc47a31fe5020/action.yml)
 - [GitHub: `actions/upload-artifact` v7.0.1 exact metadata](https://raw.githubusercontent.com/actions/upload-artifact/043fb46d1a93c77aae656e7c1c64a875d1fc6a0a/action.yml)
 - [GitHub: `actions/upload-artifact` v7.0.1 exact README](https://raw.githubusercontent.com/actions/upload-artifact/043fb46d1a93c77aae656e7c1c64a875d1fc6a0a/README.md)
 - [GitHub: `actions/upload-artifact` v7.0.1 release](https://github.com/actions/upload-artifact/releases/tag/v7.0.1)

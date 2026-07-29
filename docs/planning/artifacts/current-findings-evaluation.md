@@ -1,1692 +1,1510 @@
-# PSStyleGuide findings evaluation
+# Evaluation of open PSStyleGuide slate findings
 
-## Scope and scoring conventions
+## Purpose and method
 
-This file evaluates each open PSStyleGuide finding recorded in
-`docs/planning/artifacts/current-findings.md`, in its recorded order. Each finding
-has its own options, purpose-built rubric, scoring table, and selected resolution.
-TerraformStyleGuide issues are contextual only and are not revised.
+This file evaluates every open PSStyleGuide finding in
+`docs/planning/artifacts/current-findings.md` one at a time. Each finding
+receives:
 
-Unless a finding-specific rubric states otherwise, every criterion is scored from
-0 to 5:
+1. a comprehensive option set;
+2. a finding-specific weighted rubric;
+3. a scored comparison; and
+4. one detailed selected resolution.
 
-- 0: does not satisfy the criterion or creates an unacceptable failure;
-- 1: very weak;
-- 2: weak;
-- 3: adequate;
-- 4: strong; and
-- 5: excellent.
+Scores use a 1–5 scale, where 5 is best. Weighted totals are calculated as:
 
-Weighted points equal `score / 5 × weight`. Totals are out of 100. Raw scores are
-shown in each table so that another reviewer can reproduce or challenge the result.
-
-## Evaluation status
-
-Complete. All seven findings were evaluated in recorded order, and each selected
-resolution has been incorporated into the P1-then-P2 issue slate.
-
-## P1-1 — The security-sensitive archive helper is not automatically exercised before merge
-
-### Problem to solve
-
-The helper is a security boundary: it authenticates the retained candidate ZIP,
-validates its central-directory manifest, and controls extraction. P1 currently
-requires its malicious-fixture suite only in push consumers. That leaves ordinary
-pull-request revisions without automatic execution of the new helper and leaves
-Ubuntu coverage dependent on a one-time controlled drill.
-
-### Option dimensions and permutations
-
-Four choices can be combined:
-
-1. **Cadence**
-   - one-time controlled evidence only;
-   - every pull request;
-   - every push consumer; or
-   - both every pull request and every push consumer.
-2. **Claimed platform coverage**
-   - Ubuntu with PowerShell 7 only;
-   - Windows PowerShell 5.1 only;
-   - Windows PowerShell 7 only;
-   - the two Windows editions;
-   - Ubuntu PowerShell 7 plus both Windows editions; or
-   - all four Windows edition/EOL cells plus Ubuntu.
-3. **Placement**
-   - existing Ubuntu and Windows verification jobs;
-   - a dedicated read-only helper-test job or matrix;
-   - both a dedicated job and production-consumer smoke tests; or
-   - a privileged event such as `pull_request_target`.
-4. **Fixture-suite ownership**
-   - duplicate inline YAML/PowerShell in each job;
-   - define a workflow-local function repeatedly;
-   - place one versioned test harness in a tracked `.ps1` file;
-   - use Pester tests plus a smaller consumer smoke test; or
-   - add a test mode to the production helper itself.
-
-The full Cartesian product includes combinations that are technically equivalent,
-strictly dominated, or unsafe. The following bundles retain every materially
-different tradeoff.
-
-### Options
-
-#### Option A — Keep P1 unchanged
-
-Retain the controlled pre-merge drill and push-consumer self-tests as the only helper
-execution. This has no additional CI cost or implementation work, but it does not
-close the finding: a later pull-request commit can break the helper without any
-automatic helper test, and the expected post-merge `has_changes=false` path skips the
-Ubuntu synchronization consumer.
-
-#### Option B — Test only on Ubuntu pull requests
-
-Run the full fixture suite in the existing read-only Ubuntu pull-request job under
-PowerShell 7. Retain all push-consumer tests. This makes every revision exercise the
-helper and proves the most security-sensitive ZIP behavior on a case-sensitive
-platform, but Windows PowerShell 5.1 and Windows path semantics still lack pre-merge
-coverage.
-
-Fixture code could be inline or tracked. A tracked harness is stronger, but this
-bundle remains incomplete because its platform set is incomplete.
-
-#### Option C — Test only in the two Windows LF pull-request cells
-
-Run the suite under Windows PowerShell 5.1 and PowerShell 7 in the existing LF cells;
-retain all push-consumer tests. This proves both supported editions before merge and
-avoids coupling the helper to irrelevant CRLF generator fixtures. It does not
-automatically prove the helper's explicit Ubuntu claim.
-
-#### Option D — Inline the suite in Ubuntu and the two Windows LF cells
-
-Add the complete fixture suite to the existing Ubuntu pull-request job and to the LF
-cell for each Windows edition. Retain the in-situ suite before every push-consumer
-production invocation. Keep the fixture implementation embedded in `build.yml`.
-
-This closes the coverage gap with three pre-merge executions and no new tracked file.
-Its weakness is duplication: a long malicious-archive suite appears in multiple job
-branches and can drift between pull-request and push paths.
-
-#### Option E — Run the suite in every pull-request matrix cell
-
-Run it in Ubuntu and all four Windows edition/EOL cells, then retain all
-push-consumer tests. This is the maximal execution-count bundle. It closes the
-finding, but the helper does not consume generator-source EOL fixtures, so the two
-CRLF repetitions do not add a distinct helper behavior. Extra repetitions increase
-runtime, log volume, and the number of places a flaky environmental dependency can
-fail.
-
-The fixture code may be inline or tracked. Tracking it mitigates drift but does not
-make the redundant CRLF executions informative.
-
-#### Option F — Add a dedicated three-cell read-only helper-test matrix
-
-Create a pull-request-only job with these logical cells:
-
-- Ubuntu plus PowerShell 7;
-- Windows plus Windows PowerShell 5.1; and
-- Windows plus PowerShell 7.
-
-Run the complete fixture suite there and retain a complete in-situ suite in every
-push consumer. This produces a clear security gate and focused logs. It adds another
-job/matrix and either duplicates the suite in `build.yml` or still needs a reusable
-tracked harness. It also separates the helper test from the existing checkout and
-fixture preparation jobs, so those jobs must independently prove the exact event SHA
-and invoke the exact tracked helper.
-
-#### Option G — Use a tracked harness in existing cells and consumers
-
-Create
-`.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1` as the sole
-definition of the deterministic valid and malicious fixture suite. It must:
-
-- declare `#Requires -Version 5.1`;
-- record a script version;
-- accept or resolve the exact tracked production-helper path;
-- create all fixture state under a unique runner-temporary root;
-- invoke the production helper as a child script rather than reimplement its logic;
-- verify expected pass/fail outcomes, candidate-directory lifecycle, and known escape
-  sentinels;
-- clean all fixture state in `finally`; and
-- return nonzero on any unexpected outcome.
-
-Invoke that harness:
-
-- in the existing pull-request Ubuntu job under PowerShell 7;
-- in only the LF cell for Windows PowerShell 5.1;
-- in only the LF cell for Windows PowerShell 7; and
-- immediately before the production helper in every push consumer.
-
-This is the three-platform coverage of Option D with one auditable fixture
-definition. It adds one tracked implementation file, so P1's affected-file list,
-working-tree/staged-set checks, script-version evidence, and T1 alignment text must
-be updated.
-
-#### Option H — Use a dedicated full-suite matrix plus consumer smoke tests
-
-Run the complete tracked harness in the dedicated matrix from Option F. In push
-consumers, run only a valid-archive and wrong-digest smoke test before the production
-invocation. This reduces repeated malicious-fixture cost, but weakens P1's valuable
-in-situ guarantee that every privileged or candidate-consuming environment can reject
-every supported archive attack class. A platform-specific extraction regression
-could pass the dedicated matrix yet fail differently in a consumer after job-specific
-preparation.
-
-#### Option I — Use Pester unit tests plus an in-situ smoke or full suite
-
-Express fixtures and assertions as Pester tests. Run Pester across Ubuntu PowerShell
-7 and both Windows editions on every pull request, then either:
-
-- run a small smoke test in push consumers; or
-- run the full Pester suite in push consumers.
-
-Pester provides strong test organization and failure reporting. It introduces module
-installation, version pinning, supply-chain, cache/network, and PowerShell 5.1 module
-compatibility concerns unless Pester is vendored or already controlled by the
-repository. For one helper and a deterministic fixture suite, a self-contained
-PowerShell harness is simpler and more hermetic.
-
-#### Option J — Add a self-test switch to the production helper
-
-Give the helper a `-SelfTest` mode that constructs fixtures and recursively invokes
-its normal mode. Run it on the three claimed platforms and in push consumers. This
-keeps one file, but mixes production extraction code with test-only fixture
-construction, complicates parameter sets, and creates a risk that tests share private
-implementation paths rather than exercising the public caller contract. Security
-test code should not expand the production helper's attack surface.
-
-#### Option K — Test fork code with `pull_request_target`
-
-Run the helper suite under `pull_request_target` to gain a privileged base-repository
-context. This is unnecessary and unsafe. The suite executes pull-request-controlled
-PowerShell and archive fixtures; combining that with a trusted token or secrets is a
-well-known workflow-injection hazard. The existing `pull_request` event supplies all
-required read-only coverage and must be used.
-
-### Dominance conclusions before scoring
-
-- Options A, B, and C do not prove all claimed platforms before merge.
-- Option E adds executions without adding a new helper-input dimension.
-- Option K is security-inadmissible regardless of convenience.
-- Options D, F, and G all close the finding; their main distinction is whether the
-  suite is duplicated, isolated in another job, or owned by one tracked harness.
-- Options H and I are legitimate test-engineering alternatives but add either weaker
-  consumer assurance or dependency complexity.
-- Option J reduces file count at the cost of production/test separation.
-
-### Evaluation rubric
-
-This rubric is specific to testing a security-sensitive, cross-platform archive
-boundary. It intentionally gives only 3% to implementation churn and issue scope.
-Correct rejection behavior, platform evidence, and realistic invocation dominate.
-
-| ID | Criterion | Weight | Scoring guidance |
-| --- | --- | ---: | --- |
-| R1 | Pre-merge security regression detection | 26 | 0 means no automatic pre-merge helper execution; 3 catches common regressions on every revision; 5 runs the complete malicious suite on every materially distinct supported platform before merge. |
-| R2 | Evidence for the declared platform contract | 18 | 0 proves none of Ubuntu, Windows PowerShell 5.1, and Windows PowerShell 7; 3 proves two; 5 proves all three without treating irrelevant EOL fixtures as platform evidence. |
-| R3 | Public-contract and production-path realism | 15 | 0 tests a reimplementation; 3 invokes the helper but not in consumer-like conditions; 5 invokes the exact tracked helper through its public interface and retains in-situ checks before every production use. |
-| R4 | Hermeticity and least privilege | 12 | 0 executes untrusted code in a privileged context or depends on uncontrolled services; 3 is read-only but has avoidable external dependencies; 5 is deterministic, temporary-root-contained, dependency-free, and read-only in pull requests. |
-| R5 | Fixture consistency and long-term maintainability | 11 | 0 invites materially divergent suites; 3 is manageable with duplication; 5 has one tracked, reviewable fixture definition used everywhere. |
-| R6 | Failure localization and diagnostic quality | 7 | 0 obscures which platform or attack fixture failed; 3 supplies adequate logs; 5 identifies the exact platform, fixture, expected outcome, helper result, and containment sentinel. |
-| R7 | CI proportionality and reliability | 5 | 0 is prohibitively redundant or flaky; 3 has acceptable overhead; 5 runs once per materially distinct environment with no irrelevant repetitions. |
-| R8 | Implementation difficulty, churn, and issue-scope fit | 3 | 0 requires major unrelated infrastructure; 3 is a moderate P1 addition; 5 is a small localized edit. This deliberately low weight prevents convenience from defeating security evidence. |
-| R9 | Cross-repository alignment without coupling | 3 | 0 creates a PSStyleGuide-only architecture that cannot sensibly align; 3 is alignable with adaptation; 5 supports the same harness contract in both repositories while keeping repository-specific manifests local. |
-
-#### Scoring rules
-
-- Each raw score is an integer from 0 to 5.
-- Weighted total is the sum of `raw score / 5 × weight`.
-- R4 is a safety gate: an option scoring 0 on R4 cannot be selected even if its total
-  were otherwise competitive.
-- A selectable option should score at least 4 on R1, R2, and R3 because the finding
-  concerns a security boundary with an explicit three-platform contract.
-- Redundant CRLF executions cannot increase R2: fixture EOL is not a helper input.
-
-### Scoring table
-
-Scores for options that allow an inline or tracked implementation use the strongest
-reasonable variant stated in the option. This prevents an intentionally poor
-implementation detail from understating an architecture, while the option text still
-identifies residual drift risk.
-
-| Option | R1 | R2 | R3 | R4 | R5 | R6 | R7 | R8 | R9 | Weighted total | Gate result |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| A — unchanged | 0 | 2 | 4 | 5 | 3 | 3 | 5 | 5 | 4 | 52.4 | Fails R1/R2 |
-| B — Ubuntu PR only | 3 | 2 | 5 | 5 | 4 | 4 | 4 | 4 | 4 | 73.0 | Fails R1/R2 |
-| C — two Windows LF cells only | 4 | 3 | 5 | 5 | 4 | 4 | 4 | 4 | 4 | 81.8 | Fails R2 |
-| D — inline suite in three existing cells | 5 | 5 | 5 | 5 | 2 | 4 | 5 | 4 | 3 | 90.2 | Pass |
-| E — every PR matrix cell | 5 | 5 | 5 | 5 | 3 | 4 | 2 | 3 | 4 | 89.4 | Pass |
-| F — dedicated three-cell job, full consumer suite | 5 | 5 | 5 | 5 | 4 | 5 | 4 | 3 | 4 | 95.0 | Pass |
-| G — tracked harness in existing cells and consumers | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 3 | 5 | **98.8** | Pass |
-| H — dedicated full suite, consumer smoke tests | 5 | 5 | 3 | 5 | 5 | 5 | 5 | 2 | 4 | 91.6 | Fails R3 |
-| I — Pester plus full in-situ suite | 5 | 5 | 5 | 2 | 5 | 5 | 3 | 1 | 3 | 87.2 | Pass |
-| J — production helper self-test mode | 5 | 5 | 3 | 4 | 4 | 4 | 5 | 4 | 4 | 86.8 | Fails R3 |
-| K — `pull_request_target` | 5 | 5 | 4 | 0 | 3 | 3 | 3 | 2 | 1 | 71.6 | Disqualified by R4 |
-
-Option G leads because it combines complete pre-merge platform evidence, exact
-production-helper invocation, hermetic read-only execution, and one auditable fixture
-definition. Option F is close, but a new dedicated matrix is unnecessary when the
-existing jobs already provide all three distinct environments.
-
-### Selected resolution
-
-Select **Option G: one tracked reusable self-test harness, invoked in the three
-materially distinct pull-request environments and before every push-consumer
-production invocation**.
-
-An implementer coming in cold should make these exact P1 changes:
-
-1. Add
-   `.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1` to P1's affected
-   files and implementation scope.
-2. Require that harness to declare PowerShell 5.1 compatibility and a script version.
-   The harness, not `build.yml`, owns the complete deterministic fixture catalog.
-3. Require the harness to accept the exact production helper path and any parameters
-   needed to exercise the helper's public contract. It must invoke that file; it must
-   not copy archive-validation or extraction logic.
-4. Keep every fixture beneath one unique runner-temporary root. Include the valid
-   archive, wrong digest, missing/extra/duplicate entries, traversal, absolute or
-   drive-qualified names, directory entries, separator variants, symlink/reparse
-   attempts where constructible, compression-ratio and size limits, preexisting
-   destination, and archive mutation/lifecycle cases already required by P1.
-5. For each rejection fixture, assert the helper fails, the destination was never
-   created, and named sentinels outside the fixture root were not written. For the
-   valid fixture, assert exact extraction and returned/resolved paths.
-6. Clean the entire fixture root in `finally` and fail the harness if cleanup or any
-   expected assertion fails.
-7. In the existing Ubuntu pull-request job, invoke the harness with `pwsh` after the
-   exact event SHA and clean-checkout invariants are proved.
-8. In the Windows pull-request matrix, invoke it only when the fixture is `lf`.
-   Because the matrix already crosses edition and EOL, this executes once under
-   Windows PowerShell 5.1 and once under PowerShell 7. Do not run it in either `crlf`
-   cell.
-9. In every push consumer—the four push-matrix cells and synchronization—invoke the
-   same harness immediately before invoking the same production helper on the
-   downloaded candidate.
-10. Keep all pull-request helper tests read-only with `contents: read`. Do not use
-    `pull_request_target`, secrets, a PAT, or a GitHub App token.
-11. Update P1's affected-file list, local validation, exact working-tree/staged-set
-    checks, script-version evidence, controlled-drill evidence, pull-request evidence,
-    post-merge evidence, and acceptance criteria from three implementation files to
-    four.
-12. State that TerraformStyleGuide may adopt the same harness filename, parameter
-    interface, and placement pattern independently. Do not make P1 depend on a change
-    in that repository.
-
-This resolution preserves the strongest part of the original design—the complete
-suite running in every real consumer—while adding repeatable pre-merge proof without
-four copies of security test logic.
-
-## P1-2 — The helper cannot implement all required checks from its specified interface
-
-### Problem to solve
-
-P1 gives the helper three inputs but requires behavior that needs more context. The
-helper must prove that its download and destination paths are outside the tracked
-checkout, yet it receives no authoritative checkout root. It must also include
-artifact/run metadata in diagnostics when available without defining how that data
-arrives. Ambient current-directory and CI-environment inference would make the same
-script behave differently in local tests and production.
-
-The containment check also needs a positive trust boundary. Proving only "not under
-checkout" permits extraction into any other filesystem location. P1 already says all
-fixture and candidate state belongs beneath a unique runner-temporary root, so the
-interface can make that invariant explicit.
-
-### Option dimensions and permutations
-
-The material design axes are:
-
-1. **Checkout-root source**
-   - current directory;
-   - `git rev-parse`;
-   - `GITHUB_WORKSPACE`;
-   - a mandatory explicit parameter; or
-   - a context/configuration object.
-2. **Allowed-root policy**
-   - negative check only: outside checkout;
-   - positive check only: inside a trusted temporary root;
-   - both positive temporary-root containment and negative checkout exclusion; or
-   - caller-only validation.
-3. **Diagnostic context**
-   - read GitHub environment variables;
-   - explicit optional scalar parameters;
-   - one structured context object;
-   - make all fields mandatory; or
-   - keep artifact/run metadata entirely in caller logs.
-4. **Filesystem indirection**
-   - lexical normalized-string checks only;
-   - resolved filesystem-provider paths plus separator-boundary comparisons;
-   - canonical-link resolution where APIs permit; or
-   - fail closed on reparse/symbolic-link components beneath the trusted root.
-
-The following options represent the meaningful bundles.
-
-### Options
-
-#### Option A — Leave the interface implicit
-
-Keep the three documented parameters and let the implementer infer checkout,
-temporary-root, and diagnostics. This minimizes prose but creates multiple plausible,
-incompatible implementations. A local fixture can accidentally pass because the
-current directory happens to be the checkout, while a workflow invocation from
-another directory behaves differently.
-
-#### Option B — Discover checkout with Git and diagnostics with environment variables
-
-Have the helper run `git rev-parse --show-toplevel` and read `GITHUB_RUN_ID`,
-`GITHUB_RUN_ATTEMPT`, and caller-defined artifact variables. This avoids extra
-parameters in CI. It adds a native-command dependency to the archive boundary,
-requires the process to start inside the checkout, complicates immediate exit-code
-handling, and does not work naturally when the self-test deliberately runs from a
-temporary directory.
-
-#### Option C — Require `GITHUB_WORKSPACE` and GitHub environment variables
-
-Treat `GITHUB_WORKSPACE` as the checkout root and read run metadata from the GitHub
-environment. This is simple in GitHub-hosted jobs, but makes the helper unusable as
-specified in local tests unless callers manufacture CI environment variables. It
-also conflates an environment convention with the helper's public contract and still
-does not prove that candidate paths lie beneath the intended runner-temporary root.
-
-#### Option D — Add mandatory `CheckoutRoot`; infer diagnostics from the environment
-
-Make checkout explicit while keeping artifact/run metadata ambient. This makes
-containment testable locally and fixes the largest interface hole. Diagnostic behavior
-can still vary with stale or spoofed environment variables, and the helper knows only
-where it must not write, not where it is allowed to write.
-
-#### Option E — Add mandatory `CheckoutRoot` and optional scalar diagnostic parameters
-
-Use explicit parameters such as `CheckoutRoot`, `ArtifactId`, `RunId`, and
-`RunAttempt`. The caller passes metadata it actually owns; local tests omit optional
-fields. Resolve the checkout, download, and destination-parent paths through the
-filesystem provider and compare them with platform-appropriate ordinal semantics.
-
-This is a complete implementation of the original negative "outside checkout"
-contract, but any filesystem location outside the checkout remains eligible.
-
-#### Option F — Add explicit trusted roots and optional diagnostics
-
-Require:
-
-- `CheckoutRoot`;
-- `TrustedTemporaryRoot`;
-- `DownloadDirectory`;
-- `CandidateDirectory`; and
-- `ExpectedDigest`.
-
-Accept optional `ArtifactId`, `RunId`, and `RunAttempt` solely for diagnostic context.
-Resolve existing roots and the download directory through the filesystem provider.
-Resolve the nonexistent destination lexically only after resolving and validating its
-existing parent. Require both candidate paths to be strict descendants of the trusted
-temporary root and neither equal to nor beneath the checkout root.
-
-Reject reparse/symbolic-link components introduced between the trusted temporary root
-and either candidate location. Use separator-terminated root comparisons with
-`OrdinalIgnoreCase` on Windows and `Ordinal` on Linux. This gives the helper a positive
-write envelope as well as checkout protection and remains fully injectable in local
-tests.
-
-#### Option G — Pass one structured context object
-
-Pass a hashtable or `PSCustomObject` containing roots, digest, and diagnostics. This
-reduces parameter count and is extensible. PowerShell objects are weakly shaped across
-script boundaries: misspelled properties become runtime nulls unless the helper adds
-substantial schema validation. It also makes command-line invocation and help output
-less self-documenting than typed scalar parameters.
-
-A custom class would strengthen shape but is awkward across Windows PowerShell 5.1
-script invocation and unnecessary for eight small fields.
-
-#### Option H — Make the caller own containment and metadata
-
-Remove the helper's outside-checkout obligation. Require each workflow caller to
-validate roots and log artifact/run context before calling the three-parameter helper.
-This produces a smaller extraction API but duplicates the security boundary across
-five consumers. A caller can omit or subtly change containment checks while still
-using the nominally shared helper.
-
-#### Option I — Split containment and extraction into two production helpers
-
-Add one helper that validates/reserves paths and a second that authenticates and
-extracts the archive. This offers separation of concerns but creates a time-of-check
-to time-of-use gap and makes correct ordering a caller responsibility. Passing a
-validated token or open handle could close that gap, but that is disproportionate and
-hard to implement portably in PowerShell 5.1.
-
-#### Option J — Make every diagnostic field mandatory
-
-Require artifact ID, run ID, and run attempt in every invocation. Production logs
-become uniform, but the valid and malicious local fixtures do not naturally have
-GitHub artifact or run identities. Supplying invented identifiers weakens provenance
-and makes "available" metadata indistinguishable from synthetic test labels.
-
-#### Option K — Put roots and diagnostics in a JSON configuration file
-
-Pass one configuration-file path and parse a versioned schema. This can be strongly
-validated and archived as evidence, but adds file lifecycle, escaping, secret
-redaction, schema-version, and tamper questions to a small internal helper. It is
-appropriate for a public tool with many settings, not this repository-local boundary.
-
-### Dominance conclusions before scoring
-
-- Options A, B, and C retain ambient-state ambiguity.
-- Options D and E fix checkout-root injection; only E also gives diagnostics explicit
-  provenance.
-- Option F strictly strengthens E with the positive trusted-temporary-root invariant
-  P1 already intends.
-- Options G and K trade discoverable scalar parameters for unnecessary schema
-  machinery.
-- Options H and I fragment a boundary P1 is specifically trying to centralize.
-- Option J manufactures metadata in tests and misstates provenance.
-
-### Evaluation rubric
-
-This rubric is specific to a filesystem trust-boundary interface. It weights
-containment correctness and deterministic context far above parameter-count or scope
-churn.
-
-| ID | Criterion | Weight | Scoring guidance |
-| --- | --- | ---: | --- |
-| C1 | Containment correctness | 27 | 0 has no reliable checkout exclusion; 3 has only a lexical negative check; 5 enforces both an explicit positive trusted root and negative checkout exclusion with separator-safe comparisons. |
-| C2 | Explicitness and deterministic behavior | 17 | 0 depends on ambient process state; 3 makes the main root explicit but leaves other behavior ambient; 5 makes every security-relevant input explicit and produces the same decision locally and in CI. |
-| C3 | Resistance to path indirection and check/use mistakes | 14 | 0 delegates a racy check to callers; 3 validates resolved parents and boundaries; 5 also fails closed on introduced reparse/symbolic-link components and validates immediately before destination creation. |
-| C4 | Cross-platform and local testability | 12 | 0 is GitHub-only or edition-specific; 3 can be adapted with environment scaffolding; 5 is directly injectable under Ubuntu PowerShell 7, Windows PowerShell 5.1, Windows PowerShell 7, and local fixtures. |
-| C5 | Diagnostic provenance and usefulness | 10 | 0 omits context or invents it; 3 reads plausible ambient values; 5 receives optional caller-owned values, labels absent values clearly, and emits the validated paths/digests without ambiguity. |
-| C6 | Fail-closed ownership of the security boundary | 8 | 0 spreads required checks across callers; 3 centralizes most checks; 5 keeps digest, path envelope, manifest, lifecycle, and extraction gates in the same helper. |
-| C7 | API clarity and maintainability | 6 | 0 is opaque or schema-heavy; 3 is understandable with documentation; 5 has typed, discoverable parameters and one responsibility per input. |
-| C8 | Independent cross-repository alignment | 3 | 0 relies on repository-specific ambient state; 3 can use the same interface and semantics in P1 and T1 with only manifest differences. |
-| C9 | Implementation difficulty and churn | 3 | 0 requires disproportionate infrastructure; 3 is a moderate contract change; 5 is a minimal edit. Its low weight prevents a short parameter list from outranking containment correctness. |
-
-#### Scoring rules
-
-- Raw scores are integers from 0 to 5; weighted total is
-  `raw score / 5 × weight`.
-- C1 is a safety gate: a selectable option must score at least 4.
-- C2, C3, C4, and C6 must each score at least 3.
-- An option cannot earn C5 credit for synthetic values presented as real GitHub
-  provenance.
-- A positive allowed-root check scores higher than a negative checkout-only check
-  because it bounds all possible extraction destinations.
-
-### Scoring table
-
-| Option | C1 | C2 | C3 | C4 | C5 | C6 | C7 | C8 | C9 | Weighted total | Gate result |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| A — implicit interface | 0 | 0 | 0 | 1 | 1 | 3 | 2 | 2 | 5 | 15.8 | Fails C1/C2/C3 |
-| B — Git discovery plus environment | 2 | 1 | 2 | 2 | 3 | 4 | 3 | 2 | 4 | 44.2 | Fails C1/C2/C3/C4 |
-| C — GitHub environment contract | 2 | 1 | 2 | 1 | 3 | 4 | 3 | 2 | 4 | 41.8 | Fails C1/C2/C3/C4 |
-| D — explicit checkout, ambient diagnostics | 4 | 3 | 3 | 4 | 3 | 5 | 4 | 4 | 4 | 73.4 | Pass |
-| E — checkout plus optional diagnostics | 4 | 5 | 3 | 5 | 5 | 5 | 5 | 5 | 3 | 87.8 | Pass |
-| F — checkout and trusted root plus diagnostics | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 3 | **98.8** | Pass |
-| G — structured context object | 5 | 4 | 5 | 4 | 5 | 5 | 2 | 4 | 2 | 88.2 | Pass |
-| H — caller-owned containment | 2 | 4 | 1 | 5 | 4 | 1 | 3 | 2 | 4 | 56.0 | Fails C1/C3/C6 |
-| I — split validation/extraction helpers | 4 | 5 | 1 | 4 | 5 | 2 | 2 | 3 | 1 | 69.0 | Fails C3/C6 |
-| J — mandatory diagnostics | 4 | 5 | 3 | 2 | 1 | 5 | 4 | 4 | 3 | 70.8 | Fails C4 |
-| K — JSON configuration | 5 | 5 | 5 | 4 | 5 | 5 | 2 | 4 | 0 | 90.4 | Pass |
-
-Option F wins decisively. Option K can express the same security facts but adds a
-configuration schema and file trust problem. Option E is the best minimal contract,
-but its negative-only allowed region is weaker than P1's already intended
-runner-temporary-root discipline.
-
-### Selected resolution
-
-Select **Option F: explicit checkout and trusted-temporary roots with optional
-caller-owned diagnostic parameters**.
-
-P1 should specify this public helper interface:
-
-```powershell
-param (
-    [Parameter(Mandatory)]
-    [string]$CheckoutRoot,
-
-    [Parameter(Mandatory)]
-    [string]$TrustedTemporaryRoot,
-
-    [Parameter(Mandatory)]
-    [string]$DownloadDirectory,
-
-    [Parameter(Mandatory)]
-    [string]$CandidateDirectory,
-
-    [Parameter(Mandatory)]
-    [string]$ExpectedDigest,
-
-    [string]$ArtifactId,
-
-    [string]$RunId,
-
-    [string]$RunAttempt
-)
+```text
+sum(option score × criterion weight) / 5
 ```
 
-The names can change only if P1 and T1 use the same final names. The behavior should
-be stated unambiguously:
+The result is a percentage from 0 to 100. Criteria concerning correctness,
+security, and user/operator reliability intentionally outweigh implementation
+effort, churn, and preservation of the current draft.
 
-1. `CheckoutRoot` and `TrustedTemporaryRoot` must each resolve to exactly one existing
-   filesystem-provider directory. Require rooted native or filesystem-provider-
-   qualified absolute paths. Reject wildcards, relative paths, non-filesystem
-   providers, nonexistent roots, files, and reparse/symbolic-link roots.
-2. The trusted temporary root must be outside and must not equal the checkout root.
-3. `DownloadDirectory` must resolve to exactly one existing filesystem directory.
-   `CandidateDirectory` must not exist; its parent must resolve to exactly one existing
-   filesystem directory.
-4. The download directory and candidate directory must each be strict descendants of
-   `TrustedTemporaryRoot`. Neither may equal, contain, or be contained by the checkout
-   root.
-5. Normalize directory roots with exactly one trailing platform directory separator
-   before descendant comparison. Use ordinal case-insensitive comparison on Windows
-   and ordinal case-sensitive comparison on Linux. Do not use culture-sensitive
-   comparisons or raw string prefixes.
-6. Walk every existing component from the trusted root to the download directory and
-   candidate parent. Reject any component whose filesystem attributes identify a
-   reparse point or symbolic-link indirection. Repeat the relevant checks immediately
-   before opening the archive and immediately before creating the destination.
-7. Continue to require the archive itself to be one regular, non-reparse-point file.
-8. Treat `ArtifactId`, `RunId`, and `RunAttempt` as optional diagnostic labels supplied
-   by the caller. Never read them from ambient environment variables inside the
-   helper. Reject empty values when a parameter is explicitly supplied.
-9. Include all supplied labels plus normalized roots, archive path, expected digest,
-   actual digest when computed, and the failing validation phase in error diagnostics.
-   Represent omitted values as unavailable; never invent them.
-10. Production callers pass:
-    - the proved exact checkout path;
-    - the unique child root they created under `RUNNER_TEMP`;
-    - the download and reserved destination paths beneath that child root;
-    - preparation's propagated artifact ID and digest; and
-    - the current run ID and attempt.
-11. The tracked test harness from P1-1 creates its own unique temporary root and passes
-    explicit local labels or omits GitHub-only labels. It changes working directory
-    during at least one valid test to prove that ambient location is irrelevant.
-12. Add malicious fixtures for:
-    - a checkout root that is equal to or contains the trusted root;
-    - a download or destination outside the trusted root;
-    - a sibling-prefix path such as `repository-other`;
-    - case variants on Windows;
-    - rejected relative and non-filesystem-provider inputs, plus an accepted
-      filesystem-provider-qualified absolute input;
-    - a reparse/symlink component where the platform permits construction; and
-    - an explicitly supplied empty diagnostic label.
+The Terraform issue descriptions are considered only where a PSStyleGuide issue
+makes an explicit cross-repository alignment claim. Terraform-specific content
+is not evaluated or revised here.
 
-P1's helper section, workflow-call requirements, self-test catalog, controlled drill,
-and acceptance criteria must all state this same contract. This gives the helper all
-information it needs without Git, GitHub-specific ambient behavior, or weakly shaped
-configuration objects.
-
-## P1-3 — The modified workflow retains a Node 20 checkout action despite the active Node 24 migration
-
-### Problem to solve
-
-P1 rewrites `.github/workflows/build.yml` but leaves its
-`actions/checkout@v4` reference unstated and unpinned. The current v4.3.1 metadata
-declares Node 20. Node 20 is already end-of-life, GitHub switched the default action
-runtime toward Node 24 on 2026-06-16, and runner removal of Node 20 is scheduled for
-fall 2026. P1 also presents full-SHA pinning as an artifact-action security control
-while leaving the equally privileged checkout action on a moving major tag.
-
-### Option dimensions and permutations
-
-The material choices are:
-
-1. **Runtime**
-   - retain checkout v4/Node 20 metadata;
-   - force v4 through a runner override;
-   - use a supported Node 24 checkout major such as v5 or v6; or
-   - replace the action with hand-written Git commands.
-2. **Reference**
-   - moving major tag;
-   - moving patch tag;
-   - exact full commit SHA with release comment; or
-   - a fork or vendored copy.
-3. **Scope**
-   - only `build.yml`, which P1 already redesigns;
-   - both `build.yml` and the unrelated `markdownlint.yml`;
-   - a separate prerequisite issue; or
-   - a repository-wide action migration.
-4. **Update lifecycle**
-   - manual re-verification at implementation and periodic review;
-   - Dependabot GitHub Actions updates; or
-   - an organization policy enforcing full SHA references.
-
-Update automation and organization policy can be layered onto any full-SHA option;
-they do not replace selecting a supported immutable version now.
+## P1-1 — Action and Node-runtime modernization is stale and incomplete
 
 ### Options
 
-#### Option A — Leave `actions/checkout@v4`
+#### Option A — Keep the draft and rely only on implementation-time revalidation
 
-Make no change. This has zero implementation churn but retains a moving reference and
-Node 20 action metadata in a workflow intended to be hardened for long-term use. It
-conflicts with GitHub's runtime migration and immutable-reference guidance.
+Leave checkout v6.0.2, the “as of 2026-07-28” statement, moving
+`setup-node@v4`, Node 20, and implicit Markdown-workflow permissions in the issue.
+Expect the implementer to discover and correct all stale choices while executing
+the generic revalidation instruction.
 
-#### Option B — Force Node 24 while retaining checkout v4
+This minimizes editing now, but hands a contradictory specification to a new
+developer and makes review depend on undocumented judgment at implementation
+time.
 
-Set `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true` and retain
-`actions/checkout@v4`. This can expose runtime incompatibilities early, but it does not
-turn v4 into a supported Node 24 release and does not fix the moving major tag. It was
-a migration-testing mechanism, not a durable dependency strategy.
+#### Option B — Update only checkout
 
-#### Option C — Opt out to insecure Node 20
+Replace checkout v6.0.2 with checkout v7.0.1 at
+`3d3c42e5aac5ba805825da76410c181273ba90b1` in examples, references, and
+evidence. Leave setup-node, the installed Node toolchain, cache behavior, and
+Markdown token permissions unchanged.
 
-Set `ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true`. GitHub documents this only as a
-temporary opt-out until Node 20 is removed from runners. It extends exposure to an
-end-of-life runtime, has a fixed failure horizon, and is inadmissible for a newly
-hardened workflow.
+This makes P1's named checkout release current but leaves the more urgent
+Node 20 dependency in the same affected workflow.
 
-#### Option D — Pin checkout v4.3.1 to its full SHA
+#### Option C — Update both actions but retain the Node 20 lint toolchain
 
-Use
-`actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1`.
-This fixes supply-chain immutability but still selects action metadata that declares
-Node 20. It solves only half the finding.
+Pin checkout v7.0.1 and setup-node v7.0.0 by full SHA, but keep
+`node-version: '20'`. Add explicit `contents: read`.
 
-#### Option E — Update to a moving Node 24 major tag
+This removes moving action tags and Node 20 from the actions' embedded runtime,
+but deliberately installs an EOL toolchain for the lint commands. It treats
+action-runtime migration and user-selected runtime migration as unrelated.
 
-Use `actions/checkout@v6`. This selects the current Node 24 line and receives compatible
-updates automatically. A mutable tag can be retargeted, so it is inconsistent with
-the security standard P1 applies to artifact actions and with GitHub's strongest
-secure-use recommendation.
+#### Option D — Use Node 22 Maintenance LTS
 
-#### Option F — Update to the v6.0.2 patch tag
+Pin checkout v7.0.1 and setup-node v7.0.0, declare `contents: read`, disable
+automatic package-manager caching, and set `node-version: '22'`.
 
-Use `actions/checkout@v6.0.2`. This is easier for a human to read and is more precise
-than a major tag, but GitHub tags remain mutable. The adjacent version comment on a
-full-SHA reference provides the same readability without giving up immutability.
+Node 22 remains supported through April 2027. This is conservative for package
+compatibility, but it chooses Maintenance LTS when Node 24 is already Active LTS
+and is the runtime generation driving the GitHub Actions migration.
 
-#### Option G — Pin the current approved Node 24 release in `build.yml` only
+#### Option E — Complete the Node 24 migration inside P1
 
-As of the evaluation date, use:
+Within the already affected `markdownlint.yml`:
+
+- pin checkout v7.0.1 at
+  `3d3c42e5aac5ba805825da76410c181273ba90b1`;
+- pin setup-node v7.0.0 at
+  `820762786026740c76f36085b0efc47a31fe5020`;
+- install Node 24;
+- set `package-manager-cache: false`;
+- explicitly declare `permissions: contents: read`; and
+- validate both existing lint commands under Node 24.
+
+Update the P1 action contract, references, evidence, and narrow
+`markdownlint.yml` non-goal accordingly. Update P2's prerequisite to verify the
+result. Retain implementation-time revalidation so later security releases can
+replace these exact snapshots coherently.
+
+This is the complete same-file correction. It adds no implementation path and
+aligns action runtime, selected toolchain, supply-chain pinning, permissions, and
+handoff evidence.
+
+#### Option F — Use Node 26 Current
+
+Apply Option E but install Node 26 instead of Node 24.
+
+This maximizes recency and provides the longest theoretical support horizon, but
+Node 26 is Current rather than Active LTS on the review date. It increases the
+chance that the current Markdown dependency lock encounters ecosystem
+compatibility issues for no demonstrated functional benefit.
+
+#### Option G — Create a prerequisite runtime-modernization issue
+
+Create and complete a new issue that updates checkout, setup-node, Node,
+permissions, and caching before P1. Keep those changes out of P1, then make P1
+depend on the prerequisite.
+
+This creates a clean project-management boundary and a smaller P1 diff, but it
+delays the generator work, adds sequencing overhead, and separates P1's security
+claims from the workflow file it already changes.
+
+#### Option H — Use release tags instead of full SHAs
+
+Use `actions/checkout@v7` and `actions/setup-node@v7`, relying on GitHub-owned
+action provenance or immutable-release protections, and install Node 24.
+
+This is readable and automatically follows patch releases. It conflicts with
+P1's explicit full-SHA supply-chain policy and GitHub's secure-use guidance that
+a full commit SHA is the immutable reference available across action releases.
+
+### Evaluation rubric
+
+This finding concerns execution-platform continuity and workflow supply-chain
+security. A DevOps operator and cybersecurity reviewer need deterministic,
+supported actions; a contributor needs lint behavior that will still run; and a
+project manager needs one unambiguous handoff. Churn is relevant but deliberately
+small because all comprehensive variants modify an already affected file.
+
+| Criterion | Weight | Scoring guidance |
+| --- | ---: | --- |
+| Runner continuity | 22 | 5 eliminates Node 20 and uses a supported GitHub action runtime; 1 knowingly retains near-removal dependencies. |
+| Immutable supply-chain identity | 20 | 5 pins every touched external action to verified full SHAs; 1 retains moving references. |
+| Least privilege and cache safety | 14 | 5 explicitly limits token permissions and disables unnecessary cache writes; 1 relies on permissive defaults. |
+| Toolchain support and ecosystem stability | 14 | 5 selects the current Active LTS line; lower scores select EOL, Maintenance-only, or pre-LTS Current lines. |
+| Issue/evidence coherence | 12 | 5 updates examples, references, controlled evidence, non-goals, and P2 prerequisites together; 1 leaves contradictions. |
+| Operator and newcomer usability | 8 | 5 gives one copy-ready contract with no hidden implementation choices; 1 delegates key choices to inference. |
+| Validation quality | 6 | 5 explicitly proves both lint commands on the selected runtime; 1 provides no compatibility gate. |
+| Scope/churn efficiency | 4 | 5 resolves the finding in the existing affected path with little sequencing overhead; 1 creates broad or duplicative work. |
+
+Each option receives a 1–5 score per criterion. The weighted result emphasizes
+whether CI will execute securely and predictably, not how few issue lines must be
+edited.
+
+### Scoring results
+
+Abbreviations: RC = runner continuity; SI = supply-chain identity;
+LP = least privilege/cache safety; TS = toolchain stability;
+IC = issue coherence; OU = operator usability; VQ = validation quality;
+SC = scope/churn efficiency.
+
+| Option | RC | SI | LP | TS | IC | OU | VQ | SC | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Rely on revalidation | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 5 | 23.2 |
+| B — Checkout only | 2 | 2 | 1 | 1 | 2 | 2 | 2 | 4 | 36.0 |
+| C — Actions only, Node 20 tool | 3 | 5 | 4 | 1 | 4 | 3 | 3 | 4 | 68.4 |
+| D — Full update, Node 22 | 5 | 5 | 5 | 4 | 5 | 4 | 5 | 4 | 94.8 |
+| E — Full update, Node 24 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | **100.0** |
+| F — Full update, Node 26 | 5 | 5 | 5 | 3 | 5 | 4 | 4 | 4 | 90.8 |
+| G — Separate prerequisite | 5 | 5 | 5 | 5 | 4 | 3 | 5 | 2 | 92.0 |
+| H — Moving v7 tags | 5 | 2 | 5 | 5 | 3 | 5 | 4 | 5 | 82.0 |
+
+Option E wins because it is the only choice that resolves the embedded action
+runtime, selected lint runtime, immutable identity, permissions, cache behavior,
+evidence, and downstream prerequisite as one coherent contract. Option D is a
+credible fallback if Node 24 compatibility testing uncovers a concrete package
+defect, but no such defect is presently known.
+
+### Selected resolution
+
+Select Option E.
+
+Revise P1 so its action section uses the following reviewed snapshots, subject
+to the existing final implementation-time recheck:
 
 ```yaml
-uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 ```
 
-Immediately before implementation, verify the SHA in the official checkout
-repository, confirm the release comment, inspect `action.yml` for `node24`, and check
-for a required newer security release. Apply the verified replacement only to
-`build.yml`, which P1 already changes.
+```yaml
+uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+with:
+  node-version: '24'
+  package-manager-cache: false
+```
 
-State explicitly that the remaining checkout v4 reference in `markdownlint.yml`
-requires a separate near-term maintenance issue. This keeps P1 cohesive while
-eliminating the risk from the workflow P1 is delivering.
+Keep:
 
-#### Option H — Pin the current Node 24 release in both workflows
+```yaml
+uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+```
 
-Replace checkout in both `build.yml` and `markdownlint.yml` with the verified v6
-full SHA. This gives repository-wide checkout consistency and avoids leaving one
-workflow near the Node 20 removal horizon. It expands P1 into a second workflow whose
-behavior and validation are unrelated to deterministic artifact generation.
+and:
 
-This is technically sound if the maintainer explicitly accepts the scope expansion.
-It also requires adding `markdownlint.yml` to affected paths, exact staging checks,
-validation evidence, and non-goals.
+```yaml
+uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+```
 
-#### Option I — Create a checkout-modernization prerequisite
+In `markdownlint.yml`, explicitly set:
 
-File and merge a separate issue that updates and pins both workflows, then make P1
-depend on it. This preserves single-purpose issues and gives checkout migration its
-own evidence. It delays the more important deterministic-generation fix and adds
-coordination overhead for a one-line dependency change in `build.yml`.
+```yaml
+permissions:
+  contents: read
+```
 
-#### Option J — Replace checkout with hand-written Git commands
+The Markdown job must run its existing `npm ci`, outer Markdown lint, and nested
+Markdown lint commands on Node 24. No package or lockfile update belongs to this
+finding.
 
-Initialize and fetch the exact event SHA using Git directly. This removes the
-JavaScript runtime dependency and can be fully explicit. It transfers credential
-handling, safe-directory behavior, shallow-fetch semantics, cleanup, submodule/LFS
-defaults, and untrusted-ref protections from a maintained official action into custom
-workflow code. It is a larger and riskier security surface.
+Replace every checkout-v6-specific statement with checkout-v7 wording, while
+retaining the controlled proof that persisted credentials permit the exact
+authenticated push. Expand P1's implementation-time action check to cover
+setup-node as well as checkout/upload/download. The check must:
 
-#### Option K — Vendor or fork checkout
+1. resolve every selected release tag in the official action repository;
+2. match the adjacent version comment;
+3. inspect exact `action.yml` runtime metadata;
+4. check for a newer required security release; and
+5. update the SHA, comment, references, and evidence together if the selected
+   release changes.
 
-Copy checkout code locally or maintain a fork pinned by repository path/SHA. This
-provides maximum code ownership but creates an ongoing responsibility to track
-upstream security patches and rebuild bundled JavaScript. The repository has no need
-for checkout customization that would justify that burden.
+Change P1's `markdownlint.yml` scope statement so the allowed changes are:
 
-#### Option L — Use an untagged latest checkout commit
+- checkout reference;
+- setup-node reference;
+- `node-version`;
+- `package-manager-cache`; and
+- explicit read-only permissions.
 
-Pin the newest commit on checkout's default branch rather than a reviewed release.
-The reference is immutable, but release provenance, compatibility expectations, and
-human-readable change boundaries are weaker. P1 should use a verified released
-commit unless a documented security fix exists only after the latest release.
+Do not change the file's lint commands or error-handling topology unless Node 24
+compatibility testing proves that a further change is necessary.
 
-#### Option M — Add Dependabot or an organization SHA policy as part of P1
+Finally, add P2 prerequisite checks confirming that the Markdown workflow uses
+the approved checkout and setup-node full SHAs, Node 24, disabled automatic
+package caching, explicit `contents: read`, and passing outer/nested lint.
 
-Pin v6 by full SHA and also add Dependabot GitHub Actions updates or a repository/
-organization full-SHA enforcement policy. These are strong lifecycle controls, but
-they are separate governance changes. Dependabot configuration adds another affected
-file and review stream; organization policy may not be repository-controlled. Either
-is a good follow-up, not a substitute for Option G or H.
-
-### Dominance conclusions before scoring
-
-- Options A through D retain Node 20 metadata or a temporary override.
-- Options E and F fix the runtime but not immutability.
-- Options J through L increase maintenance or weaken release provenance without a
-  compensating requirement.
-- Options G and H are the strongest direct fixes. Their difference is focused P1
-  scope versus immediate repository-wide consistency.
-- Option I is clean project management but adds a dependency for a localized change.
-- Option M is additive governance and should be assessed separately from the runtime
-  and pin selected in this finding.
-
-### Evaluation rubric
-
-This rubric is specific to a workflow dependency facing both runtime retirement and
-supply-chain mutability. Scope adherence receives only 3%; supported operation and
-immutability receive 46%.
-
-| ID | Criterion | Weight | Scoring guidance |
-| --- | --- | ---: | --- |
-| N1 | Runtime support and continuity | 24 | 0 remains dependent on removable Node 20 behavior; 3 is a transitional workaround; 5 uses a current released Node 24 action with no insecure override. |
-| N2 | Supply-chain immutability | 22 | 0 uses a moving major reference; 2 uses a patch tag; 5 pins a verified full SHA from the official repository. |
-| N3 | Checkout security and behavioral compatibility | 14 | 0 reimplements checkout unsafely; 3 probably preserves basic checkout; 5 uses the maintained official release and validates the exact event-SHA/credential behavior P1 needs. |
-| N4 | Release provenance and auditability | 12 | 0 has no reviewable provenance; 3 names a release but permits drift; 5 binds exact SHA, version comment, official release, action metadata, and implementation-time reverification. |
-| N5 | Coverage of the repository's known runtime risk | 10 | 0 leaves both known v4 uses; 3 fixes only P1's modified workflow and explicitly tracks the other; 5 fixes both current workflow occurrences. |
-| N6 | Sustainable update lifecycle | 7 | 0 creates an unsupported fork; 3 relies on occasional manual review; 5 supports clear same-line version metadata and a practical update mechanism. |
-| N7 | Delivery sequencing and independence | 4 | 0 blocks P1 on broad governance; 3 adds coordination; 5 resolves the dependency directly in the existing implementation path. |
-| N8 | Implementation difficulty, churn, and original-scope fit | 3 | 0 replaces checkout or adds major infrastructure; 3 touches one adjacent workflow; 5 is a one-line change in `build.yml`. |
-| N9 | Maintainer and contributor usability | 4 | 0 creates confusing overrides or failures; 3 is understandable with caveats; 5 has an ordinary official action, readable version comment, and no special runner setup. |
-
-#### Scoring rules
-
-- Raw scores are integers from 0 to 5; weighted total is
-  `raw score / 5 × weight`.
-- N1 and N2 are gates: each must score at least 4.
-- A temporary runner environment override cannot score above 3 on N1.
-- A tag cannot score above 2 on N2, even when the publisher is trusted.
-- N5 rewards resolving both known occurrences, but its 10% weight is not permission
-  for an unrelated repository-wide dependency migration.
-
-### Scoring table
-
-| Option | N1 | N2 | N3 | N4 | N5 | N6 | N7 | N8 | N9 | Weighted total | Gate result |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| A — unchanged v4 major | 0 | 0 | 3 | 1 | 0 | 2 | 5 | 5 | 2 | 22.2 | Fails N1/N2 |
-| B — force Node 24 on v4 | 2 | 0 | 2 | 2 | 1 | 1 | 4 | 4 | 2 | 30.6 | Fails N1/N2 |
-| C — insecure Node 20 opt-out | 0 | 0 | 1 | 1 | 0 | 0 | 3 | 4 | 0 | 10.0 | Fails N1/N2 |
-| D — v4.3.1 full SHA | 1 | 5 | 4 | 5 | 1 | 3 | 4 | 5 | 3 | 64.8 | Fails N1 |
-| E — moving v6 major | 5 | 1 | 5 | 3 | 3 | 4 | 5 | 5 | 5 | 72.2 | Fails N2 |
-| F — v6.0.2 tag | 5 | 2 | 5 | 4 | 3 | 3 | 5 | 5 | 5 | 77.6 | Fails N2 |
-| G — v6 full SHA in `build.yml` | 5 | 5 | 5 | 5 | 3 | 4 | 5 | 5 | 5 | 94.6 | Pass |
-| H — v6 full SHA in both workflows | 5 | 5 | 5 | 5 | 5 | 4 | 4 | 3 | 5 | **96.6** | Pass |
-| I — separate prerequisite | 5 | 5 | 5 | 5 | 5 | 4 | 2 | 2 | 4 | 93.6 | Pass |
-| J — hand-written Git checkout | 5 | 5 | 2 | 3 | 3 | 1 | 2 | 0 | 1 | 68.6 | Pass, but weak N3 |
-| K — vendor or fork checkout | 5 | 5 | 3 | 3 | 3 | 0 | 1 | 0 | 2 | 70.0 | Pass, but weak N6 |
-| L — untagged latest full SHA | 5 | 5 | 3 | 1 | 3 | 2 | 4 | 5 | 2 | 73.4 | Pass, but weak N4 |
-| M — both pins plus new update governance | 5 | 5 | 5 | 5 | 5 | 5 | 3 | 1 | 3 | 94.4 | Pass |
-
-Option H narrowly outranks focused Option G because it removes the known runtime risk
-from both workflows without introducing a new dependency manager or custom checkout
-code. The 2-point difference represents repository continuity, not a general license
-to migrate every action in P1.
-
-### Selected resolution
-
-Select **Option H: replace both current checkout v4 references with the same verified
-Node 24 release pinned by full SHA**.
-
-An implementer should do the following:
-
-1. Add `.github/workflows/markdownlint.yml` to P1's affected-file list. The only
-   intended change in that file is the checkout reference unless implementation
-   testing proves a necessary compatibility adjustment.
-2. In both `build.yml` and `markdownlint.yml`, replace every
-   `actions/checkout@v4` occurrence with:
-
-   ```yaml
-   actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-   ```
-
-3. Immediately before implementation, resolve the intended tag from the official
-   `actions/checkout` repository, confirm the full SHA and same-line release comment,
-   inspect exact-commit `action.yml` for `runs.using: node24`, review the release and
-   security notices, and prefer a required newer security release if one exists.
-4. Do not use the v6 major tag, v6.0.2 patch tag, an untagged default-branch commit,
-   or a fork.
-5. Preserve each workflow's current checkout inputs and permissions unless P1's
-   architecture independently requires a change. Explicitly prove the exact event
-   SHA after checkout as P1 already requires.
-6. Account for checkout v6's credential-storage change: credentials are stored under
-   `RUNNER_TEMP` instead of `.git/config`, but the official v6.0.2 documentation says
-   ordinary authenticated Git commands continue to work. Confirm the final
-   synchronization job's explicit `git push` succeeds in the controlled write drill.
-7. Record that neither workflow invokes authenticated Git from a Docker container
-   action, so the v6 README's container-action runner-version caveat is not exercised.
-8. Run both workflow paths:
-   - the Markdown lint workflow must still check out and complete its existing lint
-     commands; and
-   - P1's pull-request, push, controlled-write, and exact-lease drills must prove
-     checkout and authenticated push behavior.
-9. Update P1's exact local working-tree/staged set to the generator, production
-   helper, test harness, `build.yml`, and `markdownlint.yml`: five implementation
-   files after the P1-1 and P1-3 selections.
-10. Add exact checkout commit metadata, README, v6.0.2 release, GitHub Node 20
-    deprecation notice, and GitHub secure-use guidance to References.
-11. Retain the non-goal against a broad action-pinning migration. P1 is making one
-    targeted checkout runtime/immutability correction across the only two current
-    occurrences; it is not changing unrelated action versions or adding Dependabot/
-    policy configuration.
-
-This selection gives the whole repository a supported checkout runtime while keeping
-the change bounded, reviewable, and consistent with P1's immutable artifact-action
-pins.
-
-## P1-4 — P1 currently fails the repository's own Markdown lint
-
-### Problem to solve
-
-In P1's "Candidate archive download, self-test, validation, and extraction" sequence,
-the YAML fence after item 4 is unindented. CommonMark therefore parses it outside the
-list, and markdownlint treats items 5 and 6 as a new ordered list that incorrectly
-starts at 5. The source fails MD029 and the rendered structure no longer reliably
-communicates that the action invocation belongs to step 4.
+## P1-2 — The helper does not bind the digest to the archive it consumes
 
 ### Options
 
-#### Option A — Leave the Markdown unchanged
+#### Option A — Retain hash-by-path followed by open-by-path
 
-Accept the two lint failures. This preserves bytes but leaves ambiguous rendering and
-forces reviewers to distinguish intentional errors from future lint regressions.
+Keep `Get-FileHash -LiteralPath`, close its internal file handle, and later open
+the same pathname as a ZIP. Depend on the trusted runner and repeated path
+containment/reparse checks to make replacement unlikely.
 
-#### Option B — Restart the second list at 1 and 2
+This is straightforward but does not prove that the hashed bytes are the bytes
+parsed.
 
-Change items 5 and 6 to 1 and 2 while leaving the fence unindented. This satisfies
-MD029 as two lists, but changes the procedure into two disconnected sequences. A
-reader coming in cold can no longer refer unambiguously to steps 5 and 6.
+#### Option B — Hash the path twice
 
-#### Option C — Indent the YAML fence as continuation content of item 4
+Hash the pathname before archive opening and again immediately after manifest
+validation. Require both digests to match.
 
-Indent the opening fence, every YAML line, and the closing fence by three spaces—the
-content indentation for the `4.` marker. Keep subsequent markers 5 and 6. This makes
-the action example structurally part of step 4, preserves the six-step procedure, and
-matches the repair documented by markdownlint.
+This detects some changes but still leaves separate opens. The archive can be
+replaced between either hash and the `ZipArchive` open, and a replace-then-restore
+sequence can evade the two snapshots.
 
-#### Option D — Convert every marker to `1.` and indent the fence
+#### Option C — Hold one file stream for hashing and ZIP processing
 
-Indent the fence as in Option C and write every ordered marker as `1.`. Markdown
-renderers auto-number the six items, and edits do not require manual renumbering.
-However, the raw issue is itself an implementation handoff with repeated references
-to numbered steps; explicit source numbers make cold review and discussion easier.
+After all path/type checks, open the retained archive once as a read-only,
+seekable `FileStream`. Compute SHA-256 through `Get-FileHash -InputStream`,
+compare the digest, rewind the same stream, and construct `ZipArchive` over it.
+Keep the stream and archive alive through manifest validation and extraction,
+then dispose both deterministically.
 
-#### Option E — Move the YAML fence before or after the ordered procedure
+This directly binds the digest to the consumed bytes without buffering the full
+artifact.
 
-Introduce the action example before the list, then make item 4 refer back to it, or
-place it after all six items. This avoids nested Markdown. It weakens locality between
-the download instruction and the exact action configuration and makes accidental
-separation during later edits more likely.
+#### Option D — Buffer the entire ZIP in memory
 
-#### Option F — Replace the ordered list with bullets
+Read the retained archive into one byte array or `MemoryStream`, hash those
+bytes, and construct `ZipArchive` over the same in-memory content.
 
-Use six unordered bullets. Lint passes and fence nesting is straightforward, but the
-order is security-significant: download must precede self-test and production helper
-invocation. Bullets understate that sequencing contract.
+This has strong identity semantics and makes path replacement irrelevant after
+the read. It duplicates the complete archive in memory and creates avoidable
+memory-exhaustion risk if artifact size grows or a compromised producer emits a
+large archive.
 
-#### Option G — Split the sequence into subheadings
+#### Option E — Copy-and-hash into a new trusted file
 
-Give download, self-test, and production invocation their own headings or paragraphs.
-This can be very clear but expands a compact six-step contract and makes it harder to
-compare against similar consumer sequences elsewhere in P1/T1.
+Open the downloaded file for reading, create a new file under the trusted root
+with `FileMode.CreateNew`, copy while hashing, then parse only the newly created
+copy.
 
-#### Option H — Disable MD029 around the block
+This can bind the copied bytes to a digest and isolate the parser from the
+download pathname. It adds another lifecycle, cleanup rules, file identity,
+partial-copy behavior, and storage cost. It also needs a second same-handle rule
+or a post-copy reopen can recreate the original gap.
 
-Add markdownlint disable/enable comments. This suppresses the symptom but does not
-repair the CommonMark structure. Tool suppression is inappropriate when the linter
-has correctly identified a broken list.
+#### Option F — Reopen and compare platform file identities
 
-#### Option I — Change repository MD029 configuration
+Hash by path, reopen by path, then compare Windows file IDs or POSIX
+device/inode metadata between handles before parsing.
 
-Disable MD029 or select a permissive numbering style. The unindented fence would still
-terminate the list. A repository-wide rule change for one malformed issue draft is
-disproportionate and would reduce future defect detection.
+This can detect replacement without holding a single handle, but requires
+platform-specific interop not naturally shared by Windows PowerShell 5.1 and
+PowerShell 7 on Linux. File identity equality also does not remove all mutation
+concerns for a writable file.
 
-#### Option J — Use raw HTML for the list or code block
+#### Option G — Remove the helper digest and trust the download action
 
-An HTML `<ol>`/`<li>` or `<pre><code>` structure can force exact rendering. It is
-harder to read and copy in source, bypasses normal Markdown tooling, and complicates
-the nested YAML example.
+Rely only on pinned download-artifact native digest validation and remove the
+helper's independent SHA-256 comparison.
 
-### Dominance conclusions before scoring
+This reduces code, but abandons the explicit propagated producer-digest check
+and the intended defense-in-depth provenance chain.
 
-- Options A, H, and I hide rather than repair the structural error.
-- Options B, E, F, and G can lint cleanly but weaken either sequence continuity or
-  example locality.
-- Option J replaces a standard Markdown construct with less maintainable HTML.
-- Options C and D are fully correct. C preserves the issue's explicit step numbers;
-  D optimizes future renumbering.
+#### Option H — Stream through a hashing tee into the parser
+
+Create a custom stream wrapper that hashes bytes as `ZipArchive` reads them,
+then compare the final digest.
+
+This appears single-pass, but ZIP readers seek and do not necessarily read every
+byte once in order. A correct random-access hashing wrapper would need extensive
+state or full buffering and would delay digest failure until after archive
+parsing, contrary to P1's required failure order.
 
 ### Evaluation rubric
 
-This rubric evaluates a procedural Markdown structure, not production code. Correct
-rendered sequence and local association of the security-sensitive YAML example carry
-the most weight. Scope and churn together receive 4%.
+This rubric emphasizes cryptographic provenance, compatibility, and bounded
+resource use. A cybersecurity reviewer needs the digest to identify the exact
+parser input; an operations engineer needs predictable memory and cleanup; a new
+maintainer needs a contract that can be audited without platform interop.
 
-| ID | Criterion | Weight | Scoring guidance |
-| --- | --- | ---: | --- |
-| M1 | Semantic preservation of the ordered security procedure | 30 | 0 destroys ordering; 3 preserves most meaning with structural separation; 5 renders one six-step sequence in the intended order. |
-| M2 | Conformance with the repository's configured Markdown lint | 20 | 0 retains errors; 3 suppresses or works around the rule; 5 passes without disabling a valid rule. |
-| M3 | Local association and copyability of the YAML example | 15 | 0 detaches or corrupts the example; 3 leaves a cross-reference; 5 makes the exact YAML visibly part of download step 4 while preserving copied bytes. |
-| M4 | Clarity for a cold implementer | 12 | 0 is misleading; 3 is understandable after rereading; 5 makes all six steps and the role of the nested example immediately clear in source and rendering. |
-| M5 | CommonMark/GitHub rendering portability | 8 | 0 depends on parser quirks; 3 relies on HTML or extensions; 5 follows the CommonMark list-content rule. |
-| M6 | Maintainability under later edits | 7 | 0 is brittle or suppressed; 3 is acceptable; 5 uses ordinary Markdown with an obvious nesting relationship. |
-| M7 | Stable step references in review and evidence | 4 | 0 removes identifiable steps; 3 auto-numbers them only when rendered; 5 preserves explicit source numbers 1 through 6. |
-| M8 | Amount of editing churn | 2 | 0 rewrites the section; 3 changes several lines; 5 adds only the required indentation. |
-| M9 | Adherence to issue scope | 2 | 0 changes repository lint policy; 3 restructures the issue; 5 repairs only the malformed block. |
+| Criterion | Weight | Scoring guidance |
+| --- | ---: | --- |
+| Exact hashed/parsed byte identity | 30 | 5 makes the parser consume the exact held bytes that were hashed; 1 leaves independent path opens. |
+| PowerShell 5.1/7 and Windows/Linux parity | 18 | 5 uses APIs present across the full support matrix; 1 depends on platform-specific interop. |
+| Bounded memory and storage | 15 | 5 streams with constant auxiliary storage; 1 buffers an unbounded complete artifact. |
+| Race and lifecycle simplicity | 12 | 5 removes pathname races with one obvious lifetime; 1 adds multiple reopen/copy windows. |
+| Fail-before-parse semantics | 10 | 5 compares the digest before constructing/reading the archive; 1 discovers mismatch after parsing. |
+| Testability and review clarity | 8 | 5 has direct assertions and a short auditable control flow; 1 requires timing races or opaque interop. |
+| Deterministic disposal/cleanup | 5 | 5 has one clear nested-disposal contract; 1 adds partial resources and cleanup ambiguity. |
+| Implementation churn | 2 | 5 is a small compatible correction; 1 requires a substantial new subsystem. |
 
-#### Scoring rules
+The identity criterion alone carries almost one third of the decision because it
+is the property the current contract claims but does not prove. Churn cannot
+outweigh a broken provenance assertion.
 
-- Raw scores are integers from 0 to 5; weighted total is
-  `raw score / 5 × weight`.
-- M1 and M2 must each score at least 4 for selection.
-- A lint-disable comment cannot receive full M2 credit when the underlying structure
-  remains malformed.
-- Source readability matters because the Markdown itself is the handoff artifact.
+### Scoring results
 
-### Scoring table
+Abbreviations: BI = byte identity; CP = compatibility/parity;
+BR = bounded resources; RL = race/lifecycle simplicity;
+FP = fail-before-parse; TR = test/review clarity; DC = disposal/cleanup;
+CH = churn.
 
-| Option | M1 | M2 | M3 | M4 | M5 | M6 | M7 | M8 | M9 | Weighted total | Gate result |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| A — unchanged | 1 | 0 | 2 | 2 | 2 | 2 | 2 | 5 | 5 | 28.4 | Fails M1/M2 |
-| B — restart at 1 and 2 | 2 | 5 | 3 | 2 | 5 | 4 | 1 | 5 | 5 | 64.2 | Fails M1 |
-| C — indent fence under item 4 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | **100.0** | Pass |
-| D — all `1.` plus indentation | 5 | 5 | 5 | 4 | 5 | 5 | 3 | 4 | 5 | 95.6 | Pass |
-| E — move the example | 4 | 5 | 3 | 3 | 5 | 3 | 3 | 3 | 4 | 77.6 | Pass |
-| F — unordered bullets | 2 | 5 | 4 | 3 | 5 | 5 | 2 | 4 | 4 | 71.0 | Fails M1 |
-| G — subheadings | 5 | 5 | 4 | 5 | 5 | 3 | 4 | 2 | 3 | 91.4 | Pass |
-| H — MD029 suppression | 1 | 3 | 2 | 2 | 2 | 1 | 2 | 3 | 2 | 37.0 | Fails M1/M2 |
-| I — repository rule change | 1 | 5 | 2 | 2 | 2 | 1 | 2 | 0 | 0 | 43.0 | Fails M1 |
-| J — raw HTML | 5 | 5 | 4 | 3 | 3 | 1 | 4 | 1 | 3 | 80.2 | Pass |
+| Option | BI | CP | BR | RL | FP | TR | DC | CH | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Path hash/open | 1 | 5 | 5 | 1 | 4 | 2 | 5 | 5 | 59.6 |
+| B — Hash path twice | 2 | 5 | 5 | 2 | 4 | 2 | 5 | 4 | 67.6 |
+| C — One held stream | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 4 | **99.6** |
+| D — Full memory buffer | 5 | 5 | 1 | 4 | 5 | 4 | 4 | 3 | 82.2 |
+| E — Copy-and-hash | 5 | 5 | 4 | 3 | 5 | 3 | 2 | 2 | 84.8 |
+| F — Platform file IDs | 4 | 1 | 5 | 2 | 4 | 1 | 3 | 1 | 60.4 |
+| G — Native digest only | 2 | 5 | 5 | 3 | 4 | 3 | 5 | 5 | 72.0 |
+| H — Hashing tee | 3 | 3 | 3 | 2 | 1 | 1 | 3 | 1 | 49.6 |
 
-Option C is a complete repair with no tradeoff: it expresses the intended parse tree,
-passes the existing rule, retains explicit step numbers, and changes only indentation.
+Option C dominates because the existing cross-edition APIs already express the
+required invariant directly. Options D and E also bind bytes, but pay substantial
+resource or lifecycle costs without improving the security result.
 
 ### Selected resolution
 
-Select **Option C: indent the YAML fence as continuation content of item 4**.
+Select Option C.
 
-The exact repair is:
+Revise P1's expected-digest and extraction contracts so the production helper
+uses this exact order:
 
-1. Keep ordered markers 1 through 6 unchanged.
-2. Under item 4, prefix the opening ```` ```yaml ```` line, every YAML content line,
-   and the closing fence with exactly three spaces. A blank line may remain empty.
-3. Do not add three spaces to the YAML content *inside* the logical code block; the
-   Markdown parser removes the list continuation indentation, so copied YAML remains
-   unchanged.
-4. Do not renumber items 5 and 6, move the example, add HTML, disable MD029, or change
-   `.markdownlint.jsonc`.
-5. Run the repository's configured `markdownlint-cli2` against P1 and run the nested
-   Markdown linter.
-6. Parse or render the section and confirm it contains one ordered list with six
-   items, with the YAML fence inside the fourth list item.
+1. Resolve and validate all roots, path components, download-directory entries,
+   and archive file type.
+2. Repeat containment and indirection checks immediately before file opening.
+3. Open the retained archive exactly once with:
+   - `FileMode.Open`;
+   - `FileAccess.Read`; and
+   - an explicitly selected sharing mode.
+4. Pass that `FileStream` to `Get-FileHash -InputStream -Algorithm SHA256`.
+5. Validate that one hash object and one 64-hex digest were returned.
+6. Compare actual and expected digests with ordinal case-insensitive equality.
+7. On mismatch, fail before `ZipArchive` construction and before candidate-leaf
+   creation.
+8. Set the same stream's `Position` back to zero.
+9. Construct one read-mode `ZipArchive` over that same stream.
+10. Use that same archive instance for the complete manifest validation and all
+    permitted entry-stream copies.
+11. Dispose entry streams, the archive, and the underlying file stream in a
+    deterministic nested `try`/`finally` structure.
 
-CommonMark's rule for a `4.` marker requires three spaces for subsequent block
-content, and markdownlint's own MD029 documentation gives this same repair for an
-improperly unindented fenced block.
+The helper must not call a path-based ZIP opener after the digest check. The
+archive path remains useful diagnostic context, but the held stream is the
+security identity.
 
-## P2-1 — P2 requires a rationale changelog that PSStyleGuide does not have
+Update diagnostics and the harness contract:
 
-### Problem to solve
+- Digest mismatch must report expected/actual digest and fail before archive
+  construction.
+- Invalid-ZIP failure must occur only after a matching digest, when the same
+  held stream is interpreted as a ZIP.
+- A successful fixture must prove the helper did not require a second archive
+  pathname open. Static inspection is acceptable for this implementation
+  property; a nondeterministic race test is not required.
+- Run the same-stream implementation under Windows PowerShell 5.1,
+  PowerShell 7 on Windows, and PowerShell 7 on Ubuntu through the existing
+  harness topology.
 
-P2 requires a "matching top rationale changelog row" and agreement among Version,
-Last Updated, and changelog metadata. PSStyleGuide has no rationale changelog,
-version-history section, row schema, or source-document rule defining one. An
-implementer cannot tell where the row belongs, what columns it needs, or whether older
-history must be reconstructed.
+Use the same contract wording in the shared P1/T1 alignment statement, while
+leaving the Terraform issue itself outside this revision.
 
-### Option dimensions and permutations
-
-The material choices are:
-
-1. **History location**
-   - no in-document changelog;
-   - a new section in `STYLE_GUIDE_RATIONALE.md`;
-   - a new section in `STYLE_GUIDE.md`;
-   - a separate `CHANGELOG.md`;
-   - GitHub releases/issues/commits; or
-   - machine-readable frontmatter.
-2. **History depth**
-   - current P2 entry only;
-   - reconstruct all prior versions;
-   - begin prospectively with an explicit policy; or
-   - link to Git history rather than duplicate it.
-3. **P2 treatment**
-   - remove the unsupported requirement;
-   - define the convention completely inside P2;
-   - make a separate prerequisite; or
-   - replace "changelog row" with ordinary rationale prose.
+## P1-3 — Exact directory contracts and candidate-leaf absence are underspecified
 
 ### Options
 
-#### Option A — Leave the changelog wording as written
+#### Option A — Leave implementation choice implicit
 
-Let the implementer invent a location and format. This is the lowest-edit choice but
-creates non-repeatable outcomes and can introduce a repository policy accidentally.
+Keep “exactly one entry,” “exactly four paths,” and “candidate must not exist”
+without naming an enumeration primitive or final-leaf algorithm.
 
-#### Option B — Remove every changelog requirement from P2
+An experienced implementer might choose safe APIs, but the issue's acceptance
+criteria and harness cannot distinguish exhaustive enumeration from
+`Get-ChildItem` without `-Force` or a dangling-link-blind existence check.
 
-Delete the instruction to add a top rationale changelog row and remove changelog
-agreement from content confirmation and acceptance criteria. Continue to update
-Version and Last Updated in `STYLE_GUIDE.md`, extend the existing rationale section,
-regenerate all outputs, and rely on Git/GitHub history for change provenance.
+#### Option B — Standardize on `Get-ChildItem -LiteralPath -Force`
 
-This matches current PSStyleGuide information architecture and keeps P2 focused on the
-blank-line example.
+Use the filesystem provider's `Get-ChildItem -LiteralPath -Force` for every
+directory count/set and parent-leaf check.
 
-#### Option C — Add a prospective changelog section to the rationale
+This includes hidden/system entries and is familiar to PowerShell developers.
+It retains provider-layer behavior, output/error semantics, and edition
+differences in the normative security primitive.
 
-Define a new `## Change history` section, exact placement, table columns, newest-first
-ordering, UTC date/version conventions, first P2 row, future maintenance rules, and
-table-of-contents handling. State explicitly that history begins with P2 and that
-older entries are not reconstructed.
+#### Option C — Use `Directory.EnumerateFileSystemEntries`
 
-This can be coherent, but it establishes permanent documentation governance while
-fixing one example.
+Resolve every path through the filesystem provider, then materialize
+`[System.IO.Directory]::EnumerateFileSystemEntries()` for:
 
-#### Option D — Reconstruct a complete rationale changelog
+- the download-directory exact count;
+- the candidate-parent leaf-name check;
+- the extracted candidate exact set; and
+- any other security-sensitive count/set assertion.
 
-Use Git history and versions to backfill prior entries, then add P2 at the top. This
-would give readers rich history but requires historical interpretation, may be
-incomplete, and turns P2 into a research/migration project. It risks asserting
-unsupported summaries for older releases.
+Use platform-appropriate ordinal leaf comparison, then inspect the matched
+entry's attributes/type without following it. Repeat candidate-parent
+enumeration immediately before creating the leaf. Reserve `Get-ChildItem
+-LiteralPath -Force` for human-readable diagnostics.
 
-#### Option E — Add history to `STYLE_GUIDE.md`
+This separates exhaustive identity enumeration from diagnostic presentation.
 
-Place a changelog table in the main operational guide near Version and Last Updated.
-It makes version history visible, but increases the size of every generated artifact
-and conflicts with the slate's goal of keeping the main guide concise and operational.
+#### Option D — Use `DirectoryInfo.GetFileSystemInfos`
 
-#### Option F — Create a separate `CHANGELOG.md`
+Construct a validated `DirectoryInfo` and call `GetFileSystemInfos()` for each
+exact set. Compare `Name` properties and inspect typed entries/attributes.
 
-Introduce a conventional repository-level changelog with a documented schema and P2
-entry. This avoids enlarging the guide, but adds another authoritative document and
-requires decisions about historical backfill, generated-artifact inclusion, release
-workflow, and future ownership. It belongs in a dedicated governance issue.
+This is also exhaustive and provides convenient metadata. It eagerly constructs
+objects for every entry and couples identity and potentially stale metadata in
+one snapshot. It remains a strong alternative if implemented carefully.
 
-#### Option G — Use GitHub releases, issues, or pull requests as the changelog
+#### Option E — Generate a random candidate leaf and skip explicit absence checks
 
-Replace the row requirement with a link to the implementing issue/PR or a release.
-This avoids duplicate history but makes the guide dependent on repository hosting and
-does not help downstream copies that consume the documents without GitHub context.
-Ordinary References can retain provenance without calling it a changelog.
+Have the helper choose a cryptographically random child name beneath the trusted
+root and retry on collision. Do not accept `CandidateDirectory` from the caller.
 
-#### Option H — Add version metadata/frontmatter to the rationale
+This makes collision unlikely and simplifies callers, but changes the aligned
+public interface, does not logically prove absence, complicates returned-path
+plumbing, and contradicts P1's no-retry lifecycle.
 
-Give `STYLE_GUIDE_RATIONALE.md` its own version/date fields or YAML frontmatter and
-require them to match the guide. This can make synchronization machine-checkable but
-does not provide a changelog row. It also creates a second version authority and
-requires generator/template changes outside P2's documentation repair.
+#### Option F — Atomically reserve the candidate with platform-native directory handles
 
-#### Option I — Add an HTML comment as hidden change history
+Use Windows native APIs and POSIX `openat`/`mkdirat`-style operations to bind a
+directory handle and reject links atomically relative to a held parent handle.
 
-Store a dated/versioned comment near the rationale edit. It avoids visible clutter but
-is invisible to readers, unconventional, difficult to discover, and still lacks a
-repository-wide policy.
+This is the strongest defense against a concurrent local attacker, but requires
+substantial platform interop unavailable as one straightforward
+PowerShell-5.1/PowerShell-7 implementation. The hosted-runner threat model does
+not justify that complexity.
 
-#### Option J — Replace the row with an ordinary rationale note
+#### Option G — Create first, then validate and delete on failure
 
-Add a sentence in the existing Blank Line Usage rationale explaining that the visible
-substitute was adopted in the current guide version/date. This gives local historical
-context without a table. It duplicates metadata in prose and will become stale, while
-the rationale already explains the substantive reason for the change.
+Call `Directory.CreateDirectory`, inspect what now exists, and remove it if
+validation finds a collision, link, or invalid archive.
 
-#### Option K — Create a separate prerequisite for changelog policy
-
-File a policy issue that chooses location, schema, backfill, ownership, and generation
-behavior; make P2 depend on it. This is appropriate only if maintainers independently
-want a changelog. It needlessly blocks the correctness repair if the changelog was
-merely text copied from TerraformStyleGuide.
-
-### Dominance conclusions before scoring
-
-- Option A is not implementable deterministically.
-- Options C through F, H, and K establish new repository governance beyond the
-  demonstrated need.
-- Options G, I, and J provide weaker or duplicative history without a complete
-  convention.
-- Option B is the only option that aligns exactly with current PSStyleGuide
-  information architecture and P2's actual user-facing objective.
+This violates the required absent-until-validated lifecycle, can follow or
+interact with a preexisting link, and turns a validation failure into a
+destructive cleanup operation.
 
 ### Evaluation rubric
 
-This rubric is specific to documentation governance and metadata authority. It gives
-most weight to repository-policy correctness, deterministic implementation, and
-avoiding contradictory sources of truth. Difficulty and scope total only 6%.
+This rubric treats directory enumeration as an authorization boundary. A
+security engineer needs all entries—including hidden and dangling—to count; an
+implementer needs APIs that behave the same across supported editions; an
+operator needs failures that never mutate an ambiguous target.
 
-| ID | Criterion | Weight | Scoring guidance |
-| --- | --- | ---: | --- |
-| D1 | Fit with established PSStyleGuide documentation policy | 24 | 0 invents an unspecified convention; 3 is plausible but unsupported; 5 follows the current source roles or explicitly establishes a complete new policy. |
-| D2 | Determinism for a cold implementer | 18 | 0 leaves location/schema unknown; 3 requires judgment; 5 states exactly what is added or removed with no missing format decision. |
-| D3 | Reader usefulness and information architecture | 16 | 0 adds invisible/noisy material; 3 supplies useful history with some clutter; 5 keeps operational and rationale content in their proper roles. |
-| D4 | Metadata integrity and single authority | 14 | 0 creates contradictory version/date authorities; 3 can be kept synchronized manually; 5 avoids duplicate authority or defines enforceable synchronization. |
-| D5 | Long-term policy consistency | 10 | 0 creates a one-off orphan convention; 3 is maintainable with discipline; 5 has no new policy burden or a fully specified durable policy. |
-| D6 | Ongoing maintainer burden | 7 | 0 requires historical reconstruction or extensive upkeep; 3 adds modest recurring work; 5 adds no new maintenance surface. |
-| D7 | Usefulness in downstream and offline copies | 5 | 0 depends entirely on repository-host context; 3 remains partly useful; 5 is self-contained or avoids unnecessary hosted references. |
-| D8 | Adherence to P2's original scope | 3 | 0 makes changelog governance a prerequisite; 3 adds adjacent policy; 5 remains the blank-line documentation repair. |
-| D9 | Implementation churn | 3 | 0 adds multiple files/history; 3 adds a section; 5 removes unsupported sentences or makes an equally small edit. |
+| Criterion | Weight | Scoring guidance |
+| --- | ---: | --- |
+| Exhaustive entry visibility | 26 | 5 necessarily includes hidden/system and all leaf directory entries; 1 permits filtered enumeration. |
+| Final-leaf collision/link safety | 22 | 5 explicitly detects every matching final entry before creation; 1 creates or follows before validation. |
+| Cross-platform/edition support | 18 | 5 uses the shared .NET/PowerShell 5.1 surface; 1 requires separate native implementations. |
+| Deterministic semantics | 12 | 5 has precise ordinal comparison and snapshot rules; 1 leaves provider or retry behavior implicit. |
+| Fixture testability | 10 | 5 yields deterministic hidden, file, directory, symlink, and dangling-link outcomes; 1 cannot state a reliable oracle. |
+| Diagnostic quality | 6 | 5 can report the exact offending entry/type; 1 collapses conditions into generic existence failure. |
+| Resource behavior | 4 | 5 is bounded by small directory snapshots without retries; 1 adds unbounded retry or heavy interop. |
+| Churn/interface preservation | 2 | 5 retains the current public API with a focused implementation rule; 1 redesigns callers. |
 
-#### Scoring rules
+The final-leaf and exhaustive-visibility criteria dominate because an “exact”
+security check that omits one class of entry is not partially correct.
 
-- Raw scores are integers from 0 to 5; weighted total is
-  `raw score / 5 × weight`.
-- D1 and D2 must each score at least 4.
-- A new changelog option can score 5 on D1 only if it defines location, schema,
-  ordering, history depth, ownership, and future update rules.
-- Git commit history is valid provenance; the rubric does not assume every guide must
-  duplicate it in document content.
+### Scoring results
 
-### Scoring table
+Abbreviations: EV = exhaustive visibility; FL = final-leaf safety;
+CP = compatibility; DS = deterministic semantics; FT = fixture testability;
+DQ = diagnostics; RB = resource behavior; CH = churn/API preservation.
 
-| Option | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9 | Weighted total | Gate result |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| A — leave undefined row | 0 | 0 | 1 | 0 | 0 | 2 | 2 | 5 | 5 | 14.0 | Fails D1/D2 |
-| B — remove changelog requirements | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | **100.0** | Pass |
-| C — prospective rationale changelog | 4 | 5 | 4 | 4 | 3 | 2 | 5 | 2 | 2 | 77.4 | Pass |
-| D — reconstructed full history | 2 | 2 | 4 | 2 | 2 | 0 | 5 | 0 | 0 | 44.2 | Fails D1/D2 |
-| E — main-guide changelog | 2 | 4 | 2 | 3 | 3 | 2 | 5 | 1 | 2 | 54.4 | Fails D1 |
-| F — separate `CHANGELOG.md` | 4 | 4 | 4 | 4 | 4 | 2 | 4 | 1 | 1 | 73.6 | Pass |
-| G — hosted history links | 3 | 4 | 3 | 4 | 3 | 4 | 1 | 3 | 4 | 66.4 | Fails D1 |
-| H — rationale metadata/frontmatter | 2 | 4 | 2 | 1 | 2 | 2 | 4 | 1 | 1 | 45.2 | Fails D1 |
-| I — hidden HTML history | 1 | 3 | 0 | 2 | 1 | 2 | 4 | 3 | 4 | 34.2 | Fails D1/D2 |
-| J — ordinary dated rationale note | 3 | 5 | 4 | 2 | 2 | 3 | 5 | 4 | 4 | 68.8 | Fails D1 |
-| K — changelog-policy prerequisite | 4 | 5 | 3 | 4 | 4 | 2 | 5 | 0 | 0 | 73.8 | Pass |
+| Option | EV | FL | CP | DS | FT | DQ | RB | CH | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Implicit choice | 1 | 1 | 5 | 1 | 1 | 1 | 5 | 5 | 39.2 |
+| B — `Get-ChildItem -Force` | 5 | 4 | 5 | 3 | 4 | 4 | 5 | 5 | 87.6 |
+| C — .NET entry enumeration | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | **100.0** |
+| D — `GetFileSystemInfos` | 5 | 5 | 5 | 4 | 5 | 5 | 4 | 5 | 96.8 |
+| E — Random leaf/retry | 4 | 2 | 5 | 2 | 2 | 3 | 2 | 1 | 62.0 |
+| F — Native directory handles | 5 | 5 | 1 | 4 | 3 | 3 | 3 | 1 | 73.6 |
+| G — Create, inspect, delete | 3 | 1 | 5 | 2 | 2 | 2 | 4 | 3 | 53.6 |
 
-Option B is the unique best result because the supposed changelog is not an existing
-PSStyleGuide feature. Removing an accidental cross-repository requirement restores a
-complete and internally consistent P2 rather than deleting a genuine user feature.
+Option C scores highest because it makes the exact-set primitive explicit while
+retaining the existing helper API. Option D is nearly equivalent, but Option C
+more cleanly separates name enumeration from later type/attribute inspection.
 
 ### Selected resolution
 
-Select **Option B: remove every unsupported changelog requirement from P2**.
+Select Option C.
 
-Make these exact changes:
+Revise P1 so every normative exact count/set check materializes:
 
-1. In "Advance metadata", delete "Add the matching top rationale changelog row."
-2. Renumber the remaining instruction to commit metadata with the source change so
-   the list is contiguous.
-3. Keep the existing rules to reread the target branch, increment Minor, use the
-   implementation UTC date, reset or increment Revision as specified, and update
-   Version and Last Updated together.
-4. In Acceptance criteria, replace "Version, Last Updated, and changelog metadata
-   agree" with "Version and Last Updated agree with the finalized target baseline and
-   UTC implementation date."
-5. Remove any changelog check from content confirmation or validation prose. Do not
-   replace it with a hidden comment, dated rationale sentence, GitHub release, or new
-   file.
-6. State that P2 extends the existing
-   `### Blank Line Usage` section in `STYLE_GUIDE_RATIONALE.md`; it does not create a
-   new history section.
-7. Keep the implementing issue/PR and Git history as repository provenance, and keep
-   any genuinely useful external sources in References. Do not describe those links
-   as an in-guide changelog.
-8. Do not add `CHANGELOG.md`, rationale frontmatter, a version table, or a changelog
-   convention as part of P2.
+```powershell
+[System.IO.Directory]::EnumerateFileSystemEntries($strResolvedDirectory)
+```
 
-After these edits, the only document metadata P2 owns is the already established
-Version and Last Updated data in `STYLE_GUIDE.md`. The rationale owns explanatory
-content, not duplicate release metadata.
+after the directory has been resolved and proved to be on the FileSystem
+provider. Do not use `Get-ChildItem` as the security decision primitive. If it is
+used to format diagnostics, require `-LiteralPath -Force`.
 
-## P2-2 — The automated middle-dot test proves only global co-occurrence, not the required example
+For the candidate leaf:
 
-### Problem to solve
+1. Resolve and validate the existing candidate parent.
+2. Derive one leaf name; reject an empty name, `.`/`..`, separators, rooted
+   input, or any name that changes parent after `GetFullPath`.
+3. Enumerate the parent and compare each entry's final name to the candidate
+   leaf using ordinal-ignore-case on Windows and ordinal on Linux.
+4. Reject any match, regardless of whether it is a file, directory, symlink,
+   reparse point, or dangling link.
+5. Repeat path containment, component-indirection, and exact parent enumeration
+   immediately before `Directory.CreateDirectory`.
+6. Create the leaf once. Never delete/recreate or retry under another name.
 
-P2's current script checks only global co-occurrence: if a touched file contains the
-Non-Compliant marker, the same file must contain an LF-delimited line of four middle
-dots somewhere. A malformed intended block can pass when the dot line appears in
-unrelated prose or another fence. The script does not prove unique occurrence,
-warning order, fence language, block line positions, or absence of a conflicting
-second marker.
+For the download directory and extracted candidate, materialize the complete
+entry array before comparing count, names, and types. Require exactly the
+expected entries, then separately require every expected path to be an ordinary
+non-reparse file.
 
-### Option dimensions and permutations
+Add distinct harness cases with stable expected rejection phases for:
 
-The meaningful axes are:
+- a hidden/system extra download entry;
+- an existing candidate file;
+- an existing candidate directory;
+- an existing candidate symlink/reparse leaf; and
+- a dangling candidate link.
 
-1. **Match scope**
-   - whole-file co-occurrence;
-   - exact canonical multi-line snippet;
-   - a bounded region starting at the unique marker; or
-   - a parsed Markdown syntax tree.
-2. **Occurrence policy**
-   - at least one;
-   - exactly one canonical snippet;
-   - exactly one marker plus exactly one validated block; or
-   - snapshot/hash equality.
-3. **Expected-file policy**
-   - test any touched file opportunistically;
-   - name the five documents that contain the guide;
-   - separately name the rationale, which should not duplicate the operational
-     example; or
-   - discover outputs from the generator.
-4. **Implementation**
-   - inline PowerShell;
-   - a new permanent validation script;
-   - Node/`markdown-it`;
-   - Pester; or
-   - manual review only.
+Where link construction is unavailable, mark only that construction-dependent
+case as an explicit platform skip; never silently treat it as a pass. The hidden
+entry, file, and directory cases must run on all supported environments.
+
+## P1-4 — The P1/T1 alignment assertion remains factually false
 
 ### Options
 
-#### Option A — Keep the global co-occurrence check
+#### Option A — Weaken P1 to match the attached T1
 
-Retain `Contains(marker)` followed by `Contains(LF + dots + LF)`. It is short and
-catches complete omission, but it demonstrably accepts a wrong target block when a
-dot line exists elsewhere.
+Remove explicit checkout/trusted-root and diagnostic parameters, derive checkout
+from helper location, remove the tracked harness, and run inline fixtures in the
+older topology.
 
-#### Option B — Require one exact canonical snippet in each guide-bearing document
+This achieves textual parity quickly but discards P1's stronger trust envelope,
+single fixture source, local validation, and clearer caller/helper contract.
 
-Build the approved heading, warning, `text` fence, brace/command lines, exact
-four-middle-dot third line, closing fence, and follow-up sentence as an array of
-literal lines joined with LF. Require exactly one ordinal occurrence and exactly one
-heading marker in:
+#### Option B — Remove every alignment statement
 
-- `STYLE_GUIDE.md`;
-- `copilot-instructions.md`;
-- `powershell.instructions.md`;
-- `STYLE_GUIDE_CHAT.md`; and
-- `STYLE_GUIDE_FULL.md`.
+Keep P1's design but describe it as wholly PSStyleGuide-specific. Do not claim
+or pursue parity with T1.
 
-Require no operational-example marker in `STYLE_GUIDE_RATIONALE.md`; that file should
-extend its existing Blank Line Usage explanation rather than duplicate the main-guide
-example. Retain independent BOM, CR, and trailing-whitespace checks.
+This makes P1 factually self-contained and avoids coordination. It abandons the
+user's stated generator/helper unification objective and invites semantic drift.
 
-This is strict and highly diagnostic. It intentionally turns P2's "materially
-equivalent" suggested wording into canonical accepted wording.
+#### Option C — Make P1 the explicit target shared contract
 
-#### Option C — Parse a bounded marker-to-fence region in PowerShell
+Retain P1's stronger mandatory/optional parameters, trusted-root behavior,
+same-stream identity, exhaustive enumeration, tracked harness, and execution
+topology. Rewrite present-tense “is aligned” wording as a normative design
+objective: these names and semantics are the shared contract that the parallel
+Terraform work must also adopt before parity is claimed.
 
-Require one unique heading marker, locate the next fenced block, and assert:
+P1 remains independently implementable and has no runtime dependency on the
+other repository. The PS issue describes only its side of the contract; T1 must
+be coordinated separately.
 
-- warning text occurs between heading and fence;
-- the fence info string is exactly `text`;
-- the fence has exactly six content lines;
-- line 3 is exactly four U+00B7 characters;
-- other block lines match the brace and command skeleton; and
-- the prohibition sentence precedes the block.
+#### Option D — Accept and document permanent divergence
 
-This permits prose variation while testing structure. It requires a small Markdown
-parser/state machine or carefully bounded indexing. Edge cases around backtick fence
-length, nested examples, or prose containing fence-like text can make an ad hoc parser
-less trustworthy than an exact snippet.
+List the differing P1 and T1 interfaces as intentional repository-specific
+choices while retaining a high-level shared goal of deterministic generation.
 
-#### Option D — Parse Markdown with the repository's `markdown-it` dependency
+This is truthful but treats security and test semantics as domain-specific even
+though the artifact transport problem is the same. It weakens maintenance and
+cross-repository review.
 
-Write a Node validation step that parses each expected file and inspects the heading,
-paragraph order, code-fence language, and fence content. This respects Markdown
-structure and handles fences robustly. It adds a cross-language validation script or
-large inline Node command, couples P2 validation to dependency installation, and
-still needs exact rules to identify the intended heading/paragraphs.
+#### Option E — Publish one shared reusable helper/action
 
-#### Option E — Add a permanent PowerShell content-validation script
+Move extraction and its tests into a third repository, reusable workflow, or
+versioned action. Both repositories consume the same external implementation.
 
-Create a tracked validator that enforces Option B or C and run it locally and in CI.
-This makes the semantic regression test durable after P2. It adds another production
-maintenance file and P1 workflow change after P1 has already merged. The current
-workflow's stale-artifact verification proves generator determinism, not arbitrary
-style-guide semantic rules; adding one content-specific validator invites a broader
-policy decision about which prose deserves permanent executable checks.
+This guarantees implementation reuse but introduces release management,
+external availability, token/trust policy, version pinning, and cross-repository
+debugging. It violates the stated self-contained/no-runtime-dependency boundary.
 
-#### Option F — Add Pester tests
+#### Option F — Generate one repository's helper from the other
 
-Express the exact or structural assertions as Pester tests. This gives good reporting
-and future extensibility, but introduces the same module/dependency concerns discussed
-for P1-1 and is disproportionate for one fixed Markdown example.
+Treat one helper/harness pair as canonical and copy or generate it into the
+second repository during development.
 
-#### Option G — Check line offsets around the marker
+This can reduce authoring drift without runtime coupling, but adds a separate
+source-of-truth tool and risks committed generated code diverging. The issue
+slates would need to define regeneration, provenance, and review responsibilities
+not currently in scope.
 
-Split content on LF, find the marker, then assert fixed relative line numbers for the
-warning, fence, dots, and closing fence. This is dependency-free and clearer than a
-regex. It is brittle to paragraph wrapping or an added explanatory line and still
-needs uniqueness and expected-file checks.
+#### Option G — Keep the current false assertion and coordinate informally
 
-#### Option H — Use one regular expression for the bounded block
+Leave P1 unchanged and rely on the downstream author to notice and reconcile the
+mismatch while implementing the two repositories in parallel.
 
-Use an escaped, anchored, multiline regex that captures heading, warning, fence, and
-content. It can require exactly one match and reject other markers. It is compact but
-harder for new contributors to audit, especially with backticks, braces, U+00B7,
-line-ending anchors, and PowerShell string escaping.
-
-#### Option I — Compare whole-file hashes or snapshots
-
-Regenerate and compare expected full-file hashes. This detects any difference but
-conflates the example with version/date/rationale changes and requires updating
-snapshots whenever any legitimate guide text changes. P1 already supplies source/
-artifact byte identity; a whole-file snapshot adds no targeted semantic explanation.
-
-#### Option J — Rely only on manual content confirmation
-
-Delete the automated middle-dot check and review the rendered/source blocks manually.
-Human review can understand prose, but it is not repeatable evidence and can miss an
-invisible or confusable Unicode character.
-
-#### Option K — Count only code points and marker occurrences
-
-Require one marker, exactly four U+00B7 code points near it, and no other middle dots
-in the file. This is stronger than Option A but can still pass when dots are in the
-wrong line or outside a `text` fence. Prohibiting all other middle dots also creates an
-unnecessary guide-wide content restriction.
-
-### Dominance conclusions before scoring
-
-- Options A, J, and K do not prove the required block.
-- Options C, D, G, and H are viable structural approaches with different parser and
-  brittleness tradeoffs.
-- Options E and F make a one-time P2 acceptance check into new permanent test
-  infrastructure.
-- Option I is overbroad and duplicates P1's byte-identity role.
-- Option B is simplest if the issue is willing to specify canonical wording; P2
-  already supplies that wording and values durable exactness.
+This minimizes current editing but makes the handoff knowingly inaccurate and
+offers no acceptance evidence for the claimed parity.
 
 ### Evaluation rubric
 
-This rubric is specific to executable validation of a Unicode Markdown example.
-False-positive resistance, exact code points, and complete output coverage receive
-57%. Difficulty and churn receive only 7%.
+This is a coordination finding, but correctness still outweighs project
+convenience. A security architect needs the stronger boundary preserved; a
+downstream implementer needs truthful normative wording; maintainers of both
+repositories need parity without making either repository operationally depend
+on the other.
 
-| ID | Criterion | Weight | Scoring guidance |
-| --- | --- | ---: | --- |
-| V1 | Proof of the required semantic structure | 27 | 0 checks unrelated content; 3 validates only part of the block; 5 proves heading, warning order, `text` fence, exact block lines, and follow-up meaning as one bounded unit. |
-| V2 | Unicode and byte-level precision | 16 | 0 accepts confusable/whitespace variants; 3 checks dots somewhere; 5 requires exactly four U+00B7 characters on the intended LF-delimited line and retains BOM/CR/trailing-space checks. |
-| V3 | Expected-file coverage and uniqueness | 14 | 0 tests an arbitrary subset; 3 opportunistically checks touched files; 5 names every guide-bearing source/artifact, requires exactly one accepted block/marker in each, and handles rationale separately. |
-| V4 | Failure diagnostics and cold-implementer clarity | 12 | 0 yields an opaque mismatch; 3 identifies the file; 5 identifies file, expected count/snippet component, actual count, and violated invariant using readable validation code. |
-| V5 | Maintainability and resistance to test drift | 10 | 0 snapshots unrelated content or uses fragile offsets; 3 is maintainable with care; 5 has one obvious canonical expectation matching the issue's required source text. |
-| V6 | Hermetic cross-platform execution | 8 | 0 requires uncontrolled tooling; 3 uses installed dependencies; 5 uses built-in PowerShell/.NET behavior and explicit LF strings with no network or platform-specific shell. |
-| V7 | Alignment with source/generated-artifact roles | 6 | 0 hand-validates generated files differently; 3 checks some outputs; 5 applies one source expectation to all generated copies while keeping the rationale's role distinct. |
-| V8 | Implementation difficulty | 4 | 0 adds a parser framework; 3 requires moderate indexing; 5 is a small literal-array/count check. |
-| V9 | Scope and churn | 3 | 0 adds permanent infrastructure; 3 adds a script; 5 changes only P2's validation block and wording. |
+| Criterion | Weight | Scoring guidance |
+| --- | ---: | --- |
+| Security-contract integrity | 25 | 5 preserves explicit trust roots, same-stream identity, exhaustive checks, and harness ownership; 1 removes them. |
+| Handoff truthfulness | 20 | 5 accurately distinguishes current local requirements from cross-repository coordination; 1 knowingly asserts false parity. |
+| Durable cross-repository parity | 18 | 5 defines concrete shared names/semantics and evidence; 1 abandons or informally assumes parity. |
+| Repository independence | 12 | 5 keeps both repositories self-contained at runtime; 1 creates a hard external dependency. |
+| Testability and acceptance evidence | 10 | 5 makes shared behavior mechanically comparable; 1 offers no parity oracle. |
+| Newcomer implementation clarity | 8 | 5 states exactly what P1 implements and what coordination means; 1 requires historical context. |
+| Coordination/project risk | 5 | 5 gives one tractable parallel coordination step; 1 adds release systems or hidden work. |
+| Draft churn | 2 | 5 needs only focused wording/contract edits; 1 creates a broad new architecture. |
 
-#### Scoring rules
+The rubric intentionally gives only two percent to draft churn. Preserving a
+misleading contract because it is already written would be a poor trade.
 
-- Raw scores are integers from 0 to 5; weighted total is
-  `raw score / 5 × weight`.
-- V1, V2, and V3 must each score at least 4.
-- A whole-file snapshot cannot substitute for a targeted semantic diagnostic.
-- Manual review remains useful but cannot earn full credit for exact U+00B7 identity.
+### Scoring results
 
-### Scoring table
+Abbreviations: SI = security integrity; HT = handoff truth;
+DP = durable parity; RI = repository independence; TA = test/acceptance;
+IC = implementation clarity; CR = coordination risk; CH = churn.
 
-| Option | V1 | V2 | V3 | V4 | V5 | V6 | V7 | V8 | V9 | Weighted total | Gate result |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| A — global co-occurrence | 1 | 3 | 2 | 2 | 2 | 5 | 3 | 5 | 5 | 48.0 | Fails V1/V2/V3 |
-| B — exact canonical snippet | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | **100.0** | Pass |
-| C — bounded PowerShell parser | 5 | 5 | 5 | 4 | 4 | 5 | 5 | 3 | 5 | 94.0 | Pass |
-| D — `markdown-it` AST | 5 | 5 | 5 | 4 | 4 | 3 | 5 | 2 | 3 | 88.8 | Pass |
-| E — permanent validator | 5 | 5 | 5 | 5 | 5 | 5 | 4 | 2 | 1 | 94.0 | Pass |
-| F — Pester tests | 5 | 5 | 5 | 5 | 4 | 2 | 4 | 1 | 1 | 86.4 | Pass |
-| G — line-offset checks | 4 | 5 | 5 | 4 | 2 | 5 | 5 | 4 | 5 | 85.4 | Pass |
-| H — bounded regex | 5 | 5 | 5 | 2 | 2 | 5 | 5 | 3 | 5 | 85.2 | Pass |
-| I — whole-file hashes | 5 | 5 | 5 | 1 | 0 | 5 | 2 | 1 | 0 | 70.6 | Pass |
-| J — manual review only | 2 | 2 | 2 | 2 | 1 | 5 | 2 | 5 | 5 | 47.0 | Fails V1/V2/V3 |
-| K — code-point/marker counts | 2 | 5 | 3 | 3 | 2 | 5 | 3 | 4 | 5 | 64.2 | Fails V1/V3 |
+| Option | SI | HT | DP | RI | TA | IC | CR | CH | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Weaken P1 | 1 | 4 | 5 | 5 | 3 | 3 | 4 | 2 | 66.6 |
+| B — Remove alignment | 5 | 5 | 1 | 5 | 2 | 4 | 5 | 5 | 78.0 |
+| C — P1 target contract | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | **100.0** |
+| D — Permanent divergence | 4 | 5 | 1 | 5 | 3 | 4 | 5 | 4 | 74.6 |
+| E — Shared external helper | 5 | 5 | 5 | 1 | 5 | 3 | 1 | 1 | 81.6 |
+| F — Development-time generation | 5 | 4 | 5 | 4 | 4 | 2 | 2 | 1 | 82.2 |
+| G — Informal coordination | 5 | 1 | 2 | 5 | 2 | 1 | 2 | 5 | 57.8 |
 
-Option B wins because P2 already provides exact approved wording. Treating that
-wording as canonical makes the validation both stricter and simpler than building a
-partial Markdown parser.
+Option C is the only option that simultaneously preserves the improved security
+contract, gives the downstream author truthful instructions, and keeps both
+repositories self-contained.
 
 ### Selected resolution
 
-Select **Option B: require exactly one canonical multi-line snippet in every
-guide-bearing document**.
+Select Option C.
 
-P2 should make its requested main-guide wording exact rather than "materially
-equivalent" and use the same exact text as its validation oracle. The snippet must
-contain, in order:
+Revise P1's helper introduction to say that the following are the normative
+PSStyleGuide side of the target P1/T1 shared contract:
 
-1. the exact bold heading
-   `Non-Compliant (blank line contains spaces; visualization only):`;
-2. the exact pre-block explanation that each middle dot substitutes for one U+0020
-   SPACE and must not be copied;
-3. a `text` fence;
-4. exactly these six fence-content lines:
-   - `{`;
-   - four spaces plus `Invoke-SomeCmdlet`;
-   - four U+00B7 MIDDLE DOT characters and nothing else;
-   - four spaces plus `Invoke-AnotherCmdlet`;
-   - `}`; and
-   - no additional content line;
-5. the closing fence; and
-6. the exact follow-up sentence that the represented spaces are prohibited and a
-   compliant blank line has no characters.
+- helper filename and purpose;
+- five mandatory scalar parameter names and semantics;
+- three optional caller-owned diagnostic labels;
+- checkout/trusted-root relationship;
+- same-held-stream digest/archive identity;
+- exhaustive count/set and final-leaf enumeration;
+- validation phases and diagnostic fields;
+- tracked harness filename/ownership; and
+- pre-merge and started-push-consumer execution semantics.
 
-The revised validation block should:
+Do not say that the attached T1 already implements those elements. A
+cold-reader-safe formulation is:
 
-1. Define `$arrGuideBearingPaths` as `STYLE_GUIDE.md` plus the four generated
-   artifacts.
-2. Define `$strRationalePath` separately.
-3. Build `$strCanonicalSnippet` from an array of literal strings joined with
-   ``"`n"``. Do not use an indented here-string whose incidental indentation or final
-   newline can obscure the expected bytes.
-4. Define the exact heading line as `$strNonCompliantMarker`.
-5. Implement a small `Get-OrdinalOccurrenceCount` function using
-   `String.IndexOf(..., [StringComparison]::Ordinal)` and a forward-moving offset.
-   Reject an empty needle.
-6. For every guide-bearing path, require:
-   - canonical snippet count equals 1; and
-   - marker count equals 1.
-7. For `STYLE_GUIDE_RATIONALE.md`, require both counts equal 0. Extend its existing
-   `### Blank Line Usage` prose without copying the operational block or exact
-   heading.
-8. On failure, report the path, expected count, actual snippet count, and actual
-   marker count.
-9. Retain independent checks for UTF-8 BOM, any CR byte, and trailing whitespace in
-   all six touched files.
-10. Retain regeneration idempotence and exact staged-path checks.
-11. Update content confirmation and acceptance criteria to say the canonical snippet
-    occurs exactly once in each named guide-bearing document, the rationale does not
-    duplicate it, and the rationale's existing Blank Line Usage section contains the
-    durability/portability explanation.
-12. Demonstrate the validator's strength before filing by applying its logic to a
-    synthetic string containing a wrong target block and an unrelated four-dot line;
-    the new check must fail.
+> These names and semantics define the PSStyleGuide side of the target shared
+> P1/T1 contract. Coordinate the parallel TerraformStyleGuide issue to use the
+> same common interface and behavior before claiming cross-repository parity.
+> The expected manifest names and repository-specific artifact names remain the
+> intentional differences. Neither repository has a runtime dependency on the
+> other.
 
-This closes both false-positive classes: a dot line elsewhere cannot satisfy the
-snippet, and a second conflicting heading cannot coexist with the required unique
-marker.
+P1 remains implementable without waiting on a Terraform commit, so do not add a
+GitHub blocked-by dependency on the other repository. The coordination gate is a
+documentation/design consistency check before the two slates are represented as
+unified.
 
-## P1/P2-1 — Evidence links point to moving major branches instead of the reviewed action commits
+Add an acceptance item requiring a side-by-side contract review of the final P1
+and parallel T1 issue texts. That review must confirm matching common parameter
+names, path/digest behavior, enumeration, harness ownership, and conditional job
+semantics while permitting only named repository-specific manifest/artifact
+differences.
 
-### Problem to solve
-
-P1 pins upload/download actions by full SHA but cites `action.yml` and implementation
-files through moving `v7` and `v8` branch URLs. P2 repeats those moving links. A later
-reader may inspect code that did not produce the pinned workflow behavior, undermining
-the digest/archive evidence the issues are designed to preserve.
-
-### Option dimensions and permutations
-
-The material choices are:
-
-1. **Reference identity**
-   - moving major branch/tag;
-   - exact patch tag;
-   - full commit SHA; or
-   - locally archived copy.
-2. **Presentation**
-   - raw file URL;
-   - GitHub blob permalink with line anchors;
-   - release page;
-   - commit page; or
-   - multiple complementary links.
-3. **Evidence set**
-   - `action.yml` only;
-   - README only;
-   - implementation only;
-   - all files that directly support the issue's claims; or
-   - a prose summary with cryptographic file hashes.
+## P1-5 — Writer preflight, commit proof, lease, and refspec use split identities
 
 ### Options
 
-#### Option A — Keep moving v7/v8 links
+#### Option A — Keep the split built-in and explicit environment names
 
-This is easy to read and always shows the newest major-line behavior. It cannot prove
-what the pinned commit did and can silently change after the issue is filed.
+Validate `GITHUB_REF` in preflight, refer to `github.sha` in prose, then use
+`TARGET_REF` and `EXPECTED_SHA` for the push. Rely on the workflow author having
+assigned both pairs from the same GitHub context.
 
-#### Option B — Link exact patch tags
+This normally works, but a future edit can change one source without invalidating
+the other and no runtime invariant catches it.
 
-Use `/v7.0.1/` and `/v8.0.1/` raw or blob URLs. This aligns the visible label with
-the intended release but tags remain mutable. It is better human context, not
-immutable evidence.
+#### Option B — Use only `GITHUB_REF` and `GITHUB_SHA`
 
-#### Option C — Replace every source link with a full-SHA raw URL
+Remove `TARGET_REF` and `EXPECTED_SHA`. Validate the built-in variables and use
+them directly in every command.
 
-Use exact commit IDs in URLs for `action.yml`, README, and the download implementation.
-These links retrieve the exact reviewed bytes. Raw pages are less navigable and do not
-show line numbers or repository context.
+This gives one source of truth and is simple. It makes the controlled stale-ref
+and exact-lease drills harder to express without mutating built-in environment
+variables or introducing separate test-only command variants.
 
-#### Option D — Use full-SHA GitHub blob permalinks with line anchors
+#### Option C — Validate explicit inputs against built-ins, then use local constants
 
-Link `blob/<full-sha>/<path>#Lx-Ly` for each relied-upon contract. This is immutable,
-human-readable, and focuses attention. Line ranges remain valid because the commit is
-fixed. A link that is too narrowly anchored can omit surrounding defaults or control
-flow needed to understand the claim.
+Keep `TARGET_REF` and `EXPECTED_SHA` as explicit workflow inputs from
+`${{ github.ref }}` and `${{ github.sha }}`. At the start of the one complete
+mutation block:
 
-#### Option E — Combine exact full-SHA source links with release pages
+1. copy them to local scalar variables;
+2. require equality with `GITHUB_REF` and `GITHUB_SHA`;
+3. validate the ref form and object IDs; and
+4. reuse those locals unchanged everywhere.
 
-For each action, link exact-commit metadata/README/implementation files and retain the
-exact patch-release page as human-readable provenance. Use raw URLs or full-SHA blob
-permalinks according to whether whole-file download or line-focused review is more
-useful.
+This gives an auditable handoff boundary, catches workflow/script wiring drift,
+and lets controlled drills mutate one explicit test value while the production
+invariant remains clear.
 
-This separates two roles cleanly: the commit link proves bytes; the release page
-explains the version label and release context.
+#### Option D — Embed GitHub expressions directly into the script
 
-#### Option F — Link only the pinned commit page
+Interpolate `${{ github.ref }}` and `${{ github.sha }}` into PowerShell source
+or command arguments at workflow evaluation time.
 
-A commit page proves repository identity and timestamp but makes the reader search the
-diff/tree for each contract. It is weaker direct evidence than file-specific links.
+This removes environment aliases but mixes expression-language quoting with
+PowerShell parsing, makes local execution harder, and risks injection/escaping
+mistakes. GitHub recommends passing potentially untrusted expression data
+through environment variables rather than direct script interpolation.
 
-#### Option G — Copy relevant action source into planning artifacts
+#### Option E — Derive target and SHA from local Git
 
-Archive the reviewed files or excerpts beneath `docs/planning/artifacts`. This protects
-against remote unavailability but duplicates third-party copyrighted source, requires
-license/provenance handling, and can be mistaken for executable vendored code.
-Exact-commit upstream links plus concise research notes are sufficient.
+Use `git symbolic-ref HEAD` for the branch and `git rev-parse HEAD^{commit}` for
+the expected SHA.
 
-#### Option H — Remove implementation-level links
+Checkout commonly operates in detached-HEAD mode, so no local symbolic branch
+may exist. The local commit proves candidate base identity but does not identify
+the event's authorized remote destination by itself.
 
-Retain release pages and trust action documentation. This shortens References but
-cannot substantiate the crucial claim that download passes `artifact.digest` as
-`expectedHash`, honors `skip-decompress`, and throws for `digest-mismatch: error`.
+#### Option F — Parse the event payload
 
-#### Option I — Add source-file hashes beside moving links
+Read `GITHUB_EVENT_PATH` and derive the ref and SHA from event JSON inside the
+writer.
 
-Record SHA-256 hashes of retrieved source files. This detects later drift but forces
-the reader to download and hash content and still does not directly retrieve the
-reviewed version. Git commit identity already supplies a standard content-addressed
-reference.
+This adds event-schema branching and file parsing even though GitHub already
+supplies normalized ref/SHA values. It increases testing surface and makes the
+writer depend on event payload shape.
 
-#### Option J — Add an automated link/content verifier
+#### Option G — Query the GitHub API and update the ref through REST
 
-Create a script that fetches References, verifies expected commits/hashes, and checks
-key strings. This offers strong repeatability but introduces network-dependent test
-infrastructure for issue prose. Implementation-time action-SHA reverification and
-immutable URLs provide the needed assurance with much less machinery.
+Replace native `git push` with a GitHub API ref update after comparing the
+remote SHA.
 
-#### Option K — Link P2 only to P1 rather than repeat evidence
+This can express an explicit target and expected state, but GitHub's update-ref
+API does not replace Git's atomic exact expected-object lease in the same simple
+call. It also adds API permissions, response handling, and a second object
+transport model.
 
-Remove action source links from P2 and say its workflow assumptions are established
-by prerequisite P1. This avoids duplication but makes P2 less self-contained for an
-implementer or reviewer who opens it directly. Exact repeated links are low-cost and
-prevent ambiguity.
+#### Option H — Use a branch name and bare lease
 
-### Dominance conclusions before scoring
+Strip `refs/heads/`, push to a short branch name, and use bare
+`--force-with-lease`.
 
-- Options A and B do not bind evidence immutably.
-- Options F and H omit directly relevant source context.
-- Options G, I, and J add archival or verification machinery without improving on
-  exact Git object identity.
-- Option K is defensible but weakens P2's standalone evidence.
-- Options C and D are strong single-format solutions; Option E combines immutable
-  technical evidence with readable release provenance.
+This is concise but reintroduces implicit destination and remote-tracking state,
+precisely the ambiguity P1 is designed to remove.
 
 ### Evaluation rubric
 
-This rubric is specific to preserving third-party action-contract evidence. Exact
-identity, direct support, and reproducibility receive 64%. Link-edit churn receives
-only 2%.
+This finding is about keeping four representations of one authorization
+decision—event ref, event SHA, local commit, and remote expected object—from
+silently diverging. The rubric therefore gives most weight to explicit
+destination and exact compare-and-swap behavior. Testability matters because
+the issue requires controlled stale-ref and mismatch drills.
 
-| ID | Criterion | Weight | Scoring guidance |
-| --- | --- | ---: | --- |
-| E1 | Identity with the pinned executable commit | 28 | 0 can move independently; 3 detects or limits drift; 5 retrieves the exact full-SHA source used by the workflow. |
-| E2 | Direct support for every relied-upon contract | 20 | 0 is generic documentation; 3 proves some inputs/outputs; 5 covers metadata, digest output, archive mode, expected-hash flow, skip-decompress, and fatal mismatch logic. |
-| E3 | Independent audit reproducibility | 16 | 0 requires trust in prose; 3 requires searching; 5 lets a reviewer retrieve the reviewed bytes and map each issue claim without guessing a revision. |
-| E4 | Link durability | 10 | 0 is a moving branch; 3 is a tag or hosted-only summary; 5 uses immutable Git object URLs in the official repositories. |
-| E5 | Human readability and navigation | 10 | 0 is opaque hashes only; 3 provides raw source; 5 combines readable file/release context and clear link labels. |
-| E6 | Self-contained usefulness of both P1 and P2 | 7 | 0 requires finding another issue; 3 gives indirect context; 5 gives each issue the evidence needed to interpret its own workflow expectations. |
-| E7 | Provenance and copyright hygiene | 4 | 0 copies unattributed third-party code; 3 includes provenance with local copies; 5 links official upstream source and paraphrases only the needed facts. |
-| E8 | Ongoing maintenance burden | 3 | 0 adds network test infrastructure; 3 needs several links updated with pins; 5 naturally changes only when the approved action pin changes. |
-| E9 | Issue-edit churn | 2 | 0 adds files/scripts; 3 adds many annotations; 5 replaces or supplements a few Reference bullets. |
+| Criterion | Weight | Scoring guidance |
+| --- | ---: | --- |
+| Target-ref and destination correctness | 24 | 5 validates one complete `refs/heads/...` identity and uses it as the explicit refspec destination; 1 relies on implicit or shortened destinations. |
+| Expected-SHA and exact-lease safety | 24 | 5 proves one full expected object ID and uses it in an explicit exact-object lease; 1 uses remote-tracking state or no compare-and-swap. |
+| Single validated identity reuse | 16 | 5 copies, validates, and reuses immutable local values; 1 validates different names from those later consumed. |
+| Controlled-drill testability | 10 | 5 permits deliberate ref/SHA substitution without changing production command shape; 1 makes safe drills impractical. |
+| Local object-format and commit proof | 8 | 5 accepts the repository-native full object ID and proves it resolves to the checked-out commit object; 1 assumes a fixed abbreviation or omits the proof. |
+| Diagnostic and reviewer clarity | 8 | 5 reports built-in/input/local/remote mismatches at their boundary; 1 leaves the failing identity ambiguous. |
+| Cross-environment maintainability | 6 | 5 uses normal Git and PowerShell behavior without event-schema or API coupling; 1 adds fragile environment-specific machinery. |
+| Scope/churn efficiency | 4 | 5 is a focused rewrite of the existing mutation block; 1 introduces a new transport or authorization system. |
 
-#### Scoring rules
+The target and lease criteria jointly carry almost half the score because a
+correct local commit is insufficient if the workflow can address or compare a
+different remote ref.
 
-- Raw scores are integers from 0 to 5; weighted total is
-  `raw score / 5 × weight`.
-- E1 and E2 must each score at least 4.
-- A release page can explain a version but cannot by itself earn immutable-identity
-  credit.
-- A link set should include only source files that materially support issue claims.
+### Scoring results
 
-### Scoring table
+Abbreviations: TR = target/ref correctness; ES = expected-SHA/lease safety;
+IR = identity reuse; DT = drill testability; OP = object/commit proof;
+DC = diagnostics; CM = cross-environment maintainability; CH = churn.
 
-| Option | E1 | E2 | E3 | E4 | E5 | E6 | E7 | E8 | E9 | Weighted total | Gate result |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| A — moving v7/v8 links | 0 | 4 | 1 | 1 | 5 | 5 | 5 | 5 | 5 | 47.2 | Fails E1 |
-| B — patch-tag links | 2 | 4 | 3 | 2 | 5 | 5 | 5 | 5 | 5 | 66.8 | Fails E1 |
-| C — full-SHA raw links | 5 | 5 | 5 | 5 | 3 | 5 | 5 | 5 | 5 | 96.0 | Pass |
-| D — full-SHA blob/line links | 5 | 4 | 5 | 5 | 5 | 5 | 5 | 4 | 4 | 95.0 | Pass |
-| E — exact sources plus releases | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 4 | 4 | **99.0** | Pass |
-| F — commit page only | 5 | 2 | 3 | 5 | 3 | 3 | 5 | 5 | 5 | 74.8 | Fails E2 |
-| G — locally copied action source | 5 | 5 | 5 | 4 | 3 | 5 | 1 | 1 | 0 | 86.4 | Pass |
-| H — release/docs only | 2 | 2 | 2 | 3 | 5 | 4 | 5 | 5 | 5 | 56.2 | Fails E1/E2 |
-| I — source hashes plus moving links | 3 | 5 | 4 | 3 | 2 | 5 | 5 | 2 | 2 | 72.6 | Fails E1 |
-| J — automated link verifier | 5 | 5 | 5 | 5 | 2 | 5 | 5 | 0 | 0 | 89.0 | Pass |
-| K — P2 links only to P1 | 4 | 4 | 4 | 5 | 4 | 1 | 5 | 5 | 5 | 79.6 | Pass |
+| Option | TR | ES | IR | DT | OP | DC | CM | CH | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Split identities | 3 | 3 | 1 | 3 | 3 | 2 | 4 | 5 | 54.8 |
+| B — Built-ins only | 5 | 5 | 5 | 2 | 4 | 4 | 4 | 5 | 89.6 |
+| C — Validated explicit inputs | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | **100.0** |
+| D — Direct expressions | 4 | 4 | 4 | 2 | 4 | 2 | 1 | 4 | 69.2 |
+| E — Local Git derivation | 2 | 3 | 3 | 2 | 5 | 3 | 3 | 4 | 57.2 |
+| F — Event payload | 4 | 4 | 4 | 3 | 4 | 2 | 2 | 2 | 70.8 |
+| G — REST ref update | 4 | 3 | 4 | 2 | 4 | 2 | 2 | 1 | 63.2 |
+| H — Short ref/bare lease | 1 | 1 | 1 | 2 | 2 | 2 | 4 | 5 | 32.0 |
 
-Option E is strongest: full-SHA files establish the exact behavior, while release
-pages explain why those commits are labeled v7.0.1 and v8.0.1.
+Option C makes the workflow-to-script handoff explicit without weakening the
+Git lease or making the production branch hard to exercise in controlled
+drills. Option B is safe in production but scores lower because its built-in
+variables are awkward test seams.
 
 ### Selected resolution
 
-Select **Option E: exact full-SHA source links plus exact patch-release pages**.
+Select Option C.
 
-Replace the moving P1 and P2 Reference bullets with clearly labeled links to:
+At the first executable line of the single complete mutation block, copy:
 
-#### Upload action v7.0.1
+```powershell
+$strTargetRef = [string]$env:TARGET_REF
+$strExpectedSha = [string]$env:EXPECTED_SHA
+```
 
-- Exact `action.yml`:
-  `https://raw.githubusercontent.com/actions/upload-artifact/043fb46d1a93c77aae656e7c1c64a875d1fc6a0a/action.yml`
-- Exact README:
-  `https://raw.githubusercontent.com/actions/upload-artifact/043fb46d1a93c77aae656e7c1c64a875d1fc6a0a/README.md`
-- Release:
-  `https://github.com/actions/upload-artifact/releases/tag/v7.0.1`
+The block must then:
 
-#### Download action v8.0.1
+1. reject empty values, leading/trailing whitespace, and CR/LF in either local;
+2. require `$strTargetRef` to be one complete `refs/heads/...` ref accepted by
+   `git check-ref-format`;
+3. require exact ordinal equality between `$strTargetRef` and
+   `[string]$env:GITHUB_REF`;
+4. require exact ordinal-ignore-case equality between `$strExpectedSha` and
+   `[string]$env:GITHUB_SHA`;
+5. resolve `git rev-parse --verify 'HEAD^{commit}'`, require exactly one
+   repository-native full object ID, and require it to equal
+   `$strExpectedSha`;
+6. call `git ls-remote --refs origin $strTargetRef`, require exactly one
+   tab-delimited record, and require both its ref and object ID to equal the
+   validated target/expected locals; and
+7. reuse only those two locals in the explicit refspec and lease:
 
-- Exact `action.yml`:
-  `https://raw.githubusercontent.com/actions/download-artifact/3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c/action.yml`
-- Exact README:
-  `https://raw.githubusercontent.com/actions/download-artifact/3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c/README.md`
-- Exact implementation:
-  `https://raw.githubusercontent.com/actions/download-artifact/3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c/src/download-artifact.ts`
-- Release:
-  `https://github.com/actions/download-artifact/releases/tag/v8.0.1`
+```powershell
+git push origin `
+    "HEAD:$strTargetRef" `
+    "--force-with-lease=$strTargetRef`:$strExpectedSha"
+```
 
-P1 should additionally include the exact checkout v6.0.2 metadata and README,
-v6.0.2 release, GitHub Node 20 deprecation notice, and GitHub secure-use reference
-selected under P1-3.
+Do not read `TARGET_REF`, `EXPECTED_SHA`, `GITHUB_REF`, or `GITHUB_SHA` again
+after the equality checks. Do not reconstruct a short branch name.
 
-Implementation rules:
+Controlled drills may supply purpose-specific local test values to the same
+validation/push logic so stale-ref and mismatched-input paths are observable.
+The production workflow values must be restored and the final checked-in
+mutation block must still source `TARGET_REF`/`EXPECTED_SHA` directly from
+`${{ github.ref }}`/`${{ github.sha }}` and validate them against the built-ins.
 
-1. Use full 40-character SHAs in every source URL.
-2. Keep exact patch-release pages only as explanatory companions; never cite them as
-   immutable source.
-3. Label each link by file and release so a reader knows which claim it supports.
-4. Keep P2 self-contained by repeating the exact artifact-action links relevant to
-   its inherited workflow evidence.
-5. If implementation-time reverification chooses newer approved action releases,
-   update workflow pin, same-line release comment, exact source URLs, implementation
-   URLs, and release URLs as one atomic evidence change.
-6. Remove all raw `/v7/` and `/v8/` source URLs from both issues.
-7. Do not copy third-party source files into the repository and do not add a
-   network-dependent link verifier.
+## P1-6 — The fixture suite lacks an executable oracle
 
-This ensures the prose, executable pin, and cited implementation cannot drift apart.
+### Options
+
+#### Option A — Keep the prose fixture inventory
+
+Retain the current lists of invalid and valid conditions, with the general rule
+that invalid cases throw and valid cases succeed.
+
+This is compact, but it does not identify the required failure phase,
+diagnostics, mutation postcondition, or successful byte/type assertions.
+
+#### Option B — Add one narrative paragraph per fixture
+
+Expand every fixture bullet into prose explaining setup and expected behavior.
+
+This can capture all required facts, but reviewers cannot scan it reliably for
+missing columns or compare cases. Repeated prose also makes phase names and
+candidate-leaf rules prone to drift.
+
+#### Option C — Put a normative case table and assertion rules in P1
+
+Give every fixture a stable ID and one row containing platform/precondition,
+expected outcome, exact failure phase, candidate-leaf postcondition,
+diagnostic fields, and success assertions. Define a small phase vocabulary
+before the table and make the tracked harness emit one record per row.
+
+This keeps the executable oracle beside the helper contract and makes omissions
+visible during issue review.
+
+#### Option D — Add a machine-readable JSON or YAML fixture manifest
+
+Create a separate data file with case IDs and expectations, then make the
+harness load it.
+
+This provides a strong executable source of truth, but expands P1's affected
+file set and requires a schema/parser whose correctness must itself be tested.
+Some setup logic—especially symlink creation—would still live in PowerShell.
+
+#### Option E — Introduce Pester and express every case as a test
+
+Add Pester to the repository and use test cases, tags, and assertions as the
+normative oracle.
+
+This yields rich reporting but adds a package/bootstrap decision and changes the
+requested dependency-free tracked harness design. Windows PowerShell 5.1 and
+PowerShell 7 environments may resolve different available Pester versions
+unless P1 also adds dependency management.
+
+#### Option F — Generate and assert fixtures inline in each workflow job
+
+Keep no tracked fixture harness. Put complete setup and assertions directly in
+the Windows, Ubuntu, and synchronization jobs.
+
+This makes each job self-contained but duplicates security-sensitive test logic,
+weakens local reproduction, and makes identical behavior hard to establish.
+
+#### Option G — Split fixture-oracle work into a later issue
+
+Implement the production helper and minimal success check in P1, then create a
+follow-up issue for the complete negative suite.
+
+This reduces the immediate P1 diff but ships the security boundary without the
+evidence required to review its reject-before-mutate claims.
+
+#### Option H — Use a normative table plus a separate generated results artifact
+
+Adopt Option C and also require the harness to serialize a JSON results artifact
+for every matrix cell.
+
+This gives excellent machine comparison, but the repository already obtains
+per-case evidence through logs and tracked source. A new result-upload lifecycle
+adds naming, retention, and cross-job handling without resolving an identified
+gap.
+
+### Evaluation rubric
+
+This finding concerns the difference between a list of interesting inputs and
+a test oracle. A security reviewer must know that each rejection happens before
+the prohibited mutation, while contributors must be able to see exactly what
+successful extraction proves.
+
+| Criterion | Weight | Scoring guidance |
+| --- | ---: | --- |
+| Oracle unambiguity | 24 | 5 assigns stable IDs and explicit expected outcomes/phases; 1 says only “throws” or “succeeds.” |
+| Negative safety postconditions | 20 | 5 states candidate-leaf absence and forbidden side effects for every rejection; 1 does not test mutation timing. |
+| Positive-case completeness | 15 | 5 asserts exact paths, ordinary-file types, bytes, and no extras; 1 accepts process success alone. |
+| Single source and drift resistance | 14 | 5 keeps one normative case definition consumed by all environments; 1 duplicates or defers it. |
+| Platform-conditional clarity | 10 | 5 distinguishes required cross-platform cases from explicit construction-dependent skips; 1 silently loses coverage. |
+| Diagnostic usability | 8 | 5 specifies phase and case-specific fields; 1 treats any exception as sufficient. |
+| Maintainability and extensibility | 6 | 5 makes new cases and missing expectations obvious without extra infrastructure; 1 is hard to extend consistently. |
+| Scope/churn efficiency | 3 | 5 fits the existing helper/harness issue with no new dependency or artifact lifecycle; 1 adds broad machinery. |
+
+Failure-phase and leaf-postcondition evidence outweigh convenience because the
+production contract's core promise is reject-before-mutate.
+
+### Scoring results
+
+Abbreviations: OU = oracle unambiguity; NS = negative safety;
+PC = positive completeness; SS = single source; PL = platform clarity;
+DU = diagnostics; ME = maintainability; CH = churn.
+
+| Option | OU | NS | PC | SS | PL | DU | ME | CH | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Prose inventory | 1 | 1 | 1 | 2 | 2 | 1 | 3 | 5 | 29.6 |
+| B — Narrative cases | 4 | 4 | 4 | 3 | 4 | 4 | 2 | 3 | 74.2 |
+| C — Normative table | 5 | 5 | 5 | 5 | 5 | 5 | 5 | 5 | **100.0** |
+| D — Data manifest | 5 | 5 | 5 | 4 | 4 | 4 | 3 | 2 | 89.4 |
+| E — Pester suite | 5 | 5 | 5 | 5 | 4 | 5 | 3 | 1 | 93.2 |
+| F — Inline per-job fixtures | 4 | 4 | 4 | 1 | 3 | 3 | 1 | 2 | 63.2 |
+| G — Later issue | 1 | 1 | 1 | 2 | 2 | 1 | 2 | 4 | 27.8 |
+| H — Table plus result artifact | 5 | 5 | 5 | 5 | 5 | 5 | 4 | 2 | 97.0 |
+
+Option C fully specifies the oracle using the tracked harness already in scope.
+Option H adds useful reporting in some projects, but its extra artifact lifecycle
+does not improve whether a case passes or fails.
+
+### Selected resolution
+
+Select Option C.
+
+Replace P1's free-form fixture lists with a normative table. The issue must
+define these failure phases, in execution order:
+
+1. `context/path`;
+2. `download-enumeration`;
+3. `digest`;
+4. `archive-open`;
+5. `manifest`;
+6. `candidate-leaf`;
+7. `extraction`; and
+8. `post-extraction`.
+
+The table must include stable rows for:
+
+- `V-01` exact archive and matching digest success;
+- `V-02` exact archive whose entry external attributes resemble symlinks but
+  whose permitted payloads extract as ordinary files;
+- `P-01` valid sibling-prefix containment;
+- `P-02` filesystem-qualified absolute path success;
+- `D-01` digest mismatch;
+- `Z-01` matching-digest invalid/truncated ZIP;
+- `M-01` missing expected entry;
+- `M-02` unexpected extra entry;
+- `M-03` exact duplicate entry;
+- `M-04` case-colliding entry;
+- `M-05` through `M-12` nested forward-slash, nested backslash, traversal in
+  both separator styles, leading slash, leading backslash, drive-qualified,
+  and explicit directory entries;
+- `M-13` file/directory collision and `M-14` empty entry name;
+- `E-01` through `E-08` outside-trusted-root, checkout overlap, invalid root
+  relationship, relative input, non-filesystem provider, Windows case variant,
+  reparse component, and hidden/system extra-download-entry cases;
+- `L-01` through `L-04` preexisting candidate file, directory,
+  symlink/reparse point, and dangling link; and
+- `X-01` an explicitly supplied empty optional diagnostic label.
+
+Every negative row must name its platform/precondition, expected `reject`
+outcome, exact phase, `candidate leaf absent` postcondition, and required
+diagnostic fields. “Any exception” is not an oracle. Diagnostic assertions
+must include the case ID and phase plus the relevant path, entry name,
+expected/actual digest, or ref/root identity; they must not require secrets or
+unstable stack traces.
+
+Every success row must require:
+
+- exactly the expected candidate paths and no extras;
+- every payload is an ordinary non-reparse file;
+- exact expected bytes, including the expected dot-content file;
+- no writes outside the candidate directory; and
+- the expected success phase/record.
+
+`V-02` specifically proves that ZIP external attributes are metadata only and
+cannot create a filesystem link. `P-01` and `P-02` must assert the intended
+canonical containment result, not just extraction success. `E-06` must state
+the Windows rejection and the applicable Linux ordinal result.
+
+The harness must execute the same case IDs in each supported shell/platform.
+Only a fixture whose setup primitive is unavailable—such as link construction
+without required privilege—may be skipped, and the skip must be a named record
+containing case ID, platform, and reason. A skip is neither a pass nor permission
+to omit all other rows in that environment.
+
+## P1/P2-1 — “Every push consumer on every run” is unattainable
+
+### Options
+
+#### Option A — Keep the universal wording
+
+Continue to require every push consumer to run the helper on every push and
+allow readers to infer that job-level conditions are an exception.
+
+This preserves the current draft but leaves acceptance impossible on the
+intended no-drift run, when the synchronization job is skipped.
+
+#### Option B — Redefine “consumer” as a job that started
+
+Change the sentence to “every started consumer” without documenting which jobs
+start under which condition.
+
+This removes the direct contradiction but leaves operators to reconstruct the
+conditional graph from workflow YAML and makes evidence ownership ambiguous.
+
+#### Option C — Define one explicit conditional topology in both issues
+
+State that all four Windows push cells always download, self-test, and invoke
+the helper; synchronization does so only when `has_changes=true`; the expected
+no-drift run skips synchronization entirely; and static inspection plus the
+controlled change-producing drill supplies synchronization evidence.
+
+This describes exactly what GitHub Actions can execute and assigns evidence to
+both graph branches.
+
+#### Option D — Always start synchronization and condition only its mutation
+
+Remove the synchronization job-level condition. Always download and self-test,
+then skip commit/push steps when `has_changes=false`.
+
+This makes the universal helper sentence attainable but changes the workflow
+topology, artifact flow, permissions exposure, duration, and no-drift contract
+solely to preserve wording.
+
+#### Option E — Remove helper self-test/invocation from synchronization
+
+Rely on the four Windows cells for all helper coverage. Let synchronization
+consume their evidence or trust its downloaded artifact without invoking the
+helper.
+
+This simplifies conditional semantics but removes defense at the write-capable
+point of consumption and weakens the intended writer trust boundary.
+
+#### Option F — Force `has_changes=true` on every push
+
+Arrange generation so synchronization always has a change, causing the job and
+helper to run.
+
+This defeats idempotence, invites bot-commit loops or meaningless changes, and
+invalidates the no-drift milestone.
+
+#### Option G — Add a separate unconditional synchronization-preflight job
+
+Create a read-only job that always runs the harness/helper, while the existing
+write-capable synchronization job remains conditional.
+
+This can provide unconditional evidence but adds a fifth consumer-like path
+whose result still does not prove that the conditional writer used the same
+downloaded bytes and invocation.
+
+### Evaluation rubric
+
+This is a workflow-graph truthfulness finding. The chosen text must preserve
+helper validation at the write-capable boundary while describing both the
+ordinary no-drift run and the deliberately change-producing proof.
+
+| Criterion | Weight | Scoring guidance |
+| --- | ---: | --- |
+| Semantic attainability | 25 | 5 can be satisfied by every described graph branch; 1 requires steps inside a skipped job. |
+| Security at the point of use | 20 | 5 retains helper validation in every job that actually consumes the archive, including the writer; 1 removes writer-side validation. |
+| Evidence truth and completeness | 18 | 5 assigns runtime/static/drill evidence to every conditional branch; 1 accepts evidence that cannot exist. |
+| Operator comprehension | 15 | 5 states which jobs start and which steps run for both condition outcomes; 1 hides conditions behind shorthand. |
+| No-drift behavior preservation | 10 | 5 preserves the skipped synchronization job on a clean run; 1 manufactures changes or changes the graph. |
+| P1/P2 consistency | 8 | 5 uses one identical conditional contract in prerequisites, design, and acceptance; 1 leaves contradictions. |
+| Scope/churn efficiency | 4 | 5 fixes issue wording and evidence allocation only; 1 adds jobs or redesigns execution. |
+
+The rubric rewards attainable evidence rather than a larger raw count of
+executions. A deliberately skipped job is correct behavior, not a missing test.
+
+### Scoring results
+
+Abbreviations: SA = semantic attainability; PU = point-of-use security;
+ET = evidence truth; OC = operator comprehension; ND = no-drift preservation;
+CI = cross-issue consistency; CH = churn.
+
+| Option | SA | PU | ET | OC | ND | CI | CH | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Universal wording | 1 | 4 | 1 | 1 | 4 | 1 | 5 | 41.2 |
+| B — “Started consumer” only | 3 | 5 | 3 | 2 | 5 | 3 | 5 | 70.6 |
+| C — Explicit topology | 5 | 5 | 5 | 5 | 5 | 5 | 5 | **100.0** |
+| D — Always start sync | 5 | 5 | 5 | 4 | 2 | 4 | 2 | 87.0 |
+| E — Remove writer invocation | 5 | 1 | 4 | 4 | 5 | 5 | 4 | 76.6 |
+| F — Force changes | 5 | 4 | 2 | 2 | 1 | 2 | 1 | 60.2 |
+| G — Add preflight job | 5 | 3 | 4 | 3 | 4 | 4 | 1 | 75.6 |
+
+Option C is the only resolution that is simultaneously true, secure at the
+writer, and faithful to the established no-drift graph.
+
+### Selected resolution
+
+Select Option C.
+
+Use this one conditional contract throughout P1 and P2:
+
+- On every push run, all four Windows consumer matrix cells start, download the
+  producer artifact, run the tracked helper harness, and invoke the production
+  helper on the retained archive.
+- The synchronization job starts only when the producer reports
+  `has_changes=true`. A started synchronization job downloads the same producer
+  artifact, runs the same harness, invokes the same helper, and only then enters
+  the writer mutation block.
+- On the expected no-drift P1/P2 push, `has_changes=false`; synchronization is
+  skipped at the job level, so none of its steps run.
+- Runtime logs from the four Windows cells prove the unconditional push path.
+  Static inspection of the synchronization graph plus a controlled
+  `has_changes=true` drill proves the conditional writer path.
+
+Replace “every push consumer on every run” and similar universal shorthand in
+P1 acceptance and P2 prerequisites/acceptance. Use “every started push
+consumer” only when it is immediately accompanied by the topology above.
+
+The controlled drill must restore the repository to the intended generated
+state. Its evidence must show the synchronization job started, ran harness and
+helper before the mutation block, and exercised the exact explicit-ref,
+exact-lease push path. A normal no-drift run must show the four Windows cells
+succeeded and synchronization was skipped—not failed or silently omitted.
+
+## P2-1 — The named validation function is undocumented
+
+### Options
+
+#### Option A — Leave the transient function unchanged
+
+Keep `Get-OrdinalOccurrenceCount` without comment-based help because it appears
+only inside a planning-document validation block rather than a committed
+`.ps1` file.
+
+This is functionally adequate but conspicuous in an issue whose output is a
+PowerShell style guide and whose validation block is meant to be copied.
+
+#### Option B — Add complete comment-based help
+
+Retain the named function and add synopsis, description, parameter help,
+outputs, examples, notes, and link/compatibility information consistent with
+the generated guide's function standard.
+
+This is maximally self-demonstrating, but turns a short local counting primitive
+into a disproportionately large part of the acceptance command.
+
+#### Option C — Use a local script block instead of a function
+
+Store the same strongly typed `param` block and ordinal, non-overlapping loop in
+a narrowly named script-block variable, invoke it with `&`, and keep the
+synthetic false-positive self-test.
+
+This preserves behavior and copy/paste use while avoiding a named command to
+which the function-help rule applies.
+
+#### Option D — Duplicate the loop inline at every call site
+
+Remove the helper abstraction and repeat the `IndexOf` loop for each required
+section/marker.
+
+This avoids an undocumented function but creates many subtly drift-prone copies
+of security-relevant validation logic.
+
+#### Option E — Count escaped regular-expression matches
+
+Use `[regex]::Matches($content, [regex]::Escape($needle)).Count`.
+
+This is concise, but the default regex matching/culture/options contract is less
+obviously identical to `StringComparison.Ordinal`, and future edits can
+accidentally remove escaping.
+
+#### Option F — Use PowerShell `Select-String -AllMatches`
+
+Pipe content to `Select-String`, escape the needle, and count match objects.
+
+This depends on cmdlet line/input behavior and regex semantics when the required
+contract is an ordinal count over one canonical string.
+
+#### Option G — Move the validator into a permanent repository script
+
+Create a reusable `.ps1` validation tool with full help and tests, then have the
+issue invoke it.
+
+This is appropriate if validation becomes a maintained product, but P2
+currently scopes a one-time copy-ready acceptance check and does not authorize
+another implementation file.
+
+### Evaluation rubric
+
+The functional counting contract is primary: canonical sections must be counted
+ordinally and non-overlapping, including a synthetic example where naïve marker
+counting would lie. The presentation must also be internally credible for a
+PowerShell style-guide issue.
+
+| Criterion | Weight | Scoring guidance |
+| --- | ---: | --- |
+| Counting-algorithm correctness | 28 | 5 preserves ordinal, non-overlapping counting over the full string and rejects empty needles; 1 changes matching semantics. |
+| Style-guide self-consistency | 18 | 5 either fully documents a named function or uses a construct outside that rule; 1 demonstrates the exact antipattern being removed. |
+| Copy/paste acceptance usability | 16 | 5 remains one self-contained command block with little boilerplate; 1 needs external setup. |
+| PowerShell 5.1/7 compatibility | 12 | 5 uses APIs and syntax shared by both editions; 1 depends on edition-specific behavior. |
+| Readability and proportionality | 10 | 5 makes the small primitive obvious without dominating the validator; 1 obscures the acceptance logic. |
+| Self-testability | 8 | 5 retains direct normal and synthetic false-positive assertions; 1 is hard to isolate. |
+| Issue-scope preservation | 5 | 5 changes only the validation example; 1 adds permanent files or dependencies. |
+| Churn | 3 | 5 is a narrowly mechanical replacement; 1 requires broad restructuring. |
+
+Correctness outweighs aesthetics, but Option A cannot win merely because the
+current function works: the finding is specifically about handoff consistency.
+
+### Scoring results
+
+Abbreviations: AC = algorithm correctness; SC = self-consistency;
+CU = copy usability; CP = compatibility; RP = readability/proportionality;
+ST = self-testability; IS = issue scope; CH = churn.
+
+| Option | AC | SC | CU | CP | RP | ST | IS | CH | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Undocumented function | 5 | 1 | 4 | 5 | 4 | 5 | 5 | 5 | 80.4 |
+| B — Full function help | 5 | 5 | 4 | 5 | 2 | 5 | 5 | 2 | 89.0 |
+| C — Local script block | 5 | 5 | 5 | 5 | 4 | 5 | 5 | 4 | **97.4** |
+| D — Duplicate inline loops | 4 | 4 | 2 | 5 | 1 | 2 | 5 | 3 | 67.2 |
+| E — Escaped regex | 3 | 5 | 5 | 5 | 5 | 4 | 5 | 5 | 87.2 |
+| F — `Select-String` | 2 | 5 | 3 | 4 | 3 | 3 | 5 | 4 | 66.6 |
+| G — Permanent validator | 5 | 5 | 3 | 5 | 4 | 5 | 1 | 1 | 85.2 |
+
+Option C retains the exact algorithm and its tests while removing the
+documentation inconsistency with minimal scope. Option B is valid but adds
+large help prose to a transient local primitive.
+
+### Selected resolution
+
+Select Option C.
+
+In P2's canonical validation block, replace:
+
+```powershell
+function Get-OrdinalOccurrenceCount {
+    param(...)
+    # Existing ordinal, non-overlapping loop.
+}
+```
+
+with a block-scoped variable such as:
+
+```powershell
+$scriptGetOrdinalOccurrenceCount = {
+    param(
+        [Parameter(Mandatory)]
+        [string] $Content,
+
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [string] $Needle
+    )
+
+    $intCount = 0
+    $intIndex = 0
+
+    while (($intIndex = $Content.IndexOf(
+                $Needle,
+                $intIndex,
+                [System.StringComparison]::Ordinal
+            )) -ge 0) {
+        $intCount++
+        $intIndex += $Needle.Length
+    }
+
+    return $intCount
+}
+```
+
+Invoke it with:
+
+```powershell
+& $scriptGetOrdinalOccurrenceCount -Content $strContent -Needle $strNeedle
+```
+
+Keep the existing normal assertions and the synthetic false-positive self-test.
+Do not replace ordinal string matching with regex or line-oriented cmdlet
+semantics. Validate the final fenced block with both Windows PowerShell 5.1 and
+PowerShell 7 parsers.
+
+## Separate maintenance — The Markdown dependency lock reports advisories
+
+### Options
+
+#### Option A — Accept the advisories without a tracked action
+
+Leave the lock unchanged and rely on reduced token permissions and hosted-runner
+isolation.
+
+Least privilege limits repository impact but does not restore CI availability;
+crafted pull-request Markdown is still processed by the affected parser/glob
+chain.
+
+#### Option B — Fold dependency updates into P1
+
+Add `package.json`, `package-lock.json`, parser/linter upgrades, and regression
+work to P1 alongside Node/action and artifact-pipeline changes.
+
+This resolves the advisories early but combines two independent security review
+surfaces and contradicts P1's intentionally narrow Markdown-workflow scope.
+
+#### Option C — Fold dependency updates into P2
+
+Upgrade the Markdown toolchain while changing generator serialization and
+content.
+
+This provides an opportunity to test generated Markdown, but dependency
+resolution is unrelated to P2's generator contract and makes a regression hard
+to attribute.
+
+#### Option D — Make dependency remediation a prerequisite to P1
+
+Create and complete a maintenance issue before any P1 work.
+
+This prioritizes availability risk but delays the higher-priority action
+runtime, archive-identity, path, and writer corrections even though the
+advisories do not prevent those changes from being reviewed.
+
+#### Option E — Track a separate maintenance issue
+
+Keep the P1/P2 order unchanged and create a distinct maintenance item for the
+Markdown package and lockfile refresh. Require Node 24 outer/nested lint
+regression, fixture coverage for affected parsing/globbing paths, and a recorded
+post-update audit.
+
+This gives the advisories a real owner and acceptance evidence without silently
+expanding either issue in the two-issue slate.
+
+#### Option F — Add npm `overrides` only
+
+Force fixed transitive versions while keeping the current direct
+`markdownlint-cli2` range.
+
+Overrides can be a tactical fix, but compatibility across the parser/glob graph
+must still be tested and npm already indicates that the direct toolchain update
+is the supported complete remediation.
+
+#### Option G — Enable Dependabot and accept generated update PRs
+
+Configure automated npm update PRs for `.github/workflows`.
+
+Automation improves ongoing maintenance, but it does not by itself decide or
+prove the current pre-1.0 toolchain migration. It also adds repository policy
+work beyond the present issue revision.
+
+#### Option H — Suppress or audit-exempt the findings temporarily
+
+Record allow-list entries or make CI tolerate the current audit result until a
+future date.
+
+This can avoid noisy gates, but no current gate is blocking work and suppression
+would reduce visibility without remediating the availability exposure.
+
+### Evaluation rubric
+
+This boundary decision must keep a real CI availability risk visible while
+protecting the reviewability of P1 and P2. Because npm proposes a pre-1.0 direct
+tool upgrade, passing regression evidence is nearly as important as removing
+advisories.
+
+| Criterion | Weight | Scoring guidance |
+| --- | ---: | --- |
+| Security remediation | 25 | 5 removes the affected dependency paths and verifies the audit; 1 only accepts or suppresses them. |
+| Functional regression evidence | 20 | 5 requires outer/nested lint and targeted parser/glob fixtures on the updated lock; 1 changes or accepts dependencies without proof. |
+| Scope isolation and reviewability | 16 | 5 gives dependency work a coherent independent diff; 1 combines unrelated generator/helper changes. |
+| Scheduling urgency | 12 | 5 creates an actionable near-term item without indefinite deferral; 1 leaves no owner. |
+| Node/toolchain compatibility | 10 | 5 proves the selected direct/transitive versions on Node 24; 1 assumes compatibility. |
+| Maintenance sustainability | 8 | 5 leaves a supported direct dependency chain and repeatable audit practice; 1 relies on temporary suppression. |
+| Handoff clarity | 6 | 5 names affected files, checks, owner boundary, and completion evidence; 1 records only a vague concern. |
+| Churn efficiency | 3 | 5 avoids unnecessary policy or unrelated implementation changes; 1 adds broad machinery. |
+
+This rubric does not treat “not a P1/P2 blocker” as “unimportant.” It separates
+sequencing from ownership.
+
+### Scoring results
+
+Abbreviations: SR = security remediation; RE = regression evidence;
+SI = scope isolation; SU = scheduling urgency; TC = toolchain compatibility;
+MS = sustainability; HC = handoff clarity; CH = churn.
+
+| Option | SR | RE | SI | SU | TC | MS | HC | CH | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Accept | 1 | 1 | 4 | 1 | 3 | 1 | 1 | 5 | 36.0 |
+| B — Fold into P1 | 5 | 3 | 1 | 5 | 3 | 2 | 2 | 1 | 64.4 |
+| C — Fold into P2 | 5 | 3 | 1 | 3 | 3 | 2 | 2 | 1 | 59.6 |
+| D — Prerequisite issue | 5 | 5 | 4 | 5 | 5 | 4 | 5 | 2 | 93.4 |
+| E — Separate maintenance issue | 5 | 5 | 5 | 4 | 5 | 5 | 5 | 5 | **97.6** |
+| F — Overrides only | 3 | 3 | 4 | 4 | 2 | 2 | 3 | 4 | 62.6 |
+| G — Dependabot only | 4 | 4 | 5 | 3 | 4 | 5 | 4 | 3 | 81.8 |
+| H — Suppress | 1 | 2 | 4 | 2 | 3 | 1 | 3 | 4 | 44.2 |
+
+Option E gives the advisories an actionable and testable resolution without
+delaying or obscuring the higher-priority P1 corrections. Option D is also
+defensible if project policy requires zero known high advisories before any
+other work, but that policy is not present in this repository.
+
+### Selected resolution
+
+Select Option E.
+
+Do not add dependency updates to P1 or P2 and do not create a third issue file
+inside this prompt's two-file revision scope. Record the handoff as a separate
+maintenance issue to be created and prioritized alongside, but not as a
+blocked-by prerequisite for, P1.
+
+That maintenance issue should affect only the Markdown toolchain and directly
+necessary tests/documentation, principally:
+
+- `.github/workflows/package.json`;
+- `.github/workflows/package-lock.json`;
+- parser/glob fixture or lint-script files if regression coverage requires
+  them; and
+- narrowly related Markdown-workflow install/lint configuration.
+
+Its acceptance evidence must:
+
+1. perform a clean install under Node 24;
+2. run the outer Markdown lint suite;
+3. run all nested-fence fixtures;
+4. exercise representative pathological parser/linkification/glob inputs with
+   bounded completion;
+5. record `npm --prefix .github/workflows audit --json`;
+6. explain any remaining advisory rather than silently suppressing it; and
+7. confirm the package and lockfile diff contains no unrelated dependency
+   churn.
+
+The current reproducible baseline is seven development-dependency advisories:
+five high and two moderate. P1 may still prove that the existing lock runs on
+Node 24, but that compatibility result is not a claim that the advisories have
+been remediated.

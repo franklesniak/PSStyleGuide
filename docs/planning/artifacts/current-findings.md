@@ -2,280 +2,476 @@
 
 ## Overall assessment
 
-P1 and P2 form a coherent, correctly ordered slate. P1 establishes deterministic
-generation and a substantially stronger verification and synchronization pipeline;
-P2 then relies on that foundation for a source-and-generated-artifact documentation
-change. The main technical direction is sound, and several concerns raised in earlier
-drafts have been resolved.
+P1 followed by P2 is the correct order. The revised issues are substantially
+stronger than the earlier drafts: the generator boundary is deterministic, the
+candidate pipeline is fail-closed, the helper now has an explicit trusted-root
+interface and tracked harness, and P2 has a precise canonical example validator.
 
-Seven findings remain. Four should be settled before filing or implementation because
-they affect a security boundary, near-term workflow compatibility, or an undefined
-implementation contract. The remaining findings are precision and maintainability
-repairs that can be made without changing the slate's intended architecture.
+I would not file or implement the slate unchanged. Four matters should be
+corrected first:
 
-## Scope and method
+1. The asserted P1/T1 helper alignment is still not true in the attached issue
+   texts.
+2. P1's concrete action selection is already stale, and its Node 24 migration
+   leaves the Markdown workflow's Node 20 setup action and toolchain untouched.
+3. The helper hashes the ZIP by path and then reopens it, so the digest is not
+   bound to the exact stream consumed by `ZipArchive`.
+4. Exact directory enumeration and dangling candidate-leaf rejection remain
+   undefined.
 
-- Primary review targets:
+The writer identity, fixture oracle, conditional-consumer wording, and one P2
+validation helper also need smaller corrections. None of these findings changes
+the P1 to P2 ordering or argues for line-for-line identity between the complete
+PSStyleGuide and TerraformStyleGuide generators.
+
+## Scope and evidence
+
+- Primary review targets were
   `docs/planning/PSStyleGuide/01PSStyleGuideP1.md` and
   `docs/planning/PSStyleGuide/02PSStyleGuideP2.md`.
-- Execution order assumed: P1, then P2.
 - The H1 titles and P1/P2 identifiers are intentional and are not findings.
-- `docs/planning/TerraformStyleGuide/03TerraformStyleGuideT1.md` and
-  `docs/planning/TerraformStyleGuide/04TerraformStyleGuideT2.md` were read only
-  for cross-repository alignment. This review does not critique T1 or T2.
-- Repository files, installed validation commands, PowerShell 5.1 and PowerShell 7,
-  Git behavior, and the pinned GitHub Action implementations were checked directly.
+- The Terraform T1/T2 files were read only to evaluate the claimed shared
+  contract. This document does not review the Terraform-specific issue content.
+- The current generator, both workflows, `.gitattributes`, source guides,
+  generated artifacts, and sibling Terraform generator were inspected.
+- Official action tags, exact commit IDs, action metadata, and current release
+  pages were rechecked on 2026-07-29.
+- Repository Markdown lint, nested-Markdown lint, Git whitespace checks, and
+  PowerShell parsing were run locally.
 
-## Findings
+## Prior-criticism audit, recommendation by recommendation
 
-### P1-1 — The security-sensitive archive helper is not automatically exercised before merge
+### Recommendation 1 — Reconcile the claimed P1/T1 helper alignment
 
-Priority: high.
+Status: confirmed concern; preferred remedy denied; alternate remedy incomplete.
 
-P1 requires the production helper's fixture suite in every push consumer, but not in
-the pull-request Ubuntu job or pull-request Windows matrix. The helper is a new
-security boundary that validates an untrusted ZIP structure and controls extraction.
-An ordinary P1 pull request can therefore pass its automatic checks without executing
-that helper at all.
+The criticism correctly identified a real mismatch. P1 now makes
+`CheckoutRoot`, `TrustedTemporaryRoot`, `DownloadDirectory`,
+`CandidateDirectory`, and `ExpectedDigest` mandatory; adds optional caller-owned
+diagnostic labels; and assigns fixtures to a tracked harness. The attached T1
+still describes a different public interface, trust boundary, and fixture
+ownership model.
 
-The controlled write-path drill supplies valuable point-in-time pre-merge Ubuntu
-evidence, and the post-merge push matrix covers the Windows editions. It does not
-replace an automatic check on every pull-request revision. Furthermore, P1's expected
-post-merge push has `has_changes=false`, so synchronization—and its Ubuntu-capable
-helper invocation—skips.
+I do not recommend the criticism's preferred fix of weakening P1 to the older
+fixed-location T1 model. P1's explicit trusted-temporary-root envelope is the
+stronger and more testable contract. Keep it and coordinate the corresponding T1
+revision. Until that happens, P1 should not say that the interfaces and
+validation behavior are already aligned. It can describe its interface as the
+target shared contract.
 
-Recommended correction:
+### Recommendation 2 — Use one writer ref identity from preflight through push
 
-1. Run the exact tracked helper's complete fixture suite in the pull-request Ubuntu
-   job under PowerShell 7.
-2. Run it in the two pull-request LF cells: once under Windows PowerShell 5.1 and once
-   under PowerShell 7.
-3. Do not repeat the same helper suite in the CRLF cells. Helper behavior is
-   independent of the generator-source EOL fixture, so those repetitions add cost
-   without adding coverage.
-4. Retain P1's in-situ self-test requirement in every push consumer before the
-   production helper invocation.
-5. Add the three automatic pre-merge executions to pull-request evidence and
-   acceptance criteria.
+Status: confirmed and only partly addressed.
 
-This proves every claimed helper platform before merge and still detects consumer
-wiring or runner-environment failures after merge. The equivalent Terraform
-prerequisite can use the same pattern to preserve the intended cross-repository
-alignment.
+P1 now supplies:
 
-### P1-2 — The helper cannot implement all required checks from its specified interface
+```yaml
+env:
+  TARGET_REF: ${{ github.ref }}
+  EXPECTED_SHA: ${{ github.sha }}
+```
 
-Priority: high.
+That is an improvement. The preflight still validates `$env:GITHUB_REF`, while
+the lease and refspec consume `$env:TARGET_REF`. Similarly, prose refers to
+`github.sha`, while the push consumes `$env:EXPECTED_SHA`; equality with
+`$env:GITHUB_SHA` is not an explicit invariant.
 
-P1 says the helper accepts only:
+These values should be copied once into local variables in the single mutation
+block, cross-checked against the immutable GitHub variables, validated, and then
+reused unchanged for `ls-remote`, parent/HEAD proofs, the exact lease, and the
+explicit refspec.
 
-- the candidate download directory;
-- the initially nonexistent destination directory; and
-- the expected archive digest.
+### Recommendation 3 — Bind helper execution to the assigned edition
 
-The same helper must prove that both paths are outside the tracked checkout and emit
-the artifact ID, run ID, and run attempt in diagnostics when available. The issue does
-not define how it receives or authoritatively discovers the checkout root or diagnostic
-context.
+Status: confirmed concern and resolved.
 
-Deriving the checkout root from the process working directory is brittle. Reading
-`GITHUB_WORKSPACE` makes the helper CI-specific and leaves the local fixture contract
-undefined. Artifact and run context could be read from environment variables, passed
-as parameters, or logged by the caller; each produces a materially different contract.
+P1 now requires:
 
-Recommended correction:
+- Ubuntu PowerShell 7 helper coverage;
+- Windows PowerShell 5.1 coverage in the Desktop LF cell;
+- PowerShell 7 coverage in the Core LF cell;
+- edition-specific Windows shells and assertions; and
+- the same tracked harness in every push consumer before production helper use.
 
-1. Add a mandatory `CheckoutRoot` parameter.
-2. Add optional `ArtifactId`, `RunId`, and `RunAttempt` parameters, or explicitly make
-   those fields caller-owned and remove them from the helper's diagnostic obligation.
-3. Require all three path parameters to resolve through the filesystem provider before
-   comparison.
-4. Define containment with a path-separator boundary, so a sibling such as
-   `/work/repository-other` is not treated as a child of `/work/repository`.
-5. Define Windows comparison as ordinal case-insensitive and POSIX comparison as
-   ordinal case-sensitive after normalization.
-6. Use the same parameter names and semantics in P1 and T1, apart from their
-   intentional manifest-name difference.
+It explicitly explains that the CRLF cells do not repeat the EOL-independent
+helper suite. That is the deliberate optimization offered by the criticism, and
+the issue no longer implies that all four pull-request cells exercised it.
 
-This converts an architectural intention into an implementable, testable interface.
+### Recommendation 4 — Specify exhaustive enumeration and final-leaf detection
 
-### P1-3 — The modified workflow retains a Node 20 checkout action despite the active Node 24 migration
+Status: confirmed and unresolved.
+
+P1 uses exact-count and exact-set language, but does not prescribe an exhaustive
+enumeration primitive. `Get-ChildItem` without `-Force` omits hidden/system
+entries. Ordinary existence checks can also report a dangling final symlink as
+absent.
+
+The helper must normatively enumerate every entry, and it must enumerate the
+candidate parent for an exact leaf-name match immediately before leaf creation.
+The fixture suite still needs distinct hidden/system extra-entry and dangling
+final-leaf cases.
+
+### Recommendation 5 — Replace fixture prose with a normative outcome table
+
+Status: confirmed and unresolved.
+
+The current list still mixes:
+
+- ordinary successful extraction;
+- successful metadata-ignored extraction;
+- rejection cases;
+- platform-conditional cases;
+- a successful sibling-prefix classification; and
+- a successful filesystem-provider-qualified path.
+
+It then refers to “each invalid fixture” and singular “the valid fixture.” Stable
+case IDs, explicit success/rejection outcomes, failure phases, candidate-leaf
+postconditions, and positive byte/type assertions are still missing.
+
+### Recommendation 6 — Match push-consumer language to the conditional graph
+
+Status: confirmed and partly resolved.
+
+The detailed post-merge sections correctly say that the synchronization job
+skips when `has_changes=false`. P1 acceptance and P2 prerequisites still say
+every push consumer runs the harness “on every run.” A skipped job has no
+executed consumer steps.
+
+The issues should say that all four Windows push cells always run the harness and
+helper, while synchronization does so only when `has_changes=true` and the job
+starts.
+
+### Recommendation 7 — Preserve a deliberate generator-unification boundary
+
+Status: confirmed guardrail and satisfied.
+
+The revised slate unifies common serialization semantics without requiring the
+complete generators to be byte-identical or creating a cross-repository runtime
+dependency. It correctly preserves:
+
+- PSStyleGuide's existing `.gitattributes`;
+- its replacement of a frontmatter here-string;
+- TerraformStyleGuide's already LF-joined frontmatter; and
+- domain-specific merge rules, headings, artifacts, and rationale structures.
+
+This is the right meaning of generator unification.
+
+### Recommendation 8 — Make P2's validation helper self-consistent
+
+Status: reasonable quality concern and unresolved; low priority.
+
+P2 still declares `Get-OrdinalOccurrenceCount` without comment-based help. The
+style guide's formal repository scope is `.ps1` files, so a transient command
+embedded in a planning document is not the same defect as an undocumented
+committed function. It is nevertheless a conspicuous inconsistency in a
+copy-paste validation block for that very style guide.
+
+Either add complete help or avoid a named function, for example by using a
+narrowly scoped script block or inline ordinal-count logic. This should not
+block the higher-priority workflow and helper corrections.
+
+## Remaining actionable findings
+
+### P1-1 — Action and Node-runtime modernization is stale and incomplete
 
 Priority: high and time-sensitive.
 
-The current `build.yml` uses the moving reference `actions/checkout@v4`. The current
-v4 and exact v4.3.1 action metadata both declare `using: node20`. Node 20 reached end
-of life in April 2026. GitHub began making Node 24 the runner default on June 16,
-2026, and states that Node 20 will be removed from runners in fall 2026. GitHub tells
-workflow users to update to action versions that run on Node 24.
+P1 says that, as of 2026-07-28, checkout v6.0.2 is the selected release. Official
+GitHub releases show that checkout v7.0.1 was released on 2026-07-20. Its exact
+commit is:
 
-P1 substantially rewrites `build.yml` but pins only the artifact actions. Its
-instruction not to begin a repository-wide unrelated-action migration is reasonable;
-it should not prevent correction of the checkout action in the workflow P1 is already
-changing.
+```text
+3d3c42e5aac5ba805825da76410c181273ba90b1
+```
+
+V7 retains v6's protected credential storage under `RUNNER_TEMP`, runs on
+Node 24, and adds dependency/security updates. P1's revalidation instruction
+would eventually detect the newer release, but the dated concrete assertion,
+examples, references, and checkout-v6-specific controlled-evidence text are
+already wrong.
+
+The same affected Markdown workflow still contains:
+
+```yaml
+uses: actions/setup-node@v4
+with:
+  node-version: '20'
+```
+
+That has two separate Node 20 dependencies:
+
+- `setup-node@v4` itself declares `runs.using: node20`; and
+- the workflow deliberately installs the EOL Node 20 toolchain.
+
+As of this review, the current setup-node release is v7.0.0 at:
+
+```text
+820762786026740c76f36085b0efc47a31fe5020
+```
+
+Its exact metadata declares `runs.using: node24`. Node 24 is the current Active
+LTS line. GitHub is already in the Node 24 runner transition and plans to remove
+Node 20 from runners in fall 2026.
 
 Recommended correction:
 
-1. In P1's `build.yml` scope, update checkout to the then-current approved Node
-   24-based release and pin it to a verified full commit SHA.
-2. As of this review, the concrete candidate is
-   `actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd`
-   with an adjacent `# v6.0.2` comment.
-3. Reverify that release and SHA immediately before implementation, just as P1
-   requires for the artifact actions.
-4. Keep a broader repository-wide action migration out of P1. Record the remaining
-   `actions/checkout@v4` in `markdownlint.yml` as a separate near-term maintenance
-   item.
+1. Recheck and use the approved full-SHA checkout v7 release in both workflows.
+2. Pin the current approved Node 24-based setup-node release by full SHA.
+3. Set the Markdown toolchain to `node-version: '24'`.
+4. Set `package-manager-cache: false` because this job does not require caching.
+5. Give the Markdown workflow an explicit `permissions: contents: read`.
+6. Run both lint commands under Node 24 before finalizing.
+7. Update P1's references, examples, non-goals, and controlled push evidence.
+8. Add the setup action, toolchain, and permission assertions to P2's
+   prerequisite.
 
-If maintainers do not want checkout modernization in P1, they should create and
-complete a prerequisite issue before Node 20 removal and state that dependency
-explicitly. Silently retaining v4 is the weakest choice because it creates a known,
-short-horizon compatibility risk in the newly hardened workflow.
+These remain changes to the already affected `markdownlint.yml`; P1's five-path
+implementation scope does not need to grow. The current upload-artifact v7.0.1
+and download-artifact v8.0.1 tags and full SHAs were reverified and remain the
+latest releases on the review date.
 
-### P1-4 — P1 currently fails the repository's own Markdown lint
-
-Priority: medium.
-
-Running the installed `markdownlint-cli2` configuration against the issue files
-reports two MD029 errors:
-
-- `01PSStyleGuideP1.md:487`
-- `01PSStyleGuideP1.md:488`
-
-The unindented action fence after ordered item 4 ends the list as parsed by the
-linter. Items 5 and 6 are then interpreted as a new list whose expected numbering is
-1 and 2.
-
-Recommended correction: indent the action fence and associated content so it remains
-part of item 4, or restart the post-fence list at `1.` and `2.`. Using `1.` for every
-source Markdown ordered-list marker is another stable option.
-
-This is not merely cosmetic while the draft lives under `docs/planning`: the
-repository's `lint:md` command includes all `**/*.md` files.
-
-### P2-1 — P2 requires a rationale changelog that PSStyleGuide does not have
+### P1-2 — The helper does not bind the digest to the archive it consumes
 
 Priority: high.
 
-P2 says to add a "matching top rationale changelog row" and requires Version, Last
-Updated, and changelog metadata to agree. Current `STYLE_GUIDE_RATIONALE.md` has no
-changelog, version-history section, dated-row schema, or prior changelog rows.
-Neither authoritative PSStyleGuide source establishes such a convention.
+P1 requires:
 
-This requirement appears to have crossed over from TerraformStyleGuide context, where
-the repository-specific T2 issue can rely on an existing rationale changelog.
+1. `Get-FileHash -Algorithm SHA256` against the retained ZIP path;
+2. digest comparison; and then
+3. opening the archive.
 
-Recommended correction:
-
-1. **Preferred:** remove the rationale-changelog instruction from P2's metadata step,
-   content confirmation, and acceptance criteria. Continue to update `STYLE_GUIDE.md`
-   Version and Last Updated and add the rationale prose to
-   `STYLE_GUIDE_RATIONALE.md`.
-2. If PSStyleGuide deliberately wants a changelog, make that an explicit scope
-   addition. Specify its heading, placement, row schema, initial-history policy,
-   table-of-contents impact, and ownership rules. Do not call the first entry a
-   "matching" row when no existing row or schema exists.
-
-The first option is the better fit for P2's focused documentation repair and avoids
-inventing repository policy incidentally.
-
-### P2-2 — The automated middle-dot test proves only global co-occurrence, not the required example
-
-Priority: medium.
-
-P2's validation reads each touched file and, when it finds the Non-Compliant marker,
-checks only whether the file contains `LF + four middle dots + LF` somewhere. This
-can pass when:
-
-- the intended Non-Compliant block contains the wrong line;
-- the four-dot line occurs in unrelated prose or another code block;
-- the warning does not precede the block;
-- the block does not use a `text` fence; or
-- multiple conflicting Non-Compliant examples exist.
-
-Manual content confirmation catches some of these cases, but the automated test is
-described as confirming the exact visualization. It does not currently establish
-that claim.
+Those are separate path-based opens. The path can identify different bytes
+between hashing and `ZipArchive` construction. Repeating containment and
+reparse-point checks does not bind file content identity.
 
 Recommended correction:
 
-1. Define one canonical multi-line snippet that includes the heading or marker,
-   warning, opening `text` fence, both command lines, the exact four-dot third line,
-   and closing fence.
-2. Require exactly one canonical occurrence in each source/generated document that
-   is expected to contain the example.
-3. Reject any additional occurrence of the Non-Compliant marker.
-4. Continue the independent no-trailing-whitespace, no-CR, and no-BOM checks.
-5. If exact prose is intentionally allowed to differ among output formats, parse a
-   tightly bounded region from the unique marker through its closing fence and assert
-   the fence language, line count, adjacency, and exact line contents instead of
-   matching a global snippet.
+1. Complete path, type, and indirection validation.
+2. Open the retained ZIP once as a read-only `FileStream`.
+3. Hash that held stream, using `Get-FileHash -InputStream` or a compatible
+   SHA-256 implementation.
+4. Compare the digest and fail before archive parsing on mismatch.
+5. Rewind the same seekable stream.
+6. Construct `ZipArchive` over that same held stream.
+7. Keep that archive/stream pair through manifest validation and extraction.
+8. Dispose both deterministically.
 
-The existing `### Blank Line Usage` section in `STYLE_GUIDE_RATIONALE.md` should also
-be named explicitly as the rationale destination. Doing so prevents a duplicate
-section and makes the implementation unambiguous.
+This is available in both supported PowerShell editions and turns the claimed
+digest chain into an identity guarantee for the bytes actually parsed.
 
-### P1/P2-1 — Evidence links point to moving major branches instead of the reviewed action commits
+### P1-3 — Exact directory contracts and candidate-leaf absence are underspecified
+
+Priority: high.
+
+“Exactly one filesystem entry” and “exactly four paths” are security properties,
+not diagnostic descriptions. The issue should prescribe exhaustive enumeration
+that cannot omit hidden or system entries.
+
+Recommended correction:
+
+- Materialize `Directory.EnumerateFileSystemEntries` for exact count/set checks.
+- If `Get-ChildItem` is used for diagnostics, require `-LiteralPath -Force`.
+- Enumerate the candidate parent and compare leaf names with platform-appropriate
+  ordinal semantics.
+- Reject an existing file, directory, symlink, reparse point, or dangling link
+  with that name.
+- Repeat the parent enumeration immediately before creation.
+- Continue to use `FileMode.CreateNew` for every extracted file.
+
+Add stable fixtures for:
+
+- a hidden/system extra download entry;
+- an existing candidate file;
+- an existing candidate directory;
+- a candidate symlink/reparse leaf; and
+- a dangling final candidate link.
+
+A reparse component elsewhere in the path does not prove final-leaf handling.
+
+### P1-4 — The P1/T1 alignment assertion remains factually false
+
+Priority: high coordination requirement.
+
+This is the actionable remainder of prior recommendation 1. P1 now defines a
+good target contract, but the attached issue texts do not share it.
+
+Recommended correction: retain P1's stronger contract and coordinate the
+equivalent T1 update before presenting the two slates as aligned. At minimum,
+the shared contract should name the same:
+
+- mandatory path/digest parameters;
+- optional diagnostic parameters;
+- trusted-root and checkout-disjointness semantics;
+- validation order and same-stream archive identity;
+- tracked harness ownership;
+- exhaustive leaf/entry behavior; and
+- pre-merge versus push execution topology.
+
+The four manifest filenames and domain-specific artifact names should remain the
+intentional repository differences.
+
+### P1-5 — Writer preflight, commit proof, lease, and refspec use split identities
 
 Priority: medium.
 
-The configured artifact-action pins and their relied-upon contracts are correct as of
-review:
+The values currently originate from the same GitHub context, so this is not an
+immediate exploit. It is an unnecessary maintenance-sensitive split in the most
+security-sensitive mutation block.
 
-- upload-artifact v7.0.1 is
-  `043fb46d1a93c77aae656e7c1c64a875d1fc6a0a`;
-- download-artifact v8.0.1 is
-  `3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c`;
-- the upload action exposes `archive` and a bare-hex `artifact-digest`; and
-- the download implementation uses the artifact digest as the expected hash, honors
-  `skip-decompress`, and makes digest mismatch fatal when configured as `error`.
+Recommended correction:
 
-However, the References sections use raw GitHub URLs under moving `v7` and `v8`
-branches. A later reader can therefore inspect different code from the exact
-implementation on which the issue's security reasoning relies.
+1. Copy `TARGET_REF` and `EXPECTED_SHA` into local variables once.
+2. Require the target to be a complete `refs/heads/` name.
+3. Require it to equal `GITHUB_REF`.
+4. Resolve `HEAD^{commit}` once and require it to equal both the expected SHA
+   and `GITHUB_SHA`.
+5. Use the same local target in `ls-remote`.
+6. Validate exactly one `<object-id><TAB><ref>` result.
+7. Use the unchanged locals in the exact lease and `HEAD:<full-ref>` refspec.
 
-Recommended correction: link `action.yml`, the relevant README sections, and download
-implementation files at the exact full commit SHAs. Exact patch-release pages may
-remain as human-readable release context.
+The controlled stale-preflight and exact-lease drills should mutate only the
+specific local test input whose rejection they intend to prove.
+
+### P1-6 — The fixture suite still lacks an executable oracle
+
+Priority: medium.
+
+Convert the prose list into a normative table with at least:
+
+- stable case ID;
+- platform/precondition;
+- expected success or rejection;
+- expected failure phase;
+- whether the candidate leaf must remain absent;
+- expected diagnostics; and
+- required path, type, and byte assertions after success.
+
+Explicitly classify both archive success cases:
+
+1. an exact archive with the correct digest; and
+2. an exact archive with symlink-like external attributes that extract as
+   ordinary regular files.
+
+Also classify the sibling-prefix and provider-qualified path successes, the
+Windows case-variant result, and platform-conditional symlink construction.
+“An exception occurred” is not enough for a negative oracle.
+
+### P1/P2-1 — “Every push consumer on every run” is unattainable
+
+Priority: medium.
+
+Use one conditional graph contract throughout both issues:
+
+- The four Windows push cells always download, self-test, and invoke the helper.
+- Synchronization self-tests and invokes the helper only when
+  `has_changes=true`.
+- On the expected P1/P2 no-drift push, synchronization is skipped and none of
+  its steps run.
+- The controlled `has_changes=true` drill plus static inspection supplies writer
+  evidence.
+
+Update P1 acceptance and P2 prerequisite/acceptance language to match those
+semantics.
+
+### P2-1 — The named validation function remains undocumented
+
+Priority: low.
+
+This is prior recommendation 8. It is a handoff-quality issue rather than a
+functional defect. Add full help to `Get-OrdinalOccurrenceCount` or use a
+non-function implementation while preserving ordinal, non-overlapping counting
+and the synthetic false-positive self-test.
+
+### Separate maintenance — The Markdown dependency lock reports known advisories
+
+Priority: medium, but not a P1/P2 blocker.
+
+After a clean install, `npm audit` reports seven development-dependency
+advisories: five high and two moderate. They include denial-of-service issues in
+packages used while globbing and parsing repository Markdown. Pull-request
+authors control Markdown input, so this is relevant to check availability even
+after token permissions are reduced.
+
+Do not silently fold a dependency refresh into P1's already large security
+change. Create a separate maintenance issue to update the Markdown toolchain and
+lockfile, run the outer and nested fixture suites under Node 24, and record the
+post-update audit result.
 
 ## Confirmed strengths and resolved concerns
 
-- The repository's broad `.gitattributes` rule,
-  `* text=auto eol=lf`, is correct for the stated cross-repository checkout policy.
-- P1 correctly distinguishes the checkout invariant from producer correctness.
-- The current generator really does have the four stated write sites, retains
-  `#Requires -Version 5.1`, and currently lacks a script version.
-- P1's proposed frontmatter construction produces the same bytes as the current
-  `powershell.instructions.md` under both Windows PowerShell 5.1 and PowerShell 7.
-- The four-cell Windows topology is the actual edition × LF/CRLF cross-product, and
-  the lone-CR probe is separate and runs once per edition.
-- The candidate transport has two independent digest checks: the pinned download
-  action's native validation and the helper's retained-ZIP SHA-256 comparison.
-- The archive lifecycle, manifest checks, extraction sequencing, exact blob proofs,
-  and expected-SHA `--force-with-lease` design are fail-closed and technically sound.
-- P2's factual premise is correct: the stored Compliant and Non-Compliant examples
-  both currently have an empty third line.
-- Four U+00B7 MIDDLE DOT characters in a `text` fence are a durable, portable
-  visualization that does not teach literal trailing whitespace.
-- P2 correctly prohibits changing `.github/copilot-instructions.md`, while allowing
-  the distinct generated root-level `copilot-instructions.md` to change through
-  regeneration.
-- P2's version snapshot is correct if its stated baseline and UTC date still apply.
-- P1's final local-validation block already addresses the supplied unstaged-change
-  concern. Before `git add`, it requests porcelain v1 status with all untracked files,
-  derives the complete changed-path set, and compares it case-sensitively with exactly
-  the three expected P1 implementation paths. A third modified or untracked path
-  fails. It then independently verifies the exact staged set.
-- The complete attached T2 text is consistent with the prerequisite context used for
-  this review; no T2 finding is asserted here.
+- P1 then P2 remains the correct dependency order.
+- `.gitattributes` already has the correct repository-wide LF policy and neither
+  issue edits it.
+- P1's final-payload normalization, path resolution, BOM-less encoding, and
+  `WriteAllText` contract is correct.
+- The frontmatter replacement preserves the intentional PSStyleGuide bytes;
+  TerraformStyleGuide's already-correct array form remains repository-specific.
+- The helper interface is now implementable without ambient Git, GitHub, or
+  current-directory discovery.
+- Automatic pre-merge helper coverage now exists on Ubuntu and both Windows
+  editions.
+- The LF/CRLF matrix and separate lone-CR sanitation probes have distinct and
+  coherent purposes.
+- The immutable candidate ID, native digest check, propagated digest check,
+  read-only approval, sole writer, blob proofs, and exact lease form are sound
+  apart from the same-stream and canonical-identity findings above.
+- The artifact upload and download inputs relied on by P1 exist at the exact
+  pinned commits.
+- P2's factual premise remains true: the stored Compliant and Non-Compliant
+  example bodies are byte-equivalent.
+- P2 removed the invalid rationale-changelog requirement and names the existing
+  `### Blank Line Usage` rationale destination.
+- P2's canonical snippet validator now rejects the earlier global-co-occurrence
+  false positive and requires one exact snippet/marker in each guide-bearing
+  output.
+- P2 correctly commits both authoritative sources with all four regenerated
+  artifacts, making a no-drift post-merge push the expected result.
+
+## Validation performed
+
+- `npm --prefix .github/workflows run lint:md` — passed, 0 errors across
+  32 Markdown files.
+- `npm --prefix .github/workflows run lint:md:nested` — passed, 18 nested
+  Markdown blocks checked.
+- `git diff --check` — passed.
+- All four complete PowerShell fences in P2 parsed under PowerShell 7.6.4 and
+  Windows PowerShell 5.1.
+- P1's seven PowerShell fences parsed under both editions; its
+  placeholder-bearing fragments were treated as illustrative, not executable
+  validation blocks.
+- Official tag resolution confirmed:
+  - checkout v7.0.1:
+    `3d3c42e5aac5ba805825da76410c181273ba90b1`;
+  - setup-node v7.0.0:
+    `820762786026740c76f36085b0efc47a31fe5020`;
+  - upload-artifact v7.0.1:
+    `043fb46d1a93c77aae656e7c1c64a875d1fc6a0a`; and
+  - download-artifact v8.0.1:
+    `3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c`.
+- Exact action metadata confirms Node 24 runtimes for the recommended checkout
+  and setup-node commits and the required archive/digest inputs for the artifact
+  commits.
+- The current P2 example bodies were extracted and compared; both third lines
+  are empty and the bodies are equal.
 
 ## Primary references
 
-- [GitHub: Deprecation of Node 20 on GitHub Actions runners](https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/)
-- [actions/checkout v4 action metadata](https://raw.githubusercontent.com/actions/checkout/v4/action.yml)
-- [actions/checkout v4.3.1 action metadata](https://raw.githubusercontent.com/actions/checkout/34e114876b0b11c390a56381ad16ebd13914f8d5/action.yml)
-- [actions/checkout v6.0.2 action metadata](https://raw.githubusercontent.com/actions/checkout/de0fac2e4500dabe0009e67214ff5f5447ce83dd/action.yml)
-- [actions/upload-artifact v7.0.1 action metadata](https://raw.githubusercontent.com/actions/upload-artifact/043fb46d1a93c77aae656e7c1c64a875d1fc6a0a/action.yml)
-- [actions/download-artifact v8.0.1 action metadata](https://raw.githubusercontent.com/actions/download-artifact/3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c/action.yml)
-- [actions/download-artifact v8.0.1 download implementation](https://raw.githubusercontent.com/actions/download-artifact/3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c/src/download-artifact.ts)
-- [GitHub: Secure use reference for GitHub Actions](https://docs.github.com/en/actions/reference/security/secure-use)
+- [GitHub: checkout v7.0.1 release](https://github.com/actions/checkout/releases/tag/v7.0.1)
+- [GitHub: checkout v7.0.1 exact metadata](https://raw.githubusercontent.com/actions/checkout/3d3c42e5aac5ba805825da76410c181273ba90b1/action.yml)
+- [GitHub: checkout v7.0.1 exact README](https://raw.githubusercontent.com/actions/checkout/3d3c42e5aac5ba805825da76410c181273ba90b1/README.md)
+- [GitHub: setup-node v7.0.0 release](https://github.com/actions/setup-node/releases/tag/v7.0.0)
+- [GitHub: setup-node v7.0.0 exact metadata](https://raw.githubusercontent.com/actions/setup-node/820762786026740c76f36085b0efc47a31fe5020/action.yml)
+- [GitHub: setup-node v4 metadata](https://raw.githubusercontent.com/actions/setup-node/v4/action.yml)
+- [GitHub: Node 20 runner-action deprecation](https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/)
+- [Node.js release schedule](https://github.com/nodejs/Release#release-schedule)
+- [GitHub: secure-use reference](https://docs.github.com/en/actions/reference/security/secure-use)
+- [GitHub: workflow permissions](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#permissions)
+- [GitHub: upload-artifact v7.0.1 exact metadata](https://raw.githubusercontent.com/actions/upload-artifact/043fb46d1a93c77aae656e7c1c64a875d1fc6a0a/action.yml)
+- [GitHub: download-artifact v8.0.1 exact metadata](https://raw.githubusercontent.com/actions/download-artifact/3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c/action.yml)
+- [Microsoft Learn: `Get-FileHash`](https://learn.microsoft.com/powershell/module/microsoft.powershell.utility/get-filehash)
+- [Microsoft Learn: `ZipArchive` stream constructor](https://learn.microsoft.com/dotnet/api/system.io.compression.ziparchive.-ctor)
+- [Microsoft Learn: `Get-ChildItem -Force`](https://learn.microsoft.com/powershell/module/microsoft.powershell.management/get-childitem)
+- [Microsoft Learn: `Directory.EnumerateFileSystemEntries`](https://learn.microsoft.com/dotnet/api/system.io.directory.enumeratefilesystementries)
+- [Git: `git ls-remote`](https://git-scm.com/docs/git-ls-remote)
+- [Git: `git push`](https://git-scm.com/docs/git-push)
+- [npm: `npm audit`](https://docs.npmjs.com/cli/commands/npm-audit)
