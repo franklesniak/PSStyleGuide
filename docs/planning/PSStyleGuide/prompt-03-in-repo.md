@@ -15,8 +15,12 @@ Given your revised PSStyleGuide GitHub Issues slate:
 And given the state of the [`TerraformStyleGuide` repo](github.com/franklesniak/TerraformStyleGuide), and the information that I provided to you about the proposed TerraformStyleGuide GitHub Issues slate:
 
 - `docs\planning\TerraformStyleGuide\03TerraformStyleGuideT1.md`
+- `docs\planning\TerraformStyleGuide\03aTerraformStyleGuideT1A.md`
+- `docs\planning\TerraformStyleGuide\03bTerraformStyleGuideT1B.md`
 - `docs\planning\TerraformStyleGuide\04TerraformStyleGuideT2.md`
+- `docs\planning\TerraformStyleGuide\05TerraformStyleGuideT3.md`
+- `docs\planning\TerraformStyleGuide\06TerraformStyleGuideT4.md`
 
 (again, assume these issues are worked on one at a time, sequentially, in the order they are listed)
 
-What feedback would you have, if any, for the person that drafted the T1/T2/etc. GitHub Issues slate? Record your answer in `docs\planning\TerraformStyleGuide\slate-criticism.md`. If the file already exists, overwrite the existing file (do not append it).
+What feedback would you have, if any, for the person that drafted the T1/T2/T3/T4/etc. GitHub Issues slate? Record your answer in `docs\planning\TerraformStyleGuide\slate-criticism.md`. If the file already exists, overwrite the existing file (do not append it).

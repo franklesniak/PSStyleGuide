@@ -15,6 +15,10 @@ Lastly, please note that I'm trying to thoughtfully unify the generator script a
 I'm not asking you to critique these, but as an FYI: here is a similar proposed GitHub Issue slate for `TerraformStyleGuide` (I will implement these in parallel with the issues in `PSStyleGuide`):
 
 - `docs\planning\TerraformStyleGuide\03TerraformStyleGuideT1.md`
+- `docs\planning\TerraformStyleGuide\03aTerraformStyleGuideT1A.md`
+- `docs\planning\TerraformStyleGuide\03bTerraformStyleGuideT1B.md`
 - `docs\planning\TerraformStyleGuide\04TerraformStyleGuideT2.md`
+- `docs\planning\TerraformStyleGuide\05TerraformStyleGuideT3.md`
+- `docs\planning\TerraformStyleGuide\06TerraformStyleGuideT4.md`
 
 As you review, please record your thoughts to `docs\planning\artifacts\current-findings.md` (overwrite the existing file if one is present). Write to the file as you're working; this will help protect you from context window compaction.

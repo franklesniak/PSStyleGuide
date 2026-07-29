@@ -25,6 +25,10 @@ Do not proceed to the next finding until all of the above are completed. Then, c
 Then, please use the information about each finding and the option selected to address it in `docs\planning\artifacts\current-findings-evaluation.md` to incorporate the feedback and revise the GitHub Issue slate (TerraformStyleGuide GitHub Issues only):
 
 - `docs\planning\TerraformStyleGuide\03TerraformStyleGuideT1.md`
+- `docs\planning\TerraformStyleGuide\03aTerraformStyleGuideT1A.md`
+- `docs\planning\TerraformStyleGuide\03bTerraformStyleGuideT1B.md`
 - `docs\planning\TerraformStyleGuide\04TerraformStyleGuideT2.md`
+- `docs\planning\TerraformStyleGuide\05TerraformStyleGuideT3.md`
+- `docs\planning\TerraformStyleGuide\06TerraformStyleGuideT4.md`
 
 If there are multiple GitHub Issues, ensure you list them in the order in which they should be executed/worked. Do not label the issue(s) as revisions or draw attention to what you've changed, as I'll be handing the information off to someone else, and I don't want to confuse them.
