@@ -1,384 +1,407 @@
-# Feedback on the PSStyleGuide P1/P2/P3 GitHub issue slate
+# Feedback on the revised PSStyleGuide P1/P2/P3 GitHub issue slate
 
 ## Overall assessment
 
-This is a strong and nearly handoff-ready slate. P1, P2, and P3 have distinct
-ownership, their P1 → P2 → P3 ordering is coherent, and the supersession
-language prevents a later issue from silently undoing an earlier issue's
-security or validation contract.
+P2 is substantively ready, and P3 is much stronger than its earlier draft.
+The latest P revisions fixed the previously identified action-role, Node
+runtime, audit-graph, residual-identity, expiry-parsing, and durable-link
+problems. Those findings should not be carried forward.
 
-The generator-unification approach is also now appropriately calibrated. P1
-and TerraformStyleGuide T1 converge on the same serialization boundary,
-BOM-less LF bytes, cross-edition behavior, archive trust model, and public
-helper semantics without creating a cross-repository runtime dependency. The
-remaining intentional differences—including artifact names, guide-specific
-transformations, and the different pull-request helper-harness placement—are
-identified rather than hidden. I would preserve that design.
+P1 is not yet ready to file in its current form. The revised
+TerraformStyleGuide slate split its equivalent work into a deterministic
+generator foundation (T1), an inert candidate-validator layer (T1A), and final
+workflow activation (T1B). PSStyleGuide P1 still combines all three layers in
+one 2,900-line issue and now refers to the obsolete, pre-split meaning of “T1.”
+More importantly, the newer Terraform issues added security controls that P1
+does not contain.
 
-P2 needs no substantive content redesign. It fixes a real defect, keeps the
-example portable across unrelated adopters, avoids storing the prohibited
-trailing spaces, separates operational guidance from rationale, and requires
-the sources and generated artifacts to move together.
+I would preserve the repository-local implementation model. The two
+repositories should converge on observable generator, archive, lifecycle,
+writer, and validation contracts without acquiring a cross-repository runtime
+dependency. The revised Terraform split makes that convergence easier to
+review, implement, and prove.
 
-I would nevertheless make the targeted corrections below before handing off
-the slate. The first affects P1. The next three affect P3. The final item is
-filing hygiene across the slate.
-
-## Current-state anchors
+## Current-state anchor
 
 These observations were rechecked on 2026-07-29 against PSStyleGuide `main` at
 commit
 [`4346310e7deebffb4159c75e30d9546263dfd649`](https://github.com/franklesniak/PSStyleGuide/commit/4346310e7deebffb4159c75e30d9546263dfd649):
 
 - `.gitattributes` already contains exactly `* text=auto eol=lf`.
-- The generator still has four edition-sensitive `Set-Content -Encoding UTF8`
-  writes and a here-string frontmatter source, so P1 addresses live behavior.
-- The build and Markdown workflows still have the action, permission, trigger,
-  and Node-runtime weaknesses described by P1.
-- The two Blank Line Usage examples still have byte-identical empty third
-  lines, so P2 addresses a live documentation defect.
-- The staged hook and staged-lint script still admit Node 20 or newer.
-- A fresh lockfile-only audit still reports seven vulnerable package nodes:
-  five high and two moderate.
-- The seven reported nodes are `brace-expansion`, `js-yaml`, `linkify-it`,
-  `markdown-it`, `markdownlint-cli2`, `minimatch`, and `picomatch`.
+- The generator still has four edition-sensitive
+  `Set-Content -Encoding UTF8` writes and an edition-sensitive frontmatter
+  here-string.
+- The build and Markdown workflows still use mutable v4 action tags.
+- Hosted Markdown validation still selects Node 20.
+- The Husky and JavaScript staged-lint guards still admit Node 20 or newer.
+- The dated seven-package-node audit baseline in P3 still describes the
+  planning baseline that must be recomputed at implementation time.
 
-The dated P3 baseline therefore remains accurate. Node 22 and Node 24 are
-currently LTS releases, while Node 20 is EOL. P3 is right to remove Node 20
-from the supported local-tooling contract.
+The proposed issues therefore still address live repository behavior. The
+feedback below is about issue architecture and missing acceptance boundaries,
+not about removing the work.
 
-## 1. Make P1's action-role validator as exact as P1 and P2 claim
+## Improvements in the latest P drafts to preserve
 
-### Finding
+The latest edits resolved several earlier material findings:
 
-P1's action validator correctly rejects:
+- P1 now defines one exact job/stable-step action-role inventory, exact
+  occurrence equality, complete allowed inputs, and negative fixtures.
+- P1 no longer describes an impossible “two checkout occurrences” inventory.
+- P3 selects its Node floor from the complete direct/transitive tree and
+  requires clean selected-minimum and Node 24 runtime cells.
+- P3 exercises the complete Husky hook and includes fail-fast below-minimum
+  guard cases.
+- P3 uses audit-native `(Package, AdvisoryUrl)` residual identity, preserves
+  package-keyed audit-node sets separately, and keeps `npm explain` diagnostic.
+- P3 reconciles audit metadata with the enumerated graph and validates node
+  paths, `via`/`effects`, advisory shapes, and remediation shapes.
+- P3 uses exact invariant UTC expiry parsing, verifies a publicly retrievable
+  PSStyleGuide issue that is not a pull request, and records owner acceptance
+  separately.
+- P3 now uses a durable commit permalink for its research record.
 
-- an unknown external action repository;
-- an unapproved workflow;
-- a non-full-SHA reference;
-- a SHA/version-comment mismatch; and
-- an extra setup-node occurrence.
+Those corrections are sound and should survive the revisions below.
 
-It does not, however, prove the claimed exact role inventory.
+## 1. Split P1 along the same trust boundaries as T1/T1A/T1B
 
-`$hashtableRequiredOccurrences` contains only workflow/action keys and the
-loop rejects a count only when it is *less than* the required minimum.
-Consequently, extra approved checkout, upload, or download steps pass. A
-required occurrence in the wrong job can also satisfy the count for a missing
-intended occurrence because the key contains no job or step role.
+Severity: High
 
-There is a related prose contradiction. P1 says not to migrate actions other
-than “the two checkout occurrences,” but P1's final workflow topology requires
-more than two YAML checkout steps:
+P1 currently owns all of the following in one issue:
 
-1. build pull-request Ubuntu verification;
-2. build pull-request Windows matrix;
-3. build push preparation;
-4. build push Windows matrix;
-5. build synchronization; and
-6. Markdown lint.
+1. generator serialization;
+2. frontmatter construction;
+3. Node 24 and action pinning;
+4. Dependabot’s intermediate GitHub Actions entry;
+5. a security-sensitive ZIP validator/extractor;
+6. its adversarial harness;
+7. artifact upload/download topology;
+8. a cross-edition Windows matrix;
+9. terminal approval; and
+10. the only repository writer.
 
-The intended permanent artifact roles likewise appear to be two uploads
-(pull-request diagnostics and push candidate) and two downloads (push Windows
-consumer and synchronization consumer), plus one Markdown setup-node step.
+Its title mentions only deterministic generation, while its acceptance surface
+extends through credentialed publication. The implementation cannot review or
+merge the validator independently before activating it, and a defect in any
+one layer blocks all six files and all evidence.
 
-This matters beyond neatness. An upload step placed in an unintended job can
-change the data-exfiltration surface; an extra checkout can change credential
-and repository-state behavior; and a missing consumer download can be masked
-by a duplicate elsewhere. P2 currently inherits the overstatement by calling
-this an “exact allowlist validator.”
+The revised Terraform issues establish a better sequence:
+
+- [T1](../TerraformStyleGuide/03TerraformStyleGuideT1.md) makes generation
+  deterministic and leaves a temporary, explicit publication boundary.
+- [T1A](../TerraformStyleGuide/03aTerraformStyleGuideT1A.md) adds the helper,
+  caller-context lifecycle, and permanent harness without changing production
+  workflow behavior.
+- [T1B](../TerraformStyleGuide/03bTerraformStyleGuideT1B.md) activates the
+  already merged scripts and replaces temporary publication with the final
+  verified writer.
 
 ### Recommended correction
 
-Define one authoritative role table after final job and step IDs are selected.
-Key every expected external action by:
+Create the analogous PSStyleGuide sequence:
+
+1. **P1:** deterministic serialization/frontmatter, Node 24, action pins,
+   one-entry Dependabot state, and a temporary least-privilege publication
+   boundary;
+2. **P1A:** candidate validator, caller-context lifecycle, and permanent
+   harness, with no production workflow activation; and
+3. **P1B:** final immutable candidate, matrices, approval, and exact-lease
+   writer.
+
+Keep the existing H1 title convention in every issue. Record actual GitHub
+blocked-by relationships and exact prerequisite merge commits.
+
+P2 should depend on P1B, not merely the generator foundation, because its
+generated-artifact change relies on the final publication path. P3’s default
+order may remain after P2, subject to its existing vulnerability-policy gate.
+
+If the drafter deliberately keeps one P1, the issue should explain why the
+cross-repository trust boundaries differ and supply an equally reviewable
+staged activation plan. File count alone is not a sufficient rationale.
+
+## 2. Replace P1’s stale “parallel T1” comparisons
+
+Severity: High
+
+P1’s generator matrix still treats “T1” as the complete Terraform generator,
+helper, transport, matrix, and writer issue. That is no longer true:
+
+- generator convergence belongs to Terraform T1;
+- helper/context/harness convergence belongs to T1A; and
+- workflow/writer convergence belongs to T1B.
+
+The stale text hides material differences by referring to one old comparison
+point. For example, it says the candidate parameter contract is P1/T1, but the
+current contract is in T1A. It also has no reciprocal writer matrix matching
+T1B’s credential, identity, diagnostics, and at-use validation requirements.
+
+### Recommended correction
+
+Define three reciprocal matrices:
+
+| PS layer | Terraform comparison | Required comparison evidence |
+| --- | --- | --- |
+| P1 | T1 | payloads, path resolution, encoding, bytes, Node/action baseline |
+| P1A | T1A | public parameters, limits, context, both cleanups, cases, editions |
+| P1B | T1B | transport, roles, matrices, approval, writer identity/credentials |
+
+The implementation that starts second should consume the other repository’s
+exact merge commit and record every status as `same`, `intentional difference`,
+or `blocker`. An unexplained security or observable failure difference should
+block merge.
+
+Update P2’s prerequisite snapshot and P3’s enduring/non-goal inventory to name
+all final PS scripts and layers. Do not leave P2 coupled to the current
+two-script P1 inventory if a caller-context script is added.
+
+## 3. Make the generator destination-path contract actually converge
+
+Severity: Medium to high
+
+P1 requires each writer to call
+`GetUnresolvedProviderPathFromPSPath`, but its prescribed pattern does not
+explicitly:
+
+- reject wildcard-bearing inputs;
+- reject non-filesystem providers;
+- reject ambiguous/multiple resolutions;
+- require one unambiguous filesystem path; or
+- retain the destination in the failure diagnostic.
+
+Terraform T1 now requires all of those controls at every final write site. This
+is part of generator unification, not a repository-specific content
+difference.
+
+### Recommended correction
+
+Adopt T1’s exact path contract for each P1 write:
+
+1. reject wildcard, non-filesystem-provider, and multiple-resolution inputs;
+2. obtain exactly one unresolved filesystem provider path;
+3. normalize the complete payload;
+4. write once with explicit `UTF8Encoding($false)` and `WriteAllText`; and
+5. report the captured destination if serialization fails.
+
+Retain PSStyleGuide’s intentional frontmatter replacement and artifact names.
+The shared target is the serialization/path/failure boundary, not identical
+source text.
+
+## 4. Add T1A’s resource limits and reusable caller-context lifecycle
+
+Severity: High
+
+P1’s ZIP helper validates an exact four-file manifest and extracts fresh
+ordinary files, but it sets no maximum for:
+
+- retained archive bytes;
+- declared uncompressed bytes per entry;
+- declared total uncompressed bytes; or
+- actual copied bytes.
+
+An exact entry count does not bound a compression bomb or an untruthful entry
+length. T1A now caps the archive at 32 MiB, each entry at 8 MiB, the total
+declared output at 32 MiB, and the actual copied output at the same limits.
+
+P1 also duplicates trusted-root acquisition and teardown behavior in workflow
+consumers and the harness. T1A instead adds
+`Manage-StyleGuideCandidateInvocationContext.ps1` with exact
+`New-StyleGuideCandidateInvocationContext` and
+`Remove-StyleGuideCandidateInvocationContext` functions. This gives both
+repositories one reusable owner for collision-only creation and nonrecursive,
+fail-closed caller teardown, separate from the candidate helper’s own cleanup.
+
+### Recommended correction
+
+- Add the same finite declared/actual archive limits unless measured
+  PSStyleGuide artifacts require a separately justified value.
+- Add the caller-context script with the same public function names and
+  meanings.
+- Make the helper remain independently distrustful of the context.
+- Exercise both production cleanup lifecycles in the permanent harness.
+- Require every production consumer to use the context functions rather than
+  copy their algorithms into workflow YAML.
+- Preserve uncertain state and the primary failure if either cleanup cannot
+  prove exact ownership.
+
+Artifact filenames and fixture placement may differ. Resource exhaustion,
+ownership, and cleanup behavior should not.
+
+## 5. Bring P1’s writer up to T1B’s credential and identity boundary
+
+Severity: High
+
+P1’s normative action-role table deliberately gives the synchronization
+checkout `persist-credentials: true`. The reviewed checkout action documents
+that this configures its token in local Git configuration until post-job
+cleanup. T1B instead disables persisted credentials on every checkout and
+expands one environment-backed HTTP authorization value only for the exact
+push.
+
+P1 also:
+
+- snapshots only `TARGET_REF` and `EXPECTED_SHA` at the start, then reads
+  `GITHUB_REF` and `GITHUB_SHA` later;
+- does not explicitly reject NUL and other control characters in all four
+  identity inputs;
+- says the writer must never regenerate, while T1B regenerates from the exact
+  expected commit in a separate controlled location and compares bytes;
+- does not require terminal approval to inspect and reject every failed or
+  unexpectedly skipped dependency; and
+- lacks T1B’s explicit token-sentinel, bounded diagnostic-retention, and
+  measured-CI-cost evidence.
+
+These are security and failure-observability differences, not guide-specific
+values.
+
+### Recommended correction
+
+Adopt T1B’s writer boundary:
+
+1. use `persist-credentials: false` everywhere;
+2. snapshot `TARGET_REF`, `EXPECTED_SHA`, `GITHUB_REF`, and `GITHUB_SHA` in the
+   first executable statements and never reread them;
+3. reject empty, whitespace-mutated, CR/LF, NUL, control, malformed-ref, and
+   malformed-object inputs before mutation or credential expansion;
+4. revalidate the exact artifact/helper/harness and independently regenerate
+   from the expected commit before copying;
+5. make terminal approval inspect the complete dependency result set,
+   including unexpected skips;
+6. expose the token only through one process-scoped environment-backed Git HTTP
+   authorization configuration for the exact push, then restore/remove it in
+   `finally`;
+7. prove with sentinels that the token never enters logs, command records,
+   files, or artifacts; and
+8. bound failure-only diagnostics and record matrix cost without silently
+   deleting a security cell.
+
+Update the exact action-role inventory atomically. The final writer checkout
+must then require `persist-credentials: false`, not `true`.
+
+## 6. P3’s Node policy still admits unreviewed future and non-LTS majors
+
+Severity: Medium to high
+
+P3 now says its evidence does not claim every intervening, EOL, or future major
+has been tested. Its required policy nevertheless sets:
 
 ```text
-workflow | job ID | stable step ID | action repository
+engines.node = >=<selected minimum>
 ```
 
-For each key, record the exact SHA, adjacent version comment, and any
-security-relevant required inputs. Then require exact set equality:
+and aligns both local guards to the same minimum-only decision. If the selected
+minimum is 22, that contract admits Node 23, 25, 26, and every future major.
+That contradicts the stated support boundary and the requirement to select a
+supported LTS line.
 
-- every expected role occurs exactly once in the workflow YAML;
-- no expected role is missing;
-- no approved action occurs in an unlisted role;
-- no additional external action occurs; and
-- the exact role has the expected repository/SHA/version tuple.
-
-At minimum, replace the lower-bound count comparisons with exact counts for
-the complete intended inventory and reject every extra occurrence. The
-stronger job/step-aware table is preferable because it proves the statement
-that an action appears only in its approved role.
-
-Use stable step IDs for the verifier rather than relying only on human-readable
-step names. Keep GitHub's real workflow run as syntax/execution evidence; the
-static verifier should prove the intended inventory, not attempt to replace
-GitHub's workflow parser.
-
-Finally:
-
-- replace “the two checkout occurrences” with the actual final inventory;
-- update P1's acceptance language to describe precisely what is mechanically
-  proved; and
-- refresh P2's prerequisite snapshot after the P1 validator is corrected.
-
-## 2. Make P3 prove the complete supported Node interval
-
-### Finding
-
-P3 aligns `package.json`, `.husky/pre-commit`, and
-`lint-staged-markdown.mjs` on a selected minimum and runs the staged harness at
-that minimum and at Node 24. That is good, but it does not yet completely prove
-the runtime-support claim:
-
-- “highest minimum ... required by the final selected direct dependency tree”
-  can be read as considering only direct packages; a transitive package can
-  impose the actual floor;
-- the copyable validation block performs clean installation and
-  `npm ls --all` only while Node 24 is active;
-- the selected-minimum instruction reruns the harness, but does not clearly
-  require a fresh `npm ci`, `npm ls --all`, both production lint commands, and
-  the harness under that minimum;
-- the harness does not invoke the complete `.husky/pre-commit` surface;
-- no negative case proves that both local guards reject a below-minimum major
-  before invoking npm/lint tooling; and
-- “if ... releases require a higher minimum, use that higher value” has no
-  explicit upper bound, even though P3 simultaneously requires Node 24 to
-  remain supported.
+Terraform T3 correctly requires a bounded range and rejects unreviewed future
+majors.
 
 ### Recommended correction
 
-Define the selected minimum as the highest Node floor in the complete resolved
-direct *and transitive* tree, not merely the direct dependency set. Require:
+Define one bounded set of reviewed Node major lines and use it consistently in:
 
-```text
-selected minimum <= 24
-```
+- `package.json`;
+- `.husky/pre-commit`;
+- `lint-staged-markdown.mjs`; and
+- the tracked harness.
 
-If a candidate requires Node 25 or later, it is incompatible with P3's retained
-Node 24 contract. Select another safe candidate, explicitly redesign the
-hosted-runtime policy in separately reviewed scope, or disposition the
-otherwise unavoidable advisory; do not claim that Node 24 still works.
+For example, if only Node 22 and 24 are supported, choose an exact semver union
+that admits those major lines without admitting 23, 25, or future majors. The
+implementation should derive the final syntax from the reviewed package tree;
+the issue need not hard-code a range before selection.
 
-Run two clean runtime cells when the selected minimum is below 24:
+Add stable cases for:
 
-| Runtime | Required evidence |
-| --- | --- |
-| Selected minimum | Fresh `npm ci`, `npm ls --all`, both production lint commands, and the tracked staged/full-lint harness |
-| Node 24 | Fresh `npm ci`, `npm ls --all`, both production lint commands, and the tracked staged/full-lint harness |
+- each supported major;
+- one below-minimum major;
+- an intervening unsupported major; and
+- an above-maximum/future major.
 
-If the selected minimum is 24, one clean Node 24 cell can satisfy both roles,
-provided the evidence says so explicitly. Retain hosted Node 24 as the
-nonoptional gate.
+Keep the current clean selected-minimum and Node 24 runtime cells.
 
-Also add small guard-policy cases:
+## 7. Make residual P3 audit approvals durable and continuously enforced
 
-- the manifest and both guards contain the same selected minimum;
-- both guards emit the reviewed stable diagnostic;
-- the staged script and hook accept the selected minimum; and
-- both reject a synthetic below-minimum major before npm, npx, or Markdown
-  tooling can run.
+Severity: High when any residual exists
 
-There is no need to execute an EOL Node 20 binary merely to test the rejection.
-For the shell hook, a test-owned `node` shim can report a below-minimum version
-and an npm/npx sentinel can prove fail-fast behavior. For the JavaScript guard,
-factor the version decision into a small pure function that the harness can
-exercise with a synthetic version while the production entry point still uses
-`process.versions.node`.
+P3’s audit-native validation is strong, but its
+`$arrApprovedResiduals` and `$arrRecordedAuditNodes` records exist only in a
+copyable implementation-time validation block. They are not part of the
+seven-file repository state, and `markdownlint.yml` runs only the lint
+regression harness.
 
-## 3. Make P3's residual approval identity match its stated unit of risk
+If a residual is approved, nothing in the merged repository automatically
+fails when:
 
-### Finding
+- the approval expires;
+- the audit graph changes;
+- a node path appears or disappears;
+- the advisory is fixed but the stale approval remains; or
+- a new moderate/high/critical advisory is introduced.
 
-P3 says each residual approval identifies one exact
-advisory/package/dependency-path combination. The validator does not compare
-that tuple.
-
-It:
-
-1. forbids duplicate advisory URLs;
-2. confirms that an approval's package/URL pair occurs once in the audit
-   advisory records;
-3. confirms that the selected dependency path is *one* path returned by
-   `npm explain`; and
-4. compares the approved and actual residual sets only as unique advisory-URL
-   sets.
-
-That permits a missing path disposition to pass. It also prevents representing
-the same advisory at two installed paths because a second record with the same
-URL is rejected before its package/path can distinguish it. A package-wide
-`npm explain <package>` can legitimately return multiple installed instances;
-npm's documentation specifically recommends a folder path when an exact
-duplicate instance must be explained.
-
-There is an additional provenance issue: the audit's `nodes` field identifies
-vulnerable installed/lockfile node locations, whereas the recursive
-`npm explain` formatter produces human-readable dependency chains for the
-package as a whole. Selecting any one explain chain does not establish that
-every audit-reported vulnerable node has a disposition.
+T3 has the right lifecycle idea: no exception file for a clean result, but a
+structured tracked exception file plus CI validation when a residual exists.
+P3’s audit-native `(Package, AdvisoryUrl)` identity and separate package-keyed
+node sets are more precise than blindly cross-producting advisory URLs and
+paths, so that P3 model should be retained.
 
 ### Recommended correction
 
-Choose and document one of these two internally consistent models.
+Conditionally add a tracked structured exception file only when the final audit
+has a residual. Add a permanent validator that:
 
-#### Preferred model: audit-native approval identity
+- reproduces P3’s reviewed report-version/schema checks;
+- requires exact current residual-key equality;
+- requires exact package-keyed audit-node-set equality;
+- validates owner acceptance, public follow-up, and exact UTC expiry;
+- fails after expiry or topology drift; and
+- rejects an exception file when the audit is clean.
 
-- Key each approval by exact `(Package, AdvisoryUrl)`, the pair directly
-  established by an object advisory in the audit graph.
-- Maintain a separate package-keyed, exact, sorted, nonempty
-  `AuditNodePaths` set equal to each vulnerability property's `nodes` value.
-  Do not present that package-level set as an advisory-to-node mapping that npm
-  did not supply.
-- Keep normalized `npm explain` chains as diagnostic/reviewer context, not as
-  the identity used for exact residual-set equality.
-- Reject duplicate package/URL composite keys rather than duplicate URLs.
-- Compare actual and approved composite-key sets exactly.
-- Separately require every audit node path to be represented in the recorded
-  node-path evidence.
+Invoke it in hosted Markdown CI after clean installation. Compute the final P3
+changed/staged set after the audit result is known instead of permanently
+requiring exactly seven paths.
 
-#### Stricter per-node model
+## P2 disposition
 
-- Key each approval by
-  `(Package, AdvisoryUrl, AuditNodePath)`.
-- Resolve the exact version at each audit node from the lockfile.
-- Use semver-correct range evaluation to prove that the advisory applies to
-  that node before constructing the actual tuple set.
-- Require exact tuple-set equality and reject only duplicate composite keys.
-- Use `npm explain <exact-folder-path>` to attach the corresponding readable
-  chain.
+P2 needs no substantive content redesign. It fixes a live documentation defect,
+keeps the visible substitute explicitly non-copyable, separates operational
+guidance from rationale, advances metadata, and regenerates all dependent
+artifacts.
 
-Do not blindly cross-product every advisory for a package with every node for
-that package; different advisory ranges may cover different installed
-versions. The preferred model is simpler and stays closest to what the audit
-JSON directly proves.
+After the P1 split and contracts are final:
 
-For either model, retain the current fail-closed handling of `npm audit` exit
-codes. npm documents that exit 0 means no vulnerability at the configured
-threshold and that nonzero behavior depends on `audit-level`; that part of P3
-is sound.
+- make P2 depend on P1B’s actual issue and exact merge commit;
+- refresh its prerequisite snapshot to include the context lifecycle and both
+  cleanup owners;
+- replace title-only draft references with actual filed issue URLs; and
+- retain P2’s six-file source/generated scope and Node 24 lint evidence.
 
-Also tighten the associated governance fields:
+## Recommended final slate
 
-- Parse `ExpiresUtc` with `DateTimeOffset.TryParseExact`, one documented
-  invariant-culture UTC format, and explicit `DateTimeStyles`; checking only a
-  trailing `Z` plus culture-sensitive `TryParse` accepts more than the issue
-  claims.
-- Treat the issue-URL regex as syntax validation only. Either query GitHub's
-  “Get an issue” endpoint and require a live public issue in the intended
-  repository, or make public reachability and owner acceptance explicit manual
-  review evidence. A regex and nonempty `Owner` string cannot prove either
-  fact.
+1. **P1:** deterministic generator/Node/action foundation.
+2. **P1A:** inert candidate validator, caller context, and adversarial harness.
+3. **P1B:** immutable transport, matrices, approval, and least-privilege writer.
+4. **P2:** blank-line visualization and regenerated documentation artifacts.
+5. **P3:** dependency/runtime/hook/audit governance, subject to the existing
+   policy gate that may move it earlier.
 
-## 4. Close P3's audit metadata/graph consistency gap
+Before filing, update every cross-repository comparison to the exact
+T1/T1A/T1B layer, use real GitHub dependencies, and replace planning references
+with actual issue URLs or immutable commit permalinks.
 
-### Finding
-
-The P3 validator proves that the five metadata severity counts are
-nonnegative and sum to `metadata.vulnerabilities.total`. It does not prove that
-those counts describe the enumerated `vulnerabilities` object.
-
-In particular, it does not require:
-
-- the number of vulnerability properties to equal metadata `total`;
-- each vulnerability node to have a recognized `severity`;
-- counts derived from node severities to equal the metadata counts;
-- each vulnerability node to have a nonempty, unique `nodes` list;
-- audit node paths to resolve to matching lockfile package/version entries; or
-- `effects` links to resolve consistently, as it already requires for string
-  `via` links.
-
-The validator also silently ignores an object advisory with an unknown or
-misspelled severity because it collects only objects whose severity happens to
-be moderate, high, or critical. That is not fail-closed schema handling.
-
-### Recommended correction
-
-Before residual disposition:
-
-1. Require every vulnerability property to contain the expected fields and
-   recognized shapes used by the selected, recorded npm version.
-2. Require node-level severity to be exactly one of `info`, `low`, `moderate`,
-   `high`, or `critical`.
-3. Derive counts from the vulnerability properties and require exact equality
-   with every metadata severity count and `total`.
-4. Require each `nodes` list to be nonempty and duplicate-free, normalize its
-   paths, and resolve each path to the matching package/version in
-   `package-lock.json`.
-5. Require every string `via` and every `effects` edge to resolve to a named
-   vulnerability node; if reciprocal edge consistency is part of the observed
-   npm schema, validate that too.
-6. Validate every object advisory's URL, severity, and range; reject unknown
-   severities rather than ignoring them.
-7. Validate `fixAvailable` only to the shapes P3 actually consumes or records:
-   boolean or the reviewed object form.
-
-Preserve the raw audit JSON, selected npm version, and human-readable evidence
-as P3 already requires. If a later npm version changes the relied-upon JSON
-shape, the check should fail with a schema diagnostic and prompt review rather
-than partially accepting the new shape.
-
-## 5. Replace planning-file references when the issues are filed
-
-### Finding
-
-Several references work only while these drafts are read as repository files:
-
-- P2 links to `01PSStyleGuideP1.md` and `03PSStyleGuideP3.md`.
-- P1 names the P3 planning path.
-- P3 links to
-  `../artifacts/prompt-02-primary-source-research.md`.
-
-Those are not durable issue-body references as written. GitHub documents a
-different relative form for repository assets referenced from issues and pull
-request comments, and the planning artifact may not exist on the eventual
-PSStyleGuide default branch at all.
-
-### Recommended correction
-
-At filing time:
-
-- replace P1/P2/P3 planning-path dependencies with the actual filed issue
-  numbers and URLs;
-- record P2's real blocked-by relationship to P1;
-- use the actual P3 issue reference wherever P1 or P2 delegates npm ownership;
-  and
-- either replace P3's research-record link with an absolute commit permalink
-  to a file that reviewers can access, or remove it and rely on the direct
-  primary-source references already present in P3.
-
-Do not use a mutable branch link for evidence whose exact historical contents
-matter.
-
-## Recommended disposition and sequence
-
-I would give the drafter this concrete direction:
-
-1. **P1:** retain the generator/helper/workflow architecture, but replace the
-   minimum-count action check with an exact job/step-role inventory and correct
-   the stale “two checkout occurrences” sentence.
-2. **P2:** retain the issue substantively as written; after P1 is final, refresh
-   its prerequisite summary and replace planning links with actual issue
-   references.
-3. **P3:** preserve its dependency-review, lint-regression, and two-ecosystem
-   Dependabot design, but complete the runtime-floor proof, align residual-set
-   equality with the declared approval identity, and validate audit metadata
-   against the enumerated graph.
-4. **Filing:** convert every cross-issue dependency to a real GitHub
-   relationship and every retained research artifact to a durable permalink.
-
-Under the stipulated sequential execution model, P1 → P2 → P3 remains
-defensible. Because the repository currently carries known high-severity
-findings, P2 should not become a scheduling reason to leave P3 idle for an
-extended period; if that risk materializes, advance P3 immediately after P1
-and refresh the prerequisite/supersession text deliberately.
+With those corrections, the two repositories can share a genuinely coherent
+generator and artifact-security design while remaining independently
+implementable.
 
 ## References
 
-- [npm Docs: `npm audit`](https://docs.npmjs.com/cli/v11/commands/npm-audit/)
-- [npm Docs: `npm explain`](https://docs.npmjs.com/cli/v11/commands/npm-explain/)
-- [Node.js: release status](https://nodejs.org/en/about/previous-releases)
-- [Microsoft Learn: `DateTimeOffset.TryParseExact`](https://learn.microsoft.com/dotnet/api/system.datetimeoffset.tryparseexact)
-- [GitHub Docs: Get an issue](https://docs.github.com/en/rest/issues/issues#get-an-issue)
-- [GitHub Docs: relative links in issues, pull requests, and comments](https://docs.github.com/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#relative-links)
-- [GitHub Docs: permanent links to files](https://docs.github.com/repositories/working-with-files/using-files/getting-permanent-links-to-files)
+- [PSStyleGuide reviewed commit](https://github.com/franklesniak/PSStyleGuide/commit/4346310e7deebffb4159c75e30d9546263dfd649)
+- [TerraformStyleGuide T1](../TerraformStyleGuide/03TerraformStyleGuideT1.md)
+- [TerraformStyleGuide T1A](../TerraformStyleGuide/03aTerraformStyleGuideT1A.md)
+- [TerraformStyleGuide T1B](../TerraformStyleGuide/03bTerraformStyleGuideT1B.md)
+- [TerraformStyleGuide T3](../TerraformStyleGuide/05TerraformStyleGuideT3.md)
+- [Pinned checkout action metadata](https://raw.githubusercontent.com/actions/checkout/3d3c42e5aac5ba805825da76410c181273ba90b1/action.yml)
+- [Pinned upload-artifact action metadata](https://raw.githubusercontent.com/actions/upload-artifact/043fb46d1a93c77aae656e7c1c64a875d1fc6a0a/action.yml)
+- [Pinned download-artifact action metadata](https://raw.githubusercontent.com/actions/download-artifact/3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c/action.yml)
+- [npm `package.json` engines](https://docs.npmjs.com/cli/v11/configuring-npm/package-json/#engines)
+- [npm audit](https://docs.npmjs.com/cli/v11/commands/npm-audit/)
+- [Node.js release status](https://nodejs.org/en/about/previous-releases)
