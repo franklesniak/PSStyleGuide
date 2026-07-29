@@ -29,7 +29,8 @@ At implementation start, confirm these P1 interfaces and invariants:
   candidate extraction implementation and permanent fixture owner.
 - Both events cover every `main` pull request/push without path filters, use
   least-privilege job permissions, and pin checkout, setup-node, upload, and
-  download actions to the approved full SHAs with matching version comments.
+  download actions to the approved repository/full-SHA/version tuples with
+  matching workflow roles through the exact allowlist validator.
 - Markdown validation asserts Node major 24, disables automatic
   package-manager caching, and passes the existing clean install, outer lint,
   and nested lint commands.
@@ -44,13 +45,21 @@ At implementation start, confirm these P1 interfaces and invariants:
   boundaries, states the job-owned/no-competing-writer model, opens the archive
   once with `FileShare.Read`, hashes/rewinds/parses that same stream, validates
   the complete manifest before creation, preserves pre-existing state, and
-  performs fail-closed cleanup of invocation-created output.
+  performs fail-closed cleanup of invocation-created output through the exact
+  ownership journal and named production cleanup function.
 - Optional artifact/run labels distinguish omitted, supplied, and explicitly
   empty values, and the permanent stable-ID table proves their exact
   diagnostics.
+- The permanent harness definition-only invokes the exact named production
+  cleanup function for its mandatory unsafe ordinary-child fixture, and at
+  least one real component-or-leaf link rejection executes on both Ubuntu and
+  Windows.
 - Pull-request evidence runs the harness under Ubuntu PowerShell 7 and only the
-  two Windows LF cells; neither CRLF cell repeats it. Every four-cell push
-  consumer runs the harness and production helper.
+  two Windows LF cells because helper behavior is source-EOL-independent;
+  neither CRLF cell repeats it. Every four-cell push consumer runs the harness
+  and production helper.
+- Local validation asserts Desktop exactly 5.1 or Core major 7 in the same
+  child process that invokes each harness/generator target.
 - P1's controlled `has_changes=true` synchronization drill—not P2's expected
   no-drift merge—proves writer integration, and its propagated-digest,
   malformed-transport, unrelated-trigger, stale-preflight, and exact-lease
@@ -141,8 +150,6 @@ At finalization, reread Version and Last Updated from the target branch.
 5. Recompute if the target branch or UTC date changes.
 6. Commit metadata with the source change.
 
-Drift-only snapshot: if the target remains `2.23.20260726.0` with Last Updated `2026-07-26`, and implementation occurs on 2026-07-28 UTC, use `2.24.20260728.0` and `2026-07-28`. Otherwise recompute.
-
 ### 4. Regenerate artifacts
 
 Run:
@@ -182,11 +189,55 @@ Run the following blocks in order from the repository root. Every block must beg
 ```powershell
 $ErrorActionPreference = 'Stop'
 
-npm --prefix .github/workflows ci
-$intNpmExitCode = $LASTEXITCODE
+$objNodeCommand = Get-Command `
+    -Name 'node' `
+    -CommandType Application `
+    -ErrorAction Stop |
+    Select-Object -First 1
 
-if ($intNpmExitCode -ne 0) {
-    throw ("npm ci failed with exit code {0}." -f $intNpmExitCode)
+$objNpmCommand = Get-Command `
+    -Name 'npm' `
+    -CommandType Application `
+    -ErrorAction Stop |
+    Select-Object -First 1
+
+$arrNodeVersionOutput = @(
+    & $objNodeCommand.Path -p 'process.versions.node'
+)
+$intNodeExitCode = $LASTEXITCODE
+
+if (
+    $intNodeExitCode -ne 0 -or
+    $arrNodeVersionOutput.Count -ne 1 -or
+    ([string]$arrNodeVersionOutput[0]).Trim() -notmatch '^24\.'
+) {
+    throw (
+        "P2 local validation requires Node.js major 24; output/exit: {0}/{1}." -f
+        ($arrNodeVersionOutput -join '; '),
+        $intNodeExitCode
+    )
+}
+
+$blnCiWasDefined = Test-Path -LiteralPath 'Env:CI'
+$strPreviousCi = [string]$env:CI
+
+try {
+    $env:CI = 'true'
+
+    & $objNpmCommand.Path --prefix .github/workflows ci
+    $intNpmExitCode = $LASTEXITCODE
+
+    if ($intNpmExitCode -ne 0) {
+        throw ("npm ci failed with exit code {0}." -f $intNpmExitCode)
+    }
+}
+finally {
+    if ($blnCiWasDefined) {
+        $env:CI = $strPreviousCi
+    }
+    else {
+        Remove-Item -LiteralPath 'Env:CI' -ErrorAction SilentlyContinue
+    }
 }
 
 & pwsh `
@@ -200,14 +251,14 @@ if ($intGeneratorExitCode -ne 0) {
     throw ("Generator failed with exit code {0}." -f $intGeneratorExitCode)
 }
 
-npm --prefix .github/workflows run lint:md
+& $objNpmCommand.Path --prefix .github/workflows run lint:md
 $intNpmExitCode = $LASTEXITCODE
 
 if ($intNpmExitCode -ne 0) {
     throw ("Markdown lint failed with exit code {0}." -f $intNpmExitCode)
 }
 
-npm --prefix .github/workflows run lint:md:nested
+& $objNpmCommand.Path --prefix .github/workflows run lint:md:nested
 $intNpmExitCode = $LASTEXITCODE
 
 if ($intNpmExitCode -ne 0) {
@@ -648,6 +699,8 @@ If preparation reports changes, treat that as a source/artifact synchronization 
 - Both sources and all four generated artifacts are committed together.
 - Every validation block starts with `$ErrorActionPreference = 'Stop'`.
 - Every required native command has an immediate exit-code check.
+- Local validation resolves Node/npm applications, requires Node major 24
+  before clean installation, and restores the caller's `CI` environment state.
 - Before staging, the complete changed-path set is exactly the six affected files.
 - After staging, the cached path set is exactly the same six files.
 - No touched file begins with a UTF-8 BOM.

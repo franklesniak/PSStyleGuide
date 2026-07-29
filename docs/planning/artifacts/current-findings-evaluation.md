@@ -1,1427 +1,1520 @@
-# PSStyleGuide findings evaluation
+# PSStyleGuide current findings evaluation
 
-## Evaluation status
+## Evaluation method and scope
 
-This file evaluates the open PSStyleGuide findings recorded in
-`docs/planning/artifacts/current-findings.md`, one finding at a time. Each
-finding received its own options, purpose-built weighted rubric, scoring table,
-and implementation-ready selected disposition before work started on the next
-finding.
+This file evaluates every finding in
+`docs/planning/artifacts/current-findings.md` serially. No finding is skipped
+because it is low-impact, already satisfied, or conditional; in those cases,
+“preserve the current state” is evaluated as a real option.
 
-The following findings are open and in scope:
+Each section contains:
 
-1. `C-01` — replace the inaccurate P1/T1 identity claim.
-2. `C-02` — complete P1's path-envelope validation.
-3. `C-03` — select and justify the held stream's sharing mode.
-4. `C-04` — make rejection postconditions truthful and add fail-closed cleanup.
-5. `C-05` — make workflow temporary paths satisfy the unique-root contract.
-6. `C-06` — decide whether and how to add a malformed-transport drill.
-7. `C-07` — decide GitHub Actions update governance.
-8. `C-08` — give current npm advisories a concrete owner and ordering.
-9. `C-P2` — preserve P2's narrow scope and refresh its P1 prerequisite.
-10. `I-P1-01` — prove the Node 24 toolchain and lint paths locally.
-11. `I-P1-02` — complete optional diagnostic-label fixture coverage.
-12. `I-P2-01` — prove the rationale heading occurs exactly once.
+1. exhaustive practical options and meaningful permutations;
+2. a finding-specific weighted rubric;
+3. a 1–5 scoring table, where 1 is poor and 5 is excellent;
+4. the weighted score out of 100, calculated as
+   `sum(weight × score / 5)`; and
+5. one implementation-ready selection.
 
-`C-09` is not open: the review found the current P1/P2 CI evidence wording
-already correct. It remains a preservation constraint when the issues are
-edited.
+Technical correctness, security, evidence quality, and legitimate operator or
+contributor usability receive more weight than churn, implementation
+difficulty, or preservation of the current file count.
 
-The primary-source and implementation-state facts used in the evaluations are
-retained in
-[`current-findings-evaluation-research.md`](current-findings-evaluation-research.md).
+The prompt names `02PSStyleGuideP3.md`, but the established slate and current
+worktree contain `03PSStyleGuideP3.md`; `02PSStyleGuideP2.md` already owns
+sequence number 02. This evaluation therefore treats
+`03PSStyleGuideP3.md` as the intended P3 target. Creating a duplicate
+`02PSStyleGuideP3.md` would make ordering and downstream handoff ambiguous.
 
-## Evaluation conventions
+## C-01: Rebaseline P1's convergence matrix against final T1
 
-- Scores use a 1–5 scale, where 5 is best.
-- Each finding has its own criteria and weights; a criterion is not reused
-  mechanically merely because it appeared in another finding.
-- Weighted totals are calculated as
-  `sum(score / 5 * criterion weight)` and therefore range from 0 to 100.
-- Technical correctness, security, and legitimate operator/developer usability
-  receive more weight than churn, implementation effort, or original issue
-  boundaries.
-- T1/T2 are context for intentional convergence only and are not revised.
+### Options
 
-## Finding evaluations
+#### Option A — Retain the current matrix
 
-### C-01 — Replace the inaccurate P1/T1 identity claim
+Leave P1's “stronger same-stream choice” and public-interface-only fixture
+claims unchanged. This minimizes editing but knowingly hands downstream
+implementers two false statements about current T1.
 
-#### Problem and perspectives
+#### Option B — Correct only the two stale matrix cells
 
-P1 currently says the two repositories share almost the complete helper and
-harness contract and that only names differ. The current drafts contradict
-that statement in stream handling, path-envelope breadth, lifecycle cleanup,
-fixture placement, and workflow transport details.
+Change Archive identity to a shared held-stream invariant and add the narrow
+definition-only production-cleanup exception to Permanent fixtures. This fixes
+today's text but supplies no defense against either draft changing again.
 
-- A security reviewer needs to distinguish genuinely shared invariants from
-  repository-specific threat-model choices.
-- An implementer coming in cold needs to know what may be copied, what must be
-  adapted, and what must remain intentionally different.
-- A maintainer needs drift to be visible without creating a new cross-repository
-  release dependency prematurely.
-- A project manager needs P1 to remain independently deliverable while still
-  advancing the generator-unification objective.
+#### Option C — Correct the cells and add an implementation-start divergence check
 
-#### Options
+Apply Option B, then require the implementation that starts second to compare
+the then-current P1/T1 contracts and record every intentional difference in the
+issue/PR evidence. Keep both repositories self-contained and make manifest
+names, artifact names, and diagnostics explicitly repository-specific.
 
-**Option A — Keep the current identity claim.**
+#### Option D — Force identity through a shared runtime component
 
-Treat the drafts as conceptually identical and rely on implementers to discover
-the differences. This has no authoring churn, but it makes acceptance criteria
-false and encourages unsafe copy/paste.
+Replace behavioral coordination with a shared module/action consumed by both
+repositories. This can prevent drift, but introduces packaging, provenance,
+versioning, rollout, cross-edition, and availability dependencies that neither
+issue currently designs.
 
-**Option B — Replace identity with a short prose disclaimer.**
+### Evaluation rubric
 
-Say the implementations are “similar but not identical” and list the largest
-differences in prose. This corrects the overclaim but provides no durable
-crosswalk for future changes.
-
-**Option C — Add a contract-level convergence matrix only.**
-
-Replace the blanket statement with a table covering parameters, archive
-identity, path security, manifest grammar, lifecycle, diagnostics, harness, and
-transport. For each row, state the shared invariant and the repository-specific
-choice. Keep both helpers and harnesses repository-local.
-
-**Option D — Extract a shared external helper/action during P1.**
-
-Move common logic to a shared repository, package, submodule, or remote
-composite/JavaScript action and have both repositories consume it. Permutations
-include a versioned PowerShell module, reusable workflow, composite action, or
-generated vendored file. This maximizes physical reuse but adds provenance,
-release, availability, pinning, cross-edition, and coordinated-rollout
-requirements that P1 does not currently specify.
-
-**Option E — Establish a shared behavioral contract now and defer physical
-unification.**
-
-Combine Option C's matrix with:
-
-- an explicit list of shared security invariants;
-- a stable fixture-intent crosswalk where the same behaviors should be tested;
-- named repository-specific deviations with rationale;
-- acceptance language that forbids claiming unlisted equivalence; and
-- a non-goal stating that a shared packaged helper/action requires a later,
-  separately reviewed trust and release design.
-
-This can later support any Option D packaging permutation without making the
-current issue depend on one.
-
-#### Evaluation rubric
-
-This rubric is specific to a cross-repository convergence claim.
-
-| Criterion | Weight | Why it matters |
+| Criterion | Weight | Why it matters for this finding |
 | --- | ---: | --- |
-| Factual truth and auditability | 28 | A reviewer must be able to prove every claimed shared/different behavior from the issue text. |
-| Security-invariant convergence | 24 | Unification is useful only if the two repositories visibly agree on the important safety properties. |
-| Long-term drift control | 18 | Future maintainers need a durable way to notice divergence. |
-| Cold-start implementer clarity | 15 | A new contributor must know what to share, copy, adapt, and test. |
-| Independent evolution and supply-chain safety | 10 | Each repository must remain operable without an underspecified new external dependency. |
-| Authoring and implementation churn | 5 | Lower churn is useful, but it cannot outweigh correctness or clarity. |
+| Factual accuracy against current T1 | 35 | A downstream issue must not start from a false contract. |
+| Preservation of shared security invariants | 25 | Stream identity and cleanup testing protect the artifact boundary. |
+| Cold-reader clarity | 15 | The author should understand shared versus repository-specific behavior without reconstructing history. |
+| Resistance to future cross-draft drift | 15 | P1 and T1 may be filed or implemented at different times. |
+| Repository independence and scope control | 10 | Coordination must not create an undesigned runtime dependency. |
 
-Scores use 1–5, where 5 is best.
+### Scoring
 
-#### Scoring
+| Option | Accuracy (35) | Security (25) | Clarity (15) | Drift resistance (15) | Independence (10) | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Retain | 1 | 1 | 1 | 1 | 5 | 28 |
+| B — Correct cells | 5 | 5 | 4 | 2 | 5 | 88 |
+| C — Correct plus recheck | 5 | 5 | 5 | 5 | 5 | **100** |
+| D — Shared runtime | 5 | 4 | 2 | 4 | 1 | 75 |
 
-| Option | Truth 28 | Security 24 | Drift 18 | Clarity 15 | Independence 10 | Churn 5 | Total / 100 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Current claim | 1 | 2 | 2 | 2 | 5 | 5 | 43.4 |
-| B — Prose disclaimer | 3 | 3 | 2 | 3 | 5 | 4 | 61.4 |
-| C — Matrix only | 5 | 4 | 4 | 5 | 5 | 3 | 89.6 |
-| D — Shared dependency now | 4 | 5 | 5 | 3 | 1 | 1 | 76.4 |
-| E — Contract now, packaging later | 5 | 5 | 5 | 5 | 4 | 3 | **96.0** |
-
-#### Selected disposition
-
-Select **Option E**.
-
-In P1, replace the near-total-identity sentence with a “Cross-repository
-convergence contract” subsection. Add a table with these exact conceptual rows:
-
-1. public helper parameters;
-2. archive identity and digest order;
-3. path roots, containment, and link rejection;
-4. manifest grammar and exact-entry rules;
-5. destination lifecycle and cleanup;
-6. diagnostics and optional caller labels;
-7. permanent fixture intent; and
-8. GitHub artifact transport.
-
-For every row, state:
-
-- the invariant deliberately shared with T1;
-- P1's concrete implementation;
-- the intentional Terraform-specific difference, if any; and
-- the evidence that proves the P1 side.
-
-Explicitly preserve P1's stronger held-stream property as an intentional
-PowerShell-specific choice. Do not describe filenames and artifact names as the
-only differences. Keep the helper and harness repository-local in P1. Add a
-non-goal explaining that a shared module/action would need its own versioning,
-pinning, provenance, cross-edition, failure-mode, and rollout design after the
-behavioral contracts converge. Update acceptance criteria so the matrix, not a
-blanket equivalence claim, defines success.
-
-### C-02 — Complete P1's path-envelope validation
-
-#### Problem and perspectives
-
-P1 validates only part of the filesystem path that determines where untrusted
-archive bytes are read and where validated output is created. It does not
-consistently cover both declared roots from their volume/share root, root
-overlap in both directions, post-extraction revalidation, or the residual race
-model.
-
-- A cybersecurity engineer needs every path component capable of redirecting
-  access covered, not only descendants below the trusted temporary root.
-- A PowerShell maintainer needs one contract that works under Windows
-  PowerShell 5.1 and PowerShell 7.
-- An operator needs a precise phase and offending component when a hosted
-  runner violates the expected topology.
-- A business stakeholder needs the issue to avoid claiming a guarantee that a
-  path-based implementation cannot provide.
-
-#### Options
-
-**Option A — Keep the current partial checks.**
-
-Validate the two roots and the components between the trusted temporary root
-and working paths. This is cheapest but leaves ancestors and after-extraction
-state outside the asserted envelope.
-
-**Option B — Add only mutual root separation.**
-
-Reject either root containing the other and retain the current descendant
-component walk. This closes one concrete configuration error but not ancestor
-links, later substitution, or incomplete lifecycle checks.
-
-**Option C — Adopt a complete repeated lexical/component contract with an
-honest race model.**
-
-Normalize absolute inputs, require mutually disjoint roots, enumerate from each
-filesystem volume/share root through all existing components, reject
-redirection/type/enumeration uncertainty, and repeat relevant checks before
-archive open, before candidate creation, and after extraction. State that this
-narrows but does not eliminate path check/use races and restrict support to a
-job-owned/no-competing-writer hosted-runner model.
-
-**Option D — Implement an OS-native handle-relative sandbox.**
-
-Open directory handles without following links and perform all traversal and
-creation relative to verified handles. Permutations include Windows
-`CreateFile`/reparse-tag logic plus Unix `openat`/`O_NOFOLLOW`, a native helper,
-or a compiled .NET component. This can provide a stronger same-object boundary
-but is not realistically portable through one PowerShell script across the
-declared editions/platforms without a substantially new implementation and test
-surface.
-
-**Option E — Use canonical-path resolution only.**
-
-Resolve final targets with modern link APIs or provider commands, then check
-that the resulting strings are inside the trusted root. This is shorter than
-Option C but cannot run uniformly on Windows PowerShell 5.1, may follow a link
-in order to classify it, and still leaves check/use races.
-
-#### Evaluation rubric
-
-This rubric is specific to filesystem trust-boundary enforcement.
-
-| Criterion | Weight | Why it matters |
-| --- | ---: | --- |
-| Link, junction, mount, and ancestor attack coverage | 30 | Any unchecked redirecting component can invalidate containment. |
-| Cross-edition/platform implementability | 18 | The same helper must run in the P1 PowerShell 5.1/7 topology. |
-| Honest treatment of check/use races | 16 | The issue must neither ignore nor overclaim the residual guarantee. |
-| Permanent fixture strength | 16 | Security behavior must be reproducible, phase-specific, and regression-tested. |
-| Failure diagnostics and operator usability | 12 | Operators must know which phase/component violated the trust model. |
-| Implementation effort and issue churn | 8 | Cost matters, but it is subordinate to a correct trust boundary. |
-
-#### Scoring
-
-| Option | Attack coverage 30 | Portability 18 | Race honesty 16 | Fixtures 16 | Diagnostics 12 | Effort 8 | Total / 100 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Current partial checks | 2 | 5 | 1 | 2 | 3 | 5 | 54.8 |
-| B — Root separation only | 3 | 5 | 2 | 3 | 3 | 4 | 65.6 |
-| C — Complete repeated contract | 5 | 5 | 5 | 5 | 4 | 3 | **94.4** |
-| D — Native handle sandbox | 5 | 1 | 5 | 3 | 3 | 1 | 68.0 |
-| E — Canonical target strings | 3 | 2 | 2 | 2 | 3 | 4 | 50.0 |
-
-#### Selected disposition
+### Selected option
 
 Select **Option C**.
 
-Replace P1's path subsection with an explicit “Root and full-component trust
-contract.” It must require the helper to:
+In P1:
 
-1. resolve each declared root exactly once to one existing ordinary filesystem
-   directory;
-2. reject equality or containment in either direction between checkout and
-   trusted temporary roots;
-3. require download and candidate paths to be strict trusted-root descendants
-   and outside checkout using separator-aware, OS-appropriate comparison;
-4. build the lexical absolute sequence from the volume root or complete UNC
-   share root through every existing component of both declared roots, the
-   download directory and retained archive, the candidate parent, and created
-   candidate paths;
-5. obtain attributes through APIs available under Windows PowerShell 5.1;
-6. reject every reparse point, symbolic link, junction, volume mount, dangling
-   entry, unexpected file/directory type, and attribute/enumeration/resolution
-   failure without following a link to classify it;
-7. repeat relevant component, containment, parent, type, and leaf checks
-   immediately before opening the archive, immediately before creating the
-   candidate, and after extraction before returning; and
-8. emit stable path-phase identifiers and the offending absolute component.
+1. Rewrite Archive identity as a deliberately shared invariant: one retained
+   file stream opened with `FileMode.Open`, `FileAccess.Read`, and
+   `FileShare.Read`; hash; exact digest comparison; rewind; the only
+   `ZipArchive`; continuous lifetime through extraction; deterministic
+   disposal.
+2. Rewrite Permanent fixtures to say ordinary archive/path cases use the
+   production helper's public expansion interface, while one unsafe-cleanup
+   case may definition-only load and invoke the exact named production cleanup
+   function.
+3. Keep filenames, manifests, artifact names, labels, and fixture placement as
+   explicit repository-specific choices.
+4. Require the implementation that starts second to reread the current other
+   issue/merged evidence and record any divergence.
+5. State that this comparison creates no runtime or filing dependency.
 
-State the supported model verbatim in substance: GitHub-hosted runners,
-runner-controlled ancestors, a job-owned checkout, one unique job-owned trusted
-temporary root, and no competing writer capable of replacing entries during
-the helper call. Say that repeated checks narrow check/use exposure and do not
-provide an OS-native directory-handle guarantee.
+## C-02: Add a generator-specific convergence contract
 
-Extend the permanent table with root equality/both containment directions,
-outside-root, sibling-prefix, case-variant, provider-qualified, ancestor link,
-intermediate component link, post-creation substitution, and post-extraction
-revalidation cases. A capability-based link skip must remain named and must not
-count as a pass.
+### Options
 
-### C-03 — Select and justify the held stream's sharing mode
+#### Option A — Rely on scattered generator requirements
 
-#### Problem and perspectives
+Keep normalization, encoding, frontmatter, and validation requirements in
+their existing sections and assume implementers will infer P1/T1 convergence.
 
-P1 requires an “explicitly selected sharing mode” but does not select one.
-That makes the final stream-concurrency contract implementation-defined.
+#### Option B — Add a short prose convergence statement
 
-- A security reviewer wants subsequent writers and deletion sharing denied
-  while verified bytes are being parsed.
-- An operator or diagnostic tool may have a legitimate reason to read the same
-  retained archive concurrently.
-- A cross-platform maintainer must not mistake `FileShare` for a universal
-  operating-system lock against every non-.NET actor.
-- A test author needs an exact constructor and observable concurrency behavior.
+State that both generators should behave equivalently at serialization
+boundaries, without defining the compared surfaces or intentional differences.
 
-#### Options
+#### Option C — Add an explicit behavioral generator matrix
 
-**Option A — Leave the enum to the implementer.**
+Define shared targets for complete-payload normalization, resolved paths,
+BOM-less encoding, write primitives, implicit-newline behavior, common
+artifact functions, frontmatter principles, script-version policy, repository
+text policy, and cross-edition/raw-byte validation. Give repository-specific
+values and transforms their own column. Keep implementations local.
 
-Retain the abstract requirement. This avoids prescribing more than the issue
-currently proves but defeats auditable implementation and can yield different
-behavior across contributors.
+#### Option D — Option C plus coordinated private serializer abstractions
 
-**Option B — Select `FileShare.None`.**
+Require each repository to introduce an equivalently contracted private
+serialization helper so the four write sites do not repeat the primitive.
+This reduces local duplication but expands both issues and makes coordination
+of function shape part of the initial implementation.
 
-Decline every subsequent open until the helper closes the archive. This offers
-the narrowest .NET sharing contract and is appropriate if no concurrent
-observation is legitimate. It can unnecessarily block benign readers and
-differs from the documented default behavior of read-only `FileStream` helpers.
+#### Option E — Publish one shared generator library/action now
 
-**Option C — Select `FileShare.Read`.**
+Centralize the generator or serializer in a third artifact consumed by both
+repositories. This maximizes code reuse but adds versioning, provenance,
+availability, cross-repository rollout, and compatibility work.
 
-Allow later read-only opens while not granting write or delete sharing. This is
-the documented normal mode for concurrent readers and the default of several
-read-oriented .NET APIs, but P1 would name it explicitly rather than rely on a
-default. The issue must continue relying on its no-competing-writer operating
-model rather than claiming this flag is a universal lock.
+### Evaluation rubric
 
-**Option D — Select `FileShare.ReadWrite` or include `FileShare.Delete`.**
-
-Allow monitoring tools to write, replace, or delete while the stream is open.
-This maximizes external flexibility but directly weakens the verified-byte
-threat model and is unjustified for a retained candidate archive.
-
-**Option E — Snapshot the archive into memory, then close the file.**
-
-Open with `None` or `Read`, copy all bytes into a byte array or `MemoryStream`,
-close the file, and hash/parse the in-memory snapshot. This also binds hash and
-parse to one byte sequence and reduces later filesystem dependence. It adds
-memory/size policy, another copy, sensitive-buffer lifecycle, and denial-of-
-service considerations that P1 does not currently need for this small archive.
-
-**Option F — Add sharing mode as a public helper parameter.**
-
-Let each caller choose `None` or `Read`. This is flexible but moves a security
-decision to every workflow call, expands the public contract and fixtures, and
-allows the same helper to behave inconsistently.
-
-#### Evaluation rubric
-
-This rubric is specific to the archive stream's concurrency policy.
-
-| Criterion | Weight | Why it matters |
+| Criterion | Weight | Why it matters for this finding |
 | --- | ---: | --- |
-| Protection of the verified byte sequence | 28 | Later write/delete sharing must not undermine digest-then-parse identity. |
-| Legitimate read-only observability | 20 | Diagnostics should not be blocked without a security reason. |
-| Explicitness and reviewability | 18 | The constructor contract must be visible and identical across implementations. |
-| Cross-platform semantic honesty | 14 | The issue must state what .NET sharing proves and what the runner model still assumes. |
-| Permanent testability | 12 | The selected behavior needs stable positive and negative oracles. |
-| Complexity and churn | 8 | A simple stream contract is preferable once the safety properties are met. |
+| Observable generator equivalence | 30 | The user's stated objective is thoughtful generator unification. |
+| Cross-edition byte correctness | 25 | Determinism is the primary purpose of P1/T1. |
+| Clarity of intentional differences | 20 | PowerShell- and Terraform-specific values must not be erased. |
+| Long-term drift detection | 15 | Future changes should expose divergence instead of silently accumulating it. |
+| Initial scope and implementation burden | 10 | Churn matters, but less than correctness and maintainability. |
 
-#### Scoring
+### Scoring
 
-| Option | Byte protection 28 | Read usability 20 | Explicit 18 | Platform honesty 14 | Tests 12 | Simplicity 8 | Total / 100 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Unspecified | 2 | 3 | 1 | 2 | 1 | 5 | 42.8 |
-| B — `FileShare.None` | 5 | 2 | 5 | 4 | 4 | 4 | 81.2 |
-| C — `FileShare.Read` | 5 | 5 | 5 | 5 | 5 | 4 | **98.4** |
-| D — Write/delete sharing | 1 | 5 | 5 | 4 | 3 | 4 | 68.4 |
-| E — Memory snapshot | 5 | 4 | 5 | 4 | 4 | 2 | 86.0 |
-| F — Caller parameter | 3 | 4 | 2 | 3 | 3 | 2 | 58.8 |
+| Option | Equivalence (30) | Correctness (25) | Differences (20) | Drift (15) | Burden (10) | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Scattered requirements | 1 | 3 | 1 | 1 | 5 | 38 |
+| B — Prose statement | 3 | 4 | 3 | 2 | 5 | 66 |
+| C — Behavioral matrix | 5 | 5 | 5 | 5 | 4 | **98** |
+| D — Matrix plus private helpers | 5 | 5 | 4 | 5 | 2 | 90 |
+| E — Shared package/action | 5 | 5 | 3 | 5 | 1 | 84 |
 
-#### Selected disposition
-
-Select **Option C: `FileShare.Read`**.
-
-P1 must require the retained archive to be opened exactly in substance as:
-
-```powershell
-[System.IO.FileStream]::new(
-    $strArchivePath,
-    [System.IO.FileMode]::Open,
-    [System.IO.FileAccess]::Read,
-    [System.IO.FileShare]::Read
-)
-```
-
-Use a constructor form available in both supported PowerShell/.NET editions.
-Do not grant `Write` or `Delete`. Compute SHA-256 from that stream, require it
-to be seekable, rewind to byte zero, and construct `ZipArchive` over that exact
-stream. Keep the stream and archive disposed through deterministic
-`try`/`finally` handling.
-
-Add permanent Windows sharing fixtures that prove:
-
-- a second .NET read-only open is allowed;
-- a subsequent .NET write open is denied while the held stream exists; and
-- the primary stream remains usable for hash/rewind/parse after the allowed
-  reader closes.
-
-Do not make a cross-platform assertion that `FileShare.Read` alone prevents
-every external actor from changing a pathname. State that the flag is
-defense-in-depth for the held file and that the complete supported model still
-requires the C-02 job-owned/no-competing-writer boundary. This combination
-gives benign read observability without permitting .NET write/delete sharing
-and makes the issue's intended enum unambiguous.
-
-### C-04 — Make rejection postconditions truthful and add fail-closed cleanup
-
-#### Problem and perspectives
-
-P1 simultaneously says every rejection leaves the candidate absent and that
-pre-existing files, directories, and links remain unchanged. It also lacks a
-complete rule for removing invocation-created output after a later failure.
-
-- A security engineer needs rejected untrusted bytes removed without following
-  an attacker-controlled link.
-- A data-safety reviewer needs absolute protection for any pre-existing leaf.
-- An implementer needs state ownership recorded explicitly rather than inferred
-  during exception handling.
-- An operator needs the original validation failure and any cleanup failure,
-  not a misleading success or overwritten exception.
-- A test author needs postconditions based on the fixture's starting state.
-
-#### Options
-
-**Option A — Require absence and remove pre-existing-leaf fixtures.**
-
-Narrow the supported contract so callers guarantee an absent leaf and stop
-testing existing objects. The helper could still reject pre-existing state, but
-the issue would lose proof that it never overwrites or deletes that state.
-
-**Option B — Add case-specific postconditions without cleanup.**
-
-Correct the table to say absent remains absent and pre-existing remains
-unchanged. Leave post-creation failure residue to the caller or job-level
-temporary-root cleanup. This makes assertions truthful but lets the helper
-return after leaving a candidate that looks usable.
-
-**Option C — Extract to a staging sibling, then rename to the requested leaf.**
-
-Use an invocation-owned staging directory, fully validate it, then move it to
-the initially absent candidate leaf. This creates a clearer commit point and
-can reduce partial visibility. It still requires safe staging cleanup, adds
-another path envelope and rename behavior, and provides limited benefit because
-the current candidate itself is job-private and not consumed until return.
-
-**Option D — Validate all extracted content in memory before any directory
-creation.**
-
-Read the four permitted entries into bounded byte arrays, validate BOM/CR and
-manifest rules, then create the candidate and write final bytes. This reduces
-post-creation validation failures but adds explicit size/memory limits and
-cannot eliminate write/finalization failures, so cleanup remains necessary.
-
-**Option E — Track invocation ownership and perform narrow, revalidated
-fail-closed cleanup.**
-
-Keep manifest validation before creation. Record the exact state created by the
-invocation. On later failure, dispose streams, revalidate the candidate
-envelope, delete only known ordinary files created by the helper, and remove
-the now-empty invocation-created directory. Never recursively delete or touch a
-pre-existing object. Preserve both original and cleanup failures.
-
-**Option F — Use unconditional recursive force deletion.**
-
-On any failure call `Remove-Item -Recurse -Force` on the candidate. This is
-simple and usually clears residue, but it can follow or remove substituted
-state and is incompatible with the trust model.
-
-#### Evaluation rubric
-
-This rubric is specific to output ownership and failure recovery.
-
-| Criterion | Weight | Why it matters |
-| --- | ---: | --- |
-| Preservation of pre-existing filesystem state | 24 | A failed verifier must never destroy caller-owned data or links. |
-| Removal/containment of rejected invocation output | 24 | Untrusted partial output must not be mistaken for an accepted candidate. |
-| Original and cleanup error fidelity | 16 | Incident response requires both causes and retained-path context. |
-| Link-safe cleanup behavior | 14 | Cleanup itself must not become a traversal or substitution vulnerability. |
-| Deterministic fixture oracles | 14 | Every starting state needs a precise observable postcondition. |
-| Lifecycle complexity and churn | 8 | Simpler code is safer only after ownership and cleanup are correct. |
-
-#### Scoring
-
-| Option | Preserve 24 | Contain residue 24 | Error fidelity 16 | Cleanup safety 14 | Test oracles 14 | Simplicity 8 | Total / 100 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Absence only | 1 | 3 | 2 | 2 | 2 | 5 | 44.8 |
-| B — Truthful table only | 5 | 2 | 3 | 3 | 4 | 4 | 69.2 |
-| C — Staging and rename | 5 | 5 | 4 | 4 | 4 | 2 | 86.4 |
-| D — In-memory prevalidation | 5 | 5 | 4 | 5 | 3 | 1 | 84.8 |
-| E — Owned narrow cleanup | 5 | 5 | 5 | 5 | 5 | 3 | **96.8** |
-| F — Recursive force delete | 1 | 4 | 2 | 1 | 3 | 4 | 48.0 |
-
-#### Selected disposition
-
-Select **Option E**.
-
-P1 must replace every blanket rejection postcondition with this state table:
-
-| Initial candidate leaf | Rejection postcondition |
-| --- | --- |
-| Absent | Remains absent for every pre-creation failure |
-| Ordinary file | Same file and bytes remain unchanged |
-| Ordinary directory | Same directory and contents remain unchanged |
-| Link, junction, reparse point, or dangling link | Same entry and link target text remain unchanged |
-| Created by this invocation | Removed after a later failure, or an explicit fail-closed cleanup failure reports the retained path |
-
-The helper must keep explicit booleans/list state indicating whether it created
-the leaf and which exact ordinary files it created. On failure after creation:
-
-1. capture the original exception and phase;
-2. dispose `ZipArchive`, entry streams, output streams, and the held
-   `FileStream`;
-3. rerun the relevant C-02 containment/component/type checks;
-4. remove only the known ordinary files created by this invocation;
-5. remove the candidate directory only if it is the same invocation-created,
-   ordinary, empty directory;
-6. never recurse, follow, delete, or “repair” an unexpected entry; and
-7. return nonzero with the original failure plus cleanup failure and retained
-   absolute path if safe cleanup cannot finish.
-
-Add a post-extraction BOM/CR fixture that proves the normal cleanup path removes
-the helper-created candidate. Preserve `L-01`–`L-04` with state-specific
-unchanged assertions. Add stable `cleanup` diagnostics and require the harness
-to treat residue after an otherwise cleanable failure as a failure. Update the
-acceptance criteria to distinguish pre-creation absence, pre-existing-state
-preservation, successful post-creation cleanup, and explicit unsafe-cleanup
-retention.
-
-### C-05 — Make workflow temporary paths satisfy the unique-root contract
-
-#### Problem and perspectives
-
-P1 requires a unique job-owned trusted temporary root but shows a fixed
-`${{ runner.temp }}/style-guide-candidate-download` path. The example therefore
-does not instantiate the boundary the helper is required to validate.
-
-- A DevOps engineer needs matrix cells and reruns isolated from one another.
-- A security reviewer needs unambiguous ownership before cleanup.
-- A PowerShell 5.1 maintainer needs a portable primitive, not a modern
-  runtime-only API.
-- An incident responder benefits from the selected root being logged without
-  using predictable reuse as a security control.
-
-#### Options
-
-**Option A — Keep the fixed child path.**
-
-Rely on GitHub-hosted runner isolation and clean images. This will normally
-work, but it contradicts the issue and gives no proof that existing state is not
-being reused.
-
-**Option B — Use a deterministic run/job-qualified directory.**
-
-Construct a name from run ID, run attempt, job/matrix edition, and EOL mode.
-This is human-readable and isolates known jobs/reruns if every dimension is
-included. It is still predictable, easy to get incomplete when the matrix
-changes, and can reuse state within the same job if a step is repeated.
-
-**Option C — Create a high-entropy job-owned child with bounded collision
-retry.**
-
-Generate a fresh leaf below `RUNNER_TEMP`, require it to be absent, create it,
-verify it is an ordinary non-reparse directory, and derive fixed download and
-candidate children beneath it. Retry a bounded number of times on a name
-collision. Log and propagate the absolute root only within the job.
-
-**Option D — Create a temporary file, delete it, and reuse its name as a
-directory.**
-
-Use `GetTempFileName`/`New-TemporaryFile` to reserve a name, remove the file,
-then create a directory. This creates a file-to-directory substitution window
-and does not work uniformly across the declared editions without extra logic.
-
-**Option E — Treat the entire runner temporary directory as the trusted root.**
-
-Pass `${{ runner.temp }}` directly and create fixed children below it. This
-avoids pretending the child is the root, but broadens ownership to unrelated
-runner/action temporary state and makes safe cleanup impossible.
-
-**Option F — Use `Directory.CreateTempSubdirectory`.**
-
-Use the modern .NET API that creates a unique temporary directory. It is an
-excellent primitive on current .NET, but unavailable to Windows PowerShell
-5.1/.NET Framework and would make fixture/workflow implementations diverge.
-
-#### Evaluation rubric
-
-This rubric is specific to job-temporary workspace construction.
-
-| Criterion | Weight | Why it matters |
-| --- | ---: | --- |
-| Collision, rerun, and matrix isolation | 25 | Each consumer must own state that no other attempt/cell can accidentally reuse. |
-| Clarity of the helper containment boundary | 22 | The exact root and its strict descendants must be obvious to code and reviewers. |
-| Cleanup ownership and blast radius | 18 | A job may clean only state it demonstrably created. |
-| PowerShell edition/platform portability | 14 | The same design must work in Desktop/Core cells and the permanent harness. |
-| Diagnostics and reproducibility | 12 | Failures must report the actual root and creation/collision phase. |
-| Implementation complexity | 9 | Avoid elaborate allocation machinery once uniqueness and ownership are sound. |
-
-#### Scoring
-
-| Option | Isolation 25 | Boundary 22 | Cleanup 18 | Portability 14 | Diagnostics 12 | Simplicity 9 | Total / 100 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Fixed path | 1 | 3 | 2 | 5 | 4 | 5 | 58.0 |
-| B — Run/job-qualified | 3 | 4 | 4 | 5 | 5 | 4 | 80.2 |
-| C — Random child + retry | 5 | 5 | 5 | 5 | 4 | 3 | **94.0** |
-| D — Temp file conversion | 4 | 4 | 4 | 4 | 3 | 2 | 74.0 |
-| E — Whole runner temp | 2 | 3 | 1 | 5 | 3 | 5 | 56.8 |
-| F — Modern temp-subdirectory API | 5 | 5 | 5 | 1 | 4 | 4 | 84.6 |
-
-#### Selected disposition
+### Selected option
 
 Select **Option C**.
 
-Every production helper consumer and the permanent harness must create one
-unique root below the exact runner-controlled temporary parent. Use a primitive
-available in both supported editions, such as
-`[System.IO.Path]::GetRandomFileName()`, with this contract:
+Add a separate generator convergence matrix to P1 with these rows:
 
-1. normalize and validate the runner temporary parent;
-2. generate a high-entropy child leaf;
-3. prove no file, directory, reparse point, or dangling entry occupies it;
-4. create it without `-Force`;
-5. verify the resulting object is the expected ordinary, non-reparse directory;
-6. retry a documented bounded number of times only for an actual name
-   collision, and fail for every other error;
-7. emit the absolute root to the current job's outputs/environment without
-   reconstructing it in later steps;
-8. create `download` below it and reserve a separate, initially absent
-   `candidate` child; and
-9. pass the unique root, download directory, and candidate path explicitly to
-   the helper.
+- serialization boundary;
+- common Copilot, Chat, and Full artifact functions;
+- instructions artifact;
+- frontmatter construction;
+- script versioning;
+- repository text policy; and
+- validation/evidence.
 
-The issue must acknowledge that `GetRandomFileName` does not create the
-directory and `CreateDirectory` can return an existing directory. The
-absence/create/verify sequence operates under C-02's runner-controlled,
-no-competing-writer model; it must never silently accept an existing leaf.
+For each row, name the shared observable target and the intentional
+PSStyleGuide/TerraformStyleGuide difference. State explicitly that unification
+currently means algorithms, bytes, failure semantics, and evidence—not a
+runtime import or forced line-for-line identity. Do not require a new private
+helper in P1; if both implementations later choose one, coordinate it as a
+separate design decision.
 
-Add an `always()` cleanup step (excluding cancellation where appropriate) that
-revalidates the unique root and removes only the known job-owned archive,
-ordinary candidate files/directories, download directory, and empty root.
-Cleanup failure must be visible and must not mask the earlier failure.
-Diagnostic upload, if needed, must occur before cleanup. Replace every fixed
-download-path example, update helper call examples, and require the permanent
-harness to use the same topology.
+## C-03: Deterministically test the exact production cleanup function
 
-### C-06 — Decide whether and how to add a malformed-transport drill
+### Options
 
-#### Problem and perspectives
+#### Option A — Keep outcome-only cleanup requirements
 
-P1 proves malformed ZIP rejection through direct helper fixtures and proves a
-valid ZIP through GitHub artifact transport. It does not join those two
-boundaries by transporting malformed bytes with the production actions.
+Retain “removed or cleanup failure reported” and rely on ordinary BOM/CR
+failures to cover successful cleanup. The unsafe branch remains unexecuted.
 
-- A DevOps reviewer wants evidence that action configuration preserves one raw
-  file for the helper rather than pre-extracting or reshaping it.
-- A security tester wants the failure attributed to archive parsing, not a
-  deliberately falsified digest.
-- A project manager wants a controlled test that does not pollute `main` or add
-  a permanently failing workflow.
-- An operator needs approval and write jobs demonstrably gated after rejection.
+#### Option B — Add an indirect workflow cleanup-failure drill
 
-#### Options
+Try to induce a filesystem failure around a complete helper invocation. This
+tests an end-to-end path, but timing, permissions, and platform differences can
+make the unsafe state nondeterministic and may not prove the exact deletion
+algorithm.
 
-**Option A — Add no drill and narrow the evidence claims.**
+#### Option C — Name, journal, and directly test production cleanup
 
-Keep unit/helper coverage and valid-transport integration. State explicitly
-that malformed bytes were not transported end to end. This is logically
-honest but leaves a meaningful boundary unexercised.
+Put cleanup in one named production function, keep an exact ownership journal,
+perform a complete pre-deletion safety pass, and permit the harness to load
+definitions without running main. A mandatory cross-platform fixture inserts
+an unjournaled ordinary child, calls that exact function, and proves retention,
+no traversal, and combined diagnostics. Add link/reparse variants only where
+the primitive is available.
 
-**Option B — Treat the permanent invalid-ZIP helper fixture as sufficient.**
+#### Option D — Make link/reparse substitution the only unsafe fixture
 
-Keep current claims and argue that artifact transport is byte-preserving based
-on action metadata. This has strong helper determinism but only indirect
-evidence at the transport/helper seam.
+Directly test the production function, but require a link replacement as the
+mandatory unsafe state. This is security-relevant but fragile on Windows
+runners where link creation may require privileges or a specific primitive.
 
-**Option C — Add one controlled-branch malformed raw-ZIP transport drill.**
+#### Option E — Redesign around OS directory handles
 
-In the already required temporary branch, upload one deterministic malformed
-ZIP as a single unarchived file, propagate its real immutable ID/digest, use the
-production download inputs, and prove all validation cells reject inside the
-helper before candidate creation. Approval and writer must skip.
+Replace repeated path validation and the no-competing-writer model with
+platform-specific handle-relative deletion. This could narrow races further,
+but Windows PowerShell 5.1/Linux portability and implementation complexity
+would become a new project.
 
-**Option D — Corrupt GitHub artifact storage to provoke a native digest
-mismatch.**
+### Evaluation rubric
 
-Attempt to change bytes after upload while preserving the original metadata
-digest. GitHub does not expose a supported mutation path for this; trying to
-simulate it would test a different system or require unsupported interference.
-
-**Option E — Add a permanent expected-failure artifact job to every pull
-request.**
-
-Upload and download a malformed artifact on every PR, capture the helper's
-expected nonzero status, and make the job pass only for the correct failure.
-This provides continuous end-to-end coverage but adds artifact storage,
-workflow complexity, and negative-test control-flow risk on every change.
-
-**Option F — Download through a separate REST/CLI path.**
-
-Upload normally, then fetch the artifact with `gh` or the REST API and invoke
-the helper. This tests GitHub storage but not the pinned production download
-action and introduces authentication/tooling differences.
-
-#### Evaluation rubric
-
-This rubric is specific to negative integration evidence at the artifact seam.
-
-| Criterion | Weight | Why it matters |
+| Criterion | Weight | Why it matters for this finding |
 | --- | ---: | --- |
-| End-to-end malformed-byte coverage | 28 | The test should cross upload, ID/digest propagation, download, and helper rejection. |
-| Precise failure attribution | 20 | It must distinguish native digest success from helper archive-format rejection. |
-| Equivalence to production action configuration | 18 | The same pins and inputs should carry the test bytes. |
-| Protected-branch and write-path safety | 14 | The drill must never require a test commit on `main` or reach synchronization. |
-| Reproducibility and maintenance value | 12 | A future maintainer must be able to repeat and interpret it. |
-| Workflow cost and issue churn | 8 | Negative evidence should not impose unnecessary permanent CI cost. |
+| Fail-closed deletion safety | 35 | Cleanup must not turn a primary failure into unsafe recursive deletion. |
+| Deterministic executable evidence | 25 | The unsafe branch must run reliably on supported platforms. |
+| Identity with production behavior | 20 | A copied test algorithm does not prove the real cleanup path. |
+| Diagnostic preservation | 10 | Operators need both the primary cause and retained unsafe state. |
+| Cross-platform implementation cost | 10 | Complexity matters after safety and proof are satisfied. |
 
-#### Scoring
+### Scoring
 
-| Option | E2E 28 | Attribution 20 | Production parity 18 | Safety 14 | Repeatability 12 | Cost 8 | Total / 100 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Narrow claims | 1 | 4 | 1 | 5 | 4 | 5 | 56.8 |
-| B — Helper fixture only | 2 | 5 | 2 | 5 | 5 | 5 | 72.4 |
-| C — Controlled raw-ZIP drill | 5 | 5 | 5 | 5 | 4 | 3 | **94.4** |
-| D — Corrupt service digest | 5 | 1 | 2 | 1 | 1 | 1 | 46.0 |
-| E — Permanent PR negative job | 5 | 5 | 5 | 4 | 5 | 1 | 90.8 |
-| F — REST/CLI download | 4 | 3 | 3 | 3 | 2 | 2 | 61.6 |
+| Option | Safety (35) | Evidence (25) | Production identity (20) | Diagnostics (10) | Cost (10) | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Outcome only | 2 | 1 | 2 | 2 | 5 | 41 |
+| B — Indirect drill | 3 | 3 | 2 | 3 | 4 | 58 |
+| C — Named function/direct ordinary fixture | 5 | 5 | 5 | 5 | 4 | **98** |
+| D — Mandatory link substitution | 5 | 3 | 5 | 5 | 2 | 84 |
+| E — OS-handle redesign | 5 | 4 | 4 | 4 | 1 | 81 |
 
-#### Selected disposition
+### Selected option
 
 Select **Option C**.
 
-Add a “Malformed-transport rejection drill” beneath P1's controlled temporary-
-branch evidence:
+P1 must require:
 
-1. create a deterministic, reviewed invalid/truncated ZIP in the temporary
-   branch only;
-2. upload that exact single file with the approved pinned upload action and
-   `archive: false`;
-3. acknowledge that the file's name becomes the artifact name and `name` is
-   ignored, which is harmless because selection uses the immutable ID;
-4. propagate the real upload `artifact-id` and `artifact-digest` as the
-   candidate outputs;
-5. let every four-cell Windows consumer download that exact ID using
-   `skip-decompress: true` and `digest-mismatch: error`;
-6. prove native download/digest verification succeeds for the actual uploaded
-   malformed bytes;
-7. prove the helper's independent digest comparison succeeds and archive
-   construction/read then fails with the stable archive-format phase before
-   manifest acceptance or candidate creation;
-8. prove approval and synchronization skip; and
-9. remove every test-only mutation before completing the issue.
+1. an exact journal containing only the candidate directory and ordinary files
+   created by the invocation;
+2. one named cleanup function used by the production failure path;
+3. archive, entry, and retained file-stream disposal before cleanup;
+4. a complete revalidation and immediate-child/journal equality pass before
+   the first deletion;
+5. individual, nonrecursive file deletion followed by removal of the
+   proven-empty directory;
+6. immediate stop and retention on any missing, extra, replaced, linked,
+   reparse, unreadable, or uncertain state; and
+7. preservation of the primary failure plus phase `cleanup`, retained path,
+   safely available offending entry, and cleanup exception.
 
-Do not call this a native digest-mismatch test and do not attempt to corrupt
-GitHub's artifact service. Do not require the rejected artifact to reach the
-writer: the writer uses the same helper and is separately covered by the
-permanent harness and successful controlled `has_changes=true` drill.
+Add one stable mandatory case for an unexpected ordinary child and optional
+link/reparse substitution variants where supported. The harness may
+definition-only load the function; it must not copy cleanup, add a test switch,
+or expose another extraction API.
 
-### C-07 — Decide GitHub Actions update governance
+## C-04: Verify local PowerShell identity inside each child
 
-#### Problem and perspectives
+### Options
 
-P1 correctly pins current action versions to full SHAs, but the repository has
-no mechanism that opens reviewable updates when those pins age. The issue
-currently forbids Dependabot without assigning that maintenance elsewhere.
+#### Option A — Keep executable-name labels
 
-- A supply-chain reviewer wants immutable execution-time references and timely
-  notification of upstream releases.
-- A maintainer wants version comments and SHAs updated together in a normal PR.
-- A security executive wants human approval retained rather than auto-merging
-  workflow-code changes.
-- A project manager wants a named owner instead of indefinite residual prose.
-- A developer wants low-noise configuration that does not mix npm upgrades into
-  an action-pin change.
+Continue treating `pwsh` as Core 7 and `powershell` as Desktop 5.1 based only
+on the resolved command name.
 
-#### Options
+#### Option B — Probe the executable in a separate child
 
-**Option A — Keep exact pins and no update mechanism.**
+Run a version command first, then start another child with `-File` for the
+harness/generator. This catches an obvious wrong executable but does not bind
+the reported identity to the process that produced the evidence.
 
-Rely on manual audits. This preserves immutable execution and has no bot noise,
-but update discovery is informal and easy to defer.
+#### Option C — Use an interpolated same-child command string
 
-**Option B — Create a separate action-governance issue.**
+Build a dynamic `-Command` string that asserts the edition/version and invokes
+the target. This couples identity and work, but quoting paths and embedding
+values as code create avoidable injection and portability risks.
 
-Keep P1 at five files and require a later issue to add Dependabot or another
-update process. This can be coherent if that issue is actually created and
-ordered, but it separates a small configuration change from the pins it governs.
+#### Option D — Use a fixed same-child command with expected values as data
 
-**Option C — Add minimal review-only GitHub Actions Dependabot in P1.**
+Pass expected edition, version, target path, and helper path through
+PSStyleGuide-specific environment variables. A fixed `-Command` prelude reads
+and validates them, asserts `$PSVersionTable`, invokes the target in that same
+process, and exits nonzero on any failure. The parent checks `$LASTEXITCODE`
+immediately and restores every variable in `finally`.
 
-Add one `.github/dependabot.yml` entry for `github-actions`, directory `/`, and
-weekly scheduling. Keep full-SHA references, same-line release comments, human
-review, and no auto-merge. Make the configuration P1's sixth affected file.
+#### Option E — Add a tracked child-bootstrap script
 
-**Option D — Add both GitHub Actions and npm Dependabot entries in P1.**
+Create another repository script that performs Option D. This is reusable and
+testable, but adds a permanent implementation file solely for local validation
+when a fixed command is sufficient.
 
-Use one configuration file for action and npm updates. This increases coverage
-but opens package-update PRs before C-08's advisory/remediation policy is
-defined and conflates separate acceptance surfaces.
+### Evaluation rubric
 
-**Option E — Auto-merge patch/minor action updates.**
-
-Use Dependabot plus auto-approval/merge rules. This shortens exposure to old
-pins but automatically changes executable workflow dependencies and conflicts
-with deliberate review of runtime/input/output changes.
-
-**Option F — Depend exclusively on an organization/enterprise policy.**
-
-Configure centrally managed action updating or policy enforcement outside the
-repository. This may be ideal at scale, but no such authoritative current policy
-is in evidence and the issue would not be self-contained for a downstream
-implementer.
-
-#### Evaluation rubric
-
-This rubric is specific to immutable action-pin maintenance.
-
-| Criterion | Weight | Why it matters |
+| Criterion | Weight | Why it matters for this finding |
 | --- | ---: | --- |
-| Timely action-update discovery | 24 | Immutable pins otherwise remain stale without a visible signal. |
-| Preservation of immutable pins and human review | 23 | Update automation must not silently execute mutable or unreviewed code. |
-| Explicit repository ownership | 18 | The maintenance path must exist in the slate, not as an aspiration. |
-| Cross-repository governance consistency | 14 | Matching PS/Terraform policy reduces maintainer surprise and drift. |
-| Noise and failure-domain control | 12 | The mechanism should propose only the dependency class P1 can review well. |
-| Configuration and review churn | 9 | A small, legible configuration is preferable once governance is adequate. |
+| Edition/version identity proof | 35 | Evidence must establish Desktop 5.1 or Core 7, not a filename convention. |
+| Coupling identity to executed work | 25 | A probe in a different process is indirect. |
+| Quoting and data/code separation | 15 | Local paths and values must not become dynamic code. |
+| Exit/failure propagation | 15 | The parent must not mistake child startup or target failure for success. |
+| Copy/paste usability | 10 | A new contributor should be able to run the validation safely. |
 
-#### Scoring
+### Scoring
 
-| Option | Discovery 24 | Immutable/review 23 | Ownership 18 | Consistency 14 | Noise 12 | Churn 9 | Total / 100 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Manual only | 1 | 5 | 1 | 1 | 5 | 5 | 55.2 |
-| B — Separate issue | 4 | 5 | 4 | 3 | 4 | 4 | 81.8 |
-| C — Actions-only Dependabot | 5 | 5 | 5 | 5 | 4 | 4 | **95.8** |
-| D — Actions plus npm | 5 | 4 | 4 | 4 | 2 | 2 | 76.4 |
-| E — Auto-merge | 5 | 1 | 3 | 3 | 1 | 2 | 53.8 |
-| F — External policy only | 5 | 5 | 3 | 5 | 4 | 3 | 86.8 |
+| Option | Identity (35) | Coupling (25) | Data safety (15) | Failure propagation (15) | Usability (10) | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Labels | 1 | 1 | 4 | 3 | 5 | 43 |
+| B — Separate probe | 3 | 2 | 4 | 4 | 4 | 63 |
+| C — Interpolated same-child | 5 | 5 | 2 | 4 | 3 | 84 |
+| D — Fixed command/data variables | 5 | 5 | 5 | 5 | 4 | **98** |
+| E — Tracked bootstrap | 5 | 5 | 5 | 5 | 2 | 94 |
 
-#### Selected disposition
+### Selected option
 
-Select **Option C**.
+Select **Option D**.
 
-Add `.github/dependabot.yml` to P1's affected files and require exactly this
-minimal semantic configuration:
+Rewrite P1's local cross-edition block so each resolved executable starts two
+same-child tasks:
 
-```yaml
-version: 2
-updates:
-  - package-ecosystem: github-actions
-    directory: /
-    schedule:
-      interval: weekly
-```
+1. assert expected edition/version, then run the exact tracked harness against
+   the exact helper;
+2. assert the same expected edition/version, then run the generator.
 
-State that Dependabot is review-only. Do not add auto-merge, auto-approval, or
-an npm ecosystem entry. Every proposed action update must receive human review
-of:
+Use fixed PSStyleGuide-prefixed environment-variable names for expected
+edition, expected major/minor, target, and helper. Reject missing values;
+require Desktop exactly 5.1 or Core major 7 before target invocation; write
+expected and observed identity into failures; return an explicit nonzero exit;
+check it immediately in the parent; and restore/remove all variables in
+`finally`. Do not use a separate probe as edition evidence.
 
-- upstream release notes and repository provenance;
-- the full commit SHA and same-line version annotation;
-- declared action runtime;
-- changed inputs, outputs, defaults, and runner minimums;
-- compatibility with `archive: false`, immutable ID selection,
-  `skip-decompress`, and fail-closed digest behavior where applicable; and
-- all P1/P2 workflow evidence relevant to the changed action.
+## C-05: Require real link coverage on both operating-system families
 
-Dependabot visibility must not replace the full-SHA execution policy. Update
-P1's file count, scope guard, staging list, validation, and acceptance criteria
-from five to six files. Add a static check that the configuration has only the
-one intended ecosystem/directory/schedule entry and that no workflow contains
-an unpinned external action.
+### Options
 
-### C-08 — Give current npm advisories a concrete owner and ordering
+#### Option A — Retain unrestricted named skips
 
-#### Problem and perspectives
+Keep stable case-level skip records but allow every link fixture to skip on an
+OS family if setup reports unavailable capability or privilege.
 
-The current lockfile audit reports seven vulnerable package nodes, including
-the direct Markdown parser/linter toolchain used on pull-request-controlled
-Markdown. P1/P2 merely call this “separate maintenance,” and no matching open or
-closed repository issue exists.
+#### Option B — Require one real rejection per OS family
 
-- A security reviewer needs a bounded remediation target and a recorded
-  disposition for anything that remains.
-- A documentation/tooling maintainer needs dependency upgrades tested against
-  both ordinary and nested Markdown lint behavior.
-- A project manager needs an explicit place in the issue order.
-- A P1 implementer needs a stable package baseline while redesigning the
-  generator/workflow trust boundary.
-- A business stakeholder needs the high-severity inventory treated as real
-  work without hiding a pre-1.0 semver-major upgrade inside another change.
+Require at least one actual component-or-leaf symbolic-link test on Ubuntu and
+one actual component-or-leaf link/reparse test on Windows. Keep narrowly
+justified case-level skips for additional unavailable link forms; fail
+unexpected setup errors and prohibit platform-wide skips.
 
-#### Options
+#### Option C — Require every link fixture everywhere
 
-**Option A — Leave the “separate maintenance” prose unchanged.**
+Eliminate skips and require ancestor, below-root, leaf, dangling-leaf, and
+cleanup-substitution link cases on every runner. Coverage is broad, but Windows
+privilege/filesystem differences make the suite brittle.
 
-Record the audit but create no issue or order. This has no immediate churn and
-no accountable path to remediation.
+#### Option D — Replace real links with ZIP external-attribute fixtures
 
-**Option B — Bundle package remediation into P1.**
+Use symlink-like ZIP metadata as the only cross-platform evidence. This proves
+that extraction creates ordinary files, but it does not exercise filesystem
+component or leaf indirection.
 
-Update `package.json`/lockfile while changing the writer, helper, harness,
-workflow architecture, action pins, and Node runtime. This reduces exposure
-soon but combines two broad regression surfaces and obscures whether failures
-come from workflow redesign or parser/linter changes.
+#### Option E — Build platform-specific privileged link test jobs
 
-**Option C — Create a P0 dependency issue before P1.**
+Use dedicated Windows/Linux setup and privileges to execute every real link
+form. This maximizes coverage but expands workflow permissions, runner
+assumptions, and operational cost.
 
-Remediate advisories first, then rebaseline all P1/P2 toolchain assumptions.
-This is the right permutation if repository policy forbids proceeding with
-known high findings or if an active exploit/exposure assessment demands
-immediate treatment. No such blocking policy or active incident is currently
-in evidence.
+### Evaluation rubric
 
-**Option D — Create a separately scoped P3 after P2.**
-
-Keep P1 and P2 on the currently validated lint baseline, then perform the
-dependency/lockfile migration with its own audit and regression gates. Add a
-weekly npm Dependabot entry in P3 after P1 creates the shared configuration
-file. P1 and P2 link P3 as the concrete owner.
-
-**Option E — Insert dependency remediation between P1 and P2.**
-
-Complete workflow hardening first, then upgrade the lint toolchain before the
-content fix. This shortens exposure compared with Option D, but it makes the
-named P1/P2 sequence misleading or requires renaming the existing P2.
-
-**Option F — Add npm Dependabot without remediating the current audit.**
-
-Let the bot propose updates and treat its PRs as the owner. This improves
-discovery but does not define acceptance, major-upgrade review, or the
-disposition of existing advisories.
-
-**Option G — Point C-08 to issue #137.**
-
-Extend the existing deterministic lint/Husky/line-ending issue informally.
-That issue has a different goal and acceptance surface; treating it as the
-owner would make both issues harder to review and would not be truthful today.
-
-#### Evaluation rubric
-
-This rubric is specific to an already-known vulnerable development toolchain.
-
-| Criterion | Weight | Why it matters |
+| Criterion | Weight | Why it matters for this finding |
 | --- | ---: | --- |
-| Risk reduction with explicit accountability | 25 | Known findings need a named issue, owner, and completion condition. |
-| Regression isolation and review quality | 21 | Parser/linter changes must be distinguishable from generator/workflow changes. |
-| Time-to-remediation proportional to exposure | 18 | Pull-request-controlled Markdown makes indefinite deferral unacceptable. |
-| Stable P1/P2 implementation baseline | 14 | The two large existing issues should not chase a moving lint baseline mid-change. |
-| Audit and dependency-test completeness | 14 | Remediation must cover direct/transitive paths, clean install, and both lint modes. |
-| Scheduling and issue churn | 8 | Ordering should remain understandable to the downstream author. |
+| Real filesystem-indirection evidence | 35 | The helper claims rejection of links/reparse points in actual paths. |
+| Deterministic hosted-runner behavior | 25 | Required CI must be reliable rather than privilege-sensitive. |
+| Honest skip semantics | 20 | Missing setup capability must not be reported as passing security coverage. |
+| Cross-platform portability | 10 | Both supported OS families need meaningful proof. |
+| Workflow/maintenance cost | 10 | Extra privileged jobs should be justified by incremental assurance. |
 
-#### Scoring
+### Scoring
 
-| Option | Accountability 25 | Isolation 21 | Timeliness 18 | Stable baseline 14 | Completeness 14 | Scheduling 8 | Total / 100 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Residual prose | 1 | 2 | 1 | 5 | 1 | 5 | 41.8 |
-| B — Bundle into P1 | 4 | 1 | 5 | 1 | 3 | 2 | 56.6 |
-| C — P0 before P1 | 5 | 5 | 5 | 3 | 5 | 2 | 89.6 |
-| D — Separate P3 after P2 | 5 | 5 | 3 | 5 | 5 | 4 | **91.2** |
-| E — Between P1 and P2 | 5 | 5 | 4 | 4 | 5 | 3 | 90.4 |
-| F — Dependabot only | 3 | 4 | 3 | 5 | 2 | 5 | 67.6 |
-| G — Reuse issue #137 | 2 | 1 | 3 | 3 | 2 | 4 | 42.6 |
+| Option | Real evidence (35) | Determinism (25) | Skip honesty (20) | Portability (10) | Cost (10) | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Unrestricted skips | 1 | 2 | 1 | 5 | 5 | 41 |
+| B — One mandatory per family | 5 | 5 | 5 | 5 | 4 | **98** |
+| C — Every form everywhere | 5 | 2 | 4 | 2 | 2 | 69 |
+| D — Metadata only | 2 | 5 | 5 | 5 | 5 | 79 |
+| E — Privileged jobs | 5 | 5 | 5 | 4 | 1 | 90 |
 
-#### Selected disposition
+### Selected option
 
-Select **Option D: add a real P3 after P2**.
+Select **Option B**.
 
-Create `docs/planning/PSStyleGuide/03PSStyleGuideP3.md` with the H1 title
-`Remediate Markdown lint dependency advisories and add npm update governance`.
-The slate order becomes P1, P2, P3. P3 must:
+P1 must say that acceptance requires:
 
-1. rerun and preserve the current `npm audit --package-lock-only --json`
-   baseline;
-2. map every direct and transitive advisory path;
-3. review the proposed pre-1.0 semver-major `markdownlint-cli2` update and
-   current upstream release notes rather than blindly running
-   `npm audit fix --force`;
-4. make only deliberate `package.json` and lockfile changes;
-5. run on Node 24 with a clean `npm ci`;
-6. prove the existing outer and nested Markdown lint commands and configuration
-   semantics remain intact;
-7. require a clean audit or an explicit, time-bounded, owner-assigned
-   disposition for every residual finding;
-8. add a weekly `npm` entry for directory `/.github/workflows` to the
-   `.github/dependabot.yml` created by P1;
-9. retain review-only dependency updates and prohibit auto-merge; and
-10. document before/after package versions, advisory paths, and lockfile churn.
+- one real component-or-leaf symlink rejection on Ubuntu;
+- one real component-or-leaf link/reparse rejection on Windows;
+- a stable ID/platform/reason record for any additional skipped form;
+- no platform-wide link-fixture skip; and
+- a failed cell for unexpected setup failure.
 
-P1 and P2 should link to P3 by local issue-description path and say that their
-read-only permissions reduce blast radius but do not remediate vulnerable
-parsing code. P3 is not a P1/P2 prerequisite under the selected ordering. If
-the repository later supplies a policy that forbids merging while remediable
-high advisories remain, move the same issue to P0 and rebaseline P1/P2; do not
-silently change ordering based on an assumed policy.
+Keep the ZIP external-attribute success case because it proves a different
+property: metadata is not restored as a filesystem link.
 
-### C-P2 — Preserve P2's narrow scope and refresh its P1 prerequisite
+## C-06: Align or explain pull-request harness placement
 
-#### Problem and perspectives
+### Options
 
-P2 is a focused documentation-source correction whose validation deliberately
-reuses P1's generator/workflow architecture. P1's selected dispositions change
-that prerequisite, but copying all P1 implementation detail into P2 would make
-the smaller issue harder to understand and easier to drift.
+#### Option A — Keep two LF cells without rationale
 
-- A documentation author needs P2 to say exactly which two source files change
-  and which four files are generated.
-- A new implementer needs to know P1 must already be merged and which commands/
-  CI behavior can be trusted.
-- A project manager needs the P1 → P2 → P3 order unmistakable.
-- A maintainer needs one source of truth for helper security details.
-- A reviewer needs P2's no-drift push evidence stated precisely.
+Retain current behavior and the generic statement that placement may differ.
 
-#### Options
+#### Option B — Keep two LF cells and document the coverage model
 
-**Option A — Copy all final P1 contracts into P2's prerequisite.**
+Explain that the helper is independent of source fixture EOL, so Ubuntu
+PowerShell 7 plus Windows Desktop/Core LF cells provide platform/edition
+coverage; CRLF cells test generator EOL equivalence only. Preserve all-four
+push-consumer harness execution.
 
-Restate path, stream, cleanup, action, workflow, fixture, and Dependabot details
-inside P2. This is self-contained but duplicates hundreds of lines and will
+#### Option C — Run the full helper suite in all four Windows PR cells
+
+Match T1's placement exactly and gain redundant EOL-axis executions at the cost
+of additional CI minutes and slower feedback.
+
+#### Option D — Move helper tests to dedicated non-matrix jobs
+
+Separate helper platform/edition coverage from generator EOL coverage. This is
+conceptually clean but changes workflow topology and dependency wiring more
+than the finding requires.
+
+#### Option E — Run extra cells only when helper files change
+
+Use path-sensitive conditional coverage. This reduces cost but complicates
+unfiltered PR guarantees and can miss interactions when workflow or runtime
+files change.
+
+### Evaluation rubric
+
+| Criterion | Weight | Why it matters for this finding |
+| --- | ---: | --- |
+| Actual helper coverage sufficiency | 35 | Both platforms/editions and required fixtures must execute. |
+| Assurance gained per CI cost | 20 | Redundant EOL-axis runs should provide material evidence. |
+| P1/T1 comparability | 20 | Differences should be understandable during coordinated implementation. |
+| Downstream workflow clarity | 15 | Job intent should be obvious to a cold reader. |
+| Feedback time and runner use | 10 | CI cost is secondary but still operationally relevant. |
+
+### Scoring
+
+| Option | Coverage (35) | Signal/cost (20) | Comparability (20) | Clarity (15) | Runtime (10) | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Undocumented two-cell | 4 | 5 | 2 | 1 | 5 | 69 |
+| B — Documented two-cell | 5 | 5 | 4 | 5 | 5 | **96** |
+| C — Four-cell symmetry | 5 | 2 | 5 | 5 | 2 | 82 |
+| D — Dedicated jobs | 5 | 3 | 3 | 4 | 3 | 77 |
+| E — Conditional expansion | 4 | 3 | 3 | 2 | 3 | 64 |
+
+### Selected option
+
+Select **Option B**.
+
+Retain P1's Ubuntu plus two-Windows-LF pull-request helper placement. Add a
+convergence-matrix note and topology explanation that this is deliberate
+platform/edition coverage, not edition × EOL helper coverage. CRLF cells remain
+generator-only because the helper consumes constructed ZIP/path fixtures, not
+source EOL variants. Keep the harness mandatory in all four push cells and in
+the writer whenever it starts.
+
+## C-07: Refresh P2's prerequisite snapshot
+
+### Options
+
+#### Option A — Leave the current snapshot
+
+Allow P2 to describe the pre-correction P1 contract. This is immediately stale
+after selected C-01/C-03/C-04/C-05 changes.
+
+#### Option B — Copy final P1 in extensive detail
+
+Duplicate cleanup algorithms, fixtures, local bootstrap, and link rules into
+P2. This is explicit but creates a second normative specification that can
 drift.
 
-**Option B — Use only a generic P1-complete statement.**
+#### Option C — Keep a concise invariant summary plus normative P1 link
 
-Replace the detailed prerequisite with one link/sentence. This minimizes churn
-but does not tell a cold-start implementer which assumptions P2 validation
-relies on.
+After P1 is final, update only the gates P2 genuinely depends on and state that
+merged P1 is the implementation source of truth. Add the new held-stream,
+named-cleanup/direct-test, mandatory-link, same-child-edition, and exact-pin
+invariants without copying algorithms.
 
-**Option C — Use a concise invariant summary and normative link to P1.**
+#### Option D — Add an executable prerequisite conformance script to P2
 
-State that P1 is merged, list only the stable interfaces/behaviors P2 consumes,
-and make P1 the implementation source of truth. Explicitly state that P2 does
-not reopen P1 choices. Preserve P2's own exact validation/evidence wording.
+Have P2 mechanically inspect the merged workflow/helper before documentation
+work begins. This can strengthen evidence but adds a new validator surface and
+still needs a human-readable dependency summary.
 
-**Option D — Make P2 independent of P1.**
+#### Option E — Remove the snapshot and keep only the P1 link
 
-Duplicate helper/workflow setup or provide alternate commands that work before
-P1. This weakens sequential delivery, expands P2, and creates two paths for the
-same generator validation.
+Avoid all duplication, but make a cold implementer reconstruct which P1
+properties are necessary for P2's validation and post-merge expectations.
 
-**Option E — Merge P2 into P1.**
+### Evaluation rubric
 
-Fix the blank-line example while redesigning the generator. This reduces issue
-count but mixes a content/version change into an issue intentionally expected
-to leave generated artifact bytes unchanged.
-
-#### Evaluation rubric
-
-This rubric is specific to a sequential issue prerequisite.
-
-| Criterion | Weight | Why it matters |
+| Criterion | Weight | Why it matters for this finding |
 | --- | ---: | --- |
-| Correct execution-order dependency | 24 | P2 must never run against the pre-P1 generator/workflow contract. |
-| Preservation of P2's narrow content scope | 23 | The small visual/rationale correction should remain independently reviewable. |
-| Truthfulness after final P1 decisions | 20 | The prerequisite cannot cite obsolete path, cleanup, file-count, or governance behavior. |
-| Cold-start clarity | 17 | A downstream author must know which P1 capabilities P2 consumes. |
-| Resistance to duplicated-contract drift | 10 | P1 should remain the sole detailed source for its implementation. |
-| Editing churn | 6 | A compact prerequisite is preferable after the other qualities are met. |
+| Accuracy against final P1 | 30 | P2 must start only after the actual prerequisite exists. |
+| Resistance to copied-contract drift | 25 | P1 remains the normative implementation owner. |
+| Cold-start implementer usability | 20 | P2 should expose the gates it relies on. |
+| Single source of normative truth | 15 | Algorithms should not have two owners. |
+| P2 scope preservation | 10 | Prerequisite text should not reopen generator work. |
 
-#### Scoring
+### Scoring
 
-| Option | Order 24 | Narrowness 23 | Truth 20 | Clarity 17 | Drift 10 | Churn 6 | Total / 100 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Copy P1 | 4 | 2 | 5 | 4 | 1 | 2 | 66.4 |
-| B — Link only | 3 | 5 | 2 | 2 | 5 | 5 | 68.2 |
-| C — Invariants + link | 5 | 5 | 5 | 5 | 5 | 4 | **98.8** |
-| D — Independent P2 | 2 | 1 | 3 | 3 | 1 | 1 | 39.6 |
-| E — Merge into P1 | 3 | 1 | 4 | 2 | 3 | 2 | 50.2 |
+| Option | Accuracy (30) | Drift (25) | Usability (20) | Source of truth (15) | Scope (10) | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Leave stale | 1 | 1 | 2 | 3 | 5 | 38 |
+| B — Copy details | 5 | 2 | 4 | 1 | 2 | 63 |
+| C — Concise summary/link | 5 | 5 | 5 | 5 | 5 | **100** |
+| D — Conformance script | 5 | 5 | 3 | 4 | 2 | 83 |
+| E — Link only | 4 | 5 | 2 | 5 | 5 | 82 |
 
-#### Selected disposition
+### Selected option
 
 Select **Option C**.
 
-Rewrite P2's prerequisite so a cold reader learns:
+After P1 revisions are complete, refresh P2's prerequisite bullets to name:
 
-- P1 must already be merged and P2 must be based on that result.
-- The generator uses the deterministic UTF-8-no-BOM/LF writer at all four
-  output sites.
-- The tracked shared helper and permanent harness own artifact validation and
-  extraction.
-- The final workflow runs for all relevant events, uses the pinned Node 24
-  actions, immutable artifact ID/digest flow, unique job-owned temporary roots,
-  full-component checks, held-stream `FileShare.Read` contract, and fail-closed
-  cleanup.
-- The pull-request topology runs the harness only in the two LF cells, while
-  every four-cell push consumer runs it.
-- P1's controlled `has_changes=true` drill, not P2's expected no-drift merge,
-  proves writer integration.
-- P1's `.github/dependabot.yml` is established but is not modified by P2.
-- P3 owns npm advisory remediation and follows P2, so it is not a P2
-  prerequisite.
+- the shared same-held-stream P1/T1 invariant;
+- the journaled named cleanup function and direct fail-closed fixture;
+- at least one real link/reparse rejection per OS family;
+- the same-child Desktop 5.1/Core 7 local proof; and
+- exact approved action tuple validation.
 
-Link P1 rather than repeating its algorithms, fixture matrix, or workflow
-implementation. Keep P2 at exactly two edited source files plus four generated
-artifacts. Preserve all C-09 evidence distinctions and the conditional metadata
-date rule.
+Keep the existing statement that P1 is the source of truth. Do not reproduce
+cleanup, path, or child-bootstrap algorithms in P2.
 
-### I-P1-01 — Prove the Node 24 toolchain and lint paths locally
+## C-08: Assert Node 24 before P2's local npm commands
 
-#### Problem and perspectives
+### Options
 
-P1 changes the Markdown workflow to Node 24 and expects clean install plus
-outer/nested lint success, but its local validation can pass on the reviewer's
-ambient Node. The current review machine is Node 26.5.0, demonstrating why that
-is not equivalent evidence.
+#### Option A — Rely on hosted CI
 
-- A DevOps engineer needs local and CI runtime assumptions aligned.
-- A new developer needs an immediate, actionable failure if the wrong Node is
-  active.
-- A dependency maintainer needs lockfile installation, not only a linter left
-  in `node_modules` from earlier work.
-- A reviewer needs every command's exit status enforced.
-- A project manager wants the check added without starting the P3 package
-  migration early.
+Let local `npm ci` and lint use any Node on `PATH`; depend on the post-push
+workflow for exact Node 24 evidence.
 
-#### Options
+#### Option B — Add a prose prerequisite
 
-**Option A — Rely entirely on pull-request CI.**
+Tell the implementer to activate Node 24, but do not make the copyable block
+verify it.
 
-The pinned setup action provisions Node 24 and provides authoritative hosted
-evidence. This is valid eventually but delays failures until after a push and
-leaves P1's “local validation” incomplete.
+#### Option C — Add a simple `node --version` regex
 
-**Option B — Check only that the local Node major is 24.**
+Run the command by name and require output beginning `v24.`. This is better
+than prose but does not resolve the exact executable or validate output shape
+as carefully as P1.
 
-Fail fast on the runtime, but do not reinstall dependencies or execute lint.
-This proves environment selection, not package compatibility or scripts.
+#### Option D — Reuse P1's resolved-command Node/npm bootstrap
 
-**Option C — Run lint under whatever local Node is active.**
+Resolve one `node` and one `npm` application, query
+`process.versions.node`, require exactly one major-24 value, set/restore `CI`
+around clean installation, and invoke all npm commands through the resolved
+npm path with immediate exit checks.
 
-Record the version and accept any passing supported runtime. This is convenient
-but does not prove the exact Node 24 contract and can mask runtime-specific
-behavior.
+#### Option E — Run validation in a Node 24 container/version manager
 
-**Option D — Use CI Node 24 only, but add explicit workflow assertions.**
+Provision a controlled runtime locally. This is reproducible but introduces
+another required tool, filesystem/UID concerns, and a validation environment
+different from the documented native workflow.
 
-Have the workflow print/assert major 24 before `npm ci` and lint. This is strong
-hosted evidence and should be retained, but it does not satisfy local
-preflight.
+### Evaluation rubric
 
-**Option E — Require local Node major 24, clean install, and both lint paths.**
-
-Add one fail-fast PowerShell block that checks Node/npm availability, requires
-major 24, runs CI-mode `npm ci` from the workflows package, then runs outer and
-nested lint with explicit exit checks.
-
-**Option F — Run local validation in an official Node 24 container.**
-
-Use a pinned Node image to make the runtime reproducible. This is strong when
-Docker is present, but adds an unavailable prerequisite for many Windows
-contributors and differs from the host filesystem/shell paths used by CI.
-
-**Option G — Add `.nvmrc`, `.node-version`, or `engines.node` as enforcement.**
-
-Version metadata improves developer discovery and could be combined with
-Option E. None is uniformly enforced by the existing Windows/PowerShell/npm
-flow, and adding package metadata overlaps P3's deliberately separate package
-review.
-
-#### Evaluation rubric
-
-This rubric is specific to local runtime/toolchain evidence.
-
-| Criterion | Weight | Why it matters |
+| Criterion | Weight | Why it matters for this finding |
 | --- | ---: | --- |
-| Fidelity to the declared Node 24 environment | 26 | Passing on Node 26 or another version is not proof of P1's selected runtime. |
-| Dependency and lint regression detection | 22 | A clean lockfile install and both lint modes are the behaviors at risk. |
-| Reproducibility for another contributor | 18 | A cold-start developer should be able to repeat the evidence. |
-| Fail-fast exit-code discipline | 14 | Tool startup and lint failures must not be mistaken for success. |
-| Contributor usability and diagnostics | 12 | Wrong/missing runtimes should produce an actionable message. |
-| Files/scope churn | 8 | Avoid package/version-file changes unless they materially improve proof. |
+| Exact runtime evidence | 35 | P2 claims Node 24 compatibility, not generic modern Node success. |
+| Consistent executable binding | 20 | Version query and npm work should use the intended toolchain. |
+| Environment restoration/failure handling | 15 | Copyable validation must not leak `CI` or ignore native exits. |
+| New-developer usability | 20 | Failure should immediately explain the required runtime. |
+| P2 scope fit | 10 | The fix should not introduce a new environment platform. |
 
-#### Scoring
+### Scoring
 
-| Option | Node fidelity 26 | Regression 22 | Reproducible 18 | Exit discipline 14 | Usability 12 | Churn 8 | Total / 100 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — CI only | 2 | 3 | 2 | 4 | 3 | 5 | 57.2 |
-| B — Version check only | 4 | 2 | 3 | 5 | 4 | 5 | 72.0 |
-| C — Ambient Node lint | 1 | 2 | 1 | 4 | 5 | 5 | 48.8 |
-| D — Hosted assertion only | 3 | 4 | 4 | 5 | 3 | 5 | 76.8 |
-| E — Node 24 + clean full lint | 5 | 5 | 5 | 5 | 4 | 4 | **96.0** |
-| F — Node 24 container | 5 | 5 | 5 | 5 | 3 | 2 | 90.4 |
-| G — Version metadata | 5 | 3 | 4 | 3 | 5 | 2 | 74.0 |
+| Option | Runtime (35) | Binding (20) | Environment (15) | Usability (20) | Scope (10) | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Hosted only | 1 | 3 | 3 | 5 | 5 | 58 |
+| B — Prose | 2 | 3 | 4 | 5 | 5 | 68 |
+| C — Simple query | 4 | 3 | 4 | 4 | 5 | 78 |
+| D — P1 bootstrap | 5 | 5 | 5 | 4 | 5 | **96** |
+| E — Container/manager | 5 | 5 | 4 | 2 | 2 | 79 |
 
-#### Selected disposition
+### Selected option
 
-Select **Option E**, while retaining Option D's hosted assertion.
+Select **Option D**.
 
-Add a P1 local-validation PowerShell block that:
+Replace the opening of P2's generate/lint block with P1's exact local Node 24
+bootstrap. Require one Node major-24 result before `npm ci`; run install with
+`CI=true` and restore the prior environment value in `finally`; then use the
+same resolved npm command for outer and nested lint. Keep the existing
+generator, whitespace, and exit-code checks.
 
-1. resolves `node` and `npm` or fails with installation guidance;
-2. parses `process.versions.node` and requires major version exactly 24;
-3. temporarily sets `CI=true` for the clean install so the repository's Husky
-   installer follows its intentional CI skip path, then restores the caller's
-   environment;
-4. runs `npm --prefix .github/workflows ci`;
-5. runs `npm --prefix .github/workflows run lint:md`;
-6. runs `npm --prefix .github/workflows run lint:md:nested`; and
-7. checks `$LASTEXITCODE` immediately after every native command.
+## C-09: Remove P2's stale metadata snapshot
 
-Do not run `npm install`, update the manifest/lockfile, or use the review
-machine's Node 26 pass as acceptance evidence. In both `build.yml` and
-`markdownlint.yml`, assert the provisioned `process.versions.node` major is 24
-before the install/lint steps. Record the local and hosted version output in
-the evidence. P3, not P1, owns later package-version changes.
+### Options
 
-### I-P1-02 — Complete optional diagnostic-label fixture coverage
+#### Option A — Retain the expired conditional example
 
-#### Problem and perspectives
+Keep `2.24.20260728.0` with its recomputation warning.
 
-P1 defines three independent optional labels—`ArtifactId`, `RunId`, and
-`RunAttempt`—with a three-state contract: omitted, supplied nonempty, or
-explicitly supplied empty. Its table has one generic empty-label case and no
-complete oracle for omitted versus supplied labels.
+#### Option B — Refresh the example to today's baseline/date
 
-- An API designer needs PowerShell binding state distinguished with
-  `$PSBoundParameters`, not guessed from the resulting string value.
-- An operator needs exact caller IDs retained in failure logs and omitted IDs
-  labeled honestly as unavailable.
-- A test maintainer needs to identify which parameter regressed.
-- A security reviewer needs empty/untrusted context rejected before filesystem
-  or archive processing.
-- A project manager wants small data-driven cases rather than a new helper API.
+Provide a new concrete value. It will become stale again when implementation
+date or target metadata changes.
 
-#### Options
+#### Option C — Remove the snapshot
 
-**Option A — Keep one generic `X-01`.**
+Keep only the normative target-branch/current-UTC algorithm and acceptance
+requirements.
 
-Let the implementation choose which label to empty. This proves one validation
-path but can leave two parameters unchecked.
+#### Option D — Replace values with placeholders
 
-**Option B — Loop over all three names inside one stable case.**
+Show `Major.Minor.YYYYMMDD.Revision` and `<current UTC date>`. This illustrates
+shape but duplicates the already clear numbered algorithm.
 
-Keep `X-01` and make it a data-driven subloop that empties each label. This is
-compact, but one aggregate result can make diagnostics and partial failure less
-obvious.
+#### Option E — Add a copyable metadata calculator
 
-**Option C — Add separate stable cases for omitted, supplied, and each empty
-label.**
+Compute the new version from parsed target content and UTC time. This can be
+precise, but version-policy parsing and concurrent target changes still need
+human finalization and increase P2's validator surface.
 
-Use one digest rejection with all exact labels supplied, one with all omitted,
-and three early rejections—one per explicitly empty label. Give each an exact
-diagnostic oracle and phase.
+### Evaluation rubric
 
-**Option D — Make all labels mandatory.**
-
-Require every caller to provide all three. This removes omitted-state
-complexity but makes local/unit callers invent GitHub context, contrary to the
-caller-owned/no-invention design.
-
-**Option E — Replace the three parameters with a context object or hashtable.**
-
-Centralize label validation and allow schema evolution. This substantially
-changes the public helper interface, complicates strict binding and cross-
-process invocation, and still needs field-by-field tests.
-
-**Option F — Remove diagnostic labels.**
-
-Log only the archive path and digest. This simplifies the helper but makes
-matrix/run failures harder to correlate and abandons an intentional operational
-feature.
-
-#### Evaluation rubric
-
-This rubric is specific to optional PowerShell parameter-state behavior.
-
-| Criterion | Weight | Why it matters |
+| Criterion | Weight | Why it matters for this finding |
 | --- | ---: | --- |
-| Complete omitted/supplied/empty state coverage | 26 | All three parameters and all meaningful binding states must be proven. |
-| Phase and diagnostic-oracle specificity | 22 | Each failure must name the exact parameter and occur before side effects. |
-| Regression localization | 18 | A case ID should immediately identify which label contract broke. |
-| PowerShell 5.1/7 binding fidelity | 14 | Tests must exercise the real public script parameters in each edition. |
-| Harness maintainability | 12 | Coverage should remain understandable and data-driven where safe. |
-| Case-count and issue churn | 8 | Extra rows are acceptable but should earn their maintenance cost. |
+| Final metadata correctness | 35 | The committed version/date must reflect the actual target and UTC date. |
+| Resistance to accidental copying | 25 | A concrete stale value is operationally hazardous. |
+| Normative algorithm clarity | 20 | The author must understand Minor/Build/Revision behavior. |
+| Implementer convenience | 10 | Examples or automation can reduce calculation effort. |
+| Editorial simplicity | 10 | This is a documentation issue, so unnecessary machinery has a cost. |
 
-#### Scoring
+### Scoring
 
-| Option | State coverage 26 | Oracle 22 | Localization 18 | Binding 14 | Maintainability 12 | Churn 8 | Total / 100 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Generic case | 2 | 2 | 2 | 4 | 5 | 5 | 57.6 |
-| B — One looped case | 4 | 3 | 3 | 5 | 5 | 4 | 77.2 |
-| C — Separate stable cases | 5 | 5 | 5 | 5 | 4 | 3 | **94.4** |
-| D — Make labels mandatory | 4 | 5 | 4 | 5 | 3 | 2 | 81.6 |
-| E — Context object | 4 | 3 | 3 | 2 | 2 | 1 | 56.8 |
-| F — Remove labels | 1 | 1 | 1 | 5 | 5 | 5 | 47.2 |
+| Option | Correctness (35) | Copy safety (25) | Clarity (20) | Convenience (10) | Simplicity (10) | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Retain | 3 | 1 | 3 | 5 | 5 | 58 |
+| B — Refresh concrete value | 2 | 2 | 3 | 5 | 4 | 54 |
+| C — Remove snapshot | 5 | 5 | 5 | 3 | 5 | **96** |
+| D — Placeholders | 4 | 4 | 4 | 4 | 4 | 80 |
+| E — Calculator | 5 | 5 | 4 | 3 | 2 | 86 |
 
-#### Selected disposition
+### Selected option
 
 Select **Option C**.
 
-Keep the existing public parameter list. The helper must use
-`$PSBoundParameters.ContainsKey(...)` independently for `ArtifactId`, `RunId`,
-and `RunAttempt`:
+Delete the drift-only snapshot paragraph. Preserve the six normative steps:
+reread target Version/Last Updated, increment Minor, use current UTC Build/date,
+reset or increment Revision correctly, recompute after target/date drift, and
+commit metadata with the source change.
 
-- omitted means diagnostics render the literal unavailable marker chosen by the
-  issue;
-- supplied nonempty means diagnostics preserve the exact caller value; and
-- explicitly supplied `''` is rejected in `context/path` before archive
-  enumeration/open or candidate creation.
+## C-10: Resolve P3's Node-engine and staged-hook mismatch
 
-Replace the underspecified table coverage with:
+### Options
 
-| ID | Label setup | Expected oracle |
-| --- | --- | --- |
-| `D-01` | Wrong well-formed digest; all three labels supplied with distinct sentinel values | `digest` rejection contains every exact sentinel |
-| `D-02` | Wrong well-formed digest; all three labels omitted | `digest` rejection renders each as unavailable and invents none |
-| `X-01` | Empty `ArtifactId`; other labels valid/omitted as specified | Early rejection names only `ArtifactId` |
-| `X-02` | Empty `RunId`; other labels valid/omitted as specified | Early rejection names only `RunId` |
-| `X-03` | Empty `RunAttempt`; other labels valid/omitted as specified | Early rejection names only `RunAttempt` |
+#### Option A — Keep P3's three-file scope and Node 20 guards
 
-All five cases must invoke the tracked production helper through its public
-parameters in every supported shell/platform. The empty cases must prove no
-download enumeration, stream open, ZIP construction, or candidate creation.
-The digest cases must prove the expected/actual digest and archive path remain
-present alongside the exact label rendering.
+Install the selected dependency tree without changing the hook/runtime
+contract. With the known candidate, explicitly admitted Node 20 contributors
+would run unsupported packages.
 
-### I-P2-01 — Prove the rationale heading occurs exactly once
+#### Option B — Select an older Node-20-compatible dependency tree
 
-#### Problem and perspectives
+Constrain upgrades to packages that preserve Node 20. This improves contributor
+compatibility, but may leave known advisory paths or force outdated direct
+versions despite Node 20 being end-of-life.
 
-P2 says to extend the existing `### Blank Line Usage` rationale section and
-forbids creating a duplicate, but its content validator does not count that
-heading.
+#### Option C — Support the selected package minimum locally and Node 24 in CI
 
-- A documentation editor needs the change placed in the existing section.
-- A Markdown maintainer knows duplicate-heading lint rules can be configured by
-  sibling scope and are not a substitute for this issue-specific invariant.
-- A test author needs an ordinal, culture-independent assertion.
-- A new developer needs an error that reports the actual count and file.
-- A project manager wants a tiny check that does not broaden P2.
+Expand P3 to `.husky/pre-commit` and `lint-staged-markdown.mjs`; set both
+guards/messages and `package.json.engines.node` to the maximum minimum required
+by the selected direct tree (currently `>=22`); retain exact Node 24 in the
+workflow/full-corpus validation; and test the selected minimum plus Node 24.
 
-#### Options
+#### Option D — Require Node 24 everywhere
 
-**Option A — Trust editing instructions and review.**
+Expand the same files but set every local and package guard to `>=24`. This
+creates one simple policy and matches hosted validation, but excludes supported
+Node 22 contributors unnecessarily if the final package tree still supports
+22.
 
-Do not add a mechanical check. Human review can catch a duplicate, but the
-acceptance criterion remains unproven.
+#### Option E — Create a separate Node-policy prerequisite
 
-**Option B — Rely on Markdown lint duplicate-heading rules.**
+File and merge a hook/runtime-policy issue before P3, then rebaseline P3.
+Separation may aid review but lengthens the dependency chain for a compatibility
+change inseparable from the selected package engine floor.
 
-Use MD024/related rules as indirect proof. Configuration can permit the same
-heading under different parents, and future rule changes can weaken the oracle.
+### Evaluation rubric
 
-**Option C — Count exact heading lines ordinally and require one.**
-
-Split the rationale using P2's existing ordinal newline method and count lines
-exactly equal to `### Blank Line Usage`. Fail unless the count is one and report
-the actual count.
-
-**Option D — Parse a Markdown abstract syntax tree.**
-
-Load the document through a parser and count level-three headings whose text
-matches. This is semantically rich but adds a parser/API dependency to a simple
-content check and can itself be affected by P3's dependency changes.
-
-**Option E — Infer uniqueness from generated-artifact equality.**
-
-Regenerate and assert the four artifacts match expected sources. Generation
-faithfully reproduces a duplicate and therefore does not detect the defect.
-
-**Option F — Use a regular expression over the whole file.**
-
-Count multiline matches allowing optional whitespace. This can accidentally
-accept malformed or indented headings and is less exact than the issue's
-literal heading requirement.
-
-#### Evaluation rubric
-
-This rubric is specific to one structural Markdown invariant.
-
-| Criterion | Weight | Why it matters |
+| Criterion | Weight | Why it matters for this finding |
 | --- | ---: | --- |
-| Ability to detect zero or duplicate sections | 25 | Both omission and duplication violate the requested change. |
-| Fidelity to the exact issue requirement | 22 | The target is one literal level-three heading, not approximate prose. |
-| Resistance to false positives/negatives | 18 | Fenced text, indentation, or sibling configuration must not satisfy the check accidentally. |
-| PowerShell edition portability | 15 | P2 validation must parse/run under Windows PowerShell 5.1 and PowerShell 7. |
-| Failure-message clarity | 12 | The author should see file, expected count, and actual count immediately. |
-| Implementation complexity | 8 | A one-line structural invariant should not require a new dependency. |
+| Runtime/package technical correctness | 30 | Admitted runtimes must satisfy every selected package engine. |
+| Contributor usability across supported Node LTS lines | 25 | Local hooks should not exclude a supported runtime without benefit. |
+| One coherent policy across guards/manifest/workflow | 20 | Conflicting floors create confusing failures. |
+| Executable minimum-and-hosted evidence | 15 | Declared compatibility must be tested, not inferred. |
+| Issue-chain and file-scope cost | 10 | Scope matters only after compatibility is coherent. |
 
-#### Scoring
+### Scoring
 
-| Option | Detect 25 | Fidelity 22 | Precision 18 | Portability 15 | Diagnostics 12 | Simplicity 8 | Total / 100 |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| A — Human review | 1 | 2 | 3 | 5 | 2 | 5 | 52.4 |
-| B — Markdown lint | 2 | 3 | 3 | 5 | 3 | 5 | 64.2 |
-| C — Exact ordinal line count | 5 | 5 | 5 | 5 | 5 | 5 | **100.0** |
-| D — Markdown AST | 5 | 5 | 5 | 3 | 4 | 1 | 85.2 |
-| E — Generated equality | 1 | 2 | 3 | 5 | 2 | 4 | 50.8 |
-| F — Multiline regex | 4 | 3 | 3 | 5 | 4 | 5 | 76.6 |
+| Option | Correctness (30) | Usability (25) | Policy (20) | Evidence (15) | Scope (10) | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Keep Node 20 guards | 1 | 5 | 1 | 1 | 5 | 48 |
+| B — Preserve Node 20 tree | 2 | 5 | 3 | 2 | 4 | 63 |
+| C — Selected minimum + Node 24 | 5 | 5 | 5 | 5 | 3 | **96** |
+| D — Node 24 everywhere | 5 | 3 | 5 | 5 | 3 | 86 |
+| E — Separate prerequisite | 5 | 4 | 5 | 5 | 1 | 87 |
 
-#### Selected disposition
+### Selected option
 
 Select **Option C**.
 
-In P2's mechanical content-confirmation script, reuse the already normalized
-ordinal line collection for `STYLE_GUIDE_RATIONALE.md`, then:
+Expand P3's affected files to include `.husky/pre-commit` and
+`.github/workflows/lint-staged-markdown.mjs`. At implementation time:
 
-1. count lines exactly equal to `### Blank Line Usage` using
-   `[StringComparison]::Ordinal`;
-2. require the count to equal one;
-3. throw a message containing the repository-relative file, expected count
-   `1`, and actual count; and
-4. run the same assertion after regeneration/staging in the final content
-   confirmation.
+1. determine the highest minimum Node major required by the final selected
+   direct dependency tree;
+2. require that major consistently in both guards/messages and
+   `package.json.engines.node`;
+3. for the known 0.23.2/0.41.1 candidate, use Node `>=22`;
+4. retain exact Node 24 for the hosted workflow and full-corpus validation;
+5. run staged integration evidence at the selected minimum and Node 24; and
+6. fail/rebaseline if implementation-time releases raise the engine floor.
 
-Do not add a parser, change Markdown lint configuration, or weaken the equality
-with whitespace/case normalization. Keep P2's existing checks that the
-operational snippet/heading do not leak into the rationale.
+Do not knowingly install an unsupported tree or keep an end-of-life Node 20
+policy merely to preserve three-file scope.
 
-## Consolidated selected issue slate
+## C-11: Execute the staged-lint API contract
 
-The evaluated findings produce three implementation issues in this execution
-order:
+### Options
 
-| Order | Issue | Purpose | Prerequisite |
-| ---: | --- | --- | --- |
-| 1 | [P1 — Make artifact generation byte-deterministic across PowerShell editions and hosts](../PSStyleGuide/01PSStyleGuideP1.md) | Implement the deterministic generator/helper, complete its security and lifecycle contract, integrate it with the pinned workflows, add controlled transport evidence, and establish review-only GitHub Actions update governance. | None |
-| 2 | [P2 — Make the non-compliant blank-line example visibly distinct](../PSStyleGuide/02PSStyleGuideP2.md) | Make the narrow source/content change after the P1 baseline, preserving exact generation and adding the ordinal uniqueness oracle. | P1 |
-| 3 | [P3 — Remediate Markdown lint dependency advisories and add npm update governance](../PSStyleGuide/03PSStyleGuideP3.md) | Re-audit and deliberately remediate the Markdown tooling dependency graph, preserve the lint contract, and extend review-only governance to the nested npm project. | P2 |
+#### Option A — Trust static upstream API inspection
 
-The issue split keeps implementation ownership explicit:
+Rely on the presence of exported `main` and `nonFileContents` in 0.23.2.
+This does not exercise repository configuration, path conversion, Git index
+reads, diagnostics, or exit mapping.
 
-- P1 owns `C-01` through `C-07`, `I-P1-01`, and `I-P1-02`.
-- P2 owns `C-P2` and `I-P2-01`.
-- P3 owns `C-08`.
-- `C-09` remains a cross-issue preservation constraint: CI results are
-  execution evidence, while static checks are source/configuration evidence.
+#### Option B — Require manual spot checks
 
-All twelve open findings have a selected disposition incorporated into the
-ordered slate. The research record is sufficient to retain the time-sensitive
-action pins, runtime support status, API semantics, and audit baseline without
-requiring the implementer to repeat this planning pass.
+Have the implementer stage one good and one bad file in their working clone.
+This risks disturbing the implementation index and is neither repeatable nor
+complete.
+
+#### Option C — Put a temporary test recipe only in P3
+
+Provide a copyable isolated-worktree script in the issue description. It can
+cover all cases without a permanent file, but the regression suite disappears
+after implementation and hosted CI cannot call the exact same test later.
+
+#### Option D — Add a tracked cross-platform staged-lint harness
+
+Create `.github/workflows/Test-LintStagedMarkdown.ps1`. It builds a disposable
+clone or isolated index, invokes the exact production
+`lint-staged-markdown.mjs`, and covers no files, compliant, lint-invalid, index
+versus working-tree divergence, and startup-failure distinction. Invoke it in
+the Node 24 Markdown workflow and require local Windows plus selected-minimum
+Node evidence.
+
+#### Option E — Refactor staged lint into a library with unit tests
+
+Split Git/index and markdownlint integration into exported functions and adopt
+a JavaScript test framework. This can improve unit isolation but changes the
+production design and adds test dependencies during a security update.
+
+### Evaluation rubric
+
+| Criterion | Weight | Why it matters for this finding |
+| --- | ---: | --- |
+| Proof of real Git-index behavior | 30 | The staged hook exists specifically to lint index bytes. |
+| Durable regression protection | 25 | A future dependency update can break the same API again. |
+| Windows/Linux and Node-policy coverage | 20 | The hook is contributor-facing across platforms/runtimes. |
+| Isolation from the implementation index | 15 | Validation must not corrupt or rewrite the change being reviewed. |
+| Added production/test complexity | 10 | New files are justified only by lasting evidence value. |
+
+### Scoring
+
+| Option | Real behavior (30) | Durability (25) | Platforms (20) | Isolation (15) | Complexity (10) | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Static inspection | 1 | 1 | 2 | 5 | 5 | 44 |
+| B — Manual spot checks | 3 | 1 | 3 | 3 | 5 | 54 |
+| C — Temporary recipe | 5 | 2 | 4 | 5 | 4 | 79 |
+| D — Tracked harness | 5 | 5 | 5 | 5 | 2 | **94** |
+| E — Library/unit refactor | 5 | 5 | 5 | 4 | 1 | 89 |
+
+### Selected option
+
+Select **Option D**.
+
+Expand P3 to add
+`.github/workflows/Test-LintStagedMarkdown.ps1` and modify
+`.github/workflows/markdownlint.yml` only enough to run that tracked harness
+after the clean install under hosted Node 24.
+
+The harness must:
+
+1. declare/verify its supported PowerShell runtime and resolve the exact
+   production script;
+2. create a unique test-owned disposable repository beneath a safe temporary
+   parent;
+3. copy only the production script/config/package context required or use an
+   isolated worktree/index without touching the implementation index;
+4. prove no staged Markdown returns 0;
+5. prove compliant staged Markdown returns 0;
+6. prove a known Markdown violation returns lint exit 1 with exact rule/path,
+   not startup exit 2;
+7. make working-tree content differ from staged content and prove staged bytes
+   are authoritative;
+8. check every Git/Node exit immediately; and
+9. remove only its own temporary state in `finally`.
+
+Run the exact harness in Ubuntu CI on Node 24 and locally on Windows at the
+selected minimum Node major and Node 24. If practical, also run local Ubuntu
+minimum-major evidence; at minimum the production package's engine and
+selected-minimum install must be separately proved.
+
+## C-12: Replace the nonexistent negative-fixture claim
+
+### Options
+
+#### Option A — Keep referring to existing negative samples
+
+Leave the acceptance criterion unverifiable because no such tracked file
+exists.
+
+#### Option B — Add permanent outer and nested negative sample files
+
+Create reviewed fixtures under `samples`. They are visible and reusable, but
+the repository's normal all-Markdown lint commands would need explicit
+exclusions or the tracked repository would fail by design.
+
+#### Option C — Generate deterministic negatives inside the tracked harness
+
+Extend the selected C-11 harness to create test-owned outer and fenced/nested
+Markdown violations, run the exact production commands/APIs, assert exact
+rules and context, and remove fixtures in `finally`. Keep the existing positive
+sample corpus unchanged.
+
+#### Option D — Put temporary-negative commands only in the issue
+
+Generate/remove deterministic files during implementation without a tracked
+harness. This proves the upgrade once but loses future regression evidence.
+
+#### Option E — Mutate an existing positive sample temporarily
+
+Edit/stage/restore a positive fixture. This reduces new fixture design but risks
+worktree/index contamination and couples negative evidence to restoration
+correctness.
+
+### Evaluation rubric
+
+| Criterion | Weight | Why it matters for this finding |
+| --- | ---: | --- |
+| Exact expected-failure semantics | 30 | Startup failure must not masquerade as lint rejection. |
+| Outer and nested surface coverage | 25 | P3 promises both lint paths remain fail-closed. |
+| Deterministic repeatability | 20 | The same rule/context should fail on every validation run. |
+| Repository corpus cleanliness | 10 | Permanent intentionally-invalid Markdown complicates normal lint. |
+| Future regression value | 15 | Dependency updates can change rules, APIs, or diagnostics later. |
+
+### Scoring
+
+| Option | Failure proof (30) | Surface coverage (25) | Repeatability (20) | Corpus (10) | Durability (15) | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Keep claim | 1 | 1 | 1 | 5 | 1 | 28 |
+| B — Permanent negatives | 5 | 5 | 5 | 2 | 5 | 94 |
+| C — Harness-generated negatives | 5 | 5 | 5 | 5 | 5 | **100** |
+| D — Issue-only temporaries | 5 | 5 | 3 | 5 | 2 | 83 |
+| E — Mutate positives | 3 | 3 | 2 | 4 | 2 | 55 |
+
+### Selected option
+
+Select **Option C**.
+
+Use the tracked C-11 harness to create and clean deterministic temporary:
+
+- outer Markdown with one selected enabled rule violation; and
+- nested fenced Markdown with one selected enabled nested rule violation.
+
+Require the exact fixture path, rule ID, nested file/depth context, and lint
+exit 1. Treat import/config/startup exit 2 or missing diagnostics as failure.
+Run the existing positive sample corpus and require success. Remove every
+reference to “existing negative fixtures” unless permanent negative files are
+actually added later.
+
+## C-13: Define how P3 supersedes P1/P2 intermediate gates
+
+### Options
+
+#### Option A — Keep “P1 and P2 validation remain green”
+
+Leave an impossible blanket acceptance statement even though P3 intentionally
+changes P1's exact Dependabot content and a different affected-path set.
+
+#### Option B — Narrow the sentence only
+
+Say “nonsuperseded behavior remains green” without naming the superseded gates
+or mechanically validating the final governance file.
+
+#### Option C — Add an explicit supersession contract and exact final validator
+
+List preserved behavioral gates, identify P1's one-entry Dependabot and earlier
+implementation path sets as superseded, define P3's final affected set, and
+compare normalized `.github/dependabot.yml` content with exactly the two
+approved review-only entries.
+
+#### Option D — Move npm Dependabot governance to a later P4
+
+Keep P3 dependency-only so P1's one-entry file survives P3. This restores one
+intermediate assertion but separates remediation from the update governance
+intended to prevent recurrence.
+
+#### Option E — Parse Dependabot YAML semantically
+
+Use a YAML parser/schema to validate two logical entries regardless of
+formatting. This is flexible but adds a parser dependency or environment
+assumption to the security validation and can accept formatting/extra-key
+variation beyond the exact intended file.
+
+### Evaluation rubric
+
+| Criterion | Weight | Why it matters for this finding |
+| --- | ---: | --- |
+| Truthfulness of final acceptance | 30 | An issue must not require mutually exclusive states. |
+| Mechanical governance proof | 25 | The final update channels must be exact and review-only. |
+| Preservation of nonsuperseded behavior | 20 | P3 must not regress generator/workflow/lint contracts. |
+| Reviewer auditability | 15 | Preserved versus replaced gates should be explicit. |
+| Issue-sequence/scope efficiency | 10 | Extra issues or dependencies should deliver material value. |
+
+### Scoring
+
+| Option | Truth (30) | Governance proof (25) | Regression (20) | Auditability (15) | Scope (10) | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Blanket green | 1 | 1 | 2 | 1 | 5 | 32 |
+| B — Wording only | 4 | 2 | 4 | 3 | 5 | 69 |
+| C — Supersession + exact validator | 5 | 5 | 5 | 5 | 4 | **98** |
+| D — Move to P4 | 5 | 5 | 4 | 4 | 1 | 85 |
+| E — Semantic YAML parser | 5 | 4 | 5 | 4 | 2 | 86 |
+
+### Selected option
+
+Select **Option C**.
+
+P3 must explicitly state:
+
+- P1/P2 generator, artifact, permission, immutable-action, helper/harness,
+  source/generated no-drift, and lint-behavior gates remain;
+- P3 supersedes P1's exact-one-Dependabot-entry assertion;
+- P3's final affected-path set supersedes P1/P2's implementation-time path
+  sets only for P3 implementation; and
+- P2 source/generated bytes remain unchanged.
+
+Add a normalized ordinal comparison requiring exactly:
+
+1. weekly review-only `github-actions` updates for `/`; and
+2. weekly review-only npm updates for `/.github/workflows`.
+
+Reject missing/duplicate/extra entries, different directories/ecosystems or
+schedules, and auto-merge/auto-approval in the changed scope.
+
+## C-14: Structure residual-advisory dispositions
+
+### Options
+
+#### Option A — Keep a URL-only array
+
+Continue claiming owner/date/path/follow-up validation without representing
+those values.
+
+#### Option B — Use structured inline records plus durable PR/issue evidence
+
+Represent URL, dependency path, owner, UTC expiry, and real follow-up issue in
+the validation block. Mechanically validate every field and exact set equality,
+then copy the reviewed table into durable PR/issue evidence. Keep the array
+empty for a clean audit.
+
+#### Option C — Add a tracked exceptions file and continuous CI enforcement
+
+Store structured exceptions in the repository and make workflow audit
+validation enforce expiry on every run. This gives durable automation but
+expands P3 into ongoing vulnerability-policy infrastructure and requires
+careful handling when the audit changes.
+
+#### Option D — Prohibit all residual findings
+
+Require audit exit 0 with no exception mechanism. This is strongest when fixes
+exist, but can make P3 impossible to complete if a newly published reachable
+advisory has no safe release or mitigation.
+
+#### Option E — Store exceptions only in an external risk system
+
+Use a security/GRC ticket as source of truth. This can improve organizational
+workflow, but the repository validator cannot independently prove the record
+without an integration and access model.
+
+### Evaluation rubric
+
+| Criterion | Weight | Why it matters for this finding |
+| --- | ---: | --- |
+| Completeness of risk decision data | 30 | URL alone cannot support an accountable exception. |
+| Machine-verifiable correspondence to audit | 25 | Missing, duplicate, unrelated, or stale approvals must fail. |
+| Expiry and follow-up enforceability | 20 | Temporary acceptance must not become permanent by neglect. |
+| Durable reviewer/auditor evidence | 15 | The decision must survive local command history. |
+| Operational burden proportionality | 10 | A one-time remediation should not accidentally create a new platform. |
+
+### Scoring
+
+| Option | Completeness (30) | Verification (25) | Expiry (20) | Audit trail (15) | Burden (10) | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — URL array | 1 | 2 | 1 | 2 | 5 | 36 |
+| B — Structured inline + durable evidence | 5 | 5 | 5 | 4 | 4 | **95** |
+| C — Tracked/continuous exceptions | 5 | 5 | 5 | 5 | 2 | 94 |
+| D — No residual ever | 5 | 5 | 5 | 5 | 1 | 92 |
+| E — External system only | 5 | 3 | 5 | 5 | 2 | 84 |
+
+### Selected option
+
+Select **Option B**, with clean audit as the default.
+
+Replace the URL array with records containing:
+
+- exact advisory URL;
+- affected package and dependency path;
+- nonempty named owner;
+- invariant UTC expiry date;
+- real HTTPS follow-up issue URL; and
+- concise reachability/mitigation rationale.
+
+The validator must reject duplicate URLs, empty fields, invalid/expired dates,
+non-issue URLs, approvals unrelated to the current audit/path, missing current
+findings, and records remaining after a clean result. Require exact current
+moderate/high/critical URL equality and record the reviewed table in the
+implementation PR/issue. If ongoing exceptions become common, create a
+separate tracked-policy/continuous-enforcement issue rather than silently
+expanding P3.
+
+## C-15: Treat every advisory URL as dynamic evidence
+
+### Options
+
+#### Option A — Keep six individual References as the effective baseline
+
+This is incomplete even today and conflates package-node count with advisory
+count.
+
+#### Option B — Freeze all 14 currently observed URLs in P3
+
+This is complete for the 2026-07-29 observation but becomes stale when npm or
+the advisory database changes.
+
+#### Option C — Capture a dynamic normalized before/after advisory graph
+
+Keep the dated seven-package-node severity table for comparison. At
+implementation, traverse the complete audit graph and record every package,
+object advisory URL/severity/range, string-valued dependency link, dependency
+path, and remediation before and after the update. Mark References as
+illustrative.
+
+#### Option D — Option C plus attach raw audit JSON
+
+Preserve normalized evidence and the full raw command output as a PR artifact
+or attachment. This aids forensic review but creates an additional storage and
+retention dependency.
+
+#### Option E — Replace evidence with live advisory links only
+
+Link to npm/GitHub pages and rely on reviewers to reconstruct the graph. That
+is not reproducible and loses the exact implementation-time state.
+
+### Evaluation rubric
+
+| Criterion | Weight | Why it matters for this finding |
+| --- | ---: | --- |
+| Complete advisory/dependency graph | 30 | Package-node and advisory counts are different security facts. |
+| Temporal correctness | 25 | Advisory data can change between drafting and implementation. |
+| Reproducible before/after evidence | 20 | Reviewers need to see what the update actually removed or retained. |
+| Reviewer comprehensibility | 15 | Normalized tables are easier to audit than raw nested JSON. |
+| Evidence storage burden | 10 | Durability matters, but a new artifact service is not automatically needed. |
+
+### Scoring
+
+| Option | Completeness (30) | Temporal (25) | Reproducibility (20) | Clarity (15) | Burden (10) | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Six references | 1 | 1 | 2 | 4 | 5 | 41 |
+| B — Freeze 14 | 5 | 1 | 3 | 3 | 3 | 62 |
+| C — Dynamic normalized graph | 5 | 5 | 5 | 5 | 4 | **98** |
+| D — Graph plus raw attachment | 5 | 5 | 5 | 5 | 3 | 96 |
+| E — Live links only | 2 | 2 | 1 | 2 | 5 | 42 |
+
+### Selected option
+
+Select **Option C**.
+
+Keep P3's dated seven-package-node table, explicitly label individual
+References as illustrative, and require a complete normalized audit graph at
+implementation time. Record before/after:
+
+- Node and npm versions;
+- audit exit and severity totals;
+- every affected package node;
+- every object advisory URL, severity, vulnerable range, and fix;
+- every string-valued dependency link;
+- all resolved dependency paths from `npm explain`; and
+- the final disposition.
+
+Do not encode 14 as a future expected count. The implementation evidence must
+derive counts from that run and explain changes from the dated baseline.
+
+## C-16: Retain P1 → P2 → P3 and record blocked-by relationships
+
+### Options
+
+#### Option A — Keep prose ordering only
+
+Leave dependency text in issue bodies but create no GitHub relationship.
+
+#### Option B — Preserve the order and add real blocked-by links after filing
+
+File the issues with their H1 titles, then update P2 to block on the actual P1
+issue and P3 to block on the actual P2 issue. Keep the relative planning links
+as drafting context.
+
+#### Option C — Combine all work into one issue
+
+One issue guarantees order internally but mixes generator/workflow security,
+documentation semantics, and a pre-1.0 dependency migration into one large
+review/rollback unit.
+
+#### Option D — Run P1/P2/P3 in parallel
+
+Reduce calendar time but allow P2 to regenerate against a moving generator and
+P3 to change the lint baseline while earlier evidence is still being produced.
+
+#### Option E — Track order only in a project/milestone
+
+Use external planning metadata without issue-level blocked-by relationships.
+This can aid portfolio reporting but is less visible to someone opening one
+issue directly.
+
+### Evaluation rubric
+
+| Criterion | Weight | Why it matters for this finding |
+| --- | ---: | --- |
+| Technical dependency correctness | 30 | Each issue assumes the prior merged baseline. |
+| Downstream handoff clarity | 25 | The implementer must know what can start now. |
+| GitHub-native traceability | 20 | Real relationships should replace placeholder references. |
+| Resistance to accidental out-of-order work | 15 | Planning metadata should enforce, not merely suggest, sequence. |
+| Coordination overhead | 10 | Relationships should remain simple to maintain. |
+
+### Scoring
+
+| Option | Dependency (30) | Handoff (25) | Traceability (20) | Order safety (15) | Overhead (10) | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Prose only | 4 | 3 | 1 | 2 | 5 | 59 |
+| B — Real blocked-by chain | 5 | 5 | 5 | 5 | 4 | **98** |
+| C — Combine | 5 | 2 | 3 | 5 | 1 | 69 |
+| D — Parallel | 1 | 2 | 2 | 1 | 5 | 37 |
+| E — Project only | 4 | 4 | 3 | 4 | 3 | 74 |
+
+### Selected option
+
+Select **Option B**.
+
+Keep the issue descriptions ordered P1, P2, P3. After filing:
+
+1. add the actual P1 issue as P2's blocker;
+2. add the actual P2 issue as P3's blocker;
+3. replace no H1 title with “revision” language;
+4. use no invented issue number; and
+5. ensure the final handoff lists the three issues in execution order.
+
+## C-17: Coordinate P1/T1 without a runtime dependency
+
+### Options
+
+#### Option A — Implement independently with no comparison
+
+Allow both repositories to solve similar problems separately and accept drift.
+
+#### Option B — Perform an informal implementation-time diff
+
+Ask maintainers to compare scripts without a defined behavioral contract or
+recorded outcome.
+
+#### Option C — Use reciprocal behavioral matrices and a second-mover check
+
+Maintain repository-local scripts while defining shared generator/helper
+invariants, intentional differences, and evidence. Whichever implementation
+starts second rereads the first merged/current contract and records divergence.
+
+#### Option D — Use a Git submodule or copied vendored script
+
+Create a cross-repository source dependency. This adds update coordination and
+still requires local artifact/manifest specialization.
+
+#### Option E — Publish a shared versioned module/action
+
+Centralize behavior with immutable consumption. This may be appropriate later,
+but needs package ownership, provenance, cross-edition compatibility, release,
+rollback, and synchronized adoption design.
+
+### Evaluation rubric
+
+| Criterion | Weight | Why it matters for this finding |
+| --- | ---: | --- |
+| Accurate behavioral convergence | 30 | Equivalent security/serialization outcomes are the current goal. |
+| Repository autonomy and availability | 25 | One repository must not break because another is unavailable or moving. |
+| Coordinated rollout/rollback safety | 20 | Shared changes should not create asymmetric half-migrations. |
+| Long-term maintenance/drift visibility | 15 | Intentional differences must stay explicit. |
+| Near-term deliverability | 10 | P1/T1 should remain implementable without a new product. |
+
+### Scoring
+
+| Option | Convergence (30) | Autonomy (25) | Rollout (20) | Maintenance (15) | Delivery (10) | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Independent | 1 | 5 | 1 | 2 | 5 | 51 |
+| B — Informal diff | 3 | 5 | 2 | 3 | 4 | 68 |
+| C — Matrices/second mover | 5 | 5 | 5 | 5 | 4 | **98** |
+| D — Submodule/vendor | 5 | 2 | 2 | 3 | 1 | 59 |
+| E — Shared package/action | 5 | 3 | 3 | 5 | 1 | 74 |
+
+### Selected option
+
+Select **Option C**.
+
+Implement C-01 and C-02's matrices in P1, retain repository-local code, and
+require a dated second-mover comparison in implementation evidence. Shared
+areas are serialization, public helper parameters, archive identity, path
+security, lifecycle, diagnostics, fixtures, and artifact transport. Explicit
+differences include manifests, filenames, frontmatter values, guide transforms,
+Node work, and existing `.gitattributes` state. Any future shared package/action
+must be a separately designed follow-up.
+
+## C-18: Keep T2 provider-recovery content out of P2/P3
+
+### Options
+
+#### Option A — Preserve current separation and explicit non-goals
+
+Keep P2 focused on the blank-line documentation defect and P3 on lint
+dependencies/governance. Mention T2 only as a parallel sequence context, not
+as content to implement.
+
+#### Option B — Summarize T2 provider work in P2's prerequisite
+
+Give cross-repository context, but burden a documentation issue with unrelated
+S3/Azure/GCS/HCP operational security.
+
+#### Option C — Copy T2 recovery requirements into P2
+
+Turn P2 into a multi-repository/provider issue with unrelated sources,
+credentials, shell examples, and validation.
+
+#### Option D — Add only a non-normative link to T2
+
+This is harmless but less explicit than preserving the current non-goal and can
+suggest a dependency where none exists.
+
+#### Option E — Merge the PSStyleGuide and TerraformStyleGuide slates
+
+Coordinate everything in shared issues. This destroys repository ownership and
+creates cross-repository completion dependencies.
+
+### Evaluation rubric
+
+| Criterion | Weight | Why it matters for this finding |
+| --- | ---: | --- |
+| Relevance to P2/P3 objectives | 35 | Provider recovery does not repair PowerShell documentation or npm tooling. |
+| Implementer cognitive load | 25 | Unrelated cloud contracts obscure the task's actual acceptance gates. |
+| Security-risk isolation | 20 | Provider credentials/state handling deserves its own review surface. |
+| Cross-repository conceptual clarity | 10 | Parallel sequencing should not be mistaken for content identity. |
+| Change/coordination cost | 10 | No-op preservation should win when the current state is correct. |
+
+### Scoring
+
+| Option | Relevance (35) | Cognitive load (25) | Isolation (20) | Clarity (10) | Cost (10) | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Preserve separation | 5 | 5 | 5 | 5 | 5 | **100** |
+| B — Summarize T2 | 3 | 3 | 4 | 4 | 4 | 68 |
+| C — Copy T2 | 1 | 1 | 1 | 2 | 1 | 22 |
+| D — Link only | 4 | 4 | 5 | 4 | 5 | 86 |
+| E — Merge slates | 1 | 1 | 1 | 1 | 1 | 20 |
+
+### Selected option
+
+Select **Option A**.
+
+No new T2 content belongs in P1/P2/P3. Preserve P2/P3's existing file and
+topic boundaries. In P2's prerequisite, state only that T2 is not imported and
+that each repository's documentation issue depends on its own generator
+baseline. This finding requires preservation, not scope expansion.
+
+## C-19: Define a policy-driven ordering exception
+
+### Options
+
+#### Option A — Ignore policy until implementation fails
+
+Proceed P1 → P2 → P3 even if a known organizational/repository policy forbids
+open high findings.
+
+#### Option B — Always move P3 before P1
+
+Minimize advisory exposure immediately, but force P1/P2 rebaselining and change
+the prompt's requested sequence even when no policy requires it.
+
+#### Option C — Add a filing/start gate with two explicit valid sequences
+
+Confirm applicable security policy before filing/starting. Default to
+P1 → P2 → P3. If policy forbids carrying the findings, perform the
+dependency/hook remediation first, then rebaseline P1/P2 against its merged
+Node/package state and record the exception.
+
+#### Option D — Fold dependency remediation into P1
+
+Avoid ordering delay by mixing the package migration, hook policy, generator,
+workflow, artifact security, and governance in one issue.
+
+#### Option E — Pause all slate work until every advisory is externally fixed
+
+Eliminate acceptance decisions but can block indefinitely on upstream packages
+and prevents unrelated security hardening.
+
+### Evaluation rubric
+
+| Criterion | Weight | Why it matters for this finding |
+| --- | ---: | --- |
+| Actual policy compliance | 35 | A documented mandatory policy outranks planning convenience. |
+| Reduction of vulnerable-parser exposure | 25 | Pull-request Markdown reaches the affected toolchain. |
+| Coherent P1/P2 baseline | 20 | Earlier issues should not validate against a dependency state that immediately changes. |
+| Decision/audit clarity | 15 | Reviewers need the reason for default or exceptional order. |
+| Calendar efficiency | 5 | Speed matters, but cannot override policy or coherent evidence. |
+
+### Scoring
+
+| Option | Policy (35) | Exposure (25) | Baseline (20) | Clarity (15) | Schedule (5) | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Ignore | 1 | 1 | 5 | 2 | 5 | 43 |
+| B — Always P3 first | 5 | 5 | 3 | 4 | 2 | 86 |
+| C — Conditional gate | 5 | 5 | 5 | 5 | 4 | **99** |
+| D — Fold into P1 | 3 | 4 | 1 | 2 | 3 | 54 |
+| E — Pause all | 5 | 5 | 1 | 2 | 1 | 71 |
+
+### Selected option
+
+Select **Option C**.
+
+Add an ordering note to P3 and the slate handoff:
+
+- confirm repository/organization vulnerability policy at filing and again at
+  implementation start;
+- absent a prohibition, retain P1 → P2 → P3;
+- if high findings cannot remain open, file/perform the P3 package/hook work
+  first (or a renamed prerequisite with the same full scope), then rebaseline
+  all P1/P2 Node, package, validation, and path assumptions after merge; and
+- record the policy source and ordering decision in issue relationships/PR
+  evidence.
+
+Do not reorder merely because a hypothetical policy might exist.
+
+## I-P1-01: Make the action-pin verifier enforce approved tuples
+
+### Options
+
+#### Option A — Keep the generic 40-hex/version regex
+
+Continue accepting any external action repository, any lowercase 40-hex
+commit, and any semantic-looking comment.
+
+#### Option B — Compare complete expected `uses:` lines
+
+Hard-code every approved line and require exact occurrences. This is strong but
+can be awkward when the same action appears multiple times or indentation/step
+placement changes.
+
+#### Option C — Parse and validate an exact action allowlist with occurrence rules
+
+Extract nonlocal `uses:` references into repository, SHA, and adjacent version
+comment. Map each approved action to its exact SHA/comment, reject unknown
+tuples, and require expected workflow/occurrence coverage. Keep a separate
+implementation-time upstream metadata/release review.
+
+#### Option D — Resolve every action commit online during local validation
+
+Query GitHub for repo/commit/tag correspondence each time. This adds network,
+authentication/rate-limit, and mutable remote-state dependencies to a local
+static gate.
+
+#### Option E — Adopt a third-party action pinning scanner
+
+Use a supply-chain tool to detect mutable refs. Such tools may verify full-SHA
+shape but still need repository-specific approved-version policy and their own
+installation/provenance.
+
+### Evaluation rubric
+
+| Criterion | Weight | Why it matters for this finding |
+| --- | ---: | --- |
+| Exact approved provenance proof | 35 | A full SHA is not necessarily the reviewed SHA. |
+| Resistance to repository/SHA/comment substitution | 25 | An attacker or mistake must not satisfy a shape-only gate. |
+| Missing/unknown/occurrence detection | 20 | The complete intended action surface must be present and only that surface. |
+| Maintainability during approved updates | 10 | SHA/comment changes should be one clear policy update. |
+| Validator simplicity/portability | 10 | The gate runs locally without a new dependency. |
+
+### Scoring
+
+| Option | Provenance (35) | Substitution (25) | Completeness (20) | Maintenance (10) | Simplicity (10) | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Generic regex | 1 | 1 | 2 | 5 | 5 | 40 |
+| B — Exact lines | 5 | 5 | 4 | 3 | 4 | 90 |
+| C — Parsed exact allowlist | 5 | 5 | 5 | 5 | 4 | **98** |
+| D — Online resolution | 5 | 5 | 4 | 2 | 2 | 84 |
+| E — Third-party scanner | 5 | 4 | 4 | 3 | 1 | 79 |
+
+### Selected option
+
+Select **Option C**.
+
+Rewrite P1's pin validator around an exact map:
+
+- `actions/checkout` →
+  `3d3c42e5aac5ba805825da76410c181273ba90b1`, `v7.0.1`;
+- `actions/setup-node` →
+  `820762786026740c76f36085b0efc47a31fe5020`, `v7.0.0`;
+- `actions/upload-artifact` →
+  `043fb46d1a93c77aae656e7c1c64a875d1fc6a0a`, `v7.0.1`; and
+- `actions/download-artifact` →
+  `3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c`, `v8.0.1`.
+
+Parse each nonlocal `uses:` line, require an allowed repository with its exact
+SHA/comment, and fail unknown/missing/mismatched references. Require checkout
+in both workflows, setup-node only where intended, and upload/download in the
+build workflow's required roles. Reverify official commit metadata and newer
+security releases immediately before implementation; the local allowlist
+proves the checked-in result, not continued upstream freshness.
+
+## I-P3-01: Close P3's npm audit command and schema boundary
+
+### Options
+
+#### Option A — Keep the current URL-set logic
+
+Allow any nonzero audit exit to pass if the extracted URL set equals approvals,
+do not query npm version, and assume JSON member shape.
+
+#### Option B — Constrain exit codes only
+
+Require clean or documented vulnerability exits, but retain unvalidated JSON
+shape and incomplete Node/npm evidence.
+
+#### Option C — Validate tools, exit semantics, JSON shape, counts, and graph
+
+Resolve/query one Node and npm application; require exact Node policy; classify
+audit exit as clean, vulnerability, or command error; parse one JSON object;
+validate required members and integral counts; traverse object/string `via`
+records and dependency paths; then apply structured exception equality.
+
+#### Option D — Replace npm audit with a third-party scanner
+
+Use another vulnerability engine/SBOM scanner. This can add insight but changes
+the advisory source, identity model, installation/provenance, and acceptance
+semantics rather than fixing the current npm boundary.
+
+#### Option E — Add a formal checked-in JSON Schema and validator dependency
+
+Validate npm output with a dedicated schema tool. This is rigorous but npm's
+output can evolve, and adding another package to the package-remediation issue
+creates a recursive dependency/provenance burden.
+
+### Evaluation rubric
+
+| Criterion | Weight | Why it matters for this finding |
+| --- | ---: | --- |
+| Command-error versus vulnerability discrimination | 30 | A scanner failure must never count as an approved finding. |
+| Audit JSON structural integrity | 25 | Security decisions require validated fields and numeric totals. |
+| Tool/version and graph evidence completeness | 20 | Reproducibility needs Node, npm, packages, URLs, and paths. |
+| Compatibility with npm's supported output model | 15 | The validator should be strict without inventing a fragile private schema. |
+| Implementation/dependency burden | 10 | New scanners or schema packages need strong justification. |
+
+### Scoring
+
+| Option | Exit semantics (30) | Structure (25) | Evidence (20) | Compatibility (15) | Burden (10) | Weighted total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| A — Current logic | 1 | 2 | 2 | 3 | 5 | 43 |
+| B — Exit codes only | 4 | 2 | 3 | 4 | 5 | 68 |
+| C — Complete inline validation | 5 | 5 | 5 | 5 | 4 | **98** |
+| D — Third-party scanner | 5 | 4 | 5 | 3 | 1 | 81 |
+| E — Formal schema dependency | 5 | 5 | 5 | 4 | 2 | 91 |
+
+### Selected option
+
+Select **Option C**.
+
+P3's primary validation must:
+
+1. query and record exactly one Node version and one npm version;
+2. require the selected Node policy and use the same resolved npm executable;
+3. capture stdout and exit immediately from
+   `audit --package-lock-only --audit-level=moderate --json`;
+4. accept exit 0 only for a clean result and the documented vulnerability exit
+   only when structured approvals exactly match; reject every other exit;
+5. require one JSON object with `metadata.vulnerabilities` and
+   `vulnerabilities`;
+6. require nonnegative integral critical/high/moderate/low/total counts and
+   internal consistency;
+7. traverse object advisories plus string dependency links and associate the
+   complete graph with `npm explain` paths; and
+8. apply C-14's duplicate, field, expiry, follow-up, clean-state, and exact-set
+   rules.
+
+Keep the dated audit table as comparison evidence. Do not hard-code today's
+advisory count as the only accepted future shape.
+
+## Selected slate-level outcome
+
+All 21 findings have now been evaluated before issue editing. The selected
+slate remains:
+
+1. P1 — deterministic generator and secure workflow/artifact baseline;
+2. P2 — blank-line documentation correction and regeneration; and
+3. P3 — dependency remediation, staged-lint regression coverage, Node-floor
+   alignment, and final npm governance.
+
+The only ordering exception is the documented policy gate in C-19.

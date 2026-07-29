@@ -32,10 +32,13 @@ Make generation byte-deterministic and establish an end-to-end provenance chain:
   no-competing-writer model.
 - Open the retained archive with explicit `FileShare.Read`.
 - Preserve pre-existing candidate state and safely remove only
-  invocation-created output after a later rejection.
+  invocation-created output after a later rejection through one journaled,
+  named, directly tested fail-closed cleanup function.
 - Use one shared, versioned PowerShell helper for candidate digest verification, archive validation, and extraction in every started push consumer.
 - Define the deterministic fixture suite once in a tracked, versioned PowerShell harness.
 - Run that harness against the exact helper before merge on Ubuntu PowerShell 7, Windows PowerShell 5.1, and Windows PowerShell 7.
+- Require at least one real filesystem-link/reparse rejection on each operating
+  system family; a platform-wide link-fixture skip is not passing evidence.
 - Run the same harness against that exact helper in every started push consumer before each production invocation.
 - Validate the candidate in an actual four-cell edition × fixture-EOL Windows matrix.
 - Run the lone-CR sanitation probe once under each edition.
@@ -45,11 +48,15 @@ Make generation byte-deterministic and establish an end-to-end provenance chain:
 - Push with an explicit destination refspec and exact expected-SHA `--force-with-lease`.
 - Check every native-command exit code immediately.
 - Preserve useful diagnostic artifacts after ordinary pull-request failures.
-- Require local validation to verify each available PowerShell edition before another edition can overwrite its output.
+- Require local validation to assert each PowerShell edition/version in the
+  same child process that runs the harness or generator before another edition
+  can overwrite its output.
 - Add review-only weekly GitHub Actions update proposals while retaining
   immutable full-SHA execution pins and human review.
 - Refuse to stage from a working tree containing any path other than the six
   implementation files.
+- Mechanically require every external action to match its exact approved
+  repository, full SHA, release comment, and workflow role.
 
 This issue is a prerequisite for **Make the non-compliant blank-line example visibly distinct**.
 The separately scoped P3 issue,
@@ -171,6 +178,33 @@ If a generator version already exists, follow the PSStyleGuide Function and Scri
 
 Do not change the style guide's own version or metadata.
 
+### Cross-repository generator convergence contract
+
+P1 and the parallel T1 issue intentionally converge generator algorithms,
+serialized bytes, failure semantics, and evidence while retaining
+repository-local scripts. This matrix defines the PSStyleGuide side:
+
+| Generator area | Deliberately shared target | Intentional repository-specific difference |
+| --- | --- | --- |
+| Serialization boundary | Normalize each complete final payload with ``-replace "`r`n?", "`n"`` immediately before encoding; resolve the destination; use `UTF8Encoding($false)` and `WriteAllText`; append no implicit newline. | Complete-payload variable names may differ. |
+| Common artifact functions | Preserve equivalent observable behavior for the Copilot, Chat, and Full artifact functions. | Guide-specific Full transformations and source/rationale content may differ. |
+| Instructions artifact | Use the same serialization primitive and LF-stable frontmatter principles. | Function name, output filename, `applyTo`, and description are PowerShell- versus Terraform-specific. |
+| Frontmatter | Construct reviewed lines as an LF-joined array with explicit spaces and final-LF count. | P1 replaces a here-string; current T1 already has an LF-joined form. |
+| Script versioning | Use the PSStyleGuide `.NOTES` version calculation policy and retain the supported `#Requires -Version 5.1` baseline. | Starting versions and implementation UTC dates may differ. |
+| Repository text policy | Treat LF checkout policy and producer correctness as complementary controls. | P1 preserves its existing `.gitattributes`; T1 adds the same rule because its repository lacks the file. |
+| Validation | Prove Windows PowerShell 5.1/PowerShell 7 and LF/CRLF producer equivalence with logical and raw-byte checks. | PSStyleGuide also validates its Node 24 Markdown workflow and PowerShell-specific artifact name. |
+
+Do not infer implementation identity from this matrix. If either issue
+introduces a private serialization abstraction, coordinate its observable
+contract before implementation rather than creating a P1-only abstraction.
+A shared package, module, submodule, or reusable action is not part of either
+issue.
+
+Immediately before implementation, compare this matrix with the then-current
+T1 issue or merged evidence. The implementation that starts second must record
+every remaining intentional difference in issue/PR evidence. This comparison
+does not create a runtime, filing, or merge dependency between repositories.
+
 ### 5. Run both event pipelines without path filters
 
 Retain:
@@ -211,15 +245,17 @@ PSStyleGuide side of that contract:
 | Contract area | Deliberately shared invariant | P1 implementation and intentional repository-specific choice |
 | --- | --- | --- |
 | Public parameters | Required root/path/digest parameters and optional caller-owned artifact/run labels have matching names and meanings. | P1 uses the exact scalar parameters below; callers supply PSStyleGuide values. |
-| Archive identity | Compare one propagated 64-hex upload digest before parsing any archive bytes. | P1 opens one `FileStream`, hashes it, rewinds it, and parses that same held stream. This stronger same-stream choice is intentional; do not claim T1 uses the same I/O sequence unless its final text says so. |
+| Archive identity | Open one retained `FileStream` with `FileMode.Open`, `FileAccess.Read`, and `FileShare.Read`; hash that stream, compare the propagated 64-hex digest before archive construction, rewind it, and retain the only `ZipArchive` over that stream through extraction. | P1 applies the shared sequence to the PSStyleGuide candidate; manifest and diagnostic values remain repository-specific. |
 | Path security | Use explicit mutually separate roots, strict containment, complete component checks, repeated validation, and an honest no-competing-writer operating model. | P1 applies the contract below to the PSStyleGuide checkout, download, and candidate names. |
 | Manifest grammar | Reject duplicates, collisions, directories, nested/traversal/absolute names, and any entry outside one exact root-level allowlist. | P1 permits the four PSStyleGuide artifact names below; T1 has its own manifest names. |
 | Candidate lifecycle | Never overwrite/reuse a leaf, preserve pre-existing state, and clean invocation-created state after later failure without unsafe recursion. | P1 returns four PSStyleGuide candidate paths and uses the cleanup contract below. |
 | Diagnostics | Use stable phases, normalized paths/digests, and optional caller-owned labels that distinguish omitted from explicitly empty. | P1 uses the exact phases and stable case IDs below; values come from the current workflow run. |
-| Permanent fixtures | Exercise matching success/rejection intent through the production helper's public interface with named capability skips. | Case IDs, platform setup, and workflow placement may differ by repository. |
+| Permanent fixtures | Exercise ordinary archive/path behavior through the production helper's public expansion interface. Permit one narrow definition-only exception that directly invokes the exact named production cleanup function for deterministic unsafe-cleanup evidence. | Case IDs and platform setup may differ. P1 deliberately runs pull-request helper coverage on Ubuntu and the two Windows LF cells because helper behavior is independent of source fixture EOL; T1 repeats it in all Windows pull-request cells. |
 | Artifact transport | Select one immutable artifact ID, fail closed on native digest mismatch, and independently verify the propagated upload digest. | P1 uses the exact upload/download action versions and raw/archived shape specified in this issue. |
 
-Do not describe filenames or artifact names as the only differences. A future
+Immediately before implementation, reread the then-current T1 contract and
+record any new intentional divergence in issue/PR evidence. Do not describe
+filenames or artifact names as the only differences. A future
 shared module/action would need its own versioning, immutable pinning,
 provenance, cross-edition compatibility, failure-mode, and coordinated-rollout
 design. Creating that package is not part of P1; first converge and prove the
@@ -399,16 +435,44 @@ The helper must:
 6. Create the leaf exactly once.
 7. Never delete and recreate it.
 8. Refuse to reuse an existing leaf.
-9. Track whether this invocation created the candidate leaf and the exact
-   ordinary files it created.
-10. If a later phase fails, capture the original failure, dispose every
-    stream/archive, revalidate the candidate envelope, delete only the known
-    ordinary files created by this invocation, and remove only the same
-    invocation-created directory when it is empty.
-11. Never recurse, follow, delete, or repair an unexpected/reparse entry during
+9. Maintain an exact ownership journal containing only:
+   - the normalized candidate directory created by this invocation; and
+   - each normalized ordinary file after its `FileMode.CreateNew` open
+     succeeds.
+10. Define one private production cleanup function named
+    `Remove-StyleGuideCandidateInvocationState`. The production failure path
+    must call that exact function; no copied cleanup implementation is
+    permitted.
+11. If a later phase fails, capture the original failure and dispose every
+    entry stream, the `ZipArchive`, and the retained file stream before calling
     cleanup.
-12. Preserve the original failure, add any cleanup failure and retained
-    absolute path, and return nonzero.
+12. Before deleting anything, the cleanup function must complete one full
+    pre-deletion safety pass:
+    - revalidate every existing component from the filesystem root through the
+      trusted root, candidate parent, and candidate leaf;
+    - require the candidate leaf to remain the exact ordinary, non-reparse
+      directory journaled by this invocation;
+    - materialize and exhaustively enumerate its immediate children;
+    - require exact ordinal/platform-appropriate equality with the journaled
+      file set; and
+    - require every expected child to remain one ordinary, non-reparse file
+      without following a link.
+13. Only after that complete pass may cleanup delete journaled files
+    individually and nonrecursively, re-prove that the candidate directory is
+    empty and ordinary, and remove that directory nonrecursively.
+14. If any component/entry is missing, extra, replaced, unreadable, linked,
+    reparse, or otherwise uncertain, stop before deletion. Never traverse,
+    recurse, follow, repair, or partially “make progress” through unsafe state.
+15. Preserve the original failure and add stable phase `cleanup`, the retained
+    absolute path, a safely available offending entry, and the cleanup
+    exception when present. Return nonzero.
+
+Place all private function declarations before the helper's main entry point.
+Permit ordinary PowerShell definition-only dot-sourcing solely so the tracked
+harness can load and invoke the exact cleanup function without running the
+expansion entry point. Do not add a public test switch, environment backdoor,
+second extraction interface, or cleanup parameter to the public expansion
+contract.
 
 Required rejection postconditions are:
 
@@ -418,7 +482,8 @@ Required rejection postconditions are:
 | Ordinary file | Same file and bytes remain unchanged |
 | Ordinary directory | Same directory and contents remain unchanged |
 | Link, junction, reparse point, or dangling link | Same entry and link target text remain unchanged |
-| Created by this invocation | Removed after a later failure, or an explicit `cleanup` failure reports the retained path |
+| Created by this invocation; journal and envelope remain exact ordinary state | Removed after a later failure |
+| Created by this invocation; state is missing, extra, replaced, unreadable, linked, reparse, or otherwise uncertain | Retained without traversal or partial deletion; the primary failure and stable `cleanup` diagnostics are both reported |
 
 A digest or manifest failure must leave the candidate leaf nonexistent. A
 post-creation failure must safely remove invocation-created state unless
@@ -466,7 +531,10 @@ This tracked harness is the sole definition of the deterministic fixture suite. 
 - Create all fixture state under one unique runner-temporary root using the
   same absence/create/verify and bounded-collision-retry topology required of
   production jobs.
-- Invoke the production helper as a child script through the helper's documented public parameters.
+- Invoke ordinary archive/path cases as a child script through the helper's
+  documented public parameters. The sole exception is the unsafe-cleanup
+  fixture below, which definition-only loads and calls the exact named
+  production cleanup function.
 - Never copy or reimplement digest, path-containment, archive-validation,
   lifecycle, cleanup, or extraction logic.
 - Change working directory during at least one valid case to prove that helper behavior does not depend on ambient location.
@@ -535,11 +603,28 @@ Every success row must require all of the following after `post-extraction`: exa
 | `L-04` | Link-capable platform; dangling candidate link | Reject, `candidate-leaf` | Preexisting dangling link unchanged | Candidate `path`, leaf name, and type |
 | `B-01` | All; exact manifest with a BOM in one extracted payload | Reject, `post-extraction` | Helper-created leaf removed | Offending `entry`; successful cleanup and no retained candidate |
 | `B-02` | All; exact manifest with a CR byte in one extracted payload | Reject, `post-extraction` | Helper-created leaf removed | Offending `entry`; successful cleanup and no retained candidate |
+| `K-01` | All; exact journaled ordinary candidate state plus one unexpected unjournaled ordinary immediate child | Reject and retain, `cleanup` | Helper-created leaf and unexpected child retained without partial deletion | Original induced failure, retained candidate path, offending child, and stable cleanup diagnostics from the exact production function |
+| `K-02` | Link-capable platform; replace one exact journaled child with a link/reparse entry before cleanup | Reject and retain, `cleanup` | Helper-created leaf and substituted entry retained without traversal | Original induced failure, retained candidate path, offending child/type, and stable cleanup diagnostics; stable skip allowed only for this supplemental form |
 | `X-01` | All; explicitly empty `ArtifactId` | Reject, `context/path` | Absent | Rejected `label` is exactly `ArtifactId`; prove no download enumeration/open |
 | `X-02` | All; explicitly empty `RunId` | Reject, `context/path` | Absent | Rejected `label` is exactly `RunId`; prove no download enumeration/open |
 | `X-03` | All; explicitly empty `RunAttempt` | Reject, `context/path` | Absent | Rejected `label` is exactly `RunAttempt`; prove no download enumeration/open |
 
 `ZipArchive.CreateEntry` may be used for constructible cases. Because it rejects an empty name at creation time, use a deterministic reviewed raw fixture for `M-14`. Construct `V-02` with `ZipArchiveEntry.ExternalAttributes` where practical or a reviewed raw fixture otherwise.
+
+`K-01` must:
+
+1. definition-only dot-source the exact resolved production helper;
+2. create the exact ordinary journaled state the production failure path would
+   own;
+3. insert the unjournaled ordinary immediate child;
+4. invoke `Remove-StyleGuideCandidateInvocationState`;
+5. prove no journaled or unexpected entry was deleted;
+6. prove outside sentinels remain unchanged; and
+7. require the primary and cleanup diagnostics.
+
+The harness must not copy/reimplement cleanup. `K-01` is mandatory on every
+supported platform because it requires no link privilege. `K-02` supplements
+it where a real link/reparse primitive is available.
 
 On Windows, the harness must also prove the selected .NET sharing semantics with
 a temporary probe: a second read-only open succeeds while `FileShare.Read` is
@@ -551,6 +636,13 @@ whose setup primitive is unavailable, such as link construction without the
 needed platform capability or privilege, may be skipped. Emit a named skip
 record containing case ID, platform, and reason; a skip is not a pass and does
 not permit other rows to be omitted.
+
+At least one real component-or-leaf symbolic-link fixture must execute and
+prove rejection on Ubuntu. At least one real component-or-leaf link/reparse
+fixture must execute and prove rejection on Windows. A stable case-level skip
+for one genuinely unavailable form remains allowed, but a platform-wide
+link-fixture skip cannot satisfy acceptance and an unexpected setup failure
+must fail the cell.
 
 These are production contract self-tests exercising the exact tracked helper, not a bypass or alternate extraction implementation.
 
@@ -872,6 +964,14 @@ Each cell must:
 9. Apply the complete diagnostic-preserving artifact contract.
 10. Include event, edition, version, fixture EOL, artifact path, and push artifact ID in failures.
 
+The pull-request harness placement is intentionally per-platform/per-edition,
+not per-edition × source-EOL. The helper consumes constructed archive/path
+fixtures and does not depend on the source documents' LF/CRLF variant, so the
+Ubuntu run and two Windows LF cells provide the required helper coverage. The
+four matrix cells remain mandatory for generator EOL equivalence. Every
+started push cell still runs the harness because each independently consumes a
+production candidate.
+
 The required normative cells are:
 
 | Fixture EOL | Windows PowerShell 5.1 | PowerShell 7 |
@@ -1166,14 +1266,284 @@ $arrEditionCommands = @(
     [pscustomobject]@{
         Label = 'PowerShell 7'
         Name = 'pwsh'
+        ExpectedEdition = 'Core'
+        ExpectedMajor = 7
+        ExpectedMinor = $null
     }
     [pscustomobject]@{
         Label = 'Windows PowerShell 5.1'
         Name = 'powershell'
+        ExpectedEdition = 'Desktop'
+        ExpectedMajor = 5
+        ExpectedMinor = 1
     }
 )
 
 $intValidatedEditionCount = 0
+
+$strChildCommand = @'
+$ErrorActionPreference = 'Stop'
+
+try {
+    $arrRequiredEnvironmentNames = @(
+        'PSSTYLEGUIDE_EXPECTED_EDITION'
+        'PSSTYLEGUIDE_EXPECTED_MAJOR'
+        'PSSTYLEGUIDE_TARGET_KIND'
+        'PSSTYLEGUIDE_TARGET_PATH'
+    )
+
+    foreach ($strEnvironmentName in $arrRequiredEnvironmentNames) {
+        if (
+            [string]::IsNullOrWhiteSpace(
+                [Environment]::GetEnvironmentVariable(
+                    $strEnvironmentName,
+                    'Process'
+                )
+            )
+        ) {
+            throw (
+                "Missing required child environment value: {0}" -f
+                $strEnvironmentName
+            )
+        }
+    }
+
+    $strExpectedEdition = [Environment]::GetEnvironmentVariable(
+        'PSSTYLEGUIDE_EXPECTED_EDITION',
+        'Process'
+    )
+
+    $intExpectedMajor = 0
+
+    if (
+        -not [int]::TryParse(
+            [Environment]::GetEnvironmentVariable(
+                'PSSTYLEGUIDE_EXPECTED_MAJOR',
+                'Process'
+            ),
+            [ref]$intExpectedMajor
+        )
+    ) {
+        throw 'PSSTYLEGUIDE_EXPECTED_MAJOR is not an integer.'
+    }
+
+    if ($strExpectedEdition -ceq 'Desktop') {
+        $intExpectedMinor = 0
+
+        if (
+            -not [int]::TryParse(
+                [Environment]::GetEnvironmentVariable(
+                    'PSSTYLEGUIDE_EXPECTED_MINOR',
+                    'Process'
+                ),
+                [ref]$intExpectedMinor
+            )
+        ) {
+            throw 'PSSTYLEGUIDE_EXPECTED_MINOR is not an integer.'
+        }
+
+        if (
+            $PSVersionTable.PSEdition -cne 'Desktop' -or
+            $PSVersionTable.PSVersion.Major -ne $intExpectedMajor -or
+            $PSVersionTable.PSVersion.Minor -ne $intExpectedMinor
+        ) {
+            throw (
+                ("Expected Desktop {0}.{1}; observed {2} {3}.") -f
+                $intExpectedMajor,
+                $intExpectedMinor,
+                $PSVersionTable.PSEdition,
+                $PSVersionTable.PSVersion
+            )
+        }
+    }
+    elseif ($strExpectedEdition -ceq 'Core') {
+        if (
+            $PSVersionTable.PSEdition -cne 'Core' -or
+            $PSVersionTable.PSVersion.Major -ne $intExpectedMajor
+        ) {
+            throw (
+                "Expected Core major {0}; observed {1} {2}." -f
+                $intExpectedMajor,
+                $PSVersionTable.PSEdition,
+                $PSVersionTable.PSVersion
+            )
+        }
+    }
+    else {
+        throw (
+            "Unsupported expected edition: {0}" -f
+            $strExpectedEdition
+        )
+    }
+
+    $strTargetKind = [Environment]::GetEnvironmentVariable(
+        'PSSTYLEGUIDE_TARGET_KIND',
+        'Process'
+    )
+
+    $strTargetPath = [Environment]::GetEnvironmentVariable(
+        'PSSTYLEGUIDE_TARGET_PATH',
+        'Process'
+    )
+
+    if (-not [System.IO.File]::Exists($strTargetPath)) {
+        throw ("Child target is not an existing file: {0}" -f $strTargetPath)
+    }
+
+    if ($strTargetKind -ceq 'Harness') {
+        $strHelperPath = [Environment]::GetEnvironmentVariable(
+            'PSSTYLEGUIDE_HELPER_PATH',
+            'Process'
+        )
+
+        if (
+            [string]::IsNullOrWhiteSpace($strHelperPath) -or
+            -not [System.IO.File]::Exists($strHelperPath)
+        ) {
+            throw (
+                "Harness helper is not an existing file: {0}" -f
+                $strHelperPath
+            )
+        }
+
+        & $strTargetPath -HelperPath $strHelperPath
+    }
+    elseif ($strTargetKind -ceq 'Generator') {
+        & $strTargetPath
+    }
+    else {
+        throw ("Unsupported child target kind: {0}" -f $strTargetKind)
+    }
+
+    if (-not $?) {
+        throw (
+            "{0} returned an unsuccessful PowerShell result." -f
+            $strTargetKind
+        )
+    }
+
+    exit 0
+}
+catch {
+    [Console]::Error.WriteLine($_.Exception.Message)
+    exit 1
+}
+'@
+
+$scriptInvokeValidatedChild = {
+    param (
+        [Parameter(Mandatory)]
+        [string]$ExecutablePath,
+
+        [Parameter(Mandatory)]
+        [string]$ExpectedEdition,
+
+        [Parameter(Mandatory)]
+        [int]$ExpectedMajor,
+
+        [AllowNull()]
+        [Nullable[int]]$ExpectedMinor,
+
+        [Parameter(Mandatory)]
+        [ValidateSet('Harness', 'Generator')]
+        [string]$TargetKind,
+
+        [Parameter(Mandatory)]
+        [string]$TargetPath,
+
+        [AllowNull()]
+        [string]$HelperPath
+    )
+
+    $hashtableEnvironmentValues = @{
+        PSSTYLEGUIDE_EXPECTED_EDITION = $ExpectedEdition
+        PSSTYLEGUIDE_EXPECTED_MAJOR = [string]$ExpectedMajor
+        PSSTYLEGUIDE_EXPECTED_MINOR = if ($null -eq $ExpectedMinor) {
+            ''
+        }
+        else {
+            [string]$ExpectedMinor.Value
+        }
+        PSSTYLEGUIDE_TARGET_KIND = $TargetKind
+        PSSTYLEGUIDE_TARGET_PATH = $TargetPath
+        PSSTYLEGUIDE_HELPER_PATH = [string]$HelperPath
+    }
+
+    $hashtablePreviousEnvironment = @{}
+
+    foreach ($strEnvironmentName in $hashtableEnvironmentValues.Keys) {
+        $strEnvironmentPath = 'Env:{0}' -f $strEnvironmentName
+
+        $hashtablePreviousEnvironment[$strEnvironmentName] = [pscustomobject]@{
+            WasDefined = Test-Path -LiteralPath $strEnvironmentPath
+            Value = [Environment]::GetEnvironmentVariable(
+                $strEnvironmentName,
+                'Process'
+            )
+        }
+    }
+
+    try {
+        foreach ($strEnvironmentName in $hashtableEnvironmentValues.Keys) {
+            [Environment]::SetEnvironmentVariable(
+                $strEnvironmentName,
+                [string]$hashtableEnvironmentValues[$strEnvironmentName],
+                'Process'
+            )
+        }
+
+        & $ExecutablePath `
+            -NoLogo `
+            -NoProfile `
+            -NonInteractive `
+            -Command $strChildCommand
+
+        $intChildExitCode = $LASTEXITCODE
+
+        if ($intChildExitCode -ne 0) {
+            throw (
+                ("{0} child under {1} failed with exit code {2}.") -f
+                $TargetKind,
+                $ExpectedEdition,
+                $intChildExitCode
+            )
+        }
+    }
+    finally {
+        foreach ($strEnvironmentName in $hashtableEnvironmentValues.Keys) {
+            $objPreviousEnvironment = $hashtablePreviousEnvironment[
+                $strEnvironmentName
+            ]
+
+            if ($objPreviousEnvironment.WasDefined) {
+                [Environment]::SetEnvironmentVariable(
+                    $strEnvironmentName,
+                    [string]$objPreviousEnvironment.Value,
+                    'Process'
+                )
+            }
+            else {
+                [Environment]::SetEnvironmentVariable(
+                    $strEnvironmentName,
+                    $null,
+                    'Process'
+                )
+            }
+        }
+    }
+}
+
+$strHarnessPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
+    './.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1'
+)
+
+$strHelperPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
+    './.github/workflows/Expand-StyleGuideCandidateArtifact.ps1'
+)
+
+$strGeneratorPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
+    './.github/workflows/Generate-StyleGuideArtifacts.ps1'
+)
 
 foreach ($objEditionCommand in $arrEditionCommands) {
     $objResolvedCommand = Get-Command `
@@ -1191,36 +1561,23 @@ foreach ($objEditionCommand in $arrEditionCommands) {
         continue
     }
 
-    & $objResolvedCommand.Path `
-        -NoLogo `
-        -NoProfile `
-        -File './.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1' `
-        -HelperPath './.github/workflows/Expand-StyleGuideCandidateArtifact.ps1'
+    & $scriptInvokeValidatedChild `
+        -ExecutablePath $objResolvedCommand.Path `
+        -ExpectedEdition $objEditionCommand.ExpectedEdition `
+        -ExpectedMajor $objEditionCommand.ExpectedMajor `
+        -ExpectedMinor $objEditionCommand.ExpectedMinor `
+        -TargetKind 'Harness' `
+        -TargetPath $strHarnessPath `
+        -HelperPath $strHelperPath
 
-    $intHarnessExitCode = $LASTEXITCODE
-
-    if ($intHarnessExitCode -ne 0) {
-        throw (
-            "Helper self-test failed under {0} with exit code {1}." -f
-            $objEditionCommand.Label,
-            $intHarnessExitCode
-        )
-    }
-
-    & $objResolvedCommand.Path `
-        -NoLogo `
-        -NoProfile `
-        -File './.github/workflows/Generate-StyleGuideArtifacts.ps1'
-
-    $intGeneratorExitCode = $LASTEXITCODE
-
-    if ($intGeneratorExitCode -ne 0) {
-        throw (
-            "Generator failed under {0} with exit code {1}." -f
-            $objEditionCommand.Label,
-            $intGeneratorExitCode
-        )
-    }
+    & $scriptInvokeValidatedChild `
+        -ExecutablePath $objResolvedCommand.Path `
+        -ExpectedEdition $objEditionCommand.ExpectedEdition `
+        -ExpectedMajor $objEditionCommand.ExpectedMajor `
+        -ExpectedMinor $objEditionCommand.ExpectedMinor `
+        -TargetKind 'Generator' `
+        -TargetPath $strGeneratorPath `
+        -HelperPath $null
 
     git diff --exit-code HEAD -- $arrArtifactPaths
     $intGitExitCode = $LASTEXITCODE
@@ -1308,7 +1665,10 @@ if ($intValidatedEditionCount -eq 0) {
 }
 ```
 
-Each edition's helper suite and generated outputs are completely verified before another edition can overwrite the outputs. CI remains responsible for mandatory coverage of both editions and Ubuntu.
+Each child asserts the expected edition/version before invoking its target in
+that same process. Each edition's helper suite and generated outputs are
+completely verified before another edition can overwrite the outputs. CI
+remains responsible for mandatory coverage of both editions and Ubuntu.
 
 ### Verify working-tree scope, stage, and verify the staged set
 
@@ -1450,12 +1810,39 @@ if ($strActualDependabot -cne $strExpectedDependabot) {
     )
 }
 
-$arrWorkflowPaths = @(
-    '.github/workflows/build.yml'
-    '.github/workflows/markdownlint.yml'
-)
+$hashtableApprovedActions = @{
+    'actions/checkout' = [pscustomobject]@{
+        Sha = '3d3c42e5aac5ba805825da76410c181273ba90b1'
+        Version = 'v7.0.1'
+        AllowedWorkflows = @('build', 'markdownlint')
+    }
+    'actions/setup-node' = [pscustomobject]@{
+        Sha = '820762786026740c76f36085b0efc47a31fe5020'
+        Version = 'v7.0.0'
+        AllowedWorkflows = @('markdownlint')
+    }
+    'actions/upload-artifact' = [pscustomobject]@{
+        Sha = '043fb46d1a93c77aae656e7c1c64a875d1fc6a0a'
+        Version = 'v7.0.1'
+        AllowedWorkflows = @('build')
+    }
+    'actions/download-artifact' = [pscustomobject]@{
+        Sha = '3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c'
+        Version = 'v8.0.1'
+        AllowedWorkflows = @('build')
+    }
+}
 
-foreach ($strWorkflowPath in $arrWorkflowPaths) {
+$hashtableWorkflowPaths = @{
+    build = '.github/workflows/build.yml'
+    markdownlint = '.github/workflows/markdownlint.yml'
+}
+
+$hashtableObservedCounts = @{}
+
+foreach ($strWorkflowName in $hashtableWorkflowPaths.Keys) {
+    $strWorkflowPath = $hashtableWorkflowPaths[$strWorkflowName]
+
     $strAbsoluteWorkflowPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
         $strWorkflowPath
     )
@@ -1471,17 +1858,101 @@ foreach ($strWorkflowPath in $arrWorkflowPaths) {
         }
 
         if (
-            $strUsesLine -cnotmatch
-            '^\s*uses:\s+[^@\s]+@[0-9a-f]{40}\s+#\s+v[0-9]+\.[0-9]+\.[0-9]+\s*$'
+            $strUsesLine -cnotmatch (
+                '^\s*uses:\s+' +
+                '(?<Repository>[^@\s]+)@' +
+                '(?<Sha>[0-9a-f]{40})\s+' +
+                '#\s+(?<Version>v[0-9]+\.[0-9]+\.[0-9]+)\s*$'
+            )
         ) {
             throw (
-                "External action is not pinned to a full SHA with an exact " +
-                "version annotation in {0}: {1}" -f
+                "Unable to parse an exact external action tuple in {0}: {1}" -f
                 $strWorkflowPath,
                 $strUsesLine
             )
         }
+
+        $strRepository = $Matches.Repository
+
+        if (-not $hashtableApprovedActions.ContainsKey($strRepository)) {
+            throw (
+                "Unapproved external action repository in {0}: {1}" -f
+                $strWorkflowPath,
+                $strRepository
+            )
+        }
+
+        $objApprovedAction = $hashtableApprovedActions[$strRepository]
+
+        if (
+            $Matches.Sha -cne $objApprovedAction.Sha -or
+            $Matches.Version -cne $objApprovedAction.Version
+        ) {
+            throw (
+                ("External action tuple mismatch in {0}; repository/SHA/" +
+                "version were {1}/{2}/{3}.") -f
+                $strWorkflowPath,
+                $strRepository,
+                $Matches.Sha,
+                $Matches.Version
+            )
+        }
+
+        if ($strWorkflowName -cnotin $objApprovedAction.AllowedWorkflows) {
+            throw (
+                "Action {0} is not approved in workflow {1}." -f
+                $strRepository,
+                $strWorkflowName
+            )
+        }
+
+        $strCountKey = '{0}|{1}' -f $strWorkflowName, $strRepository
+
+        if (-not $hashtableObservedCounts.ContainsKey($strCountKey)) {
+            $hashtableObservedCounts[$strCountKey] = 0
+        }
+
+        $hashtableObservedCounts[$strCountKey]++
     }
+}
+
+$hashtableRequiredOccurrences = @{
+    'build|actions/checkout' = 1
+    'build|actions/upload-artifact' = 1
+    'build|actions/download-artifact' = 1
+    'markdownlint|actions/checkout' = 1
+    'markdownlint|actions/setup-node' = 1
+}
+
+foreach ($strCountKey in $hashtableRequiredOccurrences.Keys) {
+    $intObservedCount = if ($hashtableObservedCounts.ContainsKey($strCountKey)) {
+        [int]$hashtableObservedCounts[$strCountKey]
+    }
+    else {
+        0
+    }
+
+    $intRequiredMinimum = [int]$hashtableRequiredOccurrences[$strCountKey]
+
+    if ($intObservedCount -lt $intRequiredMinimum) {
+        throw (
+            "Required action role {0} is missing; expected at least {1}, found {2}." -f
+            $strCountKey,
+            $intRequiredMinimum,
+            $intObservedCount
+        )
+    }
+}
+
+if (
+    $hashtableObservedCounts.ContainsKey(
+        'markdownlint|actions/setup-node'
+    ) -and
+    $hashtableObservedCounts[
+        'markdownlint|actions/setup-node'
+    ] -ne 1
+) {
+    throw 'markdownlint.yml must contain exactly one approved setup-node step.'
 }
 ```
 
@@ -1522,7 +1993,9 @@ Use a unique temporary branch or an isolated repository with equivalent Actions 
    - use native `digest-mismatch: error`;
    - create and pass a distinct unique job-owned trusted temporary root with
      separate download and initially absent candidate children;
-   - run the tracked permanent helper harness, including the digest-mismatch and path-envelope fixtures;
+   - run the tracked permanent helper harness, including digest mismatch,
+     path-envelope, mandatory real-link, and exact production cleanup-function
+     fixtures;
    - invoke the shared helper with explicit checkout/trusted roots and
      caller-owned diagnostic context, which opens with `FileShare.Read`, hashes
      and parses one held stream, validates every existing component from the
@@ -1533,7 +2006,8 @@ Use a unique temporary branch or an isolated repository with equivalent Actions 
 6. Confirm approval runs only after all four cells and propagates the same ID/digest.
 7. Confirm only synchronization has `contents: write`.
 8. Confirm synchronization repeats the tracked harness, unique-root topology,
-   and explicit helper-interface/lifecycle/cleanup contracts.
+   mandatory production cleanup-function fixture, and explicit
+   helper-interface/lifecycle/cleanup contracts.
 9. Confirm candidate, destination, index, and committed blob IDs match.
 10. Confirm the commit's only parent is the triggering SHA.
 11. Confirm the exact lease and explicit `HEAD:<full-ref>` refspec.
@@ -1632,11 +2106,15 @@ After merge:
 - Every pull request targeting `main` obtains verification.
 - Every push to `main` starts the push pipeline.
 - Pull-request jobs are read-only and stale artifacts fail.
-- Every checkout in `build.yml` and `markdownlint.yml` uses the approved checkout v7 Node 24 full commit SHA with a matching comment.
+- Every checkout in `build.yml` and `markdownlint.yml` uses the approved
+  checkout v7 Node 24 full commit SHA with a matching comment, and the exact
+  repository/SHA/comment allowlist validator rejects substitutions.
 - `markdownlint.yml` uses the approved setup-node v7 full commit SHA, installs Node 24 with automatic package-manager caching disabled, declares `contents: read`, and passes its unchanged outer and nested lint commands.
 - Local and hosted validation assert Node major 24 before a clean install and
   both existing Markdown lint commands.
-- Artifact uploads and downloads use approved full commit SHAs with matching comments.
+- Artifact uploads and downloads use approved full commit SHAs with matching
+  comments; every expected action role is present only in its approved
+  workflow.
 - Preparation declares `archive: true` and exposes one nonempty immutable ID/digest pair.
 - All four Windows push cells always download only by that ID, run the tracked harness, and invoke the helper.
 - Synchronization downloads only by that ID, runs the tracked harness, and invokes the helper only when `has_changes=true` and the job starts.
@@ -1664,12 +2142,20 @@ After merge:
 - Every security-sensitive exact count/set uses materialized `Directory.EnumerateFileSystemEntries`; candidate-parent enumeration rejects matching files, directories, links/reparse points, and dangling links immediately before creation.
 - The candidate leaf is absent until digest and manifest validation succeed and
   is created once. Pre-creation failures leave absence intact, pre-existing
-  leaves remain unchanged, and later failures remove only invocation-created
-  state or report a fail-closed `cleanup` failure and retained path.
-- One tracked, versioned harness owns the deterministic fixture suite and invokes the exact tracked helper through its public interface.
+  leaves remain unchanged, and later failures use the exact ownership journal
+  and named `Remove-StyleGuideCandidateInvocationState` function to remove
+  proven ordinary state or retain all uncertain state with the primary and
+  `cleanup` failures.
+- One tracked, versioned harness owns the deterministic fixture suite and
+  invokes ordinary cases through the exact tracked helper's public expansion
+  interface. Only the unsafe-cleanup fixture definition-only loads and invokes
+  the exact named production cleanup function.
 - Pull-request verification runs that harness under Ubuntu PowerShell 7 and in the two Windows LF cells under Windows PowerShell 5.1 and PowerShell 7.
 - Every started push consumer runs that same tracked harness against the exact tracked helper before its production helper invocation.
 - The harness implements every stable case ID in the normative oracle table, emits the expected phase/diagnostic record, and distinguishes a named platform skip from a pass.
+- Mandatory `K-01` proves the exact production cleanup function retains an
+  unexpected unjournaled ordinary child without partial deletion and reports
+  both failures.
 - Every rejection case applies its row's state-specific candidate
   postcondition; digest mismatch fails before `ZipArchive` construction.
 - Both archive successes, sibling-prefix and filesystem-qualified successes,
@@ -1678,6 +2164,9 @@ After merge:
   file/directory/link/dangling candidate leaves, all manifest forms, invalid
   ZIP, post-extraction BOM/CR cleanup, supplied/omitted labels, and all three
   empty-label cases have the table's required path/type/byte oracle.
+- At least one real component-or-leaf link rejection executes on Ubuntu and at
+  least one real component-or-leaf link/reparse rejection executes on Windows;
+  no platform-wide link-fixture skip satisfies acceptance.
 - Only the exact four entries are extracted, as new regular, non-reparse-point files.
 - The Windows topology is an actual four-cell edition × EOL matrix with `fail-fast: false`.
 - Each cell runs only its assigned edition and EOL.
@@ -1691,7 +2180,9 @@ After merge:
 - No unconditional force form, implicit destination, adaptation, or retry exists.
 - Every native command has an immediate exit-code check.
 - Every custom workflow and local PowerShell block begins with `$ErrorActionPreference = 'Stop'`.
-- Local validation verifies each available edition immediately after that edition runs.
+- Local validation asserts Desktop exactly 5.1 or Core major 7 in the same
+  child process that invokes each harness/generator target, then verifies that
+  edition's result before another edition can overwrite it.
 - Local validation requires Node major 24, clean install, and both Markdown lint
   commands.
 - CI supplies mandatory coverage for both editions.
@@ -1702,13 +2193,15 @@ After merge:
 - Controlled synchronization, propagated-digest rejection, malformed-
   transport rejection, unrelated-trigger, stale-preflight, and exact-lease
   drills pass without touching `main`.
-- The cross-repository convergence matrix truthfully identifies shared
-  observable invariants and repository-specific stream, name, fixture, and
-  transport choices; it does not claim blanket P1/T1 implementation identity.
+- The generator and helper convergence matrices truthfully identify shared
+  observable invariants and repository-specific values, transforms, names,
+  fixtures, placement, and transport choices; implementation-start evidence
+  records current divergence without claiming blanket P1/T1 identity or
+  creating a runtime dependency.
 - `.github/dependabot.yml` contains exactly one review-only weekly
   `github-actions` entry for `/`; no npm entry, auto-merge, or auto-approval is
-  introduced, and every external action remains pinned to a full SHA with an
-  exact same-line version annotation.
+  introduced, and every external action matches its exact approved
+  repository/full-SHA/same-line-version tuple and required workflow role.
 - No generated artifact, source guide, or `.gitattributes` changes in the
   implementing commit; `markdownlint.yml` changes only at checkout,
   setup-node, Node version/assertion, cache configuration, and explicit

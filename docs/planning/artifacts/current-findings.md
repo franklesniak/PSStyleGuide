@@ -1,441 +1,546 @@
-# PSStyleGuide P1/P2 review findings
+# Review of the PSStyleGuide P1/P2/P3 GitHub issue slate
 
 ## Overall assessment
 
-The slate is directionally strong, preserves the requested P1/P2 naming
-convention, and orders the work correctly. The H1 issue titles should remain:
+The P1 → P2 → P3 sequence is coherent under the requested assumption that the
+issues are implemented one at a time. P1 establishes the generator and
+workflow baseline, P2 changes source documentation and regenerates against
+that baseline, and P3 then changes the lint dependency/governance surface.
 
-1. P1: `Make artifact generation byte-deterministic across PowerShell editions
-   and hosts`
-2. P2: `Make the non-compliant blank-line example visibly distinct`
+The embedded H1 titles and P1/P2/P3 naming are clear and should be preserved.
+The slate is also substantially stronger than its earlier versions:
 
-P1 is not ready to file unchanged. Its held-stream verification design, exact
-action pins, least-privilege workflow split, deterministic writer contract,
-stable fixture IDs, and lease-protected synchronization are all strong.
-However, four correctness problems need resolution before filing:
+- P1 has complete-payload LF normalization, BOM-less serialization, immutable
+  artifact transport, a same-held-stream digest/ZIP contract, complete path
+  component checks, stable fixture IDs, and a single exact-lease writer.
+- P2 makes an invisible documentation defect durable without storing forbidden
+  trailing spaces and validates the exact canonical visualization.
+- P3 gives the known npm advisory graph a real owner, deliberate update
+  process, and review-only update-governance target.
 
-- its P1/T1 parity claim is materially broader than the actual convergence;
-- its path-envelope contract is incomplete;
-- its rejection postconditions contradict its pre-existing-leaf fixtures and
-  omit fail-closed cleanup after candidate creation; and
-- its fixed workflow download path does not satisfy its own unique trusted-root
-  contract.
+I would not hand off the current drafts unchanged. The supplied criticism is
+mostly valid. P1 needs targeted convergence, cleanup-test, edition-proof,
+link-coverage, and action-pin-verifier corrections. P2 is sound but needs its
+prerequisite refreshed and its local Node runtime bound to Node 24. P3 needs
+more substantial revision: its known upgrade candidate raises the supported
+Node floor beyond the current staged-hook guards, and its validation does not
+exercise the staged API, any real negative fixtures, the full residual
+disposition record, or its final Dependabot state.
 
-P2 has no independent blocking defect. It is appropriately narrow and should
-remain P2 after P1. Its prerequisite wording must be refreshed after P1 is
-corrected. One low-severity mechanical validation improvement is identified
-below.
+My recommended disposition is:
 
-T1 and T2 were used only as supplied cross-repository context for evaluating
-P1 convergence and P2 ordering. They were not independently critiqued.
+1. revise P1 before filing;
+2. refresh P2 from final P1 and add one local Node check;
+3. revise P3's scope and executable evidence before filing; and
+4. retain P1 → P2 → P3 unless an actual repository security policy requires
+   advisory remediation first.
 
 ## Review basis
 
-The following material was reviewed from the current worktree:
+This review used the current:
 
-- `docs/planning/PSStyleGuide/01PSStyleGuideP1.md`
-- `docs/planning/PSStyleGuide/02PSStyleGuideP2.md`
-- `docs/planning/PSStyleGuide/slate-criticism.md`
-- `docs/planning/TerraformStyleGuide/03TerraformStyleGuideT1.md`
-- `docs/planning/TerraformStyleGuide/04TerraformStyleGuideT2.md`
-- the generator, workflows, package lock, generated artifacts, and repository
-  attributes at the exact current `origin/main` commit
-  `4346310e7deebffb4159c75e30d9546263dfd649`
+- [P1](../PSStyleGuide/01PSStyleGuideP1.md);
+- [P2](../PSStyleGuide/02PSStyleGuideP2.md);
+- [P3](../PSStyleGuide/03PSStyleGuideP3.md);
+- [supplied criticism](../PSStyleGuide/slate-criticism.md); and
+- [T1](../TerraformStyleGuide/03TerraformStyleGuideT1.md) and
+  [T2](../TerraformStyleGuide/04TerraformStyleGuideT2.md) only where needed to
+  evaluate cross-repository convergence claims.
 
-The local review branch was `planning-CRT-PR-852` at
-`0aa910138055fde7ef8fa0fb54af4ed0b0559dd3`. P1 and P2 were reviewed at these
-worktree hashes and were not changed by this review:
+The live PSStyleGuide baseline remains
+[`4346310e7deebffb4159c75e30d9546263dfd649`](https://github.com/franklesniak/PSStyleGuide/commit/4346310e7deebffb4159c75e30d9546263dfd649)
+on `main`. At that commit:
 
-- P1 SHA-256:
-  `87DEA8653C9C7BB3FF7229128AC4DAD5C413A40E7687C4852124606E90F12EDF`
-- P2 SHA-256:
-  `D84539FF65FAB257D0F8A0F7489199523B0FFC95BD300537AB7146C8EEA954F6`
+- `.gitattributes` is exactly `* text=auto eol=lf`;
+- the generator has four edition-sensitive
+  `Set-Content -Encoding UTF8 -NoNewline` writes and one frontmatter
+  here-string;
+- `build.yml` has path filters, workflow-level `contents: write`, and moving
+  action tags;
+- `markdownlint.yml` installs Node 20 and uses moving action tags;
+- the Blank Line Usage examples have the same stored empty third line;
+- `.husky/pre-commit` and `lint-staged-markdown.mjs` accept Node 20 or newer;
+  and
+- `samples` contains the two positive Markdown samples but no tracked negative
+  sample.
+
+A fresh lockfile-only audit on 2026-07-29 still reports zero critical, five
+high, two moderate, and zero low vulnerable package nodes. It currently
+returns 14 distinct moderate/high advisory URLs across the object-valued
+`via` records, not merely the six representative URLs in P3's References.
+
+The current P1 action SHAs resolve in the official action repositories. Their
+exact `action.yml` files confirm Node 24 action runtimes and the relied-on
+inputs, including `package-manager-cache`, `archive`, `artifact-ids`,
+`skip-decompress`, and `digest-mismatch`.
+
+The known P3 candidate facts are also current:
+
+- installed `markdownlint-cli2@0.20.0` and `markdownlint@0.40.0` declare
+  Node `>=20`;
+- `markdownlint-cli2@0.23.2` and its bundled `markdownlint@0.41.1` declare
+  Node `>=22`;
+- the 0.23.0 changelog explicitly removes Node 20 support; and
+- 0.23.2 still exports `main` and accepts `nonFileContents`.
+
+The last point justifies testing the repository's staged integration; it does
+not prove that integration works.
 
 ## Supplied-criticism audit
 
-### C-01: Replace the claimed near-total P1/T1 identity with an explicit convergence matrix
+### C-01: Rebaseline P1's convergence matrix against final T1
 
-**Verdict: Confirmed; blocking P1 correction.**
+**Disposition: Confirmed. Impact: High factual correction.**
 
-P1 says the two repositories share the helper filename, interface, validation,
-path, digest, enumeration, diagnostics, and harness contracts, then says only
-four manifest names and artifact names intentionally differ. That is not
-accurate. Important behavioral differences include:
+P1 still describes its held-stream sequence as a stronger P1-only choice and
+warns that T1 may not share it. Current T1 now requires the same
+`FileMode.Open`/`FileAccess.Read`/`FileShare.Read` stream to be hashed,
+rewound, and retained through the only `ZipArchive`.
 
-- P1 hashes and parses one already-open `FileStream`; T1 hashes by path and
-  opens the archive separately.
-- T1 specifies a broader component-walk envelope, mutual root separation,
-  post-extraction path revalidation, and a residual race model.
-- T1 specifies fail-closed cleanup after output creation; P1 does not.
-- The repositories use different artifact transport and workflow details, not
-  merely different names.
-- The permanent harness coverage and where it runs are not identical.
+P1's Permanent fixtures row is also stale. It says fixtures exercise only the
+public helper interface, while current T1 has one narrow definition-only
+exception that directly invokes the exact named production cleanup function.
 
-The issue should replace the blanket identity claim with a compact matrix using
-at least these rows:
+Revise those two rows and the associated acceptance language. Preserve the
+repository-specific manifest names, artifact names, fixture details, and
+diagnostic values. Require an implementation-start comparison with the
+then-current T1, but do not create a runtime or filing dependency between
+repositories.
 
-| Contract area | Intentionally shared | Repository-specific choice |
-| --- | --- | --- |
-| Helper parameters | Required and optional parameter names and meanings | Caller-specific diagnostic values |
-| Archive identity | 64-hex expected/actual digest contract | PS held-stream verification; Terraform path-based flow unless deliberately changed |
-| Path security | Agreed root/component/reparse-point invariants | Checkout and temporary-root names |
-| Manifest grammar | Parsing rules, duplicate rejection, exact-entry policy | Manifest filename and permitted artifact names |
-| Candidate lifecycle | No overwrite and truthful rejection state | Repository-specific destination names |
-| Diagnostics | Stable categories and caller-owned labels | Artifact/run values |
-| Harness | Stable case intent and failure oracles | Platform-specific setup/skips and workflow placement |
-| Transport | Immutable artifact ID and fail-closed digest behavior | Action versions and archive/download shape |
+### C-02: Add a generator-specific convergence contract
 
-This is the most useful near-term generator unification: converge the security
-and observable-behavior contract while keeping repository-specific names and
-transport explicit. A cross-repository shared module or action would introduce
-its own release, trust, and compatibility boundary and should not be made a P1
-prerequisite. If desired later, it should be a separately versioned project
-after both repositories have an agreed contract matrix and matching fixtures.
+**Disposition: Confirmed as an improvement opportunity. Impact: Medium.**
 
-### C-02: Adopt T1's complete path-envelope validation in P1
+P1's existing matrix is almost entirely about the helper, paths, archive,
+lifecycle, fixtures, and artifact transport. The user's generator-unification
+objective deserves an explicit generator matrix rather than being inferred
+from scattered serialization requirements.
 
-**Verdict: Confirmed; blocking P1 correction.**
+The matrix should cover complete-payload normalization, resolved destinations,
+`UTF8Encoding($false)`, `WriteAllText`, no implicit newline, common artifact
+function behavior, frontmatter construction, script-version policy,
+`.gitattributes` versus producer correctness, and cross-edition/raw-byte
+validation. It should identify filenames, `applyTo`, descriptions, guide-
+specific transforms, and current repository state as intentional differences.
 
-P1 currently checks that roots resolve, rejects a reparse-point root, requires
-the trusted temporary location to be outside the checkout, and walks existing
-components between the trusted temporary root and the download/candidate
-parent. It does not specify the whole security envelope claimed by its parity
-language.
+This is behavioral convergence, not a requirement for a shared package,
+reusable action, or line-for-line implementation identity. It is not a
+standalone security blocker, but it materially improves the stated
+cross-repository goal.
 
-P1 should explicitly require:
+### C-03: Deterministically test the exact production cleanup function
 
-1. canonical, absolute checkout and trusted temporary roots;
-2. mutual non-containment, not only “temporary root is outside checkout”;
-3. enumeration of every existing component from the platform path root
-   (volume root or UNC share root) through each trusted root and through the
-   archive/candidate parents;
-4. rejection of reparse points or equivalent redirection objects anywhere in
-   that enumerated envelope;
-5. containment checks using platform-appropriate path comparison;
-6. revalidation after extraction and before accepting or moving the candidate;
-7. a documented residual race assumption, including that no competing writer
-   may mutate the validated path envelope during the operation; and
-8. permanent fixtures that prove the before/after checks and all supported
-   link/junction cases, with named platform-capability skips rather than silent
-   omission.
+**Disposition: Confirmed. Impact: High.**
 
-The issue should state precisely which checks are shared with T1 and which P1
-implements differently because it deliberately keeps one archive stream open.
+P1 now has truthful state-specific cleanup outcomes, but it still records only
+whether the leaf/files were created and permits either successful removal or a
+reported cleanup failure. No deterministic fixture forces the fail-closed
+branch, and no named production cleanup function is part of the contract.
 
-### C-03: Keep the held-stream design, but choose the sharing mode explicitly
+Adopt the current T1 shape:
 
-**Verdict: Partially confirmed; required clarification, but the specific enum
-value is not uniquely determined.**
+- maintain an exact ownership journal;
+- put cleanup in one named production function;
+- dispose archive/entry/file streams before cleanup;
+- complete an exhaustive envelope, immediate-child, journal, and ordinary-file
+  pre-deletion pass before deleting anything;
+- remove known files individually and the proven-empty directory
+  nonrecursively;
+- stop and retain state on missing, extra, replaced, linked, unreadable, or
+  uncertain entries; and
+- preserve the primary error plus stable cleanup diagnostics.
 
-The important criticism is valid: “an explicitly selected sharing mode” leaves
-a security-relevant implementation choice to the implementer. P1 should name
-the exact `FileShare` value and explain the permitted concurrency.
+Add one cross-platform fixture that inserts an unjournaled ordinary immediate
+child and invokes that exact function through one documented definition-only
+loading path. A real link/reparse substitution can supplement it where
+available. Update P1's lifecycle, oracle, controlled evidence, convergence
+matrix, and acceptance criteria together.
 
-The recommendation that it must be `FileShare.Read` is reasonable but not
-logically required:
+### C-04: Verify local PowerShell identity inside each child
 
-- `FileShare.Read` permits other readers while denying subsequently opened
-  writers through the .NET sharing contract.
-- `FileShare.None` is stricter and is defensible because the workflow has no
-  identified legitimate concurrent reader.
+**Disposition: Confirmed. Impact: Medium to high.**
 
-The issue should choose one. If audit/diagnostic readers are intentionally
-allowed, select `FileShare.Read` and test that declared contract. If no
-concurrent access is needed, select `FileShare.None`. In either case, keep the
-stronger P1 property: compute the digest, rewind, and construct `ZipArchive`
-from the same held stream so the parsed bytes are the verified bytes.
+P1's local loop resolves applications named `pwsh` and `powershell`, labels
+them, then invokes the harness and generator with `-File`. The child does not
+assert its own `$PSVersionTable`, so the label is not proof of the edition or
+version that performed the work.
 
-### C-04: Make rejection postconditions truthful and add fail-closed cleanup
+Use a fixed child `-Command` bootstrap with task-specific expected values passed
+as data. In the same child that invokes each target, require Desktop exactly
+5.1 or Core major 7, report expected versus observed values, propagate a
+nonzero target result, and restore/remove temporary environment variables in
+the parent's `finally`. Do this independently for the harness and generator.
 
-**Verdict: Confirmed; blocking P1 correction.**
+### C-05: Require real link coverage on both operating-system families
 
-P1 contains three incompatible statements:
+**Disposition: Confirmed. Impact: High for the path-security claim.**
 
-- every rejection row must leave the candidate leaf absent;
-- fixtures `L-01` through `L-04` begin with a pre-existing file, directory,
-  link, or dangling link and require it to remain unchanged; and
-- acceptance text alternates between “failures leave it absent” and
-  “absent or pre-existing unchanged.”
+P1 allows a stable case-level skip when a link primitive or privilege is
+unavailable, but it does not require any link/reparse case to execute on each
+OS family. All such rows could therefore be skipped on Windows or Ubuntu while
+the suite remains otherwise green.
 
-The harness and acceptance criteria need per-case postconditions:
+Require at least one real component-or-leaf symbolic-link fixture on Ubuntu and
+one real component-or-leaf link/reparse fixture on Windows. A narrowly
+identified unavailable form may still skip; an unexpected setup failure must
+fail the cell, and a platform-wide link skip must not satisfy acceptance.
 
-| Starting state | Required rejection postcondition |
-| --- | --- |
-| Candidate leaf absent | It remains absent |
-| Pre-existing file | Same file remains unchanged |
-| Pre-existing directory | Same directory remains unchanged |
-| Pre-existing link/junction/dangling link | Same object and target text remain unchanged |
-| Candidate created by this invocation, followed by later failure | Invocation-owned candidate is removed |
+### C-06: Align or explain pull-request harness placement
 
-The helper must track whether it created any candidate state. If a later
-validation, move, or finalization step fails, it must attempt cleanup without
-touching pre-existing state. A cleanup failure must itself fail the operation
-with diagnostics that retain both the original error and cleanup failure; it
-must not report a clean rejection while leaving an untrusted candidate behind.
+**Disposition: Partially confirmed. Impact: Low to medium.**
 
-The blanket sentence at P1's rejection-table introduction and the blanket
-“failures leave it absent” acceptance criterion should be replaced by this
-case-aware contract.
+There is no correctness defect in P1 running the helper harness in Ubuntu plus
+the two Windows LF cells. That covers PowerShell 7 on Ubuntu and both Windows
+editions, and helper behavior is independent of the source fixture's EOL
+variant. Repeating the full suite in CRLF cells would mainly buy placement
+symmetry with T1 at additional CI cost.
 
-### C-05: Make the trusted temporary-path example satisfy its own contract
+The criticism is correct that P1's matrix merely says placement may differ
+without recording this rationale. Keep the two-LF-cell optimization if desired,
+but identify it as intentional per-edition helper coverage rather than
+edition × EOL helper coverage. Running all four cells is optional, not required
+to repair a defect. Preserve the stronger rule that all four push cells execute
+the harness and production helper.
 
-**Verdict: Confirmed; blocking P1 correction.**
+### C-07: Refresh P2's prerequisite snapshot
 
-P1 requires a unique trusted temporary root with download and candidate paths
-under it, but the workflow example uses the fixed path
-`${{ runner.temp }}/style-guide-candidate-download`. That is a child path under
-the runner temporary directory, not the unique trusted root described by the
-helper contract, and it can be reused within the job environment.
+**Disposition: Confirmed, with a maintenance qualification. Impact: Medium.**
 
-Each consuming job should create a fresh directory using a platform-native
-unique-name primitive, then derive both download and candidate children from
-that directory. The job should:
+P2's prerequisite accurately reflects current P1, but the confirmed P1 changes
+will make it stale. Update it after P1 is final to mention the shared
+held-stream invariant, named/directly tested cleanup, mandatory cross-platform
+link coverage, and same-child edition proof.
 
-1. create the unique root itself;
-2. pass that exact root as `TrustedTemporaryRoot`;
-3. place the downloaded archive and candidate only below it;
-4. prove the paths are contained before invoking the helper; and
-5. clean up only that invocation-owned root in an `always()`/`finally` path,
-   surfacing cleanup failure according to the fail-closed contract.
+P2 already says P1 is the source of truth. Keep the prerequisite as a concise
+invariant summary and normative link rather than duplicating the final
+implementation algorithm. Do not import T2 provider-recovery content.
 
-The permanent harness should use the same layout. The issue should not show a
-fixed path while requiring a unique one.
+### C-08: Assert Node 24 before P2's local npm commands
 
-### C-06: Add an end-to-end malformed-transport drill
+**Disposition: Confirmed. Impact: Medium.**
 
-**Verdict: Partially confirmed; valuable evidence improvement, not a helper
-correctness blocker by itself.**
+P2 immediately runs `npm ci` and both lint commands using whichever `node` is
+on `PATH`. That contradicts its P1 prerequisite and hosted-evidence claims.
+The review environment itself currently has Node 26, illustrating that the
+copyable block can pass under a different major.
 
-P1 already includes direct invalid/truncated archive fixtures, successful
-artifact transport, and a controlled wrong-propagated-digest drill. Those test
-the helper rejection and the successful transport path. They do not prove that
-an actually downloaded malformed payload reaches the same fail-closed
-rejection boundary.
+Resolve `node` and `npm` as applications, query exactly one Node version, and
+require major 24 before installation or lint. Reuse P1's validated pattern and
+restore `CI` if P2 sets it. Hosted Node 24 evidence remains mandatory.
 
-Add one controlled-branch drill that uploads known non-ZIP bytes as a distinct
-single-file artifact, downloads that immutable artifact ID with the production
-download settings, and proves:
+### C-09: Remove P2's stale metadata snapshot
 
-- native transport completes for the bytes it was asked to carry;
-- the helper rejects before manifest acceptance or candidate creation;
-- the diagnostic category is archive format/structure, not digest, unless the
-  test intentionally supplies a mismatched expected digest; and
-- no write-enabled synchronization step runs.
+**Disposition: Confirmed as editorial guidance, not a blocker. Impact: Low.**
 
-If the drill is not added, narrow the evidence claims so they do not imply a
-malformed payload was exercised through GitHub artifact transport.
+The `2.24.20260728.0` value is clearly labeled a conditional drift-only
+snapshot and the normative algorithm requires recalculation, so it is not a
+logical defect. It is now a dead example and creates needless copy risk.
+Remove it and keep the target-branch/current-UTC calculation rules.
 
-### C-07: Add review-only GitHub Actions update governance
+### C-10: Resolve P3's known Node-engine and staged-hook mismatch
 
-**Verdict: Partially confirmed; sound governance recommendation, not a P1
-correctness blocker.**
+**Disposition: Confirmed. Impact: High.**
 
-P1's action references were checked against the pinned action metadata and are
-current at review time:
+P3 treats an engine change as a possible future discovery, but its named
+candidate already requires Node `>=22`. The live pre-commit shell guard and
+`lint-staged-markdown.mjs` both admit Node 20. Updating only the three current
+P3 files would let an explicitly accepted runtime launch an unsupported
+toolchain.
 
-- `actions/checkout` v7.0.1
-- `actions/setup-node` v7.0.0
-- `actions/upload-artifact` v7.0.1
-- `actions/download-artifact` v8.0.1
+P3 should either:
 
-All are pinned by full commit SHA and use the intended Node 24 action runtime.
-The repository currently has no `.github/dependabot.yml`. Review-only weekly
-updates for the `github-actions` ecosystem would reduce pin staleness while
-preserving human review and exact-SHA policy.
+- add `.husky/pre-commit` and
+  `.github/workflows/lint-staged-markdown.mjs` to its affected files, choose
+  one explicit floor, update both guards/messages, and add a matching
+  `engines.node` field; or
+- create a real prerequisite issue for that policy change and place it before
+  P3.
 
-This is governance scope, however, and the current P1 explicitly excludes it.
-Choose and document one of two coherent dispositions:
+Node `>=22` matches the known package floor; Node `>=24` intentionally aligns
+local hooks with P1's exact validation major. Either can be coherent if chosen
+once and tested at the selected minimum plus Node 24. Do not keep Node 20
+guards with an unsupported installed tree.
 
-1. include `.github/dependabot.yml` in P1, make it the sixth affected file,
-   specify weekly review-only pull requests for directory `/`, and state that
-   no auto-merge is introduced; or
-2. retain P1's five-file limit and link a separate governance issue or
-   organization-level policy that owns action-pin refresh.
+### C-11: Execute the staged-lint API contract
 
-The current unexplained “do not add Dependabot” exclusion should not be the
-final disposition if cross-repository update governance is a stated goal.
+**Disposition: Confirmed. Impact: High.**
 
-### C-08: Track the current npm advisories as real work, not residual prose
+The outer and nested npm scripts never invoke
+`lint-staged-markdown.mjs`. That script dynamically imports the programmatic
+`main` export and passes staged/index bytes through `nonFileContents`. Current
+0.23.2 still exposes both surfaces, but static presence is not behavioral
+compatibility.
 
-**Verdict: Confirmed; separate maintenance work is required.**
+Add isolated tests for:
 
-On 2026-07-29, running
-`npm audit --package-lock-only --json` in `.github/workflows` returned exit
-code 1 with seven reported vulnerabilities: five high and two moderate. The
-affected dependency graph included `brace-expansion`, `js-yaml`, `linkify-it`,
-`markdown-it`, `markdownlint-cli2`, `minimatch`, and `picomatch`.
+1. no staged Markdown;
+2. compliant staged Markdown;
+3. noncompliant staged Markdown with lint exit 1 and an exact rule/path;
+4. differing index and working-tree bytes, proving index bytes are linted; and
+5. the selected minimum Node major and Node 24.
 
-A GitHub issue search across open and closed repository issues found no issue
-dedicated to npm audit/advisory remediation. Issue #137 concerns deterministic
-Markdown linting, Husky hook installation, and line endings; it does not own
-these advisories.
+Use a disposable clone/worktree or isolated index, check every Git/Node exit,
+run on Windows and Linux, and distinguish startup exit 2 from an expected lint
+failure.
 
-Do not silently fold dependency upgrades into P1 because that would mix
-runtime/toolchain remediation with deterministic artifact transport. Create or
-identify a separate issue, link it from P1's known-state section, and state its
-ordering. At minimum that issue should require:
+### C-12: Replace the nonexistent negative-fixture claim
 
-- review of direct and transitive advisory paths;
-- an explicit decision on any pre-1.0 semver-major
-  `markdownlint-cli2` upgrade;
-- clean install and both outer/nested lint commands on the selected Node
-  runtime;
-- lockfile-only review for unrelated package churn; and
-- a recorded disposition for any advisory that cannot immediately be removed.
+**Disposition: Confirmed. Impact: High for regression evidence.**
 
-### C-09: Keep CI evidence wording exact
+P3 says to run existing positive and negative samples and requires existing
+negative fixtures to fail correctly. The live `samples` directory has only:
 
-**Verdict: Confirmed as a principle and already addressed in the current
-drafts.**
+- `test-nested-markdown-linting.md`; and
+- `test-recursive-nested-markdown.md`.
 
-The current P1 and P2 wording does not need the correction suggested here:
+No `samples/test-violations-recursive.md` or other tracked negative fixture
+exists. Add a reviewed tracked fixture to P3's scope or create deterministic
+temporary outer and nested violations during validation and remove them in
+`finally`. Require exact expected rule, file, and nested-depth/context
+diagnostics; an import/startup error must not count as a passing negative test.
 
-- pull-request evidence says only the two LF Windows cells run the permanent
-  helper harness and lone-CR probe; the CRLF cells do not repeat it;
-- controlled and post-merge push evidence says all four unconditional Windows
-  consumers run the helper harness; and
-- P2 says its expected no-drift push skips synchronization, while the P1
-  controlled `has_changes=true` drill supplies writer-integration evidence.
+### C-13: Define how P3 supersedes P1/P2 intermediate gates
 
-Preserve that exact distinction when applying the other revisions. In
-particular, do not replace “two LF pull-request cells” with “all four
-pull-request cells,” and do not claim P2's expected no-drift merge executes the
-writer steps.
+**Disposition: Confirmed. Impact: Medium to high.**
 
-### C-P2: Preserve P2's narrow design and refresh its P1 prerequisite
+P1 intentionally requires exactly one Dependabot entry and a six-file
+implementation path set. P3 intentionally adds a second entry and changes a
+different path set. Therefore P3's blanket acceptance statement that “P1 and
+P2 validation remain green” is literally false if it includes those
+implementation-time gates.
 
-**Verdict: Confirmed.**
+State that all nonsuperseded generator, workflow, permissions, action pins,
+helper/harness, artifacts, and lint behaviors remain green. Explicitly
+supersede P1's one-entry Dependabot check and P1/P2 implementation-time path
+sets with P3's final checks.
 
-P2 correctly limits source edits to `STYLE_GUIDE.md` and
-`STYLE_GUIDE_RATIONALE.md`, regenerates four derived artifacts, forbids
-hand-editing generated files, keeps the compliant example unchanged, uses a
-visible U+00B7 visualization rather than literal trailing spaces, and makes the
-date bump conditional on actual metadata drift.
+Add an exact normalized-content validator for the two-entry final
+`.github/dependabot.yml`. It must reject loss/duplication of either entry,
+other ecosystems/directories, wrong schedules, and auto-merge/auto-approval in
+the changed scope.
 
-No broader transport, helper, action, Dependabot, or dependency-remediation
-change belongs in P2. After P1 is revised, update P2's prerequisite summary so
-it points to the final P1 helper/path/cleanup and governance dispositions
-without duplicating their implementation.
+### C-14: Structure residual-advisory dispositions
+
+**Disposition: Confirmed. Impact: High if any residual is accepted.**
+
+P3 promises an owner, dependency path, expiration/review date, and follow-up
+issue, but its copyable verifier accepts only an array of URL strings. It
+cannot prove those fields, expiry, uniqueness, or applicability.
+
+Use structured records containing exact advisory URL, affected package/path,
+owner, invariantly parsed UTC expiration date, and real follow-up issue URL.
+Reject duplicate/empty/expired records, derive the approved URL set from them,
+require exact equality with current moderate/high/critical results, and reject
+any record after the audit becomes clean. Preserve the records in durable
+issue/PR evidence.
+
+If approval remains manual, narrow the mechanical claim instead of saying the
+URL-only script validates facts it cannot represent.
+
+### C-15: Treat every advisory URL as dynamic evidence
+
+**Disposition: Confirmed. Impact: Medium.**
+
+P3's seven-node severity baseline remains accurate and useful as a dated
+comparison. Its References list only six individual advisory URLs—effectively
+a representative subset—while the current audit returns 14 distinct URLs from
+object-valued `via` records. The omission is acceptable only if References are
+explicitly illustrative and implementation evidence records the complete
+current result, including multiple advisories on one package and string-valued
+dependency links.
+
+Do not freeze today's 14 URLs as the future oracle. Capture the complete audit
+at implementation time and compare it with the dated baseline.
+
+### C-16: Retain P1 → P2 → P3 and record blocked-by relationships
+
+**Disposition: Confirmed and substantially already encoded. Impact: Medium
+coordination.**
+
+P2 and P3 already contain dependency callouts requiring real blocked-by
+relationships after filing. Preserve them and add the actual issue links when
+known. Do not use placeholder issue numbers.
+
+The order keeps P1/P2 on one dependency baseline and isolates the pre-1.0
+package migration. That is a sound default under the prompt's sequential
+assumption.
+
+### C-17: Coordinate P1/T1 without a runtime dependency
+
+**Disposition: Confirmed and partially satisfied. Impact: Medium.**
+
+P1 already states that helpers remain repository-local and that P1 must not
+depend on TerraformStyleGuide changes. Preserve that boundary.
+
+Complete the coordination through the corrected helper matrix and new
+generator matrix: whichever implementation starts second rereads the current
+first contract and records intentional differences. A future shared package or
+action needs separate versioning, provenance, immutable consumption, rollout,
+and failure-mode design; it should not be introduced implicitly by P1.
+
+### C-18: Keep T2 provider-recovery content out of P2/P3
+
+**Disposition: Confirmed and already satisfied. Impact: Scope guard only.**
+
+Nothing in current P2 or P3 imports T2's S3, Azure, GCS, or HCP recovery work.
+No draft change is required. Preserve the distinction: P2/T2 are analogous
+only as documentation issues that follow their own deterministic-generator
+prerequisites.
+
+### C-19: Define a policy-driven ordering exception
+
+**Disposition: Conditionally confirmed. Impact: Potentially high, but no
+current policy violation was established by the supplied material.**
+
+It is valid to say that an actual policy forbidding known high-severity
+findings would override the assumed order. In that event, perform the
+dependency/hook remediation first and rebaseline P1/P2 after it merges.
+
+Do not reorder the slate solely because such a policy might exist. Confirm the
+repository/organization policy and record the exception if it applies. The
+known advisories still deserve explicit risk ownership while P1/P2 are open.
 
 ## Independent findings
 
-### I-P1-01: Local validation does not prove the Node 24 toolchain and lint paths
+### I-P1-01: P1's action-pin verifier accepts an arbitrary SHA/comment pair
 
-**Severity: Medium; completeness improvement.**
+**Severity:** High for the claimed executable provenance gate.
 
-P1 changes both workflow action/runtime metadata and the Markdown lint
-workflow, and its pull-request evidence expects the outer and nested lint
-commands to pass. Its local validation blocks focus on PowerShell parsing,
-generator execution, helper fixtures, artifact bytes, and staging. They do not
-explicitly require a clean Node 24 install and both lint scripts.
+P1 defines exact approved action repositories, SHAs, and release comments, but
+its copyable “Verify review-only update governance and immutable action pins”
+block checks only this general shape:
 
-Add a local validation block that:
+```text
+uses: <anything>@<40 lowercase hex> # v<integer>.<integer>.<integer>
+```
 
-1. asserts `process.versions.node` has major version 24;
-2. runs `npm ci` in `.github/workflows`;
-3. runs `npm run lint:md`;
-4. runs `npm run lint:md:nested`; and
-5. checks every exit code.
+A wrong commit, mismatched release comment, unexpected external action, or
+substituted repository can satisfy that regex. Manual static inspection is
+listed elsewhere, but the block's heading and acceptance language imply a
+stronger mechanical proof.
 
-The review machine's active Node version was 26.5.0, so a local lint pass here
-would not by itself prove the issue's Node 24 runtime contract.
+Replace the regex-only gate with an exact allowlist mapping:
 
-### I-P1-02: Optional diagnostic-label fixtures do not cover the full contract
+- `actions/checkout` → approved SHA and `v7.0.1`;
+- `actions/setup-node` → approved SHA and `v7.0.0`;
+- `actions/upload-artifact` → approved SHA and `v7.0.1`; and
+- `actions/download-artifact` → approved SHA and `v8.0.1`.
 
-**Severity: Medium; test-oracle improvement.**
+Require every nonlocal `uses:` line to match one allowed repository/SHA/comment
+tuple, require every expected action to occur in its intended workflow/steps,
+and reject unknown, missing, duplicate-unexpected, or malformed references.
+Retain implementation-time upstream/release/runtime review; exact static
+validation does not replace that review.
 
-P1 requires `ArtifactId`, `RunId`, and `RunAttempt` to be caller-owned optional
-diagnostic labels, requires omitted values to render as unavailable, and
-rejects explicitly supplied empty values. The permanent table has only one
-generic `X-01` empty-label case and a broad `D-01` reference to artifact/run
-labels.
+### I-P3-01: P3's audit verifier does not close its command/schema boundary
 
-Add stable fixture rows for:
+**Severity:** Medium to high.
 
-- all three labels omitted, with each rendered as unavailable;
-- all three labels supplied, with their exact values preserved;
-- explicitly empty `ArtifactId`;
-- explicitly empty `RunId`; and
-- explicitly empty `RunAttempt`.
+P3's requested evidence includes Node and npm versions, but the copyable
+validation queries only Node. It resolves `npm` without recording
+`npm --version`.
 
-Each rejection case should identify the exact bad label and prove no archive
-parsing or candidate creation occurred. This removes ambiguity over whether a
-single implementation path accidentally validates only one of the three
-parameters.
+The audit verifier also treats every nonzero exit the same. If the derived URL
+set happens to match the allowlist, an unexpected npm error exit is not
+explicitly rejected. It assumes the JSON has the expected `metadata` and
+`vulnerabilities` shape without validating those members and numeric severity
+counts before using them.
 
-### I-P2-01: The mechanical validator does not prove exactly one rationale heading
+Require:
 
-**Severity: Low; validation hardening.**
+1. exactly one validated npm version result, recorded before and after the
+   lockfile update;
+2. audit exit 0 for a clean result or the one documented vulnerability exit
+   for approved residual findings—every other exit fails;
+3. one valid JSON object with required `metadata.vulnerabilities` and
+   `vulnerabilities` members;
+4. nonnegative integral severity totals consistent with the enumerated result;
+5. complete URL/path extraction from object and dependency-link `via` records;
+   and
+6. the structured disposition equality checks from C-14.
 
-P2 says to extend the existing `### Blank Line Usage` rationale section and not
-create a duplicate. Its mechanical checks exclude the canonical operational
-snippet from the rationale and check the expected visualization, but they do
-not count this heading.
+This makes command failure, schema drift, a clean result, and an approved
+residual result mechanically distinct.
 
-Add an ordinal assertion that `STYLE_GUIDE_RATIONALE.md` contains exactly one
-line equal to `### Blank Line Usage`. This catches accidental duplicate
-sections even if Markdown lint configuration permits same-name headings under
-different parents.
+## Consolidated revisions before handoff
 
-## Confirmed strengths
+### P1
 
-The following parts should be preserved while correcting P1:
+1. Correct the two stale P1/T1 convergence rows.
+2. Add the generator-specific convergence matrix.
+3. Specify one journaled named cleanup function and directly test its
+   fail-closed branch.
+4. Assert edition/version in the same local child that runs each target.
+5. Require at least one real link/reparse rejection per OS family.
+6. Document the two-LF-cell pull-request harness placement as intentional, or
+   choose four-cell symmetry.
+7. Replace the action-pin shape regex with an exact approved tuple allowlist.
 
-- complete-final-payload normalization before every write;
-- explicit UTF-8-without-BOM and LF-only byte requirements;
-- first-executable-statement local-copy behavior in the writer;
-- one-read input evaluation and deterministic null/array handling;
-- `Get-FileHash -InputStream` followed by rewind and parsing of the same held
-  stream;
-- immutable artifact-ID and digest propagation;
-- pinned full-SHA actions with explicit version annotations;
-- read-only preparation/approval and one narrowly write-enabled synchronization
-  job;
-- exact remote-ref comparison, complete object IDs, exact force-with-lease
-  shape, explicit `HEAD:<full-ref>` push, and no retry/adaptation path;
-- stable permanent fixture IDs with named capability skips;
-- P2's ordinal content checks, visible-space visualization, scope guard, staged
-  rerun check, and precise no-drift evidence language.
+### P2
 
-## Required disposition before filing
+1. Refresh the concise P1 prerequisite only after P1 is final.
+2. Assert Node major 24 before `npm ci` and both lint commands.
+3. Remove the dead dated metadata snapshot while retaining the normative
+   recalculation algorithm.
 
-P1 should not be filed until C-01, C-02, C-04, and C-05 are corrected.
-C-03 must name and justify an exact sharing mode. I-P1-01 and I-P1-02 should be
-added so the validation and diagnostic contracts are complete.
+No independent content-design change is needed.
 
-C-06 and C-07 are not blockers if their evidence/governance claims are narrowed
-and they receive an explicit separate disposition. C-08 needs a real linked
-maintenance issue, but dependency remediation should stay outside P1.
+### P3
 
-P2 may then be filed after its prerequisite text is refreshed. I-P2-01 is a
-small, low-cost validation improvement and should be incorporated without
-expanding P2's implementation scope.
+1. Resolve the Node floor across package metadata, the Husky shell guard, and
+   the staged-lint implementation, expanding scope or adding a prerequisite.
+2. Execute isolated staged/index behavior on Windows and Linux.
+3. Add deterministic positive and negative outer/nested lint evidence.
+4. Define which P1/P2 gates are preserved and which P3 supersedes.
+5. Validate the exact final two-entry Dependabot file.
+6. Replace URL-only residual approvals with durable structured records.
+7. Validate npm version, audit exit codes, JSON shape, totals, URLs, and
+   dependency paths.
+8. Treat the dated seven-node/14-current-URL observations as comparison
+   evidence, not a frozen implementation oracle.
 
-## Validation performed during this review
+## Strengths to preserve
 
-- Compared the current P1 and P2 drafts with the supplied criticism one
-  recommendation at a time.
-- Compared P1's claimed shared contract against T1 without reviewing T1/T2 as
-  independent issue drafts.
-- Inspected the exact `origin/main` generator, build workflow, Markdown lint
-  workflow, package metadata, attributes, and generated document state.
-- Confirmed the current compliant and non-compliant fenced examples in
-  `STYLE_GUIDE.md` are ordinally identical, establishing P2's baseline defect.
-- Confirmed `STYLE_GUIDE_RATIONALE.md` currently contains one
-  `### Blank Line Usage` heading.
-- Parsed every P1 and P2 PowerShell validation fence under PowerShell 7.6.4 and
-  Windows PowerShell 5.1 without syntax errors.
-- Verified the pinned action metadata at each exact SHA, including Node 24
-  action runtimes and the upload/download inputs P1 relies on.
-- Ran the current package-lock audit and searched repository issues for an
-  existing advisory-remediation owner.
-- Preserved the reviewed P1 and P2 worktree bytes unchanged.
+- Embedded H1 issue titles and P1/P2/P3 terminology.
+- Repository-generic, portable guidance.
+- Existing PSStyleGuide `.gitattributes` preserved.
+- Final-payload normalization and BOM-less resolved-path serialization.
+- P1's held-stream archive identity and explicit `FileShare.Read`.
+- Complete path-envelope validation and honest no-competing-writer model.
+- Immutable artifact ID/digest propagation and native fail-closed download.
+- Stable fixture IDs and case-specific destination postconditions.
+- Four-cell push validation, read-only approval, and one exact-lease writer.
+- P2's visible four-middle-dot `text` visualization and no trailing whitespace.
+- P2's exact canonical-snippet and rationale nonduplication validation.
+- P3's deliberate release/lockfile review, no `npm audit fix --force`,
+  review-only Dependabot intent, and clean-install/full-tree audit direction.
+
+## Validation performed for this review
+
+- Resolved live `franklesniak/PSStyleGuide` `main` through the connected GitHub
+  repository and confirmed its ref at `4346310e7deebffb4159c75e30d9546263dfd649`.
+- Inspected the live generator, workflows, package manifest/lockfile, staged
+  hook/implementation, guide examples, rationale heading, and sample tree.
+- Re-ran the lockfile-only moderate-threshold audit and confirmed the
+  0/5/2/0 severity counts and seven affected package nodes.
+- Verified all four selected action commits and relied-on action metadata in
+  their official repositories.
+- Verified the current and proposed markdownlint engine requirements, 0.23.0
+  Node-support change, and 0.23.2 programmatic `main`/`nonFileContents`
+  surface from upstream sources.
+- Parsed all 15 PowerShell fences across P1/P2/P3 in both Windows PowerShell
+  5.1 and PowerShell 7. Syntax success does not substitute for the missing
+  behavioral tests identified above.
 
 ## Primary references
 
-- [.NET `FileShare` enum](https://learn.microsoft.com/dotnet/api/system.io.fileshare)
-- [.NET `FileStream` constructors](https://learn.microsoft.com/dotnet/api/system.io.filestream.-ctor)
-- [GitHub Actions dependency updates](https://docs.github.com/code-security/dependabot/working-with-dependabot/keeping-your-actions-up-to-date-with-dependabot)
-- [Dependabot configuration options](https://docs.github.com/code-security/dependabot/working-with-dependabot/dependabot-options-reference)
-- [GitHub artifact attestations and integrity concepts](https://docs.github.com/actions/security-for-github-actions/using-artifact-attestations)
-- [Node.js release schedule](https://nodejs.org/en/about/previous-releases)
+- [PSStyleGuide live baseline](https://github.com/franklesniak/PSStyleGuide/commit/4346310e7deebffb4159c75e30d9546263dfd649)
+- [Live staged Markdown hook](https://github.com/franklesniak/PSStyleGuide/blob/4346310e7deebffb4159c75e30d9546263dfd649/.husky/pre-commit)
+- [Live staged Markdown implementation](https://github.com/franklesniak/PSStyleGuide/blob/4346310e7deebffb4159c75e30d9546263dfd649/.github/workflows/lint-staged-markdown.mjs)
+- [`markdownlint-cli2` 0.23.2 package metadata](https://github.com/DavidAnson/markdownlint-cli2/blob/v0.23.2/package.json)
+- [`markdownlint` 0.41.1 package metadata](https://github.com/DavidAnson/markdownlint/blob/v0.41.1/package.json)
+- [`markdownlint-cli2` 0.23.2 programmatic API](https://github.com/DavidAnson/markdownlint-cli2/blob/v0.23.2/markdownlint-cli2.mjs#L881)
+- [`markdownlint-cli2` changelog](https://github.com/DavidAnson/markdownlint-cli2/blob/v0.23.2/CHANGELOG.md)
+- [Node.js release status](https://nodejs.org/en/about/previous-releases)
+- [npm audit documentation](https://docs.npmjs.com/cli/v11/commands/npm-audit)
+- [GitHub Dependabot options](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference)
