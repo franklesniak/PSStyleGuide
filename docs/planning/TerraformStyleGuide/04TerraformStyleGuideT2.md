@@ -38,6 +38,10 @@ At implementation start, confirm the prerequisite issue established:
   (`.github/workflows/Expand-StyleGuideCandidateArtifact.ps1`), and versioned
   permanent helper harness
   (`.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1`).
+- A reciprocal PSStyleGuide/TerraformStyleGuide generator-convergence record
+  covering shared serialization algorithms/invariants, intentional
+  repository-specific differences, and the current first/second-implementation
+  handoff without a cross-repository runtime dependency.
 - Local cross-edition validation that asserts Desktop exactly 5.1 or Core major
   7 and invokes each harness/generator target in that same child `-Command`
   process before verifying that edition's output.
@@ -98,10 +102,22 @@ At implementation start, confirm the prerequisite issue established:
   - `.github/workflows/build.yml`; and
   - `.github/workflows/markdownlint.yml`.
 - Passing LF, CRLF, lone-CR, propagated-digest rejection, malformed-transport, stale-ref, and lease evidence.
-- A real linked npm-remediation issue that owns the separately recorded
-  seven-node nested-tooling advisory baseline without expanding T1 or T2. If
-  repository policy required that issue to run before T1, confirm T1 and this
-  issue were rebaselined after it merged.
+- A real linked npm-remediation issue that treats the separately recorded
+  seven-node nested-tooling result as a dated baseline and owns:
+  - final dependency, lockfile, and affected-file selection;
+  - one coherent package/Node/workflow/hook policy, currently expected to prove
+    the final dependency minimum and preferred Node 24 LTS baseline;
+  - clean installation plus actual Terraform hook positive, outer-negative,
+    nested-negative, and tooling-failure evidence in isolated Git state;
+  - every current advisory URL/dependency path and any structured, owned,
+    expiring residual-risk record;
+  - the npm Dependabot policy decision and exact resulting one- or two-entry
+    review-only configuration; and
+  - explicit replacement of T1/T2's intermediate Dependabot and
+    implementation-time path-set gates while preserving nonsuperseded behavior.
+  If repository policy required that issue to run before T1, confirm T1 and
+  this issue were rebaselined after its dependency, Node, hook, workflow,
+  Dependabot, and lockfile changes merged.
 
 ## Affected files
 
@@ -543,14 +559,6 @@ Immediately before finalization:
 4. Reset Revision to `0`.
 5. Update `Last Updated`.
 6. Add a matching top rationale changelog row.
-
-If the branch remains at `2.6.20260726.0` and implementation occurs on 2026-07-28 UTC, use:
-
-```text
-2.7.20260728.0
-```
-
-Otherwise recompute.
 
 The changelog must mention:
 

@@ -123,6 +123,38 @@ After implementation:
 - No artifact-writing `Set-Content` remains.
 - No newline is appended implicitly.
 
+#### Coordinate generator convergence with PSStyleGuide
+
+Treat generator unification as shared algorithms, invariants, and failure
+semantics rather than a requirement for line-for-line identity. Both
+repositories remain self-contained and independently implementable. Do not add
+a cross-repository runtime import, shared module/action, or hard release-order
+dependency in this issue.
+
+Use this convergence contract:
+
+| Generator area | Shared target | Intentional repository-specific difference |
+| --- | --- | --- |
+| Final serialization boundary | Normalize each complete final payload with ``-replace "`r`n?", "`n"`` immediately before encoding. Resolve the destination, use `UTF8Encoding($false)` and `WriteAllText`, and append no implicit newline. | Complete-payload variable names may differ. |
+| Common artifact functions | Preserve equivalent behavior and failure semantics for the Copilot, Chat, and Full artifact functions. | Guide-specific transformation logic inside the Full artifact function may differ. |
+| Instructions artifact | Use the same serialization primitive and frontmatter-construction principles. | Function name, output filename, `applyTo`, description, and guide content are Terraform- or PowerShell-specific. |
+| Frontmatter | Use an LF-joined array with explicitly reviewed spacing and final-LF behavior. | T1 already has the LF-joined representation; P1 migrates a here-string. |
+| Serialization abstraction | Keep all final write boundaries behaviorally equivalent. If a private serialization helper is introduced, coordinate the same contract in both issues. | Equivalent inline boundaries are acceptable; private helper names need not match. Do not create a one-repository-only abstraction silently. |
+| Script policy | Preserve `#Requires -Version 5.1` and the same `.NOTES` version-calculation policy. | Starting versions may differ. |
+| Repository text policy | Treat LF producer correctness and LF checkout policy as complementary controls. | T1 adds `.gitattributes`; PSStyleGuide already has it. |
+| Validation | Prove Desktop 5.1/Core 7 and LF/CRLF producer equivalence with raw-byte checks. | Artifact names and separately governed Node/package work remain repository-specific. |
+
+Immediately before implementation, inspect the merged/current PSStyleGuide
+generator, the current P1 issue, and any completed P1 evidence. If P1 has not
+landed, record this matrix in the T1 pull request as the handoff baseline for
+the P1 implementer. If P1 has landed, compare T1 against the implemented P1
+behavior rather than only its earlier draft.
+
+Classify every observed difference as repository-specific content, a
+deliberately accepted design difference, or a defect/follow-up. Silence does
+not make a difference intentional. Do not compare final guide bytes across the
+repositories because the guide content is intentionally different.
+
 ### 3. Add the repository-wide LF policy
 
 Create root `.gitattributes` containing exactly:
@@ -741,24 +773,145 @@ reported package names are:
 - `minimatch`
 - `picomatch`
 
+The current repository also selects Node 20 in
+`.github/workflows/markdownlint.yml`, installs
+`markdownlint-cli2@0.20.0`/`markdownlint@0.40.0`, has no project
+`engines.node`, and admits any available `npm` in `.husky/pre-commit`. The
+current `markdownlint-cli2@0.23.2` candidate and its
+`markdownlint@0.41.1` dependency both declare Node `>=22`; upstream explicitly
+removed Node 20 support in `markdownlint-cli2` 0.23.0, and Node 20 is
+end-of-life. These are dated planning facts. The remediation issue must requery
+the final package metadata, changelog, Node release status, lockfile, audit, and
+repository use sites rather than freezing these versions as its implementation
+oracle.
+
 This issue must not modify `.github/workflows/package.json`,
 `.github/workflows/package-lock.json`, the Node version, or lint behavior.
 Instead, file a real, separately reviewable npm-remediation issue and link it
-from this subsection before T1 closes. That issue owns:
+from this subsection before T1 closes.
 
-- dependency and lockfile changes;
-- an npm Dependabot entry for directory `/.github/workflows`, if selected after
-  repository-policy review;
-- documented disposition of every advisory reported by a fresh `npm audit`;
-- clean-install validation with `npm ci`; and
-- both the repository-root and `.github/workflows` Markdown-lint commands.
+##### Required linked-issue ownership
+
+The linked issue owns:
+
+- final dependency and lockfile selection after reviewing registry metadata,
+  changelogs, resolved versions, integrity values, and dependency paths;
+- one coherent Node policy derived from the final dependency tree;
+- a matching `engines.node` declaration;
+- the Markdown workflow's Node selection;
+- an early actual-version check and stable remediation message in
+  `.husky/pre-commit`, while preserving its GUI/version-manager guidance;
+- an npm Dependabot decision for directory `/.github/workflows`;
+- complete current advisory disposition;
+- clean-install, positive, negative, and real-hook integration evidence; and
+- explicit replacement of the intermediate T1/T2 gates that its final state
+  necessarily supersedes.
+
+The expected current policy is a final package minimum of Node 22 with Node 24
+as the preferred/default hosted LTS baseline. Validate both the selected
+minimum and Node 24. If final package metadata changes the minimum, update the
+policy and evidence coherently; do not claim support for an untested runtime
+merely because an open semver range admits it. `devEngines` may supplement
+`engines.node` only after the selected npm versions and cross-platform behavior
+are verified. It must not replace the hook check or CI evidence.
+
+At minimum, affected-file discovery must consider:
+
+- `.github/workflows/package.json`;
+- `.github/workflows/package-lock.json`;
+- `.github/workflows/markdownlint.yml`;
+- `.husky/pre-commit`;
+- `.github/dependabot.yml`; and
+- every test or fixture path required by the selected validation design.
+
+This is a candidate set, not permission to change every path and not an
+exhaustive final set. The linked issue must derive and validate its exact
+working/staged path set from the final design.
+
+##### Required executable evidence
+
+Use a disposable clone/worktree or equivalently isolated Git index so negative
+fixtures and hook execution cannot disturb the implementation index. Resolve
+every cleanup target inside the disposable root and remove only test-owned
+state.
+
+At the selected Node minimum and Node 24, require:
+
+1. `npm ci`.
+2. Repository-root outer Markdown lint.
+3. `.github/workflows` nested fenced-Markdown lint.
+4. The exact tracked `.husky/pre-commit` behavior for:
+   - no staged Markdown → success without lint execution;
+   - staged compliant Markdown → outer and nested success;
+   - a staged deterministic outer violation → rejection with the expected rule
+     and fixture path;
+   - a staged deterministic nested fenced-Markdown violation → rejection with
+     the expected nested rule, file, and depth/context; and
+   - absent/broken tooling or another deterministic startup failure → the
+     stable tooling diagnostic, never a false negative-test pass.
+5. At least one real Git/Husky-installed smoke invocation in the disposable
+   repository, or documented equivalent evidence that the exact installed
+   shell path was exercised.
+
+Generate invalid outer and nested fixtures ephemerally in the isolated
+repository and remove them in `finally`. Keep the tracked samples positive; do
+not refer to a nonexistent “existing negative fixture.” Capture every Git, npm,
+Node, hook, outer-lint, and nested-lint exit status immediately. Distinguish a
+lint result from an import, configuration, or startup failure.
+
+##### Required audit and residual-risk evidence
+
+Rerun `npm audit --package-lock-only --json` and capture every current
+moderate/high/critical advisory URL and affected dependency path. Treat the
+seven package nodes above only as a dated comparison baseline; one node may
+have multiple advisories or paths.
+
+Prefer a clean result. Any unavoidable residual must have one structured,
+durably recorded issue/PR entry containing:
+
+- exact advisory URL;
+- exact affected package/dependency path;
+- nonempty named owner;
+- invariant `YYYY-MM-DD` UTC expiration date;
+- real follow-up GitHub issue URL; and
+- concise rationale.
+
+Mechanically reject duplicate advisory/path records, blank fields, invalid or
+expired dates, non-issue follow-up values, current findings without approvals,
+approvals absent from the current audit, and approvals remaining after a clean
+audit. Derive the approved set from the structured records and require exact
+set equality. Clearly label any human review rather than claiming a script
+proved it. Do not use unreviewed `npm audit fix --force`.
+
+##### Dependabot final state and supersession
+
+If repository-policy review selects npm Dependabot, validate normalized exact
+final content containing precisely:
+
+1. weekly review-only `github-actions` updates for `/`; and
+2. weekly review-only npm updates for `/.github/workflows`.
+
+Reject duplicate or extra ecosystems/directories, malformed schedules, loss of
+the T1 entry, and auto-approval or auto-merge mechanisms in the changed scope.
+If policy rejects npm Dependabot, record the rationale and validate the retained
+one-entry state instead of claiming a two-entry state.
+
+The linked issue must say explicitly:
+
+- its final Dependabot assertion supersedes T1's implementation-time
+  exact-one-entry assertion if the npm entry is added;
+- its own exact affected-file gate supersedes T1's seven-file and T2's six-file
+  implementation-time working/staged-set gates; and
+- all nonsuperseded generator, helper/harness, permission, immutable action-pin,
+  artifact, workflow-security, and Markdown-behavior checks remain green.
 
 The default execution order is T1, T2, then the npm-remediation issue, because
 T1 and T2 intentionally preserve the nested toolchain. If repository policy
 prohibits proceeding while high-severity advisories are open, move the separate
 npm issue before T1 and rebaseline both T1 and T2 against its merged dependency
-and lockfile state before implementation. A comment, draft, or unlinked
-placeholder does not satisfy this tracking requirement.
+Node, hook, workflow, Dependabot, and lockfile state before implementation. A
+comment, draft, or unlinked placeholder does not satisfy this tracking
+requirement.
 
 #### Digest integrity
 
@@ -1426,6 +1579,28 @@ before the parent verifies that edition's generated outputs. The parent restores
 all four environment variables even on failure. CI remains responsible for
 mandatory coverage of both editions.
 
+### Verify the generator-convergence record
+
+In the T1 pull request, record:
+
+1. The current PSStyleGuide generator commit and P1 issue revision inspected,
+   or an explicit statement that P1 had not landed when T1 implementation
+   began.
+2. The implemented T1 behavior for every shared row in the generator
+   convergence matrix.
+3. Every observed difference, classified as repository-specific content,
+   deliberately accepted design, or a defect with a real follow-up.
+4. Whether both repositories use equivalent inline serialization boundaries or
+   equivalent private helpers.
+5. The local raw-byte and cross-edition evidence that proves T1's shared
+   serialization invariants without comparing repository-specific final guide
+   bytes.
+
+If T1 is the second implementation, resolve unexplained divergence before
+merge. If T1 is first, make this record the explicit handoff baseline for P1.
+This evidence does not make either repository a runtime or release dependency
+of the other.
+
 ### Verify working-tree scope, stage, renormalize, and verify the staged set
 
 ```powershell
@@ -1672,6 +1847,12 @@ Observe the first natural unrelated-file-only `main` push; do not create a synth
 - All four payloads normalize CRLF/lone CR to LF at serialization.
 - All writes use resolved paths, `UTF8Encoding($false)`, and `WriteAllText`.
 - The existing LF-joined frontmatter construction is unchanged.
+- The generator-convergence matrix records every shared algorithm/invariant and
+  intentional repository-specific difference without creating a
+  cross-repository runtime or hard release dependency.
+- The T1 pull request records the current PSStyleGuide/P1 baseline inspected,
+  classifies every observed generator difference, and supplies the reciprocal
+  handoff or second-implementation drift evidence.
 - `.gitattributes` contains exactly `* text=auto eol=lf`.
 - Renormalization produces no unexplained path.
 - Generator, helper, and harness versions are correctly recorded.
@@ -1681,9 +1862,15 @@ Observe the first natural unrelated-file-only `main` push; do not create a synth
   adjacent version comment.
 - Review-only weekly Dependabot GitHub Actions updates are configured without
   auto-merge.
-- A real, separately reviewable issue for the seven-node nested npm advisory
-  baseline is filed and linked before T1 closes; dependency or lockfile changes
-  remain outside T1.
+- A real, separately reviewable issue for the dated seven-node nested npm
+  advisory baseline is filed and linked before T1 closes; dependency, lockfile,
+  Node, hook, and lint-behavior changes remain outside T1.
+- The linked npm issue owns one coherent final package/Node/workflow/hook
+  policy; clean installation and actual-hook positive/negative/tooling-failure
+  evidence at the selected minimum and Node 24; complete current advisory/path
+  disposition; any structured, owned, expiring residual record; the npm
+  Dependabot policy decision and exact resulting configuration; and explicit
+  supersession of T1/T2's intermediate Dependabot and path-set gates.
 - Preparation declares `archive: true` and exposes one nonempty immutable ID/digest pair.
 - Production downloads use immutable IDs, `skip-decompress: true`, and `digest-mismatch: error`.
 - Pinned-source/configuration evidence establishes fatal native mismatch behavior without an infeasible live corruption drill.
@@ -1818,6 +2005,15 @@ Observe the first natural unrelated-file-only `main` push; do not create a synth
 - [GitHub Docs: Configure Dependabot version updates](https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/secure-your-dependencies/configure-version-updates)
 - [GitHub Docs: Dependabot-supported GitHub Actions references](https://docs.github.com/en/code-security/reference/supply-chain-security/supported-ecosystems-and-repositories#github-actions)
 - [npm Docs: `npm audit`](https://docs.npmjs.com/cli/v11/commands/npm-audit/)
+- [npm Docs: `package.json` `engines` and `devEngines`](https://docs.npmjs.com/cli/v11/configuring-npm/package-json#engines)
+- [Node.js release status](https://nodejs.org/en/about/previous-releases)
+- [`markdownlint-cli2` v0.23.2 package metadata](https://github.com/DavidAnson/markdownlint-cli2/blob/v0.23.2/package.json)
+- [`markdownlint` v0.41.1 package metadata](https://github.com/DavidAnson/markdownlint/blob/v0.41.1/package.json)
+- [`markdownlint-cli2` changelog](https://github.com/DavidAnson/markdownlint-cli2/blob/v0.23.2/CHANGELOG.md)
+- [`markdownlint-cli2` exit codes](https://github.com/DavidAnson/markdownlint-cli2/blob/v0.20.0/README.md#exit-codes)
+- [Git `githooks`](https://git-scm.com/docs/githooks)
+- [Husky Node version-manager and GUI guidance](https://typicode.github.io/husky/how-to.html#node-version-managers-and-guis)
+- [GitHub Dependabot options reference](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference)
 - [`checkout` v7.0.1 release](https://github.com/actions/checkout/releases/tag/v7.0.1)
 - [`checkout` v7.0.1 commit](https://github.com/actions/checkout/commit/3d3c42e5aac5ba805825da76410c181273ba90b1)
 - [`setup-node` v7.0.0 release](https://github.com/actions/setup-node/releases/tag/v7.0.0)
