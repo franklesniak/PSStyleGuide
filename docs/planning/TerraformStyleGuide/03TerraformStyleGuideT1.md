@@ -18,7 +18,7 @@ Make generation byte-deterministic and establish a safe, least-privileged synchr
 - Downloading by immutable artifact ID with the pinned action, `skip-decompress: true`, and `digest-mismatch: error`.
 - Using one shared, versioned PowerShell helper for candidate digest verification, archive validation, and extraction on Windows and Ubuntu.
 - Passing preparation's propagated upload digest to that helper, which independently compares it with the retained ZIP's SHA-256 before opening the archive.
-- Running the deterministic fixture self-test suite against that exact helper in every push consumer before each production invocation.
+- Running the deterministic fixture self-test suite against that exact helper in the Ubuntu pull-request job, all four Windows pull-request cells, all four Windows push cells, and the synchronization writer whenever `has_changes=true`.
 - Validating the ZIP manifest before creating an extraction directory.
 - Validating the exact candidate in an actual four-cell edition × fixture-EOL Windows matrix.
 - Approving the candidate only after the complete Windows matrix succeeds.
@@ -189,16 +189,26 @@ The script must:
   - A candidate download directory.
   - An initially nonexistent candidate destination directory.
   - The expected candidate archive digest.
+- Derive the trusted checkout root from the helper's own fixed tracked location at `.github/workflows/Expand-StyleGuideCandidateArtifact.ps1`; verify that location invariant and never accept the checkout boundary from the caller, current working directory, or mutable process state.
 - Resolve filesystem paths before using `.NET` static methods.
 - Work under Windows PowerShell 5.1 and PowerShell 7 on Windows and Ubuntu.
 - Load required compression assemblies explicitly under Windows PowerShell 5.1.
+
+For path comparisons:
+
+- Convert PowerShell paths to absolute filesystem-provider paths before passing them to `.NET`.
+- Use separator-aware descendant checks; a sibling prefix such as `TerraformStyleGuide-other` is not inside `TerraformStyleGuide`.
+- Use ordinal-ignore-case comparison on Windows and ordinal comparison on non-Windows.
+- Use `Directory.EnumerateFileSystemEntries` for every exact filesystem-entry assertion. Materialize each enumeration once before counting or inspecting it.
+- If PowerShell enumeration is used for supporting diagnostics, require `Get-ChildItem -LiteralPath ... -Force`; plain `Get-ChildItem` is prohibited for an exact-count decision.
 
 #### Download-directory contract
 
 The helper must require:
 
-- The download directory exists outside the tracked checkout.
-- It contains exactly one filesystem entry.
+- The download directory and its existing parent resolve outside the tracked checkout.
+- The download directory and existing parent are ordinary directories, not reparse points.
+- Exhaustive top-level enumeration contains exactly one filesystem entry, including hidden or system entries.
 - That entry is a regular, non-reparse-point file.
 - The file can be opened read-only as a ZIP archive.
 
@@ -245,17 +255,18 @@ Complete manifest validation before creating or writing the candidate directory.
 
 #### Destination-directory lifecycle
 
-The caller may create a protected temporary parent directory, but the candidate leaf must not exist.
+The caller may create a protected temporary parent directory outside the checkout, but that parent must be an ordinary non-reparse-point directory and the candidate leaf must have no filesystem entry.
 
 The helper must:
 
-1. Resolve the candidate leaf path without creating it.
-2. Assert that it is outside the checkout and does not exist.
-3. Validate the digest, the complete archive, and the manifest.
-4. Reconfirm that the leaf remains absent.
-5. Create the leaf exactly once.
-6. Never delete and recreate it.
-7. Refuse to reuse an existing leaf.
+1. Resolve the candidate leaf path from its resolved existing parent without creating it.
+2. Assert that the parent and leaf are outside the checkout.
+3. Enumerate the parent exhaustively and reject any entry with the candidate leaf name using the operating system's filesystem comparison, including an existing file, directory, symlink, reparse point, or dangling link.
+4. Validate the digest, the complete archive, and the manifest.
+5. Re-enumerate the parent and reconfirm that the leaf remains absent.
+6. Create the leaf exactly once.
+7. Never delete and recreate it.
+8. Refuse to reuse or follow an existing leaf.
 
 A digest or manifest failure must leave the candidate leaf nonexistent.
 
@@ -281,7 +292,7 @@ ZIP external attributes are not a rejection criterion. Safety comes from creatin
 
 After extraction:
 
-- Enumerate the candidate directory.
+- Enumerate the candidate directory exhaustively with `Directory.EnumerateFileSystemEntries`.
 - Require exactly the four expected root-level paths.
 - Require every path to be a regular, non-reparse-point file.
 - Reject every BOM and CR byte.
@@ -293,28 +304,29 @@ No workflow step may call an automatic ZIP extraction API for this candidate.
 
 #### Permanent helper self-test
 
-Every push consumer must create deterministic fixtures under a unique runner-temporary root and invoke the production helper against:
+The Ubuntu pull-request job, every Windows pull-request cell, every Windows push cell, and the synchronization writer whenever `has_changes=true` must create deterministic fixtures under a unique runner-temporary root and invoke the exact production helper. The suite must use stable case identifiers and this outcome contract:
 
-- one valid exact archive with its correct digest;
-- a valid exact archive with a deliberately altered, well-formed 64-hex expected digest;
-- missing entry;
-- extra entry;
-- exact duplicate;
-- case-only collision;
-- forward-slash nested path;
-- backslash nested path;
-- forward and backward traversal;
-- leading-slash and leading-backslash absolute names;
-- drive-qualified name;
-- directory entry;
-- file/directory collision;
-- empty central-directory name using a reviewed fixed raw fixture;
-- invalid or truncated ZIP;
-- an entry carrying symlink-like external attributes that must still extract as an ordinary regular file, constructed with `ZipArchiveEntry.ExternalAttributes` where practical or a reviewed raw fixture otherwise.
+| Fixture class | Expected result | Required phase and postcondition |
+| --- | --- | --- |
+| Exact valid archive with its correct digest | Success | Extract exactly the four expected ordinary, non-reparse-point files with expected bytes. |
+| Exact valid archive with one entry carrying symlink-like external attributes | Success | Extract exactly four ordinary, non-reparse-point files; restore no link, type, mode, timestamp, or other ZIP metadata. |
+| Valid exact archive with a deliberately altered, well-formed 64-hex expected digest | Reject | Fail before opening the ZIP and before candidate-leaf creation. |
+| Missing or extra archive entry | Reject | Fail after ZIP open but before candidate-leaf creation or entry extraction. |
+| Exact duplicate or case-only collision | Reject | Fail after ZIP open but before candidate-leaf creation or entry extraction. |
+| Forward- or backslash-nested path | Reject | Fail after ZIP open but before candidate-leaf creation or entry extraction. |
+| Forward or backward traversal | Reject | Fail after ZIP open but before candidate-leaf creation or entry extraction. |
+| Leading-slash, leading-backslash, or drive-qualified name | Reject | Fail after ZIP open but before candidate-leaf creation or entry extraction. |
+| Directory entry or file/directory collision | Reject | Fail after ZIP open but before candidate-leaf creation or entry extraction. |
+| Empty central-directory name using a reviewed fixed raw fixture | Reject | Fail after ZIP open but before candidate-leaf creation or entry extraction. |
+| Invalid or truncated ZIP | Reject | Fail during ZIP open/read before candidate-leaf creation. |
+| Hidden extra entry in the download directory | Reject | Fail before selecting or opening an archive. |
+| Existing candidate file or directory | Reject | Fail before ZIP extraction and never reuse the leaf. |
+| Candidate symlink/reparse point or dangling candidate link | Reject | Fail before ZIP extraction and never follow the leaf. |
+| Checkout-sibling prefix path | Success as an outside-checkout classification fixture | Prove the separator-aware check does not misclassify a sibling such as `<checkout>-other` as inside the checkout. |
 
 `ZipArchive.CreateEntry` may be used for constructible cases. Because it rejects an empty name at creation time, use a deterministic reviewed raw fixture for that case.
 
-For each invalid fixture:
+For each rejection fixture:
 
 - Require the helper to fail.
 - Require the destination directory to remain nonexistent.
@@ -322,13 +334,20 @@ For each invalid fixture:
 - Require the digest-mismatch fixture to fail before the archive is opened.
 - Include the case and offending entry in diagnostics when available.
 
-For the valid fixture:
+For each successful archive fixture:
 
 - Require successful extraction.
 - Require exactly the four expected root-level regular files.
-- Clean all fixture state in `finally`.
+- Require expected bytes, no BOM or CR, and no restored archive metadata.
 
-These are production contract self-tests exercising the exact tracked helper, not a bypass or alternate extraction implementation. Because the writer runs on Ubuntu and the matrix cells on Windows, the suite permanently exercises both operating-system families.
+For every fixture:
+
+- Compute the actual archive digest except for the deliberately altered expected-digest case.
+- Assert the expected success or rejection explicitly; an exception without the matching phase/postcondition assertion is not a complete oracle.
+- Clean all fixture state in `finally`.
+- Do not silently count an unavailable symlink/reparse fixture as passing. Fail the cell or emit an explicit, narrowly justified platform skip while ensuring the same case executes successfully on another required runner.
+
+These are production contract self-tests exercising the exact tracked helper, not a bypass or alternate extraction implementation. Pull-request Ubuntu verification, all four pull-request Windows cells, all four push Windows cells, and the writer whenever `has_changes=true` collectively exercise both operating-system families before merge and at use time.
 
 ### 7. Use least-privileged, immutable candidate transport
 
@@ -404,7 +423,7 @@ Two complementary protections apply:
    - It throws when the actual digest differs and behavior is `error`.
    - Successful controlled and post-merge logs show the expected artifact ID/digest and completed download.
    - A version-matched upstream negative test may be cited when available, but is not a repository acceptance blocker.
-2. **Independent protection.** Every push consumer passes preparation's propagated `artifact-digest` output to the shared helper, which independently compares the retained ZIP's SHA-256 with that value before opening the archive, per the helper's expected-digest contract. This protection is exercised by the propagated-digest rejection drill below and by the digest-mismatch self-test fixture.
+2. **Independent protection.** Every Windows push cell, and the writer whenever `has_changes=true`, passes preparation's propagated `artifact-digest` output to the shared helper, which independently compares the retained ZIP's SHA-256 with that value before opening the archive, per the helper's expected-digest contract. This protection is exercised by the propagated-digest rejection drill below and by the digest-mismatch self-test fixture.
 
 ### 8. Pull-request verification
 
@@ -416,6 +435,7 @@ The pull-request Ubuntu job must:
 - Use `ubuntu-latest`.
 - Use `contents: read`.
 - Check out the exact event SHA.
+- Run the permanent helper self-test against the exact tracked helper under `shell: pwsh`, assert Core major version 7 in that same process, and clean the runner-temporary fixture root in `finally`.
 - Run the generator with `pwsh`.
 - Compare all four artifacts logically and by raw blob identity with `HEAD`.
 - Upload exactly four diagnostic artifacts after success or ordinary failure, but not cancellation.
@@ -457,26 +477,36 @@ permissions:
 
 No Windows cell may stage, commit, or push.
 
-Use:
+Use these rules:
 
 - `shell: powershell` when `matrix.edition == 'desktop'`;
 - `shell: pwsh` when `matrix.edition == 'core'`;
 - `shell: pwsh` for edition-neutral fixture preparation and inspection.
 
+Implement helper execution as two mutually exclusive steps rather than a `pwsh` dispatcher:
+
+- The Desktop step uses `if: ${{ matrix.edition == 'desktop' }}` and `shell: powershell`.
+- The Core step uses `if: ${{ matrix.edition == 'core' }}` and `shell: pwsh`.
+- Each step asserts its required edition/version and invokes the self-test in that same process.
+- On push, that same edition-specific step invokes the production helper immediately after its self-test.
+- No edition-neutral `pwsh` step may dot-source, call, or launch `Expand-StyleGuideCandidateArtifact.ps1`.
+
 Each cell must:
 
 1. Check out the exact event SHA.
 2. Prove `HEAD` equals the expected SHA.
-3. Validate only its assigned edition:
-   - `desktop`: `PSEdition == 'Desktop'` and version exactly 5.1;
-   - `core`: `PSEdition == 'Core'` and major version 7.
-4. Prove the fresh checkout of `STYLE_GUIDE.md`, `STYLE_GUIDE_RATIONALE.md`, the generator, and the helper contains at least one LF and no CR.
-5. For push validation:
+3. Prove the fresh checkout of `STYLE_GUIDE.md`, `STYLE_GUIDE_RATIONALE.md`, the generator, and the helper contains at least one LF and no CR.
+4. For push validation:
    - depend on preparation;
    - download preparation's exact ID;
-   - run the permanent helper self-test;
-   - invoke the shared helper with the propagated digest to validate and safely extract the exact candidate before generation.
-6. Prepare only the assigned fixture:
+   - retain the downloaded archive outside the checkout with no automatic extraction.
+5. In the edition-specific helper step:
+   - validate only the assigned edition:
+     - `desktop`: `PSEdition == 'Desktop'` and version exactly 5.1;
+     - `core`: `PSEdition == 'Core'` and major version 7;
+   - run the permanent helper self-test on both events;
+   - on push, invoke the shared helper with the propagated digest to validate and safely extract the exact candidate before generation.
+6. Prepare only the assigned source fixture:
    - `lf`: retain and prove BOM-less LF with no CR;
    - `crlf`: convert `STYLE_GUIDE.md`, `STYLE_GUIDE_RATIONALE.md`, and the generator using `UTF8Encoding($false)`, `ReadAllText`, and `WriteAllText`, then prove at least one CRLF, no bare LF, no lone CR, and no BOM. Do not stage or restore fixtures between the CRLF setup and the cell's generator run.
 7. Run the generator once under the assigned edition.
@@ -576,8 +606,7 @@ Every push cell must:
 - Use the approved pinned download action.
 - Set `skip-decompress: true`.
 - Set `digest-mismatch: error`.
-- Run the permanent helper self-test.
-- Invoke the shared helper with the propagated digest.
+- Run the permanent helper self-test and invoke the shared helper with the propagated digest in the cell's explicit edition-specific step.
 - Validate the safely extracted candidate rather than an independently regenerated candidate.
 - Never stage, commit, or push.
 
@@ -615,12 +644,27 @@ The writer must:
 - Copy and stage only the four approved files.
 - Never fetch, merge, rebase, amend, or retry.
 
-Before copying, use `git ls-remote --exit-code --refs origin "$GITHUB_REF"` and require:
+Configure the writer with:
 
-- `GITHUB_REF` begins with `refs/heads/`.
-- Exactly one result exists.
-- Its ref equals `GITHUB_REF`.
-- Its SHA equals `GITHUB_SHA`.
+```yaml
+env:
+  TARGET_REF: ${{ github.ref }}
+  EXPECTED_SHA: ${{ github.sha }}
+```
+
+Keep target validation, remote preflight, copying, staging, commit creation, and push in one complete PowerShell `run:` block. Before copying:
+
+1. Copy `$env:TARGET_REF` to `$strTargetRef` and `$env:EXPECTED_SHA` to `$strExpectedSha`.
+2. Require both local values to be nonempty.
+3. Require `$strTargetRef` to begin with `refs/heads/`.
+4. Require `$strTargetRef` to equal `$env:GITHUB_REF` using ordinal comparison.
+5. Require `$strExpectedSha` to equal `$env:GITHUB_SHA` using ordinal, case-insensitive comparison.
+6. Resolve the checked-out commit with `git rev-parse --verify "HEAD^{commit}"`, capture `$LASTEXITCODE` immediately, require exactly one complete hexadecimal object ID, and require it to equal `$strExpectedSha`. This establishes the repository's native full object-ID length without accepting an abbreviation or hard-coding one hash algorithm.
+7. Run `git ls-remote --exit-code --refs origin $strTargetRef`, capture `$LASTEXITCODE` immediately, and require zero.
+8. Parse exactly one `<object-id><TAB><ref>` line.
+9. Require the returned ref to equal `$strTargetRef` and the returned object ID to equal `$strExpectedSha`.
+
+Use `$strTargetRef` and `$strExpectedSha` unchanged for the later lease and destination refspec. Do not re-read another ref source.
 
 For each artifact:
 
@@ -644,19 +688,13 @@ Then:
 9. Resolve every committed blob with `git rev-parse --verify "HEAD:<path>"`.
 10. Require every committed blob to equal the candidate blob.
 
-Push using:
-
-```yaml
-env:
-  TARGET_REF: ${{ github.ref }}
-  EXPECTED_SHA: ${{ github.sha }}
-```
+Push in that same PowerShell block using:
 
 ```powershell
 & git push `
-    "--force-with-lease=$($env:TARGET_REF):$($env:EXPECTED_SHA)" `
+    "--force-with-lease=$($strTargetRef):$($strExpectedSha)" `
     origin `
-    "HEAD:$($env:TARGET_REF)"
+    "HEAD:$($strTargetRef)"
 $intGitExitCode = $LASTEXITCODE
 
 if ($intGitExitCode -ne 0) {
@@ -978,16 +1016,18 @@ Use `git check-attr text eol` on representative text files and require `text: au
 Confirm:
 
 1. Every pull request targeting `main` runs.
-2. Ubuntu verification is read-only.
+2. Ubuntu verification is read-only and runs the exact helper self-test under PowerShell 7.
 3. The Windows matrix displays and completes four distinct edition/EOL cells.
-4. The two LF cells run lone-CR sanitation under their assigned editions.
-5. Diagnostic upload runs after ordinary failure but not cancellation.
-6. Diagnostic names contain run ID and attempt.
-7. No pull-request job has write permission.
-8. Push-only jobs skip.
-9. All artifact actions use approved SHAs.
-10. Every download is by ID with both integrity inputs.
-11. Static review confirms no event path filters and no prohibited push form.
+4. Every Windows cell runs the exact helper self-test in the same process as its assigned edition assertion: Desktop 5.1 under `powershell`, Core 7 under `pwsh`.
+5. No edition-neutral fixture step invokes the helper.
+6. The two LF cells run lone-CR sanitation under their assigned editions.
+7. Diagnostic upload runs after ordinary failure but not cancellation.
+8. Diagnostic names contain run ID and attempt.
+9. No pull-request job has write permission.
+10. Push-only jobs skip.
+11. All artifact actions use approved SHAs.
+12. Every production download is by ID with both integrity inputs.
+13. Static review confirms no event path filters and no prohibited push form.
 
 ### Controlled temporary-branch evidence
 
@@ -1002,7 +1042,7 @@ Use a uniquely named temporary branch. Temporarily add only that exact branch to
 7. Confirm the writer runs the self-test and invokes the same helper.
 8. Confirm candidate, destination, index, and commit blob identity.
 9. Confirm the synchronization commit's parent is the triggering SHA.
-10. Confirm the exact full-ref refspec and exact expected-SHA lease.
+10. Confirm `TARGET_REF` equals `GITHUB_REF`, the same validated local target ref is used for preflight, lease, and refspec, and the exact expected-SHA lease is applied.
 11. Confirm only four artifacts are committed.
 12. Confirm no recursive workflow run.
 
@@ -1042,12 +1082,14 @@ After merge:
 
 1. The `main` push starts the pipeline.
 2. Preparation uploads one immutable candidate.
-3. All four Windows cells validate it through the self-test and the shared helper.
+3. All four Windows cells validate it through the self-test and the shared helper under their assigned editions.
 4. Preparation reports `has_changes=false`.
 5. Approval succeeds.
 6. Writer skips.
 7. No bot commit is created.
 8. Both events retain only the `main` branch filter and no path filters.
+
+This no-drift run proves the four read-only Windows consumers and the expected writer skip. The writer's helper integration and `has_changes=true` path are proved by the controlled temporary-branch synchronization drill and static inspection; none of the skipped writer's steps are described as having executed here.
 
 Observe the first natural unrelated-file-only `main` push; do not create a synthetic `main` commit solely for observation.
 
@@ -1067,13 +1109,20 @@ Observe the first natural unrelated-file-only `main` push; do not create a synth
 - Pinned-source/configuration evidence establishes fatal native mismatch behavior without an infeasible live corruption drill.
 - The shared helper is the only candidate extraction implementation.
 - The helper independently compares the retained ZIP's SHA-256 with the propagated upload digest before opening the archive.
+- The helper derives and verifies the trusted checkout root from its fixed tracked location rather than caller input, the working directory, or `GITHUB_WORKSPACE`.
+- Separator-aware, OS-appropriate path comparison rejects the checkout while accepting a checkout-sibling prefix as outside.
+- Every exact filesystem-entry assertion uses exhaustive enumeration that includes hidden/system entries.
+- Existing files, directories, symlinks, reparse points, and dangling links at the candidate leaf are rejected before extraction.
 - The candidate leaf is absent until digest and manifest validation succeed, and failures leave it absent.
 - Only the four exact entries are accepted.
 - Archive metadata is ignored.
 - Extracted results are exactly four regular, non-reparse-point files.
-- Every push consumer runs the deterministic fixture suite against the exact tracked helper on every run, on both operating-system families.
-- Every invalid fixture fails before candidate-directory creation or extraction, and the digest-mismatch fixture fails before the archive is opened.
-- Duplicate, case-colliding, nested, traversal, absolute, drive-qualified, directory, empty-name, missing, extra, file/directory-collision, invalid-ZIP, digest-mismatch, and metadata-ignored cases are covered.
+- Ubuntu pull-request verification and every pull-request Windows cell run the deterministic fixture suite against the exact tracked helper before merge.
+- Every Windows push cell runs the suite and production helper on every push; the synchronization job runs them whenever `has_changes=true` and is skipped when `has_changes=false`.
+- Helper invocations and their edition/version assertions occur in the same explicit-shell process; edition-neutral steps never invoke the helper.
+- Every rejection fixture satisfies its specified failure phase and leaves the candidate leaf absent; the digest-mismatch fixture fails before the archive is opened.
+- Both successful archive fixtures extract exactly four ordinary files; the external-attributes case proves archive metadata is ignored rather than restored.
+- Duplicate, case-colliding, nested, traversal, absolute, drive-qualified, directory, empty-name, missing, extra, file/directory-collision, hidden-extra-download-entry, existing/dangling-leaf, invalid-ZIP, digest-mismatch, and metadata-ignored cases are covered.
 - An end-to-end malformed raw ZIP is rejected before extraction.
 - The Windows topology is an actual four-cell edition × EOL matrix with `fail-fast: false`.
 - Each cell runs only its assigned edition and EOL.
@@ -1082,7 +1131,7 @@ Observe the first natural unrelated-file-only `main` push; do not create a synth
 - The writer downloads only the approved candidate.
 - Candidate, destination, index, and commit blobs match.
 - The synchronization commit is a single child of `github.sha`.
-- The final push uses `HEAD:<full-ref>` and an exact expected-SHA lease.
+- The writer validates one canonical `TARGET_REF` against `GITHUB_REF`, proves `EXPECTED_SHA` is the checkout's complete repository-native commit object ID, uses both values unchanged for remote preflight and `HEAD:<full-ref>`, and applies the exact expected-SHA lease.
 - No prohibited force or retry behavior exists.
 - Local validation verifies each available edition immediately after that edition runs, and CI supplies mandatory coverage for both editions.
 - Before staging, the complete changed-path set is exactly the four implementation files.
@@ -1098,11 +1147,16 @@ Observe the first natural unrelated-file-only `main` push; do not create a synth
 - [PowerShell character encoding](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_character_encoding)
 - [Microsoft Learn: `about_Operator_Precedence`](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_operator_precedence)
 - [Microsoft Learn: `about_Preference_Variables`](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_preference_variables)
+- [Microsoft Learn: `about_Environment_Variables`](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_environment_variables)
 - [Microsoft Learn: `about_Comment_Based_Help`](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_comment_based_help)
 - [Microsoft Learn: `Get-FileHash`](https://learn.microsoft.com/powershell/module/microsoft.powershell.utility/get-filehash)
+- [Microsoft Learn: `Get-ChildItem`](https://learn.microsoft.com/powershell/module/microsoft.powershell.management/get-childitem)
 - [`.NET UTF8Encoding`](https://learn.microsoft.com/dotnet/api/system.text.utf8encoding.-ctor)
 - [`File.WriteAllText`](https://learn.microsoft.com/dotnet/api/system.io.file.writealltext)
 - [`File.ReadAllBytes`](https://learn.microsoft.com/dotnet/api/system.io.file.readallbytes)
+- [`Directory.EnumerateFileSystemEntries`](https://learn.microsoft.com/dotnet/api/system.io.directory.enumeratefilesystementries)
+- [`.NET FileAttributes`](https://learn.microsoft.com/dotnet/api/system.io.fileattributes)
+- [`Path.GetFullPath`](https://learn.microsoft.com/dotnet/api/system.io.path.getfullpath)
 - [`FileMode`](https://learn.microsoft.com/dotnet/api/system.io.filemode)
 - [`ZipArchive.Entries`](https://learn.microsoft.com/dotnet/api/system.io.compression.ziparchive.entries)
 - [`ZipArchive.CreateEntry`](https://learn.microsoft.com/dotnet/api/system.io.compression.ziparchive.createentry)
@@ -1117,6 +1171,8 @@ Observe the first natural unrelated-file-only `main` push; do not create a synth
 - [Git `ls-remote`](https://git-scm.com/docs/git-ls-remote)
 - [Git push and exact leases](https://git-scm.com/docs/git-push)
 - [GitHub Actions workflow syntax](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax)
+- [GitHub Actions variables](https://docs.github.com/en/actions/reference/workflows-and-actions/variables)
+- [GitHub Actions job conditions](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-jobs-with-conditions)
 - [GitHub Actions `needs`](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idneeds)
 - [GitHub Docs: Evaluate expressions in workflows and actions](https://docs.github.com/en/actions/reference/workflows-and-actions/expressions)
 - [GitHub secure-use reference](https://docs.github.com/en/actions/reference/security/secure-use)

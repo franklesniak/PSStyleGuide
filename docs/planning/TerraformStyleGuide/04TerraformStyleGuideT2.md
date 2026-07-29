@@ -41,7 +41,9 @@ At implementation start, confirm the prerequisite issue established:
 - Immutable candidate ID/digest propagation from a read-only preparation job that declares `archive: true`.
 - Download by ID with `skip-decompress: true` and fatal native digest handling.
 - The shared helper as the only candidate extraction implementation, independently comparing the retained ZIP's SHA-256 with the propagated upload digest before opening the archive, and validating the full manifest before creating the candidate directory.
-- The deterministic fixture self-test suite, including the digest-mismatch fixture, running against that exact helper in every push consumer on every run.
+- The deterministic fixture self-test suite, including the digest-mismatch fixture, running against that exact helper in the Ubuntu pull-request verification job and in all four Windows pull-request cells before merge.
+- The same exact helper self-test running in all four Windows push cells on every push run, and in the synchronization writer whenever that conditional writer executes.
+- Each Windows helper invocation bound to the cell's assigned edition by a mutually exclusive step whose explicit shell is `powershell` for Desktop 5.1 or `pwsh` for Core 7, with the edition asserted in the same process immediately before the suite.
 - A Windows topology that is an actual four-cell edition × fixture-EOL cross-product, with the two LF cells supplying lone-CR sanitation coverage.
 - Read-only approval after the complete matrix.
 - A sole exact-lease writer.
@@ -102,9 +104,10 @@ For AWS, Azure, and GCS:
 - Require a protected parent directory outside every version-controlled working tree and outside shared world-readable temporary locations.
 - Require a fresh path for every recovery.
 - Set `umask 077` in a subshell.
-- Refuse to run if the destination exists.
+- Refuse to run if the final destination is any existing filesystem entry or a symbolic link, including a dangling symbolic link, by checking `[ -e "$RECOVERY_PATH" ] || [ -L "$RECOVERY_PATH" ]`.
 - Keep the `${RECOVERY_PATH:?...}` guard directly in the provider command.
 - Explain that parameter expansion validates presence, while the surrounding checks validate absolute syntax and nonexistence.
+- Explain that POSIX `test -e` follows symbolic links and can be false for a dangling final link, while `test -L` recognizes the link itself; both tests are therefore required.
 - Explain that "outside version control" remains a deliberate operator decision; the example does not attempt to discover every enclosing repository or resolve every symlink topology.
 - Explain that the AWS preflight is not an atomic filesystem lock. The protected parent and lack of competing writers are part of the model.
 - Use provider-native no-overwrite controls where available.
@@ -156,8 +159,8 @@ Use:
       ;;
   esac
 
-  if [ -e "$RECOVERY_PATH" ]; then
-    printf 'Refusing to overwrite existing recovery destination: %s\n' \
+  if [ -e "$RECOVERY_PATH" ] || [ -L "$RECOVERY_PATH" ]; then
+    printf 'Refusing to overwrite or follow an existing recovery destination: %s\n' \
       "$RECOVERY_PATH" >&2
     exit 1
   fi
@@ -244,8 +247,8 @@ Use:
       ;;
   esac
 
-  if [ -e "$RECOVERY_PATH" ]; then
-    printf 'Refusing to overwrite existing recovery destination: %s\n' \
+  if [ -e "$RECOVERY_PATH" ] || [ -L "$RECOVERY_PATH" ]; then
+    printf 'Refusing to overwrite or follow an existing recovery destination: %s\n' \
       "$RECOVERY_PATH" >&2
     exit 1
   fi
@@ -306,8 +309,8 @@ Use:
       ;;
   esac
 
-  if [ -e "$RECOVERY_PATH" ]; then
-    printf 'Refusing to overwrite existing recovery destination: %s\n' \
+  if [ -e "$RECOVERY_PATH" ] || [ -L "$RECOVERY_PATH" ]; then
+    printf 'Refusing to overwrite or follow an existing recovery destination: %s\n' \
       "$RECOVERY_PATH" >&2
     exit 1
   fi
@@ -331,6 +334,7 @@ Direct operators to the workspace's `States` tab.
 
 For the API:
 
+- Require Bash and curl.
 - Use `GET /state-versions`.
 - Require the organization and workspace-name filters.
 - Filter `status=finalized`.
@@ -351,7 +355,13 @@ Use:
 (
   umask 077
 
-  case "${TFC_RESPONSE_PATH:?Set TFC_RESPONSE_PATH to a new absolute path in a protected directory for this response page.}" in
+  TFC_RESPONSE_PATH=${TFC_RESPONSE_PATH:?Set TFC_RESPONSE_PATH to a new absolute path in a protected directory for this response page.}
+  TFC_TOKEN=${TFC_TOKEN:?Set TFC_TOKEN to an HCP Terraform API token that can read state versions.}
+  TFC_WORKSPACE_NAME=${TFC_WORKSPACE_NAME:?Set TFC_WORKSPACE_NAME to the exact HCP Terraform workspace name.}
+  TFC_ORGANIZATION_NAME=${TFC_ORGANIZATION_NAME:?Set TFC_ORGANIZATION_NAME to the exact HCP Terraform organization name.}
+  TFC_PAGE_NUMBER=${TFC_PAGE_NUMBER:-1}
+
+  case "$TFC_RESPONSE_PATH" in
     /*)
       ;;
     *)
@@ -360,11 +370,19 @@ Use:
       ;;
   esac
 
-  if [ -e "$TFC_RESPONSE_PATH" ]; then
-    printf 'Refusing to overwrite existing HCP response file: %s\n' \
+  if [ -e "$TFC_RESPONSE_PATH" ] || [ -L "$TFC_RESPONSE_PATH" ]; then
+    printf 'Refusing to overwrite or follow an existing HCP response file: %s\n' \
       "$TFC_RESPONSE_PATH" >&2
     exit 1
   fi
+
+  set -C
+  exec 3> "$TFC_RESPONSE_PATH" || {
+    printf 'Unable to create new HCP response file without overwriting: %s\n' \
+      "$TFC_RESPONSE_PATH" >&2
+    exit 1
+  }
+  set +C
 
   curl -q \
     --config - \
@@ -372,25 +390,40 @@ Use:
     --silent \
     --show-error \
     --get \
-    --data-urlencode "filter%5Bworkspace%5D%5Bname%5D=${TFC_WORKSPACE_NAME:?Set TFC_WORKSPACE_NAME to the exact HCP Terraform workspace name.}" \
-    --data-urlencode "filter%5Borganization%5D%5Bname%5D=${TFC_ORGANIZATION_NAME:?Set TFC_ORGANIZATION_NAME to the exact HCP Terraform organization name.}" \
+    --data-urlencode "filter%5Bworkspace%5D%5Bname%5D=$TFC_WORKSPACE_NAME" \
+    --data-urlencode "filter%5Borganization%5D%5Bname%5D=$TFC_ORGANIZATION_NAME" \
     --data-urlencode "filter%5Bstatus%5D=finalized" \
-    --data-urlencode "page%5Bnumber%5D=${TFC_PAGE_NUMBER:-1}" \
+    --data-urlencode "page%5Bnumber%5D=$TFC_PAGE_NUMBER" \
     --data-urlencode "page%5Bsize%5D=100" \
-    --output "${TFC_RESPONSE_PATH:?Set TFC_RESPONSE_PATH to a new absolute path in a protected directory for this response page.}" \
-    https://app.terraform.io/api/v2/state-versions <<EOF
-header = "Authorization: Bearer ${TFC_TOKEN:?Set TFC_TOKEN to an HCP Terraform API token that can read state versions.}"
+    https://app.terraform.io/api/v2/state-versions \
+    >&3 <<EOF
+header = "Authorization: Bearer $TFC_TOKEN"
 header = "Content-Type: application/vnd.api+json"
 EOF
+
+  curl_exit_code=$?
+  exec 3>&-
+
+  if [ "$curl_exit_code" -ne 0 ]; then
+    printf 'curl failed with exit code %s; the protected response file may be empty or partial and must not be treated as valid: %s\n' \
+      "$curl_exit_code" "$TFC_RESPONSE_PATH" >&2
+    exit "$curl_exit_code"
+  fi
 )
 ```
 
 Explain:
 
+- All required values are validated before the response file is created, so an unset input does not leave a misleading empty file.
+- The `[ -e "$TFC_RESPONSE_PATH" ] || [ -L "$TFC_RESPONSE_PATH" ]` preflight rejects every existing entry and a dangling final symbolic link.
+- `set -C` enables Bash's `noclobber` option, and `exec 3> "$TFC_RESPONSE_PATH"` opens the exact requested path before any network request. If that exclusive create fails, curl does not run.
+- `umask 077` restricts permissions on the newly created response file.
 - `-q` is the first option and disables automatic reading of the user's default curl configuration.
 - `--config -` reads sensitive header configuration from standard input.
 - The token therefore does not appear in curl's ordinary argument list.
 - An unquoted here-document is intentional so the guarded token expands.
+- Curl writes its response to already-open file descriptor 3 while standard input remains available to `--config -`.
+- The example captures curl's exit status immediately and closes file descriptor 3 before evaluating that status.
 - `--fail` makes HTTP 400-and-later responses fail.
 - `--silent --show-error` removes progress while retaining errors.
 - `--get` moves encoded data into the query string.
@@ -399,6 +432,9 @@ Explain:
 - `finalized` excludes pending and discarded uploads.
 - `TFC_PAGE_NUMBER` defaults to 1.
 - Page size 100 is the documented maximum.
+- Curl's `--no-clobber` output behavior is not used: curl can choose a numbered alternative filename rather than failing on the exact requested path, which would violate this contract.
+- If curl fails after the exact path is created, the empty or partial protected file is deliberately retained, is not valid response data, and must be handled according to organizational retention and secure-deletion policy; retry with a fresh path.
+- Exact-path no-clobber protection assumes a protected parent directory with no competing writer able to remove or replace entries during the operation.
 - The operator must inspect the protected response using a trusted local JSON viewer.
 - The operator must continue with fresh response paths until `meta.pagination.next-page` is `null`.
 - Every page file contains sensitive hosted URLs and must remain outside Git, logs, tickets, chat, and unprotected artifacts.
@@ -605,7 +641,7 @@ Confirm:
 
 - Exact-object filters.
 - Quoted, guarded identifiers.
-- Absolute-path and nonexistence checks.
+- Absolute-path checks plus `[ -e ] || [ -L ]` rejection of every existing destination and every dangling final symbolic link.
 - `umask 077` in every recovery block.
 - Azure `--overwrite false`.
 - GCS `--no-clobber`.
@@ -616,7 +652,7 @@ Confirm:
 - Azure HNS exclusion.
 - GCS Object Versioning scope and soft-delete distinction.
 - HCP token absent from command arguments.
-- HCP raw output written to a fresh protected file.
+- HCP raw output written through a pre-opened exact-path no-clobber descriptor to a fresh protected file, with explicit empty/partial-file handling on curl failure.
 - Pagination continues until `next-page` is `null`.
 - Generated artifacts match sources.
 
@@ -639,14 +675,12 @@ Confirm:
 1. Read-only preparation runs.
 2. One immutable candidate is uploaded with nonempty ID/digest.
 3. Every Windows push cell downloads the same ID.
-4. Every push consumer runs the deterministic helper self-test and invokes the shared archive helper with the propagated digest.
+4. Every Windows push cell reports `success`, runs the deterministic helper self-test, and invokes the shared archive helper with the propagated digest.
 5. Native digest-mismatch behavior is `error`, and the helper's independent digest comparison passes.
 6. Approval succeeds after the complete matrix.
 7. Preparation reports `has_changes=false`.
-8. The writer skips.
+8. The conditional writer reports `skipped`; none of its steps, including its helper self-test or helper invocation, executes on this no-drift run. Its integration remains evidenced by the prerequisite issue's controlled `has_changes=true` write-path run and static inspection.
 9. No bot synchronization commit is created.
-
-The synchronization consumer's helper integration is established by the prerequisite issue's controlled write-path evidence and static inspection; this issue's no-drift push does not execute the writer.
 
 If preparation reports changes, investigate source/artifact synchronization. Do not accept a recovery commit as this issue's expected outcome.
 
@@ -655,7 +689,7 @@ If preparation reports changes, investigate source/artifact synchronization. Do 
 - Discovery and recovery are separate.
 - Every provider requires deliberate version selection.
 - Every selected identifier is quoted and guarded.
-- Every recovery destination is nonempty, absolute, protected, new, and no-clobber.
+- Every recovery destination is nonempty, absolute, protected, new, and no-clobber; every final symbolic link, including a dangling link, is rejected.
 - Every recovery block uses `umask 077`.
 - Azure explicitly disables overwrite.
 - GCS explicitly uses no-clobber.
@@ -669,7 +703,9 @@ If preparation reports changes, investigate source/artifact synchronization. Do 
 - HCP filters exact organization/workspace and `finalized`.
 - HCP handles HTTP failures and manual pagination.
 - HCP token data is supplied through `--config -`, not an expanded argument.
-- HCP responses are written to fresh protected files.
+- HCP responses are written through a pre-opened Bash `noclobber` descriptor to the exact requested fresh protected path.
+- HCP does not silently select an alternate output filename when the requested path is occupied.
+- HCP curl failures retain an explicitly invalid empty or partial protected file and direct the operator to use a fresh path.
 - Archivist URLs and recovered state are identified as secrets.
 - No automatic selection, rollback, or `jq` loop is introduced.
 - Version/date/changelog metadata agree.
@@ -703,11 +739,14 @@ If preparation reports changes, investigate source/artifact synchronization. Do 
 ## References
 
 - [POSIX parameter expansion](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_06_02)
+- [POSIX `test`](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/test.html)
 - [GNU Bash redirections](https://www.gnu.org/software/bash/manual/html_node/Redirections.html)
+- [GNU Bash `set` and `noclobber`](https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html)
 - [GNU Bash parameter expansion](https://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html)
 - [Curl FAQ: protecting credentials](https://curl.se/docs/faq.html)
 - [Curl known risks](https://curl.se/docs/knownrisks.html)
 - [Curl manual](https://curl.se/docs/manpage.html)
+- [curl CVE-2022-27778: `--no-clobber` uses numbered alternative filenames](https://curl.se/docs/CVE-2022-27778.html)
 - [AWS CLI `list-object-versions`](https://docs.aws.amazon.com/cli/latest/reference/s3api/list-object-versions.html)
 - [AWS `ListObjectVersions`](https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectVersions.html)
 - [AWS required permissions](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-with-s3-policy-actions.html)
@@ -731,5 +770,7 @@ If preparation reports changes, investigate source/artifact synchronization. Do 
 - [HCP Terraform API authentication and pagination](https://developer.hashicorp.com/terraform/cloud-docs/api-docs)
 - [HCP Terraform workspace state](https://developer.hashicorp.com/terraform/cloud-docs/workspaces/state)
 - [Terraform sensitive data](https://developer.hashicorp.com/terraform/language/manage-sensitive-data)
+- [GitHub Actions job conditions](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-jobs-with-conditions)
+- [GitHub Actions `needs` context](https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#needs-context)
 - [copilot-repo-template#851](https://github.com/franklesniak/copilot-repo-template/issues/851)
 - [copilot-repo-template#852](https://github.com/franklesniak/copilot-repo-template/pull/852)
