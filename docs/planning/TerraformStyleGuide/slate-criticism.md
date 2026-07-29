@@ -17,12 +17,18 @@ the earlier drafts are resolved:
   Core major 7 instead of trusting executable names.
 - T1's rejection postconditions now distinguish initially absent,
   pre-existing, helper-created, and unsafe destination states.
+- T1 now defines a concrete generator-convergence matrix and an
+  implementation-time first/second-mover evidence record.
+- T1 now gives the future npm-remediation issue a substantially stronger
+  package/Node/hook/audit/Dependabot ownership contract, and T2 reflects it.
 - T2 states the S3 Versioning prerequisite precisely, including pre-enable
   `null` versions, suspended buckets, retention, and owner/administrator
   evidence.
 - T2 makes `set +x` the first command in the HCP subshell and requires a
   synthetic inherited-xtrace test.
 - T2 lists the complete seven-file T1 implementation boundary.
+- T2 now derives its guide version at implementation time instead of carrying
+  the stale `2.7.20260728.0` example.
 
 Do not regress those corrections.
 
@@ -32,12 +38,13 @@ root creation underspecified, promises stable harness IDs without assigning
 them, never gives its production cleanup function the exact name its harness
 must call, validates action pins by shape instead of by approved tuple, and
 normalizes writer inputs less rigorously than P1. Its cross-repository text also
-predates P1's separate generator and helper convergence matrices. The proposed
-slate is incomplete until the npm-remediation issue required by both T1 and T2
-exists as a real, Terraform-specific T3. T2 still needs a closed HCP host
-contract, positive page and safe curl-config value validation, explicit scope
-language, executable non-network tests for all four shell examples, and an
-exact Node 24 boundary around its local npm validation.
+now covers generator convergence but leaves the helper contract hypothetical.
+The proposed slate is incomplete until the npm-remediation issue required by
+both T1 and T2 exists as a real, Terraform-specific T3; detailed requirements
+embedded in T1 are not a substitute for the issue itself. T2 still needs a
+closed HCP host contract, positive page and safe curl-config value validation,
+explicit scope language, executable non-network tests for all four shell
+examples, and an exact merged-runtime boundary around its local npm validation.
 
 The preferred order remains T1, T2, then T3, provided T1 takes ownership of
 installing Node 24 while leaving package, lockfile, hook-floor, and advisory
@@ -54,7 +61,8 @@ This review compared:
   [PowerShell P2](../PSStyleGuide/02PSStyleGuideP2.md), and
   [PowerShell P3](../PSStyleGuide/03PSStyleGuideP3.md);
 - the proposed [Terraform T1](./03TerraformStyleGuideT1.md) and
-  [Terraform T2](./04TerraformStyleGuideT2.md);
+  [Terraform T2](./04TerraformStyleGuideT2.md), synchronized in this planning
+  repository at `a1970768eb27fd8c71800253f38af9b69185a33f`;
 - TerraformStyleGuide `main` at
   [`6ee3f57b2b71b885a5927b770dde47532944de62`](https://github.com/franklesniak/TerraformStyleGuide/commit/6ee3f57b2b71b885a5927b770dde47532944de62);
 - the live generator, workflows, source documents, generated documents,
@@ -109,10 +117,18 @@ safe baseline: the
 [Node release table](https://nodejs.org/en/about/previous-releases) marks Node
 20 end-of-life and Node 24 LTS.
 
-P1 already resolves the ownership boundary cleanly. T1 should own the workflow
-runtime selection because it already modifies `markdownlint.yml`; T3 should own
-the package manifest, lockfile, and advisory remediation. Updating the
-installed major does not authorize an incidental dependency upgrade.
+P1 resolves the ownership boundary cleanly by establishing Node 24 before its
+later package remediation. T1's new linked-issue contract instead assigns the
+Markdown workflow's Node selection to T3 while retaining the default order T1,
+T2, T3. Those two decisions are incompatible now that Node 20 is already EOL:
+the default order would knowingly implement and validate two issues on the
+retired runtime.
+
+The smallest default-order correction is for T1 to own only the workflow
+runtime selection because it already modifies `markdownlint.yml`; T3 can still
+own the package manifest, lockfile, hook floor, and advisory remediation.
+Updating the installed major does not authorize an incidental dependency
+upgrade.
 
 T1 should require:
 
@@ -128,13 +144,15 @@ Keep the four current action selections unless the implementation-time check
 finds a newer required release. Remove only the Node-preservation language, not
 the package/lockfile and lint-rule boundaries.
 
-If T1 will not own Node 24, then T3 must include `markdownlint.yml`, run before
-T1, and force T1/T2 to be rebaselined. Leaving Node 20 until an unspecified
-later issue is not acceptable.
+If T1 will not own Node 24, then the now-specified T3 must be drafted, include
+`markdownlint.yml`, run before T1, and force T1/T2 to be rebaselined. Leaving
+Node 20 until an unfiled issue runs after T2 is not acceptable.
 
-**Required revision:** Make Node 24 and disabled automatic package-manager
-caching part of T1's workflow, validation, acceptance, and T2 prerequisite
-contracts while keeping dependency changes in T3.
+**Required revision:** Either make Node 24 and disabled automatic
+package-manager caching part of T1's workflow, validation, acceptance, and T2
+prerequisite contracts while keeping dependency changes in T3, or file and
+execute T3 first and rebaseline T1/T2. Do not retain both T3 ownership and the
+T1 → T2 → T3 default order.
 
 ### T1-2: The caller-owned trusted-root factory is still undefined
 
@@ -320,26 +338,20 @@ freshness.
 repository/SHA/version/workflow-role validator and make the acceptance language
 say “approved tuple,” not merely “approved full SHA.”
 
-### T1/T2-1: The convergence contract is hypothetical and duplicated
+### T1/T2-1: Helper convergence is still hypothetical and T2 duplicates T1
 
 **Severity:** Medium
 
-T1 still says its rules govern “even if” the PowerShell proposal has not
-adopted the same rule and tells implementers to compare issue descriptions
-later. P1 now has two concrete convergence matrices: one for generator behavior
-and one for artifact-helper behavior. T1 already converges on the held-stream
-identity and full-component path model, so the hypothetical wording is stale.
+T1's new generator matrix is the right model and should be preserved. It
+defines shared serialization algorithms, identifies repository-specific
+frontmatter/content, avoids a runtime dependency, and gives the second mover an
+explicit drift record.
 
-Replace it with reciprocal, current matrices covering at least:
-
-| Generator surface | Required cross-repository treatment |
-| --- | --- |
-| Serialization boundary | Normalize each complete final payload, resolve the destination, use `UTF8Encoding($false)` plus `WriteAllText`, and append no implicit newline |
-| Common artifact functions | Preserve equivalent Copilot, Chat, and Full observable behavior while retaining guide-specific Full transforms |
-| Instructions artifact | Share serialization and LF-stable frontmatter principles; retain Terraform-specific name, `applyTo`, and description |
-| Frontmatter | Treat T1's already-correct LF-joined form and P1's here-string replacement as different starting states converging on the same byte contract |
-| Versioning and text policy | Use the repository's `.NOTES` policy and `* text=auto eol=lf`; retain repository-specific version/date values |
-| Validation | Prove both PowerShell editions and LF/CRLF producer equivalence with logical and raw-byte checks |
+The helper introduction still uses the older hypothetical wording: its rules
+govern “even if” P1 has not adopted the same full-component contract, followed
+by a future comparison instruction. P1 now has a concrete helper convergence
+matrix, and the two drafts already agree on the held-stream and full-component
+models. Replace this remaining prose with a reciprocal current matrix:
 
 | Helper/workflow surface | Required cross-repository treatment |
 | --- | --- |
@@ -353,30 +365,38 @@ Replace it with reciprocal, current matrices covering at least:
 | Artifact transport | Same immutable ID/digest propagation and native digest rejection |
 | Pull-request placement | Record T1's all-four-Windows-cell helper suite versus P1's two-LF-cell choice as intentional if the extra T1 coverage is retained |
 
-Document every intentional difference beside the matrices. Repository-local
+Document every intentional difference beside the helper matrix and use the same
+first/second-mover evidence rule as the generator matrix. Repository-local
 scripts, manifests, workflow artifact names, and source transforms remain
 appropriate; a shared package, module, submodule, or reusable action is not a
-prerequisite. Require whichever implementation starts second to compare the
-then-current other issue or merged evidence and record new divergence.
+prerequisite.
 
-T2's long prerequisite copy is currently accurate, including the seven-file
-non-goal boundary, but it will drift as T1 is corrected. After T1 is final,
-reduce T2 to a concise invariant summary, a normative relative link to T1, and
-a requirement to verify the merged implementation. T1 should remain the
-source of truth for helper and workflow detail.
+T2's prerequisite grew further in `a197076`. It is accurate as a snapshot,
+including the generator handoff and future npm-issue responsibilities, but it
+duplicates many pages of T1 behavior and will drift as T1 or the not-yet-filed
+T3 changes. After T1 is final, reduce T2 to a concise invariant summary,
+normative relative links to T1 and the real T3, and a requirement to verify
+their merged implementations. T1/T3 should remain the sources of truth.
 
-**Required revision:** Replace T1's future-comparison prose with reciprocal
-generator and helper matrices, record all intentional differences, and make T2
-reference final T1 rather than freezing another long implementation
-specification.
+**Required revision:** Preserve T1's new generator matrix, replace the helper's
+remaining hypothetical prose with a reciprocal current matrix, and make T2
+reference final T1/T3 rather than freezing their implementation
+specifications.
 
 ### T1/T2-2: The required npm-remediation issue does not exist
 
 **Severity:** High for slate completeness; not a reason to expand T1 or T2
 
-T1 and T2 correctly say a comment, placeholder, or unlinked draft is
+T1 and T2 now contain a useful seed specification for this work: final
+package/Node/workflow/hook policy, isolated real-hook evidence, structured
+residual risk, Dependabot final state, and supersession are all assigned to the
+future issue. Preserve that design direction.
+
+They also correctly say a comment, placeholder, or unlinked draft is
 insufficient. T1 cannot close, and T2's prerequisite cannot be satisfied,
-because this planning directory contains no real T3 issue description.
+because this planning directory still contains no real T3 issue description.
+Embedding increasingly detailed T3 prose inside T1/T2 does not create an
+independently fileable, orderable, reviewable issue.
 
 Add `05TerraformStyleGuideT3.md` with an H1 issue title following the existing
 issue-description convention, for example:
@@ -394,8 +414,9 @@ T3 should own:
 - the npm entry for `/.github/workflows` in `.github/dependabot.yml`;
 - one tracked, cross-platform Markdown integration harness;
 - the harness invocation in `.github/workflows/markdownlint.yml` after clean
-  installation, without weakening T1's exact Node 24, action pins, permissions,
-  triggers, cache setting, or existing lint commands; and
+  installation, while establishing exact hosted Node 24 and preserving T1's
+  action pins, permissions, triggers, cache setting, and existing lint
+  commands; and
 - `lint-nested-markdown.js` only if a reviewed package/API compatibility change
   actually requires it.
 
@@ -425,22 +446,35 @@ exercise the exact Husky hook's current contract: no staged Markdown exits
 zero; staged Markdown runs both repository lint commands; compliant content
 passes; deterministic temporary outer and nested violations fail for the
 expected rules; and tooling/configuration failure cannot masquerade as an
-expected lint rejection.
+expected lint rejection. Remove T1's “documented equivalent evidence” escape
+hatch for the installed-hook smoke test: run at least one real Git-triggered,
+Husky-installed invocation in the disposable repository, in addition to direct
+deterministic harness cases.
 
 Follow P3's security model: no `npm audit fix --force`, no auto-merge, no frozen
 future advisory count, and no blanket acceptance of residual
-moderate-or-higher findings. Accept audit exit 0 only for a clean result and the
-documented vulnerability exit only when structured inline records exactly
+moderate-or-higher findings. T1's seed contract still needs the command/schema
+boundary made explicit: record the npm version; run
+`audit --package-lock-only --audit-level=moderate --json`; accept only clean
+exit 0 or the documented vulnerability exit; reject every command/registry
+failure; validate `metadata.vulnerabilities` plus nonnegative internally
+consistent counts; walk both object advisories and string-valued `via` links;
+and bind every affected package to normalized `npm explain --json` paths.
+
+Accept the vulnerability exit only when structured inline records exactly
 match the current advisory URL/package/normalized-path graph. Each residual
 record needs a named owner, future UTC expiry, real follow-up issue, and
 reachability/mitigation rationale; duplicate, missing, unexpected, expired, and
-clean-result-stale records must fail. Final Dependabot validation should
-normalize to exactly the existing weekly review-only `github-actions` entry
-followed by the weekly review-only npm entry.
+clean-result-stale records must fail. Prefer the exact two-entry review-only
+Dependabot state used by P3. If an applicable repository policy rejects npm
+Dependabot, cite that policy and mechanically validate the retained exact
+one-entry state; do not leave the choice to implementer preference.
 
-Link T3 from T1 and T2 and state the final ordering. With T1 owning Node 24,
-the default remains T1, T2, T3. If policy forces T3 first, rebaseline T1 and T2
-after it merges.
+Link T3 from T1 and T2 and state the final ordering. If T1 adopts finding T1-1
+and owns the Node 24 workflow baseline, the default remains T1, T2, T3. If Node
+selection remains in T3 or policy forces advisory remediation first, the
+coherent order is T3, T1, T2, followed by rebaselining T1/T2 against the merged
+package, Node, hook, workflow, Dependabot, and lockfile state.
 
 **Required revision:** Draft, name, order, and reciprocally link a real T3
 before treating this as a complete sequential slate. Base it on P3's audit and
@@ -592,25 +626,14 @@ implementation-time runtime/package contract produced by that merged issue.
 merged runtime contract rather than inheriting whatever Node/npm happens to be
 on `PATH`.
 
-### T2-5: The dated guide-version example will become stale
-
-**Severity:** Low to medium
-
-T2 says to recompute the guide version, but still carries
-`2.7.20260728.0` as a branch/date-specific example. It is already stale by the
-review date and will be more distracting when the issue is handed to an
-implementer. The algorithm is sufficient: reread the merged version, increment
-Minor, use the implementation UTC date, reset Revision, update `Last Updated`,
-and add the matching top changelog row.
-
-**Required revision:** Remove the dated candidate value and keep only the
-deterministic implementation-time version algorithm and validation.
-
 ## Confirmed strengths to preserve
 
 - T1 then T2 is the correct dependency direction.
 - T1 correctly identifies all four generator serialization boundaries and
   leaves the already-correct LF-joined frontmatter construction alone.
+- T1's generator-convergence matrix now clearly separates shared algorithms
+  and byte contracts from repository-specific content and avoids a runtime
+  dependency.
 - The helper's explicit roots, full-component checks, strict containment,
   repeated validation, and documented no-competing-writer model are strong.
 - The five mandatory helper parameters and three optional diagnostic labels
@@ -629,6 +652,10 @@ deterministic implementation-time version algorithm and validation.
   the validator without replacing the reviewed selections.
 - Review-only weekly GitHub Actions Dependabot governance does not replace
   immutable pins or human review.
+- T1/T2's expanded future npm-issue ownership correctly recognizes the
+  Terraform repository's full-lint Husky surface instead of copying
+  PSStyleGuide's staged-content API, which does not exist in
+  TerraformStyleGuide.
 - T2 correctly separates discovery from recovery and requires deliberate
   identifier selection.
 - T2's S3 prerequisite now distinguishes enabled and suspended versioning,
@@ -641,6 +668,7 @@ deterministic implementation-time version algorithm and validation.
   invalid partial output form a strong base once the remaining input contracts
   are closed.
 - T2's complete seven-file T1 non-goal boundary is accurate.
+- T2's versioning section now uses only the implementation-time algorithm.
 - State and Archivist URLs remain treated as sensitive, and no example
   automatically selects or rolls back a version.
 
@@ -656,13 +684,12 @@ deterministic implementation-time version algorithm and validation.
 5. Normalize all four writer environment inputs once.
 6. Replace the shape-only action check with the exact approved
    repository/SHA/version/workflow-role validator.
-7. Replace hypothetical convergence prose with reciprocal generator and helper
-   matrices; make T2 link to final T1 as its implementation source of truth.
+7. Preserve the new generator matrix, replace the helper's hypothetical prose
+   with its reciprocal current matrix, and make T2 link to final T1/T3.
 8. Finish T2's HCP host, page, and curl-config value contracts.
 9. Resolve T2's state-example scope and require executable non-network shell
    evidence.
-10. Make T2's local npm block prove the merged Node/npm contract and remove its
-    stale version example.
+10. Make T2's local npm block prove the merged Node/npm contract.
 11. Add and link a real Terraform-specific T3 for advisory remediation, hook
     compatibility, regression evidence, and exact npm Dependabot governance.
 
