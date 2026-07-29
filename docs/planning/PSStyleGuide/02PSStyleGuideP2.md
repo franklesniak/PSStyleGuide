@@ -14,45 +14,56 @@ This originated from the cross-repository work tracked in [franklesniak/copilot-
 
 ## Prerequisite
 
-Complete and merge **Make artifact generation byte-deterministic across PowerShell editions and hosts** before starting.
+Complete and merge
+[P1: Make artifact generation byte-deterministic across PowerShell editions and hosts](01PSStyleGuideP1.md)
+before starting. Base P2 on that merged result.
 
-At implementation start, confirm:
+At implementation start, confirm these P1 interfaces and invariants:
 
-- Complete generator payloads canonicalize CRLF and lone CR to LF.
-- Writes use resolved paths and BOM-less `UTF8Encoding($false)`.
-- `#Requires -Version 5.1` remains.
-- `.gitattributes` still contains `* text=auto eol=lf`.
-- The generator, `.github/workflows/Expand-StyleGuideCandidateArtifact.ps1`, and `.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1` have recorded script versions.
-- Every pull request targeting `main` runs read-only Ubuntu and Windows verification.
-- Every push to `main` runs the push pipeline.
-- Neither event has a path filter.
-- Every checkout in the build and Markdown lint workflows uses the approved checkout v7 Node 24 full commit SHA with a matching release comment.
-- The Markdown lint workflow uses the approved setup-node v7 full commit SHA, installs Node 24 with automatic package-manager caching disabled, declares `contents: read`, and passes its unchanged outer and nested lint commands.
-- Artifact actions are pinned to approved full commit SHAs with matching release comments.
-- Push preparation declares `archive: true`, uploads one immutable candidate, and exposes its ID and SHA-256 digest.
-- All four Windows push cells always download only by immutable ID, run the tracked harness, and invoke the helper.
-- Synchronization performs the same sequence only when `has_changes=true` and its job starts; it is skipped at the job level on the expected no-drift run.
-- Native downloads use `skip-decompress: true` and `digest-mismatch: error`.
-- The versioned shared archive-validation helper is the only candidate extraction implementation.
-- The helper receives explicit checkout and trusted temporary roots, confines candidate paths beneath the trusted root and outside the checkout, rejects filesystem indirection, and accepts artifact/run labels only from callers.
-- Every started push consumer passes preparation's propagated artifact ID and upload digest to the helper, which hashes the exact held archive stream, compares that digest before parsing, rewinds the stream, and constructs `ZipArchive` over the same bytes.
-- Every security-sensitive exact count/set uses exhaustive .NET directory enumeration, including a candidate-parent leaf check that rejects files, directories, links/reparse points, and dangling links immediately before creation.
-- One tracked, versioned harness owns the deterministic fixture suite.
-- Pull-request verification runs that harness under Ubuntu PowerShell 7 and the two Windows editions in the LF cells.
-- Every started push consumer runs that same harness against the exact helper before production helper use.
-- The harness implements the normative stable-ID oracle table, including expected phase, candidate-leaf postcondition, diagnostics, and exact success path/type/byte assertions.
-- The helper validates the full ZIP manifest before creating or writing the candidate directory.
-- The Windows topology contains four actual edition × fixture-EOL cells.
-- Each Windows cell validates only its assigned edition and EOL.
-- The two LF cells run lone-CR sanitation under their assigned editions.
-- A read-only approval job exposes the candidate only after all four push cells succeed.
-- The sole write job verifies candidate, destination, staged, and committed blob IDs.
-- The write job validates `TARGET_REF`/`EXPECTED_SHA` against GitHub's built-ins once, proves one native `HEAD^{commit}` and one exact remote record, reuses those locals, and uses `HEAD:<full-ref>` with an exact expected-SHA `--force-with-lease`.
-- Unconditional force updates are prohibited.
-- Stale committed artifacts fail pull-request verification.
-- The controlled synchronization, propagated-digest rejection, unrelated-trigger, stale-preflight, and exact-lease evidence has passed without creating a synthetic `main` commit.
+- All four generator payloads canonicalize CRLF/lone CR to LF and serialize
+  through resolved paths with BOM-less `UTF8Encoding($false)`;
+  `#Requires -Version 5.1` and `* text=auto eol=lf` remain.
+- The versioned
+  `.github/workflows/Expand-StyleGuideCandidateArtifact.ps1` and
+  `.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1` are the only
+  candidate extraction implementation and permanent fixture owner.
+- Both events cover every `main` pull request/push without path filters, use
+  least-privilege job permissions, and pin checkout, setup-node, upload, and
+  download actions to the approved full SHAs with matching version comments.
+- Markdown validation asserts Node major 24, disables automatic
+  package-manager caching, and passes the existing clean install, outer lint,
+  and nested lint commands.
+- Push preparation uploads one immutable `archive: true` candidate and
+  propagates one nonempty artifact ID and 64-hex digest.
+- Every started push consumer selects that exact ID, uses
+  `skip-decompress: true` and `digest-mismatch: error`, creates one unique
+  job-owned trusted temporary root, and passes separate download/candidate
+  paths to the helper.
+- The helper validates mutually separate roots and every existing component
+  from the filesystem volume/share root, repeats the checks at security
+  boundaries, states the job-owned/no-competing-writer model, opens the archive
+  once with `FileShare.Read`, hashes/rewinds/parses that same stream, validates
+  the complete manifest before creation, preserves pre-existing state, and
+  performs fail-closed cleanup of invocation-created output.
+- Optional artifact/run labels distinguish omitted, supplied, and explicitly
+  empty values, and the permanent stable-ID table proves their exact
+  diagnostics.
+- Pull-request evidence runs the harness under Ubuntu PowerShell 7 and only the
+  two Windows LF cells; neither CRLF cell repeats it. Every four-cell push
+  consumer runs the harness and production helper.
+- P1's controlled `has_changes=true` synchronization drill—not P2's expected
+  no-drift merge—proves writer integration, and its propagated-digest,
+  malformed-transport, unrelated-trigger, stale-preflight, and exact-lease
+  drills pass without touching `main`.
+- `.github/dependabot.yml` contains the review-only weekly GitHub Actions entry
+  and remains outside P2's affected files.
 
-The Markdown dependency-lock advisories are separately tracked maintenance work. They are not silently folded into P2 and do not weaken this prerequisite's Node 24 lint-compatibility requirement.
+P1 is the source of truth for those implementation details; P2 does not reopen
+or restate their algorithms.
+
+[P3: Remediate Markdown lint dependency advisories and add npm update governance](03PSStyleGuideP3.md)
+follows P2. It is not a P2 prerequisite, and its package changes must not be
+silently folded into this issue.
 
 ## Affected files
 
@@ -450,6 +461,32 @@ $strRationaleAbsolutePath = $ExecutionContext.SessionState.Path.GetUnresolvedPro
 
 $strRationaleContent = [System.IO.File]::ReadAllText($strRationaleAbsolutePath)
 
+$arrRationaleLines = @(
+    ($strRationaleContent -replace "`r`n?", "`n").Split(
+        [string[]]@("`n"),
+        [StringSplitOptions]::None
+    )
+)
+
+$intBlankLineUsageHeadingCount = @(
+    $arrRationaleLines |
+        Where-Object {
+            [string]::Equals(
+                $_,
+                '### Blank Line Usage',
+                [StringComparison]::Ordinal
+            )
+        }
+).Count
+
+if ($intBlankLineUsageHeadingCount -ne 1) {
+    throw (
+        ("STYLE_GUIDE_RATIONALE.md must contain exactly one ordinal " +
+        "'### Blank Line Usage' heading; expected 1, actual {0}.") -f
+        $intBlankLineUsageHeadingCount
+    )
+}
+
 $intRationaleSnippetCount = & $scriptGetOrdinalOccurrenceCount `
     -Content $strRationaleContent `
     -Needle $strCanonicalSnippet
@@ -530,7 +567,10 @@ Confirm:
 - No touched file contains a carriage-return byte.
 - The complete canonical snippet and its exact heading marker each occur exactly once in `STYLE_GUIDE.md` and each of the four generated artifacts.
 - `STYLE_GUIDE_RATIONALE.md` contains neither the canonical snippet nor its exact operational heading.
-- The rationale's existing `### Blank Line Usage` section explains the durability and portability reasons without creating a duplicate section.
+- An ordinal exact-line count proves `STYLE_GUIDE_RATIONALE.md` contains
+  exactly one `### Blank Line Usage` heading.
+- That existing rationale section explains the durability and portability
+  reasons without creating a duplicate section.
 - No downstream-specific assumption appears.
 - Version and Last Updated agree with the finalized target baseline and UTC implementation date.
 - All four generated artifacts match the authoritative sources.
@@ -558,7 +598,12 @@ After merge to `main`, confirm:
 3. It exposes a nonempty ID and 64-hex digest.
 4. Every Windows push cell downloads that exact ID using the approved pinned download action.
 5. Native digest behavior is `error`.
-6. Every cell runs the tracked deterministic helper harness and invokes the shared helper with explicit checkout/trusted roots and caller-owned artifact/run context; the helper hashes and parses one held stream, exhaustively validates paths/manifest before candidate creation, and safely extracts the exact permitted bytes.
+6. Every cell runs the tracked deterministic helper harness, creates one unique
+   job-owned trusted temporary root, and invokes the shared helper with
+   explicit checkout/trusted roots and caller-owned artifact/run context; the
+   helper uses `FileShare.Read`, hashes and parses one held stream, validates
+   the full path envelope/manifest before candidate creation, and safely
+   extracts or cleans the exact permitted bytes.
 7. The read-only approval job succeeds only after all four cells.
 8. Because sources and generated artifacts were committed together, preparation reports `has_changes=false`.
 9. The write-enabled synchronization job skips.
@@ -580,6 +625,9 @@ If preparation reports changes, treat that as a source/artifact synchronization 
 - Do not modify `.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1`.
 - Do not modify `.github/workflows/build.yml`.
 - Do not modify `.github/workflows/markdownlint.yml`.
+- Do not modify `.github/dependabot.yml`.
+- Do not modify `.github/workflows/package.json` or
+  `.github/workflows/package-lock.json`; P3 owns that work.
 - Do not modify `.github/copilot-instructions.md`.
 - Do not modify `CONTRIBUTING.md`.
 - Do not hand-edit generated artifacts.
@@ -593,7 +641,9 @@ If preparation reports changes, treat that as a source/artifact synchronization 
 - The Compliant example remains unchanged.
 - No literal trailing whitespace is introduced.
 - The canonical snippet and exact operational heading each occur exactly once in `STYLE_GUIDE.md` and each generated artifact.
-- The rationale's existing `### Blank Line Usage` section remains generic and portable and does not duplicate the canonical snippet or operational heading.
+- The rationale contains exactly one ordinal line equal to
+  `### Blank Line Usage`; that existing section remains generic and portable
+  and does not duplicate the canonical snippet or operational heading.
 - Metadata is recalculated at finalization with the Minor component incremented.
 - Both sources and all four generated artifacts are committed together.
 - Every validation block starts with `$ErrorActionPreference = 'Stop'`.
@@ -612,7 +662,10 @@ If preparation reports changes, treat that as a source/artifact synchronization 
 - All four Windows push cells run the tracked deterministic helper harness and production helper.
 - Static inspection and P1's controlled `has_changes=true` drill prove that a started synchronization job runs the same harness/helper sequence before mutation.
 - Every production helper invocation receives explicit checkout/trusted roots and caller-owned artifact/run context.
-- The post-merge push matrix validates the exact immutable candidate through the same-held-stream digest/archive contract, exhaustive enumeration, and pre-creation manifest validation.
+- The post-merge push matrix validates the exact immutable candidate through
+  unique job-owned roots, `FileShare.Read`, the same-held-stream digest/archive
+  contract, full-component enumeration/revalidation, pre-creation manifest
+  validation, and fail-closed cleanup.
 - Post-merge preparation reports no candidate changes.
 - Synchronization skips at the job level, none of its steps run, and no recovery commit is created.
 - No unrelated or downstream-specific change is introduced.
