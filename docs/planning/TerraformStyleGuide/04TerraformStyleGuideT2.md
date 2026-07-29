@@ -34,20 +34,58 @@ At implementation start, confirm the prerequisite issue established:
 - Resolved BOM-less UTF-8 writes.
 - `#Requires -Version 5.1`.
 - `* text=auto eol=lf`.
-- A versioned generator and a versioned shared archive-validation helper (`.github/workflows/Expand-StyleGuideCandidateArtifact.ps1`).
+- A versioned generator, versioned shared archive-validation helper
+  (`.github/workflows/Expand-StyleGuideCandidateArtifact.ps1`), and versioned
+  permanent helper harness
+  (`.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1`).
 - Local cross-edition validation that verifies each available edition's output before another edition runs.
 - Unfiltered `main` coverage for pull requests and pushes.
-- Approved full-SHA artifact-action pins.
+- Every nonlocal action in `.github/workflows/build.yml` and
+  `.github/workflows/markdownlint.yml` pinned to a verified full commit SHA with
+  an adjacent release comment.
+- Review-only weekly Dependabot version updates for the `github-actions`
+  ecosystem, with no auto-merge.
 - Immutable candidate ID/digest propagation from a read-only preparation job that declares `archive: true`.
 - Download by ID with `skip-decompress: true` and fatal native digest handling.
-- The shared helper as the only candidate extraction implementation, independently comparing the retained ZIP's SHA-256 with the propagated upload digest before opening the archive, and validating the full manifest before creating the candidate directory.
-- The deterministic fixture self-test suite, including the digest-mismatch fixture, running against that exact helper in the Ubuntu pull-request verification job and in all four Windows pull-request cells before merge.
-- The same exact helper self-test running in all four Windows push cells on every push run, and in the synchronization writer whenever that conditional writer executes.
+- The shared helper as the only candidate extraction implementation, with five
+  mandatory scalar parameters (`CheckoutRoot`, `TrustedTemporaryRoot`,
+  `DownloadDirectory`, `CandidateDirectory`, and `ExpectedDigest`) and three
+  optional diagnostic labels (`ArtifactId`, `RunId`, and `RunAttempt`).
+- Caller-supplied, independently validated, mutually non-overlapping checkout
+  and trusted-temporary roots; strict-descendant working paths; rejection of
+  reparse points and other indirection in every existing component from the
+  filesystem volume/share root through each protected path; and repeated
+  component validation at the helper's archive-open, candidate-creation, and
+  post-extraction boundaries.
+- Independent comparison of the retained ZIP's SHA-256 with the propagated
+  upload digest before opening the archive, and validation of the full manifest
+  before creating the candidate directory.
+- The exact tracked permanent harness as the sole definition of the
+  deterministic fixture suite, including digest-mismatch, diagnostic-context,
+  root-separation, strict-descendant, ancestor/component-indirection, and
+  post-extraction cleanup cases.
+- The tracked harness running against the exact helper in the Ubuntu
+  pull-request verification job and in all four Windows pull-request cells
+  before merge.
+- The same tracked harness running in all four Windows push cells on every push
+  run, and in the synchronization writer whenever that conditional writer
+  executes.
+- Every production helper invocation receiving the explicit checkout root,
+  trusted-temporary root, download path, reserved candidate path, propagated
+  digest, artifact ID, run ID, and run attempt.
 - Each Windows helper invocation bound to the cell's assigned edition by a mutually exclusive step whose explicit shell is `powershell` for Desktop 5.1 or `pwsh` for Core 7, with the edition asserted in the same process immediately before the suite.
 - A Windows topology that is an actual four-cell edition × fixture-EOL cross-product, with the two LF cells supplying lone-CR sanitation coverage.
 - Read-only approval after the complete matrix.
 - A sole exact-lease writer.
-- The four prerequisite implementation paths as the complete pre-stage working-tree set and complete staged set.
+- The seven prerequisite implementation paths as the complete pre-stage
+  working-tree set and complete staged set:
+  - `.gitattributes`;
+  - `.github/dependabot.yml`;
+  - `.github/workflows/Expand-StyleGuideCandidateArtifact.ps1`;
+  - `.github/workflows/Generate-StyleGuideArtifacts.ps1`;
+  - `.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1`;
+  - `.github/workflows/build.yml`; and
+  - `.github/workflows/markdownlint.yml`.
 - Passing LF, CRLF, lone-CR, propagated-digest rejection, malformed-transport, stale-ref, and lease evidence.
 
 ## Affected files
@@ -664,7 +702,9 @@ Confirm:
 2. Read-only Ubuntu passes.
 3. The Windows matrix displays and completes four distinct edition/EOL cells.
 4. The two LF cells complete lone-CR sanitation under their assigned editions.
-5. Diagnostic upload uses the approved pin.
+5. Every nonlocal action in both workflows uses its approved full-SHA pin with
+   an adjacent release comment, and the review-only weekly GitHub Actions
+   Dependabot configuration remains present.
 6. Push jobs skip.
 7. No pull-request job has write permission.
 
@@ -675,11 +715,18 @@ Confirm:
 1. Read-only preparation runs.
 2. One immutable candidate is uploaded with nonempty ID/digest.
 3. Every Windows push cell downloads the same ID.
-4. Every Windows push cell reports `success`, runs the deterministic helper self-test, and invokes the shared archive helper with the propagated digest.
+4. Every Windows push cell reports `success`, runs the exact tracked permanent
+   harness, and invokes the shared archive helper with explicit checkout and
+   trusted-temporary roots, explicit download and candidate paths, the
+   propagated digest, and the artifact/run diagnostic labels.
 5. Native digest-mismatch behavior is `error`, and the helper's independent digest comparison passes.
 6. Approval succeeds after the complete matrix.
 7. Preparation reports `has_changes=false`.
-8. The conditional writer reports `skipped`; none of its steps, including its helper self-test or helper invocation, executes on this no-drift run. Its integration remains evidenced by the prerequisite issue's controlled `has_changes=true` write-path run and static inspection.
+8. The conditional writer reports `skipped`; none of its steps, including the
+   tracked permanent harness or helper invocation, executes on this no-drift
+   run. Its explicit-root, explicit-path, digest, diagnostic-label, and
+   full-component path-safety integration remains evidenced by the prerequisite
+   issue's controlled `has_changes=true` write-path run and static inspection.
 9. No bot synchronization commit is created.
 
 If preparation reports changes, investigate source/artifact synchronization. Do not accept a recovery commit as this issue's expected outcome.
