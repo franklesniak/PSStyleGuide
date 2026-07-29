@@ -3,6 +3,8 @@
 Given your revised PSStyleGuide GitHub Issues slate:
 
 - `docs\planning\PSStyleGuide\01PSStyleGuideP1.md`
+- `docs\planning\PSStyleGuide\01aPSStyleGuideP1A.md`
+- `docs\planning\PSStyleGuide\01bPSStyleGuideP1B.md`
 - `docs\planning\PSStyleGuide\02PSStyleGuideP2.md`
 - `docs\planning\PSStyleGuide\03PSStyleGuideP3.md`
 

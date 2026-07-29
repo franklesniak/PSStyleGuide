@@ -18,6 +18,8 @@ Lastly, please note that I'm trying to thoughtfully unify the generator script a
 I'm not asking you to critique these, but as an FYI: here is a similar proposed GitHub Issue slate for `PSStyleGuide` (I will implement these in parallel with the issues in `TerraformStyleGuide`):
 
 - `docs\planning\PSStyleGuide\01PSStyleGuideP1.md`
+- `docs\planning\PSStyleGuide\01aPSStyleGuideP1A.md`
+- `docs\planning\PSStyleGuide\01bPSStyleGuideP1B.md`
 - `docs\planning\PSStyleGuide\02PSStyleGuideP2.md`
 - `docs\planning\PSStyleGuide\03PSStyleGuideP3.md`
 

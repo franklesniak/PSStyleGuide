@@ -18,6 +18,8 @@ Given your revised TerraformStyleGuide GitHub Issues slate:
 And given the state of the [`PSStyleGuide` repo](github.com/franklesniak/PSStyleGuide), and the information that I provided to you about the proposed PSStyleGuide GitHub Issues slate:
 
 - `docs\planning\PSStyleGuide\01PSStyleGuideP1.md`
+- `docs\planning\PSStyleGuide\01aPSStyleGuideP1A.md`
+- `docs\planning\PSStyleGuide\01bPSStyleGuideP1B.md`
 - `docs\planning\PSStyleGuide\02PSStyleGuideP2.md`
 - `docs\planning\PSStyleGuide\03PSStyleGuideP3.md`
 

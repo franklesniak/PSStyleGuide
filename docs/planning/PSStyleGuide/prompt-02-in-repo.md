@@ -25,7 +25,9 @@ Do not proceed to the next finding until all of the above are completed. Then, c
 Then, please use the information about each finding and the option selected to address it in `docs\planning\artifacts\current-findings-evaluation.md` to incorporate the feedback and revise the GitHub Issue slate (PSStyleGuide GitHub Issues only):
 
 - `docs\planning\PSStyleGuide\01PSStyleGuideP1.md`
+- `docs\planning\PSStyleGuide\01aPSStyleGuideP1A.md`
+- `docs\planning\PSStyleGuide\01bPSStyleGuideP1B.md`
 - `docs\planning\PSStyleGuide\02PSStyleGuideP2.md`
-- `docs\planning\PSStyleGuide\02PSStyleGuideP3.md`
+- `docs\planning\PSStyleGuide\03PSStyleGuideP3.md`
 
 If there are multiple GitHub Issues, ensure you list them in the order in which they should be executed/worked. Do not label the issue(s) as revisions or draw attention to what you've changed, as I'll be handing the information off to someone else, and I don't want to confuse them.
