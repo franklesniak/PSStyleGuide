@@ -2,165 +2,378 @@
 
 ## Overall assessment
 
-The slate is fundamentally sound, and P1 followed by P2 is the correct execution order.
+P1 followed by P2 is the right order, and the slate is close to ready. P1 has
+already resolved most of the problems raised against earlier drafts: its public
+helper interface now matches T1 at the surface, the writer uses one validated
+ref identity, edition-specific steps invoke the helper, the fixture suite has
+stable phases and normative oracles, and P2 no longer introduces a
+noncompliant named validation function.
 
-The current `PSStyleGuide` `main` branch at commit [`4346310`](https://github.com/franklesniak/PSStyleGuide/commit/4346310e7deebffb4159c75e30d9546263dfd649) confirms the important premises:
+The baseline assertions are also accurate as of PSStyleGuide `main` commit
+[`4346310`](https://github.com/franklesniak/PSStyleGuide/commit/4346310e7deebffb4159c75e30d9546263dfd649):
 
-- `.gitattributes` already contains exactly `* text=auto eol=lf`, so P1 is correct to preserve it rather than recreate or broaden it.
-- The generator still declares PowerShell 5.1 support, writes four artifacts through edition-sensitive `Set-Content -Encoding UTF8`, and builds the PowerShell frontmatter with a here-string.
-- The build workflow is still path-filtered, grants workflow-level `contents: write`, and uses movable major-version action tags.
-- The two stored blank-line examples in `STYLE_GUIDE.md` are byte-equivalent at the supposedly different line, so P2 addresses a real documentation defect.
+- `.gitattributes` already contains exactly `* text=auto eol=lf`.
+- The generator still supports Windows PowerShell 5.1, uses four
+  edition-sensitive `Set-Content -Encoding UTF8` writes, and constructs the
+  PowerShell frontmatter with a here-string.
+- The build workflow is path-filtered, has workflow-level `contents: write`,
+  and uses movable action tags.
+- The two Blank Line Usage examples currently encode the same blank line, so
+  P2 addresses a real defect.
 
-P1 also gets the most important generator-unification boundary right: both P1 and T1 prescribe final-payload CR canonicalization, resolved destination paths, `UTF8Encoding($false)`, and `WriteAllText`. P2 correctly keeps the blank-line explanation generic to every adopter and commits both sources with all four regenerated artifacts, so its expected post-merge result is no drift and a skipped synchronization writer.
+I would not file P1 unchanged, however. Its strongest archive-identity
+protection is better than T1's current prescription, while several path and
+cleanup protections in T1 are stronger than P1's. The correct unification is
+the union of those protections, not selecting one issue wholesale as the
+template for the other. P1 also contains an impossible global rejection
+postcondition and overstates the degree of P1/T1 identity.
 
-I would make the following corrections before filing the issues.
+## Required corrections to P1
 
-## 1. Reconcile the claimed P1/T1 helper alignment before filing either issue
+### 1. Replace the claimed near-total P1/T1 identity with an explicit convergence matrix
 
-This is the largest blocking inconsistency. P1 and T1 each say that the helper's parameter interface and validation behavior are aligned and that the four manifest names are the intentional repository-specific difference. The actual prescriptions are not aligned:
+P1 currently says the common behavior matches T1 and only named manifest and
+artifact details differ. That is not true even after the public helper
+parameters were aligned.
 
-| Contract surface | P1 | T1 |
+The two issues still differ in material ways:
+
+| Surface | P1 | T1 |
 | --- | --- | --- |
-| Mandatory public parameters | `CheckoutRoot`, `TrustedTemporaryRoot`, `DownloadDirectory`, `CandidateDirectory`, and `ExpectedDigest` | Download directory, initially nonexistent candidate directory, and expected digest |
-| Diagnostic parameters | Optional `ArtifactId`, `RunId`, and `RunAttempt` | No corresponding public parameters |
-| Checkout trust boundary | Supplied by the caller | Derived and verified from the helper's fixed tracked location |
-| Temporary-root boundary | Supplied explicitly and enforced by the helper | Protected runner-temporary parent is a caller responsibility; helper validates the supplied paths |
-| Fixture-suite ownership | Separate tracked `Test-Expand-StyleGuideCandidateArtifact.ps1` | No separate harness in the affected-file set |
-| Windows pull-request execution | Two LF cells | All four edition × EOL cells |
+| Archive identity | Hashes and extracts through one continuously held stream | Hashes by path, then opens the path for extraction |
+| Path-component trust | Checks components below the trusted temporary root | Checks from the filesystem volume/share root through every protected path |
+| Root relationships | Requires the temporary root to be outside checkout | Requires all protected roots to be mutually non-overlapping |
+| Revalidation | Before archive open and candidate creation | Also after extraction |
+| Race model | Implicit | Explicitly limited to job-owned paths on a GitHub-hosted runner without competing writers |
+| Post-creation failure | No complete cleanup contract | Fail-closed, non-recursive cleanup contract |
+| Pull-request helper coverage | Two Windows LF cells | All four Windows edition × EOL cells |
+| Action governance | No Dependabot configuration | Weekly, review-only GitHub Actions updates |
+| Lint runtime | Moves the lint job to Node 24 | Leaves the Terraform repository's existing Node/package behavior alone |
+| Frontmatter | Replaces a here-string | Preserves an already-correct LF-joined array |
 
-Both descriptions cannot be true simultaneously.
+Replace the blanket parity statement with a small normative matrix in both
+issues. For every shared concern, identify:
 
-The preferred resolution, given the revised T1 slate, is to revise P1 to the same fixed-location checkout-root model and public interface, then retain only the four manifest filenames and repository-specific artifact names as differences. Deriving the checkout root from the tracked helper also avoids allowing a caller-selected value to define the boundary that the helper is supposed to protect.
+1. the common public contract;
+2. the common security and failure semantics;
+3. the common fixture IDs or equivalent test coverage;
+4. the repository-specific implementation detail, if any; and
+5. the reason that the difference is intentional.
 
-If the explicit `TrustedTemporaryRoot` envelope, optional diagnostic parameters, and separate tracked harness are deliberate improvements that should remain, coordinate a matching change to T1 before filing either issue. In that case, document those as shared contract elements. Do not leave each issue claiming exact alignment while prescribing incompatible APIs and file sets.
+The shared target should be:
 
-## 2. Use one canonical writer ref identity from preflight through push
+- P1's same-held-stream digest and extraction design;
+- T1's full path-component validation, revalidation, race assumptions, and
+  cleanup behavior;
+- the same externally observable diagnostics and fixture outcomes for common
+  cases; and
+- repository-local generators and helpers, with no runtime dependency between
+  repositories.
 
-P1 correctly uses PowerShell's environment drive in:
+Coordinate the corresponding T1 wording before implementation. In particular,
+do not weaken P1 to T1's current hash-by-path/reopen sequence merely to make the
+text look identical. T1 should adopt the stronger held-stream rule.
 
-```powershell
-git ls-remote --exit-code --refs origin $env:GITHUB_REF
-```
+Legitimate differences should be named rather than hidden: manifest filenames,
+artifact names, guide-specific merge logic, frontmatter construction work,
+existing `.gitattributes` state, lint-runtime migration, and any deliberately
+different CI matrix coverage. “Unified” should mean equivalent common
+algorithms and contracts, not line-for-line script identity or cross-repository
+byte equality.
 
-However, its later lease and refspec use `$env:TARGET_REF`. That means the writer validates one value and pushes another value.
+### 2. Adopt T1's complete path-envelope validation in P1
 
-Adopt the revised T1 contract:
+P1 validates components between the trusted temporary root and the working
+paths. That does not prove that an ancestor of the trusted root itself is not a
+symlink, junction, mount-like redirect, or reparse point. A caller-selected
+“trusted” root cannot make its unchecked ancestors trustworthy.
 
-1. Supply `TARGET_REF: ${{ github.ref }}` and `EXPECTED_SHA: ${{ github.sha }}` through workflow `env`.
-2. In the writer's one complete PowerShell mutation block, copy those values to local variables.
-3. Require the target to be a complete `refs/heads/` ref and require it to equal the immutable `$env:GITHUB_REF`.
-4. Resolve `HEAD^{commit}` to one complete repository-native object ID and require it to equal both the expected SHA and `$env:GITHUB_SHA`.
-5. Query the remote using that same validated local target ref and require exactly one `<object-id><TAB><ref>` record.
-6. Reuse the same local target ref and expected SHA unchanged in the exact lease and `HEAD:<full-ref>` refspec.
+Specify all of the following:
 
-This eliminates a security-relevant split source of truth and keeps the controlled temporary-branch drill possible.
+- Resolve `CheckoutRoot`, `TrustedTemporaryRoot`, `DownloadDirectory`, and
+  `CandidateDirectory` to absolute filesystem-provider paths before trust
+  decisions.
+- Require the checkout root, trusted temporary root, download directory, and
+  candidate directory to have the exact permitted containment relationships.
+  In particular, the two roots must be mutually non-overlapping: neither may
+  equal, contain, or be contained by the other.
+- Use separator-aware ordinal containment checks: ordinal-ignore-case on
+  Windows and ordinal on case-sensitive runners. A sibling with a common text
+  prefix must remain a sibling.
+- Walk every existing component starting at the filesystem volume root or UNC
+  share root and continuing through both roots, the download path, the archive
+  leaf, the candidate parent, and every created candidate path.
+- Reject a symlink, junction, reparse point, or an inability to obtain required
+  attributes. Do not resolve through the component and then treat the resolved
+  target as trusted.
+- Re-run the relevant checks immediately before opening the archive,
+  immediately before creating the candidate directory, and after extraction
+  before accepting or publishing any candidate bytes.
+- State the residual race assumption honestly: this contract is designed for
+  job-owned paths on a GitHub-hosted runner where no competing writer is
+  expected. Repeated path inspection does not create a general-purpose
+  race-free filesystem sandbox.
 
-## 3. Bind every helper call to an explicit edition-specific process
+Extend the permanent suite with ancestor-link and protected-root-link cases,
+not only links below an otherwise trusted root. If a particular runner cannot
+create a required link primitive, the case may be marked unavailable on that
+runner only when the same semantic case is required to execute on at least one
+other mandatory runner. A suite in which every platform skips the security case
+is not passing coverage.
 
-P1 says that the helper harness runs under the assigned edition, but its topology still permits an edition-neutral `pwsh` step to construct fixtures and invoke the helper in every cell. A generator assertion in another step would not prove which interpreter executed the helper.
+### 3. Keep the held-stream design, but choose the sharing mode explicitly
 
-Use the same structure as revised T1:
+P1 correctly requires the helper to open the archive once, compute SHA-256
+through `Get-FileHash -InputStream`, rewind the same seekable stream, and build
+one `ZipArchive` over that stream. This closes the identity gap between “the
+bytes that were hashed” and “the bytes that were extracted” and should remain
+the common P1/T1 contract.
 
-- An Ubuntu pull-request step uses `shell: pwsh`, asserts Core 7, and invokes the exact harness/helper in that same process.
-- Every Windows job has two mutually exclusive helper steps:
-  - Desktop: `if: ${{ matrix.edition == 'desktop' }}` with `shell: powershell`, asserting Desktop 5.1;
-  - Core: `if: ${{ matrix.edition == 'core' }}` with `shell: pwsh`, asserting Core 7.
-- An edition-neutral fixture-preparation step may create or inspect inputs, but it must not dot-source, call, or launch the production helper.
-- On push, the production helper invocation immediately follows the permanent suite in the same edition-specific step.
+The issue currently says to use an explicitly selected sharing mode but does
+not select one. Require read access with `FileShare.Read`:
 
-For exact P1/T1 parity and the clearest per-cell evidence, run the suite in all four Windows pull-request cells, not only the two LF cells. If the drafter deliberately retains only one cell per edition because the helper fixtures are EOL-independent, the issue must state that as an intentional CI optimization and must not imply that all four pull-request cells exercised the helper. All dependent P2 prerequisite, evidence, and acceptance wording must match the chosen topology.
+- other readers may inspect the archive;
+- a second handle is not permitted to write to or delete the archive while the
+  helper holds it; and
+- the helper itself never reopens the path between digest verification and
+  extraction.
 
-## 4. Specify exhaustive entry enumeration and final-leaf detection
+The permanent suite should assert, under both Windows PowerShell 5.1 and
+PowerShell 7, that hashing leaves the stream open, that the stream is rewound,
+and that the exact same stream instance supplies `ZipArchive`. A path-based
+`Get-FileHash` call followed by a new `FileStream` must be a prohibited
+implementation, even if it happens to pass the normal fixture.
 
-P1 requires directories to contain “exactly” a certain entry set, but it does not prescribe an enumeration that includes hidden/system entries. It also uses ordinary existence wording for the candidate leaf, which can miss a dangling final link.
+### 4. Make rejection postconditions truthful and add fail-closed cleanup
 
-Add an implementation contract equivalent to revised T1:
+P1 says, in one place, that the candidate leaf is absent after every rejection.
+Its own fixtures require a preexisting candidate file, directory, symlink, or
+reparse point to remain unchanged. Those requirements cannot both be true.
+Post-extraction rejection also occurs after the helper created the candidate,
+yet P1 does not completely specify cleanup.
 
-- Convert PowerShell paths to absolute filesystem-provider paths before passing them to .NET.
-- Use separator-aware ordinal comparison: ordinal-ignore-case on Windows and ordinal on non-Windows.
-- Materialize `Directory.EnumerateFileSystemEntries` for every exact-count or exact-set assertion.
-- If `Get-ChildItem` is used for supporting diagnostics, require `-LiteralPath -Force`; do not use it as the normative exact-count primitive.
-- Enumerate the existing candidate parent and reject any matching leaf entry, including a file, directory, symlink, reparse point, or dangling link.
-- Repeat the parent enumeration immediately before creating the candidate leaf.
-- Enumerate the extracted candidate exhaustively and require exactly four ordinary, non-reparse-point files.
+Replace every global “leaf absent on rejection” assertion with a per-case
+postcondition:
 
-Extend the permanent fixtures to cover a hidden extra download entry, an existing candidate file/directory, a reparse/symlink candidate leaf, and a dangling candidate link where the runner permits construction. A reparse component elsewhere in the path does not substitute for testing the final leaf.
+| Rejection class | Required candidate-leaf result |
+| --- | --- |
+| Failure before creation when the leaf was initially absent | Still absent |
+| Preexisting file, directory, link, or reparse leaf | Byte-for-byte and type-for-type unchanged |
+| Controlled post-creation validation failure involving only ordinary helper-created entries | Safely cleaned; leaf absent |
+| Cleanup-time safety check finds an unexpected entry, link, reparse point, or changed envelope | Do not follow or recursively delete it; preserve evidence and report both the original and cleanup failures |
 
-## 5. Replace the ambiguous fixture prose with a normative outcome table
+Add the corresponding implementation contract:
 
-P1 lists a normal valid archive and an archive with symlink-like external attributes that must still extract safely, but later says “each invalid fixture” and singular “the valid fixture.” Its path-envelope list also contains cases that should succeed, such as a checkout sibling-prefix classification and a valid filesystem-provider-qualified absolute path.
+1. Track whether this invocation created the candidate directory and which
+   ordinary files it created.
+2. Dispose the archive and all streams before cleanup.
+3. Revalidate the complete path envelope before removing anything.
+4. Remove only known ordinary, non-reparse helper-created files.
+5. Remove the candidate directory only if it is still an ordinary directory and
+   is empty.
+6. Never recurse through, follow, or delete an unexpected or reparse entry.
+7. Preserve the primary failure and append cleanup diagnostics rather than
+   replacing the original cause.
 
-Give every fixture a stable case identifier and a table containing:
+Add at least one post-extraction fixture containing a UTF-8 BOM and one
+containing a CR byte. Each should prove that controlled cleanup removes the
+helper-created candidate. Add a cleanup-safety fixture that substitutes or adds
+an unsafe entry and proves that no out-of-envelope target is touched. Stable
+failure phases should distinguish extraction/manifest rejection from cleanup
+failure.
 
-- expected result: success or rejection;
-- expected failure phase for every rejection;
-- candidate-leaf postcondition;
-- required extracted path/type/byte checks for successes;
-- required diagnostic context.
+This is both a correctness and an incident-response requirement: callers need
+to know whether a rejected candidate was absent, deliberately preserved, or
+only partially cleaned.
 
-At minimum, classify both archive successes explicitly:
+### 5. Make the trusted temporary-path example satisfy its own contract
 
-1. an exact archive with the correct digest; and
-2. an exact archive with symlink-like external attributes that are ignored while ordinary files are created.
+P1 correctly tells callers to create a unique trusted temporary root and place
+the download and candidate directories beneath it. Its workflow example then
+uses a fixed download path such as
+`${{ runner.temp }}/style-guide-candidate-download`, which does not demonstrate
+that unique-root contract and can place the download beside, rather than under,
+the value passed as `TrustedTemporaryRoot`.
 
-Also classify the sibling-prefix, case-variant, filesystem-provider path, root-overlap, hidden-entry, and final-link fixtures explicitly. An exception by itself is not a complete negative-test oracle; the harness should verify that failure occurred in the required phase and that no forbidden path was created or changed.
+Use one initialization step that:
 
-## 6. Make push-consumer language match the conditional job graph
+1. creates a unique job-owned child of `runner.temp`, incorporating immutable
+   run/attempt/job-or-matrix identifiers or a securely generated unique
+   suffix;
+2. creates the download directory as an exact child of that root;
+3. defines an initially nonexistent candidate leaf under the same root;
+4. exports all three absolute paths through `GITHUB_ENV` or step outputs; and
+5. passes those exact exported values to `download-artifact`, the harness, and
+   the production helper.
 
-P1 repeatedly says “every push consumer ... on every run,” then its post-merge evidence requires `has_changes=false` and the synchronization writer to skip. P2's post-merge section correctly explains the no-drift branch, but its prerequisite and acceptance sections retain the broader contradictory wording.
+The writer and every matrix cell should use separate roots. Do not rely on a
+fixed directory left over from a previous attempt, and do not make the helper
+guess which download path an action used.
 
-Use these exact execution semantics throughout P1 and P2:
+### 6. Add an end-to-end malformed-transport drill
 
-- **Four Windows push cells:** always download the candidate, run the permanent suite, and invoke the production helper.
-- **Synchronization writer:** runs the suite and helper only when approval reports `has_changes=true`.
-- **No-drift push:** the four Windows cells report `success`; the writer reports `skipped`, and none of its steps ran.
-- **Evidence allocation:** P1's controlled `has_changes=true` drill plus static inspection proves the writer path; ordinary P1/P2 no-drift runs prove the four read-only cells and the expected writer skip.
+P1's permanent suite tests malformed and truncated ZIP inputs directly. Keep
+those cases, but also port T1's controlled `upload-artifact`/`download-artifact`
+transport drill (including the `archive: false` malformed payload) into P1's
+acceptance evidence.
 
-P2's current numbered post-merge checklist and explanatory paragraph are a good model. Carry that precision into its prerequisite and acceptance text and into all corresponding P1 sections.
+The unit-style fixture proves the helper rejects bad bytes. The workflow drill
+proves that the actual pinned upload action, download action, selected inputs,
+digest output, trusted paths, and production helper are wired together as the
+issue claims. It should run only in a controlled, non-default-ref context,
+expect the helper to reject at the specified phase, verify the candidate
+postcondition, and then clean up its test artifacts safely.
 
-## 7. Preserve a deliberate generator-unification boundary
+If the drafter chooses not to port this drill, P1 must narrow its evidence
+claims. The permanent suite alone cannot prove the complete Actions transport
+path.
 
-Do not attempt line-for-line identity between the complete generator scripts. Their `New-StyleGuideFullVersion` implementations legitimately differ because the two guides have different rationale structures, anchors, standalone sections, headings, and instruction artifacts.
+### 7. Add review-only GitHub Actions update governance
 
-The shared generator surface should remain intentionally identical wherever the semantics are identical:
+The action SHAs presently proposed by P1 are current and internally consistent
+as of 2026-07-29:
 
-- `#Requires -Version 5.1`;
-- complete-payload normalization immediately before serialization;
-- destination resolution;
-- BOM-less `UTF8Encoding($false)`;
-- `WriteAllText` without an implicit trailing newline;
-- native-command/error handling expectations;
-- script-version calculation;
-- common function ordering and naming where the output role is the same.
+- `actions/checkout` `v7.0.1`;
+- `actions/setup-node` `v7.0.0`;
+- `actions/upload-artifact` `v7.0.1`; and
+- `actions/download-artifact` `v8.0.1`.
 
-The following differences are legitimate and should be documented as intentional:
+Keep those verified full-length pins. Do not copy T1's older checkout/setup-node
+SHAs into P1 for superficial parity; instead, update T1 during its required
+preimplementation pin revalidation.
 
-- PSStyleGuide already has the repository-wide `.gitattributes` rule; TerraformStyleGuide must add it.
-- P1 must replace its current frontmatter here-string; T1 must preserve its already-correct LF-joined array.
-- `powershell.instructions.md` and `terraform.instructions.md` require different function names, frontmatter, and manifest entries.
-- Chat titles, executive-summary handling, rationale anchors, and full-guide merge rules are domain-specific.
+P1 should also add `.github/dependabot.yml`, making six affected files, with a
+weekly `github-actions` entry for directory `/`. The policy should open
+reviewable pull requests only: no automatic merge and no bypass of the normal
+tests or review. Keep the human-readable release tag on the same line as each
+full SHA so that Dependabot can update the pinned reference and its annotation.
+This is the same review-only governance T1 already proposes and removes an
+otherwise unnecessary cross-repository difference.
 
-Keep both repositories self-contained. Unification should mean reviewed parity of the common algorithm and tests, not a runtime dependency between repositories or cross-repository byte equality.
+The move from Node 20 to Node 24 in P1's lint job is reasonable and should
+remain PSStyleGuide-specific: GitHub began changing Actions runners to Node 24
+by default on 2026-06-16 after Node 20 reached end of life. Retain explicit
+read-only permissions and `package-manager-cache: false`.
 
-## 8. Make the P2 validation helper consistent with the guide it validates
+### 8. Track the current npm advisories as real work, not residual prose
 
-P2's validation block declares `Get-OrdinalOccurrenceCount` without comment-based help. The current guide says all functions must include full comment-based help inside the function immediately above `param`.
+Running the repository's own lockfile through
+`npm audit --package-lock-only --json` on 2026-07-29 reports seven vulnerable
+package nodes: five high and two moderate. They include direct
+`markdown-it`/`markdownlint-cli2` dependencies and transitive
+`brace-expansion`, `js-yaml`, `linkify-it`, `minimatch`, and `picomatch`
+dependencies. The published advisories are primarily denial-of-service,
+quadratic-complexity, or ReDoS issues. Pull-request Markdown is processed by
+this toolchain, so this is not merely an inventory curiosity.
 
-Either:
+Do not silently combine a package-lock migration with the generator and writer
+redesign unless the project deliberately accepts the added review surface.
+The preferred handling is:
 
-- give the validation function compliant comment-based help; or
-- avoid declaring a named function in the copy-paste validation block and use a narrowly scoped alternative that retains ordinal, non-overlapping occurrence-count behavior.
+- file and link a separately scoped dependency-remediation issue;
+- require a clean or explicitly dispositioned audit result and the existing
+  lint suite;
+- add a weekly npm entry for `/.github/workflows` to the same Dependabot file
+  in that issue; and
+- state in P1 that its read-only permissions reduce impact but do not remediate
+  vulnerable parsing code.
 
-This is lower priority than the workflow and helper-contract corrections, but removing the self-inconsistency will make the handoff more credible.
+That dependency issue can follow P2 so P1 and P2 retain a stable lint baseline.
+If repository policy prohibits merging while high-severity advisories have
+known fixes, make it P0, complete it first, and rebaseline P1's package and
+workflow assumptions. What is not acceptable is leaving “address separately”
+without an issue, owner, or ordering decision.
 
-## What should remain unchanged
+### 9. Keep CI evidence wording exact
 
-- Keep the embedded H1 titles; they are clear issue titles, not duplicate prose.
-- Keep the P1 → P2 dependency and record it with the actual GitHub blocked-by relationship.
-- Do not recreate or edit `.gitattributes` in P1 or P2.
-- Keep P2's `text` fence, four U+00B7 middle-dot visualization, pre-block warning, and prohibition on copying the dots into PowerShell.
-- Keep the operational example in `STYLE_GUIDE.md` and the generic durability explanation in the existing rationale section.
-- Keep P2 generic to unrelated adopters; do not import Terraform provider-recovery guidance from T2.
-- Keep both authoritative source files and all four regenerated artifacts in the P2 implementation commit so the expected post-merge writer result remains `skipped`.
+P1's choice to execute the archive/helper suite in only the two Windows LF
+pull-request cells can be defensible because the archive contract is
+EOL-independent and both PowerShell editions are still covered. T1 instead
+runs it in all four Windows cells.
 
-With the blocking helper-contract mismatch, writer ref identity, edition binding, exhaustive enumeration, fixture oracle, and conditional-job wording corrected, the P1/P2 slate will be technically coherent with T1/T2 while preserving the PSStyleGuide-specific changes that are actually necessary.
+Choose and document one of these policies:
+
+- run the common suite in all four cells for identical P1/T1 evidence; or
+- retain P1's two-cell optimization, identify it in the convergence matrix as
+  intentional, and state precisely that helper coverage is per edition rather
+  than per edition × EOL combination.
+
+Do not say that only manifest names differ if this topology differs. In either
+case:
+
+- all four Windows push cells must download, verify, and approve the candidate;
+- the synchronization writer must run only when `has_changes=true`;
+- a normal no-drift push must show the four read-only cells as successful and
+  the writer job as skipped; and
+- the controlled change-producing drill, not a no-drift run, supplies dynamic
+  evidence for the writer path.
+
+P2's current explanation of the skipped writer is precise; keep it and update
+only its prerequisite details if P1 changes.
+
+## P2 feedback
+
+P2 has no independent blocking defect. Its proposed visualization is
+copy-safe and appropriately generic:
+
+- the warning precedes the example;
+- the fenced block is `text`, not PowerShell;
+- the third line contains exactly four U+00B7 middle-dot characters;
+- the rationale explains the durable rule without duplicating the operational
+  snippet; and
+- the source files and all four generated artifacts are committed together,
+  making a no-drift post-merge result the correct expectation.
+
+Its ordinal occurrence-count validation is now a script block with a synthetic
+false-positive self-test, so it no longer contradicts the guide's
+comment-based-help requirement for named functions. Preserve that design. The
+version/date shown in the metadata example is explicitly labeled as a
+drift-only snapshot; it need not be rewritten as a predicted future date.
+
+After P1 is corrected, update P2's prerequisite snapshot and acceptance text
+to name the final P1 file set, helper/path/cleanup contract, CI topology, and
+Dependabot result. Do not import Terraform-specific state-recovery guidance
+from T2. T2 affects the sequencing and common generator baseline, but its
+provider-oriented content is unrelated to the generic PowerShell blank-line
+example.
+
+## Recommended disposition
+
+Return P1 to the drafter for the nine corrections above, coordinate the common
+security-contract changes into T1, and then file P1 followed by P2. Keep the H1
+issue titles and the P1/P2/T1/T2 names exactly as requested.
+
+The minimum filing bar for P1 should be:
+
+- an accurate P1/T1 convergence matrix;
+- same-held-stream hashing and extraction with a chosen sharing mode;
+- validation of every protected path component from the volume/share root;
+- mutual root non-overlap, repeated validation, and an explicit race model;
+- per-fixture candidate postconditions and fail-closed cleanup;
+- unique workflow paths that satisfy the helper contract;
+- an end-to-end malformed-transport drill or appropriately narrowed evidence;
+- current full-SHA action pins plus review-only Actions Dependabot; and
+- a concrete, ordered disposition for the existing npm advisories.
+
+Once those items are incorporated, P2 can remain narrowly focused and should
+follow P1 without further expansion.
+
+## References
+
+- [PSStyleGuide baseline commit `4346310`](https://github.com/franklesniak/PSStyleGuide/commit/4346310e7deebffb4159c75e30d9546263dfd649)
+- [Microsoft Learn: `Get-FileHash`, including `-InputStream`](https://learn.microsoft.com/powershell/module/microsoft.powershell.utility/get-filehash)
+- [Microsoft Learn: `System.IO.FileShare`](https://learn.microsoft.com/dotnet/api/system.io.fileshare)
+- [GitHub Docs: secure use of third-party actions](https://docs.github.com/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions#using-third-party-actions)
+- [GitHub Docs: keeping actions up to date with Dependabot](https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/secure-your-dependencies/auto-update-actions)
+- [GitHub Docs: Dependabot support for full-SHA action references and same-line annotations](https://docs.github.com/en/code-security/reference/supply-chain-security/supported-ecosystems-and-repositories#github-actions)
+- [GitHub changelog: Node 20 deprecation and Node 24 runner migration](https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/)
+- [`actions/checkout` at the proposed `v7.0.1` commit](https://github.com/actions/checkout/commit/3d3c42e5aac5ba805825da76410c181273ba90b1)
+- [`actions/setup-node` at the proposed `v7.0.0` commit](https://github.com/actions/setup-node/commit/820762786026740c76f36085b0efc47a31fe5020)
+- [`actions/upload-artifact` at the proposed `v7.0.1` commit](https://github.com/actions/upload-artifact/commit/043fb46d1a93c77aae656e7c1c64a875d1fc6a0a)
+- [`actions/download-artifact` at the proposed `v8.0.1` commit](https://github.com/actions/download-artifact/commit/3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c)
+- [GitHub Advisory Database: `brace-expansion` exponential-time denial of service](https://github.com/advisories/GHSA-3jxr-9vmj-r5cp)
+- [GitHub Advisory Database: `js-yaml` quadratic CPU consumption](https://github.com/advisories/GHSA-52cp-r559-cp3m)
+- [GitHub Advisory Database: `linkify-it` quadratic-complexity denial of service](https://github.com/advisories/GHSA-v245-v573-v5vm)
+- [GitHub Advisory Database: `markdown-it` quadratic-complexity denial of service](https://github.com/advisories/GHSA-6v5v-wf23-fmfq)
+- [GitHub Advisory Database: `minimatch` ReDoS](https://github.com/advisories/GHSA-7r86-cg39-jmmj)
+- [GitHub Advisory Database: `picomatch` ReDoS](https://github.com/advisories/GHSA-c2c7-rcm5-vvqj)

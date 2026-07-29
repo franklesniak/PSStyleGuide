@@ -2,23 +2,34 @@
 
 ## Overall assessment
 
-The proposed order is correct: T1 should establish deterministic generation,
-artifact validation, and controlled publication before T2 changes the generated
-guide and rationale. T2's provider-specific recovery research is substantially
-stronger than the repository's current examples.
+The current T1/T2 slate is substantially improved and is close to
+implementation-ready. The sequence is correct: T1 should establish deterministic
+generation and a controlled synchronization boundary before T2 changes the
+source guide, rationale, and generated artifacts.
 
-The slate should not be implemented unchanged, however. T1 says it is aligned
-with the revised PowerShell P1 contract, but its helper interface, trust
-boundaries, byte-consumption model, and permanent-test plan are materially
-weaker. T1 also leaves moving GitHub actions and the repository's Node 20 lint
-runtime in place. Because T2 names the exact implementation delivered by T1 as
-a prerequisite, correcting T1 requires a corresponding rewrite of T2's
-prerequisite and validation sections.
+T1 now includes the important architecture that was previously missing:
 
-T2 has four remaining safety gaps: inherited shell tracing can expose the HCP
-Terraform token, the HCP API hostname assumes only the US service, the promised
-state-safety scope is broader than the examples actually inventoried, and the
-copy-safety rules are not exercised by an executable non-network harness.
+- explicit checkout and trusted-temporary roots;
+- the same five mandatory and three optional helper parameters as P1;
+- full-component path checks;
+- a tracked helper-test harness;
+- immutable artifact ID and digest propagation;
+- pinned external actions;
+- least-privileged jobs;
+- an actual edition-by-EOL Windows matrix; and
+- an exact-lease writer.
+
+Those improvements should be preserved. Four T1 details still need revision,
+however: the digest is not bound to the ZIP stream that is consumed, the
+checkout/setup-node and Node targets lag the revised P1 and current supported
+releases, the fixture table does not fulfill its own stable-ID promise, and the
+writer validation remains weaker than P1.
+
+T2's provider-specific recovery work is also strong. Its remaining gaps are
+narrower: inherited Bash tracing can expose the HCP token, the HCP API host
+excludes Europe, the universal state-safety wording is broader than the
+inventoried examples, and shell safety is reviewed but not executed through a
+non-network test harness.
 
 ## Evidence baseline
 
@@ -26,462 +37,402 @@ This review compared:
 
 - the revised [PowerShell P1](../PSStyleGuide/01PSStyleGuideP1.md) and
   [PowerShell P2](../PSStyleGuide/02PSStyleGuideP2.md);
-- the proposed [Terraform T1](./03TerraformStyleGuideT1.md) and
+- the current proposed [Terraform T1](./03TerraformStyleGuideT1.md) and
   [Terraform T2](./04TerraformStyleGuideT2.md);
-- TerraformStyleGuide `main` at commit
+- TerraformStyleGuide `main` at
   [`6ee3f57b2b71b885a5927b770dde47532944de62`](https://github.com/franklesniak/TerraformStyleGuide/commit/6ee3f57b2b71b885a5927b770dde47532944de62);
 - the live
   [`build.yml`](https://github.com/franklesniak/TerraformStyleGuide/blob/6ee3f57b2b71b885a5927b770dde47532944de62/.github/workflows/build.yml),
   [`markdownlint.yml`](https://github.com/franklesniak/TerraformStyleGuide/blob/6ee3f57b2b71b885a5927b770dde47532944de62/.github/workflows/markdownlint.yml),
   and
-  [`Generate-StyleGuide.ps1`](https://github.com/franklesniak/TerraformStyleGuide/blob/6ee3f57b2b71b885a5927b770dde47532944de62/Generate-StyleGuide.ps1);
-- the current dependency lock and a clean `npm audit` at that exact commit; and
-- current GitHub, Microsoft, Google, AWS, and HashiCorp primary documentation
-  linked in the relevant findings below.
+  [`Generate-StyleGuideArtifacts.ps1`](https://github.com/franklesniak/TerraformStyleGuide/blob/6ee3f57b2b71b885a5927b770dde47532944de62/.github/workflows/Generate-StyleGuideArtifacts.ps1);
+- the live `STYLE_GUIDE.md` and `STYLE_GUIDE_RATIONALE.md`; and
+- the current primary sources linked in the findings below.
 
-At that commit, `.gitattributes` is absent, the generator still targets
-PowerShell 5.1 and uses four `Set-Content -Encoding UTF8 -NoNewline` calls,
-`build.yml` uses moving `actions/checkout@v4` and
-`actions/upload-artifact@v4`, and `markdownlint.yml` uses moving
-`actions/checkout@v4`, moving `actions/setup-node@v4`, and Node 20.
+At that commit, `.gitattributes` is absent. The PowerShell 5.1 generator still
+has four `Set-Content -Encoding UTF8 -NoNewline` write sites. `build.yml` still
+uses moving `actions/checkout@v4` and `actions/upload-artifact@v4`, while
+`markdownlint.yml` still uses moving `actions/checkout@v4`,
+`actions/setup-node@v4`, and Node 20.
 
 ## Findings
 
-### T1-1: The helper is not aligned with the revised P1 trust contract
+### T1-1: The verified digest is not bound to the consumed ZIP stream
 
 **Severity:** High
 
-T1 repeatedly describes its helper as aligned with PowerShell P1, but the
-specified interface accepts only three logical inputs:
+T1 requires:
 
-- download directory;
-- candidate directory; and
-- expected digest.
+```powershell
+Get-FileHash -Algorithm SHA256
+```
 
-It derives the checkout root from the helper's own fixed location, has no
-explicit trusted temporary root, and mentions artifact ID, run ID, and run
-attempt in diagnostics only "when available." There are no caller-owned
-optional parameters through which those values become available.
+against the retained archive path and then opens that path again for ZIP
+processing. The path checks are extensive, but hashing one open and parsing a
+later open does not prove that the bytes parsed are the bytes that passed the
+digest comparison.
 
-The revised P1 target contract deliberately requires five scalar path/digest
-inputs:
+P1 already has the correct shared contract:
 
-- `CheckoutRoot`;
-- `TrustedTemporaryRoot`;
-- `DownloadDirectory`;
-- `CandidateDirectory`; and
-- `ExpectedDigest`.
+1. perform the component, containment, type, and leaf checks;
+2. open the retained file once as a read-only, seekable `FileStream` with an
+   explicitly selected restrictive sharing mode;
+3. hash that stream with `Get-FileHash -InputStream -Algorithm SHA256`;
+4. require exactly one valid hash result and compare it with the propagated
+   digest;
+5. rewind the same held stream;
+6. construct one read-only `ZipArchive` over that stream;
+7. use that archive through manifest validation and extraction; and
+8. dispose entry streams, the archive, and the underlying stream in deterministic
+   nested `try`/`finally` blocks.
 
-It also defines optional scalar `ArtifactId`, `RunId`, and `RunAttempt`
-diagnostic inputs. That interface supports validation of both important
-relationships: the untrusted download and candidate paths must be strict
-descendants of the caller-established trusted temporary root, and the checkout
-must be disjoint from that root. A helper-local assumption about repository
-layout cannot prove either relationship on the caller's behalf.
+Repeated path validation remains valuable, but it does not substitute for
+same-stream identity.
 
-T1 should adopt the stronger contract rather than declaring a reduced interface
-equivalent. Its path-validation phase should explicitly require:
+**Required revision:** Replace T1's path-based digest section with P1's held
+stream contract. Update the helper requirements, fixture expectations,
+acceptance criteria, T2 prerequisite, and propagated-digest drill together.
 
-1. scalar, nonempty inputs with no wildcards;
-2. filesystem-provider paths only, including rejection of registry, variable,
-   function, alias, and other provider-qualified paths;
-3. normalization against an explicit base for relative inputs;
-4. component-by-component inspection of every existing ancestor;
-5. rejection of symlink, junction, mount-point, and other reparse components;
-6. strict-descendant proofs for download and candidate paths under the trusted
-   temporary root;
-7. checkout/trusted-root disjointness in both directions;
-8. platform-appropriate case comparison;
-9. a final "last safe moment" revalidation immediately before opening the ZIP;
-   and
-10. a final destination revalidation immediately before the candidate becomes
-    visible.
-
-These are not PowerShell-specific embellishments. They define the trust
-boundary for an artifact produced by another job and consumed before a possible
-repository write.
-
-**Required revision:** Replace the three-input helper interface with the revised
-P1 five-input plus three-optional-diagnostic interface, and copy the complete
-relationship and reparse-point requirements into T1 in Terraform-specific
-language.
-
-### T1-2: The verified bytes are not bound to the consumed ZIP stream
-
-**Severity:** High
-
-T1 calculates the SHA-256 digest with `Get-FileHash -Path` and later opens the
-same pathname again for ZIP inspection. This proves that some bytes at that path
-were hashed; it does not bind the bytes subsequently parsed and extracted to
-the successfully verified stream.
-
-The helper should instead:
-
-1. finish path and component validation;
-2. open the archive once as a read-only, seekable `FileStream` with restrictive
-   sharing;
-3. hash that held stream with `Get-FileHash -InputStream`;
-4. compare the normalized digest in constant, ordinal form;
-5. rewind the same stream to position zero; and
-6. construct `ZipArchive` over that still-held stream for validation and
-   extraction.
-
-The stream should remain open until archive processing is complete. Path
-revalidation is still necessary, but it is not a substitute for consuming the
-same byte stream that passed the digest check.
-
-**Required revision:** Rewrite the digest, archive-open, and extraction phases
-around one held stream. Update every corresponding acceptance criterion and
-fixture expectation.
-
-### T1-3: The "permanent helper self-test" has no tracked fixture oracle
-
-**Severity:** High
-
-T1 calls its test plan permanent, but its affected-files list contains no test
-script. Instead, workflow jobs are expected to construct and evaluate fixtures
-inline. That invites the Ubuntu and Windows cells to drift and leaves no single
-reviewable definition of the helper's security contract.
-
-The grouped outcome table is also not yet an executable oracle:
-
-- it promises stable fixture IDs but supplies no IDs;
-- several distinct failure modes are grouped into one row;
-- failure phases are not named consistently;
-- required diagnostic fields are not specified per case;
-- candidate-tree postconditions are not specified per case; and
-- several boundary cases from the revised P1 suite are absent or ambiguous.
-
-T1 should add a tracked fixture harness, for example
-`.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1`. The harness
-should be the sole fixture constructor and outcome oracle used by all
-PowerShell cells.
-Give every fixture a stable ID and record:
-
-- platform or precondition;
-- exact inputs;
-- expected success or named failure phase;
-- required diagnostic fields;
-- expected candidate-tree postcondition; and
-- whether the helper may have created any destination content.
-
-At minimum, the matrix should independently cover:
-
-- valid absolute, relative, and filesystem-provider-qualified inputs;
-- non-filesystem provider rejection;
-- missing, empty, wildcarded, and multi-valued inputs;
-- download/candidate equality and ancestor/descendant inversions;
-- checkout/trusted-root equality and nesting in either direction;
-- platform-appropriate case behavior;
-- optional diagnostic fields absent, empty, and populated;
-- symlink/reparse components at each security-relevant level;
-- missing archive, multiple archives, digest mismatch, and archive replacement
-  attempts;
-- duplicate entries, duplicate manifest, missing manifest, unexpected entries,
-  directory entries, absolute paths, drive-qualified paths, traversal, mixed
-  separators, malformed ZIP metadata, and excessive size/count;
-- manifest/guide/rationale digest or length mismatch;
-- pre-existing candidate destination, dangling-link destination, and simulated
-  publish failure; and
-- success with byte-for-byte expected output and no extra files.
-
-The pre-merge topology should also follow the revised P1 structure:
-
-- Ubuntu with PowerShell 7;
-- Windows with Windows PowerShell and LF source;
-- Windows with PowerShell 7 and LF source; and
-- separate CRLF generation/build consumers where needed.
-
-All four push consumers should always start. The three validation cells should
-run for both drift and no-drift fixtures, while only the selected writer may
-enter mutation steps when `has_changes == 'true'`. The CRLF cells do not need
-to duplicate helper tests whose behavior is independent of generator source
-line endings.
-
-**Required revision:** Add the tracked harness to the affected files, version
-it with the helper, replace the grouped prose table with stable fixture rows,
-and make every matrix cell invoke that harness.
-
-### T1-4: Action and runtime modernization is incomplete
+### T1-2: The action and Node targets are stale and diverge from P1
 
 **Severity:** High and time-sensitive
 
-T1 pins only artifact upload and download actions. That leaves both workflows'
-checkout actions moving, and it leaves the lint workflow on a moving
-`setup-node@v4` plus Node 20. This is inconsistent with T1's own
-reproducibility and supply-chain goals.
+T1 is dated 2026-07-29 but prescribes:
 
-The revised P1 already records the current exact modernization target:
+- `actions/checkout` v6.1.0;
+- `actions/setup-node` v6.5.0; and
+- preservation of the lint workflow's Node 20 behavior.
 
-- `actions/checkout` v7.0.1 at
-  `3d3c42e5aac5ba805825da76410c181273ba90b1`;
-- `actions/setup-node` v7.0.0 at
-  `820762786026740c76f36085b0efc47a31fe5020`; and
-- Node 24 with package-manager caching explicitly disabled unless the issue
-  deliberately enables and constrains it.
+The revised P1 uses the current targets:
 
-GitHub's action metadata and release notes should still be rechecked at
-implementation time. The exact SHA, release tag, and relevant runtime behavior
-should be recorded together, just as T1 already requires for artifact actions.
+- [`actions/checkout` v7.0.1](https://github.com/actions/checkout/releases/tag/v7.0.1)
+  at `3d3c42e5aac5ba805825da76410c181273ba90b1`;
+- [`actions/setup-node` v7.0.0](https://github.com/actions/setup-node/releases/tag/v7.0.0)
+  at `820762786026740c76f36085b0efc47a31fe5020`;
+- `node-version: '24'`; and
+- `package-manager-cache: false`.
 
-`markdownlint.yml` should also receive explicit least-privilege
-`permissions: contents: read`. The build workflow may grant `contents: write`
-only to the selected writer job or otherwise at the narrowest practical scope;
-validation jobs do not need write permission.
+Both action commits declare the Node 24 action runtime. More importantly, the
+lint process selected by `node-version` is separate from the action's own
+runtime. The official
+[Node release table](https://nodejs.org/en/about/previous-releases) marks Node
+20 end-of-life and Node 24 LTS. T1's instruction to preserve Node 20 therefore
+retains an unsupported lint runtime even if the action itself is pinned.
 
-After adding the fixture harness, the corrected T1 affected-file set should be
-six paths:
+T1's upload-artifact v7.0.1 and download-artifact v8.0.1 pins are current and
+should remain unless implementation-time verification identifies a required
+newer release.
 
-1. `.gitattributes`;
-2. `Generate-StyleGuide.ps1`;
-3. `.github/workflows/Expand-StyleGuideCandidateArtifact.ps1`;
-4. `.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1`;
-5. `.github/workflows/build.yml`; and
-6. `.github/workflows/markdownlint.yml`.
+The Dependabot difference also needs an explicit decision. T1 intentionally
+adds review-only GitHub Actions updates, while P1 intentionally excludes
+Dependabot from scope. Repository-specific supply-chain policy can justify that
+difference, but it should be labeled as intentional rather than presented as
+part of the shared generator/helper contract.
 
-The staged-path allowlist, evidence map, implementation sequence, rollback
-plan, and non-goals must all use this same six-path set.
+**Required revision:** Align checkout, setup-node, installed Node, and cache
+behavior with P1; retain explicit `contents: read` for lint. State whether
+TerraformStyleGuide's Dependabot addition is an intentional repository-specific
+difference. The final choice determines whether T1 has seven affected files or
+six.
 
-**Required revision:** Include checkout and setup-node pinning, Node 24,
-least-privilege lint permissions, and `markdownlint.yml` in T1's implementation
-scope and acceptance criteria.
-
-### T1-5: The writer contract needs final normalization
-
-**Severity:** Medium
-
-T1's writer is much improved: it copies target values into locals, resolves a
-native full object ID, requires an exact `ls-remote` observation, and uses an
-exact lease and fully qualified refspec. The remaining requirements should be
-made as explicit as they are in revised P1:
-
-- validate the complete target ref with `git check-ref-format`, not only the
-  `refs/heads/` prefix;
-- reject whitespace, carriage return, and line feed in all control values;
-- copy the target ref and expected SHA at the first executable lines of the
-  mutation block and never reread their environment variables;
-- use only the validated local ref in parent and remote proofs; and
-- ensure controlled failure drills mutate only the intended local test input,
-  never the real environment or remote reference.
-
-**Required revision:** Copy the revised P1 writer normalization and drill
-constraints into T1, preserving T1's already-strong exact-lease behavior.
-
-### T1/T2-1: T2's prerequisite becomes stale when T1 is corrected
-
-**Severity:** High
-
-T2 currently names a four-file T1 implementation, versions only the generator
-and helper, describes all four PR cells as Windows harness consumers, carries
-forward path-based hashing, and discusses only the artifact action pins.
-
-After the T1 corrections above, T2 must require the exact delivered versions of
-the generator, helper, and fixture harness, and must name the six implementation
-paths. Its prerequisite evidence should confirm:
-
-- the five required and three optional helper parameters;
-- same-held-stream digest and ZIP consumption;
-- the exhaustive, stable-ID fixture oracle;
-- the actual Ubuntu/Windows Desktop/Windows Core topology;
-- all four push consumers starting on every push;
-- writer-only mutation on drift;
-- exact checkout, setup-node, upload, and download pins;
-- Node 24 and lint-workflow permissions; and
-- successful LF and CRLF generated-output validation.
-
-T2 should fail closed if the repository does not match that delivered T1
-contract. It should not preserve obsolete T1 details merely because they appear
-in the current draft.
-
-**Required revision:** Regenerate T2's dependency gate, affected-file evidence,
-and validation references from the corrected final T1.
-
-### T2-1: The HCP example can expose the token under inherited xtrace
-
-**Severity:** High
-
-Saying "do not use `set -x`" does not neutralize tracing inherited from the
-caller's shell. In the current proposed block, the parameter expansion that
-validates `TFC_TOKEN` may itself be traced before the script has disabled
-anything, exposing the token in a terminal transcript or CI log.
-
-The HCP example should execute in a subshell and make `set +x` its first command
-before any token expansion, validation, header construction, or `curl`
-invocation. It should avoid placing the token in process arguments or error
-messages and should keep the authorization header inside the command boundary.
-
-Acceptance must test this, not merely inspect it. Run the exact published block
-with tracing already enabled, a sentinel token, and stubbed `curl`; then prove
-that the sentinel appears in neither captured trace output nor the stub's
-recorded argument list.
-
-**Required revision:** Add first-command trace disabling and an inherited-xtrace
-sentinel test to the HCP acceptance criteria.
-
-### T2-2: The HCP API host assumes only the US service
+### T1-3: The tracked harness exists, but its oracle is not deterministic enough
 
 **Severity:** Medium to high
 
-The proposed example hardcodes `https://app.terraform.io`. HCP Terraform Europe
-uses `https://app.eu.terraform.io`, as documented in
-[HCP Terraform Europe](https://developer.hashicorp.com/terraform/cloud-docs/europe).
-Silently encouraging users to substitute an arbitrary hostname would be worse,
-because a bearer token could then be sent to an attacker-controlled endpoint.
+Adding
+`.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1` as the sole
+fixture oracle is the right design. The table beneath it, however, says the
+suite must use stable case identifiers without assigning any identifiers.
+Several rows also combine independently meaningful cases, including:
 
-The issue should choose an explicit environment selector or validated API-host
-allowlist covering the standard and Europe services. Require HTTPS and reject
-all other hosts before token handling. If Terraform Enterprise is intentionally
-out of scope, say so; supporting arbitrary enterprise installations requires a
-different trust and certificate configuration contract.
+- forward- and backslash nesting;
+- forward and backward traversal;
+- leading slash, leading backslash, and drive qualification;
+- multiple root-overlap relationships;
+- each of the three optional empty labels; and
+- different reparse/symlink component locations.
 
-The block should also validate `TFC_PAGE_NUMBER` as a positive decimal integer
-before interpolation. The current default does not prevent callers from
-supplying malformed values.
+That leaves the implementer to invent both the IDs and the one-to-many mapping
+between a prose row and executable results. It also weakens platform-skip
+accounting because a grouped row can partially execute while still appearing
+covered.
 
-HashiCorp's
-[API overview](https://developer.hashicorp.com/terraform/cloud-docs/api-docs)
-and
-[state-version endpoint](https://developer.hashicorp.com/terraform/cloud-docs/api-docs/state-versions)
-should be rechecked at implementation time for token, pagination, filter, and
-temporary-download-URL behavior.
+There is an internal postcondition conflict as well. T1 says every rejection
+fixture must leave the destination directory nonexistent, but its pre-existing
+candidate file, directory, symlink, and dangling-link cases require the
+pre-existing entry to remain unchanged. Those cases cannot satisfy a blanket
+nonexistence assertion.
 
-**Required revision:** Add a closed host/environment selection, HTTPS and
-positive-page validation, explicit Terraform Enterprise scope, and tests for
-accepted and rejected hosts.
+Use P1's explicit ID-and-phase table as the structural model, with
+Terraform-specific manifest names. While doing so, make the postcondition
+row-specific:
 
-### T2-3: The promised state-safety scope is broader than the inventory
+- pre-creation cases with no pre-existing leaf require absence;
+- pre-existing-leaf cases require the exact original entry to remain unchanged;
+- post-creation failure cases require safe removal of only the helper-created
+  leaf or an explicit fail-closed cleanup error and retained path; and
+- success cases require the complete four-file byte and type contract.
 
-**Severity:** High
+The pull-request topology should also be reconciled. T1 currently repeats the
+entire helper suite in all four Windows PR cells; P1 runs it on Ubuntu and the
+two Windows LF cells while reserving the CRLF cells for generator behavior.
+Repeating the suite is not incorrect, but it adds CI cost without exercising a
+helper behavior that depends on source-fixture EOL. Keep the broader topology
+only if there is a documented Terraform-specific reason. All four push cells
+should continue to run the suite because each is a real candidate consumer.
 
-T2 promises that every recovery destination and every displayed recovery
-command is copy-safe, but its concrete inventory focuses on four provider/API
-blocks. The current guide and rationale contain adjacent state commands with
-the same safety implications, including:
+**Required revision:** Assign one stable ID to every executable case, split
+grouped cases where outcome attribution matters, define exact phase,
+diagnostics, and row-specific candidate postconditions, and document the chosen
+PR-suite topology.
 
-- `terraform state pull` redirected to a local backup path;
-- `terraform show -json` piped through truncating display commands;
-- `terraform state push`;
-- deletion commands;
-- another prefix-only S3 listing; and
-- legacy Azure, GCS, and HCP snippets outside the primary four blocks.
-
-The issue needs an explicit scope decision:
-
-1. expand T2's inventory and acceptance criteria to cover every state backup,
-   inspection, recovery, and destructive example in both source documents; or
-2. narrow T2's universal wording to the four named blocks and file a follow-up
-   issue with an enumerated command inventory.
-
-The first option better matches the current T2 title and acceptance language.
-Whichever option is chosen, distinguish copy-safe local destinations from
-provider-side non-overwrite guarantees and from destructive operations that
-require separate warnings and confirmation.
-
-**Required revision:** Add a complete source-location inventory or narrow the
-claim and create an explicit follow-up. Do not retain universal acceptance
-language with partial coverage.
-
-### T2-4: Copy-safety needs executable non-network validation
+### T1-4: The writer validation remains weaker than P1
 
 **Severity:** Medium
 
-Generator execution, Markdown linting, whitespace checks, and visual review
-cannot prove shell control-flow properties. The issue should require a
-non-network implementation-time harness that extracts the exact fenced Bash
-blocks destined for publication and exercises them with stubbed provider
-commands.
+T1's writer already has strong exact-SHA behavior: it resolves a native full
+object ID, checks exactly one `ls-remote` record, reuses a full ref in the lease
+and destination refspec, and prohibits adaptation to newer history.
 
-The harness should:
+The remaining normalization should match P1:
 
-- run `bash -n` on each exact block;
-- stub `aws`, `az`, `gcloud`, and `curl`;
-- prove missing, empty, relative, existing, directory, symlink, and dangling
-  destination paths fail before the provider command is called;
-- prove paths containing spaces and shell metacharacters remain one literal
+- copy `TARGET_REF` and `EXPECTED_SHA` at the first executable lines of the
+  mutation block;
+- reject empty values, leading or trailing whitespace, and CR/LF;
+- require the complete ref to pass `git check-ref-format`, not merely begin with
+  `refs/heads/`;
+- compare the locals with `GITHUB_REF` and `GITHUB_SHA` once;
+- never reread any of those four environment variables afterward;
+- use the unchanged locals for the checkout, remote, parent, lease, and refspec
+  proofs; and
+- ensure controlled stale-ref and lease drills mutate only a purpose-specific
+  local test input.
+
+**Required revision:** Copy P1's writer-input normalization and one-read rule
+into T1 while preserving T1's existing exact-lease and blob-identity checks.
+
+### T1/T2-1: Regenerate T2's prerequisite after the final T1 correction
+
+**Severity:** Medium
+
+T2's prerequisite section is now detailed and correctly names the current
+seven-path T1 proposal. It should not be frozen before T1 is finalized.
+
+After the corrections above, update T2 to require:
+
+- same-held-stream digest and ZIP consumption;
+- the final stable-ID fixture oracle and PR topology;
+- the selected checkout/setup-node versions;
+- Node 24 and explicit cache behavior;
+- the final Dependabot decision and resulting six- or seven-path set; and
+- the normalized writer contract.
+
+T2's non-goals currently list only four of T1's seven implementation paths even
+though they say not to modify the prerequisite issue's files. Either list the
+complete final set or say "all files delivered by T1" and point to the verified
+prerequisite manifest.
+
+**Required revision:** Rebuild the dependency gate and non-goal path list from
+the merged T1 implementation rather than copying an intermediate proposal.
+
+### T2-1: Inherited Bash tracing can expose the HCP token
+
+**Severity:** High
+
+The proposed HCP block says not to use `set -x`, but it does not disable tracing
+that the caller has already enabled. The subshell inherits xtrace. Its early
+assignment:
+
+```bash
+TFC_TOKEN=${TFC_TOKEN:?...}
+```
+
+can therefore place the expanded token in trace output before `curl` starts.
+Keeping the token out of curl's process arguments does not protect against a
+shell trace leak.
+
+The HCP subshell should make `set +x` its first command, before `umask`, token
+expansion, validation, header construction, or any command that could expose
+secret-bearing values.
+
+Acceptance must execute this condition. Run the exact published block with
+xtrace already enabled, a sentinel token, and stubbed `curl`; then prove the
+sentinel appears in neither captured trace output nor the stub's recorded
+argument list.
+
+**Required revision:** Add first-command trace disabling and the inherited-
+xtrace sentinel test to the example, rationale, validation, and acceptance
+criteria.
+
+### T2-2: The HCP endpoint excludes Europe and pagination input is unvalidated
+
+**Severity:** Medium to high
+
+The example hardcodes:
+
+```text
+https://app.terraform.io/api/v2/state-versions
+```
+
+HashiCorp documents `app.eu.terraform.io` for
+[HCP Terraform Europe](https://developer.hashicorp.com/terraform/cloud-docs/europe).
+The issue should support both hosted regions without allowing an arbitrary
+token destination.
+
+Use a closed environment selector or exact HTTPS host allowlist containing only:
+
+- `app.terraform.io`; and
+- `app.eu.terraform.io`.
+
+Reject every other value before token handling. If Terraform Enterprise is out
+of scope, state that explicitly; a safe arbitrary-enterprise-host contract
+requires separate trust and certificate requirements.
+
+Also require `TFC_PAGE_NUMBER` to be a positive decimal integer. Defaulting to
+`1` does not validate a caller-supplied value.
+
+The current state-version endpoint, required organization/workspace filters,
+status values, and pagination model are otherwise supported by HashiCorp's
+[state-version API reference](https://developer.hashicorp.com/terraform/cloud-docs/api-docs/state-versions)
+and
+[API overview](https://developer.hashicorp.com/terraform/cloud-docs/api-docs).
+
+**Required revision:** Add closed US/Europe host selection, HTTPS enforcement,
+positive-page validation, explicit Terraform Enterprise scope, and accepted/
+rejected host tests.
+
+### T2-3: The state-safety scope is ambiguous
+
+**Severity:** Medium to high
+
+T2's acceptance criteria say every recovery destination is protected and
+no-clobber, and its sensitive-state section says the examples retrieve a copy
+rather than overwrite active backend state. The concrete requested changes
+focus on the four provider/API examples.
+
+The current guide and rationale contain other nearby state operations,
+including:
+
+- `terraform state pull` redirected to local backup paths;
+- `terraform show -json ... | head -50` as backup inspection;
+- `terraform state push`;
+- state removal commands;
+- a second prefix-only S3 version listing; and
+- legacy Azure, GCS, and HCP examples.
+
+This does not necessarily require expanding T2 indefinitely, but the issue must
+make its quantifier precise. Choose one:
+
+1. inventory and harden every state backup, discovery, inspection, recovery,
+   and destructive example in both source documents; or
+2. explicitly limit T2 to the four named provider-version blocks and create a
+   follow-up issue with the remaining source locations.
+
+The first choice best matches T2's current universal acceptance language. If
+the second is intended, narrow phrases such as "every recovery destination" to
+the enumerated blocks and avoid a document-wide claim that adjacent
+`terraform state push` guidance contradicts.
+
+**Required revision:** Add a complete source-location inventory or narrow the
+scope and record the omitted examples in a follow-up issue.
+
+### T2-4: Shell safety needs executable non-network validation
+
+**Severity:** Medium
+
+All seven current Bash fences pass `bash -n`, which is a useful baseline.
+T2's written validation, however, stops at generator execution, Markdown lint,
+whitespace checks, and content confirmation. Those checks do not prove
+control-flow, quoting, no-overwrite, or trace-secrecy behavior.
+
+Require a non-network implementation-time harness that extracts the exact Bash
+blocks intended for publication and:
+
+- reruns `bash -n`;
+- stubs `aws`, `az`, `gcloud`, and `curl`;
+- proves missing, empty, relative, existing, directory, symlink, and dangling
+  destination paths fail before a provider call;
+- proves paths containing spaces and shell metacharacters remain one literal
   argument;
-- prove no example overwrites an existing local file;
-- assert required version/generation selectors reach the provider command
-  unchanged;
-- exercise provider-side no-overwrite flags where promised; and
-- perform the inherited-xtrace sentinel check from T2-1.
+- proves version and generation selectors reach the stub unchanged;
+- proves Azure and GCS no-overwrite flags are present;
+- proves no block overwrites a local file;
+- verifies US/Europe HCP host acceptance and arbitrary-host rejection;
+- verifies positive-page validation; and
+- performs the inherited-xtrace sentinel test.
 
-This may be a temporary implementation validation artifact rather than a
-permanent repository file, but the issue should specify its inputs, assertions,
-captured evidence, and disposal.
+This can be a temporary validation artifact outside the repository rather than
+a seventh T2 file. The issue should still define its assertions and require its
+captured output as implementation evidence.
 
-**Required revision:** Add this harness to the implementation plan and make its
-successful output required evidence before generated-file acceptance.
+**Required revision:** Add this executable harness to T2's validation and make
+successful non-network results a prerequisite for accepting the generated
+examples.
 
-### Separate maintenance observation: the Markdown dependency lock has advisories
+### Separate maintenance observation: the lint dependency tree has advisories
 
 **Severity:** Medium, not a T1/T2 blocker
 
-A clean audit at the reviewed commit reports seven advisories in the current
-lint dependency tree: five high and two moderate. The implicated locked
-packages include `markdownlint-cli2` 0.20.0 and transitive packages. The
-suggested upgrade crosses a pre-1.0 minor boundary, so it should not be folded
-silently into T1's workflow hardening.
+A clean audit of `.github/workflows/package-lock.json` at the reviewed commit
+reports seven advisories: five high and two moderate. The affected package set
+is `brace-expansion`, `js-yaml`, `linkify-it`, `markdown-it`,
+`markdownlint-cli2`, `minimatch`, and `picomatch`.
 
-Create a separate maintenance issue to:
+T1 correctly excludes dependency changes from its workflow hardening. Keep that
+separation, but create a maintenance issue to:
 
 - update the lint dependency set intentionally;
 - perform a clean Node 24 install;
 - run outer and nested Markdown lint;
-- review lockfile and command changes; and
+- review the lockfile and command changes; and
 - record the post-update audit result.
 
-This work can proceed independently and does not change the required T1 before
-T2 ordering.
+GitHub Actions Dependabot configuration does not cover this npm dependency
+tree, so the proposed review-only action updates do not resolve these
+advisories.
 
 ## Confirmed strengths to preserve
 
-The following parts of the slate are well founded and should survive revision:
-
-- T1 before T2 is the right dependency order.
-- T1 correctly treats line endings as repository-specific: the generator's
-  PowerShell 5.1 `Set-Content -Encoding UTF8` behavior is the real portability
-  concern, while the frontmatter is already assembled from LF-delimited array
-  elements.
-- T1's exhaustive tracked-file enumeration, normalized path comparison, exact
-  candidate-leaf detection, drift/no-drift split, writer selection, full native
-  object-ID resolution, exact remote observation, exact lease, and explicit
-  refspec are strong improvements.
-- T1 correctly requires all push consumers to start and confines mutation to
-  the selected writer when drift exists.
-- T2's provider-specific direction is strong: immutable identifiers rather
-  than timestamp inference, explicit Azure version IDs, GCS generation-aware
-  selection, HCP state-version enumeration, and destination non-overwrite
-  checks are the correct foundation.
-- T2's dated AWS permission reconciliation is valuable because AWS documentation
-  varies by bucket class and operation. Preserve the requirement to recheck
-  current primary documentation rather than flattening those distinctions into
-  a universal KMS statement. Relevant sources include the
-  [S3 policy-action mapping](https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-with-s3-policy-actions.html),
-  [SSE-KMS guidance](https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html),
-  and
-  [`GetObject` API reference](https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html).
-- The Azure and GCS research targets are appropriate. Recheck the
-  [Azure versioning limitations](https://learn.microsoft.com/en-us/azure/storage/blobs/versioning-overview),
-  [Azure CLI blob commands](https://learn.microsoft.com/en-us/cli/azure/storage/blob?view=azure-cli-latest),
-  [`gcloud storage ls`](https://docs.cloud.google.com/sdk/gcloud/reference/storage/ls),
-  and
-  [`gcloud storage cp`](https://docs.cloud.google.com/sdk/gcloud/reference/storage/cp)
-  when implementing.
+- T1 before T2 is the correct dependency order.
+- T1 correctly identifies the Terraform generator's four serialization
+  boundaries and leaves its already-correct LF-joined frontmatter alone.
+- The five mandatory helper parameters and three optional diagnostic labels now
+  match P1.
+- T1's full-component rule is deliberately stronger where needed and correctly
+  says to coordinate or document any remaining cross-repository difference
+  rather than claiming false parity.
+- The tracked helper harness, explicit shell/edition steps, exact fixture-EOL
+  matrix, all-push-consumer behavior, immutable candidate transport, and
+  diagnostic artifact handling are strong designs.
+- T1's exact remote observation, full object-ID handling, exact expected-SHA
+  lease, explicit refspec, staged/committed blob proof, and no-retry policy are
+  strong.
+- T2 correctly separates discovery from recovery and deliberate identifier
+  selection.
+- T2's S3 bucket-class and KMS reconciliation, Azure non-HNS scope and
+  `--overwrite false`, GCS Object Versioning/soft-delete distinction and
+  `--no-clobber`, and HCP `/state-versions` filters are well researched.
+- The HCP use of `curl -q --config -`, a pre-opened noclobber file descriptor,
+  restrictive `umask`, explicit failure handling, and retention of invalid
+  partial output is materially safer than the current guide.
+- T2 correctly treats state and Archivist URLs as sensitive and avoids
+  automatic recovery selection or rollback.
 
 ## Recommended final slate
 
-1. Revise T1 to the five-input trust contract, one-held-stream archive model,
-   tracked stable-ID fixture harness, six affected files, current exact action
-   pins, Node 24, least-privilege permissions, and normalized writer contract.
-2. Revise T2's prerequisite to the final delivered T1 contract.
-3. Revise T2's HCP block for inherited tracing, closed US/Europe host selection,
-   positive pagination validation, and explicit Enterprise scope.
-4. Resolve T2's all-state-examples scope and require an executable non-network
-   copy-safety harness.
-5. Implement and merge T1 before beginning T2.
-6. Track the Markdown dependency update separately so its compatibility and
-   audit evidence remain reviewable.
+1. Revise T1 to use one held archive stream from digest through extraction.
+2. Align T1's checkout/setup-node pins and lint runtime with P1 and Node 24;
+   record whether Dependabot is an intentional Terraform-only difference.
+3. Replace T1's grouped fixture table with stable IDs and row-specific
+   postconditions, and normalize the writer contract.
+4. Update T2's prerequisite and non-goal manifest from the final merged T1.
+5. Add first-command xtrace disabling, closed US/Europe HCP host selection, and
+   positive pagination validation to T2.
+6. Resolve T2's state-example scope and require executable non-network shell
+   validation.
+7. Keep T1 then T2 sequential, and track npm dependency maintenance separately.
 
-With those changes, the two-issue sequence is a sound plan: T1 will provide a
-reproducible and security-testable publication boundary, and T2 can then improve
-state-recovery guidance without weakening that boundary.
+With those corrections, the slate provides a sound cross-repository direction:
+the shared generator and artifact boundary can converge where behavior should
+match, while manifest names, Dependabot policy, and genuinely repository-
+specific concerns remain explicit rather than accidental differences.
