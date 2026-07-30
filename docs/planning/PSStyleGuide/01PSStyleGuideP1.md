@@ -145,6 +145,13 @@ Do not hand-edit generated artifacts.
 
 ## Frozen P1 supply tuple
 
+Materialize the complete tuple and both gate results as the immutable
+`P1-SUPPLY-FREEZE-v1` record. It includes exact `package.json` and
+`package-lock.json` HEAD/stage-0 blob IDs and SHA-256, reviewed working bytes,
+Node/npm identities, the sole lock/install producer argv, canonical installed
+package-tree identity, normalized audit findings, and the dated policy
+decision. P1B consumes this named record without reinterpretation.
+
 Use:
 
 - `yaml@2.9.0`, registry integrity
