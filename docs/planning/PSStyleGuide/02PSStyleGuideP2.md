@@ -32,10 +32,18 @@ Before coding, record:
 | Scope verifier | Exact script version/hash and invocation contract |
 | Publication | Final graph/action/default contract; candidate/attestation/approval/writer evidence |
 | Credentials/evidence | Honest token-state proof and isolated evidence-ref deletion |
+| Main governance | Persistent rule ID/digest, active effective rules, required check/source, sole Actions bypass |
 | Reciprocal | P1↔T1, P1A↔T1A, and P1B↔T1B without blockers |
 | Updates | Exact one-entry review-only Actions Dependabot policy |
 
-Compare these landed values with this issue. Any material difference stops for
+Re-fetch the persistent rule by ID, hash its normalized JSON, query all active
+rules applying to `main`, and require exact targeting, pull-request/resolved/
+current/check/deletion/non-fast-forward behavior, the stable P1B terminal
+check from the GitHub Actions source, and exactly one re-resolved official
+Actions integration in `always` mode. Missing, disabled, broadened, drifted,
+or extra-bypass state stops implementation.
+
+Compare all landed values with this issue. Any material difference stops for
 issue review and reruns affected predecessor validation; do not restate or
 silently modify predecessor algorithms here.
 
@@ -259,7 +267,9 @@ After filing, P3 records P2's permanent issue URL and blocked-by edge. Give P3
 the P2 issue/PR URLs, reviewed head/base, merge method, landed commit/tree,
 final guide version/date, exact six-path scope, source/artifact hashes,
 generator-idempotence and content-mutation results, pull-request/post-merge
-run evidence, and confirmation that no dependency/workflow contract changed.
+run evidence, persistent rule ID/normalized digest/effective-rule result/
+required check/source/sole bypass, and confirmation that no dependency/
+workflow contract changed.
 
 ## References
 

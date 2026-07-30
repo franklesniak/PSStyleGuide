@@ -2,406 +2,407 @@
 
 ## Review status
 
-Review complete against the current committed versions of:
+This review covers the current sequential P slate:
 
-- `docs/planning/PSStyleGuide/01PSStyleGuideP1.md`;
-- `docs/planning/PSStyleGuide/01aPSStyleGuideP1A.md`;
-- `docs/planning/PSStyleGuide/01bPSStyleGuideP1B.md`;
-- `docs/planning/PSStyleGuide/02PSStyleGuideP2.md`;
-- `docs/planning/PSStyleGuide/03PSStyleGuideP3.md`; and
-- `docs/planning/PSStyleGuide/slate-criticism.md`.
+1. `01PSStyleGuideP1.md`;
+2. `01aPSStyleGuideP1A.md`;
+3. `01bPSStyleGuideP1B.md`;
+4. `02PSStyleGuideP2.md`; and
+5. `03PSStyleGuideP3.md`.
 
-The pre-existing findings artifact was written before the current issue drafts
-and criticism file. Its conclusions are not being carried forward without
-revalidation.
+The review uses the criticism in `docs/planning/PSStyleGuide/slate-criticism.md`,
+the planning-tree state at PSStyleGuide commit
+`977d315d1cb123cc080176055d6034a1f28811e4`, the corresponding copied P files
+at TerraformStyleGuide commit `87eb81f`, and the live default branch at
+`4346310e7deebffb4159c75e30d9546263dfd649`.
 
-## Initial observations
+The slate structure, order, issue identifiers, and H1-as-title convention are
+sound. No issue addition, deletion, rename, or reorder is warranted. P2 is
+ready after corrected predecessors land. P1, P1A, P1B, and P3 require another
+contract-closure pass before filing.
 
-- All five issue descriptions preserve the requested H1 title convention and
-  identify the issues as P1, P1A, P1B, P2, and P3.
-- The intended dependency order is explicit: P1 → P1A → P1B → P2 → P3.
-- The current P1 draft now places the structural workflow-policy validator and
-  NUL-safe exact Git path-set verifier in the foundational issue, so older
-  criticism that described these mechanisms as absent must be checked for
-  supersession.
-- The issue drafts are individually below GitHub's issue-body size boundary,
-  but the slate contains more than 3,000 lines of implementation contract and
-  validation text. Precision is valuable; repeated or nonessential mechanisms
-  should still be removed because they increase contradiction and maintenance
-  risk.
+## Primary-source and live-state validation
+
+Read-only checks on 2026-07-30 confirmed:
+
+- `main` remains the PSStyleGuide default branch;
+- the repository ruleset list is empty;
+- classic protection for `main` returns `404 Branch not protected`;
+- the official GitHub Actions application still resolves to owner `github`,
+  slug `github-actions`, integration ID `15368`; and
+- the five P issue drafts are byte-identical in both planning trees.
+
+Current primary sources also confirm:
+
+- GitHub `push.branches` filters use short branch names such as `main`, while
+  `github.ref` is a full ref such as `refs/heads/main`;
+- repository rulesets can require pull requests, strict/current status checks,
+  resolved conversations, deletion protection, and non-fast-forward
+  protection;
+- a ruleset bypass actor can be an `Integration`, and `always` and `exempt`
+  are materially different modes;
+- GitHub exposes the active rules that apply to a named branch, which is the
+  correct post-activation effective-state check;
+- npm's `package-lock-only` mode limits installation state to the lock, while
+  `ignore-scripts` is a separate control and is necessary because the
+  repository has a root `prepare` lifecycle;
+- Node emits `close` only after the child ends and stdio closes, `error` and
+  `exit` can race, a delivered signal need not terminate a process, and killing
+  a parent does not generally prove its descendants stopped; and
+- GitHub's issue API distinguishes issues from pull requests and exposes the
+  stable IDs, state, labels, assignees, timestamps, title, and body needed for
+  a scope-bound exception record.
+
+Detailed source URLs and the exact live commands/results are retained in
+`docs/planning/artifacts/prompt-loop-primary-source-research-2026-07-30.md`.
 
 ## Criticism recommendation audit
 
 ### Slate structure and sequencing
 
-- **Keep the P1/P1A/P1B/P2/P3 split — valid.** Serialization, adversarial
-  archive handling, publication, the source-content repair, and dependency
-  governance are distinct review units.
-- **Keep P3 last only behind the advisory-risk authorization — valid.** P1
-  contains a concrete stop/rebaseline gate rather than silently accepting a
-  stale audit baseline.
-- **Preserve every H1 and the P/T identifiers — valid and already satisfied.**
-- **Distinguish reviewed heads from landed commits — valid and still open.**
-  The handoffs generally request a “final merge commit” but do not consistently
-  retain the reviewed head, merge method, landed identity, or required rerun
-  when those identities differ.
+**Confirmed.** Keep P1 → P1A → P1B → P2 → P3. P1 establishes read-only
+generation and policy foundations; P1A creates workflow-inert candidate
+validation; P1B activates the sole publication path; P2 is the first ordinary
+content exercise; and P3 deliberately supersedes the interim runtime and
+dependency policy. P1's dated advisory authorization remains the gate that
+makes placing P3 last defensible.
 
-### P1 recommendations
+The title-only P2 reference from P3 does not require a fabricated URL. P3 can
+record P2's permanent URL and dependency edge when P3 is filed.
 
-1. **Closed artifact map — valid; the proposed `File.Replace` transaction —
-   denied as written.** A closed artifact-ID/destination map and a repository
-   root derived from `$PSScriptRoot` materially reduce accidental overwrite
-   scope and improve PS/T convergence. `File.WriteAllText` truncates an existing
-   destination before writing, so it does not offer old-or-complete-new
-   behavior. However, neither .NET nor the underlying Windows `ReplaceFile`
-   contract promises the criticism's stronger invariant. Windows explicitly
-   documents failed replacement states in which, when no backup path was
-   supplied, the old destination no longer exists or has moved. Therefore
-   `File.Replace(temp, destination, $null)` cannot support “every failure before
-   return leaves the old destination byte-identical.” Do not import that exact
-   T1 recipe into P1. If atomic/recoverable local replacement is a real project
-   requirement, design and prove a platform-specific transaction with honest
-   uncertain-state/recovery semantics. It is not a prerequisite for byte
-   determinism or remote-writer safety.
-2. **Publish the first generator version explicitly — valid.** The baseline
-   script has a `.NOTES` section but no version field, so P1's phrase “existing
-   parseable `.NOTES` location” is inaccurate. State that this is first
-   publication and require `1.0.<UTC implementation YYYYMMDD>.0` under the
-   repository's `[System.Version]` rules.
-3. **Lock the YAML parser and lockfile producer — valid and open.** P1 currently
-   leaves both the parser identity and lockfile-producing Node/npm pair open.
-   Registry evidence confirms that `yaml@2.9.0` is currently the latest release,
-   supports Node `>=14.6`, and has the integrity value cited below. Because the
-   issue already pins action versions while requiring re-resolution, use the
-   same pattern here: name the exact parser and lock producer now, re-resolve
-   immediately before implementation/merge, and stop for review on drift.
-4. **Make security-relevant action inputs explicit or classify omitted
-   defaults — valid.** The separate pinned-manifest-default record is strong,
-   but the reciprocal matrix should say which defaults are intentionally
-   omitted. Converging the authored inputs where practical makes policy review
-   easier. This is a contract-clarity improvement, not evidence that pinned
-   defaults are ignored.
-5. **Expand P1↔T1 for the new foundations — valid.** The current list does not
-   explicitly cover the parser/package identity, explicit-versus-default action
-   policy, raw Git path verifier, or evidence-state cleanup.
+### Cross-cutting `main` governance
 
-### P1A recommendations
+**Confirmed blocker.** P1B's exact lease is a stale-write control, not a
+substitute for repository governance. With no active ruleset or classic branch
+protection, contributors, administrators, and other integrations are not
+constrained by the intended pull-request/check/conversation/current-branch
+policy.
 
-1. **Validate raw public values before PowerShell coercion — valid and
-   blocking for the claimed fail-closed contract.** “Mandatory scalar” does not
-   specify parameter types. Typed `[string]` binding can erase whether the
-   caller supplied a collection or other object. Public untrusted values need a
-   closed raw `[object]` classification order before normalization. The
-   “multiple-resolution path” cases should also be replaced with reachable
-   ambiguity/type fixtures after wildcard rejection.
-2. **Publish exact context and journal schemas — valid.** The issue says the
-   context contains “exactly” a set of fields but uses descriptions such as
-   “nonempty scalar” and “ordered collection.” Cleanup is supposed to treat the
-   context as untrusted, which requires exact type names, property sets, enums,
-   sequence rules, and path relationships.
-3. **Complete lifecycle and repeated disposal — partially valid.** Repeated
-   disposal should be a zero-filesystem-call success for the identical valid
-   disposed object; it must never inspect or delete a later unrelated object
-   that reused a path. A retained-uncertainty state is already represented by
-   `CleanupFailed`, so another terminal enum is optional. `CleanupInProgress`
-   is useful only if the implementation defines a reachable re-entry or retry
-   model; it is not independently a filing blocker.
-4. **Give all three scripts explicit first-publication versions — valid
-   clarification, low severity.** The linked repository policy already implies
-   the values, but saying `1.0.<UTC implementation YYYYMMDD>.0` removes doubt
-   and gives the harness an unambiguous initial-version rule.
-5. **Namespace IDs and add semantic case keys — valid for reciprocal
-   comparison.** Short IDs are locally unique but collide semantically with
-   T1A. Local IDs plus cross-repository semantic keys let the matrix compare
-   behavior instead of spelling.
-6. **Close the result-record schema — valid.** The prose names fields but does
-   not define a closed property/type/enum/status contract, even though the
-   harness must reject unexpected and mismatched records.
+P1 must require a separately authorized administrator settings task. It must
+freeze current, desired, and rollback JSON; target exactly
+`refs/heads/main`; prohibit deletion and non-fast-forward updates; require a
+pull request, resolved conversations, strict/current checks, and the stable
+P1B terminal check; and allow exactly the re-resolved official GitHub Actions
+integration in `always` mode. Repository settings remain outside P1's affected
+file set.
 
-### P1B recommendations
+The settings task needs a two-stage dependency:
 
-1. **Add a complete job/direct-needs/permission/data-flow table — valid and
-   high priority.** The action-role table is not a job-graph table. The final
-   contract should make direct output dependencies, exact job predicates,
-   permissions, output ownership, and side effects structurally testable.
-   Workflow-level `contents: read` is broader than necessary for the approval
-   job; job-level grants better match “least privileged.”
-2. **Make final action inputs explicit or record intentional differences —
-   valid.** In particular, seven-day candidate retention and omitted
-   compression differ from the stated T1B model and need either convergence or
-   a cost/evidence rationale.
-3. **Use `failure() && !cancelled()` for diagnostics — valid defect.** Both
-   normative diagnostic rows say only `failure()`, contradicting the later
-   “never cancellation” requirement.
-4. **Remove the remaining credential-free phrases — valid defects.** A matrix
-   checkout is “without persisted credentials,” not “without credentials,” and
-   writer work occurs before explicit push-header construction, not before
-   token materialization.
-5. **Exercise the real writer graph on an evidence ref — valid strengthening.**
-   A separately copied workflow can be structurally compared, but it does not
-   naturally exercise the production job graph and output wiring. An isolated,
-   never-merged evidence-ref delta to the same `build.yml`, with exact allowed
-   changes and guarded cleanup, provides stronger evidence.
-6. **Make reviewed-head/landed handoff explicit — valid.** P2 consumes the
-   landed workflow and needs reachability plus rerun evidence if the reviewed
-   and landed identities differ.
+1. before P1B production activation, test a field-equivalent temporary rule
+   on the evidence ref; and
+2. after the P1B pull request has produced the stable terminal context but
+   before it merges, activate and query the persistent `main` rule.
 
-### P2 recommendation
+P1B is blocked on this settings task. P2 and P3 must re-query the exact active
+rule, effective branch rules, required check source, and sole bypass before
+using the writer handoff. Until then the issues must not call `main`
+“protected.”
 
-1. **Fix the future P3 URL protocol — valid.** P3 does not exist when P2 is
-   initially filed in the prescribed order. Keep a clearly noncanonical title
-   reference and backpatch after P3 exists, or omit the forward URL and let P3
-   point backward.
+### P1 version contract
 
-### P3 recommendations
+**Confirmed required correction.** P1 publishes only the generator's initial
+version template. It does not define the exact `.NOTES` marker, timeless
+grammar, expected-version trust source, error taxonomy, change classification,
+or same-day progression that P1A already claims to consume. It calls the Git
+path verifier “versioned” without specifying its marker or initial version.
 
-1. **Select exact npm/Corepack identity and Node floors — valid and open.** P3
-   presently leaves the npm release and patch floors open. Current registry
-   evidence confirms the criticism's proposed exact descriptor and engine:
-   npm `12.0.2`, SHA-512
-   `b885e890b9418fa1693544d05f53e64f9a73ec194837d4258b15fecdd692347b1dd2a517b1b0cbaf9d31cd8e92c3b70956bd2ecc72833a57b4b3098f5bfa7943`,
-   and `^22.22.2 || ^24.15.0 || >=26.0.0`. Use the finite repository range
-   `>=22.22.2 <23 || >=24.15.0 <25`, the hash-qualified `packageManager`,
-   explicit `corepack npm`, and one exact Node-24 lock producer, subject to the
-   same pre-implementation/pre-merge re-resolution used for actions. A proved
-   later incompatibility should trigger review and an intentional-difference
-   record, not an ambient “latest” selection.
-2. **Do not let production callers supply the observed Node version or policy —
-   valid.** The production CLI should read `process.versions.node` and enforce a
-   compiled tracked policy. Keep caller-supplied values only on a separate pure
-   fixture API.
-3. **Add and harden the real `install-husky.mjs` prepare installer — valid.**
-   It is the live `prepare` target, is omitted from P3's scope, and currently
-   silently skips for ambient conditions. At minimum P3 must include and test
-   its exact install/skip/failure contract.
-4. **Validate raw audit bytes and native outcome before object validation —
-   valid for the stated fail-closed policy.** PowerShell object parsing loses
-   duplicate-key and raw encoding evidence. The boundary should preserve
-   bounded stdout/stderr, one closed native outcome, strict BOM-less UTF-8, one
-   JSON value, and a closed report-v2 schema before policy evaluation.
-5. **Add raw/schema/process audit fixtures — valid if the raw boundary is
-   adopted.** The current 25 cases cover policy outcomes but not malformed raw
-   JSON, duplicate keys, encoding/size/depth, unknown fields, signal, timeout,
-   or start failure.
-6. **Bind residual exceptions to retained live issue evidence — valid
-   governance clarification.** The offline validator can prove canonical URL
-   and evidence-record structure, not that an issue is currently open and
-   owned. Approval/renewal needs an authorized live lookup and a bounded
-   retained identity/scope record.
+P1 must define a slate-wide PowerShell script version profile:
 
-### Cross-slate consistency recommendations
+- exactly one `Version: <Major>.<Minor>.<YYYYMMDD>.<Revision>` marker in the
+  script-level `.NOTES` block before the first function;
+- canonical ASCII nonnegative components with no leading zero except `0`,
+  valid `System.Version` bounds, and a real Gregorian build date;
+- timeless parsing independent of clocks, filesystems, Git timestamps, and
+  file timestamps;
+- an expected version bound by a separate reviewed path/commit/blob/hash
+  record;
+- distinct `invalid-version`, `unexpected-version`, and
+  `version-progression` failures; and
+- progression from the merge-base version, semantic change class, and UTC date
+  of the final material edit, with Revision incremented for a second material
+  edit on the same UTC date.
 
-1. **Preserve H1s/P-T labels — valid and satisfied.**
-2. **Use real URLs/dependency edges without fabricated numbers — valid, but the
-   current transaction wording is ambiguous about creation-time versus
-   post-creation verification; see independent findings.**
-3. **Distinguish reviewed heads and landed commits — valid and open.**
-4. **Reuse P1's one workflow-policy validator — valid and satisfied in P1B/P3.**
-5. **Reuse P1's raw Git path verifier — valid and satisfied in P1A/P1B/P2/P3.**
-6. **Separate authored inputs and reviewed defaults — valid and substantially
-   satisfied; intentional omissions still need reciprocal rationale.**
-7. **Re-resolve actions/packages/manifests before implementation and merge —
-   valid and substantially satisfied.** Package selections also need an exact
-   freeze point after re-resolution.
-8. **Namespace local IDs and compare semantic keys — valid and open in P1A.**
-9. **Keep generated artifacts derived-only and synchronized with sources —
-   valid and satisfied.**
-10. **Treat temporary evidence as exact test state with cleanup proofs — valid,
-    though eliminating P1's temporary writer is simpler than hardening it.**
+The generator and path verifier receive explicit first-publication versions.
+P1A and P3 must consume the landed profile for every PowerShell script they
+add or change.
+
+### P1 lock producer
+
+**Confirmed required correction.** Selecting Node `24.18.1` and bundled npm
+`11.16.0` does not identify the state-changing command or neutralize the root
+`prepare` lifecycle. P1 must require a clean disposable producer, verified
+official Node artifact/checksums/signature evidence, exact `yaml: 2.9.0`, and:
+
+```text
+npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+```
+
+It must retain executable/version/supply/config evidence with secrets redacted
+and pre/post package/lock hashes. Every nonproducer is a frozen
+`npm ci --ignore-scripts --no-audit --no-fund` consumer and must prove package
+and lock bytes unchanged.
+
+### P1 generator result and reciprocal convergence
+
+**Confirmed required correction.** P1 names `RolledBack` and
+`ReplacementStateUncertain` but does not publish the exact result schema that
+P1A says it consumes. Its P1↔T1 comparison is a prose topic list rather than a
+stable executable matrix.
+
+P1 must publish:
+
+- a closed generator invocation/result schema with success, no-change,
+  rollback, uncertain-state, cleanup, per-path pre/post identity, backup
+  disposition, failure phase/category, bounded recovery evidence, and exit
+  mappings;
+- crash-boundary and cleanup truth rules; and
+- the same stable 16 `GF-*` row meanings used by T1, with one row each,
+  immutable commits/locators/evidence hashes, observed values or fixture IDs,
+  and `same|intentional difference|blocker`.
+
+The preferred convergence is the same private per-artifact writer boundary in
+both repositories. If PS retains its four-file coordinator, it must explicitly
+prove equivalent observable failure strength and document backup/crash/result
+semantics as an intentional difference.
+
+### P1A production outcome versus harness verdict
+
+**Confirmed blocker.** The case catalog expects negative production
+diagnostics, while the result schema says a passed case requires diagnostic
+`None`. A correctly rejected malicious candidate therefore cannot be both an
+expected production rejection and a passing harness case.
+
+The result must separate expected and actual production result/status/phase/
+diagnostic from `HarnessVerdict: pass|fail|skip`. A negative case passes when
+the actual rejection exactly matches its oracle. Applicability is an honest
+skip. Harness errors are reserved for fixture or orchestration failures.
+
+### P1A atomic case oracles
+
+**Confirmed required correction.** The 96-case total is arithmetically sound,
+but ranges such as `PS-P1A-E-01..15` and slash/“plus” descriptions do not bind
+each immutable ID to one fixture and one expected outcome. The implementer is
+still required to invent the ID allocation.
+
+P1A must require a physical row for each of the original 96 IDs, either
+containing the complete oracle or referencing an immutable single oracle
+profile. The trusted-script correction requires 14 additional atomic Git
+identity rows, for a selected final total of 110. Each row must singularly bind
+applicability, fixture, initial state, expected production
+result/status/phase/subreason/diagnostic, pre-cleanup state, final
+candidate/context state, ordered cleanup sequence, sentinels, source-tree
+state, and expected filesystem/native calls. Catalog mutation cases must reject
+missing, duplicate, unknown, regrouped, orphaned, multiply emitted, and
+undeclared-skip IDs.
+
+### P1A trusted script inputs and public functions
+
+**Confirmed required correction.** The `S-*` inventory mentions supplied
+helper/context paths without defining a mandatory harness interface or proving
+those paths are the reviewed repository blobs. An untracked, staged,
+worktree-modified, filtered, wrong-mode, conflict-stage, or cross-repository
+script could otherwise generate trusted-looking evidence.
+
+The harness must accept mandatory raw `HelperPath` and
+`ContextManagerPath` plus separately trusted expected versions. It derives the
+repository root from fixed `$PSScriptRoot`, then proves fixed literal path,
+ordinary `100644` HEAD blob, matching stage-0 index with no conflict stages,
+and no-filter working object ID equal to HEAD/index before dot-sourcing and
+immediately before use. P1's raw NUL-safe Git discipline applies.
+
+P1A must also publish exact parameter, return, mutation, diagnostic, and
+failure contracts for `New-StyleGuideCandidateInvocationContext`,
+`Remove-StyleGuideCandidateInvocationContext`, and
+`Remove-StyleGuideCandidateInvocationState`; object schemas alone do not
+define callable interfaces.
+
+### P1B evidence trigger
+
+**Confirmed blocker.** P1B changes predicates from `refs/heads/main` to an
+evidence ref but leaves `on.push.branches: [main]`. A push to the evidence ref
+would not start the workflow. The short trigger name and full predicate ref are
+different literals and cannot be corrected by one replacement.
+
+P1B needs a versioned allowed-delta manifest that enumerates exact
+evidence-only hunks for the short push branch filter, full-ref approval/writer
+predicates, `TARGET_REF`, policy constants, bounded scenario
+selector/instrumentation, and one safe source fixture. The comparator must
+reject every other trigger, permission, graph, action, input, artifact,
+credential, path, commit, lease, refspec, or diagnostic change. Dispatch
+events, wildcard refs, secret inheritance, caller-selected refs, and copied
+workflows remain prohibited.
+
+### P1B ruleset proof and cleanup
+
+**Confirmed blocker.** P1B must integrate the governance task rather than
+merely receive it in prose. The real writer must succeed under the temporary
+field-equivalent evidence-ref rule. Stale/lost lease, non-fast-forward,
+deletion, and ordinary-maintainer direct updates must fail without moving the
+ref.
+
+Cleanup must wait for or cancel every evidence run, delete the ref with an
+expected-old guard, prove no active workflow or policy names it, delete the
+temporary rule, and re-query restored settings. Cleanup failure blocks
+production activation; it never permits an unprotected fallback. The
+persistent `main` rule must be active/effective, with exact terminal context
+and sole official-Actions bypass, before P1B merges.
+
+### P2
+
+**Confirmed with one dependent edit.** P2's content oracle, scope, generated
+artifact discipline, pull-request no-writer proof, and post-merge no-change
+proof remain appropriate. Do not add package, generator, workflow, or policy
+work to P2.
+
+P2's consumed/handoff evidence must add the active ruleset ID, normalized rule
+digest, effective-rule query result, stable required terminal context/source,
+and sole official-Actions bypass identity. P2 must stop if that governance
+state drifted.
+
+### P3 wrapper operation table
+
+**Confirmed required correction.** Naming five operations is not an invocation
+contract. P3 must publish one literal versioned operation table for every real
+operation. The selected resolution retains `ci`, `audit`, `lock-noop`, and
+`run-lint` and removes unused `run-test`, because the repository has no package
+test script or production consumer. Every retained row includes:
+
+- verified `process.execPath` and bundled Corepack entry identity;
+- complete ordered argv;
+- working directory;
+- network/cache/config mode;
+- exact environment additions/removals;
+- stdin/stdout/stderr handling;
+- timeout/termination behavior;
+- accepted native exits; and
+- permitted filesystem side effects.
+
+The wrapper, hook, audit validator, workflows, and policy fixtures must all
+consume the same table or its immutable digest.
+
+### P3 Husky identity
+
+**Confirmed required correction.** “Exact lock-resolved Husky” plus a dynamic
+import does not bind the actual package, public entry point, generated support
+tree, or tracked hook. P3 must freeze the selected Husky package version,
+tarball/integrity, lock node, package root, invoked public API/CLI, reviewed
+package-file hashes, and invocation boundary after dependency selection.
+
+It must also freeze the tracked `.husky/pre-commit` HEAD/index/no-filter
+working identity, marker/version, length/hash/mode, exact `core.hooksPath`, and
+complete `.husky/_` path/type/content/hash/mode inventory. The installer needs
+a closed decision result and atomic required/skip/conflict/import-or-spawn/
+native/postcondition/immutability/real-commit cases.
+
+### P3 audit process, streams, and parser resources
+
+**Confirmed blocker.** A timeout and byte ceilings are insufficient without a
+state machine. Node documents that `error`, `exit`, and `close` can interleave,
+that signal delivery does not prove termination, and that killing a parent
+does not prove descendants stopped.
+
+P3 must publish one immutable native-outcome object and state machine covering
+start, stream reads/errors, overflow, timeout, termination request/delivery,
+grace expiry, final close, cleanup, and one-result emission. It must specify
+whether overflow triggers termination, continued bounded draining, TERM/KILL
+or Windows behavior, descendant-process limits, fixed grace, valid
+exit/signal/start-failure/timeout combinations, byte counts/digests, overflow
+flags, bounded diagnostics, and precedence.
+
+The strict JSON scanner also needs exact inclusive depth, token, property,
+string-token byte/scalar, and numeric-token ceilings with below/at/above
+fixtures. Where Windows cannot prove Unix-style process-group termination, the
+issue must state the platform boundary and test the pure outcome model instead
+of claiming portable descendant termination.
+
+### P3 physical Node/audit catalogs
+
+**Confirmed required correction.** The Node and audit catalogs describe
+families, not immutable rows. The audit catalog has no frozen cardinality.
+“Exactly once” is not testable until each ID has one literal fixture and
+oracle.
+
+Every Node and audit case must be a physical row or a row referencing one
+immutable atomic profile. Audit rows singularly bind layer, raw
+length/digest/fixture, native outcome, exception state, terminal class,
+normalized finding set, package-keyed node paths, parser state, process-call
+count, and bounded diagnostic. Multi-defect rows are allowed only as named
+precedence cases. Catalog mutation cases cover missing, duplicate, unknown,
+regrouped, orphaned, multiply emitted, and skipped IDs.
+
+### P3 live exception evidence
+
+**Confirmed required correction.** The current issue projection can prove that
+an open labeled assigned issue exists, but not that its content governs the
+exact findings. A maintainer is also told to “live-generate” canonical
+evidence without any named capture implementation.
+
+P3 must add a named read-only capture mode/tool. Each follow-up issue receives
+a canonical scope hash over the exact sorted finding set and a required body
+marker carrying that hash. The canonical projection binds repository, number,
+numeric/database ID, node ID, `isPullRequest=false`, state, sorted labels and
+assignees, owner, target date equal to exception expiry, scope hash, bounded
+title/body-marker hashes, updated/fetched timestamps, API version, and closed
+property order/preimage.
+
+The live client needs an exact request API version, retry count, accepted
+`Retry-After` forms and cap, pagination disposition, size limits, and
+fail-closed response rules. Verification freshly fetches state and fails on
+scope/content/state/owner/date drift. It never silently refreshes approval.
+
+### Cross-slate convergence model
+
+**Confirmed.** Converge on stable semantic rows, schema shapes, evidence, and
+security/failure semantics while keeping both repositories self-contained.
+Repository-specific source transforms, artifact names, frontmatter, cleanup
+lifecycle, staged-lint architecture, and content work can remain intentional
+differences.
+
+The current SHA-224 npm descriptor is valid and must not be treated as a
+correctness defect. Converging on T3's SHA-512 descriptor is a low-risk
+consistency improvement because it is the hex form of the already-recorded
+registry SRI. The selected resolution should use SHA-512 unless re-resolution
+changes the tuple.
 
 ## Independent findings
 
-### Filing and readiness are conflated
+### A settings task is a predecessor contract, not an affected implementation file
 
-The repeated “before filing/readying” protocol combines steps that occur at
-different times:
+The governance correction must not silently expand P1's ten implementation
+paths or P1B's five implementation paths. The correct artifact is a separately
+authorized administrator task/record whose immutable URL, approved JSON,
+execution evidence, rule ID/digest, and rollback evidence become consumed
+contracts. This preserves both repository-settings authorization and exact
+Git path-set validation.
 
-1. `gh issue create --blocked-by` can create the successor and dependency edge
-   in one operation, or the edge can be added immediately afterward;
-2. the successor and its edge can only be retrieved and verified after that
-   creation operation;
-3. the predecessor's landed merge commit cannot be known until after
-   implementation and merge; and
-4. the successor can only then pass its implementation-readiness gate.
+### Required-check identity must be discovered before persistent activation
 
-Define initial body construction, create-with-edge, post-create verification,
-later merge-identity backpatch, and implementation readiness separately. This
-also resolves P2's impossible forward P3 URL requirement without placeholders.
+The desired ruleset cannot safely invent the terminal check name/source.
+P1B must first produce the stable terminal check on its pull request, capture
+the exact context and GitHub Actions source, and only then authorize persistent
+activation. The pull request cannot merge until the activated rule is queried
+and proven effective. This closes the otherwise circular dependency without
+temporarily weakening `main`.
 
-### P1's temporary writer is avoidable
+### Version and case profiles need one physical owner
 
-P1 and P1A deliberately change no guide source or generated artifact bytes, and
-P2 requires both sources and all four derived artifacts to land together. P1
-can therefore make the build read-only and fail on generation drift until P1B
-introduces the final writer. Removing the temporary synchronizer would remove:
+Repeating prose copies across P1, P1A, P1B, and P3 invites drift. P1 should own
+the PowerShell version profile; each successor consumes it and names only its
+script-specific expected versions. Likewise, each case catalog may use
+immutable oracle profiles to control document size, but every physical case row
+must reference exactly one profile and carry every case-specific identity.
 
-- a temporary write-enabled job and token;
-- its action role and credential checks;
-- exact-lease push code;
-- a temporary evidence workflow/branch; and
-- cleanup/absence drills for code that P1B immediately replaces.
+### P3 should align the descriptor digest with T3
 
-This is a smaller and safer P1/P1B boundary than implementing two writers in
-sequence.
-
-### P1 still derives authoritative inputs from the ambient current directory
-
-The baseline generator names `STYLE_GUIDE.md`, `STYLE_GUIDE_RATIONALE.md`, and
-all four destinations as relative strings. P1 rejects relative final
-destinations but does not explicitly change the main entry point to construct
-the absolute mapped destinations, and it does not close the two source paths at
-all. Derive the repository root from the script's fixed
-`.github/workflows` location, require the two exact tracked ordinary source
-files, and construct all four mapped destinations from that root. Otherwise the
-new helper either rejects the script's own current calls or an implementer
-retains current-directory authority outside the helper.
-
-### Workflow-policy fixture and manifest-evidence ownership is unclear
-
-P1's exact eight-file scope names no fixture or pinned-manifest snapshot files,
-yet it requires tracked positive/negative workflow copies, reviewed manifest
-defaults, and deterministic offline validation over explicit manifest paths.
-State whether the complete fixture catalog and expected manifest/default
-records are embedded in `Validate-WorkflowPolicy.mjs`, stored as separately
-tracked files (which changes scope), or retained only as external governed
-evidence. The validator cannot both require explicit upstream manifest files
-and run offline everywhere unless their source and identity are defined.
-
-### Production time must not be caller-spoofable
-
-P3 correctly injects `now` into the pure audit core for deterministic fixtures.
-The production entry point should obtain current UTC time from its trusted
-runtime and offer no caller-controlled clock override, just as the production
-Node-policy CLI should not accept a caller-supplied observed version. Retain
-time injection only on the pure test API.
-
-### P3 lacks a named external Node-policy case manifest
-
-The issue specifies 19 `NODE-*` rows but does not include the criticism's
-proposed `node-policy-cases.json` in affected files or name another single
-authoritative catalog. Embedding copies in the hook harness, workflow, and
-module would recreate drift. Add one tracked immutable case manifest, or state
-which one existing file is its sole owner and make every consumer validate
-against it.
-
-### P3 does not close ambient npm and Corepack configuration
-
-Pinning npm's executable does not pin its behavior. npm reads command-line
-flags, every `npm_config_*` environment variable, project/user/global/built-in
-configuration files, and defaults. Those inputs can change the audit registry,
-failure threshold, submitted dependency tree, workspace scope, lockfile/tree
-selection, cache behavior, and lifecycle execution. `NODE_ENV=production`
-alone defaults `omit` to `dev`. Corepack likewise permits ambient variables to
-disable project-spec enforcement or integrity checks and can load a different
-environment file.
-
-Define one closed invocation environment for install, audit, and verification:
-
-- select the intended public registry, `audit-level`, include/omit/workspace,
-  `package-lock-only`, script, and cache behavior explicitly;
-- reject or sanitize unapproved `npm_config_*`, `NODE_ENV`, and
-  `COREPACK_*` controls before invoking either tool;
-- bind user/global configuration to known empty or reviewed files without
-  overwriting the user's real configuration;
-- make the intentionally permitted proxy/network variables and credential
-  redaction behavior explicit; and
-- capture the effective nonsecret configuration in evidence so a result is
-  attributable to the reviewed command contract.
-
-This is necessary for P3's claimed fail-closed reproducibility and should be
-represented in the raw/process fixture catalog.
-
-## Primary-source and local verification
-
-- GitHub's dependency documentation requires an existing issue to be selected
-  as the blocking issue, while `gh issue create --blocked-by` permits the
-  predecessor to be attached during successor creation. This supports the
-  create-then-retrieve/verify filing protocol, not a pre-creation verification
-  step:
-  <https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/creating-issue-dependencies>.
-- GitHub documents that the `needs` context contains only direct dependencies
-  and that matrix outputs are combined only when output names are unique:
-  <https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#needs-context>
-  and
-  <https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax-for-github-actions#using-job-outputs-in-a-matrix-job>.
-- The pinned checkout manifest defaults `token` to `github.token` and describes
-  temporary Git authentication, confirming that “without credentials” is
-  false even when persistence is disabled:
-  <https://raw.githubusercontent.com/actions/checkout/3d3c42e5aac5ba805825da76410c181273ba90b1/action.yml>.
-- GitHub's status functions define `failure()` and `cancelled()` independently,
-  supporting the exact `failure() && !cancelled()` diagnostic condition:
-  <https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions>.
-- Microsoft documents that `[string]` parameter binding can convert an array to
-  a string and that `[object]` or an untyped parameter preserves the supplied
-  type:
-  <https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_type_conversion>.
-- `GetUnresolvedProviderPathFromPSPath` returns one provider-internal string and
-  leaves wildcard characters unresolved; it is not a multi-match resolver:
-  <https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.pathintrinsics.getunresolvedproviderpathfrompspath>.
-- .NET documents that `WriteAllText` truncates an existing target. .NET's
-  `File.Replace` page does not promise atomic old-or-new failure behavior, and
-  the Windows `ReplaceFile` contract explicitly lists partial failure states:
-  <https://learn.microsoft.com/en-us/dotnet/api/system.io.file.writealltext>,
-  <https://learn.microsoft.com/en-us/dotnet/api/system.io.file.replace>, and
-  <https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-replacefilea>.
-- Current registry records used in this review:
-  <https://registry.npmjs.org/yaml/2.9.0> and
-  <https://registry.npmjs.org/npm/12.0.2>. Corepack documents hash-qualified
-  `packageManager` descriptors, explicit `corepack npm`, strict project-spec
-  behavior, and integrity controls:
-  <https://github.com/nodejs/corepack>.
-- npm documents that configuration comes from flags, `npm_config_*`
-  environment variables, four npmrc layers, and defaults:
-  <https://docs.npmjs.com/cli/v12/using-npm/config/>. Its audit contract
-  confirms that `audit-level` controls the native exit threshold, `omit`
-  changes the submitted tree, `NODE_ENV=production` defaults to omitting
-  development dependencies, and `package-lock-only` changes the selected tree:
-  <https://docs.npmjs.com/cli/v12/commands/npm-audit/>. Corepack separately
-  documents ambient switches that bypass project-spec or integrity enforcement:
-  <https://github.com/nodejs/corepack#environment-variables>.
-- The four action release tags currently resolve to the SHAs in P1/P1B:
-  checkout `v7.0.1`, setup-node `v7.0.0`, upload-artifact `v7.0.1`, and
-  download-artifact `v8.0.1`. Their pinned manifests also contain the cited
-  token/cache/archive/download controls.
-- A local read-only audit rerun on 2026-07-29 under Node `26.5.1` and npm
-  `11.7.0` reproduced exit `1`, report version `2`, seven vulnerability
-  properties, fourteen object advisory records, two string graph edges, seven
-  unique node paths, five high properties, and two moderate properties.
+The SHA-224 descriptor is accepted by Corepack and is not defective. Selecting
+the same SHA-512 descriptor used by T3 reduces an unnecessary reciprocal
+difference, makes the descriptor hex directly traceable to the stored registry
+SRI, and simplifies the manager-evidence row. This is selected only if the
+pre-implementation registry re-resolution confirms the same tarball/integrity.
 
 ## Filing assessment
 
-**The slate is materially stronger, but it is not ready to file unchanged.**
-The sequence, issue boundaries, H1s, P labels, dependency-gate concept, and
-shared-validator direction are sound. Every recommendation in
-`slate-criticism.md` has been audited above. Adopt the criticism except where
-this review denies or narrows it: the exact `File.Replace` failure invariant is
-unsupported, additional P1A lifecycle enum names are conditional rather than
-mandatory, and filing-time identity must be separated from later
-implementation readiness.
-
-Before filing, revise in this order:
-
-1. **P1 — major revision.** Prefer removing the temporary writer entirely. In
-   either design, close repository-root/source/destination authority, publish
-   the first version, select the parser and lock producer, resolve fixture and
-   manifest-evidence ownership, complete the reciprocal matrix, and do not
-   promise the disproved `File.Replace` transaction invariant.
-2. **P1A — targeted blocking revision.** Validate raw objects before binding,
-   publish closed context/journal/result schemas, guarantee zero-call repeated
-   disposal, publish initial versions, and add semantic reciprocal keys.
-3. **P1B — targeted blocking revision.** Publish the complete job graph and
-   least-privilege table, resolve explicit-input differences, correct
-   diagnostic predicates and credential language, exercise the real writer on
-   an isolated evidence ref, and close reviewed-head/landed-commit handoff.
-4. **P2 — nearly ready after upstream corrections.** Repair only the impossible
-   future P3 URL protocol and consume the final P1/P1A/P1B contracts.
-5. **P3 — major revision.** Freeze npm/Corepack/Node identities, close ambient
-   npm/Corepack configuration, split trusted production observations from pure
-   fixture injection, include the Husky installer, validate raw native audit
-   results, add raw/schema/process and Node-policy case catalogs, and bind
-   exceptions to retained live issue evidence.
-
-Prepare all five descriptions as a coherent slate, but treat issue creation,
-dependency-edge verification, merge-identity backpatching, and implementation
-readiness as separate lifecycle stages. Re-run package/action resolution and
-the reciprocal review immediately before each implementation and merge.
+Do not file the slate unchanged. Preserve the five-file slate and order, then
+resolve the findings above. The correction pass should not add issue files.
+After revision, rerun the reciprocal review against the current T slate and
+require no unexplained `blocker` row before filing.

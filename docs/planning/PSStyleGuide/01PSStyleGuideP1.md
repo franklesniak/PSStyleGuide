@@ -4,9 +4,14 @@
 
 Make all four generated style-guide artifacts byte-identical under Windows
 PowerShell 5.1 and PowerShell 7 on Windows and Ubuntu. Establish one fixed-root,
-multi-file generation transaction; a safe, offline workflow-policy contract;
-and a raw NUL-safe Git path-set verifier. Pin the P1 YAML/Node/npm/action supply
-tuple and keep both workflows strictly read-only.
+complete-payload generation contract with one private per-artifact writer; a
+safe, offline workflow-policy contract; a raw NUL-safe Git path-set verifier;
+and the slate-wide PowerShell script-version profile. Pin the P1
+YAML/Node/npm/action supply tuple and keep both workflows strictly read-only.
+
+Require a separately authorized administrator task to establish and prove the
+branch rule that makes P1B's later workflow the sole direct updater of `main`.
+Repository settings are not part of P1's implementation-file scope.
 
 P1 establishes shared foundations only. P1A owns candidate validation, P1B owns
 publication, P2 owns the guide-content change, and P3 supersedes the interim
@@ -57,6 +62,52 @@ Rerun the exact audit at P1 start. Missing, expired, unauthorized, or materially
 worsened evidence stops implementation. If policy does not permit the wait,
 rebaseline the slate with the smallest dependency-remediation predecessor;
 do not improvise lint dependency changes in P1.
+
+## Separately authorized `main` governance
+
+The current repository has no ruleset or classic branch protection for `main`.
+Before P1B implementation, open and approve a separate administrator-owned
+settings task containing:
+
+- the current-state export and digest;
+- exact desired and rollback JSON;
+- accountable approver and role;
+- execution window and prerequisites;
+- validation and retained audit evidence; and
+- incident rollback and restoration proof.
+
+The desired persistent branch ruleset is named
+`ps-style-guide-main-protection`, type `branch`, enforcement `active`, includes
+exactly `refs/heads/main`, and has no exclusion. It prohibits deletion and
+non-fast-forward updates; requires pull requests, resolved conversations, the
+stable P1B terminal check `Build Style Guide Artifacts / approve_candidate`
+from the GitHub Actions application, and a current branch for ordinary merges;
+and contains exactly one bypass actor: the official GitHub Actions integration
+ID `15368`, mode `always`.
+
+No user, repository role, administrator, team, deploy key, second application,
+or `exempt`-mode bypass is permitted. Immediately before temporary or
+persistent rule creation, re-resolve `GET /apps/github-actions` and require
+owner `github`, slug `github-actions`, and ID `15368`; drift stops for review.
+The app bypass is broad enough for a direct workflow push, so the workflow
+policy must continue to prove that only P1B's reviewed writer has
+`contents: write`.
+
+Before persistent activation, use a temporary field-equivalent rule targeting
+only P1B's unique evidence ref. The real P1B writer must succeed for the exact
+parent/lease, while stale/lost lease, non-fast-forward, deletion, and an
+ordinary maintainer's direct update fail without moving the ref. Retain
+rule/application/run/commit/ref identities, before/after remote values,
+effective rules, and audit evidence, then remove the temporary rule/ref and
+prove restoration.
+
+After P1B's pull request produces the exact terminal check context, activate
+the persistent rule before merging P1B and query the active rules applying to
+`main`. Retain the rule ID, normalized rule-JSON SHA-256, effective-rule
+result, required check/source, sole bypass identity, and rollback proof.
+Before that query use “target `main` commit” or “reviewed head,” not “protected
+`main`.” P1B is blocked on this settings task. P2 and P3 must re-query the
+same state before consuming the publication handoff.
 
 ## Affected files
 
@@ -110,9 +161,21 @@ the same complete tuple again immediately before merge. A changed version,
 tarball, integrity, Node patch, bundled npm, engine constraint, or security
 status requires renewed review and an atomic tuple/lock update.
 
-Generate the lock only with the selected Node/npm pair. Record executable paths,
-versions, registry/tarball identities, clean-install tree, and byte-identical
-lock no-op. Never hand-edit the lock.
+From a clean disposable clone, verify the official Node artifact against its
+signed release checksums, use the selected Node/npm pair, set only exact
+`"yaml": "2.9.0"`, and run exactly:
+
+```text
+npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+```
+
+Record executable paths/versions, Node artifact/checksum/signature evidence,
+registry/tarball identities, and effective registry/proxy/certificate/peer/
+lock/script/audit/fund configuration with secrets redacted. Record pre/post
+manifest and lock hashes. Every nonproducer runtime is a frozen
+`npm ci --ignore-scripts --no-audit --no-fund` consumer and must leave
+manifest and lock bytes unchanged. Never hand-edit the lock. P3 still owns the
+durable hash-qualified package-manager policy.
 
 ## Generator contract
 
@@ -145,46 +208,89 @@ $strNormalizedContent = $CompleteFinalPayload -replace "`r`n?", "`n"
 Encode with `System.Text.UTF8Encoding($false)` and add no implicit final
 newline.
 
-### Four-file replacement transaction
+### Complete-payload generation and private artifact writer
 
-Never write a destination with `WriteAllText`, `Set-Content`, `Out-File`, or
-truncating/open-in-place behavior. The transaction must:
+Compute and validate all four complete final byte arrays before any destination
+mutation. `Write-StyleGuideArtifact` is the only permitted final-write
+boundary and accepts only a closed artifact ID mapped to one fixed destination:
 
-1. compute all four final byte arrays before any destination mutation;
-2. capture ordinary-file metadata and SHA-256 for all existing destinations;
-3. create exclusive random candidates and backups in each destination's own
-   directory, with restrictive access where supported;
-4. write exact candidate bytes through `FileStream`, call `Flush(true)`, close,
-   reopen, and verify length/hash/BOM/CR/final-newline expectations;
-5. revalidate destination/candidate/backup identity and link/reparse state;
-6. replace each existing destination with
-   `File.Replace(candidate, destination, backup, false)`;
-7. retain every backup until all four replacements and post-verification pass;
-   and
-8. delete candidates/backups only after success, with bounded cleanup evidence.
+| Artifact ID | Exact destination leaf |
+| --- | --- |
+| `copilot` | `copilot-instructions.md` |
+| `powershell-instructions` | `powershell.instructions.md` |
+| `chat` | `STYLE_GUIDE_CHAT.md` |
+| `full` | `STYLE_GUIDE_FULL.md` |
 
-On any failure, classify the exact phase and attempt reverse-order restoration
-from verified backups. Report `RolledBack` only after all four original
-lengths/hashes and path identities are reverified. If the operating system
-reports an indeterminate replacement condition, restoration fails, or final
-state cannot be proven, report `ReplacementStateUncertain`, retain recoverable
-backups, stop, and give bounded manual-recovery paths/hashes. Do not claim
-cross-file crash atomicity or that `File.Replace` always preserves one known
-name after every platform failure.
+Reject null, empty/whitespace, controls, wildcard/provider syntax, relative or
+drive-relative paths, artifact/path mismatch, containment escape, alias,
+link/reparse components, nonordinary parent, or nonordinary destination before
+writing. Every destination must already exist as a tracked ordinary file.
 
-Inject failure before/after every create, flush, verify, replace, rollback, and
-cleanup boundary. Prove success, honest rollback, and uncertain-state
-categories without touching the real repository.
+For each artifact in the fixed order, create one unpredictable same-directory
+sibling with bounded real-collision retries using `FileMode.CreateNew`,
+`FileAccess.Write`, and `FileShare.None`; write the complete byte array through
+`FileStream`; call `Flush(true)`; close; reopen; and verify exact length,
+SHA-256, BOM/CR/final-newline expectations. Revalidate parent, destination, and
+temporary identity, then call `File.Replace(candidate,destination,$null)`
+exactly once.
 
-### Script metadata
+- Before `File.Replace` returns, any failure requires the old destination to
+  remain byte-identical and removes only the proven temporary sibling.
+- After `File.Replace` returns, the complete new destination and absent
+  temporary name are committed success; no fallible semantic gate follows.
+- Unsupported replacement, cleanup failure, or uncertain filesystem state
+  fails closed without backup/copy/move/direct-write fallback.
 
-Retain `#Requires -Version 5.1`. The generator's first published parseable
-`.NOTES` version is:
+Do not claim cross-file crash atomicity. A later-artifact failure may leave
+earlier complete replacements visible and must report that exact state; the
+generator never claims rollback. Fault-injection cases cover every phase from
+pre-create through cleanup on all required hosts without touching the real
+repository.
 
-`1.0.<implementation UTC YYYYMMDD>.0`
+The versioned generator result has exact ordered fields for schema/generator
+version, overall `Success|NoChange|Failed|ReplacementStateUncertain`, stable
+phase/category/native outcome/exit, and one fixed-order per-artifact record.
+Each artifact record contains ID/path, original/candidate/final
+length/SHA-256/ordinary identity, replace-returned flag, temporary disposition,
+and cleanup result. Unknown combinations fail. Success requires all four final
+hashes; uncertainty preserves bounded verified recovery identity without
+printing content or hostile bytes.
 
-The unversioned baseline is not an earlier release. Parse and validate the
-named metadata field; a guide-document version is not a substitute.
+### Slate-wide PowerShell script versions
+
+Retain `#Requires -Version 5.1`. Every governed PowerShell script has exactly
+one complete marker in the script-level `.NOTES` block before its first
+function:
+
+```text
+Version: <Major>.<Minor>.<YYYYMMDD>.<Revision>
+```
+
+The common raw parser is timeless. Components contain ASCII digits only, have
+no sign/whitespace/extra component or leading zero except `0`, fit
+`System.Version` nonnegative bounds, round-trip canonically, and use a real
+invariant proleptic-Gregorian Build date. Parsing reads no clock, Git or
+filesystem timestamp, or network. Missing, duplicate, out-of-location/decoy,
+malformed, overflow, impossible-date, and component-count failures are
+`invalid-version`.
+
+A separately trusted consumer binds the exact expected canonical version to
+the reviewed fixed path, commit, Git blob, and SHA-256. Valid but unequal is
+`unexpected-version`; version never substitutes for code identity.
+
+Only implementation/merge validation enforces authoring progression. Record
+the merge-base blob/version or `absent`, semantic change class, accountable
+author, and UTC date of the final material edit. New scripts start
+`1.0.<date>.0`; a breaking contract increments Major and resets Minor/
+Revision; a compatible capability increments Minor and resets Revision; a
+correction preserves Major/Minor, uses the final-edit date, resets Revision
+when Build changes, and otherwise increments Revision by exactly one. Test
+execution alone never bumps a version. Violations are `version-progression`.
+
+The generator and `Test-ExactGitPathSet.ps1` both first publish
+`1.0.<implementation UTC YYYYMMDD>.0`. The unversioned baseline is not an
+earlier release. P1A and P3 consume this same grammar, trust separation,
+progression rule, and failure taxonomy for every PowerShell script.
 
 ## Workflow and action policy
 
@@ -249,9 +355,10 @@ parser hazards, and every action-input disposition.
 
 ## Exact Git path-set verifier
 
-Add versioned `Test-ExactGitPathSet.ps1` with `#Requires -Version 5.1`. It
-accepts an explicit validated repository root, an exact repository-relative
-path array, closed mode `Working`, `Staged`, or `Both`, and optional empty
+Add `Test-ExactGitPathSet.ps1` with `#Requires -Version 5.1` and first version
+`1.0.<implementation UTC YYYYMMDD>.0` under the P1 version profile. It accepts
+an explicit validated repository root, an exact repository-relative path
+array, closed mode `Working`, `Staged`, or `Both`, and optional empty
 working-versus-index requirement.
 
 Resolve Git as an application and use `System.Diagnostics.Process` with
@@ -284,17 +391,37 @@ second npm entry for `/.github/workflows`.
 
 ## Reciprocal P1↔T1 comparison
 
-At implementation start and before merge, compare exact PSStyleGuide P1 and
-TerraformStyleGuide T1 commits across fixed source/output authority,
-path/link rules, serialization, four-file transaction and rollback states,
-frontmatter, script version, Node/YAML/npm tuple, action inputs/defaults,
-offline fixtures, raw path verifier, native exits, workflow permissions, and
-generated byte/idempotence evidence.
+At implementation start and before merge, compare exact immutable P1/T1
+commits using this closed symmetric catalog:
 
-For every row retain both evidence identities, status `same`,
-`intentional difference`, or `blocker`, and rationale. An unexplained
-observable security/failure difference blocks merge. Keep repositories
-self-contained.
+| Stable row | Required comparison |
+| --- | --- |
+| `GF-PARAMETERS` | Public names/types/defaults and omission/null/empty/raw-value rules |
+| `GF-DESTINATION` | Trusted root, mapped destinations, provider/wildcard/root rules, normalization, comparison, failure |
+| `GF-CONTENT` | Source order, wrappers/frontmatter, repository-specific names, complete payload |
+| `GF-SERIALIZATION` | CR/lone-CR normalization, LF/final newline, BOM-less UTF-8, byte checks |
+| `GF-WRITE` | Complete payload, temporary identity/create, flush/close, atomic replace, prohibited fallbacks |
+| `GF-FAILURE` | Phase postconditions, cleanup/uncertainty, bounded diagnostics, fault cases |
+| `GF-HOSTS` | Editions/hosts, executable identity, equality, idempotence |
+| `GF-VERSION` | Timeless grammar, trusted expected version, authoring gate, fixtures |
+| `GF-NODE-LOCK` | Exact producer/provenance/config, YAML graph, frozen consumers |
+| `GF-YAML` | Parser package/API, document/schema strictness, diagnostics, forbidden features |
+| `GF-ACTION-PINS` | Roles, full pins, provenance, runtime, atomic updates |
+| `GF-ACTION-INPUTS` | Authored security inputs and reviewed manifest defaults |
+| `GF-GIT` | NUL records, byte allowlists, statuses, cardinality, refs, lease/refspec |
+| `GF-GRAPH` | Production/evidence triggers, permissions, needs, conditions, outputs, side effects, writer |
+| `GF-CREDENTIALS` | Job-token availability, auth projection, cleanup, push-only materialization |
+| `GF-EVIDENCE` | Temporary workflow/ref/rule equality, drills, retained identities, cleanup, absence |
+
+Each row occurs exactly once and records both repository URLs/commits,
+normative and implementation locators, evidence paths/SHA-256, observed
+values/fixture IDs, one status `same|intentional difference|blocker`, and
+rationale. An intentional difference names both literals, repository need,
+equal security/failure strength, owner, and review/expiry condition. Duplicate,
+missing, unknown, renamed, empty, or unexplained rows block merge. Repository
+payloads/names and P1's lack of a temporary writer can differ; path security,
+serialization, version parsing, native status, credential containment, and
+failure truth cannot. Keep both repositories self-contained.
 
 ## Validation
 
@@ -314,13 +441,15 @@ For Windows PowerShell 5.1 on Windows, PowerShell 7 on Windows, and PowerShell
 
 At minimum, Windows PowerShell 5.1 and one PowerShell 7 cell must match.
 Exercise fixed-map success, path/link/reparse rejection, CRLF/lone-CR
-normalization, frontmatter, candidate/flush/replace/rollback/cleanup injected
-failures, and `ReplacementStateUncertain`.
+normalization, frontmatter, every candidate/flush/replace/cleanup injected
+failure, partial earlier-artifact success, and
+`ReplacementStateUncertain`.
 
 Also prove:
 
 - P1's exact Node/YAML/npm tuple, reproducible lock, clean install, and both
   existing outer/nested lint surfaces;
+- every timeless/expected/progression version case for both P1 scripts;
 - package/hook/lint declarations unchanged except the YAML parser;
 - exact workflow events, permissions, jobs, roles, authored inputs, reviewed
   defaults, and stable diagnostic predicate;
@@ -329,6 +458,9 @@ Also prove:
   helper, download, matrix approval, or final writer exists;
 - `.gitattributes` and all applicable tracked text blobs satisfy LF/BOM rules;
 - generated destination blobs remain unchanged;
+- the separately authorized settings task is approved, with exact desired and
+  rollback JSON, and P1B remains blocked on its temporary/persistent proof;
+- all 16 reciprocal rows occur once with no unexplained blocker;
 - working and staged sets equal exactly the ten affected paths; and
 - validation from staged content produces no additional diff.
 
@@ -339,22 +471,25 @@ unrelated changed path stops for rebaseline.
 
 - [ ] The fixed two-source/four-destination authority rejects caller path/root
       substitution and every link/reparse/escape.
-- [ ] All four payloads are computed before one honest replace/rollback
-      transaction; no destination is truncated in place.
-- [ ] Success, `RolledBack`, and `ReplacementStateUncertain` are proven with
-      injected failures.
+- [ ] All four payloads are computed before fixed-order private per-artifact
+      replacement; no destination is truncated in place.
+- [ ] Every per-artifact success/failure, partial complete replacement, cleanup,
+      and `ReplacementStateUncertain` result is truthful under injected faults.
 - [ ] Windows PowerShell 5.1 and PowerShell 7 produce byte-identical,
       idempotent BOM-less/LF artifacts, with committed outputs unchanged.
-- [ ] Generator version is `1.0.<implementation UTC YYYYMMDD>.0`.
-- [ ] The exact re-resolved YAML/Node/npm tuple and reproducible lock evidence
-      are recorded.
+- [ ] Generator and path verifier versions, expected identities, timeless
+      grammar, and authoring progression pass the P1 profile.
+- [ ] The exact re-resolved YAML/Node/npm tuple, verified producer command/
+      configuration, frozen consumers, and reproducible lock evidence exist.
 - [ ] Both workflows are unfiltered and read-only; generation only detects
       drift.
 - [ ] Every action role/input/default equals the closed contract.
 - [ ] The workflow policy/case catalogs and validator pass all offline cases.
 - [ ] The raw NUL-safe path verifier passes required hostile-path cells.
 - [ ] Dependabot contains exactly one review-only Actions entry.
-- [ ] The advisory-risk gate is current and P1↔T1 has no unexplained blocker.
+- [ ] The advisory-risk gate is current; the separately authorized ruleset
+      task is approved and blocks P1B until its evidence; P1↔T1's 16 rows have
+      no unexplained blocker.
 - [ ] The working/staged path sets contain exactly the ten affected files.
 
 ## Handoff
@@ -362,8 +497,10 @@ unrelated changed path stops for rebaseline.
 Give P1A the permanent P1 issue/PR URLs, reviewed head/base, merge method,
 landed commit/tree, generator version/hash, policy schema/version/hashes, path
 verifier version/hash, exact action manifest/default evidence, supply tuple,
-generator matrix, advisory decision, and P1↔T1 matrix. P1A must compare these
-landed contracts with its assumptions before implementation.
+generator result/host matrix, script-version profile, verified lock-producer
+record, advisory decision, settings-task URL/approved desired and rollback
+digests, and P1↔T1 matrix. P1A must compare these landed contracts with its
+assumptions before implementation.
 
 ## Non-goals
 
