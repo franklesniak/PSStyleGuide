@@ -103,8 +103,7 @@ All blocks require:
 - their named interpreter and explicitly resolved `terraform`; `jq`/digest
   tools where named;
 - a protected operator-owned directory outside Git and shared world-readable
-  temporary locations;
-- `umask 077`;
+  temporary locations, under the exact platform contract below;
 - fresh absolute destination paths;
 - both `-e` and `-L` rejection for every final destination;
 - no competing process able to replace entries in the protected directory;
@@ -119,9 +118,187 @@ The filesystem checks are not a universal adversarial-filesystem sandbox.
 Refuse operation when ownership, type, link status, or backend concurrency is
 uncertain.
 
+For POSIX, set `umask 077` before creation and inspect—not infer—the canonical
+ordinary non-link parent as effective-UID-owned mode exactly `0700` and every
+state temporary/final as effective-UID-owned mode exactly `0600`.
+
+For Windows, accept only an existing local NTFS/ReFS parent outside repository/
+shared roots. Owner is the current process-token user SID. Its DACL is
+canonical and protected, contains no inherited or deny ACE, and contains
+exactly three explicit `FullControl` allows: current user SID, LOCAL SYSTEM
+`S-1-5-18`, and BUILTIN Administrators `S-1-5-32-544`, inheritable to child
+containers/objects. Immediately after `CreateNew`, while the handle remains
+exclusive, set and inspect a protected file DACL with inheritance removed and
+the same three explicit noninheriting allows. Reinspect temporary/final after
+publication and final after temporary-name removal.
+
+Use SID-based .NET access-control APIs:
+`WindowsIdentity.GetCurrent().User`,
+`GetAccessControl`/`SetAccessControl` (or the corresponding
+`FileSystemAclExtensions` methods),
+`SetOwner`, `SetAccessRuleProtection($true,$false)`,
+`FileSystemAccessRule`, `GetOwner`, `AreAccessRulesProtected`,
+`AreAccessRulesCanonical`, and `GetAccessRules`. Do not parse localized account
+names, `icacls`, or infer success from the setter. Any mismatch before pull
+stops; after candidate creation, remove only a still-proven owned unpublished
+file and otherwise retain the uncertain root.
+
 The Bash blocks require the exact tested Bash contract from T2. The PowerShell
 block requires Windows PowerShell exactly 5.1 or PowerShell major 7 on Windows
-and uses no ordinary native-output redirection.
+and uses no ordinary native-output redirection. Both models protect against
+ordinary principals; Administrators/SYSTEM retain normal authority, so the
+operator also attests no authorized competing process.
+
+## Exact identity, confirmation, decoding, and review contracts
+
+### Backend, label, digest, and terminal confirmation grammar
+
+`EXPECTED_BACKEND_ID` is exactly
+`backend-v1:<type>:<authority>:<scope>`. Each component is 1–63 ASCII bytes and
+matches `[a-z0-9](?:[a-z0-9._-]{0,61}[a-z0-9])?`; total length is at most
+206. Reject uppercase, whitespace/control/Unicode, slash/backslash/percent,
+empty/additional component, or leading/trailing punctuation. Grammar success
+does not prove identity; the value remains operator-attested.
+
+For these copyable blocks, workspace is the deliberate safe subset
+`[A-Za-z0-9][A-Za-z0-9._-]{0,89}`. An unsupported historical name stops for a
+separate reviewed procedure. Optional `OPERATION_LABEL` is absent/empty or a
+real UTC instant `yyyyMMdd'T'HHmmss'Z'`, hyphen, and a 1–32-byte lowercase
+slug matching `[a-z0-9](?:[a-z0-9-]{0,30}[a-z0-9])?`; complete length is at
+most 49 and it never affects a path/command.
+
+A tool-computed SHA-256 must first be exactly 64 ASCII hex, map `A-F` to
+`a-f`, then match `[0-9a-f]{64}`. User confirmation is never normalized and
+contains exactly its first 16 lowercase characters.
+
+Generate one compact BOM-less UTF-8 JSON confirmation line:
+
+- push:
+  `["state-push","<workspace>","<backend>",<currentSerial>,<proposedSerial>,"<proposedDigest16>"]`;
+- rm:
+  `["state-rm","<workspace>","<backend>","<exactResourceAddress>","<backupDigest16>"]`.
+
+Use the reviewed serializer; serials are canonical nonnegative safe integers
+and JSON string escaping is the only resource-address escaping. Display once,
+read exactly one line from `/dev/tty`, and compare bytes ordinally. Reject EOF,
+NUL/CR, invalid UTF-8, second line, leading/trailing whitespace, more than 4096
+bytes, or any mismatch. No trim/case fold/normalization/eval/retry.
+
+Whole-block statuses are:
+`64` input grammar, `65` environment/identity, `66` snapshot/parse,
+`67` review/diff, `68` confirmation, `69` lock/exclusion,
+`70` Terraform mutation, `71` post-verification,
+`72` cleanup/uncertain state, and `73` stderr overflow. Confirmation mismatch
+is exactly `68`, starts no destructive child, and leaves all sentinels
+unchanged.
+
+### PowerShell raw streams, stderr bound, and strict state decoding
+
+Start independent raw pumps for `StandardOutput.BaseStream` to the exclusively
+held candidate and `StandardError.BaseStream` to a bounded buffer. Define
+`MAX_STDERR_BYTES = 65536` raw bytes. Retain at most those first bytes; exactly
+65,536 is allowed. On the 65,537th byte set overflow, discard all later bytes,
+but continue draining both streams to EOF before process wait/disposal so
+neither pipe deadlocks. Overflow returns `73` regardless of native exit while
+retaining that native outcome separately.
+
+Never emit or persist captured stderr, complete or truncated. Safe diagnostics
+contain only reason, native start/exit class,
+`stderrLimitBytes=65536`, and observed `0..65536|65537+`. Overflow prevents
+validation/publication and cleans only a proven candidate. Stable cases cover
+65535/65536/65537, zero/nonzero exits, simultaneous large streams, read error,
+and delayed EOF on both editions.
+
+After successful process completion and identity checks, open the candidate
+read-only/`FileShare.None`. Reject leading UTF-8 BOM bytes `EF BB BF`.
+Validate every original byte incrementally using exactly
+`UTF8Encoding(false,true).GetDecoder()` and final `flush=true`; discard decoded
+characters and never decode/re-encode the file. Any invalid/incomplete sequence
+returns `66` before JSON, `terraform show`, metadata, or publication. Cases
+cover stray/missing continuation, overlong, surrogate, above-U+10FFFF,
+truncated 2/3/4-byte endings, repeated invalid, UTF-8/UTF-16 BOM, valid maximum
+scalar, and every buffer boundary on 5.1 and 7. Diagnostics never include
+state bytes/text or exception content.
+
+### Windows canonical path, reparse, file-ID, and hard-link mechanics
+
+Use one fixed C# `Add-Type` Win32 helper on both PowerShell editions. Accept
+only a fully qualified local drive path; reject relative, UNC/device/extended-
+device/provider/ADS/extra-colon/wildcard/control/trailing-file-separator
+syntax. Call `Path.GetFullPath` once and use only that canonical path.
+
+Walk every existing component to the protected parent using
+`CreateFileW(OPEN_EXISTING)` with `FILE_FLAG_OPEN_REPARSE_POINT` and
+`FILE_FLAG_BACKUP_SEMANTICS` for directories. Inspect
+`FILE_ATTRIBUTE_TAG_INFO`, normalized handle path, type, and volume; reject any
+reparse/non-directory/open/attribute/path mismatch. Treat any ordinary,
+directory, live/dangling reparse, or indeterminate leaf as existing; a
+`Test-Path` false result is not absence proof.
+
+After `FileMode.CreateNew`/write-only/`FileShare.None`, retain
+`SafeFileHandle` and inspect `FileAttributeTagInfo`, `FileIdInfo`, and link
+count from `GetFileInformationByHandle`. Require ordinary non-reparse,
+protected-parent volume, and exactly one link. Identity is opaque
+`(VolumeSerialNumber,128-bit FileId)`.
+
+Publish exactly once with `CreateHardLinkW(final,temp,NULL)`. Microsoft
+documents this primitive as NTFS-only; a ReFS parent may satisfy the ACL/file-ID
+inspection but must take the explicit unsupported-publication failure path with
+final absent and validated temporary retained. No PowerShell
+`-Force`, fallback, copy/move/delete/recreate/retry/alternate name. Open both
+names no-follow and require ordinary type, equal volume/file ID, link count
+`2`, length/digest/ACL equality; then unlink exact temp, reopen final, and
+require the original identity with link count `1`. Unsupported/ambiguous API,
+filesystem, ID, or link count fails closed. An initial link count above one
+proves an undisclosed hard link.
+
+These handle checks prove inspected file identity, not an adversarial
+`openat`-style namespace sandbox. T4's protected DACL and no-authorized-
+competitor attestation are mandatory on both editions; if unavailable, refuse.
+
+### Offline secret-safe state-difference review
+
+Add a reviewed offline helper operating only on protected validated current/
+proposed states. Disable transcript/xtrace/network, use explicit size/depth/
+count and duplicate-key ceilings, and retain parsed values only in memory.
+Obtain both exact `terraform show -json` representations under the same
+resolved Terraform version in protected proven-owned temporary streams/files.
+
+Emit only a closed canonical projection: lineage/serial/format labels;
+configuration-known module/resource address, mode/type/name/provider/schema/
+instance key; output name/type/sensitivity; JSON property path; old/new JSON
+kind; and change enum
+`added|removed|type-changed|value-changed|sensitive-subtree-changed|unchanged`.
+Never emit a value, length/entropy clue, encoding, fragment, provider
+diagnostic, or leaf digest. Collapse `sensitive_values` subtrees. Any identifier
+not already present in reviewed configuration/schema or with unsafe bytes
+becomes only `unreviewed-identity-present` and requires protected local review.
+
+A preapproved exact path/change-enum allowlist rejects every missing/extra/
+duplicate/unknown/resource-binding/provider/output/sensitivity change. Retain
+only sorted safe rows/counts, tool/Terraform versions, already-required whole-
+file digests, and canonical summary SHA-256. Equal whole-file digests stop as
+no change; unequal digests plus empty summary stop as
+`serialization-only-difference`. Typed confirmation follows peer approval and
+binds the proposed whole-file prefix. Canary fixtures prove no raw/encoded/
+hashed secret leaks to stdout, stderr, results, or artifacts.
+
+### T2 signal contract on every T4 Bash phase
+
+Record the exact landed T2 commit/evidence and extend the same
+`Test-StateRecoveryExamples.sh` signal driver. Each T4 Bash block has distinct
+HUP/INT/TERM handlers returning `129/130/143` and one EXIT cleanup owner:
+capture primary first, disable EXIT, ignore further signals, cleanup once;
+primary nonzero wins, cleanup-only failure returns `1`.
+
+Use synchronized barriers for each block/ownership phase and all three signals
+with cleanup success/failure. Before a push/rm child starts, interruption proves
+zero destructive calls. During/after start, remote outcome is `unknown`;
+retain backup/evidence, never retry/force/unlock/delete evidence/auto-rollback,
+and require incident/manual remote verification. Publication-window uncertainty
+retains names unless handle identity proves exact safe cleanup. Every case has
+one stable ID/result with signal/status/phase/cleanup count/path state/child
+count/remote sentinel. All prior T2 signal IDs remain unchanged and green.
 
 ## Requested changes
 
@@ -201,17 +378,18 @@ postconditions, and operator-attested backend language. It must:
    for an actual create-new collision and fail immediately for every other
    error;
 4. start the process, copy `StandardOutput.BaseStream` bytes directly to the
-   file, drain stderr concurrently with an explicit bound, and only then wait
-   for stream/process completion so neither pipe can deadlock;
+   file, drain `StandardError.BaseStream` concurrently under the exact
+   65,536-byte retain/drain-to-EOF/fail-on-65,537 contract above, and only then
+   wait for stream/process completion so neither pipe can deadlock;
 5. capture the native exit exactly, reject start/nonzero/empty/partial output,
    and never print state bytes;
 6. dispose process/stream objects before cleanup;
-7. require one ordinary non-reparse temporary file containing BOM-less UTF-8
-   state that `terraform show -json` accepts; extract/record lineage, serial,
-   Terraform version, and SHA-256;
-8. publish once with
-   `New-Item -ItemType HardLink -Path <final> -Target <temp>` without
-   `-Force`, after repeated final-absence/type checks;
+7. require one ordinary non-reparse temporary file that passes the explicit
+   BOM-prefix check and complete `UTF8Encoding(false,true)` incremental decode
+   before `terraform show -json`; extract/record lineage, serial, Terraform
+   version, and SHA-256;
+8. publish once with the reviewed `CreateHardLinkW(final,temp,NULL)` interop
+   primitive after repeated no-follow final-absence/type checks;
 9. verify final bytes/digest/file identity, unlink only the temporary hard-link
    name, and retain the final validated backup; and
 10. on failure, delete only a still-proven owned ordinary unpublished
@@ -442,19 +620,50 @@ temporary/final state, remote-call count, diagnostics, and sentinels.
 | `SM-PS-BACKUP-04` | nonzero with no stdout | no final; temp removed; native status retained |
 | `SM-PS-BACKUP-05` | nonzero with partial stdout | no final; exact partial removed |
 | `SM-PS-BACKUP-06` | zero with empty/truncated output | no final; validation failure |
-| `SM-PS-BACKUP-07` | invalid/BOM state | no final; validation failure |
+| `SM-PS-BACKUP-07` | valid UTF-8 but invalid JSON state | no final; status 66 JSON validation failure |
 | `SM-PS-BACKUP-08` | existing ordinary final | reject before process; bytes unchanged |
 | `SM-PS-BACKUP-09` | live/dangling reparse final | reject before process; target unchanged |
 | `SM-PS-BACKUP-10` | cleanup substitution/failure | uncertain root retained; both reasons reported |
 | `SM-PS-BACKUP-11` | real hard-link publication | final bytes/identity verified; temp name absent |
 | `SM-PS-BACKUP-12` | two competing publishers | exactly one create succeeds; loser cannot overwrite |
 | `SM-PS-BACKUP-13` | hard links unsupported | final absent; validated temp retained; fail closed |
-| `SM-PS-BACKUP-14` | stdout/stderr exceed process edge cases | no deadlock; bounded diagnostics; exact result |
+| `SM-PS-BACKUP-14` | exactly 65,535 stderr bytes, native zero | no overflow; normal valid-state result |
 | `SM-PS-BACKUP-15` | existing final directory | reject before process; directory unchanged |
+| `SM-PS-BACKUP-16` | exactly 65,536 stderr bytes, native zero | no overflow; normal valid-state result |
+| `SM-PS-BACKUP-17` | exactly 65,537 stderr bytes | status 73; final absent; no stderr payload emitted |
+| `SM-PS-BACKUP-18` | simultaneous stdout/stderr above pipe capacity | no deadlock; exact native/overflow result |
+| `SM-PS-BACKUP-19` | stderr raw-stream read failure | process/tool failure; no publication |
+| `SM-PS-BACKUP-20` | delayed stderr EOF after process exit | both pumps complete before decision |
 
 Every `SM-PS-*` row runs under Windows PowerShell exactly 5.1 and PowerShell
 major 7 unless the row is explicitly edition-specific. A skip names
 ID/edition/platform/reason and is not a pass.
+
+Strict UTF-8 cases are also one row/result each on both editions:
+
+| ID | Exact candidate bytes/class | Exact oracle |
+| --- | --- | --- |
+| `SM-PS-UTF8-01` | stray continuation `80` | status 66 before JSON/show; final absent |
+| `SM-PS-UTF8-02` | missing continuation `C2 20` | status 66 before JSON/show; final absent |
+| `SM-PS-UTF8-03` | overlong `C0 AF` | status 66 before JSON/show; final absent |
+| `SM-PS-UTF8-04` | overlong `E0 80 AF` | status 66 before JSON/show; final absent |
+| `SM-PS-UTF8-05` | surrogate `ED A0 80` | status 66 before JSON/show; final absent |
+| `SM-PS-UTF8-06` | above U+10FFFF `F4 90 80 80` | status 66 before JSON/show; final absent |
+| `SM-PS-UTF8-07` | truncated 2-byte ending | status 66 before JSON/show; final absent |
+| `SM-PS-UTF8-08` | truncated 3-byte ending | status 66 before JSON/show; final absent |
+| `SM-PS-UTF8-09` | truncated 4-byte ending | status 66 before JSON/show; final absent |
+| `SM-PS-UTF8-10` | leading UTF-8 BOM | status 66 `state-utf8-bom`; final absent |
+| `SM-PS-UTF8-11` | UTF-16LE BOM/input | status 66 before JSON/show; final absent |
+| `SM-PS-UTF8-12` | UTF-16BE BOM/input | status 66 before JSON/show; final absent |
+| `SM-PS-UTF8-13` | valid non-ASCII and maximum scalar | bytes remain identical and validation continues |
+| `SM-PS-UTF8-14` | valid multibyte split at every decoder buffer boundary | bytes remain identical and validation continues |
+| `SM-PS-UTF8-15` | invalid sequence split at every decoder buffer boundary | status 66 before JSON/show; final absent |
+
+Each confirmation grammar rejection similarly receives one immutable fixture
+ID/result—empty, EOF, wrong case, nonhex, short, long, extra text, CRLF,
+second line, wrong operation/field, JSON escape, address quotes/backslashes,
+serial form, digest form, and every exact length endpoint. A grouped harness
+row is not accepted as multiple results.
 
 ### Local corruption preservation
 
@@ -504,7 +713,7 @@ filesystem postcondition.
 
 The Bash harness executes real same-filesystem
 `ln --no-target-directory` without `--force`/`--backup`; the PowerShell harness
-executes real `New-Item -ItemType HardLink` without `-Force`. Both prove absent
+executes the real reviewed `CreateHardLinkW` interop call. Both prove absent
 target success, existing ordinary/directory/link target refusal without byte
 changes, and two synchronized publisher processes with exactly one success and
 one already-exists failure. Use bounded repetition only as supplemental
@@ -551,8 +760,19 @@ From clean disposable clones:
       lineage, serial, digest, mode, and no-replace publication.
 - [ ] The backend label is explicitly operator-attested; no generic block
       claims to derive every remote backend identity.
+- [ ] POSIX parent/file modes and Windows owner/protected-DACL/exact-SID ACEs
+      are inspected at every required phase; no Windows acceptance uses
+      `umask` as a security control.
 - [ ] Windows PowerShell 5.1 and PowerShell 7 use one raw .NET stdout-stream
       capture contract and produce byte-identical non-ASCII backup evidence.
+- [ ] PowerShell retains at most 65,536 raw stderr bytes, drains excess through
+      EOF, fails on byte 65,537 with status 73, and emits no stderr payload.
+- [ ] Every candidate is explicitly BOM-checked and completely validated with
+      `UTF8Encoding(false,true)` before JSON/show/publication; every invalid
+      byte-class/buffer-boundary ID passes once per edition.
+- [ ] Windows component traversal, reparse rejection, file identity, link
+      counts, and no-replace hard-link publication use the one reviewed
+      handle-based Win32 helper and fail closed when unavailable.
 - [ ] Bash and PowerShell exercise real same-filesystem no-replace publication,
       existing-target refusal, and exactly-one-winner race cases.
 - [ ] Unsupported hard-link publication fails closed with final absent and
@@ -563,6 +783,12 @@ From clean disposable clones:
       concurrency/lineage/serial/diff/confirmation guarded, and never forced.
 - [ ] Push/rm confirmations require the exact first 16 lowercase SHA-256
       characters plus their operation-specific fields.
+- [ ] Backend/workspace/label/digest inputs and canonical JSON confirmation
+      lines satisfy the literal grammars, terminal-byte comparison, status 68,
+      and zero-destructive-call mismatch oracle.
+- [ ] State-difference approval uses only the offline redacted structural/
+      change-kind projection and exact allowlist; no state value or
+      value-derived leaf digest appears in logs/evidence.
 - [ ] Manual state push and state rm use exactly `-lock-timeout=5m`, never
       disable locking, and require external exclusion for a no-lock backend.
 - [ ] State rm prefers `removed` blocks, requires dry-run exact matches,
@@ -574,6 +800,9 @@ From clean disposable clones:
 - [ ] Every one-row-per-ID Bash and PowerShell `SM-*` oracle passes exactly once
       on each applicable runtime.
 - [ ] All prior `SR-*` tests remain green.
+- [ ] Every T4 Bash phase consumes T2's exact HUP/INT/TERM 129/130/143 and
+      one-EXIT-owner contract; cleanup runs once and an interrupted started
+      mutation is retained as unknown without retry/rollback.
 - [ ] Source/generated files advance consistently and remain LF/BOM-less/
       CR-free/idempotent.
 - [ ] The callable workflow's permanent Windows 5.1/7 evidence is a same-run
@@ -605,4 +834,8 @@ From clean disposable clones:
 - [PowerShell 7 redirection](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_redirection?view=powershell-7.5#redirecting-binary-data)
 - [.NET redirected standard output](https://learn.microsoft.com/dotnet/api/system.diagnostics.process.standardoutput?view=netframework-4.8.1)
 - [.NET FileMode.CreateNew](https://learn.microsoft.com/dotnet/api/system.io.filemode)
-- [PowerShell New-Item hard links](https://learn.microsoft.com/powershell/module/microsoft.powershell.management/new-item?view=powershell-5.1)
+- [CreateHardLinkW](https://learn.microsoft.com/windows/win32/api/winbase/nf-winbase-createhardlinkw)
+- [CreateFileW and reparse-point flags](https://learn.microsoft.com/windows/win32/api/fileapi/nf-fileapi-createfilew)
+- [FILE_ID_INFO](https://learn.microsoft.com/windows/win32/api/winbase/ns-winbase-file_id_info)
+- [.NET UTF8Encoding](https://learn.microsoft.com/dotnet/api/system.text.utf8encoding?view=netframework-4.8.1)
+- [.NET FileSystemSecurity](https://learn.microsoft.com/dotnet/api/system.security.accesscontrol.filesystemsecurity?view=netframework-4.8.1)

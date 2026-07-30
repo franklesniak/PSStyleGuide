@@ -30,20 +30,23 @@ commits. Before editing workflows:
   candidate-validation-layer comparison has an unresolved blocker.
 
 **Make state-version discovery and recovery examples copy-safe with guarded
-identifiers** is blocked by this issue.
+identifiers** is blocked by this issue. Before T1B merges, record the reviewed
+T1B head, final evidence runs, the T2 handoff location, and the accountable
+handoff owner. After merge, that owner records the actual protected-branch
+landed commit, merge method/time, issue/PR links, and reviewed-head distinction
+in T2; T2 independently validates that commit before editing.
 
 ## Affected files
 
-Exactly these five files may change:
+Exactly these three files may change:
 
 - `.github/workflows/build.yml`;
 - `.github/workflows/markdownlint.yml`;
-- `.github/workflows/Validate-WorkflowPolicy.mjs` — add;
-- `.github/workflows/package.json`; and
-- `.github/workflows/package-lock.json`.
+- `.github/workflows/Validate-WorkflowPolicy.mjs`.
 
-The manifest/lockfile change is limited to one reviewed direct YAML parser used
-by the permanent offline workflow-policy validator. Do not change the
+Extend T1's existing permanent offline workflow-policy validator and locked
+direct parser; do not add a second validator/parser or change package/lock
+bytes. Do not change the
 generator, helper, context lifecycle, helper harness, hook, lint configuration,
 source guides, or generated artifacts in this issue. T3 later owns the final
 package upgrade/audit state and must retain/revalidate this direct parser and
@@ -56,8 +59,9 @@ validator.
 - Do not use workflow-level path filters or a skip-commit convention.
 - Add `merge_group` if the repository enables merge queue and requires these
   checks.
-- Set workflow/top-level permissions to `contents: read`.
-- Give `contents: write` only to the final synchronization writer job.
+- Set workflow/top-level `permissions: {}`.
+- Give every job its exact permissions below; give `contents: write` only to
+  the final synchronization writer job.
 - Use only standard GitHub-hosted runners.
 - Use `persist-credentials: false` on every checkout.
 - Do not use caches, service containers, reusable remote workflows, or
@@ -82,10 +86,11 @@ retain provenance evidence. The required commits are:
 
 Every `uses:` line must use a full SHA plus matching release annotation.
 
-Create `.github/workflows/Validate-WorkflowPolicy.mjs`. Declare one reviewed
-direct YAML parser in `package.json`, lock it in the version-3 lockfile, and use
-safe core-schema parsing with duplicate keys rejected. Reject unsupported
-custom tags and aliases. The validator accepts the two exact workflow paths,
+Extend T1's `.github/workflows/Validate-WorkflowPolicy.mjs` and its existing
+locked direct YAML parser. Keep strict core-schema parsing, unique keys,
+warnings-as-errors, and the complete T1 rejection of directives, tags,
+anchors/aliases, merges, multidocument streams, complex keys, and non-JSON-like
+values. The validator accepts the two exact workflow paths,
 never fetches the network, and enforces:
 
 - exact events and event filters;
@@ -99,9 +104,9 @@ never fetches the network, and enforces:
 - static Windows matrix IDs and unique outputs; and
 - one and only one contents-writing writer.
 
-Require exact equality to the final
-workflow/job/step-role/repository/SHA/count table. At minimum, encode separate
-roles for:
+Require exact equality to the normative
+workflow/job/step-role/repository/SHA/count/input tables. Encode exactly these
+roles:
 
 - preparation checkout;
 - candidate upload;
@@ -114,14 +119,15 @@ roles for:
 - Markdown checkout; and
 - Markdown Node setup.
 
-Final YAML determines exact counts. Reject missing, duplicate, extra, dynamic,
+The hand-authored issue/validator tables determine exact counts; parsed YAML
+never defines policy. Reject missing, duplicate, extra, dynamic,
 mutable, wrong-repository, arbitrary-SHA, and swapped upload/download roles.
 Add stable positive and negative fixtures for those states plus duplicate YAML
 keys, invalid job dependencies, an extra write permission, persisted
 credentials, wrong local reusable workflow, and wrong matrix/output mapping.
 The verifier is deterministic and offline. Update `uses:`, annotation,
-allowlist, package/lockfile when needed, and fixtures atomically on an
-intentional upgrade.
+issue tables, validator constants, workflow, action provenance/default review,
+and fixtures atomically on an intentional upgrade.
 
 ## Requested changes
 
@@ -231,7 +237,8 @@ matrix:
 
 Every cell:
 
-1. checks out and verifies the exact event SHA without credentials;
+1. performs a transient authenticated checkout with persistence disabled, then
+   verifies the exact event SHA;
 2. asserts the selected PowerShell edition/version;
 3. resolves the exact helper/context/harness as tracked ordinary files;
 4. runs the permanent harness and requires every applicable stable ID;
@@ -395,8 +402,9 @@ commit.
 
 ### 10. Add controlled negative drills
 
-Before enabling writes to `main`, use a unique temporary branch and controlled
-artifact/run fixtures to prove:
+Before enabling writes to `main`, use the exact
+`refs/heads/t1b-evidence/<utc>-<random>` protocol and allowed-delta manifest in
+section 14 with controlled artifact/run fixtures to prove:
 
 - propagated digest altered to another well-formed 64-hex value fails before
   ZIP construction/candidate creation;
@@ -441,6 +449,173 @@ Re-evaluate immediately if the repository becomes private, standard-runner
 billing changes, larger runners are proposed, or retention policy changes.
 Cost does not silently remove a security cell.
 
+### 12. Enforce one complete authored job/role/data-flow policy
+
+The job graph is exact:
+
+| Job | Direct needs | Exact permission | Eligibility/ownership |
+| --- | --- | --- | --- |
+| `markdown` | none | `contents: read` | calls only `./.github/workflows/markdownlint.yml`; no steps or inherited secrets |
+| `prepare` | none | `contents: read` | checkout, generation, hashes, immutable upload, outputs |
+| `validate_windows` | `prepare` | `contents: read` | static four-cell matrix; one cell-specific result each |
+| `approve` | `markdown`, `prepare`, `validate_windows` | `{}` | `always()`; one decision for success/failure/skipped/no-change |
+| `writer` | `prepare`, `validate_windows`, `approve` | `contents: write` | exact protected-main push, approval success, `has_changes == 'true'` |
+
+Only these static action roles exist:
+
+| Role ID | Static count | Expanded runtime count |
+| --- | ---: | ---: |
+| `prepare.checkout` | 1 | 1 |
+| `prepare.upload-candidate` | 1 | 1 |
+| `windows.checkout` | 1 | 4 |
+| `windows.download-candidate` | 1 | 4 |
+| `windows.upload-failure-diagnostics` | 1 | 0–4 |
+| `writer.checkout` | 1 | 0–1 |
+| `writer.download-candidate` | 1 | 0–1 |
+| `writer.upload-failure-diagnostics` | 1 | 0–1 |
+| `markdown.checkout` | 1 | 1 |
+| `markdown.setup-node` | 1 | 1 |
+
+For every row, the validator stores the exact job/step ID and order,
+action/full SHA/release annotation, semantic YAML scalar type and `with`
+key/value map, `if`, `continue-on-error`, permissions, environment-key set,
+side effect, and output owner. It first rejects missing/extra roles, then
+compares values. Expressions must equal one authorized expression text and may
+not be composed or sourced elsewhere.
+
+Every checkout uses T1's complete explicit input set, with
+`repository: ${{ github.repository }}`, the role's exact event/ref SHA,
+`token: ${{ github.token }}`, and `persist-credentials: false`. Setup Node
+uses T1's exact Node-24/token/cache input set. Each role has a separate closed
+omitted-default table keyed by pinned action/input/upstream default/rationale/
+security consequence; an undocumented or unknown omission fails.
+
+Candidate upload uses collision-free
+`style-guide-candidate-${{ github.run_id }}-${{ github.run_attempt }}`, the
+four literal generated paths, `if-no-files-found: error`,
+`retention-days: 1`, `compression-level: 0`, `overwrite: false`, and
+`include-hidden-files: false`. Windows and writer downloads select only
+`artifact-ids: ${{ needs.prepare.outputs.candidate_artifact_id }}`, use their
+new protected context download directory, `skip-decompress: true`, and
+`digest-mismatch: error`; `name`, `pattern`, `merge-multiple`, `github-token`,
+`repository`, and `run-id` are absent.
+
+Failure diagnostic upload runs only under
+`failure() && !cancelled()`, is `continue-on-error: true`, names only exact
+test-owned diagnostic paths, uses a collision-free job/cell/run/attempt name,
+7-day retention, explicit missing-file behavior, no hidden files/overwrite,
+and cannot mask the primary result. Candidate archives, arbitrary workspace
+trees, tokens, state, signed URLs, and Git configuration are forbidden.
+
+Producer/consumer outputs are exact:
+
+- `prepare` owns artifact ID, bare artifact digest, diagnostic-only unique
+  name, event SHA, target ref, `has_changes`, and four path-bound hashes;
+- each static matrix include row owns immutable cell ID, runner, executable,
+  expected edition/version, source EOL, and one unique output key;
+- each cell emits one closed canonical JSON result under only that key;
+- `approve` directly consumes preparation, every cell, and Markdown results;
+  it rejects empty/duplicate/wrong IDs/keys and schema/hash mismatch; and
+- `writer` directly needs every producer whose output/result it reads.
+
+No transitive `needs` assumption is allowed. Fixtures cover every table
+dimension, name-based or implicit decompression, cross-run selection, correct
+action in wrong role, missing direct need, shared output key, success/
+cancellation diagnostics, wildcard/hidden diagnostic paths, and a dormant
+second writer.
+
+### 13. State the job-token and Git-push boundary truthfully
+
+GitHub creates a job token before each job and `github.token` remains available
+to execution steps. Job permissions bound authority; no job is described as
+token-free or credential-free. Read jobs have only `contents: read`; only
+`writer` has `contents: write`.
+
+The writer checkout explicitly receives the write-capable job token for
+authenticated fetch but does not persist it. Immediately afterward, a
+presence-only check rejects an origin with embedded credentials, credential
+helpers, or local/global HTTP authorization configuration without printing any
+value. The write job may run only its named checkout/download, local reviewed
+scripts, fixed Git operations, and failure-diagnostic role—never downloaded
+candidate code, untrusted PR code, a remote workflow, or command-string eval.
+
+Only reviewed action `token` inputs may explicitly expand `github.token`.
+Only the exact guarded push step may construct the Basic authorization header
+and pass it via process-scoped `GIT_CONFIG_COUNT`/key/value variables to the
+one direct `git push` child. Every candidate/regeneration/ref/SHA/parent/tree/
+lease/path/diagnostic check completes before construction. Clear variables in
+`finally`; never place credentials in args, files, remotes, Git config,
+outputs, artifacts, or logs. Other scripts receive no explicit token/header/
+helper/config environment.
+
+### 14. Prove the real writer on one isolated evidence ref
+
+After static/local/PR evidence, record the final production candidate commit as
+`PRODUCTION_BASE`. Create one unpredictable lowercase
+`refs/heads/t1b-evidence/<utc>-<random>` at that commit. Evidence-only commits
+remain on that ref and are never merged, rebased, cherry-picked, or squashed
+into production.
+
+On that branch only, patch the same `build.yml` and validator constants. An
+upfront allowed-delta manifest lists the exact file/hunk/old/new literals that
+change the push filter, approval ref, writer condition, `TARGET_REF`, bounded
+scenario instrumentation, closed selector, and one source-guide fixture from
+`main` to the evidence ref. Reject any other permission, graph, action/input,
+candidate, credential, path, commit, lease, refspec, diagnostic, or event
+delta. Do not use `workflow_dispatch`, `repository_dispatch`, a caller ref,
+wildcard/prefix, secret inheritance, or a copied writer.
+
+The positive evidence source edit deterministically changes generated bytes.
+The normal prepare/matrix/approval/real-writer flow must move only the evidence
+ref from the event/`EXPECTED_SHA` to one child commit whose tree differs only
+at the four generated paths and whose blobs equal propagated hashes. Record
+the exact lease/refspec and prove the token-created commit did not recursively
+start a run.
+
+Each negative drill is a separate evidence-only commit selected by a closed
+enum incapable of carrying a ref/path/command/credential/expression/data.
+Before each drill, a maintainer/controller advances the evidence ref with its
+own expected-old lease. Record scenario commit, run ID/URL, phase/status,
+remote before/after, approval/writer result, diagnostic artifact identity, and
+sentinel scan. The stale race makes a separate controlled ref update after
+preflight so the unchanged exact writer lease loses.
+
+Do not modify main protection. A smallest temporary rule change may target
+only the evidence ref and must have byte/field-equivalent before-state restored
+and verified in `finally`, or production enablement is blocked. Cleanup waits
+for/cancels all runs, restores settings, deletes the remote ref with an
+expected-old guard, proves it absent, removes the local branch, and proves no
+rule/environment/policy/active run still names it.
+
+Before main enablement, prove the production candidate descends from
+`PRODUCTION_BASE`, contains no evidence commit/string/scenario/instrumentation/
+fixture/alternate condition/event/push path, and exactly restores the main-only
+normative tables and fixtures. Retain commits, manifest/result, runs, artifact
+identity/digest/four hashes, ref/parent/tree evidence, setting before/after,
+and cleanup results—never credentials or signed URLs.
+
+### 15. Use one byte-safe Git/status policy and a satisfiable handoff
+
+Extend T1's one validator and hand-authored role schema; do not add a policy
+generator or derive constants from positive YAML. All affected-file, evidence-
+variant, worktree/index, commit/parent, and generated-four gates read native Git
+stdout bytes from NUL-delimited modes. Require empty or one terminal NUL, split
+only on `00`, reject interior empty/duplicate/malformed records, and compare
+sorted raw canonical repository-path byte sequences.
+
+Run difference predicates separately and classify native status exactly:
+`0` no difference, `1` difference, every other status/start failure a tool
+failure. Record each command's endpoints and equality/subset/empty oracle.
+Fixtures include spaces, tabs, newlines, leading dash, quote/escape characters,
+missing-final-NUL, status `0/1/2`, start failure, and combined misleading
+path/status/extra-role attacks.
+
+Before merge, record full **reviewed head**, exact script versions parsed under
+T1's `.NOTES` contract, final run IDs, T2 blocked-by link, handoff location, and
+owner. Do not call the reviewed head a merge commit. T2 records and validates
+the actual landed protected-branch commit after merge (merge, squash, or rebase
+result), preserving both identities and revalidation evidence when they differ.
+
 ## Reciprocal PSStyleGuide writer-layer comparison
 
 At implementation start and before merge, record the exact PSStyleGuide commit
@@ -469,7 +644,7 @@ if PS planning files are renamed or split.
 
 Prove:
 
-- only the five affected files changed/staged;
+- only the three affected files changed/staged;
 - every action equals the final exact role allowlist;
 - permissions are read-only except the writer job;
 - events are unfiltered as required;
@@ -477,7 +652,7 @@ Prove:
   remote reusable workflow, command-string Git, recursive cleanup, or
   skip-commit behavior exists;
 - the T1 temporary writer and every second/dormant push path are absent;
-- manifest/lockfile changes are limited to the reviewed direct YAML parser;
+- package/lockfile bytes and T1's locked direct parser remain unchanged;
 - hook/lint config and all four generated artifacts are unchanged;
 - the tracked structural validator passes both workflows and every mandatory
   positive/negative fixture; and
@@ -497,7 +672,7 @@ Require:
 
 ### Push and writer evidence
 
-Use the controlled temporary branch first. Require:
+Use the exact isolated evidence-ref protocol first. Require:
 
 - exact preparation ID/digest/four-hash propagation;
 - all four unique Windows cells;
@@ -520,8 +695,9 @@ the run URLs/IDs in the issue.
 - [ ] `build.yml` is the event owner; the repository-local callable
       `markdownlint.yml` is a direct same-run approval dependency with no
       duplicate independent triggers.
-- [ ] Only the writer has `contents: write`; every checkout disables persisted
-      credentials.
+- [ ] Workflow default permissions are empty; only the writer has
+      `contents: write`; checkout authentication is transient and every
+      checkout disables persistence.
 - [ ] External actions equal the exact repository/SHA/role/count allowlist.
 - [ ] The tracked locked-parser validator structurally enforces workflow,
       action, dependency, matrix, output, credential, and permission policy.
@@ -539,7 +715,9 @@ the run URLs/IDs in the issue.
       rereads them.
 - [ ] Remote preflight, parent, lease, and refspec use the same validated pair.
 - [ ] Candidate, destination, staged, committed, and remote bytes/IDs match.
-- [ ] Credentials exist only for one exact push and never appear in evidence.
+- [ ] Only the guarded writer push process receives an explicit Git push
+      authorization header; token expansions are limited to the normative
+      action inputs and push role and never appear in evidence.
 - [ ] Digest, manifest, identity, stale-preflight, lease, no-op, event, and
       token drills pass.
 - [ ] Failure diagnostics are bounded, redacted, failure-only, and retained
@@ -548,8 +726,10 @@ the run URLs/IDs in the issue.
 - [ ] The T1 temporary writer is removed and exactly one push path remains.
 - [ ] The reciprocal PS writer-layer/Terraform matrix has no unexplained
       blocker.
-- [ ] Only the five declared affected files are in the changed/staged set.
-- [ ] T2 records this issue's exact merge commit as its prerequisite.
+- [ ] Only the three declared affected files are in the changed/staged set.
+- [ ] The reviewed T1B head, T2 blocked-by relationship, handoff location, and
+      owner are recorded; T2 must record and validate the actual landed commit
+      after this issue merges.
 
 ## Non-goals
 

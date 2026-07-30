@@ -25,9 +25,10 @@ Record real GitHub dependencies in the selected order.
 
 ## Dated baseline, not acceptance
 
-On 2026-07-29, `npm audit --package-lock-only --json` under Node 26.5.0/npm
-11.7.0 reported seven affected package nodes: five high and two moderate. The
-report included advisories through:
+On 2026-07-29, `corepack npm audit --package-lock-only --json` under Node
+26.5.0/npm 11.7.0 reported seven vulnerability **properties** (five high and
+two moderate), 14 advisory objects in `via`, two package-name string edges in
+`via`, and seven installed audit node paths. The seven property keys were:
 
 - `brace-expansion`;
 - `js-yaml`;
@@ -55,6 +56,8 @@ Required files:
 - `.github/workflows/markdownlint.yml`;
 - `.github/workflows/Test-MarkdownToolingIntegration.ps1` — add;
 - `.github/workflows/Check-NodePolicy.mjs` — add;
+- `.github/workflows/Install-Husky.mjs` — add;
+- `.github/workflows/node-policy-cases.json` — add;
 - `.github/workflows/Validate-NpmAudit.mjs` — add; and
 - `.github/workflows/Validate-WorkflowPolicy.mjs`.
 
@@ -84,9 +87,9 @@ From a clean clone and exact prerequisite commit, record:
 - Node/npm executable paths and full versions;
 - `package.json`;
 - lockfile version and root dependency declarations;
-- `npm ls --all --json`;
-- `npm outdated --json`;
-- `npm audit --package-lock-only --json`;
+- `corepack npm ls --all --json`;
+- `corepack npm outdated --json`;
+- `corepack npm audit --package-lock-only --json`;
 - direct package release/engine requirements and changelogs;
 - existing lint scripts/config/nested-lint imports;
 - exact `.husky/pre-commit` behavior; and
@@ -122,47 +125,56 @@ For every direct dependency:
 - document required config/API changes; and
 - justify retaining, upgrading, replacing, or removing the dependency.
 
-Upgrade through explicit `package.json` edits and one selected supported npm.
+Upgrade through explicit `package.json` edits and npm exactly `12.0.2`, selected
+through the hashed Corepack project identity:
+
+```json
+"packageManager": "npm@12.0.2+sha512.b885e890b9418fa1693544d05f53e64f9a73ec194837d4258b15fecdd692347b1dd2a517b1b0cbaf9d31cd8e92c3b70956bd2ecc72833a57b4b3098f5bfa7943"
+```
+
+Every package operation is `corepack npm ...`; never invoke ambient `npm` or
+`npx`, install npm globally, or add npm as a devDependency. Enable Corepack's
+strict project/integrity behavior, assert exact `corepack npm --version`
+`12.0.2`, hydrate in the job-local trusted install phase, then prove a second
+clean install with network disabled/offline cache only. Re-resolve the dated
+npm release/integrity immediately before implementation; drift requires an
+explicit reviewed issue update, not an automatic “latest.”
+
 Regenerate lockfile version 3 from a clean dependency state. Never use
 `npm audit fix --force`, `--force`, `--legacy-peer-deps`, ignored engines, or
 manual lockfile edits.
 
 After selection, require:
 
-- clean `npm ci`;
-- `npm ls --all` with no invalid/extraneous/missing dependency;
+- clean `corepack npm ci`;
+- `corepack npm ls --all` with no invalid/extraneous/missing dependency;
 - exact lockfile/root declaration agreement;
 - unchanged script intent for outer/nested lint; and
 - reproducible second clean install.
 
 ### 3. Declare the final Node policy
 
-Select a supported even-numbered Node LTS minimum admitted by every final
-direct/transitive package and by the real hook/tooling behavior. The preferred
-hosted line remains Node 24 unless current support/release evidence requires a
-newer LTS.
+The finite reviewed policy is exactly:
 
-The expected default is:
+| Line | Admitted interval | Floor evidence | Dated current evidence |
+| --- | --- | --- | --- |
+| Node 22 | `>=22.22.2 <23` | `22.22.2` | `22.23.2` on 2026-07-29 |
+| Node 24 | `>=24.15.0 <25` | `24.15.0` | `24.18.1` on 2026-07-29 |
 
-- supported minimum Node 22; and
-- preferred hosted Node 24.
-
-Do not finalize that expectation until the selected package tree and current
-Node release schedule prove it. Do not choose EOL Node 20 merely because a
-package declares `>=20`.
-
-Add an exact `engines.node` range that expresses the reviewed supported lines.
-Avoid an unbounded range that silently claims unsupported future majors. Record
-the policy in `package.json` without adding an unrelated package-manager field
-unless the issue explicitly selects and validates one.
+Set `engines.node` exactly to
+`>=22.22.2 <23 || >=24.15.0 <25`. Node 20 is EOL; 21/23/25 are
+unreviewed/non-LTS lines; Node 26 is current but not yet an admitted LTS line;
+Node 27 and later are not silently accepted. There is no general even-major
+rule.
 
 Add `.github/workflows/Check-NodePolicy.mjs` as the dependency-free policy
 implementation. It exports a pure version predicate for tests and provides a
 CLI that always checks `process.versions.node`; the production CLI has no
-version-override argument. Prefer explicit reviewed major intervals over a
-general semver reimplementation. The expected implementation-time result is to
-admit majors 22 and 24 only, for example `>=22 <23 || >=24 <25`, and reject
-odd/intervening/future major 23, 25, and 26 until separately reviewed.
+version-override argument. Implement an explicit two-row major/floor/ceiling
+table and accept canonical ASCII `x.y.z` only. Reject prefixes, signs, leading
+zeros, missing/extra components, prerelease/build text, Unicode digits,
+overflow, every below-floor patch, majors 20/21/23/25/26/27+, and any
+unreviewed line.
 
 `engines.node`, workflow setup-node cells, hook diagnostic, and the policy
 module must encode the same admitted set. The structural workflow-policy
@@ -200,15 +212,16 @@ Before testing installed tooling, `.husky/pre-commit` must:
 4. invoke the exact tracked `Check-NodePolicy.mjs` against the actual Node
    process before checking `node_modules`;
 5. reject malformed, unsupported, EOL, and unreviewed future majors;
-6. require `npm` to resolve as an application only after Node policy passes;
+6. require `corepack` to resolve as an application only after Node policy
+   passes and require its selected npm identity exactly;
 7. print one stable diagnostic with observed version, accepted range, and
    remediation command/guidance;
 8. retain GUI Git/version-manager guidance through
    `~/.config/husky/init.sh`;
 9. preserve deliberate `--no-verify` guidance as a bypass disclosure, not a
    success path; and
-10. invoke the unchanged logical outer then nested lint surfaces only after
-   runtime/tooling validation.
+10. invoke the unchanged logical outer then nested lint surfaces only through
+    `corepack npm` after runtime/tooling validation.
 
 Preserve exit classification:
 
@@ -220,7 +233,32 @@ Preserve exit classification:
 Do not replace TerraformStyleGuide's real full-lint hook with PSStyleGuide's
 different programmatic staged-content API.
 
-### 5. Add a tracked cross-platform integration harness
+### 5. Install Husky through a tracked fail-closed state machine
+
+Add `.github/workflows/Install-Husky.mjs` and set `prepare` exactly to
+`node Install-Husky.mjs`; remove every `|| true` or equivalent swallowed
+installation failure. The default state is **required install**. Skip is
+permitted only under one of:
+
+- `HUSKY_INSTALL_MODE=skip`;
+- `HUSKY=0`; or
+- `CI=true` with exact recorded reason `read-only-ci-install`.
+
+Reject unknown/noncanonical values and conflicting state. Required mode
+independently resolves the repository root, invokes the project-pinned Husky
+through the selected Corepack npm environment, then verifies local
+`core.hooksPath` equals exactly `.husky/_`, every required shim is an ordinary
+non-link file, and the tracked `.husky/pre-commit` is the exact ordinary
+versioned hook. Any install/invocation/verification error is nonzero.
+
+Skip mode proves byte/config/filesystem immutability and reports the exact
+selected skip source/reason; it never reports “installed.” Tests run only in
+disposable repositories and include a real `git commit` that proves Git invokes
+the installed hook. Add atomic cases for required success/failure, each skip,
+unknown/conflicting variables, wrong root/hooksPath, missing/linked/untracked
+shim/hook, and a hook that direct invocation would pass but Git does not call.
+
+### 6. Add a tracked cross-platform integration harness
 
 Create `.github/workflows/Test-MarkdownToolingIntegration.ps1` with
 `#Requires -Version 5.1`, a recorded version, and an explicit path to the
@@ -233,23 +271,64 @@ For each supported platform/runtime combination, prove:
 
 | ID | Required real behavior |
 | --- | --- |
-| `NPM-01` | clean install and `npm ls --all` |
+| `NPM-01` | clean install and `corepack npm ls --all` |
 | `NPM-02` | outer lint success |
 | `NPM-03` | nested lint success |
 | `HOOK-01` | no staged Markdown skips without invoking npm |
 | `HOOK-02` | staged valid Markdown passes |
 | `HOOK-03` | temporary outer-rule violation rejects with exact rule/path |
 | `HOOK-04` | temporary nested-fence violation rejects with exact rule/depth/path |
-| `HOOK-05` | missing npm/tool binary rejects as tooling failure |
-| `HOOK-06` | broken config/tool startup rejects distinctly from lint findings |
-| `HOOK-07` | unsupported/malformed Node rejects before npm/lint |
-| `HOOK-08` | installed Husky hook invoked by a real `git commit` passes/rejects as expected |
+| `HOOK-05` | missing Corepack rejects as tooling failure |
+| `HOOK-06` | broken lint configuration rejects distinctly from lint findings |
+| `HOOK-08` | installed Husky hook invoked by a real `git commit` passes |
+| `HOOK-09` | missing installed lint binary rejects as tooling failure |
+| `HOOK-10` | lint tool startup failure rejects distinctly from lint findings |
+| `HOOK-11` | real `git commit` invokes installed hook and a test violation rejects |
 
-`HOOK-07` is a family with one durable row for malformed text, one major below
-minimum, exact minimum, latest admitted 22, odd/intervening 23, exact minimum
-24, latest admitted 24, odd 25, and first unreviewed even 26. Tests import the
-pure policy predicate for synthetic versions; real hook/CLI cases always use
-the actual process version and cannot override it.
+Replace the grouped `HOOK-07` family with one real installed-hook result per
+exact platform/runtime cell:
+
+| ID | Platform | Exact actual Node | Exact result |
+| --- | --- | --- | --- |
+| `HOOK-07-U-22-BELOW` | Ubuntu | `22.22.1` | reject before Corepack/npm/lint: below floor |
+| `HOOK-07-W-22-BELOW` | Windows Git Bash | `22.22.1` | reject before Corepack/npm/lint: below floor |
+| `HOOK-07-U-22-FLOOR` | Ubuntu | `22.22.2` | accept; pinned npm and lint run |
+| `HOOK-07-W-22-FLOOR` | Windows Git Bash | `22.22.2` | accept; pinned npm and lint run |
+| `HOOK-07-U-22-CURRENT` | Ubuntu | `22.23.2` | accept; pinned npm and lint run |
+| `HOOK-07-W-22-CURRENT` | Windows Git Bash | `22.23.2` | accept; pinned npm and lint run |
+| `HOOK-07-U-23` | Ubuntu | `23.0.0` | reject before Corepack/npm/lint: major unreviewed |
+| `HOOK-07-W-23` | Windows Git Bash | `23.0.0` | reject before Corepack/npm/lint: major unreviewed |
+| `HOOK-07-U-24-BELOW` | Ubuntu | `24.14.0` | reject before Corepack/npm/lint: below floor |
+| `HOOK-07-W-24-BELOW` | Windows Git Bash | `24.14.0` | reject before Corepack/npm/lint: below floor |
+| `HOOK-07-U-24-FLOOR` | Ubuntu | `24.15.0` | accept; pinned npm and lint run |
+| `HOOK-07-W-24-FLOOR` | Windows Git Bash | `24.15.0` | accept; pinned npm and lint run |
+| `HOOK-07-U-24-CURRENT` | Ubuntu | `24.18.1` | accept; pinned npm and lint run |
+| `HOOK-07-W-24-CURRENT` | Windows Git Bash | `24.18.1` | accept; pinned npm and lint run |
+| `HOOK-07-U-25` | Ubuntu | `25.0.0` | reject before Corepack/npm/lint: major unreviewed |
+| `HOOK-07-W-25` | Windows Git Bash | `25.0.0` | reject before Corepack/npm/lint: major unreviewed |
+| `HOOK-07-U-26` | Ubuntu | `26.5.1` | reject before Corepack/npm/lint: current major unreviewed |
+| `HOOK-07-W-26` | Windows Git Bash | `26.5.1` | reject before Corepack/npm/lint: current major unreviewed |
+
+Provision every exact runtime; these rows read the actual process version and
+cannot use an override. Re-resolve dated `CURRENT` versions before
+implementation; if changed, append new IDs and retire the old rows with a
+recorded reason rather than changing their meaning.
+
+`node-policy-cases.json` is the one closed manifest for policy-module,
+policy-CLI, and installed-hook cases. Every row has exact `Id`, `Layer`,
+`Platform`, `NodeVersionSource`, literal `Input`, `ExpectedExit`,
+`ExpectedReason`, `ExpectCorepack`, `ExpectNpm`, and `ExpectLint`. IDs are
+opaque; reject family/range/wildcard rows, duplicate/missing/unknown IDs, or
+more than one result.
+
+Give every direct pure input one `NODE-POLICY-###` ID: empty, whitespace,
+`v` prefix, missing/extra component, leading zero, sign, prerelease, build
+metadata, Unicode digit, overflow, Node 20/21, `22.22.1`, `22.22.2`,
+`22.23.2`, `22.999.999`, `23.0.0`, `24.14.0`, `24.14.999`,
+`24.15.0`, `24.18.1`, `24.999.999`, `25.0.0`, `26.0.0`,
+`26.5.1`, and `27.0.0`. Give actual CLI checks separate
+`NODE-CLI-###` IDs. Audit all remaining `NPM-*`, `HOOK-*`, and `AUDIT-*`
+rows and split any family before evidence.
 
 The same harness owns these append-only audit-validator IDs:
 
@@ -266,14 +345,22 @@ The same harness owns these append-only audit-validator IDs:
 | `AUDIT-09` | one second before expiration | pass |
 | `AUDIT-10` | exactly at expiration | fail expired |
 | `AUDIT-11` | one second after expiration | fail expired |
-| `AUDIT-12` | malformed timestamp/schema/type | fail schema |
+| `AUDIT-12` | malformed timestamp | fail schema |
 | `AUDIT-13` | unknown property | fail closed schema |
-| `AUDIT-14` | duplicate finding/URL/package/node | fail duplicate |
-| `AUDIT-15` | missing owner/follow-up/approval | fail schema/governance |
+| `AUDIT-14` | duplicate finding identity | fail duplicate |
+| `AUDIT-15` | missing owner | fail governance |
 | `AUDIT-16` | invalid follow-up issue URL | fail governance |
-| `AUDIT-17` | non-JSON/truncated audit report | fail audit input |
+| `AUDIT-17` | non-JSON audit report | fail audit input |
 | `AUDIT-18` | equivalent input in different order | pass with identical normalization |
-| `AUDIT-19` | real report captured after clean `npm ci` | CLI result matches current governed state |
+| `AUDIT-19` | real report captured after clean `corepack npm ci` | CLI result matches current governed state |
+| `AUDIT-20` | wrong schema version | fail schema |
+| `AUDIT-21` | wrong property type | fail schema |
+| `AUDIT-22` | duplicate canonical advisory URL identity | fail duplicate |
+| `AUDIT-23` | duplicate audit package property | fail duplicate |
+| `AUDIT-24` | duplicate installed node path | fail duplicate |
+| `AUDIT-25` | missing follow-up fields | fail governance |
+| `AUDIT-26` | missing approval identity | fail governance |
+| `AUDIT-27` | truncated JSON audit report | fail audit input |
 
 Deterministic fixture cases import the pure validator core and inject the UTC
 instant; the production CLI has no clock override. `AUDIT-19` invokes the exact
@@ -305,12 +392,12 @@ Windows PowerShell 5.1 may orchestrate the harness, but the actual hook executes
 through the Git/Husky shell environment. Record exact shell, Git, Node, npm,
 package, and harness versions.
 
-### 6. Resolve or govern every advisory
+### 7. Resolve or govern every advisory
 
 Run after clean installation:
 
 ```text
-npm audit --package-lock-only --json
+corepack npm audit --package-lock-only --json
 ```
 
 The preferred final result is zero vulnerabilities at all severities. Also run
@@ -328,7 +415,7 @@ for:
 - expired/stale governance.
 
 The callable workflow captures
-`npm audit --package-lock-only --json` to a protected temporary report without
+`corepack npm audit --package-lock-only --json` to a protected temporary report without
 letting strict shell behavior lose the native status, then invokes this exact
 validator. Non-JSON/truncated/network/tool failure is an audit-input failure,
 not an approved residual. Never hide risk with `--audit-level`.
@@ -346,7 +433,8 @@ schema and contains exactly:
   - accountable owner;
   - canonical whole-second RFC 3339 UTC `createdAt`, `approvedAt`, and
     `expiresAt` values ending in `Z`;
-  - real filed follow-up GitHub issue URL;
+  - canonical follow-up issue URL/number, current scope hash, verification
+    time, and retained filing-evidence hash under the exact fields below;
   - explicit approval identity; and
   - evidence that no fixed compatible package tree exists; and
 - `auditNodePaths`, sorted and unique by package, each containing the exact
@@ -367,6 +455,103 @@ Approval time is bounded:
   analysis/controls/follow-up status, and a new accountable approval. Changing
   only timestamps is forbidden.
 
+#### Closed audit report-v2 and native-status contract
+
+The orchestration invokes exactly
+`corepack npm audit --package-lock-only --json` with no `--audit-level`.
+Capture stdout and stderr separately into protected bounded streams, preserve
+the process outcome as one of `exit`, `signal`, `timeout`, or `startFailure`,
+and pass the exact native exit plus stdout file to the validator. Do not merge
+streams, parse console prose, or let shell strict mode erase the exit.
+
+Before `JSON.parse`, enforce an 8-MiB raw stdout maximum, BOM-less strict UTF-8,
+one complete JSON value/trailing-whitespace only, depth/count/string/number
+ceilings, and duplicate-key detection with a reviewed JSON tokenizer. The
+closed valid report has `auditReportVersion: 2`, `vulnerabilities`, and
+`metadata` only. Every vulnerability property has exact keys/types for
+`name`, `severity`, `isDirect`, `via`, `effects`, `range`, `nodes`, and
+`fixAvailable`; its property key equals `name`.
+
+`via` contains only:
+
+- an advisory object with closed
+  `source`, `name`, `dependency`, `title`, `url`, `severity`, `cwe`,
+  `cvss { score, vectorString }`, and `range`; or
+- a package-name string that is a real edge to another vulnerability property.
+
+`effects` and package-string `via` edges are reciprocal; referenced packages
+exist. `nodes` is a sorted unique installed-path set. `fixAvailable` is exactly
+`false`, `true`, or closed `{name,version,isSemVerMajor}`. Metadata has closed
+nonnegative safe-integer severity counts
+`info|low|moderate|high|critical|total` and dependency counts
+`prod|dev|optional|peer|peerOptional|total`; reconcile totals/severity
+properties without inventing advisory-to-node Cartesian edges.
+
+The decision table is exact:
+
+| Native outcome | Parsed graph | Decision |
+| --- | --- | --- |
+| exit `0` | valid and empty | continue; exception file must be absent |
+| exit `0` | nonempty | status/report mismatch |
+| exit `1` | valid and nonempty | evaluate exact exception policy |
+| exit `1` | empty or malformed | status/report/schema failure |
+| other exit, signal, timeout, start failure | any | process/tool failure; never governed residual |
+
+Validator exit classes are:
+`0 PASS`, `20 PROCESS_TOOL`, `21 AUDIT_INPUT_JSON`,
+`22 AUDIT_REPORT_SCHEMA`, `23 AUDIT_STATUS_MISMATCH`,
+`24 AUDIT_POLICY_MISMATCH`, and `25 AUDIT_GOVERNANCE`. Each fixture expects
+one exact class, normalized Finding set, package-keyed AuditNodePaths set,
+exception state, and safe diagnostic.
+
+Record the dated baseline as four separate observations: seven vulnerability
+properties (the seven package keys listed above), 14 advisory objects, two
+package-string graph edges, and seven installed node paths. Store Node/npm/
+Corepack versions, exact argv/native outcome, report SHA-256, and the exact
+four sets. These numbers describe the 2026-07-29 input only and are prohibited
+as acceptance constants.
+
+#### Canonical follow-up reference and filing evidence
+
+A residual exception's finding adds exact closed fields:
+`followUpIssueUrl`, `followUpIssueNumber`, `followUpScopeSha256`,
+`followUpVerifiedAt`, and `followUpEvidenceSha256`. Parse the URL and require
+serialized equality to
+`https://github.com/franklesniak/TerraformStyleGuide/issues/<number>`:
+lowercase canonical HTTPS host, exact owner/repository/path case, no
+credentials/port/query/fragment/trailing slash/encoding/dot segment. Number is
+a JSON safe integer whose canonical decimal matches `[1-9][0-9]*` and the URL
+exactly; reject `/pull/` and every alternate repository/form.
+
+`followUpScopeSha256` hashes a versioned canonical JSON array of the exact
+sorted current `(Package, AdvisoryUrl)` identities assigned to that issue.
+Every finding is covered exactly once (or by one explicitly shared issue scope)
+with no missing/extra/stale identity. The issue body contains reviewed marker
+`npm-audit-findings-sha256: <same-lowercase-64-hex>` plus owner, remediation
+objective, and target date.
+
+At initial approval and every renewal, an authorized maintainer performs one
+live GitHub API/UI read after filing and retains a bounded evidence record:
+endpoint/time/actor, repository, canonical URL/number, immutable database ID/
+node ID, `state=open`, absence of `pull_request`, creation/update times,
+owner/assignee, title/body hash, scope marker, and current scope hash. Canonical
+record SHA-256 equals `followUpEvidenceSha256`;
+`followUpVerifiedAt` equals its time and is in the same approval session within
+the at-most-30-day window. Retain no token/header/arbitrary response/email/
+signed URL.
+
+The pure validator checks only offline URL/number grammar, scope coverage,
+canonical timestamps/hashes, evidence-reference presence/freshness, and
+exception policy. It performs no network access or issues permission and says
+only “offline reference/evidence fields valid,” never “issue exists/open.”
+A reviewer independently validates the retained record. Closed/transferred/
+deleted/converted/unowned/scope-changed issues require remediation or a new
+filed/reapproved issue—not a timestamp/hash-only edit.
+
+Fixtures separately cover offline URL/number/scope/evidence errors and retained
+external records for nonexistent, pull-request, closed, wrong repository/ID,
+missing owner, changed marker/body, and valid open issue.
+
 Reject unknown/missing properties, wrong types, noncanonical/duplicate URLs or
 paths, duplicate finding/package identities, malformed timestamps, empty
 owner/follow-up/approval, invalid issue URLs, missing or extra findings,
@@ -386,7 +571,7 @@ The schedule/manual path invokes no candidate, artifact, approval, or writer
 job. Scheduled failure creates visible evidence and requires a normal
 issue/pull-request fix; it never auto-edits, auto-approves, or auto-merges.
 
-### 7. Establish final npm Dependabot governance
+### 8. Establish final npm Dependabot governance
 
 Change `.github/dependabot.yml` to normalized exact content with two and only
 two update entries:
@@ -404,7 +589,7 @@ They do not bypass the action SHA allowlist or residual-risk process.
 
 This two-entry state replaces T1's intermediate one-entry assertion.
 
-### 8. Revalidate merged behavior and declare supersession
+### 9. Revalidate merged behavior and declare supersession
 
 Classify prior controls:
 
@@ -439,10 +624,12 @@ Do not describe enduring security behavior as superseded.
 From fresh clones and clean dependency state:
 
 1. run selected minimum and preferred Node versions;
-2. record one resolved Node/npm pair per run;
-3. scope/restore `CI=true` around `npm ci`;
-4. run `npm ci` twice from clean `node_modules`;
-5. run `npm ls --all`;
+2. record actual Node path/version, Corepack path/version, exact selected
+   `npm@12.0.2` version, and verified package-manager descriptor/integrity;
+3. scope/restore `CI=true` around `corepack npm ci`;
+4. hydrate once in the job-local trusted phase, then run a second
+   `corepack npm ci` from clean `node_modules` with network disabled;
+5. run `corepack npm ls --all`;
 6. run both lint scripts;
 7. run every `NPM-*`, `HOOK-*`, and `AUDIT-*` integration-harness ID;
 8. perform at least one real installed Husky `git commit` on each OS family;
@@ -464,10 +651,14 @@ showing the artifact pipeline remains correct.
 
 - [ ] Final direct packages are maintained, justified, and installed
       reproducibly without force flags.
-- [ ] Lockfile version/tree exactly matches `package.json`; `npm ls --all`
+- [ ] `packageManager` equals the exact hashed `npm@12.0.2` descriptor;
+      every package command uses Corepack and the second install is offline.
+- [ ] Lockfile version/tree exactly matches `package.json`;
+      `corepack npm ls --all`
       passes.
-- [ ] `engines.node`, workflow matrix, and hook enforce one coherent supported
-      minimum/preferred policy.
+- [ ] `engines.node` is exactly
+      `>=22.22.2 <23 || >=24.15.0 <25`; policy module, CLI, workflow,
+      and hook enforce the same finite table.
 - [ ] No ordinary validation relies on EOL Node 20.
 - [ ] Malformed, below-minimum, odd/intervening, admitted 22/24 boundaries, and
       the first unreviewed future even major have explicit passing or rejecting
@@ -476,15 +667,27 @@ showing the artifact pipeline remains correct.
 - [ ] Every tracked integration ID passes on minimum/Node 24 and both OS
       families.
 - [ ] At least one real clean-installed Husky hook is invoked by `git commit`.
+- [ ] The tracked fail-closed installer is the exact `prepare` command;
+      required installation verifies `.husky/_`, and only the three closed
+      skip states may avoid installation without mutation.
 - [ ] Temporary outer/nested violations and tooling/runtime failures reject for
       the intended reason.
 - [ ] One tracked validator governs every local/hosted audit invocation with
       stable input/schema, mismatch, and expiry exit classes.
+- [ ] Audit orchestration applies the exact 8-MiB/strict-UTF-8/duplicate-key/
+      closed-report-v2 graph schema and the explicit native
+      `0`/`1`/other/signal/timeout/start-failure decision table.
 - [ ] The audit is zero with no exception file, or current
       `(Package, AdvisoryUrl)` findings and package-keyed node paths exactly
       equal one valid, approved, unexpired, at-most-30-day exception state.
 - [ ] Every `AUDIT-*` clean, residual, topology, schema, duplicate, and
       before/at/after-expiry oracle passes.
+- [ ] Offline follow-up URL/scope/evidence validation is distinguished from
+      the reviewed live filing record that proves the issue existed, was open,
+      and was correctly scoped at initial approval/latest renewal.
+- [ ] Every policy/hook platform/version case has one immutable ID, one
+      literal input/oracle, and exactly one reconciled result; no family ID
+      remains.
 - [ ] Ordinary/Dependabot PR, merge-group, `main` push, schedule, and manual
       event fixtures all invoke the same validator; schedule/manual cannot
       reach publication.
@@ -507,8 +710,8 @@ showing the artifact pipeline remains correct.
 
 ## References
 
-- [npm audit](https://docs.npmjs.com/cli/v11/commands/npm-audit/)
-- [npm package.json engines](https://docs.npmjs.com/cli/v11/configuring-npm/package-json#engines)
+- [npm audit](https://docs.npmjs.com/cli/commands/npm-audit/)
+- [npm package.json engines](https://docs.npmjs.com/cli/configuring-npm/package-json#engines)
 - [Git hooks](https://git-scm.com/docs/githooks)
 - [Husky](https://typicode.github.io/husky/)
 - [markdownlint-cli2](https://github.com/DavidAnson/markdownlint-cli2)

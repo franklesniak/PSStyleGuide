@@ -23,7 +23,12 @@ copy-safe**.
 
 Implement only after **Promote generated style-guide artifacts through a
 least-privileged verified writer** merges. Record the real blocked-by
-relationship and exact merge commit.
+relationship. The T1B handoff records both its reviewed head and actual
+protected-branch landed commit, merge method/time, and issue/PR links. Before
+any edit, parse the landed value as a full commit ID, require it exists and is
+reachable from protected `main`, and validate all enduring T1/T1A/T1B
+interfaces/versions at that commit. Stop on an absent, predicted, head-only, or
+mismatched value.
 
 At implementation start, verify these merged enduring invariants:
 
@@ -104,9 +109,10 @@ For AWS, Azure, and GCS recovery:
 - require Bash through an explicit shebang/runtime guard; select and document
   the minimum Bash version available on the supported hosted Ubuntu runner;
 - assign each input once before validation;
-- require `RECOVERY_PATH` to be a new absolute POSIX file path;
-- require a protected parent outside version-controlled worktrees and shared
-  world-readable temporary locations;
+- require explicit `RECOVERY_PARENT`, direct-child `RECOVERY_PATH`, and literal
+  `RECOVERY_PARENT_ATTESTATION=private-outside-vcs-no-competing-writers`;
+- inspect the parent's canonical path, ordinary/non-link type, effective owner,
+  exact mode `0700`, and outside-repository/shared-root relationship;
 - use a new path for every attempt;
 - use a subshell, `set -euo pipefail`, and `umask 077`;
 - reject the destination before provider invocation when
@@ -213,16 +219,33 @@ Final recovery body:
       "$destination"
   }
 
-  recovery_path=${RECOVERY_PATH:?Set RECOVERY_PATH to a new absolute path in a protected directory outside version control.}
-  [[ $recovery_path == /* ]] || {
-    printf '%s\n' 'RECOVERY_PATH must be an absolute POSIX path.' >&2
+  recovery_parent=${RECOVERY_PARENT:?Set RECOVERY_PARENT to the exact protected parent.}
+  recovery_path=${RECOVERY_PATH:?Set RECOVERY_PATH to one new direct-child path.}
+  recovery_attestation=${RECOVERY_PARENT_ATTESTATION:?Set the protected-parent attestation.}
+  [[ $recovery_attestation == private-outside-vcs-no-competing-writers ]] || {
+    printf '%s\n' 'RECOVERY_PARENT_ATTESTATION is invalid.' >&2
     exit 1
   }
-  recovery_parent=${recovery_path%/*}
-  [[ -n $recovery_parent ]] || recovery_parent=/
-  [[ -d $recovery_parent && ! -L $recovery_parent ]] || {
-    printf 'Recovery parent must be an ordinary protected directory: %s\n' \
+  [[ $recovery_parent == /* && $recovery_parent != / ]] || {
+    printf '%s\n' 'RECOVERY_PARENT must be an absolute non-root POSIX path.' >&2
+    exit 1
+  }
+  [[ $(realpath -e -- "$recovery_parent") == "$recovery_parent" &&
+      -d $recovery_parent && ! -L $recovery_parent &&
+      $(stat -c '%u' -- "$recovery_parent") == "$(id -u)" &&
+      $(stat -c '%a' -- "$recovery_parent") == 700 ]] || {
+    printf 'Recovery parent failed canonical owner/mode/type checks: %s\n' \
       "$recovery_parent" >&2
+    exit 1
+  }
+  [[ $recovery_path == "$recovery_parent"/* ]] || {
+    printf '%s\n' 'RECOVERY_PATH must be a direct child of RECOVERY_PARENT.' >&2
+    exit 1
+  }
+  recovery_leaf=${recovery_path#"$recovery_parent"/}
+  [[ -n $recovery_leaf && $recovery_leaf != */* &&
+      $recovery_leaf != . && $recovery_leaf != .. ]] || {
+    printf '%s\n' 'RECOVERY_PATH leaf is invalid.' >&2
     exit 1
   }
   [[ ! -e $recovery_path && ! -L $recovery_path ]] || {
@@ -237,7 +260,9 @@ Final recovery body:
 
   cleanup_recovery() {
     local primary_status=$?
-    trap - EXIT HUP INT TERM
+    local cleanup_status=0
+    trap - EXIT
+    trap '' HUP INT TERM
     shopt -s nullglob dotglob
     local entries=("$recovery_root"/*)
     if (( published != 0 || retain_on_failure != 0 )); then
@@ -245,6 +270,7 @@ Final recovery body:
         "$recovery_root" >&2
     elif (( ${#entries[@]} == 0 )); then
       if ! rmdir -- "$recovery_root"; then
+        cleanup_status=1
         printf 'Retained cleanup-raced sensitive recovery root: %s\n' \
           "$recovery_root" >&2
       fi
@@ -253,20 +279,32 @@ Final recovery body:
         -f $recovery_temp && ! -L $recovery_temp ]]; then
       if rm -- "$recovery_temp"; then
         if ! rmdir -- "$recovery_root"; then
+          cleanup_status=1
           printf 'Retained cleanup-raced sensitive recovery root: %s\n' \
             "$recovery_root" >&2
         fi
       else
+        cleanup_status=1
         printf 'Retained undeletable sensitive recovery state: %s\n' \
           "$recovery_root" >&2
       fi
     else
+      cleanup_status=1
       printf 'Retained ownership-uncertain sensitive recovery state: %s\n' \
         "$recovery_root" >&2
     fi
-    exit "$primary_status"
+    if (( primary_status != 0 )); then
+      exit "$primary_status"
+    fi
+    exit "$cleanup_status"
   }
-  trap cleanup_recovery EXIT HUP INT TERM
+  terminate_hup()  { trap '' HUP INT TERM; exit 129; }
+  terminate_int()  { trap '' HUP INT TERM; exit 130; }
+  terminate_term() { trap '' HUP INT TERM; exit 143; }
+  trap cleanup_recovery EXIT
+  trap terminate_hup HUP
+  trap terminate_int INT
+  trap terminate_term TERM
 
   if download_selected_state "$recovery_temp"; then
     :
@@ -345,16 +383,33 @@ Final recovery body:
       --auth-mode login
   }
 
-  recovery_path=${RECOVERY_PATH:?Set RECOVERY_PATH to a new absolute path in a protected directory outside version control.}
-  [[ $recovery_path == /* ]] || {
-    printf '%s\n' 'RECOVERY_PATH must be an absolute POSIX path.' >&2
+  recovery_parent=${RECOVERY_PARENT:?Set RECOVERY_PARENT to the exact protected parent.}
+  recovery_path=${RECOVERY_PATH:?Set RECOVERY_PATH to one new direct-child path.}
+  recovery_attestation=${RECOVERY_PARENT_ATTESTATION:?Set the protected-parent attestation.}
+  [[ $recovery_attestation == private-outside-vcs-no-competing-writers ]] || {
+    printf '%s\n' 'RECOVERY_PARENT_ATTESTATION is invalid.' >&2
     exit 1
   }
-  recovery_parent=${recovery_path%/*}
-  [[ -n $recovery_parent ]] || recovery_parent=/
-  [[ -d $recovery_parent && ! -L $recovery_parent ]] || {
-    printf 'Recovery parent must be an ordinary protected directory: %s\n' \
+  [[ $recovery_parent == /* && $recovery_parent != / ]] || {
+    printf '%s\n' 'RECOVERY_PARENT must be an absolute non-root POSIX path.' >&2
+    exit 1
+  }
+  [[ $(realpath -e -- "$recovery_parent") == "$recovery_parent" &&
+      -d $recovery_parent && ! -L $recovery_parent &&
+      $(stat -c '%u' -- "$recovery_parent") == "$(id -u)" &&
+      $(stat -c '%a' -- "$recovery_parent") == 700 ]] || {
+    printf 'Recovery parent failed canonical owner/mode/type checks: %s\n' \
       "$recovery_parent" >&2
+    exit 1
+  }
+  [[ $recovery_path == "$recovery_parent"/* ]] || {
+    printf '%s\n' 'RECOVERY_PATH must be a direct child of RECOVERY_PARENT.' >&2
+    exit 1
+  }
+  recovery_leaf=${recovery_path#"$recovery_parent"/}
+  [[ -n $recovery_leaf && $recovery_leaf != */* &&
+      $recovery_leaf != . && $recovery_leaf != .. ]] || {
+    printf '%s\n' 'RECOVERY_PATH leaf is invalid.' >&2
     exit 1
   }
   [[ ! -e $recovery_path && ! -L $recovery_path ]] || {
@@ -369,7 +424,9 @@ Final recovery body:
 
   cleanup_recovery() {
     local primary_status=$?
-    trap - EXIT HUP INT TERM
+    local cleanup_status=0
+    trap - EXIT
+    trap '' HUP INT TERM
     shopt -s nullglob dotglob
     local entries=("$recovery_root"/*)
     if (( published != 0 || retain_on_failure != 0 )); then
@@ -377,6 +434,7 @@ Final recovery body:
         "$recovery_root" >&2
     elif (( ${#entries[@]} == 0 )); then
       if ! rmdir -- "$recovery_root"; then
+        cleanup_status=1
         printf 'Retained cleanup-raced sensitive recovery root: %s\n' \
           "$recovery_root" >&2
       fi
@@ -385,20 +443,32 @@ Final recovery body:
         -f $recovery_temp && ! -L $recovery_temp ]]; then
       if rm -- "$recovery_temp"; then
         if ! rmdir -- "$recovery_root"; then
+          cleanup_status=1
           printf 'Retained cleanup-raced sensitive recovery root: %s\n' \
             "$recovery_root" >&2
         fi
       else
+        cleanup_status=1
         printf 'Retained undeletable sensitive recovery state: %s\n' \
           "$recovery_root" >&2
       fi
     else
+      cleanup_status=1
       printf 'Retained ownership-uncertain sensitive recovery state: %s\n' \
         "$recovery_root" >&2
     fi
-    exit "$primary_status"
+    if (( primary_status != 0 )); then
+      exit "$primary_status"
+    fi
+    exit "$cleanup_status"
   }
-  trap cleanup_recovery EXIT HUP INT TERM
+  terminate_hup()  { trap '' HUP INT TERM; exit 129; }
+  terminate_int()  { trap '' HUP INT TERM; exit 130; }
+  terminate_term() { trap '' HUP INT TERM; exit 143; }
+  trap cleanup_recovery EXIT
+  trap terminate_hup HUP
+  trap terminate_int INT
+  trap terminate_term TERM
 
   if download_selected_state "$recovery_temp"; then
     :
@@ -475,16 +545,33 @@ Final recovery body:
       "$destination"
   }
 
-  recovery_path=${RECOVERY_PATH:?Set RECOVERY_PATH to a new absolute path in a protected directory outside version control.}
-  [[ $recovery_path == /* ]] || {
-    printf '%s\n' 'RECOVERY_PATH must be an absolute POSIX path.' >&2
+  recovery_parent=${RECOVERY_PARENT:?Set RECOVERY_PARENT to the exact protected parent.}
+  recovery_path=${RECOVERY_PATH:?Set RECOVERY_PATH to one new direct-child path.}
+  recovery_attestation=${RECOVERY_PARENT_ATTESTATION:?Set the protected-parent attestation.}
+  [[ $recovery_attestation == private-outside-vcs-no-competing-writers ]] || {
+    printf '%s\n' 'RECOVERY_PARENT_ATTESTATION is invalid.' >&2
     exit 1
   }
-  recovery_parent=${recovery_path%/*}
-  [[ -n $recovery_parent ]] || recovery_parent=/
-  [[ -d $recovery_parent && ! -L $recovery_parent ]] || {
-    printf 'Recovery parent must be an ordinary protected directory: %s\n' \
+  [[ $recovery_parent == /* && $recovery_parent != / ]] || {
+    printf '%s\n' 'RECOVERY_PARENT must be an absolute non-root POSIX path.' >&2
+    exit 1
+  }
+  [[ $(realpath -e -- "$recovery_parent") == "$recovery_parent" &&
+      -d $recovery_parent && ! -L $recovery_parent &&
+      $(stat -c '%u' -- "$recovery_parent") == "$(id -u)" &&
+      $(stat -c '%a' -- "$recovery_parent") == 700 ]] || {
+    printf 'Recovery parent failed canonical owner/mode/type checks: %s\n' \
       "$recovery_parent" >&2
+    exit 1
+  }
+  [[ $recovery_path == "$recovery_parent"/* ]] || {
+    printf '%s\n' 'RECOVERY_PATH must be a direct child of RECOVERY_PARENT.' >&2
+    exit 1
+  }
+  recovery_leaf=${recovery_path#"$recovery_parent"/}
+  [[ -n $recovery_leaf && $recovery_leaf != */* &&
+      $recovery_leaf != . && $recovery_leaf != .. ]] || {
+    printf '%s\n' 'RECOVERY_PATH leaf is invalid.' >&2
     exit 1
   }
   [[ ! -e $recovery_path && ! -L $recovery_path ]] || {
@@ -499,7 +586,9 @@ Final recovery body:
 
   cleanup_recovery() {
     local primary_status=$?
-    trap - EXIT HUP INT TERM
+    local cleanup_status=0
+    trap - EXIT
+    trap '' HUP INT TERM
     shopt -s nullglob dotglob
     local entries=("$recovery_root"/*)
     if (( published != 0 || retain_on_failure != 0 )); then
@@ -507,6 +596,7 @@ Final recovery body:
         "$recovery_root" >&2
     elif (( ${#entries[@]} == 0 )); then
       if ! rmdir -- "$recovery_root"; then
+        cleanup_status=1
         printf 'Retained cleanup-raced sensitive recovery root: %s\n' \
           "$recovery_root" >&2
       fi
@@ -515,20 +605,32 @@ Final recovery body:
         -f $recovery_temp && ! -L $recovery_temp ]]; then
       if rm -- "$recovery_temp"; then
         if ! rmdir -- "$recovery_root"; then
+          cleanup_status=1
           printf 'Retained cleanup-raced sensitive recovery root: %s\n' \
             "$recovery_root" >&2
         fi
       else
+        cleanup_status=1
         printf 'Retained undeletable sensitive recovery state: %s\n' \
           "$recovery_root" >&2
       fi
     else
+      cleanup_status=1
       printf 'Retained ownership-uncertain sensitive recovery state: %s\n' \
         "$recovery_root" >&2
     fi
-    exit "$primary_status"
+    if (( primary_status != 0 )); then
+      exit "$primary_status"
+    fi
+    exit "$cleanup_status"
   }
-  trap cleanup_recovery EXIT HUP INT TERM
+  terminate_hup()  { trap '' HUP INT TERM; exit 129; }
+  terminate_int()  { trap '' HUP INT TERM; exit 130; }
+  terminate_term() { trap '' HUP INT TERM; exit 143; }
+  trap cleanup_recovery EXIT
+  trap terminate_hup HUP
+  trap terminate_int INT
+  trap terminate_term TERM
 
   if download_selected_state "$recovery_temp"; then
     :
@@ -590,12 +692,14 @@ or response-file creation:
 
 - `TFC_HOST` is exactly `app.terraform.io` or `app.eu.terraform.io`;
 - `TFC_PAGE_NUMBER` matches `^[1-9][0-9]*$`;
-- organization and workspace are nonempty, contain no controls, and satisfy
-  the then-current documented HCP name grammar;
+- organization and workspace each match the deliberate supported subset
+  `[A-Za-z0-9][A-Za-z0-9_-]{0,63}`;
 - `TFC_TOKEN` is nonempty and contains no CR, LF, control byte, double quote,
   or backslash; and
-- `TFC_RESPONSE_PATH` is an absolute POSIX fresh path for which neither
-  `-e` nor `-L` is true.
+- `TFC_RESPONSE_PARENT`,
+  `TFC_RESPONSE_PARENT_ATTESTATION=private-outside-vcs-no-competing-writers`,
+  and direct-child `TFC_RESPONSE_PATH` satisfy the exact HCP protected-parent
+  contract; neither `-e` nor `-L` is true for the response.
 
 The block must:
 
@@ -625,6 +729,109 @@ rollback command.
 Curl config quoted parameters interpret backslash escapes. Rejecting
 quote/backslash/control bytes before writing the file is a required
 authorization boundary, not an optional hygiene check.
+
+## Normative protection, identifier, interruption, and evidence contracts
+
+The following contracts apply to every final marked block and supersede any
+shorter illustrative guard in the requested-change snippets.
+
+### Protected parent is an attested precondition plus an inspected subset
+
+AWS/Azure/GCS recovery accepts three separate values:
+`RECOVERY_PARENT`, `RECOVERY_PATH`, and
+`RECOVERY_PARENT_ATTESTATION`. The attestation must equal literal
+`private-outside-vcs-no-competing-writers`. `RECOVERY_PARENT` is a fully
+qualified absolute path resolved with `realpath -e` to exactly itself; it is an
+ordinary non-link directory outside repository/shared temporary roots, owned by
+the effective UID, mode exactly `0700`, on the destination filesystem.
+`RECOVERY_PATH` is one direct-child ordinary filename under that exact parent,
+not merely a string-prefix descendant, and is absent under both `-e` and `-L`.
+
+The operator attests, based on separately reviewed OS/storage evidence, that
+the parent is outside version control/shared storage, its access controls apply
+to all relevant principals/mount layers, and no other process able to mutate
+entries is active. The block/harness may prove only the canonical path,
+direct-child relationship, owner, mode, type/link state, filesystem, and
+absence subset; it must never report the real-world attestation as
+machine-proven. A wrong/missing literal or any failed/unsupported inspection
+stops before directory/provider creation.
+
+HCP uses the identical two-layer semantics under HCP-specific names:
+`TFC_RESPONSE_PARENT`, `TFC_RESPONSE_PATH`, and
+`TFC_RESPONSE_PARENT_ATTESTATION`. Its curl-config root is a direct child mode
+`0700`; config and response are mode `0600`; response is acquired with
+noclobber. The intentional HCP difference is retention: success retains the
+validated page; curl/HTTP/nonempty-partial failure retains the exact response
+as invalid sensitive evidence. Cleanup never deletes the response name and
+removes only the proven token-config file/root.
+
+Fixtures distinguish enforceable inspection from attested facts. They cover
+wrong literal, parent equality/canonicalization, nested/escaped destination,
+wrong owner/mode/type/link/filesystem, repository/shared-root membership, and
+an attestation that is syntactically valid but intentionally false; the latter
+proves the harness does not claim external truth.
+
+### Signal-specific exit and one cleanup owner
+
+Every Bash block has distinct HUP/INT/TERM handlers that ignore further
+signals and exit `129`, `130`, or `143`. Only `EXIT` invokes cleanup. On entry,
+cleanup captures `$?`, disables its own trap, ignores HUP/INT/TERM, inspects and
+cleans exactly once, and preserves the primary nonzero status. Cleanup-only
+failure returns `1`; cleanup failure during another primary/signal failure is
+reported but never replaces it.
+
+No block uses one cleanup function directly for `EXIT HUP INT TERM`, returns
+zero after a signal, recursively deletes, or retries. The permanent harness
+uses synchronization barriers—not timing sleeps—to deliver every signal during
+pre-create, partial-provider, validated-before-publication, and publication
+uncertainty phases for AWS/Azure/GCS, with cleanup success/failure
+permutations. Each stable row asserts signal status, cleanup call count `1`,
+final/temp/root state, provider call count, diagnostic reason, and unchanged
+sentinel.
+
+### Deliberately narrow provider-field grammars
+
+Set `LC_ALL=C` before validation. Reject NUL, every C0/C1/DEL control,
+non-ASCII, whitespace, or an over-limit byte sequence before logging or
+provider invocation. Accepted bytes are passed to the provider unchanged—no
+trim, case fold, Unicode normalization, decode/re-encode, shell arithmetic, or
+automatic selection.
+
+| Field | Exact supported subset |
+| --- | --- |
+| `AWS_S3_BUCKET` | 3–63 lowercase ASCII alphanumeric/hyphen; alphanumeric endpoints; no `--` or reviewed reserved form |
+| AWS key | 1–1024 bytes of nonempty `/`-separated safe segments using `[A-Za-z0-9._~+=,@-]`; no empty, `.`/`..`, leading slash |
+| `VERSION_ID` | 1–1024 bytes `[A-Za-z0-9._~+/%=-]+`; literal `null` is valid |
+| Azure account | 3–24 lowercase ASCII alphanumeric |
+| Azure container | 3–63 lowercase alphanumeric/hyphen; alphanumeric endpoints; no `--` |
+| Azure blob | 1–1024 bytes of the same nonempty safe-segment model |
+| `AZURE_VERSION_ID` | 1–128 bytes `[A-Za-z0-9._~:+%-]+` |
+| GCS bucket | 3–63 lowercase alphanumeric/hyphen; alphanumeric endpoints; no `--` |
+| GCS object | 1–1024 bytes of the same nonempty safe-segment model |
+| `GCS_GENERATION` | `[1-9][0-9]{0,19}` |
+| HCP organization/workspace | 1–64 bytes: `[A-Za-z0-9]` followed by at most 63 `[A-Za-z0-9_-]` |
+
+These are intentional copyable safe subsets, not complete provider grammars.
+Immediately before implementation, recheck official provider sources; a needed
+identifier outside a subset requires an issue/table/fixture change, not ad hoc
+relaxation. Add one atomic fixture per field at every endpoint/length/control/
+metacharacter boundary and assert exact unchanged provider argv.
+
+### Raw-byte affected-path and native-status evidence
+
+Consume T1B's merged native Git reader/status classifier rather than
+reimplementing line parsing. It exposes closed endpoint modes for
+`status --porcelain=v1 -z`, cached diff, commit/parent diff, and quiet
+difference. Preserve Buffer/NUL records, reject malformed/final-NUL/duplicate/
+noncanonical paths, and classify only native `0` as no difference, `1` as
+difference, and every other/start/signal outcome as tool failure.
+
+Apply independent endpoint checks to the exact nine T2 paths at worktree,
+index, commit/parent, and post-generator layers. Record whether each expected
+set is equality, subset, or empty; never use one layer's status as evidence for
+another. Disposable Git fixtures include spaces, tabs, newline, leading dash,
+quotes/non-ASCII, malformed NUL records, external diff/text conversion, and
+native `0/1/2` plus start failure.
 
 ## Source roles and generated output
 
@@ -804,6 +1011,12 @@ and either correct no-op or exact-lease writer behavior.
 - [ ] Every destination introduced/modified here is fresh, absolute,
       protected, restrictive, and guarded against file/directory/live/dangling
       link overwrite.
+- [ ] Every recovery/HCP parent has the exact attestation literal plus the
+      independently inspected canonical/direct-child/owner/mode/type subset;
+      tests never claim to prove the real-world no-competitor assertion.
+- [ ] HUP, INT, and TERM return exactly 129, 130, and 143 through one EXIT
+      cleanup owner; cleanup runs once and never replaces a primary nonzero
+      status.
 - [ ] Discovery and recovery remain separate and selection is deliberate.
 - [ ] S3 exact-key, bucket-class, versioning, KMS, and permission guidance is
       internally consistent.
@@ -813,6 +1026,8 @@ and either correct no-op or exact-lease writer behavior.
       and requires canonical positive generation passed unchanged.
 - [ ] HCP uses the correct state-versions endpoint, filters, pagination, closed
       US/EU hosts, protected config/response files, and closed token grammar.
+- [ ] Every provider identifier satisfies its exact field-specific ASCII/length
+      subset and reaches provider argv byte-for-byte unchanged.
 - [ ] No token appears in command arguments, trace, logs, files other than the
       short-lived protected config, or artifacts.
 - [ ] Every exact block passes syntax and mandatory non-network behavioral
@@ -825,6 +1040,8 @@ and either correct no-op or exact-lease writer behavior.
 - [ ] Both source files and all four generated files advance consistently and
       pass LF/BOM/lint/idempotence checks.
 - [ ] Local npm validation uses one resolved pair and restores `CI`.
+- [ ] All affected-path layers use the merged NUL-byte parser and distinguish
+      native Git status 0, 1, and tool/start failure.
 - [ ] The adjacent destructive-state inventory is explicit and linked to T4.
 - [ ] The workflow-policy validator recognizes the exact new stable step
       without changing the T1B event/permission/writer topology.
