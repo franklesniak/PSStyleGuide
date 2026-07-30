@@ -24,16 +24,18 @@ copy-safe**.
 Implement only after **Promote generated style-guide artifacts through a
 least-privileged verified writer** merges. Record the real blocked-by
 relationship. The T1B handoff records both its reviewed head and actual
-protected-branch landed commit, merge method/time, and issue/PR links. Before
+ruleset-protected `main` landed commit, merge method/time, issue/PR links,
+ruleset ID, normalized rule JSON SHA-256, and effective-rule/bypass evidence. Before
 any edit, parse the landed value as a full commit ID, require it exists and is
-reachable from protected `main`, and validate all enduring T1/T1A/T1B
-interfaces/versions at that commit. Stop on an absent, predicted, head-only, or
-mismatched value.
+reachable from live `refs/heads/main`; re-query the exact active/effective rule
+and sole official Actions bypass; and validate all enduring T1/T1A/T1B
+interfaces/versions at that commit. Stop on absent/disabled/broadened rule,
+different bypass actor, predicted/head-only commit, or mismatch.
 
 At implementation start, verify these merged enduring invariants:
 
 - generator output is LF and BOM-less under supported PowerShell editions;
-- hosted Markdown validation uses exact Node 24;
+- hosted Markdown validation uses exact Node `24.18.1`/npm `11.16.0`;
 - candidate transport uses immutable artifact ID plus propagated digest;
 - the production helper enforces exact manifest, containment/link rejection,
   caller-owned context, and fail-closed cleanup;
@@ -47,8 +49,8 @@ Consume the merged public interfaces and evidence. Do not restate or alter
 helper parameters, cleanup internals, case IDs, workflow roles, or writer
 behavior here.
 
-If npm remediation ran first due to advisory policy, use its exact merged
-runtime/package contract rather than the default Node 24 prerequisite.
+No implementation-time substitution is allowed: use the exact merged Node
+`24.18.1` and bundled npm `11.16.0` pair.
 
 ## Affected files
 
@@ -104,6 +106,60 @@ state mutation.
 
 ## Common destination contract
 
+The public environment input map is closed:
+
+| Provider field | Exact input | Discovery | Recovery/API | Supported subset |
+| --- | --- | ---: | ---: | --- |
+| AWS bucket | `AWS_S3_BUCKET` | required | required | 3–63 lowercase alphanumeric/hyphen; alphanumeric endpoints; no `--` or reserved form |
+| AWS object key | `AWS_S3_KEY` | required | required | 1–1024-byte safe nonempty segment grammar |
+| AWS selected version | `AWS_S3_VERSION_ID` | absent | required | 1–1024-byte safe version grammar; literal `null` allowed |
+| Azure account | `AZURE_STORAGE_ACCOUNT` | required | required | 3–24 lowercase ASCII alphanumeric |
+| Azure container | `AZURE_STORAGE_CONTAINER` | required | required | 3–63 lowercase alphanumeric/hyphen |
+| Azure blob | `AZURE_STORAGE_BLOB` | required | required | 1–1024-byte safe nonempty segment grammar |
+| Azure selected version | `AZURE_STORAGE_VERSION_ID` | absent | required | 1–128 bytes `[A-Za-z0-9._~:+%-]+` |
+| GCS bucket | `GCS_BUCKET` | required | required | 3–63 lowercase alphanumeric/hyphen |
+| GCS object | `GCS_OBJECT` | required | required | 1–1024-byte safe nonempty segment grammar |
+| GCS selected generation | `GCS_GENERATION` | absent | required | `[1-9][0-9]{0,19}` |
+| HCP hostname | `TFC_HOST` | n/a | required | exactly `app.terraform.io` or `app.eu.terraform.io` |
+| HCP organization | `TFC_ORGANIZATION` | n/a | required | `[A-Za-z0-9][A-Za-z0-9_-]{0,63}` |
+| HCP workspace | `TFC_WORKSPACE` | n/a | required | same 1–64-byte subset |
+| HCP page | `TFC_PAGE_NUMBER` | n/a | required | `[1-9][0-9]{0,19}` |
+| HCP bearer token | `TFC_TOKEN` | n/a | required secret | nonempty; no quote, backslash, CR/LF, or control |
+
+Immediately before each standalone marked subshell, show only applicable
+`export NAME='replace-with-...'` placeholders and instruct discovery first and
+deliberate selected-version assignment before recovery. No marked block
+contains a demonstration bucket/key/account/container/blob/object/workspace,
+placeholder, live-version query, `latest`, or automatic selection.
+
+As the first in-subshell input operation, set `LC_ALL=C`; copy every applicable
+public variable exactly once with `${NAME-}` into a provider-prefixed local,
+mark it readonly, and unset the copied public names. HCP executes `set +x`
+before its first secret expansion. No later reread, indirect expansion, alias,
+or default is permitted. Unset/empty is one `input-missing-or-empty` failure
+before filesystem/provider work; control/non-ASCII/whitespace/length/shape
+fail separately. Accepted bytes are not trimmed, normalized, decoded, or
+rewritten.
+
+Provider construction uses only the snapshotted locals:
+
+- AWS discovery/recovery pass unchanged bucket/key to `--bucket` and
+  `--prefix`/exact equality query, and recovery alone passes
+  `--version-id "$aws_s3_version_id"`;
+- Azure passes unchanged account/container/blob to `--account-name`,
+  `--container-name`, and `--prefix|--name`, with recovery alone using
+  `--version-id "$azure_storage_version_id"`;
+- GCS constructs exactly `gs://${gcs_bucket}/${gcs_object}` and recovery adds
+  `#${gcs_generation}` after delimiter-safe validation; and
+- HCP uses separate `curl --data-urlencode` fields for
+  organization/workspace/status/page, validated host for URL, and token only
+  in the protected curl config.
+
+The harness records redacted field name, accepted length/SHA-256, and NUL-safe
+provider argv. Discovery/recovery location bytes must match and selected
+version appears only in recovery. Each field has one atomic missing, empty,
+control, ASCII, endpoint, length, metacharacter, and valid preservation row.
+
 For AWS, Azure, and GCS recovery:
 
 - require Bash through an explicit shebang/runtime guard; select and document
@@ -140,6 +196,15 @@ For AWS, Azure, and GCS recovery:
 - use provider-native no-overwrite flags for the temporary leaf where
   available; and
 - never auto-select a version.
+
+The direct destination leaf, shared by `RECOVERY_PATH` and
+`TFC_RESPONSE_PATH`, is 1–128 bytes and exactly
+`[A-Za-z0-9][A-Za-z0-9._-]{0,127}` under `LC_ALL=C`. Derive it only after
+proving the full destination is exactly `"$parent/$leaf"` with one nonempty
+component. Reject slash, leading dot/dash, dot entries, whitespace/control/
+non-ASCII, and length violations before showing raw input. Render any validated
+or retained path for diagnostics only through `printf -v rendered_path '%q'
+-- "$path"` and a fixed format.
 
 Explain that `test -e` follows links and can be false for a dangling final
 link, while `test -L` identifies the link. The preflight is not an atomic
@@ -191,148 +256,32 @@ Document:
 - current AWS bucket-class/KMS documentation must be rechecked immediately
   before implementation.
 
-Final discovery body:
+Final marked AWS blocks are assembled from the single common standalone
+lifecycle below plus these provider-specific fragments; do not duplicate the
+cleanup, identity, publication, or signal implementation in this subsection.
+
+Discovery passes the snapshotted values and uses exact-key filtering:
 
 ```bash
 aws s3api list-object-versions \
-  --bucket acme-corp-terraform-state \
-  --prefix environments/prod/terraform.tfstate \
-  --query "Versions[?Key=='environments/prod/terraform.tfstate'].{Key:Key,VersionId:VersionId,IsLatest:IsLatest,LastModified:LastModified,Size:Size}" \
+  --bucket "$aws_s3_bucket" \
+  --prefix "$aws_s3_key" \
+  --query "Versions[?Key=='$aws_s3_key'].{Key:Key,VersionId:VersionId,IsLatest:IsLatest,LastModified:LastModified,Size:Size}" \
   --output table
 ```
 
-Require deliberate setting of `VERSION_ID`.
-
-Final recovery body:
+Recovery requires deliberate `AWS_S3_VERSION_ID` input and defines only this
+provider adapter for the shared recovery lifecycle:
 
 ```bash
-(
-  set -euo pipefail
-  umask 077
-
-  download_selected_state() {
-    local destination=$1
-    aws s3api get-object \
-      --bucket acme-corp-terraform-state \
-      --key environments/prod/terraform.tfstate \
-      --version-id "${VERSION_ID:?Set VERSION_ID to the exact S3 VersionId selected for recovery.}" \
-      "$destination"
-  }
-
-  recovery_parent=${RECOVERY_PARENT:?Set RECOVERY_PARENT to the exact protected parent.}
-  recovery_path=${RECOVERY_PATH:?Set RECOVERY_PATH to one new direct-child path.}
-  recovery_attestation=${RECOVERY_PARENT_ATTESTATION:?Set the protected-parent attestation.}
-  [[ $recovery_attestation == private-outside-vcs-no-competing-writers ]] || {
-    printf '%s\n' 'RECOVERY_PARENT_ATTESTATION is invalid.' >&2
-    exit 1
-  }
-  [[ $recovery_parent == /* && $recovery_parent != / ]] || {
-    printf '%s\n' 'RECOVERY_PARENT must be an absolute non-root POSIX path.' >&2
-    exit 1
-  }
-  [[ $(realpath -e -- "$recovery_parent") == "$recovery_parent" &&
-      -d $recovery_parent && ! -L $recovery_parent &&
-      $(stat -c '%u' -- "$recovery_parent") == "$(id -u)" &&
-      $(stat -c '%a' -- "$recovery_parent") == 700 ]] || {
-    printf 'Recovery parent failed canonical owner/mode/type checks: %s\n' \
-      "$recovery_parent" >&2
-    exit 1
-  }
-  [[ $recovery_path == "$recovery_parent"/* ]] || {
-    printf '%s\n' 'RECOVERY_PATH must be a direct child of RECOVERY_PARENT.' >&2
-    exit 1
-  }
-  recovery_leaf=${recovery_path#"$recovery_parent"/}
-  [[ -n $recovery_leaf && $recovery_leaf != */* &&
-      $recovery_leaf != . && $recovery_leaf != .. ]] || {
-    printf '%s\n' 'RECOVERY_PATH leaf is invalid.' >&2
-    exit 1
-  }
-  [[ ! -e $recovery_path && ! -L $recovery_path ]] || {
-    printf 'Refusing an existing recovery destination: %s\n' "$recovery_path" >&2
-    exit 1
-  }
-
-  recovery_root=$(mktemp -d -- "$recovery_parent/.state-recovery.XXXXXXXX")
-  recovery_temp=$recovery_root/candidate.tfstate
-  published=0
-  retain_on_failure=0
-
-  cleanup_recovery() {
-    local primary_status=$?
-    local cleanup_status=0
-    trap - EXIT
-    trap '' HUP INT TERM
-    shopt -s nullglob dotglob
-    local entries=("$recovery_root"/*)
-    if (( published != 0 || retain_on_failure != 0 )); then
-      printf 'Retained invalid or uncertain sensitive recovery state: %s\n' \
-        "$recovery_root" >&2
-    elif (( ${#entries[@]} == 0 )); then
-      if ! rmdir -- "$recovery_root"; then
-        cleanup_status=1
-        printf 'Retained cleanup-raced sensitive recovery root: %s\n' \
-          "$recovery_root" >&2
-      fi
-    elif (( ${#entries[@]} == 1 )) &&
-      [[ ${entries[0]} == "$recovery_temp" &&
-        -f $recovery_temp && ! -L $recovery_temp ]]; then
-      if rm -- "$recovery_temp"; then
-        if ! rmdir -- "$recovery_root"; then
-          cleanup_status=1
-          printf 'Retained cleanup-raced sensitive recovery root: %s\n' \
-            "$recovery_root" >&2
-        fi
-      else
-        cleanup_status=1
-        printf 'Retained undeletable sensitive recovery state: %s\n' \
-          "$recovery_root" >&2
-      fi
-    else
-      cleanup_status=1
-      printf 'Retained ownership-uncertain sensitive recovery state: %s\n' \
-        "$recovery_root" >&2
-    fi
-    if (( primary_status != 0 )); then
-      exit "$primary_status"
-    fi
-    exit "$cleanup_status"
-  }
-  terminate_hup()  { trap '' HUP INT TERM; exit 129; }
-  terminate_int()  { trap '' HUP INT TERM; exit 130; }
-  terminate_term() { trap '' HUP INT TERM; exit 143; }
-  trap cleanup_recovery EXIT
-  trap terminate_hup HUP
-  trap terminate_int INT
-  trap terminate_term TERM
-
-  if download_selected_state "$recovery_temp"; then
-    :
-  else
-    provider_status=$?
-    exit "$provider_status"
-  fi
-
-  shopt -s nullglob dotglob
-  recovery_entries=("$recovery_root"/*)
-  (( ${#recovery_entries[@]} == 1 ))
-  [[ ${recovery_entries[0]} == "$recovery_temp" ]]
-  [[ -f $recovery_temp && ! -L $recovery_temp && -s $recovery_temp ]]
-  terraform show -json "$recovery_temp" >/dev/null
-  if ! ln --no-target-directory -- "$recovery_temp" "$recovery_path"; then
-    retain_on_failure=1
-    printf 'No-replace publication failed; final path was not overwritten: %s\n' \
-      "$recovery_path" >&2
-    exit 1
-  fi
-  published=1
-  [[ -f $recovery_path && ! -L $recovery_path ]]
-  cmp -- "$recovery_temp" "$recovery_path"
-  rm -- "$recovery_temp"
-  rmdir -- "$recovery_root"
-  published=0
-  trap - EXIT HUP INT TERM
-)
+download_selected_state() {
+  local destination=$1
+  aws s3api get-object \
+    --bucket "$aws_s3_bucket" \
+    --key "$aws_s3_key" \
+    --version-id "$aws_s3_version_id" \
+    "$destination"
+}
 ```
 
 AWS has no `s3api get-object` no-clobber flag. The protected parent, fresh path,
@@ -349,154 +298,36 @@ Document:
 - hierarchical-namespace accounts do not currently support Blob Versioning
   and are outside this version-ID procedure.
 
-Final discovery body:
+Final marked Azure blocks use the common standalone lifecycle and these
+provider-specific fragments only.
+
+Discovery passes the snapshotted values and filters the exact blob name:
 
 ```bash
 az storage blob list \
-  --account-name stacmeterraform \
-  --container-name tfstate \
+  --account-name "$azure_storage_account" \
+  --container-name "$azure_storage_container" \
   --include v \
-  --prefix environments/prod/terraform.tfstate \
-  --query "[?name=='environments/prod/terraform.tfstate'].{Name:name,VersionId:versionId,IsCurrent:isCurrentVersion}" \
+  --prefix "$azure_storage_blob" \
+  --query "[?name=='$azure_storage_blob'].{Name:name,VersionId:versionId,IsCurrent:isCurrentVersion}" \
   --auth-mode login \
   --output table
 ```
 
-Require deliberate setting of `AZURE_VERSION_ID`.
-
-Final recovery body:
+Recovery requires deliberate `AZURE_STORAGE_VERSION_ID` input and defines:
 
 ```bash
-(
-  set -euo pipefail
-  umask 077
-
-  download_selected_state() {
-    local destination=$1
-    az storage blob download \
-      --account-name stacmeterraform \
-      --container-name tfstate \
-      --name environments/prod/terraform.tfstate \
-      --version-id "${AZURE_VERSION_ID:?Set AZURE_VERSION_ID to the exact Azure blob version ID selected for recovery.}" \
-      --file "$destination" \
-      --overwrite false \
-      --auth-mode login
-  }
-
-  recovery_parent=${RECOVERY_PARENT:?Set RECOVERY_PARENT to the exact protected parent.}
-  recovery_path=${RECOVERY_PATH:?Set RECOVERY_PATH to one new direct-child path.}
-  recovery_attestation=${RECOVERY_PARENT_ATTESTATION:?Set the protected-parent attestation.}
-  [[ $recovery_attestation == private-outside-vcs-no-competing-writers ]] || {
-    printf '%s\n' 'RECOVERY_PARENT_ATTESTATION is invalid.' >&2
-    exit 1
-  }
-  [[ $recovery_parent == /* && $recovery_parent != / ]] || {
-    printf '%s\n' 'RECOVERY_PARENT must be an absolute non-root POSIX path.' >&2
-    exit 1
-  }
-  [[ $(realpath -e -- "$recovery_parent") == "$recovery_parent" &&
-      -d $recovery_parent && ! -L $recovery_parent &&
-      $(stat -c '%u' -- "$recovery_parent") == "$(id -u)" &&
-      $(stat -c '%a' -- "$recovery_parent") == 700 ]] || {
-    printf 'Recovery parent failed canonical owner/mode/type checks: %s\n' \
-      "$recovery_parent" >&2
-    exit 1
-  }
-  [[ $recovery_path == "$recovery_parent"/* ]] || {
-    printf '%s\n' 'RECOVERY_PATH must be a direct child of RECOVERY_PARENT.' >&2
-    exit 1
-  }
-  recovery_leaf=${recovery_path#"$recovery_parent"/}
-  [[ -n $recovery_leaf && $recovery_leaf != */* &&
-      $recovery_leaf != . && $recovery_leaf != .. ]] || {
-    printf '%s\n' 'RECOVERY_PATH leaf is invalid.' >&2
-    exit 1
-  }
-  [[ ! -e $recovery_path && ! -L $recovery_path ]] || {
-    printf 'Refusing an existing recovery destination: %s\n' "$recovery_path" >&2
-    exit 1
-  }
-
-  recovery_root=$(mktemp -d -- "$recovery_parent/.state-recovery.XXXXXXXX")
-  recovery_temp=$recovery_root/candidate.tfstate
-  published=0
-  retain_on_failure=0
-
-  cleanup_recovery() {
-    local primary_status=$?
-    local cleanup_status=0
-    trap - EXIT
-    trap '' HUP INT TERM
-    shopt -s nullglob dotglob
-    local entries=("$recovery_root"/*)
-    if (( published != 0 || retain_on_failure != 0 )); then
-      printf 'Retained invalid or uncertain sensitive recovery state: %s\n' \
-        "$recovery_root" >&2
-    elif (( ${#entries[@]} == 0 )); then
-      if ! rmdir -- "$recovery_root"; then
-        cleanup_status=1
-        printf 'Retained cleanup-raced sensitive recovery root: %s\n' \
-          "$recovery_root" >&2
-      fi
-    elif (( ${#entries[@]} == 1 )) &&
-      [[ ${entries[0]} == "$recovery_temp" &&
-        -f $recovery_temp && ! -L $recovery_temp ]]; then
-      if rm -- "$recovery_temp"; then
-        if ! rmdir -- "$recovery_root"; then
-          cleanup_status=1
-          printf 'Retained cleanup-raced sensitive recovery root: %s\n' \
-            "$recovery_root" >&2
-        fi
-      else
-        cleanup_status=1
-        printf 'Retained undeletable sensitive recovery state: %s\n' \
-          "$recovery_root" >&2
-      fi
-    else
-      cleanup_status=1
-      printf 'Retained ownership-uncertain sensitive recovery state: %s\n' \
-        "$recovery_root" >&2
-    fi
-    if (( primary_status != 0 )); then
-      exit "$primary_status"
-    fi
-    exit "$cleanup_status"
-  }
-  terminate_hup()  { trap '' HUP INT TERM; exit 129; }
-  terminate_int()  { trap '' HUP INT TERM; exit 130; }
-  terminate_term() { trap '' HUP INT TERM; exit 143; }
-  trap cleanup_recovery EXIT
-  trap terminate_hup HUP
-  trap terminate_int INT
-  trap terminate_term TERM
-
-  if download_selected_state "$recovery_temp"; then
-    :
-  else
-    provider_status=$?
-    exit "$provider_status"
-  fi
-
-  shopt -s nullglob dotglob
-  recovery_entries=("$recovery_root"/*)
-  (( ${#recovery_entries[@]} == 1 ))
-  [[ ${recovery_entries[0]} == "$recovery_temp" ]]
-  [[ -f $recovery_temp && ! -L $recovery_temp && -s $recovery_temp ]]
-  terraform show -json "$recovery_temp" >/dev/null
-  if ! ln --no-target-directory -- "$recovery_temp" "$recovery_path"; then
-    retain_on_failure=1
-    printf 'No-replace publication failed; final path was not overwritten: %s\n' \
-      "$recovery_path" >&2
-    exit 1
-  fi
-  published=1
-  [[ -f $recovery_path && ! -L $recovery_path ]]
-  cmp -- "$recovery_temp" "$recovery_path"
-  rm -- "$recovery_temp"
-  rmdir -- "$recovery_root"
-  published=0
-  trap - EXIT HUP INT TERM
-)
+download_selected_state() {
+  local destination=$1
+  az storage blob download \
+    --account-name "$azure_storage_account" \
+    --container-name "$azure_storage_container" \
+    --name "$azure_storage_blob" \
+    --version-id "$azure_storage_version_id" \
+    --file "$destination" \
+    --overwrite false \
+    --auth-mode login
+}
 ```
 
 `--overwrite false` is defense in depth; the common preflight remains required.
@@ -514,156 +345,33 @@ Document:
   `gcloud storage ls --all-versions`; and
 - no soft-delete restoration is added.
 
-Final discovery body:
+Final marked GCS blocks use the common standalone lifecycle and these
+provider-specific fragments only.
+
+Discovery constructs the exact validated object URI once:
 
 ```bash
 gcloud storage ls \
   --all-versions \
   --json \
-  gs://acme-corp-terraform-state/environments/prod/terraform.tfstate
+  "gs://${gcs_bucket}/${gcs_object}"
 ```
 
-Require deliberate setting of exact `GCS_GENERATION`.
-
-Final recovery body:
+Recovery requires deliberate exact `GCS_GENERATION` input and defines:
 
 ```bash
-(
-  set -euo pipefail
-  umask 077
-
-  if ! [[ ${GCS_GENERATION-} =~ ^[1-9][0-9]*$ ]]; then
-    printf '%s\n' 'GCS_GENERATION must be a canonical positive decimal.' >&2
-    exit 1
-  fi
-
-  download_selected_state() {
-    local destination=$1
-    gcloud storage cp \
-      --no-clobber \
-      "gs://acme-corp-terraform-state/environments/prod/terraform.tfstate#${GCS_GENERATION}" \
-      "$destination"
-  }
-
-  recovery_parent=${RECOVERY_PARENT:?Set RECOVERY_PARENT to the exact protected parent.}
-  recovery_path=${RECOVERY_PATH:?Set RECOVERY_PATH to one new direct-child path.}
-  recovery_attestation=${RECOVERY_PARENT_ATTESTATION:?Set the protected-parent attestation.}
-  [[ $recovery_attestation == private-outside-vcs-no-competing-writers ]] || {
-    printf '%s\n' 'RECOVERY_PARENT_ATTESTATION is invalid.' >&2
-    exit 1
-  }
-  [[ $recovery_parent == /* && $recovery_parent != / ]] || {
-    printf '%s\n' 'RECOVERY_PARENT must be an absolute non-root POSIX path.' >&2
-    exit 1
-  }
-  [[ $(realpath -e -- "$recovery_parent") == "$recovery_parent" &&
-      -d $recovery_parent && ! -L $recovery_parent &&
-      $(stat -c '%u' -- "$recovery_parent") == "$(id -u)" &&
-      $(stat -c '%a' -- "$recovery_parent") == 700 ]] || {
-    printf 'Recovery parent failed canonical owner/mode/type checks: %s\n' \
-      "$recovery_parent" >&2
-    exit 1
-  }
-  [[ $recovery_path == "$recovery_parent"/* ]] || {
-    printf '%s\n' 'RECOVERY_PATH must be a direct child of RECOVERY_PARENT.' >&2
-    exit 1
-  }
-  recovery_leaf=${recovery_path#"$recovery_parent"/}
-  [[ -n $recovery_leaf && $recovery_leaf != */* &&
-      $recovery_leaf != . && $recovery_leaf != .. ]] || {
-    printf '%s\n' 'RECOVERY_PATH leaf is invalid.' >&2
-    exit 1
-  }
-  [[ ! -e $recovery_path && ! -L $recovery_path ]] || {
-    printf 'Refusing an existing recovery destination: %s\n' "$recovery_path" >&2
-    exit 1
-  }
-
-  recovery_root=$(mktemp -d -- "$recovery_parent/.state-recovery.XXXXXXXX")
-  recovery_temp=$recovery_root/candidate.tfstate
-  published=0
-  retain_on_failure=0
-
-  cleanup_recovery() {
-    local primary_status=$?
-    local cleanup_status=0
-    trap - EXIT
-    trap '' HUP INT TERM
-    shopt -s nullglob dotglob
-    local entries=("$recovery_root"/*)
-    if (( published != 0 || retain_on_failure != 0 )); then
-      printf 'Retained invalid or uncertain sensitive recovery state: %s\n' \
-        "$recovery_root" >&2
-    elif (( ${#entries[@]} == 0 )); then
-      if ! rmdir -- "$recovery_root"; then
-        cleanup_status=1
-        printf 'Retained cleanup-raced sensitive recovery root: %s\n' \
-          "$recovery_root" >&2
-      fi
-    elif (( ${#entries[@]} == 1 )) &&
-      [[ ${entries[0]} == "$recovery_temp" &&
-        -f $recovery_temp && ! -L $recovery_temp ]]; then
-      if rm -- "$recovery_temp"; then
-        if ! rmdir -- "$recovery_root"; then
-          cleanup_status=1
-          printf 'Retained cleanup-raced sensitive recovery root: %s\n' \
-            "$recovery_root" >&2
-        fi
-      else
-        cleanup_status=1
-        printf 'Retained undeletable sensitive recovery state: %s\n' \
-          "$recovery_root" >&2
-      fi
-    else
-      cleanup_status=1
-      printf 'Retained ownership-uncertain sensitive recovery state: %s\n' \
-        "$recovery_root" >&2
-    fi
-    if (( primary_status != 0 )); then
-      exit "$primary_status"
-    fi
-    exit "$cleanup_status"
-  }
-  terminate_hup()  { trap '' HUP INT TERM; exit 129; }
-  terminate_int()  { trap '' HUP INT TERM; exit 130; }
-  terminate_term() { trap '' HUP INT TERM; exit 143; }
-  trap cleanup_recovery EXIT
-  trap terminate_hup HUP
-  trap terminate_int INT
-  trap terminate_term TERM
-
-  if download_selected_state "$recovery_temp"; then
-    :
-  else
-    provider_status=$?
-    exit "$provider_status"
-  fi
-
-  shopt -s nullglob dotglob
-  recovery_entries=("$recovery_root"/*)
-  (( ${#recovery_entries[@]} == 1 ))
-  [[ ${recovery_entries[0]} == "$recovery_temp" ]]
-  [[ -f $recovery_temp && ! -L $recovery_temp && -s $recovery_temp ]]
-  terraform show -json "$recovery_temp" >/dev/null
-  if ! ln --no-target-directory -- "$recovery_temp" "$recovery_path"; then
-    retain_on_failure=1
-    printf 'No-replace publication failed; final path was not overwritten: %s\n' \
-      "$recovery_path" >&2
-    exit 1
-  fi
-  published=1
-  [[ -f $recovery_path && ! -L $recovery_path ]]
-  cmp -- "$recovery_temp" "$recovery_path"
-  rm -- "$recovery_temp"
-  rmdir -- "$recovery_root"
-  published=0
-  trap - EXIT HUP INT TERM
-)
+download_selected_state() {
+  local destination=$1
+  gcloud storage cp \
+    --no-clobber \
+    "gs://${gcs_bucket}/${gcs_object}#${gcs_generation}" \
+    "$destination"
+}
 ```
 
-Validate the generation before constructing the source argument or calling
-gcloud. Do not trim, convert with shell arithmetic, accept locale digits, or
-auto-select a live/latest value. Pass the reviewed decimal string unchanged.
+`--no-clobber` protects the private absent temporary leaf; the shared real
+GNU `ln --no-target-directory` operation is still the only final-path
+publication mechanism.
 
 ### HCP Terraform
 
@@ -732,8 +440,10 @@ authorization boundary, not an optional hygiene check.
 
 ## Normative protection, identifier, interruption, and evidence contracts
 
-The following contracts apply to every final marked block and supersede any
-shorter illustrative guard in the requested-change snippets.
+The following contracts are the only lifecycle implementation requirements for
+every final marked block. Provider subsections contribute argv construction
+fragments only; they do not define parallel cleanup, identity, publication, or
+signal behavior.
 
 ### Protected parent is an attested precondition plus an inspected subset
 
@@ -780,14 +490,95 @@ cleans exactly once, and preserves the primary nonzero status. Cleanup-only
 failure returns `1`; cleanup failure during another primary/signal failure is
 reported but never replaces it.
 
-No block uses one cleanup function directly for `EXIT HUP INT TERM`, returns
-zero after a signal, recursively deletes, or retries. The permanent harness
+The shared implementation is a closed state machine. Install traps only after
+every cleanup variable and ownership flag has an explicit initial value. A
+signal handler records only its conventional status and transfers control to
+the single `EXIT` owner. On cleanup entry, expand and store `$?` in
+`primary_status` before every other expansion or command; then run `set +e`
+followed by `set +u`, clear `EXIT`, and ignore HUP/INT/TERM. Classify the status
+of each trap operation.
+
+Maintain `cleanup_status=0`, an explicit lifecycle/ownership state, and
+`inspection_complete=false`. Enumerate the invocation root with a waited
+producer: open a dynamic descriptor from
+`find -- "$root" -mindepth 1 -maxdepth 1 -print0`, save `$!`, read every
+NUL-delimited entry, close the descriptor, and explicitly classify
+`wait "$producer_pid"`. A failed open, read, close, wait, type check, ownership
+check, or diagnostic sets cleanup status `1`, retains the whole root, and
+authorizes no deletion. No unlink or `rmdir` branch is reachable before all
+relevant inspections succeed.
+
+Permit `rm -- "$exact_owned_partial"` only when inventory contains exactly
+that journaled path, it is an ordinary non-link, and lifecycle state proves
+this invocation created but did not publish it. Permit
+`rmdir -- "$exact_root"` only after successful inspection and after the owned
+partial was removed successfully or the root was proven empty. Never remove
+recursively. Every fallible diagnostic, descriptor operation, `find`, `wait`,
+`rm`, and `rmdir` is inside an explicit status branch; no bare cleanup command
+may determine flow under shell options. Exit with the primary status when it
+is nonzero, otherwise `1` for any cleanup failure, otherwise `0`.
+
+No block invokes one cleanup function directly for `EXIT HUP INT TERM`,
+returns zero after a signal, retries, or follows a link. The permanent harness
 uses synchronization barriers—not timing sleeps—to deliver every signal during
 pre-create, partial-provider, validated-before-publication, and publication
 uncertainty phases for AWS/Azure/GCS, with cleanup success/failure
-permutations. Each stable row asserts signal status, cleanup call count `1`,
-final/temp/root state, provider call count, diagnostic reason, and unchanged
-sentinel.
+permutations. It also covers diagnostic-write, descriptor-open/read/close,
+`find`, `wait`, unlink, `rmdir`, reoccupation, symlink, dangling-link,
+unreadable-root, primary-plus-cleanup-failure, cleanup-only-failure, and
+second-signal cases. Each stable row asserts status, cleanup call count `1`,
+exact remaining identities, reason code, provider call count, and unchanged
+sentinels.
+
+### Exact sensitive-file identity at every boundary
+
+Use one shared POSIX state-file identity record:
+
+```text
+device:inode:owner_uid:mode_octal:link_count:size
+```
+
+With `LC_ALL=C`, obtain it from exactly
+`stat -c '%d:%i:%u:%a:%h:%s' -- "$path"` with native stderr suppressed.
+Require one line containing exactly six canonical nonnegative decimal fields,
+except that `mode_octal` is canonical octal; reject nonzero status,
+extra/missing output, or malformed fields. Separately require `-f "$path"` and
+`! -L "$path"`. Resolve and parse the effective UID once with `id -u` and the
+protected-parent device once with `stat -c '%d'`. Diagnostics use stable
+reason codes and encoded paths, never native error text or state bytes.
+
+After AWS/Azure/GCS provider success and before validation/publication, require
+the one journaled temporary to have the effective owner, mode `600`, protected
+parent/root device, link count `1`, and nonzero size. Save its device/inode.
+After the real no-replace hard link, snapshot both names and require the same
+saved device/inode, owner, mode, size, and link count `2`; require
+`cmp -- "$recovery_temp" "$recovery_path"` success. Unlink the exact temporary,
+snapshot the final again, and require the same identity and link count `1`
+before removing the empty root.
+
+Publication eligibility and cleanup ownership are distinct. Wrong mode blocks
+publication but still permits cleanup only if effective owner, device, ordinary
+non-link type, exact journaled path, and link count `1` prove ownership. Wrong
+owner/device/link count, substitution, failed inspection, or an extra entry is
+`candidate-identity-uncertain`: retain the whole root and unlink nothing. Any
+post-publication mismatch is `publication-identity-uncertain`: retain both
+names and the root. A no-replace publication failure retains the validated
+strict-identity temporary.
+
+For HCP, snapshot the response immediately after noclobber acquisition and
+again after curl exits and its descriptor closes. Both snapshots must have the
+same device/inode, effective owner, mode `600`, response-parent device, and
+link count `1`; success also requires nonzero size. Content or identity failure
+retains the exact response under the existing sensitive-evidence rule.
+
+Atomic fixtures cover wrong mode, wrong owner, initial extra hard link,
+device/inspection failure, inode substitution, post-link identity/link-count
+mismatch, and post-unlink link count other than `1` for all three recovery
+providers. HCP covers acquisition and post-curl wrong mode/owner/link count,
+substitution, and inspection failure. Positive rows record the exact tuple at
+every phase. The Ubuntu harness uses real GNU `stat` and `ln`; a declared
+noninteractive privileged fixture step may arrange a foreign UID but is never
+part of production code.
 
 ### Deliberately narrow provider-field grammars
 
@@ -801,11 +592,11 @@ automatic selection.
 | --- | --- |
 | `AWS_S3_BUCKET` | 3–63 lowercase ASCII alphanumeric/hyphen; alphanumeric endpoints; no `--` or reviewed reserved form |
 | AWS key | 1–1024 bytes of nonempty `/`-separated safe segments using `[A-Za-z0-9._~+=,@-]`; no empty, `.`/`..`, leading slash |
-| `VERSION_ID` | 1–1024 bytes `[A-Za-z0-9._~+/%=-]+`; literal `null` is valid |
+| `AWS_S3_VERSION_ID` | 1–1024 bytes `[A-Za-z0-9._~+/%=-]+`; literal `null` is valid |
 | Azure account | 3–24 lowercase ASCII alphanumeric |
 | Azure container | 3–63 lowercase alphanumeric/hyphen; alphanumeric endpoints; no `--` |
 | Azure blob | 1–1024 bytes of the same nonempty safe-segment model |
-| `AZURE_VERSION_ID` | 1–128 bytes `[A-Za-z0-9._~:+%-]+` |
+| `AZURE_STORAGE_VERSION_ID` | 1–128 bytes `[A-Za-z0-9._~:+%-]+` |
 | GCS bucket | 3–63 lowercase alphanumeric/hyphen; alphanumeric endpoints; no `--` |
 | GCS object | 1–1024 bytes of the same nonempty safe-segment model |
 | `GCS_GENERATION` | `[1-9][0-9]{0,19}` |
@@ -916,30 +707,40 @@ machine-readable harness row:
 | `AWS-PART-03` | nonzero, substituted/extra entry | final absent; uncertain root retained |
 | `AWS-PART-04` | zero, invalid state | final absent; ordinary temporary state removed |
 | `AWS-PART-05` | zero, valid state | one validated final; private root absent |
-| `AWS-PART-06` | existing/racing final | provider skipped or publication refuses; existing bytes unchanged |
+| `AWS-PART-06` | ordinary final sentinel exists before block start | exit `1`, `destination-preexisting`; provider/mktemp/publication counts `0`; sentinel identity/bytes/mode/mtime unchanged; no root/temp |
+| `AWS-PART-07` | final absent at preflight; wrapper creates competing sentinel immediately before real `ln` | exit `1`, `publication-race`; provider/validator/publication counts `1`; competitor unchanged; exact validated temp/root retained |
 | `AZURE-PART-01` | nonzero, no output | final absent; empty private root removed |
 | `AZURE-PART-02` | nonzero, ordinary partial | final absent; exact partial/root removed |
 | `AZURE-PART-03` | nonzero, substituted/extra entry | final absent; uncertain root retained |
 | `AZURE-PART-04` | zero, invalid state | final absent; ordinary temporary state removed |
 | `AZURE-PART-05` | zero, valid state | one validated final; private root absent |
-| `AZURE-PART-06` | existing/racing final | provider skipped or publication refuses; existing bytes unchanged |
+| `AZURE-PART-06` | ordinary final sentinel exists before block start | exit `1`, `destination-preexisting`; provider/mktemp/publication counts `0`; sentinel identity/bytes/mode/mtime unchanged; no root/temp |
+| `AZURE-PART-07` | final absent at preflight; wrapper creates competing sentinel immediately before real `ln` | exit `1`, `publication-race`; provider/validator/publication counts `1`; competitor unchanged; exact validated temp/root retained |
 | `GCS-PART-01` | nonzero, no output | final absent; empty private root removed |
 | `GCS-PART-02` | nonzero, ordinary partial | final absent; exact partial/root removed |
 | `GCS-PART-03` | nonzero, substituted/extra entry | final absent; uncertain root retained |
 | `GCS-PART-04` | zero, invalid state | final absent; ordinary temporary state removed |
 | `GCS-PART-05` | zero, valid state | one validated final; private root absent |
-| `GCS-PART-06` | existing/racing final | provider skipped or publication refuses; existing bytes unchanged |
+| `GCS-PART-06` | ordinary final sentinel exists before block start | exit `1`, `destination-preexisting`; provider/mktemp/publication counts `0`; sentinel identity/bytes/mode/mtime unchanged; no root/temp |
+| `GCS-PART-07` | final absent at preflight; wrapper creates competing sentinel immediately before real `ln` | exit `1`, `publication-race`; provider/validator/publication counts `1`; competitor unchanged; exact validated temp/root retained |
 
 Each row also asserts provider argv/version ID, phase/status, temporary/final
-state, required diagnostics, and unchanged outside sentinels. The harness
-rejects missing, duplicate, unexpected, or multiply emitted applicable IDs.
-Shared fixture functions are permitted; provider identity is not collapsed.
+identity tuple, required diagnostics, and unchanged outside sentinels. For
+each `07`, the wrapper records NUL-safe argv, delegates the unchanged
+`ln --no-target-directory -- "$recovery_temp" "$recovery_path"` call to real
+GNU `ln`, and proves that call returned nonzero. The retained root contains
+exactly one validated ordinary non-link temporary whose identity and bytes
+differ from the competing final; no cleanup unlink or `rmdir` succeeds. The
+harness rejects missing, duplicate, unexpected, or multiply emitted IDs and
+rejects any expected field containing an alternative, wildcard, or
+provider-dependent branch. Shared fixture functions are permitted; provider
+identity is not collapsed.
 
 Provider cases:
 
-- exact S3 key filter, unchanged `VERSION_ID`, expected flags, and no provider
+- exact S3 key filter, unchanged `AWS_S3_VERSION_ID`, expected flags, and no provider
   call before validation;
-- exact Azure filter, unchanged `AZURE_VERSION_ID`, `--overwrite false`, and
+- exact Azure filter, unchanged `AZURE_STORAGE_VERSION_ID`, `--overwrite false`, and
   expected auth mode;
 - exact GCS object, `--all-versions`, `--no-clobber`, and unchanged generation;
 - GCS positive one-/20-digit generations and rejection of empty, zero, signs,
@@ -964,7 +765,8 @@ Invoke the exact harness as a stable step in the callable Ubuntu
 and both lint surfaces. The T1B event-owning `build.yml` job therefore gates
 the same event SHA on this result. Preserve merged:
 
-- hosted Node 24 and disabled automatic package-manager cache;
+- exact hosted Node `24.18.1`/npm `11.16.0` and disabled automatic
+  package-manager cache;
 - exact action pins/role allowlist;
 - read-only permissions;
 - the local `workflow_call` boundary and event-owner triggers;
@@ -978,8 +780,8 @@ cross-workflow `needs` edge.
 ## Local validation
 
 Resolve one Node and npm application pair. Prove npm's actual
-`process.execPath`/`process.versions.node` matches the selected Node and exact
-merged major (Node 24 in default order). Record paths and full versions.
+`process.execPath`/`process.versions.node` matches exact Node `24.18.1` and npm
+`11.16.0`. Record paths and full versions.
 
 Save whether process `CI` exists and its exact value. Set `CI=true` only around
 clean `npm ci`; in `finally`, restore the prior value exactly or remove it.
@@ -1011,12 +813,18 @@ and either correct no-op or exact-lease writer behavior.
 - [ ] Every destination introduced/modified here is fresh, absolute,
       protected, restrictive, and guarded against file/directory/live/dangling
       link overwrite.
+- [ ] Every direct destination leaf satisfies the exact shared 1–128-byte
+      grammar and every public provider input is snapshotted once, unset, and
+      used unchanged through its closed provider construction.
 - [ ] Every recovery/HCP parent has the exact attestation literal plus the
       independently inspected canonical/direct-child/owner/mode/type subset;
       tests never claim to prove the real-world no-competitor assertion.
 - [ ] HUP, INT, and TERM return exactly 129, 130, and 143 through one EXIT
       cleanup owner; cleanup runs once and never replaces a primary nonzero
       status.
+- [ ] Cleanup uses the closed waited-producer inspection state machine,
+      authorizes no deletion before inspection completes, classifies every
+      fallible operation/diagnostic, and retains every uncertain root.
 - [ ] Discovery and recovery remain separate and selection is deliberate.
 - [ ] S3 exact-key, bucket-class, versioning, KMS, and permission guidance is
       internally consistent.
@@ -1033,8 +841,11 @@ and either correct no-op or exact-lease writer behavior.
 - [ ] Every exact block passes syntax and mandatory non-network behavioral
       cases in the tracked harness.
 - [ ] Every AWS/Azure/GCS `*-PART-*` row proves the exact success, ordinary
-      failure cleanup, uncertainty retention, and existing/racing-final
-      postcondition.
+      failure cleanup, uncertainty retention, preexisting-final `06`, and
+      publication-race `07` postcondition with one oracle per ID.
+- [ ] Provider, published, retained, and HCP response files satisfy the exact
+      numeric state-file identity tuple at every boundary, including link-count
+      `1→2→1` for successful hard-link publication.
 - [ ] The permanent harness runs in the callable same-run read-only Ubuntu
       validation gate.
 - [ ] Both source files and all four generated files advance consistently and

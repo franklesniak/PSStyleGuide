@@ -37,40 +37,56 @@ Each script must:
 
 - declare `#Requires -Version 5.1`;
 - contain exactly one script-level `.NOTES` line before its first function,
-  `Version: 1.0.<actual-UTC-implementation-YYYYMMDD>.0`, validated by T1's
-  complete four-component/date/reset convention;
+  `Version: 1.0.<final-material-edit-UTC-YYYYMMDD>.0`, validated by T1's
+  timeless grammar, explicit expected-version, and baseline authoring-bump
+  layers;
 - remain an ordinary LF, BOM-less UTF-8 file; and
 - pass the repository's PowerShell formatting/static checks.
 
-Reject missing, duplicate, malformed, stale, impossible-date, or function-level
-decoy versions. The harness checks exact expected script versions from the T1A
-commit in addition to ordinary-file identity; commit IDs and SHA-256 remain the
-immutable evidence.
+Timeless parsing rejects missing, duplicate, malformed, impossible-date, or
+function-level decoy versions without reading the clock; an old or future real
+date is valid grammar. Consumers check exact expected script versions from the
+same T1A commit/path/SHA as `unexpected-version`. Merge validation separately
+checks new-file/final-edit date and bump/reset rules. Commit IDs and SHA-256
+remain the immutable evidence.
 
 ## Public contracts
 
 ### Archive validator/extractor
 
-`Expand-StyleGuideCandidateArtifact.ps1` accepts five mandatory scalar
-parameters:
+`Expand-StyleGuideCandidateArtifact.ps1` is an advanced script with positional
+binding disabled. Its raw boundary is exact:
 
-- `CheckoutRoot`;
-- `TrustedTemporaryRoot`;
-- `DownloadDirectory`;
-- `CandidateDirectory`; and
-- `ExpectedDigest`.
+| Parameter | Presence | Exact declaration after `[Parameter(...)]` | Accepted provided value after production validation |
+| --- | --- | --- | --- |
+| `CheckoutRoot` | mandatory | `[AllowNull()] [AllowEmptyString()] [AllowEmptyCollection()] [object]` | Runtime type exactly `System.String`, then the path grammar |
+| `TrustedTemporaryRoot` | mandatory | same | Runtime type exactly `System.String`, then the path grammar |
+| `DownloadDirectory` | mandatory | same | Runtime type exactly `System.String`, then the path grammar |
+| `CandidateDirectory` | mandatory | same | Runtime type exactly `System.String`, then the path grammar |
+| `ExpectedDigest` | mandatory | same | Runtime type exactly `System.String`; exactly 64 ASCII hex |
+| `ArtifactId` | optional | `[AllowNull()] [AllowEmptyString()] [AllowEmptyCollection()] [object]` | If present, exact `System.String` canonical positive decimal, 1–20 digits |
+| `RunId` | optional | same | If present, exact `System.String` canonical positive decimal, 1–20 digits |
+| `RunAttempt` | optional | same | If present, exact `System.String` canonical positive decimal, 1–20 digits |
 
-It accepts three optional scalar diagnostic labels:
+Mandatory omission remains a binder interface error. Every *provided* value,
+including null/empty/empty collection, reaches the same first production
+validation block. Snapshot all eight `$PSBoundParameters` presence flags and
+raw object references without formatting. Reject each provided
+string-intended value in exact order: null; runtime type other than exactly
+`System.String`; zero length; Unicode-whitespace-only; Unicode control; then
+its parameter grammar. Do not cast/interpolate/trim/case-fold/enumerate/place
+on the pipeline/call `ToString()`/pass to regex or filesystem APIs before the
+type gate. A type error may report only parameter name and safely obtained
+runtime type name.
 
-- `ArtifactId`;
-- `RunId`; and
-- `RunAttempt`.
-
-The helper must use `$PSBoundParameters` to distinguish omitted labels from
-explicit null/empty values. Omitted labels become the diagnostic text
-`unavailable`. Explicit null or empty labels fail parameter validation.
-Labels are never used for selection, authorization, digest trust, or path
-construction.
+After validation, path strings remain byte-for-character unchanged through
+the path grammar; digest must match `\A[0-9A-Fa-f]{64}\z` before creating one
+lowercase comparison copy; and each present label must match
+`\A[1-9][0-9]{0,19}\z`. Omitted labels, determined only from the snapshot, map
+to `unavailable`. Explicit null, empty, whitespace, control, `0`, leading zero,
+sign, decimal/exponent, non-ASCII digit, or 21st digit rejects. Labels never
+select an artifact, form a path/name, authorize bytes, affect cleanup, or
+choose a fixture.
 
 Place function definitions before the main entry point. When dot-sourced
 through the ordinary PowerShell invocation context, define functions and
@@ -106,9 +122,29 @@ Remove-StyleGuideCandidateInvocationState
 ```
 
 The normal helper failure path and every `K-*` harness case invoke this exact
-function. It accepts the normalized candidate envelope, the explicit ordered
-ownership journal, and the primary failure. It does not delegate recursive
-deletion to the caller-context cleanup.
+function. It accepts only `CandidateOwnershipState` and `PrimaryFailure`; there
+is no envelope/journal/Boolean-disposed overload. It does not delegate
+recursive deletion to the caller-context cleanup.
+
+The helper creates and returns the same mutable object whose first
+`PSTypeName` is exactly
+`TerraformStyleGuide.StyleGuideCandidateOwnershipState.v1`:
+
+| Property | Exact type/meaning |
+| --- | --- |
+| `SchemaVersion` | `[uint32]1` |
+| `CandidateId` | new nonempty immutable `[guid]` |
+| `LifecycleState` | `[string]`; one of `NotCreated`, `Active`, `CleanupInProgress`, `Disposed`, or `RetainedUncertain` |
+| `TrustedTemporaryRootPath` | immutable normalized nonempty `[string]` |
+| `CandidateParentPath` | immutable normalized nonempty strict descendant |
+| `CandidateDirectoryPath` | immutable normalized exact leaf |
+| `OwnershipJournal` | ordered `[object[]]` of closed v1 entries |
+| `CleanupAttempt` | `[uint32]0`; increment only on valid nonterminal cleanup entry |
+| `CleanupSummary` | `$null`, then closed ID/prior/final/primary/cleanup/removed/retained/leaf summary |
+
+Construct it in `NotCreated` before candidate creation, transition to `Active`
+only after acquiring the fresh directory, and journal each ordinary file at
+ownership acquisition. Success and failure return the same object reference.
 
 ## Requested changes
 
@@ -188,9 +224,11 @@ the primary failure.
 
 Before filesystem/archive work:
 
-- require `ExpectedDigest` to match `^[0-9A-Fa-f]{64}$`;
-- reject explicit null/empty optional labels;
-- normalize omitted labels to `unavailable`; and
+- snapshot presence/raw references and apply the exact null/type/empty/
+  whitespace/control gate to every provided value;
+- require `ExpectedDigest` to match `\A[0-9A-Fa-f]{64}\z`;
+- require every present label to match `\A[1-9][0-9]{0,19}\z`;
+- normalize only omitted labels to `unavailable`; and
 - initialize stable phase diagnostics.
 
 Stable phases cover:
@@ -310,23 +348,75 @@ After extraction:
 - enumerate exact candidate contents;
 - require exactly the four expected ordinary non-reparse files;
 - reject UTF-8 BOM bytes and every `0x0D` byte; and
-- return/log the four normalized candidate paths.
+- return the four normalized candidate paths plus the same Active
+  `CandidateOwnershipState`; log only safe paths/ID/state, never contents.
 
 ### 9. Fail closed during candidate cleanup
 
-`Remove-StyleGuideCandidateInvocationState` must perform one complete
-pre-deletion pass:
+`Remove-StyleGuideCandidateInvocationState` treats its lifecycle object as
+untrusted. Before filesystem work require exact PSTypeName/property set/types,
+nonempty ID, allowed state, immutable envelope, journal schema/order/unique
+paths, Owned flags, attempt count, and summary consistency. Missing, forged,
+copied-loose, reactivated, path/ID-mutated, or contradictory state is
+`cleanup/candidate-state-invalid` with zero filesystem/deletion calls.
 
-- validate the candidate envelope;
-- exhaustively enumerate immediate children;
-- require exact equality with the ownership journal;
-- validate every journaled child as its expected ordinary non-reparse file;
-  and
-- require safe parent/leaf relationships.
+Transitions are closed:
 
-Only after all checks pass may it delete journaled files nonrecursively and
-remove the proven empty candidate directory. If any state is uncertain, delete
-nothing further, retain the path, and emit primary plus cleanup diagnostics.
+1. `NotCreated`: revalidate the trusted parent and materialize its immediate
+   entries once. Exact candidate-leaf absence moves to `Disposed` with an empty
+   cleanup. Any matching/unclassifiable entry moves to `RetainedUncertain`;
+   delete nothing.
+2. `Active`: perform one complete pre-deletion pass over envelope, exact
+   immediate-child equality, journaled ordinary-file identity, and
+   parent/leaf relationships. Any uncertainty moves to `RetainedUncertain`
+   before deletion. Only a complete pass increments attempt, enters
+   `CleanupInProgress`, removes journaled files nonrecursively in safe order,
+   and removes the proven-empty candidate directory. Complete success sets all
+   journal `Owned=false`, retains acquisition evidence, records absent leaf,
+   and moves to `Disposed`. Inspection/deletion failure stops immediately,
+   records removed/retained entries, and moves to `RetainedUncertain`; no
+   retry.
+3. `Disposed`: validate the full object and require all entries `Owned=false`;
+   revalidate parent components and enumerate only to prove the exact leaf is
+   absent. Absence returns the identical object/attempt/journal/summary with
+   zero deletion. Any ordinary file/directory, live/dangling link/reparse,
+   duplicate, unknown entry, or enumeration error moves to
+   `RetainedUncertain` as
+   `cleanup/candidate-disposed-leaf-reoccupied`, with zero deletion.
+4. Entry in `CleanupInProgress` or `RetainedUncertain` returns stable nonzero
+   `cleanup/candidate-state-retained`, with no inspection below the safe
+   envelope and zero deletion.
+
+Parent enumeration, not `File.Exists`/`Directory.Exists`, defines absence.
+Nothing is followed or recursively removed. Caller-context cleanup may
+continue only when the exact candidate object is `Disposed` and leaf absence
+is re-proven; otherwise it makes the invocation context
+`RetainedUncertain`. Primary failure remains primary, with candidate/context
+cleanup outcomes attached separately.
+
+Candidate-lifecycle rows are atomic:
+
+| ID | Exact behavior |
+| --- | --- |
+| `T1A-K-03` | valid Disposed object, absent leaf, identical no-deletion success |
+| `T1A-K-05` | Disposed leaf reoccupied by ordinary file |
+| `T1A-K-06` | Disposed leaf reoccupied by ordinary directory |
+| `T1A-K-07` | Disposed leaf reoccupied by live link/reparse |
+| `T1A-K-08` | Disposed leaf reoccupied by dangling link |
+| `T1A-K-09` | Disposed leaf unreadable/unclassifiable |
+| `T1A-K-10` | NotCreated with absent leaf to Disposed |
+| `T1A-K-11` | NotCreated with occupied leaf to RetainedUncertain |
+| `T1A-K-12` | entry in CleanupInProgress |
+| `T1A-K-13` | entry in RetainedUncertain |
+| `T1A-K-14` | obsolete loose envelope/journal invocation |
+| `T1A-K-15` | Disposed journal reactivated with `Owned=true` |
+| `T1A-K-16` | CandidateId mutation |
+| `T1A-K-17` | immutable envelope/path mutation |
+
+Every rejection has zero deletion and records CandidateId, transition,
+attempt count, exact removed/retained sequence, sentinel, and context
+consequence. `T1A-K-04` remains the primary-failure plus partial-cleanup-failure
+case.
 
 ### 10. Implement the permanent stable-ID harness
 
@@ -367,7 +457,8 @@ state exactly as stated. Parameter/download failures perform no archive work.
 | T1A-D-03 | `candidate.digest.case-03` | 63-hex expected digest | `parameter`; candidate absent; archive unopened |
 | T1A-D-04 | `candidate.digest.case-04` | 64 characters containing nonhex | `parameter`; candidate absent; archive unopened |
 | T1A-D-05 | `candidate.digest.case-05` | `sha256:`-prefixed digest | `parameter`; candidate absent; archive unopened |
-| T1A-Z-01 | `candidate.archive.case-01` | invalid/truncated ZIP with matching digest | `archive`; candidate absent |
+| T1A-Z-01 | `archive.invalid.header-rejected` | invalid ZIP header with matching digest | `archive/invalid-zip`; candidate absent |
+| T1A-Z-02 | `archive.truncated.rejected` | truncated otherwise-valid ZIP with matching digest | `archive/truncated-zip`; candidate absent |
 | T1A-M-01 | `candidate.manifest.case-01` | one required entry missing | `manifest`; candidate absent |
 | T1A-M-02 | `candidate.manifest.case-02` | one extra entry | `manifest`; candidate absent |
 | T1A-M-03 | `candidate.manifest.case-03` | exact duplicate name | `manifest`; candidate absent |
@@ -382,18 +473,18 @@ state exactly as stated. Parameter/download failures perform no archive work.
 | T1A-M-12 | `candidate.manifest.case-12` | directory entry | `manifest`; candidate absent |
 | T1A-M-13 | `candidate.manifest.case-13` | file/directory collision | `manifest`; candidate absent |
 | T1A-M-14 | `candidate.manifest.case-14` | fixed reviewed raw ZIP with empty name | `manifest`; candidate absent; fixture SHA recorded |
-| T1A-E-01 | `candidate.environment.case-01` | download/candidate outside trusted root | `containment`; candidate absent |
+| T1A-E-01 | `path.download.outside-trusted-root-rejected` | download directory outside trusted root | `containment/download-outside`; candidate absent |
 | T1A-E-02 | `candidate.environment.case-02` | checkout and trusted roots equal | `root`; candidate absent |
 | T1A-E-03 | `candidate.environment.case-03` | checkout contains trusted root | `root`; candidate absent |
 | T1A-E-04 | `candidate.environment.case-04` | trusted root contains checkout | `root`; candidate absent |
-| T1A-E-05 | `candidate.environment.case-05` | relative working/root path | `parameter`; candidate absent |
+| T1A-E-05 | `path.working.relative-rejected` | relative working path | `parameter/path-not-fully-qualified`; candidate absent |
 | T1A-E-06 | `candidate.environment.case-06` | non-filesystem provider path | `parameter`; candidate absent |
 | T1A-E-07 | `candidate.environment.case-07` | Windows case variation of the same existing path envelope | Windows only: pass/status 0/`complete`; four valid files; candidate cleanup succeeds; context `Disposed`; sentinel unchanged |
 | T1A-E-08 | `candidate.environment.case-08` | Linux differently cased sibling outside trusted root | Linux only: fail/status 1/`containment/case-sensitive-outside`; candidate absent; context cleanup reaches `Disposed`; sentinel unchanged |
-| T1A-E-09 | `candidate.environment.case-09` | root or ancestor link/reparse component | `root`; candidate absent |
+| T1A-E-09 | `path.root.reparse-rejected` | declared root is a link/reparse component | `root/root-reparse`; candidate absent |
 | T1A-E-10 | `candidate.environment.case-10` | below-root link/reparse component | fail/status 1/`containment/component-reparse`; candidate absent; context cleanup reaches `Disposed` |
-| T1A-E-11 | `candidate.environment.case-11` | hidden/system extra download entry | `download`; candidate absent |
-| T1A-E-12 | `candidate.environment.case-12` | wildcard root/working path | `parameter`; candidate absent |
+| T1A-E-11 | `download.hidden-extra-entry-rejected` | hidden extra download entry | `download/extra-entry`; candidate absent |
+| T1A-E-12 | `path.root.wildcard-rejected` | wildcard root path | `parameter/path-wildcard`; candidate absent |
 | T1A-E-13 | `candidate.environment.case-13` | wildcard path capable of multiple matches under a resolving API | fail/status 1/`parameter/path-wildcard` before resolution/context creation; candidate absent |
 | T1A-E-14 | `candidate.environment.case-14` | checkout root missing | fail/status 1/`root/checkout-missing`; candidate absent |
 | T1A-E-15 | `candidate.environment.case-15` | checkout root is not a directory | fail/status 1/`root/checkout-not-directory`; candidate absent |
@@ -405,6 +496,11 @@ state exactly as stated. Parameter/download failures perform no archive work.
 | T1A-E-21 | `candidate.environment.case-21` | retained archive is not an ordinary file | fail/status 1/`download/archive-not-file`; candidate absent |
 | T1A-E-22 | `candidate.environment.case-22` | candidate parent missing | fail/status 1/`destination/parent-missing`; candidate absent |
 | T1A-E-23 | `candidate.environment.case-23` | candidate parent is not a directory | fail/status 1/`destination/parent-not-directory`; candidate absent |
+| T1A-E-24 | `path.candidate.outside-trusted-root-rejected` | candidate path outside trusted root | `containment/candidate-outside`; candidate absent |
+| T1A-E-25 | `path.root.relative-rejected` | relative root path | `parameter/path-not-fully-qualified`; candidate absent |
+| T1A-E-26 | `path.ancestor.reparse-rejected` | ancestor below volume/share root is link/reparse | `root/ancestor-reparse`; candidate absent |
+| T1A-E-27 | `download.system-extra-entry-rejected` | system extra download entry | `download/extra-entry`; candidate absent |
+| T1A-E-28 | `path.working.wildcard-rejected` | wildcard working path | `parameter/path-wildcard`; candidate absent |
 | T1A-L-01 | `candidate.destination.case-01` | preexisting ordinary candidate file | `destination`; leaf unchanged |
 | T1A-L-02 | `candidate.destination.case-02` | preexisting candidate directory | `destination`; leaf unchanged |
 | T1A-L-03 | `candidate.destination.case-03` | live link/reparse candidate leaf | `destination`; target and leaf unchanged |
@@ -419,10 +515,11 @@ state exactly as stated. Parameter/download failures perform no archive work.
 | T1A-C-02 | `context.cleanup.case-02` | repeated caller-context teardown | success/no-op under disposed-context contract |
 | T1A-C-03 | `context.cleanup.case-03` | unjournaled ordinary context entry | `cleanup`; entire uncertain context retained |
 | T1A-C-04 | `context.cleanup.case-04` | link/reparse substitution in context | `cleanup`; context/target retained unchanged |
-| T1A-C-05 | `context.cleanup.case-05` | missing/unreadable journaled context entry | `cleanup`; no further deletion |
+| T1A-C-05 | `cleanup.context.journaled-entry-missing` | missing journaled context entry | `cleanup/context-entry-missing`; no further deletion |
 | T1A-C-06 | `context.cleanup.case-06` | primary failure then caller-cleanup failure | primary prominent; cleanup and retained root reported |
 | T1A-C-07 | `context.cleanup.case-07` | proven partial ordinary ownership journal | success; only journaled entries removed nonrecursively |
 | T1A-C-08 | `context.cleanup.case-08` | candidate cleanup then context cleanup | success; exact production lifecycles invoked in order |
+| T1A-C-09 | `cleanup.context.journaled-entry-unreadable` | unreadable journaled context entry | `cleanup/context-entry-unreadable`; no further deletion |
 | T1A-R-01 | `candidate.limit.case-01` | entry one byte below 8 MiB | pass/status 0/`complete`; four valid files; candidate and context cleanups succeed; context `Disposed` |
 | T1A-R-02 | `candidate.limit.case-02` | entry exactly 8 MiB | pass/status 0/`complete`; four valid files; candidate and context cleanups succeed; context `Disposed` |
 | T1A-R-03 | `candidate.limit.case-03` | declared entry one byte above 8 MiB | `manifest`; candidate absent |
@@ -433,14 +530,16 @@ state exactly as stated. Parameter/download failures perform no archive work.
 | T1A-R-08 | `candidate.limit.case-08` | actual cumulative output exceeds 32 MiB | `extraction`; stop at first excess; owned partial removed |
 | T1A-R-09 | `candidate.limit.case-09` | retained archive exactly 32 MiB | pass/status 0/`complete`; four valid files; candidate and context cleanups succeed; context `Disposed` |
 | T1A-R-10 | `candidate.limit.case-10` | retained archive one byte above 32 MiB | pre-ZIP limit failure; candidate absent |
-| T1A-R-11 | `candidate.limit.case-11` | raw ZIP with negative/inconsistent length state | `manifest`; candidate absent; fixture SHA recorded |
+| T1A-R-11 | `limit.raw-zip.negative-length-rejected` | raw ZIP with negative length state | `manifest/negative-length`; candidate absent; fixture SHA recorded |
 | T1A-R-12 | `candidate.limit.case-12` | length arithmetic overflow fixture | `manifest`; checked overflow; candidate absent |
 | T1A-R-13 | `candidate.limit.case-13` | retained archive one byte below 32 MiB | pass/status 0/`complete`; four valid files; candidate and context cleanups succeed; context `Disposed` |
+| T1A-R-14 | `limit.raw-zip.inconsistent-length-rejected` | raw ZIP with inconsistent length fields | `manifest/inconsistent-length`; candidate absent; fixture SHA recorded |
 | T1A-W-01 | `candidate.download.case-01` | empty download directory | `download`; candidate absent |
 | T1A-W-02 | `candidate.download.case-02` | two top-level download entries | `download`; candidate absent |
 | T1A-W-03 | `candidate.download.case-03` | directory as sole download entry | `download`; candidate absent |
 | T1A-W-04 | `candidate.download.case-04` | link/reparse as sole download entry | `download`; target unchanged; candidate absent |
-| T1A-W-05 | `candidate.download.case-05` | unreadable/unclassifiable download entry | `download`; candidate absent |
+| T1A-W-05 | `download.entry.unreadable-rejected` | unreadable download entry | `download/entry-unreadable`; candidate absent |
+| T1A-W-06 | `download.entry.unclassifiable-rejected` | unclassifiable download entry | `download/entry-unclassifiable`; candidate absent |
 | T1A-S-01 | `harness.input.case-01` | missing helper script path | fail/status 1/`harness-input/script-missing`; no context; neither supplied script invoked; sentinel unchanged |
 | T1A-S-02 | `harness.input.case-02` | wildcard helper path | fail/status 1/`harness-input/path-wildcard`; no context; neither supplied script invoked; sentinel unchanged |
 | T1A-S-03 | `harness.input.case-03` | non-filesystem helper path | fail/status 1/`harness-input/path-provider`; no context; neither supplied script invoked; sentinel unchanged |
@@ -497,8 +596,11 @@ The public path inventory is closed:
 | context cleanup | every explicit journaled owned path |
 | harness | `HelperPath`, `ContextManagerPath` |
 
-Preserve each raw value as `[object]`; do not let PowerShell enumerate or join
-it. Validate in this order before any filesystem work:
+Every public path-looking parameter is declared `[object]` with the applicable
+`[Parameter(...)]`, `[AllowNull()]`, `[AllowEmptyString()]`, and
+`[AllowEmptyCollection()]`; the harness uses mandatory named parameters.
+Preserve each raw value as one object reference and do not let PowerShell
+enumerate or join it. Validate in this order before any filesystem work:
 
 1. null → status 1, `parameter/path-null`;
 2. non-string scalar or collection → `parameter/path-type`;
@@ -518,6 +620,22 @@ require `FileSystem`, and normalize once. This API returns one unresolved
 string; production code must not call a resolving/multi-match API. Every
 grammar rejection creates no context/directory/archive/candidate, attempts no
 cleanup of unowned state, and leaves the outside sentinel unchanged.
+
+Structured context/candidate-state/journal inputs remain `[object]` and must
+pass exact first `PSTypeName`, runtime type, closed property set/type, array
+shape, and lifecycle consistency before any property or element access.
+Hashtable/`PSCustomObject` substitution and PowerShell collection flattening
+are not accepted accidentally. `PrimaryFailure` remains an `ErrorRecord`,
+`Exception`, or explicit null under the stated contract and is never converted
+to text to decide cleanup/status.
+
+The atomic raw-boundary catalog gives every parameter its own null, integer,
+Boolean, one-element array, two-element array, empty array, hashtable,
+`PSCustomObject`, `StringBuilder`, empty, whitespace-only, and control case.
+Digest adds 63/65 length and nonhex classes; each optional label adds omission,
+zero, leading zero, sign, non-ASCII digit, and overlength. Each case proves its
+one phase/subreason, no filesystem/archive side effect, no attacker-object
+`ToString()` call, bounded diagnostics, and edition parity.
 
 ### 12. Publish the invocation-context schema and lifecycle
 
@@ -569,27 +687,68 @@ authorization, so every Active cleanup revalidates actual ownership.
 
 ### 13. Make the case catalog and results structurally atomic
 
-Every case row and emitted result has the fixed fields:
-`Id`, `SemanticCase`, `Applicability`, `Fixture`, `InitialState`, `Result`
-(`pass|fail|skip`), exact process `Status`, `Phase`, `Subreason`,
-`CandidateState` (`absent|four-valid-files|owned-partial-removed|
-preexisting-unchanged|uncertain-retained`), `ContextState`, ordered
-`CleanupSequence`, `Diagnostics`, and `SentinelState`.
+The normative catalog version is `T1A-CASES-v1`; its immutable closed oracle
+dictionary is `T1A-ORACLES-v1`. Every row has exact fields:
 
-Status is exactly `0` for pass and `1` for helper/harness rejection. The table's
-compact repeated phrases inherit these mandatory defaults: every fail has the
-literal named phase/subreason, no unproved deletion, unchanged sentinel, and
-the candidate/context states stated by its fixture; every successful
-end-to-end case has four valid ordinary files, candidate cleanup followed by
-context cleanup, final `Disposed`, and unchanged sentinel. “Continues,”
-“proceeds,” “applicable,” an `or` oracle, or a slash-combined fixture is not a
-final result and must not appear in machine metadata.
+```text
+Id SemanticCase Applicability Fixture InitialState OracleProfile
+ExpectedResult ExpectedStatus ExpectedPhase ExpectedSubreason
+PreCleanupCandidateState FinalCandidateState FinalContextState
+CleanupSequence ExpectedDiagnostics SentinelState SourceRepositoryState
+```
 
-At startup, reconcile the applicable expected ID set; at completion, require
-one and only one complete result per applicable ID and none for nonapplicable
-IDs. Skip is permitted only for the narrow real-link primitive-availability
-rule, names exact ID/platform/reason, credits no pass, and cannot eliminate the
-required real link rejection on either OS family.
+Emitted records repeat every expected field and add corresponding `Actual*`
+fields, exact fixture parameters, runtime/edition/platform, and
+`HarnessVerdict (pass|fail|skip)`. A correctly observed production rejection
+is `ExpectedResult: rejection`, `ExpectedStatus: 1`,
+`HarnessVerdict: pass`; it is not a failed test. Applicability skip uses
+`ExpectedResult: skip`, `ExpectedStatus: null`, `HarnessVerdict: skip` and
+earns no pass.
+
+Candidate states are exactly `not-applicable|absent|four-valid-files|
+owned-partial|preexisting-unchanged|uncertain-retained`; context states are
+`not-created|Active|Disposed|RetainedUncertain`. Cleanup is an ordered array
+containing only `candidate-cleanup|candidate-cleanup-noop|context-cleanup|
+context-cleanup-noop|none`. Slash lists, “then,” “applicable,” `or`, or prose
+alternatives are invalid metadata.
+
+The oracle profiles expand as follows:
+
+| Profile | Immutable expansion; row-specific fields |
+| --- | --- |
+| `OP-SUCCESS-EXTRACT` | success/0/`complete`/`none`; pre-cleanup four files; final candidate absent/context Disposed; candidate then context cleanup; unchanged sentinels/source; row supplies applicability/fixture/initial state/diagnostics |
+| `OP-SUCCESS-CANDIDATE-NOOP` | success/0/`cleanup`/`candidate-already-disposed`; final candidate absent/context Active; candidate-noop only; unchanged sentinels/source |
+| `OP-SUCCESS-CONTEXT-NOOP` | success/0/`cleanup`/`context-already-disposed`; final candidate absent/context Disposed; context-noop only; unchanged sentinels/source |
+| `OP-SUCCESS-PARTIAL-JOURNAL` | success/0; final candidate absent/context Disposed; context cleanup; row supplies exact removed sequence |
+| `OP-REJECT-PRECONTEXT` | rejection/1; candidate absent/context not-created; no cleanup; row supplies exact phase/subreason |
+| `OP-REJECT-PRECANDIDATE` | rejection/1; candidate absent/context Disposed; context cleanup; row supplies exact phase/subreason |
+| `OP-REJECT-PREEXISTING` | rejection/1; pre/final candidate preexisting-unchanged/context Disposed; context cleanup; row supplies exact leaf identity and reason |
+| `OP-REJECT-PARTIAL-REMOVED` | rejection/1; pre-cleanup owned-partial/final absent/context Disposed; candidate then context cleanup; row supplies exact owned sequence/reason |
+| `OP-REJECT-CANDIDATE-RETAINED` | rejection/1; pre/final uncertain-retained/context RetainedUncertain; candidate then context cleanup; row supplies primary/cleanup reasons and retained paths |
+| `OP-REJECT-CONTEXT-RETAINED` | rejection/1; row's proven candidate state/context RetainedUncertain; context cleanup; row supplies exact reason/retained paths |
+| `OP-SKIP-PRIMITIVE` | skip/null/`applicability`; no fixture; candidate not-applicable/context not-created; no cleanup; row supplies platform/probe/reason |
+| `OP-CATALOG-REJECTION` | rejection/1/`catalog`; candidate/context not-applicable; no cleanup; row supplies mutation/subreason |
+
+Each profile declares all fixed fields and only permitted row variations.
+Unknown fields/profiles, fixed-field override, missing variation, contradictory
+state, or prose alternative fails static catalog validation. Profiles and
+existing ID/key meanings are immutable after merge; new behavior appends a new
+row/profile.
+
+Every existing case table row must be transcribed with one profile and exact
+variations before filing. A row mutates one parameter/path/separator/platform/
+leaf/outcome only. Split `root or ancestor link/reparse` and any other
+remaining disjunction into append-only rows. Replace ordinal semantic names
+with behavior names; at minimum use the mappings and catalog-integrity rows
+listed below. P1A must split grouped evidence before it can satisfy multiple
+Terraform keys.
+
+Startup expands profiles/rows, validates schema/unique sets, and computes exact
+applicable `(ID,runtime)` pairs. Completion requires one complete record for
+every pair and none outside it. Mutation tests independently prove missing,
+duplicate, unexpected, and multiply emitted results fail. Retain profile/
+catalog versions, canonical expanded SHA-256, profile/applicability/expected
+result counts, and per-runtime pass/fail/skip totals.
 
 ### 14. Use repository-local IDs and shared semantic identities
 
@@ -597,6 +756,38 @@ Every Terraform ID in the table is namespaced `T1A-`. Every row/result also
 contains the explicit unique semantic key shown in the table, matching
 `^[a-z][a-z0-9]*(\.[a-z][a-z0-9-]*)+$`. IDs and keys are opaque,
 append-only, and never changed/reused after merge.
+
+Required behavior-key mappings include:
+
+| Local ID | Exact `SemanticCase` |
+| --- | --- |
+| `T1A-V-01` | `archive.valid.exact-four-files` |
+| `T1A-V-02` | `archive.valid.external-attributes-ignored` |
+| `T1A-P-01` | `path.containment.checkout-sibling-prefix-rejected` |
+| `T1A-P-02` | `path.provider.filesystem-qualified-accepted` |
+| `T1A-D-01` | `digest.mismatch.labels-supplied` |
+| `T1A-D-02` | `digest.mismatch.labels-omitted` |
+| `T1A-M-05` | `manifest.name.forward-slash-nesting-rejected` |
+| `T1A-M-06` | `manifest.name.backslash-nesting-rejected` |
+| `T1A-L-03` | `destination.preexisting.live-reparse-retained` |
+| `T1A-K-03` | `cleanup.candidate.repeat-disposed` |
+| `T1A-C-02` | `cleanup.context.repeat-disposed` |
+| `T1A-R-06` | `limit.declared-total.at-32mib-accepted` |
+| `T1A-W-02` | `download.entry-count.two-rejected` |
+| `T1A-S-11` | `harness.input.provider-qualified-tracked-scripts-accepted` |
+
+Add exact disposable-catalog rows:
+
+| ID | `SemanticCase` | Profile and subreason |
+| --- | --- | --- |
+| `T1A-I-01` | `catalog.local-id.duplicate-rejected` | `OP-CATALOG-REJECTION`; `duplicate-local-id` |
+| `T1A-I-02` | `catalog.local-id.missing-rejected` | `OP-CATALOG-REJECTION`; `missing-local-id` |
+| `T1A-I-03` | `catalog.semantic-key.duplicate-rejected` | `OP-CATALOG-REJECTION`; `duplicate-semantic-key` |
+| `T1A-I-04` | `catalog.semantic-key.missing-rejected` | `OP-CATALOG-REJECTION`; `missing-semantic-key` |
+| `T1A-I-05` | `catalog.mapping.changed-rejected` | `OP-CATALOG-REJECTION`; `id-key-mapping-changed` |
+| `T1A-I-06` | `catalog.oracle.divergence-rejected` | `OP-CATALOG-REJECTION`; `equal-key-oracle-differs` |
+| `T1A-I-07` | `catalog.counterpart.classification-missing-rejected` | `OP-CATALOG-REJECTION`; `counterpart-classification-missing` |
+| `T1A-I-08` | `catalog.intentional-difference.rationale-missing-rejected` | `OP-CATALOG-REJECTION`; `intentional-difference-rationale-missing` |
 
 Reciprocal equality means exact equality of semantic key, fixture,
 applicability, result, terminal phase/subreason/status, candidate/context
@@ -606,9 +797,66 @@ ID/evidence, classification (`same|intentional difference|blocker`), and
 rationale. A grouped, missing, or divergent P row is a blocker, not an assumed
 oracle. Runtime never downloads or executes the other repository.
 
-Add catalog fixtures for duplicate/missing local ID, duplicate/missing semantic
-key, changed mapping, equal key with different expected fields, missing
-counterpart classification, and intentional difference without rationale.
+Run each catalog-integrity row against a disposable mutated catalog, never by
+changing the authoritative in-memory catalog.
+
+### 15. Prove both supplied scripts are the exact HEAD/index/working blobs
+
+The harness derives its trusted repository root from the ordinary non-reparse
+`.github/workflows` `$PSScriptRoot` by exactly two parents; it never trusts the
+current directory or an ambient Git root. Launch Git directly with argument
+arrays/raw streams, remove or reject `GIT_DIR`, `GIT_WORK_TREE`,
+`GIT_INDEX_FILE`, object/alternate-object, and pathspec-mode variables, and set
+child-only `GIT_LITERAL_PATHSPECS=1`, `GIT_OPTIONAL_LOCKS=0`. Every command uses
+`--no-replace-objects --no-pager -C <trusted-root>`. Record Git path/version.
+
+Require raw stdout exactly for:
+
+```text
+git ... rev-parse --is-inside-work-tree
+git ... rev-parse --show-prefix
+git ... rev-parse --show-object-format=storage
+git ... rev-parse --verify HEAD^{commit}
+```
+
+The first is `true` plus LF, prefix is one empty LF record, object format is
+`sha1|sha256`, and HEAD is one full lowercase 40/64-hex commit. Normalize each
+raw public script path once, compare to its exact absolute role destination,
+then map—not derive—it to:
+
+| Role | Fixed repository path |
+| --- | --- |
+| helper | `.github/workflows/Expand-StyleGuideCandidateArtifact.ps1` |
+| context manager | `.github/workflows/Manage-StyleGuideCandidateInvocationContext.ps1` |
+
+For each fixed repository path run:
+
+```text
+git ... ls-tree --full-tree -r -z HEAD -- <path>
+git ... ls-files --cached --stage --full-name -z --error-unmatch -- <path>
+git ... hash-object --no-filters -- <normalized-absolute-path>
+```
+
+Parse NUL records from `BaseStream`. Tree output is exactly one
+`100644 blob <full-oid>\t<exact-path>\0`; index output is exactly one
+`100644 <same-oid> 0\t<exact-path>\0`; no conflict stage/duplicate/trailing
+bytes are allowed. `ls-files` status 1/no record is `script-untracked`; every
+other unexpected nonzero/start error is `git-tool-failure`. The no-filter
+working OID is one LF-terminated full OID equal to HEAD/index; it never uses
+`-w`, filters, conversion, or index bytes as a working-file substitute.
+
+Both roles must pass completely before either is dot-sourced/invoked. Retain
+only normalized role paths, OIDs, and expected versions. Immediately before
+each later invocation repeat ordinary/component identity and no-filter OID.
+Diagnostics identify fixed role/command/status/structural reason and safe OIDs,
+not raw output/path/content/environment/stderr.
+
+Keep `T1A-S-12`/`13` for untracked roles and append atomic rows for HEAD/index
+absence, staged and unstaged replacement, conflict stage, wrong mode/nonblob,
+duplicate/truncated/malformed records, path mismatch, abbreviated/wrong-format
+OID, expected status 1, unexpected status 2, and start failure. Disposable
+repos include spaces, tabs/newlines, leading dash, wildcard/pathspec-magic,
+quotes, and non-ASCII to prove literal fixed selection.
 
 ## Reciprocal PSStyleGuide comparison
 
@@ -668,6 +916,11 @@ prove it is absent from the final changed/staged path set.
 
 - [ ] The helper, context lifecycle, and harness have versioned PowerShell 5.1
       compatible implementations.
+- [ ] Timeless marker parsing, exact expected-version identity, and
+      baseline-to-staged authoring progression pass independent cases.
+- [ ] Every provided public raw value reaches one production type/empty/
+      whitespace/control/grammar gate with no binder conversion, enumeration,
+      attacker `ToString()`, or pre-gate side effect.
 - [ ] Caller-root acquisition proves new ownership with bounded
       collision-only retry.
 - [ ] Both production cleanup paths are nonrecursive, journal-based, and retain
@@ -683,12 +936,21 @@ prove it is absent from the final changed/staged path set.
 - [ ] Post-extraction BOM/CR/type/content checks pass.
 - [ ] Every mandatory stable ID has one explicit oracle and pre-teardown
       postcondition.
-- [ ] The machine-readable harness inventory exactly equals the normative
-      one-row-per-ID table, with no renumbered surviving behavior.
+- [ ] `T1A-CASES-v1` exactly expands `T1A-ORACLES-v1`; every machine-readable
+      atomic row/result has singular expected/actual fields, profile, behavior
+      key, and one applicable-runtime result.
+- [ ] Catalog mutation cases reject missing/duplicate/changed IDs, semantic
+      keys, mappings, profiles, counterpart classifications, and results.
 - [ ] Declared and actual resource boundaries pass below/exact cases and reject
       above/overflow/deceptive cases as specified.
 - [ ] Both cleanup lifecycles pass independent and combined
       primary-plus-cleanup-failure cases.
+- [ ] Candidate ownership transitions are exactly
+      NotCreated/Active/CleanupInProgress/Disposed/RetainedUncertain; repeated
+      Disposed cleanup proves leaf absence and never deletes a reoccupied leaf.
+- [ ] Helper and context-manager inputs independently prove exact trusted-root,
+      HEAD tree, stage-0 index, and no-filter working blob identity before
+      either script is invoked.
 - [ ] Real link/reparse rejection executes on both OS families.
 - [ ] The reciprocal PS candidate-validation-layer/Terraform matrix has no
       unexplained blocker.

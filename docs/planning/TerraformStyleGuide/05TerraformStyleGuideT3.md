@@ -57,8 +57,11 @@ Required files:
 - `.github/workflows/Test-MarkdownToolingIntegration.ps1` — add;
 - `.github/workflows/Check-NodePolicy.mjs` — add;
 - `.github/workflows/Install-Husky.mjs` — add;
+- `.github/workflows/husky-install-contract.json` — add;
 - `.github/workflows/node-policy-cases.json` — add;
-- `.github/workflows/Validate-NpmAudit.mjs` — add; and
+- `.github/workflows/npm-audit-cases.json` — add;
+- `.github/workflows/Validate-NpmAudit.mjs` — add;
+- `.github/workflows/Capture-NpmAuditFollowUpEvidence.mjs` — add; and
 - `.github/workflows/Validate-WorkflowPolicy.mjs`.
 
 Conditionally affected only when the selected package/API/config change
@@ -244,19 +247,89 @@ permitted only under one of:
 - `HUSKY=0`; or
 - `CI=true` with exact recorded reason `read-only-ci-install`.
 
-Reject unknown/noncanonical values and conflicting state. Required mode
-independently resolves the repository root, invokes the project-pinned Husky
-through the selected Corepack npm environment, then verifies local
-`core.hooksPath` equals exactly `.husky/_`, every required shim is an ordinary
-non-link file, and the tracked `.husky/pre-commit` is the exact ordinary
-versioned hook. Any install/invocation/verification error is nonzero.
+Add strict JSON `.github/workflows/husky-install-contract.json` with schema
+`TerraformStyleGuide.HuskyInstallContract.v1`, closed keys, duplicate-key
+rejection, LF-only/BOM-less bytes, and installer contract
+`Install-Husky.v1`. It records:
+
+- exact package `husky` version `9.1.7`, lockfile SHA-512 integrity, package
+  relative root and binary mapping `husky: bin.js`, plus reviewed byte lengths
+  and SHA-256 values for `package.json`, `bin.js`, `index.js`, and `husky`;
+- tracked hook `.husky/pre-commit`, Git mode `100644`, marker
+  `# terraform-style-guide-hook-schema: 1` exactly once on physical line `2`,
+  and final byte length/SHA-256; and
+- generated root `.husky/_`, expected `core.hooksPath` `.husky/_`, and an
+  exact 17-entry array with relative path, role, length, SHA-256, and POSIX
+  executable expectation.
+
+Set the root dependency exactly to `"husky": "9.1.7"`. Its lock entry is
+version `9.1.7`, tarball
+`https://registry.npmjs.org/husky/-/husky-9.1.7.tgz`, integrity
+`sha512-5gs5ytaNjBrh5Ow3zrvdUUY+0VxIuWVL4i9irt6friV+BqdCfmV11CQTWMiBYWHbXhco+J1kHfTOUkePhCDvMA==`,
+and binary `husky: bin.js`. Reconfirm this release identity at implementation
+time; any substitution is a reviewed contract change.
+
+`Install-Husky.mjs` resolves its directory from `import.meta.url`, derives the
+repository root as exactly two parents, and proves it with Git. Required mode:
+
+1. parses the closed contract;
+2. proves the package root and executable components are ordinary non-links
+   below `.github/workflows/node_modules/husky`;
+3. proves package manifest, root dependency, lock identity, byte lengths, and
+   hashes equal the contract;
+4. spawns exactly `process.execPath` with the verified absolute
+   `node_modules/husky/bin.js`, no arguments, repository-root `cwd`,
+   `shell:false`, and bounded stdout/stderr;
+5. requires native exit `0`;
+6. reads raw local Git config and requires exactly one `core.hooksPath` equal
+   to `.husky/_`; and
+7. verifies the separate tracked-hook and generated-file schemas.
+
+There is no PATH-resolved Husky, `npx`, `npm exec`, shell command string,
+download, `init`, or package API import. The installer never writes the
+contract or tracked hook. Resolve the hook's final byte length and SHA-256 only
+after its behavior is complete and commit that value in the contract.
+
+The tracked hook is exactly one stage-0 tracked blob with Git mode `100644`,
+ordinary non-link working object, LF-only/BOM-less bytes, the schema marker
+immediately after `#!/bin/sh`, and contract length/hash. The generated schema
+requires ordinary non-link `.husky` and `.husky/_` directories with exactly
+these 17 ordinary non-link files and no extra entry:
+
+- support: `.gitignore`, `h`, `husky.sh`;
+- shims: `applypatch-msg`, `commit-msg`, `post-applypatch`, `post-checkout`,
+  `post-commit`, `post-merge`, `post-rewrite`, `pre-applypatch`,
+  `pre-auto-gc`, `pre-commit`, `pre-merge-commit`, `pre-push`, `pre-rebase`,
+  `prepare-commit-msg`.
+
+For Husky `9.1.7`, every shim is the exact 39-byte body with SHA-256
+`34fe496008be71d8fdd446b2cce81e4bb0406109c130eafc583fbd9fe33244e2`;
+`.gitignore` is byte `*`; `h` equals package file `husky`, length `551`,
+SHA-256
+`70200b200ca709b0622784f93839a5b2872333a917a09afddefd7dc2d8cdc680`;
+and `husky.sh` is length `160`, SHA-256
+`21122903fca7209a13c991e5be68780636e28f1b8f0ae7ea07ed0065dfe37268`.
+On POSIX, `h` and all 14 shims have every contract executable bit; on Windows,
+content/type checks plus real Git Bash execution are authoritative.
+
+Environment parsing is closed and case-sensitive:
+`HUSKY_INSTALL_MODE` is absent, `required`, or `skip`; `HUSKY` is absent or
+`0`; `CI` is absent, `false`, or `true`. Exactly one of install-mode `skip`,
+`HUSKY=0`, or `CI=true` selects `explicit-install-mode`, `husky-disabled`, or
+`read-only-ci-install`. Unknown values, explicit `required` plus a skip source,
+or multiple skip sources fail.
 
 Skip mode proves byte/config/filesystem immutability and reports the exact
 selected skip source/reason; it never reports “installed.” Tests run only in
 disposable repositories and include a real `git commit` that proves Git invokes
-the installed hook. Add atomic cases for required success/failure, each skip,
-unknown/conflicting variables, wrong root/hooksPath, missing/linked/untracked
-shim/hook, and a hook that direct invocation would pass but Git does not call.
+the installed hook. Allocate one `HUSKY-INSTALL-###` row for every distinct
+required-success, package identity/link/spawn, root/hooksPath, tracked-hook
+missing/untracked/mode/type/link/marker/hash, generated-root, generated-file
+missing/extra/type/link/hash/mode, authorized-skip, unknown environment,
+required/skip conflict, multiple-skip conflict, skip-immutability,
+direct-only-false-positive, and real-commit pass/reject state. No row may join
+“shim/hook” or “missing/linked.” Each result records one phase, native status,
+reason, Husky/Git call counts, hooksPath, and exact tracked/generated state.
 
 ### 6. Add a tracked cross-platform integration harness
 
@@ -330,7 +403,25 @@ metadata, Unicode digit, overflow, Node 20/21, `22.22.1`, `22.22.2`,
 `NODE-CLI-###` IDs. Audit all remaining `NPM-*`, `HOOK-*`, and `AUDIT-*`
 rows and split any family before evidence.
 
-The same harness owns these append-only audit-validator IDs:
+Add strict `.github/workflows/npm-audit-cases.json` as the closed append-only
+manifest for tokenizer, report, exception, production-CLI, and process-driver
+fixtures. Every physical row has exact `Id`, `Layer`, literal fixture
+reference, `NativeOutcome`, `ExceptionState`, `ExpectedExit`,
+`ExpectedReason`, `ExpectedNormalizedFindings`,
+`ExpectedAuditNodePaths`, `ExpectedParserState`, and
+`ExpectedProcessCallCount`. Reject range/family/wildcard/multi-result rows.
+
+The same harness owns these append-only audit-validator IDs. Existing IDs
+`01`–`27` retain one narrowed meaning: `12` is only invalid `createdAt`; `13`
+one extra exception-root property; `14` one duplicate normalized exception
+finding; `15` omits only owner; `16` uses the canonical path on the wrong
+GitHub host; `17` is ASCII `not-json`; `18` is one reversed-order equivalent;
+`19` is the real CLI; `20` is numeric report version `1`; `21` makes
+`vulnerabilities` an array; `22` duplicates one approved advisory URL; `23`
+repeats one raw vulnerability property; `24` duplicates one report node;
+`25` omits only `followUpEvidenceSha256`; `26` omits only
+`approvalIdentity`; and `27` removes the last byte from an otherwise valid
+report.
 
 | ID | Fixture | Exact oracle |
 | --- | --- | --- |
@@ -361,6 +452,153 @@ The same harness owns these append-only audit-validator IDs:
 | `AUDIT-25` | missing follow-up fields | fail governance |
 | `AUDIT-26` | missing approval identity | fail governance |
 | `AUDIT-27` | truncated JSON audit report | fail audit input |
+
+The issue and committed manifest allocate one physical row—not a range row—for
+each remaining case:
+
+| ID | Literal fixture |
+| --- | --- |
+| `AUDIT-28` | empty raw report |
+| `AUDIT-29` | UTF-8 BOM |
+| `AUDIT-30` | UTF-16LE BOM |
+| `AUDIT-31` | stray UTF-8 continuation |
+| `AUDIT-32` | truncated multibyte UTF-8 |
+| `AUDIT-33` | exactly 8,388,608-byte valid empty report |
+| `AUDIT-34` | raw report byte 8,388,609 |
+| `AUDIT-35` | second JSON value |
+| `AUDIT-36` | trailing non-whitespace |
+| `AUDIT-37` | trailing JSON whitespace |
+| `AUDIT-38` | depth 64 |
+| `AUDIT-39` | depth 65 |
+| `AUDIT-40` | 250,000 values |
+| `AUDIT-41` | 250,001 values |
+| `AUDIT-42` | 1,048,576-byte string token |
+| `AUDIT-43` | 1,048,577-byte string token |
+| `AUDIT-44` | 64-byte number token |
+| `AUDIT-45` | 65-byte number token |
+| `AUDIT-46` | duplicate key in report root |
+| `AUDIT-47` | duplicate key in vulnerability object |
+| `AUDIT-48` | duplicate key in advisory object |
+| `AUDIT-49` | duplicate key in `cvss` |
+| `AUDIT-50` | duplicate key in `fixAvailable` |
+| `AUDIT-51` | duplicate key in `metadata` |
+| `AUDIT-52` | duplicate key in `metadata.vulnerabilities` |
+| `AUDIT-53` | duplicate key in `metadata.dependencies` |
+| `AUDIT-54` | duplicate key in native-outcome root |
+| `AUDIT-55` | duplicate key in exception root |
+| `AUDIT-56` | duplicate key in exception finding |
+| `AUDIT-57` | duplicate key in exception topology row |
+| `AUDIT-58` | outcome BOM |
+| `AUDIT-59` | outcome invalid UTF-8 |
+| `AUDIT-60` | outcome second value |
+| `AUDIT-61` | outcome extra property |
+| `AUDIT-62` | outcome non-string `kind` |
+| `AUDIT-63` | impossible `exit` combination |
+| `AUDIT-64` | impossible `signal` combination |
+| `AUDIT-65` | impossible `timeout` combination |
+| `AUDIT-66` | impossible `startFailure` combination |
+| `AUDIT-67` | stdout length/hash mismatch |
+| `AUDIT-68` | missing stdout file |
+| `AUDIT-69` | native exit `2` |
+| `AUDIT-70` | external `SIGTERM` |
+| `AUDIT-71` | timeout ends after TERM |
+| `AUDIT-72` | timeout requires KILL |
+| `AUDIT-73` | process start failure |
+| `AUDIT-74` | stderr exactly 65,536 bytes |
+| `AUDIT-75` | stderr byte 65,537 |
+| `AUDIT-76` | stdout stream failure |
+| `AUDIT-77` | stderr stream failure |
+| `AUDIT-78` | termination delivery failure |
+| `AUDIT-79` | error then close emits one result |
+| `AUDIT-80` | close without prior exit/error |
+| `AUDIT-81` | report-root extra property |
+| `AUDIT-82` | missing `auditReportVersion` |
+| `AUDIT-83` | missing `vulnerabilities` |
+| `AUDIT-84` | missing `metadata` |
+| `AUDIT-85` | null `vulnerabilities` |
+| `AUDIT-86` | array `metadata` |
+| `AUDIT-87` | unsafe vulnerability package-property name |
+| `AUDIT-88` | vulnerability property-key/name mismatch |
+| `AUDIT-89` | vulnerability extra property |
+| `AUDIT-90` | vulnerability missing `name` |
+| `AUDIT-91` | vulnerability missing `severity` |
+| `AUDIT-92` | vulnerability missing `isDirect` |
+| `AUDIT-93` | vulnerability missing `via` |
+| `AUDIT-94` | vulnerability missing `effects` |
+| `AUDIT-95` | vulnerability missing `range` |
+| `AUDIT-96` | vulnerability missing `nodes` |
+| `AUDIT-97` | vulnerability missing `fixAvailable` |
+| `AUDIT-98` | vulnerability wrong `name` |
+| `AUDIT-99` | vulnerability wrong `severity` |
+| `AUDIT-100` | vulnerability wrong `isDirect` |
+| `AUDIT-101` | vulnerability wrong `via` |
+| `AUDIT-102` | vulnerability wrong `effects` |
+| `AUDIT-103` | vulnerability wrong `range` |
+| `AUDIT-104` | vulnerability wrong `nodes` |
+| `AUDIT-105` | vulnerability wrong `fixAvailable` |
+| `AUDIT-106` | invalid `via` entry type |
+| `AUDIT-107` | advisory extra property |
+| `AUDIT-108` | advisory missing `source` |
+| `AUDIT-109` | advisory missing `name` |
+| `AUDIT-110` | advisory missing `dependency` |
+| `AUDIT-111` | advisory missing `title` |
+| `AUDIT-112` | advisory missing `url` |
+| `AUDIT-113` | advisory missing `severity` |
+| `AUDIT-114` | advisory missing `cwe` |
+| `AUDIT-115` | advisory missing `cvss` |
+| `AUDIT-116` | advisory missing `range` |
+| `AUDIT-117` | advisory wrong `source` |
+| `AUDIT-118` | advisory wrong `name` |
+| `AUDIT-119` | advisory wrong `dependency` |
+| `AUDIT-120` | advisory wrong `title` |
+| `AUDIT-121` | advisory wrong `url` |
+| `AUDIT-122` | advisory wrong `severity` |
+| `AUDIT-123` | advisory wrong `cwe` |
+| `AUDIT-124` | advisory wrong `cvss` |
+| `AUDIT-125` | advisory wrong `range` |
+| `AUDIT-126` | non-string CWE entry |
+| `AUDIT-127` | CVSS extra property |
+| `AUDIT-128` | CVSS missing `score` |
+| `AUDIT-129` | CVSS missing `vectorString` |
+| `AUDIT-130` | out-of-range/nonfinite CVSS score |
+| `AUDIT-131` | non-string CVSS vector |
+| `AUDIT-132` | package-string `via` target absent |
+| `AUDIT-133` | `effects` target absent |
+| `AUDIT-134` | via edge lacks reciprocal effect |
+| `AUDIT-135` | effect lacks reciprocal via edge |
+| `AUDIT-136` | unsorted `nodes` |
+| `AUDIT-137` | invalid `fixAvailable: null` |
+| `AUDIT-138` | fix object extra property |
+| `AUDIT-139` | fix object missing `name` |
+| `AUDIT-140` | fix object missing `version` |
+| `AUDIT-141` | fix object missing `isSemVerMajor` |
+| `AUDIT-142` | fix object wrong `name` |
+| `AUDIT-143` | fix object wrong `version` |
+| `AUDIT-144` | fix object wrong `isSemVerMajor` |
+| `AUDIT-145` | metadata extra property |
+| `AUDIT-146` | missing vulnerability count `info` |
+| `AUDIT-147` | missing vulnerability count `low` |
+| `AUDIT-148` | missing vulnerability count `moderate` |
+| `AUDIT-149` | missing vulnerability count `high` |
+| `AUDIT-150` | missing vulnerability count `critical` |
+| `AUDIT-151` | missing vulnerability count `total` |
+| `AUDIT-152` | missing dependency count `prod` |
+| `AUDIT-153` | missing dependency count `dev` |
+| `AUDIT-154` | missing dependency count `optional` |
+| `AUDIT-155` | missing dependency count `peer` |
+| `AUDIT-156` | missing dependency count `peerOptional` |
+| `AUDIT-157` | missing dependency count `total` |
+| `AUDIT-158` | negative metadata count |
+| `AUDIT-159` | unsafe-integer metadata count |
+| `AUDIT-160` | non-integer metadata count |
+| `AUDIT-161` | severity-total arithmetic mismatch |
+| `AUDIT-162` | property/severity reconciliation mismatch |
+| `AUDIT-163` | dependency-total mismatch |
+| `AUDIT-164` | duplicate normalized advisory identity in report |
+
+For deliberately deep/count/long values that cannot satisfy the closed npm
+schema, `ExpectedParserState` distinguishes acceptance through the tokenizer
+followed by schema rejection from tokenizer rejection.
 
 Deterministic fixture cases import the pure validator core and inject the UTC
 instant; the production CLI has no clock override. `AUDIT-19` invokes the exact
@@ -403,10 +641,11 @@ corepack npm audit --package-lock-only --json
 The preferred final result is zero vulnerabilities at all severities. Also run
 the repository-approved human-readable audit and capture native exit codes.
 
-Create `.github/workflows/Validate-NpmAudit.mjs`. Its exported pure core accepts
-an audit object, optional exception object, and injected UTC instant for
-fixtures. Its production CLI accepts exact report/exception paths and the
-captured native audit status, always obtains actual current UTC, and has no
+Create `.github/workflows/Validate-NpmAudit.mjs`. It exports the strict raw
+tokenizer plus closed report/exception/policy cores; fixtures pass exact raw
+bytes, structured outcome, exception bytes/state, and an injected UTC instant.
+Its production CLI accepts exact protected report, stderr, structured outcome,
+and optional exception paths, always obtains actual current UTC, and has no
 clock-bypass argument. It emits one canonical summary and stable exit classes
 for:
 
@@ -414,11 +653,11 @@ for:
 - unapproved or topology-mismatched residuals; and
 - expired/stale governance.
 
-The callable workflow captures
-`corepack npm audit --package-lock-only --json` to a protected temporary report without
-letting strict shell behavior lose the native status, then invokes this exact
-validator. Non-JSON/truncated/network/tool failure is an audit-input failure,
-not an approved residual. Never hide risk with `--audit-level`.
+The callable workflow uses the closed process driver to capture
+`corepack npm audit --package-lock-only --json` into protected report, stderr,
+and structured-outcome files, then invokes this exact validator. Non-JSON/
+truncated/network/tool failure is an input/process failure, not an approved
+residual. Never hide risk with `--audit-level`.
 
 If a residual finding cannot be removed without a disproportionate or
 incompatible change, the optional exception file uses one versioned closed
@@ -455,16 +694,76 @@ Approval time is bounded:
   analysis/controls/follow-up status, and a new accountable approval. Changing
   only timestamps is forbidden.
 
-#### Closed audit report-v2 and native-status contract
+#### Closed audit report-v2 and structured process-outcome contract
 
 The orchestration invokes exactly
 `corepack npm audit --package-lock-only --json` with no `--audit-level`.
 Capture stdout and stderr separately into protected bounded streams, preserve
 the process outcome as one of `exit`, `signal`, `timeout`, or `startFailure`,
-and pass the exact native exit plus stdout file to the validator. Do not merge
-streams, parse console prose, or let shell strict mode erase the exit.
+and pass the exact structured outcome plus both stream files to the validator.
+Do not merge streams, parse console prose, or let shell strict mode erase the
+native outcome.
 
-Before `JSON.parse`, enforce an 8-MiB raw stdout maximum, BOM-less strict UTF-8,
+The process driver writes strict
+`TerraformStyleGuide.NpmAuditNativeOutcome.v1` JSON with exactly these
+properties:
+
+```text
+schemaVersion
+commandContract
+kind
+exitCode
+signal
+termination
+timeoutMilliseconds
+terminationGraceMilliseconds
+stdoutRetainedBytes
+stdoutOverflow
+stdoutSha256
+stderrRetainedBytes
+stderrOverflow
+stderrSha256
+```
+
+`schemaVersion` is `1`; `commandContract` is
+`corepack-npm-audit-package-lock-v1`; timeout values are `120000` and `5000`.
+Lengths are safe integers bounded by `8,388,608` and `65,536`; hashes are
+lowercase SHA-256. Valid discriminants are:
+
+| Kind | `exitCode` | `signal` | `termination` |
+| --- | --- | --- | --- |
+| `exit` | integer `0`–`255` | `null` | `none` |
+| `signal` | `null` | canonical supported `SIG*` name | `external-signal` |
+| `timeout` | `null` | `null` | `sigterm` or `sigkill` |
+| `startFailure` | `null` | `null` | `not-started` |
+
+Every other combination is `20 PROCESS_TOOL`. The outcome contains no command
+path, output path, native error text, stdout, or stderr. CLI syntax is exactly:
+
+```text
+node Validate-NpmAudit.mjs --report REPORT --stderr STDERR --outcome OUTCOME
+[--exceptions EXCEPTIONS]
+```
+
+Options are ordered, single-use, nonempty separate values without aliases.
+The validator opens ordinary non-link protected inputs and recomputes both
+stream lengths/hashes. It never prints input bytes or native exception text.
+
+Production orchestration spawns only the resolved Corepack executable with
+arguments `npm`, `audit`, `--package-lock-only`, `--json`, `shell:false`, at
+the package root. It concurrently drains raw Buffer streams, retains bounded
+prefixes while continuing to drain overflow, waits for `close`, and reconciles
+an earlier `error` exactly once. It writes report, stderr, and outcome as new
+mode-`0600` files. At 120,000 ms on hosted Ubuntu it signals the detached
+process group with `SIGTERM`, waits 5,000 ms, and sends `SIGKILL` if still
+open. Delivery or close failure is `PROCESS_TOOL`. Windows exercises all pure
+outcome/validator fixtures but does not claim process-tree termination parity.
+
+`stdoutOverflow` is class `21`; `stderrOverflow` is class `20`. Stderr is
+never decoded. In `finally`, remove all three protected files; cleanup failure
+fails the job without replacing the validator's recorded class.
+
+Before `JSON.parse`, enforce an 8,388,608-byte raw stdout maximum, BOM-less strict UTF-8,
 one complete JSON value/trailing-whitespace only, depth/count/string/number
 ceilings, and duplicate-key detection with a reviewed JSON tokenizer. The
 closed valid report has `auditReportVersion: 2`, `vulnerabilities`, and
@@ -511,7 +810,15 @@ Corepack versions, exact argv/native outcome, report SHA-256, and the exact
 four sets. These numbers describe the 2026-07-29 input only and are prohibited
 as acceptance constants.
 
-#### Canonical follow-up reference and filing evidence
+Classification precedence is process envelope `20`, raw report `21`, report
+schema/graph `22`, exit/report agreement `23`, residual equality `24`, then
+exception governance `25`. Only ordinary exit `0` or `1` reaches parsing.
+Parser limits are depth `64`, value tokens `250,000`, string-token bytes
+`1,048,576`, and number-token bytes `64`; reject the first over-limit value,
+all raw duplicate keys, BOM/invalid UTF-8, a second value, and non-whitespace
+suffix before object construction.
+
+#### Embedded canonical follow-up reference and filing evidence
 
 A residual exception's finding adds exact closed fields:
 `followUpIssueUrl`, `followUpIssueNumber`, `followUpScopeSha256`,
@@ -530,27 +837,91 @@ with no missing/extra/stale identity. The issue body contains reviewed marker
 `npm-audit-findings-sha256: <same-lowercase-64-hex>` plus owner, remediation
 objective, and target date.
 
-At initial approval and every renewal, an authorized maintainer performs one
-live GitHub API/UI read after filing and retains a bounded evidence record:
-endpoint/time/actor, repository, canonical URL/number, immutable database ID/
-node ID, `state=open`, absence of `pull_request`, creation/update times,
-owner/assignee, title/body hash, scope marker, and current scope hash. Canonical
-record SHA-256 equals `followUpEvidenceSha256`;
-`followUpVerifiedAt` equals its time and is in the same approval session within
-the at-most-30-day window. Retain no token/header/arbitrary response/email/
-signed URL.
+The exception root has exactly `schemaVersion`, `findings`, `auditNodePaths`,
+and `followUpEvidence`. `followUpEvidence` is a sorted unique array with one
+record per distinct referenced issue and no unreferenced record. Findings may
+share a record only when their exact sorted identities yield that record's one
+scope hash. Every finding's number/URL, scope hash, verification time, and
+evidence hash equals its record.
 
-The pure validator checks only offline URL/number grammar, scope coverage,
-canonical timestamps/hashes, evidence-reference presence/freshness, and
-exception policy. It performs no network access or issues permission and says
-only “offline reference/evidence fields valid,” never “issue exists/open.”
-A reviewer independently validates the retained record. Closed/transferred/
-deleted/converted/unowned/scope-changed issues require remediation or a new
-filed/reapproved issue—not a timestamp/hash-only edit.
+Each record has these properties in this canonical order:
 
-Fixtures separately cover offline URL/number/scope/evidence errors and retained
-external records for nonexistent, pull-request, closed, wrong repository/ID,
-missing owner, changed marker/body, and valid open issue.
+```text
+evidenceSchema
+verificationMethod
+apiVersion
+verifiedAt
+verificationActor
+repository
+issueUrl
+issueNumber
+issueDatabaseId
+issueNodeId
+state
+isPullRequest
+createdAt
+updatedAt
+author
+assignees
+responsibleOwner
+targetDate
+scopeMarker
+scopeSha256
+titleSha256
+bodySha256
+```
+
+`evidenceSchema` is
+`TerraformStyleGuide.NpmAuditFollowUpEvidence.v1`;
+`verificationMethod` is `github-rest-user-and-issue-v1`; and `apiVersion` is
+the exact REST version used for capture. Whole-second UTC timestamps satisfy
+`createdAt <= updatedAt <= verifiedAt`. Verifier, author, and assignees are
+closed `{login,databaseId,nodeId}` objects; assignees sort uniquely. Repository
+is exactly `{owner:"franklesniak",name:"TerraformStyleGuide"}`. The issue
+database ID is a positive safe integer and node ID is 1–128 safe ASCII bytes.
+State is `open`; `isPullRequest` is false. `responsibleOwner` equals each
+referencing finding owner and appears exactly once in assignees. The canonical
+target date is present in the issue marker set and is no later than exception
+expiry. Scope marker/hash and title/body hashes bind the reviewed live issue.
+
+Canonicalization constructs new null-prototype objects in the stated order,
+sorts arrays by their defined keys, rejects lone surrogates, and uses native
+`JSON.stringify`. SHA-256 covers that exact BOM-less UTF-8 serialization with
+no whitespace/final newline; the digest is not in the record.
+
+Add `.github/workflows/Capture-NpmAuditFollowUpEvidence.mjs`. Initial approval
+and every renewal give it exact issue number, expected scope hash, responsible
+owner, and a new protected output path. A non-logged environment variable
+supplies its token. It performs authenticated no-redirect `GET /user` and
+`GET /repos/franklesniak/TerraformStyleGuide/issues/<number>`, bounds each
+response at 1 MiB, and rejects non-200, malformed/extra required shape,
+identity mismatch, pull request, non-open state, missing responsible assignee,
+or missing/duplicate/wrong markers. It writes only the canonical minimized
+record create-new mode `0600`; never token, headers, raw response, title, body,
+or email. The approver embeds that exact object and deletes the scratch record
+in the same reviewed change.
+
+Require `verificationActor.login == approvalIdentity` and:
+
+```text
+verifiedAt <= createdAt == approvedAt <= verifiedAt + 3600 seconds
+```
+
+Renewal repeats live reads, current fix-availability analysis, scope/body/
+assignee review, and approval. Reusing an old record or changing only
+timestamps fails.
+
+The pure validator reconstructs every embedded evidence preimage and digest,
+then checks URL/number grammar, exact record coverage, scope, timestamp,
+identity, and exception policy. It performs no network access or issues
+permission and says only `offline-follow-up-evidence-valid`, never that the
+issue is currently open. The record proves live state observed at
+`verifiedAt`; the 30-day approval bound is its maximum offline staleness.
+
+When all residuals disappear, delete the exception file; reviewed Git history
+retains the record. Removing one scope removes its findings and now-unreferenced
+record atomically. Missing, duplicate, unreferenced, changed-hash, or
+incompletely removed records fail governance.
 
 Reject unknown/missing properties, wrong types, noncanonical/duplicate URLs or
 paths, duplicate finding/package identities, malformed timestamps, empty
@@ -558,6 +929,36 @@ owner/follow-up/approval, invalid issue URLs, missing or extra findings,
 missing or extra node paths, expired entries, and any exception file when the
 normalized audit is empty. The file is absent when no residual exists; never
 create a blank mechanism “for later.”
+
+The audit manifest appends these physical rows:
+
+| ID | Literal fixture |
+| --- | --- |
+| `AUDIT-165` | missing evidence array |
+| `AUDIT-166` | missing referenced record |
+| `AUDIT-167` | extra unreferenced record |
+| `AUDIT-168` | duplicate issue record |
+| `AUDIT-169` | evidence hash mismatch |
+| `AUDIT-170` | verified-time mismatch |
+| `AUDIT-171` | verifier/approval mismatch |
+| `AUDIT-172` | closed issue record |
+| `AUDIT-173` | pull-request record |
+| `AUDIT-174` | wrong repository |
+| `AUDIT-175` | URL/number mismatch |
+| `AUDIT-176` | invalid database/node identity |
+| `AUDIT-177` | responsible owner absent from assignees |
+| `AUDIT-178` | scope marker/hash mismatch |
+| `AUDIT-179` | invalid title hash |
+| `AUDIT-180` | invalid body hash |
+| `AUDIT-181` | timestamp/order failure |
+| `AUDIT-182` | approval session exceeds 3,600 seconds |
+| `AUDIT-183` | valid single-issue record |
+| `AUDIT-184` | valid shared-issue scope |
+
+The capture-helper catalog separately gives one physical ID/oracle to
+nonexistent, redirect, API failure, pull request, closed, wrong repository/ID,
+missing assignee, changed marker/body, oversized response, and valid open
+issue.
 
 Run this same validator:
 
@@ -589,7 +990,7 @@ They do not bypass the action SHA allowlist or residual-risk process.
 
 This two-entry state replaces T1's intermediate one-entry assertion.
 
-### 9. Revalidate merged behavior and declare supersession
+### 9. Revalidate and classify inherited controls
 
 Classify prior controls:
 
@@ -604,7 +1005,7 @@ Enduring behavior that must remain green:
 - outer/nested lint semantics; and
 - generated artifact bytes unless a reviewed lint fix is separately required.
 
-Final-state assertions replaced here:
+Final-state assertions owned by this issue:
 
 - Node/package/contributor floor;
 - package and lockfile content;
@@ -612,12 +1013,12 @@ Final-state assertions replaced here:
 - Markdown job runtime matrix; and
 - exactly two Dependabot entries.
 
-One-time implementation gates superseded here:
+Historical one-time gates that are not inherited:
 
 - earlier issue-specific affected-file counts; and
 - T1's one-entry Dependabot path gate.
 
-Do not describe enduring security behavior as superseded.
+All enduring security behavior remains mandatory.
 
 ## Validation
 
@@ -633,7 +1034,8 @@ From fresh clones and clean dependency state:
 6. run both lint scripts;
 7. run every `NPM-*`, `HOOK-*`, and `AUDIT-*` integration-harness ID;
 8. perform at least one real installed Husky `git commit` on each OS family;
-9. capture native status plus normalized and human-readable audit;
+9. capture the structured native outcome plus bounded stdout/stderr identities
+   and the human-readable audit;
 10. invoke the exact tracked audit validator and validate exceptions, if any;
 11. validate exact two-entry Dependabot content;
 12. run the structural workflow validator, including schedule/manual
@@ -668,23 +1070,28 @@ showing the artifact pipeline remains correct.
       families.
 - [ ] At least one real clean-installed Husky hook is invoked by `git commit`.
 - [ ] The tracked fail-closed installer is the exact `prepare` command;
-      required installation verifies `.husky/_`, and only the three closed
-      skip states may avoid installation without mutation.
+      required installation invokes only verified local Husky `9.1.7`, proves
+      the independent tracked-hook schema and exact 17 generated files against
+      `husky-install-contract.json`, and only the three closed skip states may
+      avoid installation without mutation.
 - [ ] Temporary outer/nested violations and tooling/runtime failures reject for
       the intended reason.
 - [ ] One tracked validator governs every local/hosted audit invocation with
       stable input/schema, mismatch, and expiry exit classes.
 - [ ] Audit orchestration applies the exact 8-MiB/strict-UTF-8/duplicate-key/
-      closed-report-v2 graph schema and the explicit native
+      closed-report-v2 graph schema, the structured process envelope and
+      bounded stderr, and the explicit
       `0`/`1`/other/signal/timeout/start-failure decision table.
 - [ ] The audit is zero with no exception file, or current
       `(Package, AdvisoryUrl)` findings and package-keyed node paths exactly
       equal one valid, approved, unexpired, at-most-30-day exception state.
 - [ ] Every `AUDIT-*` clean, residual, topology, schema, duplicate, and
-      before/at/after-expiry oracle passes.
+      before/at/after-expiry oracle through `AUDIT-184` appears as one physical
+      `npm-audit-cases.json` row and passes with its one exact result.
 - [ ] Offline follow-up URL/scope/evidence validation is distinguished from
-      the reviewed live filing record that proves the issue existed, was open,
-      and was correctly scoped at initial approval/latest renewal.
+      current live state; every minimized capture record is embedded in the
+      exception, independently rehashable, exactly referenced, and bound to
+      the approval session.
 - [ ] Every policy/hook platform/version case has one immutable ID, one
       literal input/oracle, and exactly one reconciled result; no family ID
       remains.

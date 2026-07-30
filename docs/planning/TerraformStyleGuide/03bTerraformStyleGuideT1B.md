@@ -32,9 +32,16 @@ commits. Before editing workflows:
 **Make state-version discovery and recovery examples copy-safe with guarded
 identifiers** is blocked by this issue. Before T1B merges, record the reviewed
 T1B head, final evidence runs, the T2 handoff location, and the accountable
-handoff owner. After merge, that owner records the actual protected-branch
-landed commit, merge method/time, issue/PR links, and reviewed-head distinction
-in T2; T2 independently validates that commit before editing.
+handoff owner. After merge, that owner records the actual ruleset-protected
+`main` landed commit, merge method/time, issue/PR links, reviewed-head distinction,
+and live main-ruleset identity/effective-rule evidence in T2; T2 independently
+validates all of them before editing.
+
+T1's separately authorized repository-settings task is a hard prerequisite.
+T1B may not enable its production writer or call `main` protected until the
+temporary real-writer ruleset test passes and the persistent
+`terraform-style-guide-main-protection` ruleset is active/effective with the
+one reviewed GitHub Actions bypass.
 
 ## Affected files
 
@@ -147,7 +154,7 @@ pull-request/push triggers so validation is not duplicated.
 Call `markdownlint.yml` as a read-only job in `build.yml` for the same event
 SHA. A called-workflow failure is therefore a direct same-run dependency result
 available to the terminal approval job. Do not use `workflow_run`, duplicate
-the lint steps in `build.yml`, or rely on branch protection to gate a push
+the lint steps in `build.yml`, or rely on the branch ruleset alone to gate a push
 writer.
 
 ### 2. Keep called Markdown validation read-only
@@ -155,9 +162,12 @@ writer.
 In `.github/workflows/markdownlint.yml`:
 
 - expose only the reviewed `workflow_call` interface;
-- preserve exact hosted Node 24 and `package-manager-cache: false`;
-- assert actual Node major 24;
-- perform clean `npm ci`;
+- preserve exact hosted Node `24.18.1`, bundled npm `11.16.0`,
+  `check-latest: false`, and `package-manager-cache: false`;
+- assert exact executable Node/npm versions;
+- hash manifest/lock, perform clean
+  `npm ci --ignore-scripts --no-audit --no-fund`, and require unchanged
+  post-hashes/empty package diff;
 - invoke the exact tracked `Validate-WorkflowPolicy.mjs` against
   `build.yml`/`markdownlint.yml` and all mandatory policy fixtures;
 - run the unchanged outer and nested lint commands;
@@ -175,7 +185,9 @@ stable step without weakening these invariants.
 
 The read-only preparation job runs on Ubuntu and:
 
-1. checks out the exact event SHA with credentials disabled;
+1. checks out the exact event SHA using the reviewed checkout action's explicit
+   `${{ github.token }}` input with persistence disabled, then proves checkout
+   left no retained Git credential state before repository code runs;
 2. verifies `HEAD` is the event commit object;
 3. verifies the generator/helper/context/harness paths are tracked ordinary
    non-reparse files with expected versions;
@@ -331,9 +343,13 @@ command string.
 
 ### 7. Revalidate artifact and candidate in the writer
 
-Before token expansion or repository mutation, the writer:
+After transient authenticated checkout and its credential-removal proof, and
+before explicit push-step token environment/header construction or repository
+mutation, the writer:
 
-1. checks out the exact expected commit with credentials disabled;
+1. checks out the exact expected commit with explicit transient
+   authentication and persistence disabled, then proves no retained Git
+   credential state;
 2. proves clean working tree/index and exact `HEAD`;
 3. runs the exact permanent helper harness;
 4. creates a new caller context;
@@ -420,7 +436,7 @@ section 14 with controlled artifact/run fixtures to prove:
 - an unexpected skipped dependency blocks approval;
 - token sentinels never appear in logs, artifacts, process command records, or
   files; and
-- all failed drills leave the protected remote target unchanged.
+- all failed drills leave the guarded remote target unchanged.
 
 Identity drills mutate separate test-local copies, never the four production
 environment inputs.
@@ -459,7 +475,61 @@ The job graph is exact:
 | `prepare` | none | `contents: read` | checkout, generation, hashes, immutable upload, outputs |
 | `validate_windows` | `prepare` | `contents: read` | static four-cell matrix; one cell-specific result each |
 | `approve` | `markdown`, `prepare`, `validate_windows` | `{}` | `always()`; one decision for success/failure/skipped/no-change |
-| `writer` | `prepare`, `validate_windows`, `approve` | `contents: write` | exact protected-main push, approval success, `has_changes == 'true'` |
+| `writer` | `prepare`, `validate_windows`, `approve` | `contents: write` | exact ruleset-protected `main` push after effective-rule proof, approval success, `has_changes == 'true'` |
+
+The table above is the five caller declarations, not the complete expanded
+graph. The qualified reusable-workflow caller is:
+
+| Qualified job | Exact contract |
+| --- | --- |
+| `build::markdown` | `build.yml` job ID `markdown`; local `uses` exactly `./.github/workflows/markdownlint.yml`; permissions exactly `contents: read`; no direct needs/job condition; no `with`, secrets/inherit, outputs, strategy, concurrency, environment, name override, `runs-on`, container, services, or steps |
+
+`markdownlint.yml` has only `on: workflow_call`, whose interface has no input,
+secret, or output. It has no independent event/dispatch/schedule, workflow
+environment/default/concurrency, nested reusable call, or external reference.
+The local file resolves from the same commit as `build.yml` and is still parsed
+and validated as a separate document.
+
+The sole called job is:
+
+| Qualified job | Direct needs/eligibility | Permission/runner/outputs | Exact ordered roles and side effects |
+| --- | --- | --- | --- |
+| `markdown::markdownlint` | absent; no job `if` | exactly `contents: read`; `ubuntu-latest`; no output/strategy/concurrency/environment/container/services/job continue-on-error | checkout; setup-node; exact Node/npm assertion; frozen install; policy fixtures/real workflows; outer lint; nested lint; T1A helper/harness validation; final lint-result gate. Only transient authenticated read checkout, workspace Node/tool install, diagnostics, and test-owned cleanup; no cache/artifact/repository/ref/issue/deployment/package/external publication write |
+
+The two lint steps retain reviewed `continue-on-error: true` so both outcomes
+are collected; every other step omits/sets false, and the final gate fails if
+either lint failed. No step publishes output, writes caller `GITHUB_ENV`, or
+uses an undeclared secret. `npm ci` is the only install and manifest/lock bytes
+must remain equal. T2 may later add one stable state-recovery harness step to
+this ordered called job only; it may not add a called job/output/permission/
+runner/workflow layer.
+
+Count domains are exact:
+
+| Domain | Count |
+| --- | ---: |
+| Static declarations in `build.yml` | 5 |
+| Static internal declarations in `markdownlint.yml` | 1 |
+| Total static declarations | 6 |
+| Static local call edges | 1 |
+| Nested call edges | 0 |
+| Expanded structural nodes (five caller, one internal, three additional matrix cells) | 9 |
+| Runner jobs when writer ineligible/no-change | 7 |
+| Runner jobs when writer eligible/changed | 8 |
+
+The seven are one internal Markdown runner, prepare, four Windows cells, and
+approve; the caller node itself has no runner. Failure/skip/cancel retains the
+structural inventory and records actual starts/conclusions separately.
+`approve` directly consumes `build::markdown`'s rolled-up success; no caller
+reads an internal job output.
+
+The validator rejects internal job add/rename, alternate caller path,
+nested/input/secret/output interface, permission drift at either level, extra
+runner/matrix/service/container/environment, step-order/owner/condition/side-
+effect drift, and any `5/1/6/1/0/9` mismatch. Negative fixtures include an
+extra internal shell-only job and an extra internal read-only no-action job so
+action-role counts cannot hide them. Retained run evidence maps every qualified
+node and reconciles seven/eight applicable runner starts.
 
 Only these static action roles exist:
 
@@ -486,7 +556,7 @@ not be composed or sourced elsewhere.
 Every checkout uses T1's complete explicit input set, with
 `repository: ${{ github.repository }}`, the role's exact event/ref SHA,
 `token: ${{ github.token }}`, and `persist-credentials: false`. Setup Node
-uses T1's exact Node-24/token/cache input set. Each role has a separate closed
+uses T1's exact Node `24.18.1`/npm `11.16.0`/token/cache input set. Each role has a separate closed
 omitted-default table keyed by pinned action/input/upstream default/rationale/
 security consequence; an undocumented or unknown omission fails.
 
@@ -526,6 +596,18 @@ second writer.
 
 ### 13. State the job-token and Git-push boundary truthfully
 
+The credential lifecycle is exact:
+
+| Phase | Exact claim |
+| --- | --- |
+| Job creation | GitHub creates `GITHUB_TOKEN`; `github.token` is available to steps/actions subject to exact job permissions. No job is token-free. |
+| Checkout input | Every reviewed checkout explicitly expands `${{ github.token }}` into `token` for transient fetch/REST fallback. |
+| Checkout persistence | `persist-credentials: false` prevents checkout from leaving configured token/SSH material for later Git; checkout is not anonymous. |
+| Post-checkout proof | After checkout cleanup, presence-only checks require no credential-bearing remote, helper, `http.*.extraheader`, or token/header environment deliberately supplied to repository scripts. This proves absence of retained Git authentication, not absence of job token/context. |
+| Pre-push validation | Artifact/helper/path/ref/parent/tree/lease work occurs after authenticated checkout but before explicit push-step environment/header construction, commit/ref mutation, or push. |
+| Push materialization | Only the guarded push step maps `${{ github.token }}` to a masked environment, constructs the in-memory Basic header, and exposes temporary `GIT_CONFIG_*` only to one `git push` child. |
+| Final cleanup/expiry | `finally` clears step-created token/header/config and presence checks prove no retained Git state; GitHub owns job-token expiry. |
+
 GitHub creates a job token before each job and `github.token` remains available
 to execution steps. Job permissions bound authority; no job is described as
 token-free or credential-free. Read jobs have only `contents: read`; only
@@ -547,6 +629,13 @@ lease/path/diagnostic check completes before construction. Clear variables in
 `finally`; never place credentials in args, files, remotes, Git config,
 outputs, artifacts, or logs. Other scripts receive no explicit token/header/
 helper/config environment.
+
+The validator does not infer inaccessibility from an omitted explicit mapping:
+reviewed actions can access `github.token` from context. Fixtures independently
+mutate checkout token input, persistence, job permission, post-checkout
+residue, push-step environment owner, header child scope, args/remotes/config,
+and final cleanup. Evidence records presence/absence plus role/phase only,
+never credential values.
 
 ### 14. Prove the real writer on one isolated evidence ref
 
@@ -580,12 +669,21 @@ remote before/after, approval/writer result, diagnostic artifact identity, and
 sentinel scan. The stale race makes a separate controlled ref update after
 preflight so the unchanged exact writer lease loses.
 
-Do not modify main protection. A smallest temporary rule change may target
-only the evidence ref and must have byte/field-equivalent before-state restored
-and verified in `finally`, or production enablement is blocked. Cleanup waits
-for/cancels all runs, restores settings, deletes the remote ref with an
-expected-old guard, proves it absent, removes the local branch, and proves no
-rule/environment/policy/active run still names it.
+Workflow code never mutates repository settings. The separately authorized
+administrator task creates one temporary ruleset that is byte/field-equivalent
+to the desired persistent rule except unique name and exact evidence-ref
+target. It uses the same sole official GitHub Actions integration bypass. The
+positive real writer must succeed under that rule; stale/lost lease,
+non-fast-forward, deletion, and ordinary-maintainer direct-update negatives
+must fail without moving the ref. Retain complete before/after/effective rule
+JSON, rule/app identity, run/ref/commit/remote evidence, and audit/insights
+entry. Restore/delete the temporary setting and ref exactly or block
+production enablement; never disable a rule, add an actor, or fall back to an
+unprotected push.
+
+Cleanup waits for/cancels all runs, restores settings, deletes the remote ref
+with an expected-old guard, proves it absent, removes the local branch, and
+proves no rule/environment/policy/active run still names it.
 
 Before main enablement, prove the production candidate descends from
 `PRODUCTION_BASE`, contains no evidence commit/string/scenario/instrumentation/
@@ -593,6 +691,15 @@ fixture/alternate condition/event/push path, and exactly restores the main-only
 normative tables and fixtures. Retain commits, manifest/result, runs, artifact
 identity/digest/four hashes, ref/parent/tree evidence, setting before/after,
 and cleanup results—never credentials or signed URLs.
+
+After the pull-request run establishes successful exact check context
+`Build Style Guide Artifacts / approve`, the administrator activates
+`terraform-style-guide-main-protection` before T1B merges. Query its effective
+rules for `refs/heads/main` and require active enforcement, exact PR/resolved-
+conversation/current-check/non-fast-forward/deletion rules, no exclusions, and
+only official GitHub Actions app ID `15368` mode `always` as bypass. Retain rule
+ID and normalized JSON SHA-256. T1B stops on absent/disabled/broadened/different
+actor; it cannot silently select an unprotected design.
 
 ### 15. Use one byte-safe Git/status policy and a satisfiable handoff
 
@@ -613,8 +720,11 @@ path/status/extra-role attacks.
 Before merge, record full **reviewed head**, exact script versions parsed under
 T1's `.NOTES` contract, final run IDs, T2 blocked-by link, handoff location, and
 owner. Do not call the reviewed head a merge commit. T2 records and validates
-the actual landed protected-branch commit after merge (merge, squash, or rebase
-result), preserving both identities and revalidation evidence when they differ.
+the actual landed commit after merge (merge, squash, or rebase result), proves
+it reachable from live `refs/heads/main`, and re-queries the exact active
+ruleset ID/effective rules/bypass actor before calling it a
+ruleset-protected-main commit. Preserve reviewed/landed/generated-child
+identities and revalidation evidence when they differ.
 
 ## Reciprocal PSStyleGuide writer-layer comparison
 
@@ -662,7 +772,7 @@ Prove:
 
 Require:
 
-- Node 24 clean install and both lints;
+- exact Node `24.18.1`/npm `11.16.0` frozen install and both lints;
 - Ubuntu full helper harness;
 - one immutable candidate ID/digest;
 - all four unique Windows output keys/cell IDs, every applicable stable ID,
@@ -698,9 +808,15 @@ the run URLs/IDs in the issue.
 - [ ] Workflow default permissions are empty; only the writer has
       `contents: write`; checkout authentication is transient and every
       checkout disables persistence.
+- [ ] Credential claims match the seven named phases: job token exists,
+      checkout explicitly authenticates, post-checkout proves only retained
+      Git auth absent, and only one push child receives the temporary header.
 - [ ] External actions equal the exact repository/SHA/role/count allowlist.
 - [ ] The tracked locked-parser validator structurally enforces workflow,
       action, dependency, matrix, output, credential, and permission policy.
+- [ ] The hierarchical graph contains exactly five caller declarations, one
+      called internal job, one local edge, no nested edge, nine expanded nodes,
+      and seven/eight applicable runner jobs with exact ordered called steps.
 - [ ] Preparation uploads exactly one immutable four-file candidate and
       propagates ID, bare digest, and four path-bound hashes.
 - [ ] Ubuntu and every Windows cross-product cell invoke the exact production
@@ -724,6 +840,9 @@ the run URLs/IDs in the issue.
       seven days.
 - [ ] Full matrices remain enabled and the measured-cost review is assigned.
 - [ ] The T1 temporary writer is removed and exactly one push path remains.
+- [ ] The real writer passes the temporary equivalent ruleset; the persistent
+      main ruleset is active/effective before merge with exact terminal check,
+      sole official Actions bypass, retained rule ID, and normalized JSON hash.
 - [ ] The reciprocal PS writer-layer/Terraform matrix has no unexplained
       blocker.
 - [ ] Only the three declared affected files are in the changed/staged set.

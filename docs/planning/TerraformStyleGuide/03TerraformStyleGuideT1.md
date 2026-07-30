@@ -10,7 +10,7 @@ Actions dependency updates.
 
 This issue establishes foundations only. It does not add the candidate ZIP
 validator or activate the new artifact-promotion writer. It also establishes
-the reciprocal generator-layer contract with PSStyleGuide without introducing
+the reciprocal generator-and-foundation contract with PSStyleGuide without introducing
 a shared cross-repository runtime dependency.
 
 ## Execution order
@@ -129,7 +129,7 @@ Before staging, record current Git attributes and path sets. After staging,
 prove the cached path set is exactly the eight affected files and that no
 generated artifact changed.
 
-### 4. Use exact hosted Node 24
+### 4. Use exact hosted Node 24.18.1
 
 In `.github/workflows/markdownlint.yml`:
 
@@ -138,16 +138,28 @@ In `.github/workflows/markdownlint.yml`:
 
   ```yaml
   with:
-    node-version: '24'
+    node-version: '24.18.1'
+    check-latest: false
     package-manager-cache: false
   ```
 
 - resolve the actual Node process before installation;
-- require exact major 24 and log the full Node and npm versions;
-- run a clean `npm ci`;
+- require exact Node `24.18.1` and bundled npm `11.16.0`, and record both
+  executable paths and versions before installation;
+- run a clean frozen
+  `npm ci --ignore-scripts --no-audit --no-fund`;
+- hash `package.json` and `package-lock.json` before and after and require
+  equality;
 - run the unchanged outer Markdown lint command;
 - run the unchanged nested-Markdown lint command; and
 - classify the native exit of each phase.
+
+Immediately before implementation, recheck the official Node archive and the
+signed `SHASUMS256.txt` for the intended Node 24 LTS release. If the selected
+patch or its bundled npm differs from `24.18.1`/`11.16.0`, stop before any
+package edit and update the literal pair, artifact, checksum, and review
+evidence in this issue. A floating major, `latest`, runner `PATH`, or
+after-the-fact observation is not an authorized package producer or consumer.
 
 Except for the direct exact YAML parser addition required by the tracked
 workflow-policy validator below, do not change:
@@ -267,6 +279,30 @@ generation/commit/push step. Version control is the rollback mechanism.
 The Markdown workflow remains read-only and runs for every pull request
 targeting `main`.
 
+The complete temporary workflow graph is normative:
+
+| Workflow/job | Direct `needs` | Literal job `if` | Job permission | Outputs | Permitted side effects |
+| --- | --- | --- | --- | --- | --- |
+| `build.yml` / `verify` | absent | absent; ordinary event eligibility | exactly `contents: read` | absent | Read checkout, ephemeral generation/validation, and one success-only upload of the four generated artifacts |
+| `build.yml` / `temporary-writer` | exactly `[verify]` | `${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.verify.result == 'success' }}` | exactly `contents: write`; all unspecified permissions `none` | absent | Ephemeral regeneration/validation and at most one guarded commit/update of `refs/heads/main` when the exact generated set changed |
+| `markdownlint.yml` / `markdownlint` | absent | absent; ordinary event eligibility | exactly `contents: read` | absent | Read checkout, exact Node acquisition, frozen install, and both lint surfaces |
+
+There are exactly three jobs. No matrix, container, service, reusable-workflow
+call, dynamic job, job output, extra direct/transitive dependency, second
+write-capable job, or `always()`/`failure()`/`cancelled()` widening is allowed.
+The `verify` upload step occurs after all validation, declares
+`if: ${{ success() }}`, has no `continue-on-error`, and fails `verify` if the
+upload fails. Failure, cancellation, or skip uploads nothing.
+
+The writer repeats generation and all path/byte/ref checks from the triggering
+SHA; it does not consume the verification artifact or a job output. A
+no-change outcome makes no commit or push. Only its final guarded step receives
+explicit push credential material. The policy fixtures independently mutate
+each job, edge, condition operand/operator, permission, output, step order,
+upload condition, side effect, and called-workflow boundary. T1B replaces this
+entire graph and deletes the temporary writer rather than retaining a disabled
+fallback.
+
 ### 8. Use one private artifact writer and an exact failure-state transaction
 
 `Write-StyleGuideArtifact` is the only permitted final-write boundary. Its
@@ -306,7 +342,7 @@ call `File.Replace(temp,destination,$null)` exactly once.
 Fault-injection cases cover every phase from pre-create through cleanup on
 Windows PowerShell 5.1, PowerShell 7 on Windows, and PowerShell 7 on Linux.
 
-### 9. Publish and consume one parseable generator version
+### 9. Separate timeless version parsing, consumer identity, and authoring bumps
 
 The script-level comment help before the first function contains exactly one:
 
@@ -314,17 +350,38 @@ The script-level comment help before the first function contains exactly one:
 Version: 1.0.YYYYMMDD.0
 ```
 
-The four decimal components must parse as `[System.Version]`; Build is exactly
-eight digits and a real UTC date. Use the actual implementation UTC date,
-recomputing it if work crosses midnight. Later published changes increment
-Major for breaking public/output changes or Minor for nonbreaking capability,
-always set Build to the modification UTC date, reset Revision to `0` when
-Major/Minor/Build changes, and otherwise increment Revision.
+The common raw parser is timeless. It requires exactly one complete marker line
+in the script-level `.NOTES` block before the first function and exact grammar
+`Version: <Major>.<Minor>.<YYYYMMDD>.<Revision>`. Components use ASCII digits,
+have no sign/whitespace/extra component, and have no leading zero except the
+single digit `0`. All four fit `[System.Version]` nonnegative integer bounds
+and round-trip canonically; Build is a real invariant proleptic-Gregorian
+`yyyyMMdd` date, including leap-day validation. The parser never reads the
+clock, Git timestamps, filesystem timestamps, or network. Real old and future
+dates remain valid. Missing, duplicate, out-of-location/decoy, malformed,
+overflow, impossible-date, and component-count failures are
+`invalid-version`, never “stale.”
 
-Reject missing, duplicate, malformed, impossible/stale date, extra component,
-sign/whitespace, or a decoy function-level `Version:`. The version is human
-metadata and never substitutes for commit, ordinary-file identity, or SHA-256.
-T1A and T1B consume this exact parser/semantics.
+A trusted consumer separately embeds or supplies the exact expected canonical
+version from the same reviewed commit/path/SHA. Ordinal mismatch after valid
+parsing is `unexpected-version`. No expected version is derived from the
+untrusted script, and version never substitutes for commit, ordinary-file
+identity, or SHA-256.
+
+Only implementation/merge validation enforces authoring progression. For every
+affected script, record merge-base blob/version (or `absent`), change class,
+accountable author, and the UTC date of the final material edit. A new script
+starts `1.0.<date>.0`; a breaking contract increments Major and resets Minor
+and Revision; a compatible capability increments Minor and resets Revision; a
+correction preserves Major/Minor, uses the final-edit date, resets Revision
+when Build changes, and otherwise increments Revision by exactly one. An
+unchanged file is excluded. A later test run alone never causes a bump.
+Decrease, jump, reused revision, wrong final-edit date, or reset violation
+fails `version-progression`.
+
+Fixtures are partitioned into timeless grammar, explicit expected-version, and
+baseline-to-staged progression cases. T1A and T1B consume these same three
+layers.
 
 ### 10. Add the permanent locked workflow-policy validator now
 
@@ -333,6 +390,33 @@ version-3 lockfile with the reviewed official tarball/integrity and no
 lifecycle scripts. Immediately before implementation, re-resolve the package
 and integrity and rerun the dated audit decision; drift or a policy-blocking
 finding requires review/rebaseline.
+
+There is exactly one lockfile producer. In a clean disposable clone with no
+inherited `node_modules`, acquire the official Node `24.18.1` artifact for the
+selected producer platform and verify it against the release's signed
+`SHASUMS256.txt`. Require `node --version` and `npm --version` to equal
+`24.18.1` and `11.16.0` before editing package metadata. Set the one direct
+manifest entry to exact `"yaml": "2.9.0"` and, from
+`.github/workflows`, run exactly:
+
+```text
+npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+```
+
+Use a fresh evidence cache and record release URL/artifact, expected/actual
+SHA-256, signature result, executable paths, OS/architecture, clean source
+commit, effective registry/proxy/certificate/peer/lock/script/audit/fund
+configuration with secrets redacted, and pre/post manifest/lock hashes. Do not
+add an interim `packageManager`, invoke a second producer, use force/
+legacy-peer flags, install globally, format, normalize, or hand-edit the lock.
+Require lockfile version 3, exact root dependency and package
+registry/integrity identity, and no unrelated resolution churn.
+
+Every other platform/runtime cell is a frozen consumer: record pre-hashes, run
+`npm ci --ignore-scripts --no-audit --no-fund`, require identical post-hashes
+and an empty manifest/lock diff, then run the parser validation. T3—not T1—owns
+the durable hash-qualified package-manager policy and any later authorized
+lock regeneration.
 
 `Validate-WorkflowPolicy.mjs` contains a pure parser/policy core and thin CLI.
 It accepts exactly `build.yml` then `markdownlint.yml`, performs no network or
@@ -345,7 +429,8 @@ The validator transcribes the normative role policy below; observed YAML never
 defines the allowlist. Its append-only fixture inventory gives every syntax,
 schema, action, input, permission, event, condition, and role mutation one ID
 and one result. Run fixtures and real workflows after the same clean `npm ci`
-and exact Node-24 assertion used by lint, then prove offline execution.
+and exact Node `24.18.1`/npm `11.16.0` assertion used by lint, then prove
+offline execution.
 
 T1B extends—not replaces—this validator, parser, and fixture suite. T3
 revalidates the same direct parser through its dependency update.
@@ -381,7 +466,7 @@ All checkout roles declare exactly:
 
 SSH inputs, sparse checkout/filter, alternate path/server URL, and every
 unlisted input remain absent as separately reviewed defaults. Setup Node
-declares exactly `node-version: '24'`, `check-latest: false`,
+declares exactly `node-version: '24.18.1'`, `check-latest: false`,
 `package-manager-cache: false`, and `token: ${{ github.token }}`; registry,
 scope, cache path, version file, architecture, mirror, and mirror-token inputs
 remain absent.
@@ -416,6 +501,47 @@ Disposable-repository fixtures include spaces, tabs, leading dashes, quotes,
 non-ASCII, and embedded newlines; each must remain one unexpected path rather
 than split or disappear.
 
+### 13. Require separately authorized main-branch governance before T1B
+
+Repository settings are not authorized by this issue's affected-file list.
+Before T1B implementation, open and approve a separate administrator-owned
+settings task containing the current-state export, exact desired/rollback JSON,
+approver, execution window, validation, and incident rollback.
+
+The desired persistent branch ruleset is named
+`terraform-style-guide-main-protection`, type `branch`, enforcement `active`,
+includes exactly `refs/heads/main`, and has no exclusion. It prohibits deletion
+and non-fast-forward updates; requires pull requests, resolved conversations,
+the exact terminal T1B check `Build Style Guide Artifacts / approve`, and a
+current branch for ordinary merges; and contains exactly one bypass actor:
+the official GitHub Actions integration ID `15368`, mode `always`. No user,
+repository role, administrator, team, deploy key, second app, or exempt-mode
+bypass is permitted. Immediately before creation, re-resolve
+`GET /apps/github-actions` and require owner `github`, slug `github-actions`,
+and ID `15368`; drift stops for review.
+
+The app bypass is broad enough for a direct workflow push, so the repository
+workflow-policy validator must continue to prove that only T1B's reviewed
+writer job has `contents: write`. It is not a substitute for the exact
+workflow graph.
+
+Before persistent activation, use a temporary byte/field-equivalent ruleset
+targeting only T1B's unique evidence ref. The real `GITHUB_TOKEN` writer must
+succeed for exact-parent/exact-lease, reject stale/lost lease,
+non-fast-forward, and deletion attempts, and prove an ordinary maintainer's
+direct update is rejected. Record ruleset/app/run/commit/ref identities,
+before/after remote values, effective rules, and audit entry; then remove the
+temporary rule/ref and prove restoration. Do not weaken/add bypasses or fall
+back to an unprotected push.
+
+After T1B's pull-request `approve` check establishes the exact check context,
+activate the persistent rule before merging T1B and query effective rules for
+`refs/heads/main`. Retain rule ID and normalized rule-JSON SHA-256. Before that
+query, use `target main commit` or `reviewed head`, never “protected.” After it,
+use `ruleset-protected main`. Successor issues distinguish reviewed head,
+actual merge-method commit, and any generated-artifact child commit and
+revalidate the live rule/bypass before relying on the handoff.
+
 ## Validation
 
 Run validation from a clean disposable clone or worktree. Do not let one
@@ -445,36 +571,52 @@ identical hashes before merge.
 Add controlled temporary fixtures proving CRLF and lone CR are converted to LF
 at each complete-payload boundary. Restore test-owned state in `finally`.
 
-### Reciprocal PSStyleGuide generator-layer matrix
+### Reciprocal PSStyleGuide generator-and-foundation matrix
 
 At implementation start and again before merge, record the exact reviewed
-PSStyleGuide commit and the current generator-layer location (the exact P1
-section or its eventual P1 generator issue identifier). Compare:
+PSStyleGuide commit and its P1 normative location. The closed symmetric catalog
+is:
 
-| Contract row | Required evidence |
+| Stable row | Required comparison |
 | --- | --- |
-| public generator parameters | names, types, defaults, omission rules |
-| destination resolution | one filesystem path; wildcard, provider, missing, and multi-match behavior |
-| content assembly | source order, wrapper/frontmatter, and final payload |
-| byte serialization | CRLF/lone-CR normalization, LF, UTF-8 without BOM, final-newline behavior |
-| write boundary | exactly one explicit complete-payload write per artifact |
-| failure destination state | preexisting/absent destination postcondition and diagnostics |
-| edition/host tests | Windows PowerShell 5.1 and PowerShell 7 evidence |
+| `GF-PARAMETERS` | Public names/types/defaults and omission/null/empty/raw-value rules |
+| `GF-DESTINATION` | Trusted root, allowed destinations, provider/wildcard/rooted-path rules, normalization, comparison, and failure state |
+| `GF-CONTENT` | Source order, wrappers/frontmatter, repository-specific names, and complete payload |
+| `GF-SERIALIZATION` | CRLF/lone-CR normalization, LF/final newline, BOM-less UTF-8, and byte checks |
+| `GF-WRITE` | Complete-payload write path, temporary identity/create, flush/close, atomic replace, and prohibited fallbacks |
+| `GF-FAILURE` | Phase postconditions, cleanup/uncertainty, bounded diagnostics, and fault cases |
+| `GF-HOSTS` | Editions/hosts, executable identity, cross-cell equality, and idempotence |
+| `GF-VERSION` | Timeless marker grammar, explicit expected version, authoring bump gate, and independent fixtures |
+| `GF-NODE-LOCK` | Exact Node/npm producer/provenance, cache/side effects, YAML graph, and frozen consumers |
+| `GF-YAML` | Parser package/API, document/schema/strictness, diagnostics, and forbidden YAML features |
+| `GF-ACTION-PINS` | Closed roles, full pins, publisher/repository/release provenance, internal runtime, and atomic updates |
+| `GF-ACTION-INPUTS` | Authored security inputs versus separately inventoried pinned-manifest defaults |
+| `GF-GIT` | NUL records, byte allowlists, native statuses, cardinality, refs, ancestry, lease, and refspec |
+| `GF-GRAPH` | Production/evidence triggers, permissions, direct needs, conditions, outputs, side effects, and sole writer |
+| `GF-CREDENTIALS` | Job-token availability, transient fetch auth, persistence/cleanup, push-only materialization, and absence |
+| `GF-EVIDENCE` | Temporary workflow/ref structural equality, drills, retained identities, cleanup, and final absence |
 
-For every row, record PS evidence, Terraform evidence, status (`same`,
-`intentional difference`, or `blocker`), and rationale. Identical
-security/error/byte behavior is the default. Repository paths, manifest names,
-and workflow topology may differ intentionally. Every deliberate difference
-requires a repository-specific reason and stable evidence; every unexplained
-difference blocks merge. Add a short human-readable summary above the complete
-matrix. Store it in the pull request or a tracked planning artifact.
+Each row occurs exactly once and records both repository URLs/commits,
+normative locators, implementation locators, retained evidence paths/SHA-256,
+observed values/fixture IDs, one status
+`same|intentional difference|blocker`, and rationale. An intentional
+difference names both literals, repository need, equal security/failure
+strength, owner, and review/expiry condition. Repository paths/names/payloads
+or platform applicability can differ; parser strictness, credential
+containment, Git status handling, failure postconditions, or cleanup guarantees
+cannot be excused by equal happy-path output.
+
+Duplicate/missing/unknown IDs, changed row meaning, empty evidence/locator, or
+unexplained difference is a blocker. If either fixed head moves before merge,
+rerun all 16 rows. This is an evidence schema, not a shared runtime dependency;
+an unmatched PS contract is recorded as a blocker rather than omitted.
 
 ### Node and lint
 
 From `.github/workflows`:
 
-1. resolve and record one Node/npm application pair;
-2. require the observed Node major to be 24;
+1. resolve the reviewed official Node `24.18.1`/npm `11.16.0` consumer pair;
+2. require exact executable paths and versions;
 3. save the caller's `CI` environment state;
 4. set process-scoped `CI=true` only for `npm ci`;
 5. restore the prior `CI` value or absence in `finally`;
@@ -517,11 +659,15 @@ intentional paths.
 - [ ] Repeated generation is byte-idempotent and the four committed generated
       artifacts remain unchanged.
 - [ ] `.gitattributes` contains exactly `* text=auto eol=lf`.
-- [ ] Hosted Markdown validation runs on actual Node major 24 with automatic
-      setup-node package-manager caching disabled.
+- [ ] Hosted Markdown validation runs on exact Node `24.18.1` with bundled npm
+      `11.16.0` and automatic setup-node package-manager caching disabled.
 - [ ] Clean installation and both unchanged lint surfaces pass.
 - [ ] Package/lock changes are exactly the direct `yaml@2.9.0` parser and its
       reviewed version-3 lock metadata; hook and lint policy do not change.
+- [ ] One verified official Node/npm pair performs the one allowed lock rewrite;
+      every other cell is a hash-proven frozen consumer.
+- [ ] Marker grammar, expected-version identity, and baseline authoring
+      progression are tested independently without a runtime clock gate.
 - [ ] Every current external action equals its exact official
       repository/SHA/workflow-role/count allowlist row.
 - [ ] Mutable, arbitrary, swapped, duplicate, missing, and extra action
@@ -531,7 +677,13 @@ intentional paths.
       external action is activated.
 - [ ] The temporary writer uses only process-scoped environment-backed HTTP
       authorization for the exact push and stores no credential.
-- [ ] The reciprocal generator-layer matrix has no unexplained blocker.
+- [ ] The exact three-job temporary graph, edges, conditions, outputs,
+      permissions, step order, side effects, and negative fixtures pass.
+- [ ] The reciprocal 16-row generator-and-foundation matrix has no missing,
+      duplicate, unknown, or unexplained blocker.
+- [ ] T1B is blocked on the separately authorized ruleset task and exact
+      temporary real-writer compatibility evidence; no issue file claims
+      `main` is protected before effective-rule proof.
 - [ ] The exact raw-byte working/staged path gates contain only the eight
       affected files and distinguish Git statuses `0`, `1`, and tool failure.
 - [ ] T1A is required to record and validate this issue's actual merge commit;
@@ -544,7 +696,7 @@ intentional paths.
 - Caller temporary-root ownership.
 - Permanent helper harness implementation.
 - Artifact download/promotion or writer redesign.
-- Package or lockfile upgrades.
+- Package or lockfile changes beyond the exact YAML parser addition.
 - Declaring the final contributor Node minimum.
 - Changing hook or lint semantics.
 - Hand-editing generated outputs.
