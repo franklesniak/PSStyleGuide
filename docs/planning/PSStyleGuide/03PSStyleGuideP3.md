@@ -21,13 +21,23 @@ Implement P3 after:
 3. P1B — final immutable candidate and verified writer; and
 4. P2 — blank-line visualization/source/generated update.
 
-Record P2's real blocked-by relationship and exact P1/P1A/P1B/P2 merge
+Before filing/readying P3, insert P2's canonical PSStyleGuide issue URL,
+create the real GitHub `blocked by` relationship, retrieve both issues, and
+verify repository/number/title/relationship. Record exact P1/P1A/P1B/P2 merge
 commits. This slate is worked in that one order. Do not perform a partial
 package update outside P3 or maintain an alternate dependency graph.
 
 At implementation start, re-read current package/lock/hook/lint/workflow/
 Dependabot state and rerun the audit. Do not treat the dated baseline below as
 acceptance.
+
+Require P1's exact advisory-risk decision to remain identifiable through P3
+start and compare the fresh audit's packages, advisory identities, severities,
+fix availability, and topology to the authorized wait. If the decision
+expired, policy refused the wait, a critical/materially worse finding appears,
+or the package graph changed outside the sequence, stop and regenerate the
+issue order/prerequisite baselines. Do not silently continue or perform an
+undocumented partial update.
 
 ## Dated baseline, not acceptance
 
@@ -55,11 +65,15 @@ P3 cell.
 
 Required:
 
+- `.github/workflows/build.yml`;
+- `.github/workflows/markdownlint.yml`;
+- `.github/workflows/Validate-WorkflowPolicy.mjs`;
+- `.github/workflows/Check-NodePolicy.mjs` — add;
+- `.github/workflows/Validate-NpmAudit.mjs` — add;
 - `.github/workflows/package.json`;
 - `.github/workflows/package-lock.json`;
 - `.husky/pre-commit`;
 - `.github/dependabot.yml`;
-- `.github/workflows/markdownlint.yml`;
 - `.github/workflows/lint-staged-markdown.mjs`;
 - `.github/workflows/Test-LintStagedMarkdown.ps1` — add; and
 - `.github/workflows/Test-NpmAuditPolicy.ps1` — add.
@@ -70,12 +84,18 @@ Conditionally add only if a real residual audit finding is approved:
 
 Determine the complete exact path set after package selection/audit
 disposition and before editing. Do not preserve a fixed earlier file count.
+Record and freeze that set in implementation evidence. Use P1's exact merged
+`Test-ExactGitPathSet.ps1` in `Both`/`Staged` modes before staging, after
+staging, and after final rerun. If later discovery requires another path, stop,
+explain/review the condition, recompute the set, and restart scope validation;
+do not edit outside the frozen set.
 
 Do not change Markdown configuration or nested-lint implementation unless the
 selected maintained package API makes a reviewed compatibility change
 unavoidable. In that case add the exact file to the computed scope and explain
-why. No style-guide source/generated artifact, generator, build workflow,
-candidate script, or P1B writer behavior should change.
+why. No style-guide source/generated artifact, generator, candidate script, or
+P1B writer behavior should change. `build.yml` changes only to add the reviewed
+schedule/manual read-only dependency-policy subgraph and final Node roles.
 
 ## Requested changes
 
@@ -124,9 +144,11 @@ Edit `package.json` explicitly and regenerate lockfile version 3 from clean
 state with the selected exact npm. Never use `npm audit fix --force`, `--force`,
 `--legacy-peer-deps`, ignored engines, or manual lock edits.
 
-Require clean `npm ci`, `npm ls --all` with no invalid/extraneous/missing node,
-exact root/lock agreement, preserved outer/nested/staged intent, and a second
-reproducible clean install.
+Require clean `npm ci` with process-scoped
+`npm_config_engine_strict=true`, `npm ls --all` with no
+invalid/extraneous/missing node, exact root/lock agreement, preserved
+outer/nested/staged intent, and a second reproducible clean install. Restore
+the caller's prior strict-engine environment state in `finally`.
 
 ### 3. Select and enforce one exact npm CLI
 
@@ -165,24 +187,91 @@ policy it must admit reviewed Node 22 and 24 releases while excluding 23, 25,
 current 26, and unreviewed future majors. Never use an open-ended minimum or
 contiguous range that admits an intervening unsupported major.
 
-Make `.husky/pre-commit` and
-`.github/workflows/lint-staged-markdown.mjs` implement the same finite
-decision. If one shared dependency-free implementation is impractical across
-shell/Node, use identical fixtures and prove the decisions equal.
+Add dependency-free `.github/workflows/Check-NodePolicy.mjs` with one pure
+exported decision and small CLI. It accepts exactly one observed canonical
+`major.minor.patch` string and one versioned finite policy, uses no filesystem,
+environment, network, clock, or `node_modules`, and returns stable
+supported/unsupported/malformed categories.
 
-Test:
+The hook resolves/queries `node`, then invokes this CLI before resolving npm or
+checking `node_modules`. `lint-staged-markdown.mjs` imports the same pure
+function. `engines.node`, workflow roles, CLI/imported decisions, and fixtures
+must express the identical finite set.
+
+Give individual `NODE-*` stable IDs to:
 
 - lowest admitted and normal current patch on each supported major;
 - one below each patch floor;
 - below-minimum major;
 - every intervening unsupported major;
-- current/above-maximum unreviewed majors;
-- empty, malformed, prefix/suffix, whitespace, and extra-component forms.
+- current/above-maximum unreviewed majors; and
+- empty, whitespace, prefix, suffix, missing/extra component, leading-zero,
+  and nonnumeric forms.
+
+Mandatory IDs:
+
+| ID | Exact semantic fixture/oracle |
+| --- | --- |
+| `NODE-01` | selected Node 22 patch floor is supported |
+| `NODE-02` | reviewed normal current Node 22 patch is supported |
+| `NODE-03` | selected Node 24 patch floor is supported |
+| `NODE-04` | reviewed normal current Node 24 patch is supported |
+| `NODE-05` | one patch below Node 22 floor is unsupported |
+| `NODE-06` | one patch below Node 24 floor is unsupported |
+| `NODE-07` | below-minimum major 21 is unsupported |
+| `NODE-08` | intervening major 23 is unsupported |
+| `NODE-09` | intervening major 25 is unsupported |
+| `NODE-10` | current/unreviewed major 26 is unsupported |
+| `NODE-11` | synthetic above-maximum future major is unsupported |
+| `NODE-12` | empty string is malformed |
+| `NODE-13` | leading/trailing whitespace is malformed |
+| `NODE-14` | `v` or other prefix is malformed |
+| `NODE-15` | suffix/build/pre-release text is malformed |
+| `NODE-16` | missing version component is malformed |
+| `NODE-17` | extra version component is malformed |
+| `NODE-18` | noncanonical leading zero is malformed |
+| `NODE-19` | nonnumeric component is malformed |
+
+Fixtures prove CLI, imported function, `engines` admission, and workflow matrix
+agree; no case is collapsed into the generic `HOOK-08` result.
 
 Do not encode the durable rule as “even majors”; Node's announced post-26
 release cadence makes that an unstable synonym for LTS.
 
-### 5. Preserve and prove full/nested/staged lint behavior
+### 5. Add continuous read-only dependency-policy execution
+
+Keep `build.yml` as the sole external event owner. Retain:
+
+- ordinary and Dependabot pull requests targeting `main`;
+- pushes to `main`; and
+- `merge_group` only when merge queue is enabled.
+
+Add:
+
+```yaml
+schedule:
+  - cron: '23 17 * * 3'
+workflow_dispatch:
+```
+
+The schedule is weekly at 17:23 UTC on Wednesday. Manual dispatch has no
+inputs. For schedule/manual events, only the same-commit local
+`validate_markdown_dependencies` call job and a read-only
+`dependency_policy_result` terminal job may run. They use `contents: read` and
+perform exact Node/npm selection, clean install/tree validation, audit policy,
+outer/nested lint, and hook harness appropriate to the final role policy.
+
+Candidate preparation, artifact upload/download, Windows candidate matrix,
+promotion approval, candidate diagnostics, and writer are structurally
+ineligible on schedule/manual events. The workflow-policy validator enumerates
+the exact event-to-job graph and rejects any schedule/manual path to an
+artifact action, secret, or write permission.
+
+Retain ordinary/Dependabot PR, push, schedule, and manual run evidence. A
+fixture with an expired exception must fail the scheduled/manual terminal
+result without entering publication.
+
+### 6. Preserve and prove full/nested/staged lint behavior
 
 The pre-commit hook:
 
@@ -209,7 +298,7 @@ Preserve classifications:
 Do not replace PSStyleGuide's staged-content API with TerraformStyleGuide's
 different full-lint hook.
 
-### 6. Add a tracked cross-platform lint/hook harness
+### 7. Add a tracked cross-platform lint/hook harness
 
 Create `Test-LintStagedMarkdown.ps1` with `#Requires -Version 5.1`, exact script
 version, and explicit repository path. It creates disposable repositories and
@@ -229,7 +318,7 @@ Mandatory stable IDs:
 | `HOOK-05` | staged-only API lints staged content, not unrelated worktree bytes |
 | `HOOK-06` | missing npm/tool rejects as tooling failure |
 | `HOOK-07` | broken config/startup differs from lint finding |
-| `HOOK-08` | unsupported/malformed/future Node rejects before npm/lint |
+| `HOOK-08` | hook delegates representative unsupported/malformed/future Node values to exact `NODE-*` policy and rejects before npm/lint |
 | `HOOK-09` | clean-installed Husky hook invoked by real `git commit` passes/rejects and leaves expected index/commit |
 
 At least one case performs clean install, stages test-owned Markdown, invokes
@@ -246,34 +335,78 @@ Run the harness on:
 PowerShell may orchestrate; the real hook executes in Git/Husky shell. Record
 shell, Git, Node, npm, package, and harness versions.
 
-### 7. Add a tracked audit-policy validator
+### 8. Add a tracked audit-policy validator
+
+Create dependency-free `.github/workflows/Validate-NpmAudit.mjs`. Its exported
+pure core accepts parsed audit data, optional parsed exceptions, normalized
+lockfile package lookup, injected canonical UTC `now`, exact npm version, and
+captured native exit. The core has no filesystem, process, environment, clock,
+registry, or network access.
+
+The core:
+
+1. requires report version 2 and validates every consumed field/type;
+2. validates metadata counts against vulnerability properties;
+3. validates property name/severity/range/isDirect, array `via`/`effects`/
+   `nodes`, object advisory URL/severity/range, string graph links, and Boolean
+   or reviewed-object `fixAvailable`;
+4. validates reciprocal graph targets;
+5. resolves every node path to matching package/version in the supplied
+   lockfile lookup;
+6. derives unique `(Package, AdvisoryUrl)` residual keys;
+7. keeps exact package-keyed node sets separate;
+8. validates native exit against the derived result;
+9. validates exact exception equality and timestamps; and
+10. returns bounded canonical `clean`, `vulnerability`, `policy`, `schema`,
+    `registry-tool`, or `native-exit` results.
+
+A thin CLI reads only exact explicit input files/arguments, invokes the core,
+and maps stable categories to documented exits.
 
 Create `Test-NpmAuditPolicy.ps1` with `#Requires -Version 5.1`, exact script
 version, explicit repository/package/lock/exception paths, and exact selected
-npm application.
+npm application. It owns live orchestration: run
+`npm audit --package-lock-only --json`, capture raw stdout/stderr/native exit
+immediately, preserve bounded raw evidence and exact npm version, parse once,
+build the lockfile lookup, invoke the validator CLI, and run cross-platform
+fixtures. Registry/tool/native failures remain distinct from vulnerability
+policy.
 
-It:
+Mandatory deterministic IDs:
 
-1. runs `npm audit --package-lock-only --json`;
-2. captures raw JSON and native exit immediately;
-3. treats only reviewed vulnerability exit separately from registry/tool
-   failure;
-4. requires report version 2 and validates every consumed field/type;
-5. validates metadata counts against vulnerability properties;
-6. validates property name/severity/range/isDirect, array `via`/`effects`/
-   `nodes`, object advisory URL/severity/range, string graph links, and Boolean
-   or reviewed-object `fixAvailable`;
-7. validates reciprocal graph targets;
-8. resolves every node path to matching package/version in lockfile;
-9. derives unique `(Package, AdvisoryUrl)` residual keys;
-10. keeps exact package-keyed node sets separate;
-11. validates native exit against derived actionable set; and
-12. emits no package contents/secrets.
+| ID | Oracle |
+| --- | --- |
+| `AUDIT-01` | clean report/no exception passes |
+| `AUDIT-02` | clean report/stale exception fails policy |
+| `AUDIT-03` | residual/no approval fails policy |
+| `AUDIT-04` | exact approved residual passes |
+| `AUDIT-05` | missing finding key fails policy |
+| `AUDIT-06` | extra finding key fails policy |
+| `AUDIT-07` | duplicate finding key fails policy |
+| `AUDIT-08` | missing node path fails topology |
+| `AUDIT-09` | extra node path fails topology |
+| `AUDIT-10` | changed node topology fails topology |
+| `AUDIT-11` | malformed advisory field/type fails schema |
+| `AUDIT-12` | broken `via`/`effects` target fails graph |
+| `AUDIT-13` | metadata/severity total mismatch fails schema |
+| `AUDIT-14` | Boolean `fixAvailable` is accepted/validated |
+| `AUDIT-15` | reviewed-object `fixAvailable` is accepted/validated |
+| `AUDIT-16` | unsupported report version fails schema |
+| `AUDIT-17` | native exit/derived result mismatch fails |
+| `AUDIT-18` | one second before expiry passes |
+| `AUDIT-19` | exact expiry fails policy |
+| `AUDIT-20` | one second after expiry fails policy |
+| `AUDIT-21` | malformed/noncanonical timestamp fails schema |
+| `AUDIT-22` | expiry beyond 30×24 hours fails policy |
+| `AUDIT-23` | registry/tool failure is distinct |
+| `AUDIT-24` | unexpected native exit is distinct/preserved |
+| `AUDIT-25` | all input fixture bytes remain unchanged |
 
-Preserve raw report and exact npm version in bounded failure evidence so schema
-or registry changes fail clearly.
+Record fixture SHA-256 values. Mutate only disposable copies. Reject missing,
+duplicate, unexpected, or mismatched IDs/totals/categories and any source,
+dependency, or repository mutation.
 
-### 8. Resolve or govern every advisory
+### 9. Resolve or govern every advisory
 
 Preferred result: zero vulnerabilities at all severities.
 
@@ -283,24 +416,30 @@ If clean:
 - validator rejects an empty/stale exception file.
 
 If a residual cannot be removed compatibly, conditionally add the structured
-exception file. Each record contains:
+exception file. It uses one versioned closed schema containing:
 
-- exact package and advisory URL/source ID;
-- severity/CVSS when supplied;
-- exact package-keyed `AuditNodePaths`;
-- exploitability for this repository;
-- compensating controls;
-- accountable owner;
-- UTC creation and invariant expiration;
-- real public PSStyleGuide follow-up issue URL, not a PR;
-- approval identity/date; and
-- evidence no maintained compatible fixed tree exists.
+- `schemaVersion: 1`;
+- `findings`, sorted/unique by `(package, advisoryUrl)`, each with package,
+  canonical advisory URL/source ID, severity/range/CVSS when supplied,
+  repository-specific exploitability, compensating controls, accountable
+  owner, canonical whole-second RFC 3339 UTC `createdAt`, `approvedAt`, and
+  `expiresAt`, real public PSStyleGuide follow-up issue URL, approval identity,
+  and evidence no maintained compatible fixed tree exists; and
+- `auditNodePaths`, sorted/unique by package, with exact sorted unique installed
+  paths.
+
+`createdAt` and `approvedAt` represent the same reviewed approval instant.
+`expiresAt` is strictly later and no later than exactly 30×24 hours afterward.
+Expiration is exclusive: injected `now >= expiresAt` fails. Reject future
+approval, malformed/offset/fractional/noncanonical timestamps, and expiry one
+second beyond the limit.
 
 Require exact equality: no missing, extra, duplicate, expired, stale,
-topology-changed, or already-fixed record. Expiry is future and within
-repository maximum. CI fails after expiry or topology change.
+topology-changed, or already-fixed record. Renewal requires new clean-install/
+audit/fix-availability evidence, updated analysis/controls/follow-up status,
+and new accountable approval; changing timestamps alone is forbidden.
 
-### 9. Establish final Dependabot governance
+### 10. Establish final Dependabot governance
 
 Normalize `.github/dependabot.yml` to exactly two review-only entries:
 
@@ -314,22 +453,36 @@ Dependabot proposals require CI, changelog/license/provenance/engine review,
 lockfile review, exact npm/Node cells, real hook evidence, and audit policy.
 They never bypass immutable action roles.
 
-### 10. Update the final Markdown workflow role policy
+### 11. Update the final Markdown workflow role policy
 
-Retain P1B action SHAs and all enduring build workflow roles. Update the sole
-normative role table atomically for the final Markdown Node matrix/job layout:
+Immediately before implementation and again immediately before merge,
+re-resolve every retained external-action release tag and repeat repository,
+release, source, manifest/default, and full-SHA review. Stop for renewed review
+on any difference.
+
+Retain P1B action SHAs and all enduring build workflow roles unless that
+two-checkpoint review approves a change. Update the sole normative role table
+atomically for the final Markdown Node matrix/job layout:
 
 - exact supported-minimum and preferred Node 24 setup roles;
 - exact checkout refs/persistence;
 - automatic package-manager cache disabled;
-- exact conditions and complete inputs; and
+- exact conditions and **Exact explicitly declared inputs**;
+- separate **Reviewed effective defaults at pinned manifest** records; and
 - no unreviewed action.
 
 Run clean install, tree validation, audit policy, required lint/hook harness
 work in every claimed cell. The preferred Node 24 cell also runs the complete
 outer/nested lint, P1A helper harness, and any P2 permanent content evidence.
 
-### 11. Revalidate enduring behavior and declare supersession
+Update P1B's exact tracked `Validate-WorkflowPolicy.mjs`; do not replace it.
+Retain its parser safe/core schema, duplicate-key/alias/custom-tag rejection,
+stable policy IDs, and every P1B fixture. Add exact finite Node roles and the
+schedule/manual no-publication graph. Reject any lost/weakened P1B fixture,
+second event owner/validator, parser drift without review, or
+schedule/manual path to artifact/write behavior.
+
+### 12. Revalidate enduring behavior and declare supersession
 
 Enduring and green:
 
@@ -358,24 +511,31 @@ Earlier affected-file counts are one-time gates, not enduring behavior.
 From fresh clones/clean dependency state:
 
 1. run exact selected npm on minimum/preferred Node and both OS families;
-2. record executable/full versions and enforce strict engines;
+2. record executable/full versions and scope/restore strict-engine state;
 3. scope/restore `CI=true` around `npm ci`;
 4. run two clean reproducible installs;
 5. run `npm ls --all`;
 6. run outer/nested lints;
-7. run every staged/hook stable ID;
+7. run every individual Node-policy and staged/hook stable ID;
 8. invoke at least one real installed hook per OS family;
-9. run raw/human-readable audit and tracked policy validator;
-10. validate absent or exact exception file;
+9. run raw/human-readable audit integration and all 25 pure-policy fixture IDs;
+10. validate absent or exact exception file, injected time, and 30-day
+    before/at/after boundaries;
 11. validate exact two-entry Dependabot;
-12. validate final action roles;
-13. rerun P1/P1A/P1B/P2 enduring evidence;
-14. regenerate and require unchanged four artifacts;
-15. require exact changed/staged equality to computed P3 path set; and
-16. rerun from staged content with no additional diff.
+12. rerun every inherited P1B workflow-policy fixture and the new
+    Node/schedule/manual graph fixtures;
+13. validate exact action roles, explicit input keys, reviewed defaults, and
+    both action-tag provenance checkpoints;
+14. rerun P1/P1A/P1B/P2 enduring evidence;
+15. regenerate and require unchanged four artifacts;
+16. use P1's exact raw NUL-safe verifier before staging, after staging, and
+    after final rerun against the frozen computed P3 path set; and
+17. rerun from staged content with no additional diff.
 
-Capture required PR cells and one post-merge push proving the publication
-pipeline remains correct.
+Capture ordinary and Dependabot PR cells, one post-merge push, one schedule,
+and one input-free manual run. Schedule/manual evidence must contain only the
+local dependency call and read-only terminal result and must prove every
+publication job was ineligible.
 
 ## Acceptance criteria
 
@@ -383,23 +543,33 @@ pipeline remains correct.
       without force/engine bypass.
 - [ ] Lockfile version/tree exactly matches manifest; `npm ls --all` passes.
 - [ ] One exact npm CLI is used in every claimed Node/OS cell.
-- [ ] `engines.node`, hook, staged API, workflow roles, and tests enforce one
-      finite supported set.
+- [ ] P1's advisory-risk wait is closed by zero findings or exact governed
+      residuals; any rebaseline condition stopped implementation.
+- [ ] `Check-NodePolicy.mjs` is the one decision used by `engines.node`, hook,
+      staged API, workflow roles, and individual fixtures for one finite set.
 - [ ] Unsupported intervening/current/future majors fail before npm/lint.
 - [ ] Outer, nested, and staged semantics remain correct.
 - [ ] Every lint/hook stable ID passes on both Node roles and OS families.
 - [ ] Real clean-installed Husky hook is invoked by `git commit`.
-- [ ] Audit validator fails closed on schema/tool/registry/topology/expiry
-      changes.
+- [ ] Dependency-free `Validate-NpmAudit.mjs` and all 25 deterministic IDs fail
+      closed on schema/tool/registry/topology/expiry changes.
 - [ ] Audit is zero or every residual package/advisory has one exact,
       approved, unexpired record and real follow-up.
+- [ ] Exception timestamps are canonical UTC, expire exclusively, and are no
+      more than exactly 30×24 hours after approval.
 - [ ] Exception file is absent when audit is clean.
 - [ ] Dependabot has exactly Actions `/` and npm `/.github/workflows`,
       review-only.
-- [ ] Final exact action roles/permissions/triggers and all P1A/P1B/P2
-      enduring evidence remain green.
+- [ ] Schedule/manual runs are read-only dependency-policy-only graphs and
+      every publication job is structurally ineligible.
+- [ ] P1B's exact workflow-policy validator/parser, all inherited fixtures, and
+      new Node/event fixtures remain green.
+- [ ] Final action roles/permissions/triggers, exact explicit inputs, reviewed
+      defaults, and both tag-resolution checkpoints are green.
+- [ ] All P1A/P1B/P2 enduring evidence remains green.
 - [ ] Generated artifacts remain unchanged.
-- [ ] Final affected/staged path set is recomputed and exact.
+- [ ] P1's raw NUL-safe verifier proves the frozen computed affected/staged
+      path set is exact before/after staging and final rerun.
 
 ## Non-goals
 
@@ -415,7 +585,10 @@ pipeline remains correct.
 - [npm audit](https://docs.npmjs.com/cli/v11/commands/npm-audit/)
 - [npm package engines](https://docs.npmjs.com/cli/v11/configuring-npm/package-json/#engines)
 - [Node.js release status](https://nodejs.org/en/about/previous-releases)
+- [GitHub scheduled workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)
+- [GitHub reusable workflows](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows)
 - [Git hooks](https://git-scm.com/docs/githooks)
+- [Git status pathname format and `-z`](https://git-scm.com/docs/git-status#_pathname_format_notes_and_z)
 - [Husky](https://typicode.github.io/husky/)
 - [markdownlint-cli2](https://github.com/DavidAnson/markdownlint-cli2)
 - [Dependabot options](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference)

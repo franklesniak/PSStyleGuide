@@ -20,30 +20,28 @@ This originated from the cross-repository work tracked in [franklesniak/copilot-
 Complete and merge P1B before starting. P1B already depends on exact P1 and
 P1A merge commits, so it is P2's one final prerequisite. At filing, replace
 the title-only reference with P1B's actual issue URL and mark P2 blocked by
-P1B.
+P1B. Retrieve both issues and verify repository, number, title, and dependency
+relationship before readying P2; do not use a placeholder.
 
 At implementation start, record P1B's exact merge commit and confirm these
-enduring interfaces/invariants:
+enduring interface evidence:
 
-- P1's one destination/serialization boundary, BOM-less LF bytes,
-  cross-edition idempotence, script metadata, Node 24/action foundations, and
-  exact LF checkout policy.
-- P1A's exact helper/context/harness versions, same-stream digest/ZIP identity,
-  complete component/path checks, exact four-file manifest, declared/actual
-  resource ceilings, fresh extraction, explicit-null/empty diagnostics, and
-  separate nonrecursive caller/candidate cleanup owners.
-- P1B's unfiltered read-only validation, immutable artifact ID plus bare
-  digest, Ubuntu plus four Windows cells, exact four unique attestations,
-  `always()` terminal approval, at-use regeneration, four-value writer
-  identity, exact remote preflight/parent/lease/refspec, nonpersisted
-  credentials, bounded diagnostics, and sole final action-role table.
-- The complete P1↔T1, P1A↔T1A, and P1B↔T1B matrices have no unexplained
-  blocker.
-- `.github/dependabot.yml` contains exactly the merged review-only GitHub
-  Actions entry and remains outside P2's affected files.
+- P1B's actual issue URL and real GitHub blocked-by relationship;
+- exact P1/P1A/P1B merge commits;
+- generator/helper/context/harness/workflow-policy/path-verifier versions and
+  hashes;
+- final action provenance, explicit-input, and pinned-manifest-default records;
+- retained P1B positive/negative run IDs and exact evidence-workflow removal;
+- preparation artifact ID/digest/four hashes, four attestations, approval, and
+  writer identity evidence;
+- complete P1↔T1, P1A↔T1A, and P1B↔T1B matrices with no unexplained blocker;
+  and
+- exact merged `.github/dependabot.yml` review-only Actions entry.
 
-P1/P1A/P1B remain the source of truth. P2 consumes their merged interfaces and
-does not restate or change their algorithms.
+P1/P1A/P1B remain the sole source of truth for generator, candidate,
+workflow, transport, matrix, approval, credential, and writer algorithms. P2
+consumes the exact merged interfaces and retained evidence; it does not
+paraphrase or change those algorithms.
 
 **P3: Remediate Markdown lint dependency advisories and add npm update
 governance** follows P2. It is not a P2 prerequisite, and its package changes
@@ -70,7 +68,27 @@ The generated artifacts must change only through regeneration.
 
 ### 1. Repair the visualization in `STYLE_GUIDE.md`
 
-Keep the Compliant heading and fenced block unchanged and copy-ready.
+Keep this complete Compliant heading and fenced block ordinally unchanged and
+copy-ready:
+
+````text
+**Compliant (blank line is truly empty):**
+
+```powershell
+{
+    Invoke-SomeCmdlet
+
+    Invoke-AnotherCmdlet
+}
+```
+````
+
+Before editing, record the exact prerequisite commit and SHA-256 of that
+LF-joined snippet. Require exactly one ordinal occurrence in `STYLE_GUIDE.md`
+before and after editing and, after regeneration, exactly one in each
+generated artifact. Do not trim or normalize before comparison. Negative
+self-tests change the empty line, fence language, command text, and duplicate
+the block; every mutation must fail.
 
 Use exactly:
 
@@ -254,7 +272,7 @@ if ($intGitExitCode -ne 0) {
 ```powershell
 $ErrorActionPreference = 'Stop'
 
-$arrExpectedStagedPaths = @(
+$arrExpectedPaths = @(
     'STYLE_GUIDE.md'
     'STYLE_GUIDE_RATIONALE.md'
     'copilot-instructions.md'
@@ -263,56 +281,53 @@ $arrExpectedStagedPaths = @(
     'STYLE_GUIDE_FULL.md'
 ) | Sort-Object
 
-$arrStatusLines = @(
-    git status `
-        --porcelain=v1 `
-        --untracked-files=all `
-        --ignore-submodules=none `
-        -- .
-)
-$intGitExitCode = $LASTEXITCODE
+& pwsh `
+    -NoLogo `
+    -NoProfile `
+    -File './.github/workflows/Test-ExactGitPathSet.ps1' `
+    -RepositoryRoot '.' `
+    -ExpectedPath $arrExpectedPaths `
+    -Mode 'Both'
 
-if ($intGitExitCode -ne 0) {
+$intVerifierExitCode = $LASTEXITCODE
+
+if ($intVerifierExitCode -ne 0) {
     throw (
-        "Unable to read working-tree status; git exited with {0}." -f
-        $intGitExitCode
+        "Pre-stage exact path-set validation failed with exit code {0}." -f
+        $intVerifierExitCode
     )
 }
 
-$arrChangedPaths = @(
-    $arrStatusLines |
-        ForEach-Object {
-            if ($_ -notmatch '^..\s+') {
-                throw ("Unexpected porcelain status record: {0}" -f $_)
-            }
-
-            $_ -replace '^..\s+', ''
-        } |
-        Sort-Object -Unique
-)
-
-$arrWorkingTreeDifferences = @(
-    Compare-Object `
-        -ReferenceObject $arrExpectedStagedPaths `
-        -DifferenceObject $arrChangedPaths `
-        -CaseSensitive
-)
-
-if ($arrWorkingTreeDifferences.Count -ne 0) {
-    throw (
-        "The working-tree path set is not exactly the two sources and four " +
-        "generated artifacts. Status: {0}" -f
-        ($arrStatusLines -join '; ')
-    )
-}
-
-git add -- $arrExpectedStagedPaths
+git add -- $arrExpectedPaths
 $intGitExitCode = $LASTEXITCODE
 
 if ($intGitExitCode -ne 0) {
     throw ("git add failed with exit code {0}." -f $intGitExitCode)
 }
+
+& pwsh `
+    -NoLogo `
+    -NoProfile `
+    -File './.github/workflows/Test-ExactGitPathSet.ps1' `
+    -RepositoryRoot '.' `
+    -ExpectedPath $arrExpectedPaths `
+    -Mode 'Staged' `
+    -RequireWorkingSetEmpty
+
+$intVerifierExitCode = $LASTEXITCODE
+
+if ($intVerifierExitCode -ne 0) {
+    throw (
+        "Post-stage exact path-set validation failed with exit code {0}." -f
+        $intVerifierExitCode
+    )
+}
 ```
+
+The exact merged P1 verifier captures raw native stdout with
+`System.Diagnostics.Process`, parses NUL-delimited records, disables rename
+collapse, and unions unstaged/cached/untracked sources. Do not replace it with
+line-oriented `git status` or `git diff --name-only`.
 
 ### Rerun and verify the staged result
 
@@ -337,6 +352,21 @@ $arrTouchedPaths = @(
 $arrExpectedStagedPaths = @($arrTouchedPaths | Sort-Object)
 
 $strMiddleDot = [string][char]0x00B7
+
+$arrCanonicalCompliantSnippetLines = @(
+    '**Compliant (blank line is truly empty):**'
+    ''
+    '```powershell'
+    '{'
+    '    Invoke-SomeCmdlet'
+    ''
+    '    Invoke-AnotherCmdlet'
+    '}'
+    '```'
+)
+
+$strCanonicalCompliantSnippet = $arrCanonicalCompliantSnippetLines -join "`n"
+$strCompliantMarker = $arrCanonicalCompliantSnippetLines[0]
 
 $arrCanonicalSnippetLines = @(
     '**Non-Compliant (blank line contains spaces; visualization only):**'
@@ -467,15 +497,31 @@ foreach ($strGuideBearingPath in $arrGuideBearingPaths) {
         -Content $strContent `
         -Needle $strCanonicalSnippet
 
+    $intCompliantSnippetCount = & $scriptGetOrdinalOccurrenceCount `
+        -Content $strContent `
+        -Needle $strCanonicalCompliantSnippet
+
+    $intCompliantMarkerCount = & $scriptGetOrdinalOccurrenceCount `
+        -Content $strContent `
+        -Needle $strCompliantMarker
+
     $intMarkerCount = & $scriptGetOrdinalOccurrenceCount `
         -Content $strContent `
         -Needle $strNonCompliantMarker
 
-    if ($intSnippetCount -ne 1 -or $intMarkerCount -ne 1) {
+    if (
+        $intSnippetCount -ne 1 -or
+        $intMarkerCount -ne 1 -or
+        $intCompliantSnippetCount -ne 1 -or
+        $intCompliantMarkerCount -ne 1
+    ) {
         throw (
-            ("Canonical Non-Compliant example count mismatch in {0}; " +
-            "expected snippet/marker counts 1/1, actual {1}/{2}.") -f
+            ("Canonical example count mismatch in {0}; expected " +
+            "Compliant snippet/marker and Non-Compliant snippet/marker " +
+            "counts 1/1/1/1, actual {1}/{2}/{3}/{4}.") -f
             $strGuideBearingPath,
+            $intCompliantSnippetCount,
+            $intCompliantMarkerCount,
             $intSnippetCount,
             $intMarkerCount
         )
@@ -534,10 +580,33 @@ if ($intRationaleSnippetCount -ne 0 -or $intRationaleMarkerCount -ne 0) {
 git diff --exit-code -- $arrTouchedPaths
 $intGitExitCode = $LASTEXITCODE
 
-if ($intGitExitCode -ne 0) {
+if ($intGitExitCode -eq 1) {
+    & pwsh `
+        -NoLogo `
+        -NoProfile `
+        -File './.github/workflows/Test-ExactGitPathSet.ps1' `
+        -RepositoryRoot '.' `
+        -ExpectedPath $arrExpectedStagedPaths `
+        -Mode 'Both'
+
+    $intVerifierExitCode = $LASTEXITCODE
+
+    if ($intVerifierExitCode -ne 0) {
+        throw (
+            ("Generator drift occurred and exact path-set validation also " +
+            "failed with exit code {0}.") -f
+            $intVerifierExitCode
+        )
+    }
+
     throw (
-        "The final generator run changed the staged expected result; " +
-        "git exited with {0}." -f
+        "The final generator run differs from the staged expected result."
+    )
+}
+elseif ($intGitExitCode -ne 0) {
+    throw (
+        "Unable to compare the final generator result; git command failed " +
+        "with exit code {0}." -f
         $intGitExitCode
     )
 }
@@ -552,47 +621,39 @@ if ($intGitExitCode -ne 0) {
     )
 }
 
-$arrStagedPaths = @(git diff --cached --name-only)
-$intGitExitCode = $LASTEXITCODE
+& pwsh `
+    -NoLogo `
+    -NoProfile `
+    -File './.github/workflows/Test-ExactGitPathSet.ps1' `
+    -RepositoryRoot '.' `
+    -ExpectedPath $arrExpectedStagedPaths `
+    -Mode 'Staged' `
+    -RequireWorkingSetEmpty
 
-if ($intGitExitCode -ne 0) {
+$intVerifierExitCode = $LASTEXITCODE
+
+if ($intVerifierExitCode -ne 0) {
     throw (
-        "Unable to list staged paths; git exited with {0}." -f
-        $intGitExitCode
+        "Final exact path-set validation failed with exit code {0}." -f
+        $intVerifierExitCode
     )
 }
-
-$arrStagedPaths = @($arrStagedPaths | Sort-Object)
-
-$arrPathDifferences = @(
-    Compare-Object `
-        -ReferenceObject $arrExpectedStagedPaths `
-        -DifferenceObject $arrStagedPaths `
-        -CaseSensitive
-)
-
-if ($arrPathDifferences.Count -ne 0) {
-    throw (
-        "Unexpected staged path set: {0}" -f
-        ($arrStagedPaths -join ', ')
-    )
-}
-
-$arrStagedPaths
 ```
 
 ### Content confirmation
 
 Confirm:
 
-- The Compliant example is unchanged.
+- The exact baseline Compliant snippet/digest is unchanged and its
+  snippet/marker each occur exactly once in every guide-bearing file.
 - The Non-Compliant visualization visibly differs.
 - Line 3 contains exactly four U+00B7 characters and nothing else.
 - The warning precedes the visualization.
 - The dots are explicitly identified as documentation substitutes that must not be copied.
 - No touched line has literal trailing whitespace.
 - No touched file contains a carriage-return byte.
-- The complete canonical snippet and its exact heading marker each occur exactly once in `STYLE_GUIDE.md` and each of the four generated artifacts.
+- The complete canonical Non-Compliant snippet and its exact heading marker
+  each occur exactly once in `STYLE_GUIDE.md` and each generated artifact.
 - `STYLE_GUIDE_RATIONALE.md` contains neither the canonical snippet nor its exact operational heading.
 - An ordinal exact-line count proves `STYLE_GUIDE_RATIONALE.md` contains
   exactly one `### Blank Line Usage` heading.
@@ -602,46 +663,39 @@ Confirm:
 - Version and Last Updated agree with the finalized target baseline and UTC implementation date.
 - All four generated artifacts match the authoritative sources.
 - No touched file begins with `EF BB BF`.
-- The working-tree and staged-path sets are each exactly the two sources and four generated artifacts.
+- P1's raw NUL-safe verifier proves the working-tree and staged-path sets are
+  each exactly the two sources and four generated artifacts.
 
 ### Pull-request evidence
 
 While the pull request is open, confirm:
 
 1. Verification runs because every pull request targeting `main` is covered.
-2. The read-only Ubuntu job passes, including the tracked helper harness under PowerShell 7.
-3. The Windows matrix displays and completes four distinct edition/EOL cells against committed `HEAD`.
-4. The two LF cells complete the tracked helper harness and lone-CR sanitation under their assigned editions; neither CRLF cell repeats the helper suite.
-5. Diagnostic upload uses the approved pinned upload action.
-6. Push-only preparation, approval, and synchronization jobs skip.
-7. No pull-request job has `contents: write`.
+2. Preparation uploads the immutable four-file candidate, including the
+   no-change case.
+3. The same-commit local Markdown/dependency call passes read-only.
+4. All four Windows edition/EOL cells execute every applicable P1A ID and the
+   exact production helper/context/harness against that candidate.
+5. Four unique hash-bound attestations reach the read-only terminal approval.
+6. Approval succeeds only after the exact successful dependency result set.
+7. The writer skips because a pull request is not an approved changed push to
+   `main`; no pull-request job has `contents: write`.
 
 ### Post-merge evidence
 
 After merge to `main`, confirm:
 
-1. Read-only preparation runs.
-2. It uploads exactly one immutable candidate using the approved pinned upload action.
-3. It exposes a nonempty ID and 64-hex digest.
-4. Every Windows push cell downloads that exact ID using the approved pinned download action.
-5. Native digest behavior is `error`.
-6. Every cell runs the tracked deterministic helper harness, creates one unique
-   job-owned trusted temporary root, and invokes the shared helper with
-   explicit checkout/trusted roots and caller-owned artifact/run context; the
-   helper uses `FileShare.Read`, hashes and parses one held stream, validates
-   the full path envelope/manifest before candidate creation, and safely
-   extracts or cleans the exact permitted bytes.
-7. The read-only approval job succeeds only after all four cells.
-8. Because sources and generated artifacts were committed together, preparation reports `has_changes=false`.
-9. The write-enabled synchronization job skips.
-10. No bot synchronization commit is created.
+1. The same read-only preparation/Markdown/four-cell/approval graph succeeds
+   against the merged commit.
+2. Preparation reports `has_changes=false` because both sources and all four
+   generated artifacts were committed together.
+3. The writer skips at job level and none of its steps run.
+4. No bot synchronization commit is created.
 
-The synchronization consumer's helper/context integration is established by
-P1B's controlled `has_changes=true` write-path evidence and static inspection;
-this issue's expected no-drift push skips the writer and executes none of its
-steps.
-
-If preparation reports changes, treat that as a source/artifact synchronization failure. Do not accept a recovery commit as this issue's expected outcome.
+P1B's exact merge and retained controlled `has_changes=true` evidence remain
+the authority for writer internals. If P2 preparation reports changes, fail as
+a source/artifact synchronization defect; do not accept a recovery commit as
+P2's expected outcome.
 
 ## Scope and non-goals
 
@@ -652,7 +706,11 @@ If preparation reports changes, treat that as a source/artifact synchronization 
 - Do not modify `.gitattributes`.
 - Do not modify `.github/workflows/Generate-StyleGuideArtifacts.ps1`.
 - Do not modify `.github/workflows/Expand-StyleGuideCandidateArtifact.ps1`.
+- Do not modify
+  `.github/workflows/Manage-StyleGuideCandidateInvocationContext.ps1`.
 - Do not modify `.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1`.
+- Do not modify `.github/workflows/Validate-WorkflowPolicy.mjs`.
+- Do not modify `.github/workflows/Test-ExactGitPathSet.ps1`.
 - Do not modify `.github/workflows/build.yml`.
 - Do not modify `.github/workflows/markdownlint.yml`.
 - Do not modify `.github/dependabot.yml`.
@@ -668,9 +726,11 @@ If preparation reports changes, treat that as a source/artifact synchronization 
 - The two examples visibly differ.
 - The complete canonical Non-Compliant snippet is exact and safely explained.
 - Its third line contains exactly four U+00B7 characters and nothing else.
-- The Compliant example remains unchanged.
+- The exact baseline Compliant snippet/digest remains ordinally unchanged,
+  occurs once per guide-bearing file, and passes mutation self-tests.
 - No literal trailing whitespace is introduced.
-- The canonical snippet and exact operational heading each occur exactly once in `STYLE_GUIDE.md` and each generated artifact.
+- The canonical Non-Compliant snippet and exact operational heading each occur
+  exactly once in `STYLE_GUIDE.md` and each generated artifact.
 - The rationale contains exactly one ordinal line equal to
   `### Blank Line Usage`; that existing section remains generic and portable
   and does not duplicate the canonical snippet or operational heading.
@@ -680,31 +740,25 @@ If preparation reports changes, treat that as a source/artifact synchronization 
 - Every required native command has an immediate exit-code check.
 - Local validation resolves Node/npm applications, requires Node major 24
   before clean installation, and restores the caller's `CI` environment state.
-- Before staging, the complete changed-path set is exactly the six affected files.
-- After staging, the cached path set is exactly the same six files.
+- Before staging, P1's raw NUL-safe verifier proves the complete changed-path
+  set is exactly the six affected files.
+- After staging and final rerun, the same verifier proves cached equality and
+  an empty unstaged/untracked set.
 - No touched file begins with a UTF-8 BOM.
 - No touched file contains a carriage-return byte.
 - The canonical validator rejects a wrong target block even when an unrelated four-middle-dot line is present.
 - The canonical validator uses the local ordinal-count script block, not an undocumented named function, and the fenced command parses in Windows PowerShell 5.1 and PowerShell 7.
 - Lint, whitespace, and generator-idempotency checks pass.
-- Pull-request Ubuntu verification and its PowerShell 7 helper harness pass.
-- The four-cell pull-request Windows matrix, all four production
-  helper/context/harness executions, exact unique attestations, and inherited
-  P1 lone-CR probes pass.
-- Post-merge consumers use the approved pinned artifact actions.
-- The native digest configuration and the helper's independent digest comparison pass.
-- All four Windows push cells run the exact tracked helper/context/harness and
-  compare the selected fixture's generated bytes to the immutable candidate.
-- Static inspection and P1B's controlled `has_changes=true` drill prove that a
-  started writer runs the exact harness/helper/context/regeneration sequence
-  before mutation.
-- Every production helper invocation receives explicit checkout/trusted roots and caller-owned artifact/run context.
-- The post-merge push matrix validates the exact immutable candidate through
-  unique job-owned roots, `FileShare.Read`, the same-held-stream digest/archive
-  contract, full-component enumeration/revalidation, pre-creation manifest
-  validation, and fail-closed cleanup.
+- `git diff --exit-code` distinguishes equal, ordinary generator difference,
+  and Git command failure with stable diagnostics.
+- Pull-request preparation, same-commit Markdown call, all four P1B Windows
+  cells, four unique hash-bound attestations, and read-only approval pass.
+- The pull-request writer skips and no pull-request job has write permission.
 - Post-merge preparation reports no candidate changes.
-- Synchronization skips at the job level, none of its steps run, and no recovery commit is created.
+- Post-merge writer skips at job level, none of its steps run, and no recovery
+  commit is created.
+- Exact P1B merge/run evidence remains the sole authority for publication
+  internals; P2 does not restate them.
 - No unrelated or downstream-specific change is introduced.
 
 ## References
