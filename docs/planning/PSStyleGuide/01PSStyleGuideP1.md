@@ -2,86 +2,88 @@
 
 ## Summary
 
-Make the four generated style-guide artifacts byte-identical under Windows
-PowerShell 5.1 and PowerShell 7 on Windows and Ubuntu. Centralize final
-destination validation and BOM-less UTF-8 serialization, preserve the existing
-LF checkout policy, move hosted Markdown validation to exact Node 24, pin every
-current external action to a reviewed full commit SHA, and add review-only
-GitHub Actions updates. Establish the tracked structural workflow-policy
-validator and raw NUL-safe Git path-set verifier that later issues extend or
-consume.
+Make all four generated style-guide artifacts byte-identical under Windows
+PowerShell 5.1 and PowerShell 7 on Windows and Ubuntu. Establish one fixed-root,
+multi-file generation transaction; a safe, offline workflow-policy contract;
+and a raw NUL-safe Git path-set verifier. Pin the P1 YAML/Node/npm/action supply
+tuple and keep both workflows strictly read-only.
 
-This issue establishes foundations only. It does not add the candidate ZIP
-validator or activate the final artifact-promotion writer.
+P1 establishes shared foundations only. P1A owns candidate validation, P1B owns
+publication, P2 owns the guide-content change, and P3 supersedes the interim
+Node/npm policy while remediating dependencies.
 
-## Execution order
+## Slate order and issue identity
 
-This is P1 and the first issue in the PSStyleGuide slate.
+Execute the PSStyleGuide slate in this order:
 
-After P1 merges:
+1. P1 — this issue;
+2. P1A — **Add a fail-closed cross-platform style-guide candidate validator**;
+3. P1B — **Promote generated style-guide artifacts through a
+   least-privileged verified writer**;
+4. P2 — **Make the non-compliant blank-line example visibly distinct**; and
+5. P3 — **Remediate Markdown lint dependency advisories and add npm update
+   governance**.
 
-1. implement P1A, **Add a fail-closed cross-platform style-guide candidate
-   validator**, against P1's exact merge commit;
-2. implement P1B, **Promote generated style-guide artifacts through a
-   least-privileged verified writer**, against exact P1/P1A merge commits;
-3. implement P2 against P1B's final publication boundary; and
-4. implement P3 against exact P1/P1A/P1B/P2 commits.
+Draft bodies contain titles, never fabricated URLs or issue numbers. File each
+successor with `gh issue create --blocked-by <predecessor-url>` when supported;
+otherwise create it and immediately add the dependency through GitHub's
+supported issue-dependency operation. After every creation, retrieve both
+issues and verify repository, number, title, canonical URL, and the `blockedBy`
+edge. Retain the five canonical URLs and four verified edges.
 
-Record real GitHub blocked-by relationships when the issues are filed.
+Implementation readiness is a later gate, not the filing transaction. Before
+P1A or a later phase starts, record for every consumed predecessor:
 
-File the slate transactionally in P1, P1A, P1B, P2, P3 order. After filing
-each predecessor, copy its canonical PSStyleGuide issue URL into the successor,
-create the real GitHub `blocked by` relationship, retrieve both issues, and
-verify repository, number, title, and relationship before filing/readying the
-successor. Retain the five canonical URLs and four verified edges. Never file
-a literal placeholder or fabricated issue number.
+- permanent issue and reviewed pull-request URLs;
+- reviewed head and base commits;
+- merge method;
+- landed commit(s) and tree; and
+- exact contract paths, schema/interface versions, and retained evidence.
 
-## Advisory-risk execution gate
+Compare landed state with the issue assumptions. A material difference stops
+implementation for issue review and reruns all affected validation. Do not
+equate issue creation, PR approval, merge, and implementation readiness.
 
-Before editing, obtain one dated accountable decision that permits the current
-npm advisory state to remain through P1, P1A, P1B, and P2 until P3. Record in
-the filed P1 issue or linked governed evidence:
+## Advisory-risk gate
 
-- approving person/role and authorizing policy;
-- canonical UTC decision and expiry times;
-- exact Node/npm executable paths and versions;
-- exact audit command, native exit, report version, raw-response digest, and
-  current package/advisory/severity inventory;
-- reason generator/writer hardening precedes dependency remediation;
-- compensating controls and prohibited package changes; and
-- maximum authorized milestone, which cannot extend beyond P3 completion.
+Before editing, obtain a dated accountable decision permitting the current npm
+advisory state to remain through P2 until P3. Record approver/role and policy,
+canonical UTC approval/expiry, exact audit command and native outcome,
+Node/Corepack/npm identities, raw-response digest, finding inventory, reason
+for sequencing, compensating controls, prohibited package changes, and a hard
+expiry no later than P3 completion.
 
-At P1 start rerun the exact audit. Missing, expired, unauthorized, or
-materially worsened evidence stops implementation. If governing policy does
-not permit the wait, rebaseline the slate with the smallest compatible
-dependency-remediation issue before P1; do not improvise package changes in
-P1.
+Rerun the exact audit at P1 start. Missing, expired, unauthorized, or materially
+worsened evidence stops implementation. If policy does not permit the wait,
+rebaseline the slate with the smallest dependency-remediation predecessor;
+do not improvise lint dependency changes in P1.
 
 ## Affected files
 
-Exactly these eight implementation files may change:
+Exactly these ten implementation paths may change:
 
 - `.github/workflows/Generate-StyleGuideArtifacts.ps1`;
 - `.github/workflows/build.yml`;
 - `.github/workflows/markdownlint.yml`;
 - `.github/workflows/Validate-WorkflowPolicy.mjs` — add;
+- `.github/workflows/workflow-policy-contract.json` — add;
+- `.github/workflows/workflow-policy-cases.json` — add;
 - `.github/workflows/Test-ExactGitPathSet.ps1` — add;
 - `.github/workflows/package.json`;
 - `.github/workflows/package-lock.json`; and
 - `.github/dependabot.yml` — add.
 
-Package/lock changes are limited to one reviewed direct YAML parser required
-by `Validate-WorkflowPolicy.mjs`. Do not upgrade, replace, or otherwise change
-the existing lint/hook dependency graph; P3 owns that work.
+Package/lock changes are limited to exact `yaml@2.9.0` and its reproducible
+lock resolution. Do not change the existing lint/hook dependency graph.
 
-Do not modify `.gitattributes`; verify it remains exactly:
+Do not modify `.gitattributes`; it must remain exactly:
 
 ```gitattributes
 * text=auto eol=lf
 ```
 
-The generator must exercise these artifacts during validation, but their final
-committed bytes must remain unchanged:
+The generator exercises these destinations, but their committed bytes must not
+change:
 
 - `copilot-instructions.md`;
 - `powershell.instructions.md`;
@@ -90,435 +92,285 @@ committed bytes must remain unchanged:
 
 Do not hand-edit generated artifacts.
 
-## Requested changes
+## Frozen P1 supply tuple
 
-### 1. Add one final destination and serialization boundary
+Use:
 
-Create one private generator helper used by all four final writes. It accepts
-one destination string and one complete final payload.
+- `yaml@2.9.0`, registry integrity
+  `sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==`
+  and tarball `https://registry.npmjs.org/yaml/-/yaml-2.9.0.tgz`;
+- Node `24.18.1`;
+- the npm `11.16.0` bundled with that Node release as the sole P1 lock
+  producer; and
+- exact setup-node `node-version: '24.18.1'`.
 
-For the destination:
+Before implementation, independently query the official npm registry and
+record the exact tarball URL, integrity, bytes, and SHA-256/SHA-512. Resolve
+the same complete tuple again immediately before merge. A changed version,
+tarball, integrity, Node patch, bundled npm, engine constraint, or security
+status requires renewed review and an atomic tuple/lock update.
 
-1. capture the original value for diagnostics;
-2. reject null/empty/whitespace, wildcard-bearing, relative, and malformed
-   provider input without trimming or rewriting it;
-3. call the `GetUnresolvedProviderPathFromPSPath` overload that returns
-   `ProviderInfo` and `PSDriveInfo`;
-4. require exactly the FileSystem provider;
-5. require one rooted absolute provider-internal result;
-6. normalize it once with `Path.GetFullPath`; and
-7. fail with stable phase, captured destination, and underlying exception on
-   every inconsistent or failed result.
+Generate the lock only with the selected Node/npm pair. Record executable paths,
+versions, registry/tarball identities, clean-install tree, and byte-identical
+lock no-op. Never hand-edit the lock.
 
-Do not pass unresolved wildcard characters to .NET. Do not use `Resolve-Path`
-in a way that requires a previously existing destination leaf.
+## Generator contract
 
-For the payload:
+### Fixed source/output authority
+
+`Generate-StyleGuideArtifacts.ps1` has no public repository-root, source-path,
+destination-path, or output-map override. Anchor one canonical repository root
+to `$PSScriptRoot`, validate every ancestor/component as an expected ordinary
+non-link/reparse path, and use this closed map:
+
+| Sources | Destinations |
+| --- | --- |
+| `STYLE_GUIDE.md`; `STYLE_GUIDE_RATIONALE.md` | `copilot-instructions.md`; `powershell.instructions.md`; `STYLE_GUIDE_CHAT.md`; `STYLE_GUIDE_FULL.md` |
+
+Reject a missing/unexpected source, destination, duplicate identity,
+containment escape, wildcard/provider syntax, symlink, junction, reparse point,
+or path identity alias before reading or writing. Keep the transformation core
+pure: raw source bytes in, four complete payload byte arrays out. Production
+alone supplies the fixed map.
+
+Build `powershell.instructions.md` frontmatter from an explicit line array
+joined with LF. Preserve exact keys, values, quoting, closing delimiter, and
+two following blank lines. Normalize CRLF and lone CR only after all content
+transformation:
 
 ```powershell
 $strNormalizedContent = $CompleteFinalPayload -replace "`r`n?", "`n"
 ```
 
-Then:
+Encode with `System.Text.UTF8Encoding($false)` and add no implicit final
+newline.
 
-- construct `System.Text.UTF8Encoding($false)` explicitly;
-- call `System.IO.File.WriteAllText` exactly once;
-- do not append an implicit final newline;
-- perform no later text transformation; and
-- do not use `Set-Content`, `Out-File`, or a host-default encoding for final
-  artifacts.
+### Four-file replacement transaction
 
-The complete final payloads remain:
+Never write a destination with `WriteAllText`, `Set-Content`, `Out-File`, or
+truncating/open-in-place behavior. The transaction must:
 
-| Function | Complete final payload |
-| --- | --- |
-| `New-StyleGuideCopilotVersion` | `$strContent` |
-| `New-StyleGuidePowerShellInstructionsVersion` | `$strFullContent` |
-| `New-StyleGuideChatVersion` | `$strWrappedContent` |
-| `New-StyleGuideFullVersion` | `$strOutput` |
+1. compute all four final byte arrays before any destination mutation;
+2. capture ordinary-file metadata and SHA-256 for all existing destinations;
+3. create exclusive random candidates and backups in each destination's own
+   directory, with restrictive access where supported;
+4. write exact candidate bytes through `FileStream`, call `Flush(true)`, close,
+   reopen, and verify length/hash/BOM/CR/final-newline expectations;
+5. revalidate destination/candidate/backup identity and link/reparse state;
+6. replace each existing destination with
+   `File.Replace(candidate, destination, backup, false)`;
+7. retain every backup until all four replacements and post-verification pass;
+   and
+8. delete candidates/backups only after success, with bounded cleanup evidence.
 
-Preserve `New-StyleGuideFullVersion`'s existing split/join semantics. Normalize
-after all transformations and concatenations, immediately before encoding.
+On any failure, classify the exact phase and attempt reverse-order restoration
+from verified backups. Report `RolledBack` only after all four original
+lengths/hashes and path identities are reverified. If the operating system
+reports an indeterminate replacement condition, restoration fails, or final
+state cannot be proven, report `ReplacementStateUncertain`, retain recoverable
+backups, stop, and give bounded manual-recovery paths/hashes. Do not claim
+cross-file crash atomicity or that `File.Replace` always preserves one known
+name after every platform failure.
 
-### 2. Replace the frontmatter here-string
+Inject failure before/after every create, flush, verify, replace, rollback, and
+cleanup boundary. Prove success, honest rollback, and uncertain-state
+categories without touching the real repository.
 
-Build the `powershell.instructions.md` YAML frontmatter from an explicit array
-of lines joined with ``"`n"``. Preserve its exact keys, values, quoting, two
-blank lines after the closing delimiter, and existing generated bytes.
+### Script metadata
 
-Do not depend on source-file or host newline style.
+Retain `#Requires -Version 5.1`. The generator's first published parseable
+`.NOTES` version is:
 
-### 3. Record exact script metadata
+`1.0.<implementation UTC YYYYMMDD>.0`
 
-Retain `#Requires -Version 5.1`.
+The unversioned baseline is not an earlier release. Parse and validate the
+named metadata field; a guide-document version is not a substitute.
 
-Use the PSStyleGuide Function and Script Versioning policy and record the
-generator version in the existing parseable `.NOTES` location. Use the
-implementation UTC date and exact calculation/bump rule. Validation must parse
-that named field; a guide-document version is not a substitute for script
-metadata.
+## Workflow and action policy
 
-P1A and P1B consume the exact P1 script version and merge commit.
+Set workflow-level `permissions: {}`. Every P1 job is read-only and declares
+only `contents: read`. Run build verification for every pull request targeting
+`main` and every push to `main`, without workflow path filters or skip-commit
+logic. Generation checks drift and fails on differences; it never stages,
+commits, pushes, receives write permission, or constructs a push credential.
+P1B introduces the sole writer.
 
-### 4. Preserve LF checkout policy
+Pin these reviewed releases to full SHAs, re-resolving tag, release, repository,
+manifest digest, and defaults before implementation and merge:
 
-Prove `.gitattributes` has the exact required single line and that all tracked
-text index blobs are LF/BOM-less as applicable before implementation.
-
-Run `git add --renormalize .` only in a disposable validation worktree. Stop
-and rebaseline rather than silently widening P1 if any unrelated tracked text
-path would change. The final working/cached path sets must equal P1's eight
-affected files; generated artifacts and `.gitattributes` remain unchanged.
-
-### 5. Use exact hosted Node 24
-
-In `.github/workflows/markdownlint.yml`:
-
-- use the exact setup-node role below;
-- set `node-version: '24'`;
-- set `package-manager-cache: false`;
-- resolve the actual Node process before installation;
-- require exact major 24 and log full Node/npm versions;
-- save the caller's `CI` environment state;
-- set process-scoped `CI=true` only for `npm ci`;
-- restore the prior value or absence in `finally`;
-- run the unchanged outer Markdown lint command; and
-- run the unchanged nested-Markdown lint command.
-
-Except for the one reviewed direct YAML parser and regenerated lockfile
-required by this issue, do not change existing package declarations, the hook,
-lint configuration, lint scripts, or final contributor runtime policy. P3
-owns dependency remediation and runtime-policy changes.
-
-### 6. Pin the current external actions with one normative role table
-
-Immediately before implementation and again immediately before merge,
-re-resolve the official release tags and retain timestamped provenance
-evidence. Stop for renewed review if a tag target, repository provenance,
-release metadata, or pinned manifest/default digest differs.
-
-| Action | Required full commit SHA | Reviewed release |
+| Action | Full commit SHA | Release |
 | --- | --- | --- |
 | `actions/checkout` | `3d3c42e5aac5ba805825da76410c181273ba90b1` | `v7.0.1` |
 | `actions/setup-node` | `820762786026740c76f36085b0efc47a31fe5020` | `v7.0.0` |
 | `actions/upload-artifact` | `043fb46d1a93c77aae656e7c1c64a875d1fc6a0a` | `v7.0.1` |
 
-This is the sole normative temporary action-role inventory:
+The normative role/input table is:
 
-| Workflow | Job ID | Step ID | Action/release | Condition | Exact explicitly declared inputs |
-| --- | --- | --- | --- | --- | --- |
-| `build.yml` | `verify_generated_artifacts` | `checkout_repository` | `actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1` (`v7.0.1`) | ordinary job step | `ref: ${{ github.sha }}`; `persist-credentials: false` |
-| `build.yml` | `verify_generated_artifacts` | `upload_failure_diagnostics` | `actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a` (`v7.0.1`) | `${{ failure() && !cancelled() }}` | collision-free run/attempt name; exact diagnostic-directory output; `if-no-files-found: error`; `retention-days: 7`; `overwrite: false`; `include-hidden-files: false`; `archive: true` |
-| `build.yml` | `synchronize_generated_artifacts_temporary` | `checkout_repository` | `actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1` (`v7.0.1`) | ordinary job step | `ref: ${{ github.sha }}`; `persist-credentials: false` |
-| `markdownlint.yml` | `markdownlint` | `checkout_repository` | `actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1` (`v7.0.1`) | ordinary job step | `ref: ${{ github.sha }}`; `persist-credentials: false` |
-| `markdownlint.yml` | `markdownlint` | `setup_node` | `actions/setup-node@820762786026740c76f36085b0efc47a31fe5020` (`v7.0.0`) | ordinary job step | `node-version: '24'`; `package-manager-cache: false` |
+| Workflow/job/step | Action | Condition | Authored `with` inputs |
+| --- | --- | --- | --- |
+| `build.yml/verify_generated_artifacts/checkout_repository` | checkout SHA above | ordinary | `repository: ${{ github.repository }}`; `ref: ${{ github.sha }}`; `token: ${{ github.token }}`; `persist-credentials: false`; `clean: true`; `fetch-depth: 1`; `fetch-tags: false`; `show-progress: true`; `lfs: false`; `submodules: false`; `set-safe-directory: true`; `allow-unsafe-pr-checkout: false` |
+| `build.yml/verify_generated_artifacts/upload_failure_diagnostics` | upload SHA above | `${{ failure() && !cancelled() }}` | exact run/job/attempt name; exact producer path; `if-no-files-found: error`; `retention-days: 7`; `compression-level: 0`; `overwrite: false`; `include-hidden-files: false`; `archive: true` |
+| `markdownlint.yml/markdownlint/checkout_repository` | checkout SHA above | ordinary | same closed checkout inputs |
+| `markdownlint.yml/markdownlint/setup_node` | setup-node SHA above | ordinary | `node-version: '24.18.1'`; `check-latest: false`; `token: ${{ github.token }}`; `package-manager-cache: false` |
 
-For `upload_failure_diagnostics`, “collision-free run/attempt name” means
-exactly
-`style-guide-verification-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}`.
-Its path is exactly
-`${{ steps.failure_diagnostics.outputs.diagnostic_path }}`. The producer
-creates a fresh job-owned directory under `RUNNER_TEMP`, always writes one
-bounded redacted BOM-less/LF summary with stable phase/native-exit/
-repository-relative-path/size/hash fields, and copies an available generated
-destination only after ordinary-file, non-reparse, containment, and reviewed
-size checks. It never copies source, environment, token, Git configuration,
-remote URL, or arbitrary logs. The producer and upload both use
-`continue-on-error: true` so diagnostics cannot hide the primary failure.
+`workflow-policy-contract.json` records every manifest input as exactly one of
+`Authored`, `ReviewedDefault`, or `NotApplicable`, including credential,
+checkout clean/fetch, cache, extraction, retention, overwrite, and unsafe-link
+behavior. It stores the exact pinned `action.yml` URL/digest and reviewed
+default shape. Unknown, duplicate, omitted-without-disposition, or extra
+literal inputs fail.
 
-For every role, retain a second record titled **Reviewed effective defaults at
-pinned manifest**. It identifies the exact full-SHA `action.yml` URL/digest,
-every manifest input/default shape, and the effective omitted values affecting
-credentials, clean/fetch behavior, caching, selection/extraction, overwrite,
-retention, or failure. The role table governs literal YAML `with` keys;
-manifest defaults remain real reviewed behavior.
+Failure diagnostics use the exact name
+`style-guide-verification-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}`
+and a fresh job-owned `RUNNER_TEMP` directory. The producer writes one bounded,
+redacted, BOM-less/LF summary with stable phase/native-exit/path/size/hash
+fields and may copy only a verified bounded ordinary generated destination.
+Never copy sources, environment, credentials, Git config, remote URLs, or
+arbitrary logs. Producer and upload may use `continue-on-error: true`; neither
+may hide the primary failure.
 
-Every `uses:` line must have the exact full SHA and matching release comment.
-Parse all tracked workflow YAML structurally and require exact role-set and
-explicit-input-set equality. Reject unknown explicit inputs, roles, actions,
-and workflows even when an action would ignore the input. A changed
-security-relevant test-manifest default must require renewed review.
+## Offline workflow-policy fixtures
 
-Negative fixtures cover missing, extra, duplicate, misplaced, mutable,
-arbitrary-SHA, wrong-repository, wrong-release-comment, wrong-condition, and
-weakened-input rows.
+Implement `Validate-WorkflowPolicy.mjs` over exact `yaml@2.9.0` with safe/core
+schema settings. Reject duplicate keys, aliases, merge keys, custom tags,
+unknown shapes, dynamic names/expressions where literals are required,
+unbounded nodes, mutable actions, remote reusable workflows, cache roles,
+credential persistence, auto-extraction, write permissions, unknown roles, and
+role/input/default drift.
 
-P1B atomically replaces this temporary table with its final role table.
+`workflow-policy-contract.json` is the single machine-readable contract.
+`workflow-policy-cases.json` is the single versioned, namespaced positive/
+negative case catalog. Tests generate disposable workflow/manifest fixtures
+from it and remain offline; no copied third-party manifest or temporary
+fixture workflow is production authority. Cover missing/extra/duplicate/
+swapped jobs and steps, trigger/permission/needs/condition mutation, wrong
+repository/SHA/comment/input/default, writer introduction, dynamic values,
+parser hazards, and every action-input disposition.
 
-### 7. Add tracked structural workflow-policy validation
+## Exact Git path-set verifier
 
-Create `.github/workflows/Validate-WorkflowPolicy.mjs` with a versioned
-dependency-free policy layer over one reviewed direct YAML parser. Regenerate
-the lockfile with the exact selected npm; do not manually edit it. After
-`npm ci`, validation is deterministic and offline.
+Add versioned `Test-ExactGitPathSet.ps1` with `#Requires -Version 5.1`. It
+accepts an explicit validated repository root, an exact repository-relative
+path array, closed mode `Working`, `Staged`, or `Both`, and optional empty
+working-versus-index requirement.
 
-Parser/validator requirements:
+Resolve Git as an application and use `System.Diagnostics.Process` with
+argument arrays and raw redirected bytes:
 
-- use the reviewed safe/core schema;
-- reject duplicate keys, aliases, custom tags, unknown node shapes, merge
-  keys, and unbounded/dynamic constructs;
-- distinguish exact explicit YAML inputs from reviewed pinned-manifest
-  defaults;
-- validate exact events, permissions, jobs, stable step IDs, conditions,
-  `needs`, action roles, full SHAs/comments, and the sole temporary writer;
-- reject a second write-enabled job, remote reusable workflow, cache,
-  credential persistence, auto-extraction, mutable action, or unknown role;
-- emit stable policy IDs and bounded diagnostics; and
-- operate on explicit repository/workflow/manifest paths without ambient
-  discovery.
+- `git diff --no-renames --name-only -z`;
+- `git diff --cached --no-renames --name-only -z`; and
+- `git ls-files --others --exclude-standard -z`.
 
-Tracked positive and negative fixtures use test-owned workflow copies.
-Independently cover missing, extra, duplicate, swapped, dynamic, mutable,
-wrong-repository/SHA/comment/condition/permission/event/input/default, and
-writer-predicate mutations. P1B updates this same validator and parser
-atomically; P3 retains and extends them.
+Capture native status immediately. Split only on byte `0x00`, require exact
+termination/cardinality, and compare raw expected ASCII bytes ordinally.
+Never decode or print hostile path bytes. Emit stable missing, unexpected,
+malformed, and native-command categories. Disposable repositories cover spaces,
+tabs, quotes, backslashes, newline-bearing names, supported non-ASCII names,
+deletion, rename, untracked, and mixed staged/unstaged state under Windows
+PowerShell 5.1 and PowerShell 7.
 
-### 8. Add one NUL-safe exact Git path-set verifier
+All complete PowerShell workflow blocks explicitly select `powershell` or
+`pwsh`, start with `$ErrorActionPreference = 'Stop'`, capture
+`$LASTEXITCODE` immediately, validate output shape, and fail nonzero. Treat
+`git diff --exit-code` status 0 as equal, 1 as ordinary difference, and every
+other status as command failure.
 
-Create `.github/workflows/Test-ExactGitPathSet.ps1` with
-`#Requires -Version 5.1`, exact script version, and a public command accepting:
+## Dependabot
 
-- explicit repository root;
-- explicit expected repository-relative path array;
-- closed mode `Working`, `Staged`, or `Both`; and
-- optional requirement for an empty working-versus-index set.
+Add exactly one review-only `github-actions` entry for `/` on a weekly
+schedule. No automatic approval or merge. Every proposal requires release,
+provenance, SHA, runtime, manifest/default, and role-table review. P3 adds the
+second npm entry for `/.github/workflows`.
 
-Resolve Git as an application and invoke it through
-`System.Diagnostics.Process` with argument arrays and redirected raw
-stdout/stderr. Capture native exit immediately. Use:
-
-- `git diff --no-renames --name-only -z` for unstaged paths;
-- `git diff --cached --no-renames --name-only -z` for staged paths; and
-- `git ls-files --others --exclude-standard -z` for untracked paths.
-
-Split only on raw byte `0x00`; reject malformed termination/cardinality and
-compare each record to the exact expected ASCII bytes using ordinal identity.
-Do not text-decode or print hostile raw path bytes. Emit stable missing,
-unexpected, malformed, and native-command categories.
-
-Disposable-repository fixtures cover spaces, tabs, quotes, backslashes,
-newline-bearing names, non-ASCII names where supported, deletion, rename,
-untracked files, and mixed staged/unstaged state. Run them under Windows
-PowerShell 5.1 and PowerShell 7. P1A, P1B, P2, and P3 consume this exact
-version unless a separately scoped fix is reviewed.
-
-### 9. Add review-only GitHub Actions updates
-
-Create `.github/dependabot.yml` with normalized exact content equivalent to:
-
-```yaml
-version: 2
-updates:
-  - package-ecosystem: github-actions
-    directory: /
-    schedule:
-      interval: weekly
-```
-
-Use approved weekday/time/timezone fields only if repository policy requires
-them. Require exactly one `github-actions` entry for `/`, no duplicates, and no
-automatic approval/merge. Every proposal requires release/provenance/SHA/
-runtime/input review and atomic role-table updates.
-
-P3 replaces this intermediate invariant with exactly two entries by adding npm
-at `/.github/workflows`.
-
-### 10. Isolate the temporary publication boundary
-
-P1 must not add the candidate helper, context manager, permanent harness,
-download action, matrix approval, or final writer.
-
-In `.github/workflows/build.yml`:
-
-- run pull-request verification for every pull request targeting `main`;
-- run push verification for every push to `main`;
-- remove workflow-level path filters and skip-commit behavior;
-- set workflow/top-level permissions to `contents: read`;
-- run a read-only generation/byte verification job from the exact event SHA;
-- give `contents: write` only to a separate temporary push-to-`main`
-  synchronization job;
-- disable persisted credentials on every checkout;
-- stage only the four generated artifacts and reject any other path; and
-- use explicit remote preflight, destination ref, and exact expected-SHA lease
-  for the temporary push.
-
-GitHub creates the write-capable `GITHUB_TOKEN` for the complete temporary
-writer job. The exact pinned checkout action may use it transiently for fetch.
-`persist-credentials: false` and checkout cleanup remove retained
-authentication; immediately afterward prove no credential helper,
-`http.*.extraheader`, token-bearing remote URL, or ordinary token environment
-variable is available to repository scripts.
-
-Keep xtrace disabled. Only the exact push step receives the masked token and
-derives one child-process-scoped environment-backed HTTP authorization header
-for the single exact-lease/refspec `git push`. Never place token/header state
-in a remote URL, constructed command string, file, artifact, output, or
-diagnostic. Restore/remove every temporary environment and Git value in
-`finally`, then prove no credential state remains.
-
-Before enabling the push-to-`main` predicate, use exactly
-`.github/workflows/evidence-p1-temporary-writer.yml` on one recorded unique
-temporary branch. Its writer algorithm/action roles must structurally equal
-the proposed production temporary writer except for a literal predicate
-authorizing only that exact evidence ref. Run changed/no-change, stale
-preflight, lost lease, unrelated ref, unexpected path, and token-sentinel
-drills against the real repository origin.
-
-Retain workflow/commit/run/remote identity evidence, then delete the evidence
-workflow and branch. Final validation proves the evidence path and every
-alternate write predicate are absent from the production commit. Never
-hand-edit the production predicate to run this proof.
-
-P1B replaces this temporary job with immutable candidate transport, complete
-matrix approval, at-use revalidation, and the final writer.
-
-### 11. Apply one native-command contract
-
-Every complete PowerShell `run:` block:
-
-- selects `powershell` or `pwsh` explicitly;
-- starts with `$ErrorActionPreference = 'Stop'`;
-- captures `$LASTEXITCODE` immediately after each native command;
-- validates output count/shape before use; and
-- throws/exits nonzero on every failure.
-
-Classify `git diff --exit-code`/`--no-index --exit-code` as 0 equal, 1 ordinary
-difference, and every other value command failure. Treat every nonzero
-`git ls-remote --exit-code` as failure and retain the native status.
-
-### 12. Add the reciprocal P1↔T1 comparison
+## Reciprocal P1↔T1 comparison
 
 At implementation start and before merge, compare exact PSStyleGuide P1 and
-TerraformStyleGuide T1 commits across:
+TerraformStyleGuide T1 commits across fixed source/output authority,
+path/link rules, serialization, four-file transaction and rollback states,
+frontmatter, script version, Node/YAML/npm tuple, action inputs/defaults,
+offline fixtures, raw path verifier, native exits, workflow permissions, and
+generated byte/idempotence evidence.
 
-- complete-payload boundaries;
-- destination/provider rules;
-- encoding/newline/final-newline behavior;
-- frontmatter and intentional artifact differences;
-- script metadata;
-- Node/action foundations;
-- native exits;
-- generated-byte/idempotence evidence; and
-- temporary publication boundaries.
-
-For every row retain PS evidence, Terraform evidence, status (`same`,
-`intentional difference`, or `blocker`), and rationale. Unexplained observable
-security/failure differences block merge. Keep both repositories
-self-contained; do not create a shared runtime package.
+For every row retain both evidence identities, status `same`,
+`intentional difference`, or `blocker`, and rationale. An unexplained
+observable security/failure difference blocks merge. Keep repositories
+self-contained.
 
 ## Validation
 
-Use clean disposable clones/worktrees and do not let one edition overwrite
-another's evidence.
+Use clean disposable clones/worktrees. Never let one runtime overwrite another
+cell's evidence.
 
-### Generator matrix
+For Windows PowerShell 5.1 on Windows, PowerShell 7 on Windows, and PowerShell
+7 on Ubuntu:
 
-Run:
-
-- Windows PowerShell exactly 5.1 on Windows;
-- PowerShell 7 on Windows; and
-- PowerShell 7 on Ubuntu.
-
-For every available cell:
-
-1. record executable path, edition, full version, OS, and Git version;
+1. record executable, edition/version, OS, and Git;
 2. start from exact committed source/artifact bytes;
-3. run the exact generator;
+3. run generation;
 4. capture all four SHA-256 values;
 5. prove no UTF-8 BOM or `0x0D`;
-6. prove a second run is byte-idempotent; and
+6. prove second-run byte idempotence; and
 7. compare hashes across cells.
 
 At minimum, Windows PowerShell 5.1 and one PowerShell 7 cell must match.
+Exercise fixed-map success, path/link/reparse rejection, CRLF/lone-CR
+normalization, frontmatter, candidate/flush/replace/rollback/cleanup injected
+failures, and `ReplacementStateUncertain`.
 
-Use controlled fixtures for ordinary rooted and FileSystem-qualified
-destinations; null/empty, relative, wildcard, non-FileSystem, malformed, and
-serialization failures; CRLF/lone CR normalization; frontmatter; BOM/CR; and
-repeat idempotence. Restore test-owned state in `finally`.
+Also prove:
 
-### Node, workflow, and scope
+- P1's exact Node/YAML/npm tuple, reproducible lock, clean install, and both
+  existing outer/nested lint surfaces;
+- package/hook/lint declarations unchanged except the YAML parser;
+- exact workflow events, permissions, jobs, roles, authored inputs, reviewed
+  defaults, and stable diagnostic predicate;
+- every workflow-policy and hostile Git-path fixture passes offline;
+- no write permission, stage, commit, push, credential derivation, candidate
+  helper, download, matrix approval, or final writer exists;
+- `.gitattributes` and all applicable tracked text blobs satisfy LF/BOM rules;
+- generated destination blobs remain unchanged;
+- working and staged sets equal exactly the ten affected paths; and
+- validation from staged content produces no additional diff.
 
-Prove:
-
-- Node 24 clean install and both existing lint surfaces pass;
-- existing dependency versions, hook, and lint scripts/config remain unchanged;
-- package/lock differences are exactly the reviewed direct YAML parser and its
-  reproducible dependency graph;
-- `.gitattributes` and tracked text index blobs satisfy LF policy;
-- every external action equals the sole temporary role table;
-- explicit-input and pinned-manifest-default records are exact;
-- all structural workflow-policy positive/negative fixtures pass;
-- all exact Git path-set verifier fixtures pass on required runtimes;
-- Dependabot has exactly one review-only Actions entry;
-- workflow permissions/triggers match this issue;
-- no helper/context/harness/download/approval/final writer exists;
-- diagnostics are bounded/redacted/failure-only and token-sentinel clean;
-- generated artifact blobs remain unchanged;
-- working and cached path sets equal the eight affected files through the
-  tracked raw NUL-safe verifier; and
-- validation from staged content produces no further diff.
-
-Retain pull-request and controlled temporary-branch push evidence. The
-temporary writer must prove stale ref, exact lease, no-op, unrelated event, and
-token-sentinel failures leave the remote target unchanged. Retain evidence that
-the exact temporary evidence workflow/ref was removed and is absent from the
-production commit.
+Run `git add --renormalize .` only in a disposable validation worktree. Any
+unrelated changed path stops for rebaseline.
 
 ## Acceptance criteria
 
-- [ ] One private helper validates every destination and performs every final
-      BOM-less UTF-8 write.
-- [ ] All complete payloads normalize CRLF/lone CR immediately before
-      serialization.
-- [ ] Windows PowerShell 5.1 and PowerShell 7 produce identical artifact bytes.
-- [ ] Repeated generation is byte-idempotent and committed artifacts remain
-      unchanged.
-- [ ] Frontmatter bytes/content remain exact.
-- [ ] `.gitattributes` remains the exact LF policy.
-- [ ] A current accountable advisory-risk decision authorizes the sequence
-      through P3 or implementation stops for rebaseline.
-- [ ] Hosted Markdown validation uses actual Node major 24 with automatic
-      package-manager caching disabled.
-- [ ] Existing package/hook/lint semantics remain unchanged; package/lock
-      additions are exactly the reviewed YAML parser graph.
-- [ ] The tracked workflow-policy validator/parser and every positive/negative
-      fixture pass deterministically offline.
-- [ ] The tracked raw NUL-safe path-set verifier and hostile-path fixtures pass
-      under Windows PowerShell 5.1 and PowerShell 7.
-- [ ] Every action equals the sole exact temporary role table.
-- [ ] Exact explicit action inputs and reviewed pinned-manifest defaults are
-      separately recorded and validated.
-- [ ] Failure diagnostics are exact, bounded, redacted, ordinary-failure-only,
-      seven-day, and token-sentinel clean.
-- [ ] Dependabot has exactly one review-only GitHub Actions entry.
-- [ ] Workflows are unfiltered as required and read-only except the temporary
-      writer.
-- [ ] Every checkout disables persisted credentials.
-- [ ] Checkout's transient token use/cleanup and push-only explicit
-      materialization match the honest credential contract.
-- [ ] Native command and temporary exact-lease/token drills pass through the
-      exact evidence workflow.
-- [ ] The evidence workflow/ref is removed and no alternate production write
-      predicate remains.
-- [ ] P1↔T1 has no unexplained blocker.
-- [ ] The working/staged path sets contain exactly the eight affected files.
+- [ ] The fixed two-source/four-destination authority rejects caller path/root
+      substitution and every link/reparse/escape.
+- [ ] All four payloads are computed before one honest replace/rollback
+      transaction; no destination is truncated in place.
+- [ ] Success, `RolledBack`, and `ReplacementStateUncertain` are proven with
+      injected failures.
+- [ ] Windows PowerShell 5.1 and PowerShell 7 produce byte-identical,
+      idempotent BOM-less/LF artifacts, with committed outputs unchanged.
+- [ ] Generator version is `1.0.<implementation UTC YYYYMMDD>.0`.
+- [ ] The exact re-resolved YAML/Node/npm tuple and reproducible lock evidence
+      are recorded.
+- [ ] Both workflows are unfiltered and read-only; generation only detects
+      drift.
+- [ ] Every action role/input/default equals the closed contract.
+- [ ] The workflow policy/case catalogs and validator pass all offline cases.
+- [ ] The raw NUL-safe path verifier passes required hostile-path cells.
+- [ ] Dependabot contains exactly one review-only Actions entry.
+- [ ] The advisory-risk gate is current and P1↔T1 has no unexplained blocker.
+- [ ] The working/staged path sets contain exactly the ten affected files.
 
 ## Handoff
 
-Provide P1A with P1's actual issue URL, final merge commit, advisory-risk
-decision, generator/validator/path-verifier versions and hashes, action
-provenance/default evidence, generator matrix, temporary-writer runs/removal
-evidence, and P1↔T1 matrix. P1A records receipt in its own dependency gate.
+Give P1A the permanent P1 issue/PR URLs, reviewed head/base, merge method,
+landed commit/tree, generator version/hash, policy schema/version/hashes, path
+verifier version/hash, exact action manifest/default evidence, supply tuple,
+generator matrix, advisory decision, and P1↔T1 matrix. P1A must compare these
+landed contracts with its assumptions before implementation.
 
 ## Non-goals
 
-- Candidate ZIP parsing/extraction or resource ceilings.
-- Caller temporary-root ownership.
-- Permanent helper/context/harness implementation.
-- Immutable artifact download/promotion or final writer activation.
-- Dependency remediation, lint/hook behavior changes, or final contributor
-  Node-policy changes beyond the reviewed direct YAML parser required here.
+- Candidate ZIP validation/extraction or caller-owned temporary roots.
+- Publication, staging, committing, pushing, or any temporary/final writer.
 - Source-guide or generated-artifact content changes.
+- Lint/hook dependency remediation or final contributor Node policy.
 - A shared cross-repository runtime package.
 
 ## References
@@ -526,12 +378,15 @@ evidence, and P1↔T1 matrix. P1A records receipt in its own dependency gate.
 - [PSStyleGuide Function and Script Versioning](https://github.com/franklesniak/PSStyleGuide/blob/main/STYLE_GUIDE.md#function-and-script-versioning)
 - [PowerShell unresolved provider paths](https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.pathintrinsics.getunresolvedproviderpathfrompspath)
 - [PowerShell character encoding](https://learn.microsoft.com/powershell/module/microsoft.powershell.core/about/about_character_encoding)
-- [Node.js release status](https://nodejs.org/en/about/previous-releases)
-- [GitHub secure use reference](https://docs.github.com/en/actions/reference/security/secure-use)
+- [File.Replace](https://learn.microsoft.com/en-us/dotnet/api/system.io.file.replace)
+- [ReplaceFile failure behavior](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-replacefilea)
+- [FileStream.Flush(Boolean)](https://learn.microsoft.com/en-us/dotnet/api/system.io.filestream.flush)
+- [yaml 2.9.0 registry record](https://registry.npmjs.org/yaml/2.9.0)
+- [Official Node distribution index](https://nodejs.org/dist/index.json)
+- [npm 11.16.0 registry record](https://registry.npmjs.org/npm/11.16.0)
 - [GitHub workflow permissions](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#permissions)
-- [Pinned checkout action metadata](https://raw.githubusercontent.com/actions/checkout/3d3c42e5aac5ba805825da76410c181273ba90b1/action.yml)
-- [Dependabot options](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference)
+- [Pinned checkout manifest](https://raw.githubusercontent.com/actions/checkout/3d3c42e5aac5ba805825da76410c181273ba90b1/action.yml)
+- [Pinned setup-node manifest](https://raw.githubusercontent.com/actions/setup-node/820762786026740c76f36085b0efc47a31fe5020/action.yml)
+- [Pinned upload-artifact manifest](https://raw.githubusercontent.com/actions/upload-artifact/043fb46d1a93c77aae656e7c1c64a875d1fc6a0a/action.yml)
 - [Git status pathname format and `-z`](https://git-scm.com/docs/git-status#_pathname_format_notes_and_z)
-- [Git diff exit codes](https://git-scm.com/docs/git-diff#Documentation/git-diff.txt---exit-code)
 - [Git attributes](https://git-scm.com/docs/gitattributes)
-- [Git push and leases](https://git-scm.com/docs/git-push)
