@@ -179,6 +179,11 @@ run-lint (vector 2, only after vector 1 succeeds):
 --no-progress --color=false lint:md:nested
 ```
 
+The canonical preimage is exactly the bytes between those fences, beginning
+with `ci:`, ending with the LF after `lint:md:nested`, encoded once as BOM-less
+UTF-8 with LF and no fence bytes. Its literal SHA-256 is
+`bacd645f3b9fd5e2b740d865c64488d6853935de23c05b07639d0c9f02d8dff1`.
+
 Every row uses the fixed `.github/workflows` package root as working directory,
 `shell: false`, hidden Windows console, ignored stdin, and no inherited file
 descriptors. `ci` and `audit` use the closed network environment and a fresh
@@ -394,18 +399,33 @@ inputs, and postcondition failures in disposable Git repositories. Run one real
 `prepare` lifecycle install and one explicit `HUSKY=0` clean-CI install.
 Workflows intending to skip set `HUSKY=0`; they never rely on ambient `CI`.
 
-The lint/hook harness contains one physical row and oracle for each:
-`PS-P3-HUSKY-001` required install; `002` explicit opt-out; `003` production
-skip; `004` CI-without-policy conflict; `005` malformed control; `006` wrong
-working directory; `007` missing package; `008` package/link substitution;
-`009` entry hash drift; `010` hook HEAD/index/working drift; `011` hook mode/
-marker drift; `012` import/spawn failure; `013` throw/nonzero outcome; `014`
-nonempty failure message; `015` wrong hooksPath; `016` generated-inventory
-drift; `017` tracked-source/index mutation; and `018` real installed-hook
-commit. Range prose is not authority: the committed catalog has 18 individual
-records with literal fixtures, exact decisions, identities, calls, side
-effects, and diagnostics, and mutation tests reject missing/duplicate/
-unknown/regrouped/orphaned rows.
+The installer catalog has these 18 physical records; each additionally carries
+its literal fixture, exact decision, package/entry/hook identity, native
+outcome, calls, pre/post state, side effects, and diagnostic:
+
+| ID | Singular fixture and oracle |
+| --- | --- |
+| `PS-P3-HUSKY-001` | required install succeeds with exact inventory |
+| `PS-P3-HUSKY-002` | explicit `HUSKY=0` opt-out is immutable |
+| `PS-P3-HUSKY-003` | production skip is immutable |
+| `PS-P3-HUSKY-004` | CI without explicit Husky policy rejects |
+| `PS-P3-HUSKY-005` | malformed control rejects |
+| `PS-P3-HUSKY-006` | wrong working directory rejects without mutation |
+| `PS-P3-HUSKY-007` | missing package rejects before import |
+| `PS-P3-HUSKY-008` | package link/reparse substitution rejects |
+| `PS-P3-HUSKY-009` | fixed entry hash drift rejects |
+| `PS-P3-HUSKY-010` | hook HEAD/index/working drift rejects |
+| `PS-P3-HUSKY-011` | hook mode/marker drift rejects |
+| `PS-P3-HUSKY-012` | import/spawn failure rejects |
+| `PS-P3-HUSKY-013` | throw/nonzero outcome rejects |
+| `PS-P3-HUSKY-014` | nonempty failure message rejects |
+| `PS-P3-HUSKY-015` | wrong final hooksPath rejects |
+| `PS-P3-HUSKY-016` | generated-inventory drift rejects |
+| `PS-P3-HUSKY-017` | tracked source/index mutation rejects |
+| `PS-P3-HUSKY-018` | real installed-hook commit succeeds |
+
+Mutation tests reject missing, duplicate, unknown, regrouped, skipped,
+orphaned, unused, or multiply emitted rows.
 
 The hook:
 
@@ -432,6 +452,30 @@ Node-policy delegation, installer branches, and a real clean-installed Husky
 hook invoked by `git commit`. Run Ubuntu and Windows/Git Bash for both exact
 Node cells; record shell/Git/Node/Corepack/npm/package/tool versions and leave
 the source repository unchanged.
+
+The four columns below are literal applicability:
+`U22 = ubuntu-24.04/22.23.2`,
+`U24 = ubuntu-24.04/24.18.1`,
+`W22 = windows-2025 Git Bash/22.23.2`, and
+`W24 = windows-2025 Git Bash/24.18.1`. Every cell is a separate physical case
+with one fixture, exact manager/runtime identity, native result, side effects,
+diagnostic, and emitted record:
+
+| Behavior and exact oracle | U22 ID | U24 ID | W22 ID | W24 ID |
+| --- | --- | --- | --- | --- |
+| clean `ci` and dependency-tree validation succeeds | `PS-P3-NPM-U22-01` | `PS-P3-NPM-U24-01` | `PS-P3-NPM-W22-01` | `PS-P3-NPM-W24-01` |
+| `lock-noop` proves byte-identical lock | `PS-P3-NPM-U22-02` | `PS-P3-NPM-U24-02` | `PS-P3-NPM-W22-02` | `PS-P3-NPM-W24-02` |
+| outer lint succeeds | `PS-P3-NPM-U22-03` | `PS-P3-NPM-U24-03` | `PS-P3-NPM-W22-03` | `PS-P3-NPM-W24-03` |
+| nested lint succeeds | `PS-P3-NPM-U22-04` | `PS-P3-NPM-U24-04` | `PS-P3-NPM-W22-04` | `PS-P3-NPM-W24-04` |
+| no staged Markdown; zero manager calls | `PS-P3-HOOK-U22-01` | `PS-P3-HOOK-U24-01` | `PS-P3-HOOK-W22-01` | `PS-P3-HOOK-W24-01` |
+| staged valid Markdown passes | `PS-P3-HOOK-U22-02` | `PS-P3-HOOK-U24-02` | `PS-P3-HOOK-W22-02` | `PS-P3-HOOK-W24-02` |
+| outer-rule violation rejects exact rule/path | `PS-P3-HOOK-U22-03` | `PS-P3-HOOK-U24-03` | `PS-P3-HOOK-W22-03` | `PS-P3-HOOK-W24-03` |
+| nested-fence violation rejects exact rule/depth/path | `PS-P3-HOOK-U22-04` | `PS-P3-HOOK-U24-04` | `PS-P3-HOOK-W22-04` | `PS-P3-HOOK-W24-04` |
+| staged/worktree isolation preserves unstaged bytes | `PS-P3-HOOK-U22-05` | `PS-P3-HOOK-U24-05` | `PS-P3-HOOK-W22-05` | `PS-P3-HOOK-W24-05` |
+| missing manager/tool rejects as tooling failure | `PS-P3-HOOK-U22-06` | `PS-P3-HOOK-U24-06` | `PS-P3-HOOK-W22-06` | `PS-P3-HOOK-W24-06` |
+| broken configuration differs from lint finding | `PS-P3-HOOK-U22-07` | `PS-P3-HOOK-U24-07` | `PS-P3-HOOK-W22-07` | `PS-P3-HOOK-W24-07` |
+| real installed hook commit passes | `PS-P3-HOOK-U22-08` | `PS-P3-HOOK-U24-08` | `PS-P3-HOOK-W22-08` | `PS-P3-HOOK-W24-08` |
+| real installed hook violation commit rejects | `PS-P3-HOOK-U22-09` | `PS-P3-HOOK-U24-09` | `PS-P3-HOOK-W22-09` | `PS-P3-HOOK-W24-09` |
 
 ## Raw npm-audit boundary
 
@@ -584,9 +628,9 @@ count, bounded diagnostic, and applicable OS/Node cells. These are the closed
 | `PS-P3-AUDIT-001` | clean audit, no exception file | pass |
 | `PS-P3-AUDIT-002` | clean audit, exception file present | fail stale permission |
 | `PS-P3-AUDIT-003` | residual audit, no exception file | fail unapproved findings |
-| `PS-P3-AUDIT-004` | exact approved findings/topology | pass |
-| `PS-P3-AUDIT-005` | new `(Package, AdvisoryUrl)` | fail exact addition |
-| `PS-P3-AUDIT-006` | removed approved finding | fail stale removal |
+| `PS-P3-AUDIT-004` | exact observed facts, approvals, and topology | pass |
+| `PS-P3-AUDIT-005` | new observed `(Package, AdvisoryUrl)` | fail exact addition |
+| `PS-P3-AUDIT-006` | removed observed finding/stale approval | fail stale removal |
 | `PS-P3-AUDIT-007` | new package node path | fail topology addition |
 | `PS-P3-AUDIT-008` | removed approved node path | fail stale topology |
 | `PS-P3-AUDIT-009` | one millisecond before expiration | pass |
@@ -594,7 +638,7 @@ count, bounded diagnostic, and applicable OS/Node cells. These are the closed
 | `PS-P3-AUDIT-011` | one millisecond after expiration | fail expired |
 | `PS-P3-AUDIT-012` | malformed timestamp | fail schema |
 | `PS-P3-AUDIT-013` | unknown exception property | fail closed schema |
-| `PS-P3-AUDIT-014` | duplicate finding identity | fail duplicate |
+| `PS-P3-AUDIT-014` | duplicate observed/approval identity | fail duplicate |
 | `PS-P3-AUDIT-015` | missing owner | fail governance |
 | `PS-P3-AUDIT-016` | invalid follow-up issue URL | fail governance |
 | `PS-P3-AUDIT-017` | non-JSON audit report | fail audit input |
@@ -636,8 +680,8 @@ count, bounded diagnostic, and applicable OS/Node cells. These are the closed
 | `PS-P3-AUDIT-053` | duplicate key in `metadata.dependencies` | duplicate-key failure |
 | `PS-P3-AUDIT-054` | duplicate key in native-outcome root | outcome schema failure |
 | `PS-P3-AUDIT-055` | duplicate key in exception root | exception schema failure |
-| `PS-P3-AUDIT-056` | duplicate key in exception finding | exception schema failure |
-| `PS-P3-AUDIT-057` | duplicate key in exception topology row | exception schema failure |
+| `PS-P3-AUDIT-056` | duplicate key in observed-finding row | exception schema failure |
+| `PS-P3-AUDIT-057` | duplicate key in approval row | exception schema failure |
 | `PS-P3-AUDIT-058` | outcome BOM | outcome input failure |
 | `PS-P3-AUDIT-059` | outcome invalid UTF-8 | outcome input failure |
 | `PS-P3-AUDIT-060` | outcome second value | outcome input failure |
@@ -783,11 +827,29 @@ Preferred acceptance is zero vulnerabilities at every severity and no
 file.
 
 If no maintained compatible clean tree exists, the conditional file has one
-closed schema. Each exception includes stable ID; exact package/advisory,
-vulnerable range, maximum severity, dependency types, canonical root-to-node
-path set, reason/controls, owner login, and canonical `ApprovedAt`/`ExpiresAt`
-(maximum 30 days). Each finding also binds one follow-up issue number/URL,
-scope SHA-256, verification instant, and evidence-record SHA-256.
+closed root with exactly `SchemaVersion`, `ObservedFindings`, `Approvals`,
+`AuditNodePaths`, and `FollowUpEvidence`.
+
+`ObservedFindings` is sorted uniquely by exact `(Package, AdvisoryUrl)` and
+contains only report/tree/lock/native facts: stable ID, package/advisory/source,
+vulnerable range, maximum severity, CVSS when supplied, fix availability/type,
+dependency types/parents, and report/lock identities. `AuditNodePaths` is the
+separate exact package-keyed sorted path topology; do not create advisory/path
+pairs.
+
+`Approvals` is separately sorted uniquely by the same exact key. It copies and
+must exactly equal the observed source, range, severity/CVSS, fix
+availability/type, dependency types/parents, and report/lock identities, then
+adds repository reason/controls, owner login, canonical
+`ApprovedAt`/`ExpiresAt` (maximum 30 days), and the follow-up issue URL/number,
+scope SHA-256, verification instant, evidence-record SHA-256, and evidence that
+no compatible fixed tree exists.
+
+Validation independently requires exact current-to-file observed equality,
+exact observed/approval key equality, copied-fact equality, exact
+package-topology equality, and approval governance. Any observed fact,
+topology, scope, or expiry drift revokes approval; observed normalization never
+synthesizes a reason, control, owner, or approval.
 
 `FollowUpScopeSha256` hashes this exact BOM-less UTF-8/no-whitespace/no-final-
 newline canonical JSON value, constructed with new null-prototype objects and
@@ -798,7 +860,7 @@ native `JSON.stringify`:
  [{"Package":"<exact>","AdvisoryUrl":"<canonical exact>"}]]
 ```
 
-The finding objects are the exact sorted unique findings assigned to that
+The approval objects are the exact sorted unique findings assigned to that
 issue, ordered by `Package` then `AdvisoryUrl`. No residual is missing,
 duplicated, or covered by two issue scopes.
 
@@ -816,7 +878,7 @@ title states the remediation objective. Hash the complete bounded title and
 the canonical three-field marker projection separately; do not retain raw
 title/body/comments in the exception file.
 
-The exception root includes a sorted unique `FollowUpEvidence` array with one
+The exception root's sorted unique `FollowUpEvidence` array has one
 record per referenced issue and no unreferenced record. Each
 `PSStyleGuide.NpmAuditFollowUpEvidence.v1` record has this exact property order:
 
@@ -895,19 +957,52 @@ text. The approver embeds that exact record and deletes the scratch file in the
 same reviewed change.
 
 `Verify-NpmAuditExceptions.mjs` uses the same client and reconstructs/fetches
-every embedded record. Both tools make at most three total attempts. Only HTTP
+every embedded record. Each logical GET makes at most three total attempts;
+the two-endpoint capture therefore makes at most six HTTP requests. Only HTTP
 `429`, `502`, `503`, and `504` are retryable. `Retry-After`, when present, must
-be canonical ASCII integer seconds from 0 through 30; otherwise retry fails.
-When absent, delays are exactly one second before attempt two and two seconds
-before attempt three. Redirect, auth/network, `403`, `404`, exhausted retry,
-malformed response, or rate-limit metadata without a valid bounded delay fails
-closed. Send exact `Accept: application/vnd.github+json`,
-`X-GitHub-Api-Version: 2022-11-28`, and a fixed User-Agent. The tools use one
-system instant; HTTP `Date` is corroboration only.
+be one canonical ASCII integer-seconds value `0`–`30`; duplicate, padded,
+signed, date-form, malformed, or over-cap values fail.
+
+Without `Retry-After`, a single canonical `x-ratelimit-reset` may be used only
+for `429`. Parse it as an unsigned epoch second against one captured system
+instant and require a ceiling delay `0`–`30`; a past reset means zero. A
+canonical `x-ratelimit-remaining: 0` without a usable bounded reset fails.
+Otherwise the fixed waits are one second before attempt two and two seconds
+before attempt three. Redirect, auth/network/TLS, every other status,
+exhausted retry, malformed response/header, or required wait over 30 seconds
+fails closed. Cached/offline state never substitutes for a live read.
+
+Send exact `Accept: application/vnd.github+json`,
+`X-GitHub-Api-Version: 2022-11-28`, and fixed
+`User-Agent: PSStyleGuide-audit-governance/1`. Record only safe endpoint,
+attempt, status/native class, delay source, and delay. HTTP `Date` is
+corroboration only.
 
 Fresh verification compares live canonical state to the embedded record and
 fails any scope/title-marker/body-marker/state/owner/assignee/target-date/
 identity/timestamp drift. It never rewrites or silently refreshes approval.
+
+The live-client catalog contains these physical Ubuntu/Node 24 rows, each with
+one literal response/header fixture, exact call/sleep count, terminal class,
+output state, and safe diagnostic:
+
+| ID | Literal fixture | Exact oracle |
+| --- | --- | --- |
+| `PS-P3-CAPTURE-001` | issue `404` | fail once; no output |
+| `PS-P3-CAPTURE-002` | redirect | fail without follow |
+| `PS-P3-CAPTURE-003` | nonretryable `403` | fail once |
+| `PS-P3-CAPTURE-004` | pull-request issue object | fail |
+| `PS-P3-CAPTURE-005` | closed issue | fail |
+| `PS-P3-CAPTURE-006` | wrong repository/immutable identity | fail |
+| `PS-P3-CAPTURE-007` | missing label/assignee | fail |
+| `PS-P3-CAPTURE-008` | changed scope/body marker | fail |
+| `PS-P3-CAPTURE-009` | body byte 1,048,577 | fail at limit |
+| `PS-P3-CAPTURE-010` | `429`, `Retry-After: 31` | fail without retry |
+| `PS-P3-CAPTURE-011` | `429`, canonical bounded reset | one bounded wait then success |
+| `PS-P3-CAPTURE-012` | `503`, no retry headers | waits 1 then 2 seconds; third failure terminal |
+| `PS-P3-CAPTURE-013` | malformed/duplicate retry header | fail without sleep |
+| `PS-P3-CAPTURE-014` | valid open labeled/assigned issue | create-new canonical output |
+| `PS-P3-CAPTURE-015` | live state differs from embedded record | fail; cached state forbidden |
 
 Document create/refresh/renew/remove: the maintainer creates/assigns/labels and
 marks the issue, runs the capture tool, reviews exact scope/expiry/content, and
@@ -1019,9 +1114,8 @@ From fresh clones and empty dependency/cache state:
 3. prove descriptor/manager/executable/config identity and hostile ambient
    cases;
 4. run two clean installs, exact tree, lock producer/no-op checks;
-5. run all 48 Node-policy rows, 18 Husky identity/decision rows, and 184 audit
-   raw/process/schema/graph/exception/seam rows exactly once per applicable
-   cell;
+5. run all 48 Node-policy, 16 manager, 36 staged/hook, 18 Husky installer,
+   15 live-capture, and 184 audit rows exactly once per applicable cell;
 6. run production raw audit and preserve bounded byte/native/lifecycle/
    termination/cleanup evidence;
 7. require zero findings or exact current exception plus live issue evidence;
@@ -1048,7 +1142,9 @@ are ineligible.
       range, sole producer, and two freeze gates are proven.
 - [ ] Every package operation uses the closed wrapper; hostile ambient config,
       credentials, PATH, and policy controls cannot weaken its literal ordered
-      vector/environment/stream/timeout/exit/side-effect table.
+      vector/environment/stream/timeout/exit/side-effect table, whose canonical
+      preimage SHA-256 is exactly
+      `bacd645f3b9fd5e2b740d865c64488d6853935de23c05b07639d0c9f02d8dff1`.
 - [ ] Node production policy observes the current process once, accepts no
       caller policy/version, and matches all 48 physical catalog rows.
 - [ ] Husky package/entry bytes, tracked hook, generated support inventory, and
@@ -1056,11 +1152,17 @@ are ineligible.
       prepare/install/commit pass.
 - [ ] Full, nested, staged-only, and real installed-hook semantics pass on
       both Node cells and OS families.
+- [ ] The non-audit catalogs contain exactly 16 manager, 36 staged/hook,
+      18 installer, and 15 live-capture physical IDs with one literal
+      applicability/fixture/oracle/result each and no remaining family/range
+      allocation.
 - [ ] Production audit owns native launch/raw bytes/strict parsing/schema/
       policy, has one exact cross-platform-truthful lifecycle result, accepts
       no caller report/clock, and all 184 physical catalog rows pass.
-- [ ] Audit is clean or every exact residual has a current ≤30-day exception,
-      ≤24-hour offline evidence, and open labeled/assigned live issue.
+- [ ] Audit is clean or exact current `ObservedFindings`/`AuditNodePaths` equal
+      the exception's observed facts while separately keyed `Approvals` are
+      scope-exact, current for at most 30 days, backed by ≤24-hour evidence,
+      and bound to an open labeled/assigned live issue.
 - [ ] Exception file is absent when clean; the named capture tool binds exact
       issue scope/content/owner/target date; live verification/retry is
       fail-closed and release evidence is fresh.

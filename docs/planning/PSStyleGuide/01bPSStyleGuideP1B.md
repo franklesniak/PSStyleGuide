@@ -30,6 +30,14 @@ Before coding, record:
 | Main governance | Approved settings-task URL, current/desired/rollback digests, exact application identity |
 | Reciprocal | P1↔T1 and P1A↔T1A matrices |
 
+Consume P1's immutable supply-freeze record. At P1B implementation start and
+immediately before merge, require exact equality of the protected P1
+`package.json`/`package-lock.json` blob IDs and SHA-256 values, Node/npm pair,
+sole lock/install producer argv, installed-tree identity, normalized audit
+result, and dated policy decision. A registry, advisory, package-tree,
+manifest/lock, toolchain, or decision change stops P1B and rebaselines every
+affected successor. P1B never refreshes the lock or imports P3 work.
+
 Rerun P1's baseline and every applicable P1A catalog case. Compare landed
 interfaces with this issue; a missing dependency, stale risk decision,
 identity/schema drift, or reciprocal blocker stops for issue review. A
@@ -126,10 +134,22 @@ The exact roles and remaining authored inputs are:
 
 Candidate name is
 `style-guide-candidate-${{ github.run_id }}-${{ github.run_attempt }}`.
-Candidate paths are exactly the four generated files in P1 order. Matrix
-diagnostic names include job, edition, fixture EOL, run, and attempt; writer
-diagnostics include job, run, and attempt. Exact paths come only from the
-bounded diagnostic producer.
+Candidate paths are exactly the four generated files in P1 order.
+
+Failure diagnostics use this complete literal producer/upload contract:
+
+| Role | Sole producer and exact path | Upload name and exact action inputs |
+| --- | --- | --- |
+| Windows cell | final result step writes one bounded BOM-less UTF-8 JSONL file at `.test-results/p1b/windows/${{ matrix.diagnostic_key }}.jsonl` | `name: failure-windows-${{ matrix.diagnostic_key }}-${{ github.run_id }}-${{ github.run_attempt }}`; `path: .test-results/p1b/windows/${{ matrix.diagnostic_key }}.jsonl`; `if-no-files-found: error`; `retention-days: 7`; `compression-level: 0`; `overwrite: false`; `include-hidden-files: false`; `archive: true` |
+| Writer | final verification step writes one bounded BOM-less UTF-8 JSONL file at `.test-results/p1b/writer/result.jsonl` | `name: failure-writer-${{ github.run_id }}-${{ github.run_attempt }}`; `path: .test-results/p1b/writer/result.jsonl`; `if-no-files-found: error`; `retention-days: 7`; `compression-level: 0`; `overwrite: false`; `include-hidden-files: false`; `archive: true` |
+
+Each producer creates its exact ordinary non-reparse parent, opens the final
+file create-new, writes canonical closed/redacted records, and stops at 1 MiB.
+It runs before its corresponding upload. The upload runs only under
+`${{ failure() && !cancelled() }}` and is `continue-on-error: true`. No glob,
+directory, second file, alternate producer, success/cancellation upload,
+source/archive/token/Git configuration, or signed URL is permitted. An upload
+failure cannot mask the primary result.
 
 For download roles, `artifact-ids`, exact `path`, `skip-decompress`, and
 `digest-mismatch` are the complete authored input set. `name`, `pattern`,
@@ -173,12 +193,12 @@ whether generated content changed.
 
 The Windows job uses `fail-fast: false` and this exact matrix:
 
-| Edition | Fixture EOL | Cell key | Static output |
-| --- | --- | --- | --- |
-| Windows PowerShell 5.1 | LF | `desktop/lf` | `attestation_desktop_lf` |
-| Windows PowerShell 5.1 | CRLF | `desktop/crlf` | `attestation_desktop_crlf` |
-| PowerShell 7 | LF | `core/lf` | `attestation_core_lf` |
-| PowerShell 7 | CRLF | `core/crlf` | `attestation_core_crlf` |
+| Edition | Fixture EOL | Cell key | Diagnostic key | Static output |
+| --- | --- | --- | --- | --- |
+| Windows PowerShell 5.1 | LF | `desktop/lf` | `desktop-lf` | `attestation_desktop_lf` |
+| Windows PowerShell 5.1 | CRLF | `desktop/crlf` | `desktop-crlf` | `attestation_desktop_crlf` |
+| PowerShell 7 | LF | `core/lf` | `core-lf` | `attestation_core_lf` |
+| PowerShell 7 | CRLF | `core/crlf` | `core-crlf` | `attestation_core_crlf` |
 
 Each cell proves `strategy.job-total == 4`, checkout/event identity, exact
 production script/catalog identities, every applicable P1A case, one
