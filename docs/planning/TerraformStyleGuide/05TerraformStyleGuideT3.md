@@ -12,16 +12,16 @@ local support policy from a GitHub Action's internal runtime.
 
 ## Execution order and policy gate
 
-Default order: implement after **Make state-version discovery and recovery
-examples copy-safe with guarded identifiers** and against exact merged
-T1/T1A/T1B/T2 commits.
+Implement only as the fifth node in the authorized
+**T1 → T1A → T1B → T2 → T3 → T4** graph, after **Make state-version discovery
+and recovery examples copy-safe with guarded identifiers**, against exact
+ruleset-protected landed T1/T1A/T1B/T2 commits.
 
-Before using that default, record that repository policy permits the current
-high-severity advisories to remain through the earlier work. If policy requires
-zero current high-severity findings, implement this issue first, then rebaseline
-T1, T1A, T1B, and T2 on its exact merge commit.
-
-Record real GitHub dependencies in the selected order.
+T1's dated advisory decision is a go/no-go gate for that graph. If repository
+policy no longer permits the residuals through T2, stop the slate; do not run
+T3 out of order. After remediation, reissue/rebaseline every affected draft
+from the new protected `main` commit and begin again at T1. Record the real
+GitHub blocked-by relationship to T2.
 
 ## Dated baseline, not acceptance
 
@@ -98,17 +98,18 @@ From a clean clone and exact prerequisite commit, record:
 - exact `.husky/pre-commit` behavior; and
 - exact final T1B/T2 workflow roles/action allowlist.
 
-Normalize the audit report into two sorted sets.
+Normalize the audit report into two sorted observed sets.
 
-`Findings` contains one unique row per exact `(Package, AdvisoryUrl)`:
+`ObservedFindings` contains one unique row per exact
+`(Package, AdvisoryUrl)` and only report/tree/lock/native facts:
 
 - package and advisory URL/source ID;
 - severity;
 - vulnerable range;
 - direct parent(s);
 - fix availability;
-- chosen disposition; and
-- evidence date/tool version.
+- evidence date/tool version; and
+- the exact report and lock identities.
 
 `AuditNodePaths` contains one unique package key and a sorted unique array of
 every installed npm node/dependency path for that package. Do not deduplicate
@@ -142,6 +143,77 @@ strict project/integrity behavior, assert exact `corepack npm --version`
 clean install with network disabled/offline cache only. Re-resolve the dated
 npm release/integrity immediately before implementation; drift requires an
 explicit reviewed issue update, not an automatic “latest.”
+
+`T3-NPM-OPERATIONS-v1` is the sole package-operation authority. In the
+canonical LF-terminated payload below, `<corepack-entry>`,
+`<empty-user-npmrc>`, `<empty-global-npmrc>`, and `<operation-cache>` are
+internally derived, validated ordinary paths under the current verified Node
+distribution or a job-owned protected temporary root; they are never caller
+values.
+
+```text
+T3-NPM-OPERATIONS-v1
+ci:
+<corepack-entry> npm ci --ignore-scripts --include=prod --include=dev
+--include=optional --include=peer --workspaces=false --install-links=false
+--strict-peer-deps=true --registry=https://registry.npmjs.org
+--userconfig=<empty-user-npmrc> --globalconfig=<empty-global-npmrc>
+--cache=<operation-cache> --prefer-online --no-audit --no-fund
+--no-update-notifier --no-progress --color=false
+audit:
+<corepack-entry> npm audit --package-lock-only --json
+--include=prod --include=dev --include=optional --include=peer
+--workspaces=false --install-links=false --strict-peer-deps=true
+--registry=https://registry.npmjs.org --userconfig=<empty-user-npmrc>
+--globalconfig=<empty-global-npmrc> --cache=<operation-cache> --prefer-online
+--no-fund --no-update-notifier --no-progress --color=false
+lock-noop:
+<corepack-entry> npm install --package-lock-only --ignore-scripts
+--include=prod --include=dev --include=optional --include=peer
+--workspaces=false --install-links=false --strict-peer-deps=true
+--registry=https://registry.npmjs.org --userconfig=<empty-user-npmrc>
+--globalconfig=<empty-global-npmrc> --cache=<operation-cache> --offline
+--no-audit --no-fund --no-update-notifier --no-progress --color=false
+run-lint-outer:
+<corepack-entry> npm run --ignore-scripts --workspaces=false
+--userconfig=<empty-user-npmrc> --globalconfig=<empty-global-npmrc>
+--cache=<operation-cache> --offline --no-fund --no-update-notifier
+--no-progress --color=false lint:md
+run-lint-nested:
+<corepack-entry> npm run --ignore-scripts --workspaces=false
+--userconfig=<empty-user-npmrc> --globalconfig=<empty-global-npmrc>
+--cache=<operation-cache> --offline --no-fund --no-update-notifier
+--no-progress --color=false lint:md:nested
+```
+
+The SHA-256 of those exact payload bytes, including the final LF and excluding
+the fences, is
+`76eb77bc407b9cf6792bb05bb4cb297520752b91436c111b81c6749365b114fb`. The issue, workflow-policy
+validator, hook, installer, audit driver, and integration harness require that
+literal digest and the exact selected operation; no caller executable, argv,
+root, registry, config, cache, script, workspace, timeout, environment, or
+policy override exists.
+
+Every row invokes the current verified `process.execPath` plus the validated
+ordinary bundled Corepack entry directly with `shell: false`, closed stdin,
+hidden Windows console, and no inherited descriptors. The working directory
+is the fixed `.github/workflows` package root. The environment starts empty and
+adds only fixed `CI=true`, Corepack strict/project/integrity controls, the
+operation's protected Corepack/cache/config paths, registry/network controls,
+and required platform process variables by exact allowlist. `ci` and `audit`
+use a fresh network-enabled cache; `lock-noop` and both lint rows use a fresh
+network-disabled cache seeded only from the verified `ci` cache.
+
+`ci`, `lock-noop`, and each lint vector have a 300,000-ms timeout, concurrent
+4-MiB stdout/stderr limits, and accept only exit `0`; nested lint runs only
+after outer lint succeeds. `audit` has a 120,000-ms timeout, the separate
+8-MiB stdout and 1-MiB stderr contracts below, and accepts native `0` or `1`
+only for strict report validation. Start failure, signal, timeout, overflow, or
+any other exit is a tool failure. Only `ci` may create `node_modules`; only
+`lock-noop` may propose lock bytes and must prove a no-op; lint has no tracked
+side effect; audit is read-only. Package/hook lifecycle installation occurs
+only through the separately hash-bound installer, never an implicit npm
+lifecycle side effect.
 
 Regenerate lockfile version 3 from a clean dependency state. Never use
 `npm audit fix --force`, `--force`, `--legacy-peer-deps`, ignored engines, or
@@ -199,7 +271,17 @@ In `.github/workflows/markdownlint.yml`:
 
 The T1B `build.yml` remains the sole external event owner. Retain ordinary and
 Dependabot pull requests to `main`, `main` pushes, and `merge_group` when
-enabled. Add a read-only UTC schedule and optional manual dispatch. Those two
+enabled. Add exactly this read-only UTC schedule and optional input-free manual
+dispatch:
+
+```yaml
+schedule:
+  - cron: '23 17 * * 3'
+workflow_dispatch:
+```
+
+Missing, duplicate, extra, or mutated cron entries fail structural fixtures.
+Schedule/manual events invoke no publication-capable path. Those two
 events invoke only the callable Markdown validation plus a read-only terminal
 result; candidate preparation, artifact upload, Windows candidate matrix,
 promotion approval, and writer are explicitly gated off. Only a changed
@@ -321,15 +403,47 @@ or multiple skip sources fail.
 
 Skip mode proves byte/config/filesystem immutability and reports the exact
 selected skip source/reason; it never reports “installed.” Tests run only in
-disposable repositories and include a real `git commit` that proves Git invokes
-the installed hook. Allocate one `HUSKY-INSTALL-###` row for every distinct
-required-success, package identity/link/spawn, root/hooksPath, tracked-hook
-missing/untracked/mode/type/link/marker/hash, generated-root, generated-file
-missing/extra/type/link/hash/mode, authorized-skip, unknown environment,
-required/skip conflict, multiple-skip conflict, skip-immutability,
-direct-only-false-positive, and real-commit pass/reject state. No row may join
-“shim/hook” or “missing/linked.” Each result records one phase, native status,
-reason, Husky/Git call counts, hooksPath, and exact tracked/generated state.
+disposable repositories and include real `git commit` pass/reject cases. The
+installer catalog is this closed physical allocation; each row records one
+literal fixture, phase, native status, reason, Husky/Git call counts,
+hooksPath, exact tracked/generated state, side effects, and diagnostic:
+
+| ID | Singular fixture and oracle |
+| --- | --- |
+| `T3-HUSKY-001` | required install succeeds and exact inventory matches |
+| `T3-HUSKY-002` | package identity mismatch rejects before import |
+| `T3-HUSKY-003` | package path link/reparse rejects before import |
+| `T3-HUSKY-004` | fixed entry import/spawn failure rejects |
+| `T3-HUSKY-005` | wrong repository root rejects without mutation |
+| `T3-HUSKY-006` | wrong final `core.hooksPath` rejects |
+| `T3-HUSKY-007` | tracked hook missing rejects |
+| `T3-HUSKY-008` | tracked hook untracked rejects |
+| `T3-HUSKY-009` | tracked hook wrong Git mode rejects |
+| `T3-HUSKY-010` | tracked hook wrong filesystem type rejects |
+| `T3-HUSKY-011` | tracked hook link/reparse rejects |
+| `T3-HUSKY-012` | tracked hook marker position/count drift rejects |
+| `T3-HUSKY-013` | tracked hook length/hash drift rejects |
+| `T3-HUSKY-014` | generated root missing/wrong type rejects |
+| `T3-HUSKY-015` | one generated file missing rejects |
+| `T3-HUSKY-016` | one extra generated entry rejects |
+| `T3-HUSKY-017` | generated entry wrong filesystem type rejects |
+| `T3-HUSKY-018` | generated entry link/reparse rejects |
+| `T3-HUSKY-019` | generated entry length/hash drift rejects |
+| `T3-HUSKY-020` | generated executable-mode drift rejects |
+| `T3-HUSKY-021` | exact explicit `HUSKY=0` authorized skip is immutable |
+| `T3-HUSKY-022` | exact production read-only CI skip is immutable |
+| `T3-HUSKY-023` | unknown environment value rejects |
+| `T3-HUSKY-024` | required/skip source conflict rejects |
+| `T3-HUSKY-025` | multiple skip sources reject |
+| `T3-HUSKY-026` | skip-state filesystem/config mutation rejects |
+| `T3-HUSKY-027` | direct-dependency-only false positive rejects |
+| `T3-HUSKY-028` | imported function throws/nonzero outcome rejects |
+| `T3-HUSKY-029` | real installed hook commit passes |
+| `T3-HUSKY-030` | real installed hook violation commit rejects |
+
+No row joins missing/link, shim/hook, pass/reject, or platform/runtime results.
+Mutation fixtures reject a missing, duplicate, unknown, regrouped, orphaned,
+unused, skipped, or multiply emitted ID.
 
 ### 6. Add a tracked cross-platform integration harness
 
@@ -340,47 +454,53 @@ repository under test.
 The harness creates disposable repositories/indexes only. It must never mutate
 the implementer's real index, hooks, config, or working tree.
 
-For each supported platform/runtime combination, prove:
+The four columns below are literal applicability:
+`U22 = ubuntu-24.04/22.23.2`,
+`U24 = ubuntu-24.04/24.18.1`,
+`W22 = windows-2025 Git Bash/22.23.2`, and
+`W24 = windows-2025 Git Bash/24.18.1`. Every cell is a separate physical case
+with one fixture, expected package/runtime identity, native outcome, side
+effect set, diagnostic, and result:
 
-| ID | Required real behavior |
-| --- | --- |
-| `NPM-01` | clean install and `corepack npm ls --all` |
-| `NPM-02` | outer lint success |
-| `NPM-03` | nested lint success |
-| `HOOK-01` | no staged Markdown skips without invoking npm |
-| `HOOK-02` | staged valid Markdown passes |
-| `HOOK-03` | temporary outer-rule violation rejects with exact rule/path |
-| `HOOK-04` | temporary nested-fence violation rejects with exact rule/depth/path |
-| `HOOK-05` | missing Corepack rejects as tooling failure |
-| `HOOK-06` | broken lint configuration rejects distinctly from lint findings |
-| `HOOK-08` | installed Husky hook invoked by a real `git commit` passes |
-| `HOOK-09` | missing installed lint binary rejects as tooling failure |
-| `HOOK-10` | lint tool startup failure rejects distinctly from lint findings |
-| `HOOK-11` | real `git commit` invokes installed hook and a test violation rejects |
+| Behavior and exact oracle | U22 ID | U24 ID | W22 ID | W24 ID |
+| --- | --- | --- | --- | --- |
+| clean `ci` plus `npm ls --all` succeeds | `T3-NPM-U22-01` | `T3-NPM-U24-01` | `T3-NPM-W22-01` | `T3-NPM-W24-01` |
+| outer lint succeeds | `T3-NPM-U22-02` | `T3-NPM-U24-02` | `T3-NPM-W22-02` | `T3-NPM-W24-02` |
+| nested lint succeeds | `T3-NPM-U22-03` | `T3-NPM-U24-03` | `T3-NPM-W22-03` | `T3-NPM-W24-03` |
+| no staged Markdown; zero npm calls | `T3-HOOK-U22-01` | `T3-HOOK-U24-01` | `T3-HOOK-W22-01` | `T3-HOOK-W24-01` |
+| staged valid Markdown passes | `T3-HOOK-U22-02` | `T3-HOOK-U24-02` | `T3-HOOK-W22-02` | `T3-HOOK-W24-02` |
+| outer-rule violation rejects exact rule/path | `T3-HOOK-U22-03` | `T3-HOOK-U24-03` | `T3-HOOK-W22-03` | `T3-HOOK-W24-03` |
+| nested-fence violation rejects exact rule/depth/path | `T3-HOOK-U22-04` | `T3-HOOK-U24-04` | `T3-HOOK-W22-04` | `T3-HOOK-W24-04` |
+| missing Corepack is tooling failure | `T3-HOOK-U22-05` | `T3-HOOK-U24-05` | `T3-HOOK-W22-05` | `T3-HOOK-W24-05` |
+| broken lint config differs from lint finding | `T3-HOOK-U22-06` | `T3-HOOK-U24-06` | `T3-HOOK-W22-06` | `T3-HOOK-W24-06` |
+| installed hook via real commit passes | `T3-HOOK-U22-08` | `T3-HOOK-U24-08` | `T3-HOOK-W22-08` | `T3-HOOK-W24-08` |
+| missing installed lint binary is tooling failure | `T3-HOOK-U22-09` | `T3-HOOK-U24-09` | `T3-HOOK-W22-09` | `T3-HOOK-W24-09` |
+| lint startup failure differs from lint finding | `T3-HOOK-U22-10` | `T3-HOOK-U24-10` | `T3-HOOK-W22-10` | `T3-HOOK-W24-10` |
+| real commit with test violation rejects | `T3-HOOK-U22-11` | `T3-HOOK-U24-11` | `T3-HOOK-W22-11` | `T3-HOOK-W24-11` |
 
-Replace the grouped `HOOK-07` family with one real installed-hook result per
-exact platform/runtime cell:
+The runtime-bound installed-hook cases are already allocated one physical
+result per exact platform/runtime cell:
 
 | ID | Platform | Exact actual Node | Exact result |
 | --- | --- | --- | --- |
-| `HOOK-07-U-22-BELOW` | Ubuntu | `22.22.1` | reject before Corepack/npm/lint: below floor |
-| `HOOK-07-W-22-BELOW` | Windows Git Bash | `22.22.1` | reject before Corepack/npm/lint: below floor |
-| `HOOK-07-U-22-FLOOR` | Ubuntu | `22.22.2` | accept; pinned npm and lint run |
-| `HOOK-07-W-22-FLOOR` | Windows Git Bash | `22.22.2` | accept; pinned npm and lint run |
-| `HOOK-07-U-22-CURRENT` | Ubuntu | `22.23.2` | accept; pinned npm and lint run |
-| `HOOK-07-W-22-CURRENT` | Windows Git Bash | `22.23.2` | accept; pinned npm and lint run |
-| `HOOK-07-U-23` | Ubuntu | `23.0.0` | reject before Corepack/npm/lint: major unreviewed |
-| `HOOK-07-W-23` | Windows Git Bash | `23.0.0` | reject before Corepack/npm/lint: major unreviewed |
-| `HOOK-07-U-24-BELOW` | Ubuntu | `24.14.0` | reject before Corepack/npm/lint: below floor |
-| `HOOK-07-W-24-BELOW` | Windows Git Bash | `24.14.0` | reject before Corepack/npm/lint: below floor |
-| `HOOK-07-U-24-FLOOR` | Ubuntu | `24.15.0` | accept; pinned npm and lint run |
-| `HOOK-07-W-24-FLOOR` | Windows Git Bash | `24.15.0` | accept; pinned npm and lint run |
-| `HOOK-07-U-24-CURRENT` | Ubuntu | `24.18.1` | accept; pinned npm and lint run |
-| `HOOK-07-W-24-CURRENT` | Windows Git Bash | `24.18.1` | accept; pinned npm and lint run |
-| `HOOK-07-U-25` | Ubuntu | `25.0.0` | reject before Corepack/npm/lint: major unreviewed |
-| `HOOK-07-W-25` | Windows Git Bash | `25.0.0` | reject before Corepack/npm/lint: major unreviewed |
-| `HOOK-07-U-26` | Ubuntu | `26.5.1` | reject before Corepack/npm/lint: current major unreviewed |
-| `HOOK-07-W-26` | Windows Git Bash | `26.5.1` | reject before Corepack/npm/lint: current major unreviewed |
+| `T3-HOOK-07-U-22-BELOW` | Ubuntu | `22.22.1` | reject before Corepack/npm/lint: below floor |
+| `T3-HOOK-07-W-22-BELOW` | Windows Git Bash | `22.22.1` | reject before Corepack/npm/lint: below floor |
+| `T3-HOOK-07-U-22-FLOOR` | Ubuntu | `22.22.2` | accept; pinned npm and lint run |
+| `T3-HOOK-07-W-22-FLOOR` | Windows Git Bash | `22.22.2` | accept; pinned npm and lint run |
+| `T3-HOOK-07-U-22-CURRENT` | Ubuntu | `22.23.2` | accept; pinned npm and lint run |
+| `T3-HOOK-07-W-22-CURRENT` | Windows Git Bash | `22.23.2` | accept; pinned npm and lint run |
+| `T3-HOOK-07-U-23` | Ubuntu | `23.0.0` | reject before Corepack/npm/lint: major unreviewed |
+| `T3-HOOK-07-W-23` | Windows Git Bash | `23.0.0` | reject before Corepack/npm/lint: major unreviewed |
+| `T3-HOOK-07-U-24-BELOW` | Ubuntu | `24.14.0` | reject before Corepack/npm/lint: below floor |
+| `T3-HOOK-07-W-24-BELOW` | Windows Git Bash | `24.14.0` | reject before Corepack/npm/lint: below floor |
+| `T3-HOOK-07-U-24-FLOOR` | Ubuntu | `24.15.0` | accept; pinned npm and lint run |
+| `T3-HOOK-07-W-24-FLOOR` | Windows Git Bash | `24.15.0` | accept; pinned npm and lint run |
+| `T3-HOOK-07-U-24-CURRENT` | Ubuntu | `24.18.1` | accept; pinned npm and lint run |
+| `T3-HOOK-07-W-24-CURRENT` | Windows Git Bash | `24.18.1` | accept; pinned npm and lint run |
+| `T3-HOOK-07-U-25` | Ubuntu | `25.0.0` | reject before Corepack/npm/lint: major unreviewed |
+| `T3-HOOK-07-W-25` | Windows Git Bash | `25.0.0` | reject before Corepack/npm/lint: major unreviewed |
+| `T3-HOOK-07-U-26` | Ubuntu | `26.5.1` | reject before Corepack/npm/lint: current major unreviewed |
+| `T3-HOOK-07-W-26` | Windows Git Bash | `26.5.1` | reject before Corepack/npm/lint: current major unreviewed |
 
 Provision every exact runtime; these rows read the actual process version and
 cannot use an override. Re-resolve dated `CURRENT` versions before
@@ -394,14 +514,65 @@ policy-CLI, and installed-hook cases. Every row has exact `Id`, `Layer`,
 opaque; reject family/range/wildcard rows, duplicate/missing/unknown IDs, or
 more than one result.
 
-Give every direct pure input one `NODE-POLICY-###` ID: empty, whitespace,
-`v` prefix, missing/extra component, leading zero, sign, prerelease, build
-metadata, Unicode digit, overflow, Node 20/21, `22.22.1`, `22.22.2`,
-`22.23.2`, `22.999.999`, `23.0.0`, `24.14.0`, `24.14.999`,
-`24.15.0`, `24.18.1`, `24.999.999`, `25.0.0`, `26.0.0`,
-`26.5.1`, and `27.0.0`. Give actual CLI checks separate
-`NODE-CLI-###` IDs. Audit all remaining `NPM-*`, `HOOK-*`, and `AUDIT-*`
-rows and split any family before evidence.
+The Node catalog is already allocated as exactly these 48 physical rows. Each
+row additionally declares its unique semantic key, raw JSON type/value,
+normalized value/category/exit, requirement key, and exact pure/CLI/hook/lint/
+workflow consumers. No implementation-time ID allocation remains:
+
+| ID | Literal fixture | Exact oracle |
+| --- | --- | --- |
+| `T3-NODE-001` | JSON null | malformed type |
+| `T3-NODE-002` | Boolean | malformed type |
+| `T3-NODE-003` | number | malformed type |
+| `T3-NODE-004` | array | malformed type |
+| `T3-NODE-005` | object | malformed type |
+| `T3-NODE-006` | empty string | malformed syntax |
+| `T3-NODE-007` | ASCII whitespace | malformed syntax |
+| `T3-NODE-008` | `v22.23.2` | prefix rejected |
+| `T3-NODE-009` | `+22.23.2` | sign rejected |
+| `T3-NODE-010` | `-22.23.2` | sign rejected |
+| `T3-NODE-011` | `22.23` | missing component |
+| `T3-NODE-012` | `22.23.2.0` | extra component |
+| `T3-NODE-013` | `022.23.2` | leading-zero major |
+| `T3-NODE-014` | `22.023.2` | leading-zero minor |
+| `T3-NODE-015` | `22.23.02` | leading-zero patch |
+| `T3-NODE-016` | `22.23.2-rc.1` | prerelease rejected |
+| `T3-NODE-017` | `22.23.2+build` | build metadata rejected |
+| `T3-NODE-018` | `2.2e1.2` | exponent spelling rejected |
+| `T3-NODE-019` | `0x16.23.2` | hexadecimal spelling rejected |
+| `T3-NODE-020` | Unicode digit component | non-ASCII digit rejected |
+| `T3-NODE-021` | component above safe bound | overflow rejected |
+| `T3-NODE-022` | embedded NUL | control rejected |
+| `T3-NODE-023` | embedded newline | control rejected |
+| `T3-NODE-024` | `22.23.2x` | trailing data rejected |
+| `T3-NODE-025` | `20.999.999` | unsupported EOL line |
+| `T3-NODE-026` | `21.999.999` | unsupported odd line |
+| `T3-NODE-027` | `22.22.1` | one below Node 22 floor |
+| `T3-NODE-028` | `22.22.2` | exact Node 22 floor passes |
+| `T3-NODE-029` | `22.23.2` | selected Node 22 cell passes |
+| `T3-NODE-030` | `22.999.999` | admitted Node 22 upper patch passes |
+| `T3-NODE-031` | `23.0.0` | unsupported odd line |
+| `T3-NODE-032` | `24.14.999` | one range below Node 24 floor |
+| `T3-NODE-033` | `24.15.0` | exact Node 24 floor passes |
+| `T3-NODE-034` | `24.18.1` | selected Node 24 cell passes |
+| `T3-NODE-035` | `24.999.999` | admitted Node 24 upper patch passes |
+| `T3-NODE-036` | `25.0.0` | unsupported odd line |
+| `T3-NODE-037` | `26.0.0` | unreviewed future line |
+| `T3-NODE-038` | `27.0.0` | unreviewed future line |
+| `T3-NODE-039` | mutate admitted major | frozen-policy mutation fails |
+| `T3-NODE-040` | mutate floor | frozen-policy mutation fails |
+| `T3-NODE-041` | mutate ceiling | frozen-policy mutation fails |
+| `T3-NODE-042` | pass CLI positional argument | no-argument CLI fails |
+| `T3-NODE-043` | environment policy override | override ignored/rejected |
+| `T3-NODE-044` | file policy override | override ignored/rejected |
+| `T3-NODE-045` | production imports fixture evaluator | structural failure |
+| `T3-NODE-046` | second current-version read | structural failure |
+| `T3-NODE-047` | real CLI under Node `22.23.2` | actual-process pass |
+| `T3-NODE-048` | real CLI under Node `24.18.1` | actual-process pass |
+
+Both synthetic runtime cells consume every pure row. Actual CLI rows use only
+the named real process. Catalog mutations reject missing, duplicate, unknown,
+regrouped, skipped, multiply emitted, orphaned, or unused IDs.
 
 Add strict `.github/workflows/npm-audit-cases.json` as the closed append-only
 manifest for tokenizer, report, exception, production-CLI, and process-driver
@@ -664,9 +835,15 @@ incompatible change, the optional exception file uses one versioned closed
 schema and contains exactly:
 
 - `schemaVersion: 1`;
-- `findings`, sorted and unique by `(package, advisoryUrl)`, each with:
-  - package, canonical advisory URL, and source ID;
-  - severity, vulnerable range, and CVSS when supplied;
+- `observedFindings`, sorted and unique by `(package, advisoryUrl)`, containing
+  only the captured package, canonical advisory URL/source ID, severity,
+  vulnerable range, CVSS when supplied, fix availability/type, direct parents,
+  affected dependency types, and report/lock identities;
+- `approvals`, separately sorted and unique by the same exact key, each with:
+  - package and canonical advisory URL;
+  - copied source ID, severity, vulnerable range, CVSS, fix availability/type,
+    direct parents, affected dependency types, and report/lock identities that
+    must equal its observed row;
   - repository-specific exploitability analysis;
   - explicit compensating controls;
   - accountable owner;
@@ -679,9 +856,13 @@ schema and contains exactly:
 - `auditNodePaths`, sorted and unique by package, each containing the exact
   sorted unique installed paths for that package.
 
-Do not create advisory/path pairs. The validator requires exact equality
-between current normalized `Findings` and approved findings and exact equality
-between current and approved package-keyed node-path sets.
+Do not create advisory/path pairs or copy human approval fields into
+`ObservedFindings`. The validator requires exact key equality between current
+normalized `ObservedFindings`, exception `observedFindings`, and `approvals`;
+exact equality of every copied report/tree/lock/native field; exact equality
+between current and exception package-keyed node-path sets; and separate
+approval-governance validity. Any observed field, topology, key scope, or
+expiry drift fails rather than preserving an old approval.
 
 Approval time is bounded:
 
@@ -837,12 +1018,12 @@ with no missing/extra/stale identity. The issue body contains reviewed marker
 `npm-audit-findings-sha256: <same-lowercase-64-hex>` plus owner, remediation
 objective, and target date.
 
-The exception root has exactly `schemaVersion`, `findings`, `auditNodePaths`,
-and `followUpEvidence`. `followUpEvidence` is a sorted unique array with one
-record per distinct referenced issue and no unreferenced record. Findings may
-share a record only when their exact sorted identities yield that record's one
-scope hash. Every finding's number/URL, scope hash, verification time, and
-evidence hash equals its record.
+The exception root has exactly `schemaVersion`, `observedFindings`,
+`approvals`, `auditNodePaths`, and `followUpEvidence`. `followUpEvidence` is a
+sorted unique array with one record per distinct referenced issue and no
+unreferenced record. Approvals may share a record only when their exact sorted
+identities yield that record's one scope hash. Every approval's number/URL,
+scope hash, verification time, and evidence hash equals its record.
 
 Each record has these properties in this canonical order:
 
@@ -901,6 +1082,30 @@ record create-new mode `0600`; never token, headers, raw response, title, body,
 or email. The approver embeds that exact object and deletes the scratch record
 in the same reviewed change.
 
+The capture client sends exact
+`Accept: application/vnd.github+json`,
+`X-GitHub-Api-Version: 2022-11-28`, and fixed
+`User-Agent: TerraformStyleGuide-audit-governance/1`; it accepts no redirect,
+proxy/auth ambient configuration, compressed body, or cached/offline
+substitution. Each logical GET permits at most three total attempts and each
+body is bounded at 1 MiB before decoding. Only HTTP `429`, `502`, `503`, and
+`504` are retryable. Authentication/network/TLS failure, every other status,
+redirect, malformed header/body, exhausted attempts, or a required wait over
+30 seconds fails closed.
+
+For a retryable response, a present `Retry-After` must be one canonical ASCII
+integer seconds value `0`–`30`; malformed, duplicate, date-form, signed,
+whitespace-padded, or over-cap values fail. Without `Retry-After`, a canonical
+single `x-ratelimit-reset` may be used only with `429`; parse it as unsigned
+decimal epoch seconds against the client's one captured system instant and
+require a ceiling delay of `0`–`30`. A past reset means zero. Missing reset on
+`429` uses the fixed fallback only when `x-ratelimit-remaining` is not
+canonical `0`; remaining `0` without a usable bounded reset fails. All other
+retryable responses without an authoritative delay wait exactly one second
+before attempt two and two seconds before attempt three. Record only endpoint,
+attempt, status/native class, selected delay source, and delay—not headers or
+body.
+
 Require `verificationActor.login == approvalIdentity` and:
 
 ```text
@@ -955,10 +1160,27 @@ The audit manifest appends these physical rows:
 | `AUDIT-183` | valid single-issue record |
 | `AUDIT-184` | valid shared-issue scope |
 
-The capture-helper catalog separately gives one physical ID/oracle to
-nonexistent, redirect, API failure, pull request, closed, wrong repository/ID,
-missing assignee, changed marker/body, oversized response, and valid open
-issue.
+The capture-helper catalog has these immutable physical rows; each is
+Ubuntu/Node 24 only and declares one exact response/header fixture, call count,
+terminal class, output-file state, and safe diagnostic:
+
+| ID | Literal fixture | Exact oracle |
+| --- | --- | --- |
+| `T3-CAPTURE-001` | issue `404` | fail; one issue attempt; no output |
+| `T3-CAPTURE-002` | redirect | fail; no redirect follow; no output |
+| `T3-CAPTURE-003` | nonretryable API `403` | fail once; no output |
+| `T3-CAPTURE-004` | issue object contains pull-request marker | fail; no output |
+| `T3-CAPTURE-005` | closed issue | fail; no output |
+| `T3-CAPTURE-006` | wrong repository or database/node identity | fail; no output |
+| `T3-CAPTURE-007` | responsible assignee missing | fail; no output |
+| `T3-CAPTURE-008` | scope/body marker changed | fail; no output |
+| `T3-CAPTURE-009` | response exceeds 1 MiB | fail at byte limit; no output |
+| `T3-CAPTURE-010` | `429`, `Retry-After: 31` | fail without retry |
+| `T3-CAPTURE-011` | `429`, bounded canonical reset | one bounded wait; next attempt succeeds |
+| `T3-CAPTURE-012` | `503`, no retry headers | waits 1 then 2 seconds; third failure is terminal |
+| `T3-CAPTURE-013` | malformed/duplicate retry header | fail without sleep |
+| `T3-CAPTURE-014` | valid open issue and actor | canonical create-new output succeeds |
+| `T3-CAPTURE-015` | live state drifts from embedded evidence | verification fails; cached state forbidden |
 
 Run this same validator:
 
@@ -1032,7 +1254,8 @@ From fresh clones and clean dependency state:
    `corepack npm ci` from clean `node_modules` with network disabled;
 5. run `corepack npm ls --all`;
 6. run both lint scripts;
-7. run every `NPM-*`, `HOOK-*`, and `AUDIT-*` integration-harness ID;
+7. run every physical `T3-NODE-*`, `T3-NPM-*`, `T3-HOOK-*`,
+   `T3-HUSKY-*`, `T3-CAPTURE-*`, and `AUDIT-*` ID;
 8. perform at least one real installed Husky `git commit` on each OS family;
 9. capture the structured native outcome plus bounded stdout/stderr identities
    and the human-readable audit;
@@ -1055,6 +1278,11 @@ showing the artifact pipeline remains correct.
       reproducibly without force flags.
 - [ ] `packageManager` equals the exact hashed `npm@12.0.2` descriptor;
       every package command uses Corepack and the second install is offline.
+- [ ] Every package operation consumes literal
+      `T3-NPM-OPERATIONS-v1` and SHA-256
+      `76eb77bc407b9cf6792bb05bb4cb297520752b91436c111b81c6749365b114fb`;
+      no ambient executable/argv/config/network/cache/policy input can weaken
+      it.
 - [ ] Lockfile version/tree exactly matches `package.json`;
       `corepack npm ls --all`
       passes.
@@ -1083,8 +1311,9 @@ showing the artifact pipeline remains correct.
       bounded stderr, and the explicit
       `0`/`1`/other/signal/timeout/start-failure decision table.
 - [ ] The audit is zero with no exception file, or current
-      `(Package, AdvisoryUrl)` findings and package-keyed node paths exactly
-      equal one valid, approved, unexpired, at-most-30-day exception state.
+      `ObservedFindings` and package-keyed node paths exactly equal the
+      exception's observed facts while a separately keyed `Approvals`
+      collection is valid, scope-exact, and unexpired at no more than 30 days.
 - [ ] Every `AUDIT-*` clean, residual, topology, schema, duplicate, and
       before/at/after-expiry oracle through `AUDIT-184` appears as one physical
       `npm-audit-cases.json` row and passes with its one exact result.
@@ -1092,12 +1321,13 @@ showing the artifact pipeline remains correct.
       current live state; every minimized capture record is embedded in the
       exception, independently rehashable, exactly referenced, and bound to
       the approval session.
-- [ ] Every policy/hook platform/version case has one immutable ID, one
-      literal input/oracle, and exactly one reconciled result; no family ID
-      remains.
+- [ ] The catalogs contain exactly 48 `T3-NODE`, 12 `T3-NPM`, 58 `T3-HOOK`,
+      30 `T3-HUSKY`, 15 `T3-CAPTURE`, and 184 `AUDIT` physical IDs; each has
+      one literal applicability/input/oracle and one reconciled result, with no
+      family/range allocation left to implementation.
 - [ ] Ordinary/Dependabot PR, merge-group, `main` push, schedule, and manual
-      event fixtures all invoke the same validator; schedule/manual cannot
-      reach publication.
+      event fixtures all invoke the same validator; schedule is exactly
+      `'23 17 * * 3'` and schedule/manual cannot reach publication.
 - [ ] Dependabot contains exactly GitHub Actions `/` and npm
       `/.github/workflows`, review-only.
 - [ ] Exact action pins/roles, permissions, triggers, helper, artifact,

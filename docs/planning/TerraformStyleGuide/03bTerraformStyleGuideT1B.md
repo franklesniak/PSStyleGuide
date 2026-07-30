@@ -29,6 +29,15 @@ commits. Before editing workflows:
 - stop if either merged contract or the reciprocal PS/Terraform generator or
   candidate-validation-layer comparison has an unresolved blocker.
 
+Consume T1's immutable `T1-SUPPLY-FREEZE-v1` record. At T1B implementation
+start and immediately before merge, require the protected prerequisite
+`package.json`/`package-lock.json` blob IDs and SHA-256 values, exact Node/npm
+pair, frozen-install argv, installed package-tree identity, normalized audit
+result, and policy decision to equal that record. T1B may install only with the
+recorded producer and may not refresh a lock, accept an advisory change, or
+import T3 package work. Drift stops T1B and requires the affected issue slate
+to be rebaselined.
+
 **Make state-version discovery and recovery examples copy-safe with guarded
 identifiers** is blocked by this issue. Before T1B merges, record the reviewed
 T1B head, final evidence runs, the T2 handoff location, and the accountable
@@ -570,12 +579,21 @@ new protected context download directory, `skip-decompress: true`, and
 `digest-mismatch: error`; `name`, `pattern`, `merge-multiple`, `github-token`,
 `repository`, and `run-id` are absent.
 
-Failure diagnostic upload runs only under
-`failure() && !cancelled()`, is `continue-on-error: true`, names only exact
-test-owned diagnostic paths, uses a collision-free job/cell/run/attempt name,
-7-day retention, explicit missing-file behavior, no hidden files/overwrite,
-and cannot mask the primary result. Candidate archives, arbitrary workspace
-trees, tokens, state, signed URLs, and Git configuration are forbidden.
+Failure diagnostics use this complete literal producer/upload contract:
+
+| Role | Sole producer and exact path | Upload name and exact action inputs |
+| --- | --- | --- |
+| Windows cell | the cell's final harness-result step writes one bounded BOM-less UTF-8 JSONL file at `.test-results/t1b/windows/${{ matrix.cell_id }}.jsonl` with `Out-File -LiteralPath` prohibited | `name: failure-windows-${{ matrix.cell_id }}-${{ github.run_id }}-${{ github.run_attempt }}`; `path: .test-results/t1b/windows/${{ matrix.cell_id }}.jsonl`; `if-no-files-found: error`; `retention-days: 7`; `compression-level: 0`; `overwrite: false`; `include-hidden-files: false` |
+| Writer | the writer's final verification step writes one bounded BOM-less UTF-8 JSONL file at `.test-results/t1b/writer/result.jsonl` with `Out-File -LiteralPath` prohibited | `name: failure-writer-${{ github.run_id }}-${{ github.run_attempt }}`; `path: .test-results/t1b/writer/result.jsonl`; `if-no-files-found: error`; `retention-days: 7`; `compression-level: 0`; `overwrite: false`; `include-hidden-files: false` |
+
+Each producer creates its exact parent with no reparse component, uses
+no-replace file creation, canonical field order, redacted closed diagnostic
+codes, and a 1 MiB maximum. Each corresponding upload step runs only under
+`failure() && !cancelled()`, is `continue-on-error: true`, and occurs after its
+producer. No glob, directory path, optional second file, alternate producer,
+or success/cancellation upload is authorized. Candidate archives, arbitrary
+workspace trees, tokens, state, signed URLs, and Git configuration are
+forbidden, and upload failure cannot mask the primary result.
 
 Producer/consumer outputs are exact:
 

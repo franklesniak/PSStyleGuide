@@ -54,7 +54,7 @@ No implementation-time substitution is allowed: use the exact merged Node
 
 ## Affected files
 
-Exactly these nine files may change:
+Exactly these ten files may change:
 
 Source files:
 
@@ -70,6 +70,7 @@ Generated files:
 
 Permanent test integration:
 
+- `.github/workflows/Read-NativeGitEvidence.mjs` — add;
 - `.github/workflows/Test-StateRecoveryExamples.sh` — add;
 - `.github/workflows/markdownlint.yml`; and
 - `.github/workflows/Validate-WorkflowPolicy.mjs`.
@@ -110,7 +111,7 @@ The public environment input map is closed:
 
 | Provider field | Exact input | Discovery | Recovery/API | Supported subset |
 | --- | --- | ---: | ---: | --- |
-| AWS bucket | `AWS_S3_BUCKET` | required | required | 3–63 lowercase alphanumeric/hyphen; alphanumeric endpoints; no `--` or reserved form |
+| AWS bucket | `AWS_S3_BUCKET` | required | required | 3–63 lowercase alphanumeric/hyphen; alphanumeric endpoints; no `--`; no frozen reserved prefix/suffix or `-an` suffix |
 | AWS object key | `AWS_S3_KEY` | required | required | 1–1024-byte safe nonempty segment grammar |
 | AWS selected version | `AWS_S3_VERSION_ID` | absent | required | 1–1024-byte safe version grammar; literal `null` allowed |
 | Azure account | `AZURE_STORAGE_ACCOUNT` | required | required | 3–24 lowercase ASCII alphanumeric |
@@ -160,10 +161,17 @@ provider argv. Discovery/recovery location bytes must match and selected
 version appears only in recovery. Each field has one atomic missing, empty,
 control, ASCII, endpoint, length, metacharacter, and valid preservation row.
 
+Every marked Bash block requires canonical Bash `>=4.4.0`. Its first
+non-comment operations set `LC_ALL=C`, prove `BASH_VERSION` has exactly three
+canonical decimal components plus an optional ignored release suffix, compare
+the components numerically without coercing an unvalidated value, and emit
+only `runtime/bash-4.4.0-required` before any public-input expansion or external
+call when unavailable, malformed, or lower. Permanent rows cover unavailable,
+malformed, `4.3.999`, `4.4.0`, and the current hosted version.
+
 For AWS, Azure, and GCS recovery:
 
-- require Bash through an explicit shebang/runtime guard; select and document
-  the minimum Bash version available on the supported hosted Ubuntu runner;
+- require the exact Bash guard above;
 - assign each input once before validation;
 - require explicit `RECOVERY_PARENT`, direct-child `RECOVERY_PATH`, and literal
   `RECOVERY_PARENT_ATTESTATION=private-outside-vcs-no-competing-writers`;
@@ -399,7 +407,7 @@ The finalized block must implement these exact validation rules before config
 or response-file creation:
 
 - `TFC_HOST` is exactly `app.terraform.io` or `app.eu.terraform.io`;
-- `TFC_PAGE_NUMBER` matches `^[1-9][0-9]*$`;
+- `TFC_PAGE_NUMBER` matches `^[1-9][0-9]{0,19}$`;
 - organization and workspace each match the deliberate supported subset
   `[A-Za-z0-9][A-Za-z0-9_-]{0,63}`;
 - `TFC_TOKEN` is nonempty and contains no CR, LF, control byte, double quote,
@@ -590,7 +598,7 @@ automatic selection.
 
 | Field | Exact supported subset |
 | --- | --- |
-| `AWS_S3_BUCKET` | 3–63 lowercase ASCII alphanumeric/hyphen; alphanumeric endpoints; no `--` or reviewed reserved form |
+| `AWS_S3_BUCKET` | 3–63 lowercase ASCII alphanumeric/hyphen; alphanumeric endpoints; no `--`; no frozen reserved prefix/suffix or `-an` suffix |
 | AWS key | 1–1024 bytes of nonempty `/`-separated safe segments using `[A-Za-z0-9._~+=,@-]`; no empty, `.`/`..`, leading slash |
 | `AWS_S3_VERSION_ID` | 1–1024 bytes `[A-Za-z0-9._~+/%=-]+`; literal `null` is valid |
 | Azure account | 3–24 lowercase ASCII alphanumeric |
@@ -608,16 +616,40 @@ identifier outside a subset requires an issue/table/fixture change, not ad hoc
 relaxation. Add one atomic fixture per field at every endpoint/length/control/
 metacharacter boundary and assert exact unchanged provider argv.
 
+For `AWS_S3_BUCKET`, the offline `T2-S3-RESERVED-v1` set is frozen from the
+AWS general-purpose bucket naming rules reviewed 2026-07-30. Reject exact
+lowercase prefixes `xn--`, `sthree-`, and `amzn-s3-demo-`; exact lowercase
+suffixes `-s3alias`, `--ol-s3`, `.mrap`, `--x-s3`, and `--table-s3`; and the
+additional `-an` suffix because this issue does not establish an
+account-regional namespace. Matching is against the entire validated bucket
+without case folding. For each literal, add shorter/exact/longer,
+middle-position, and case-variant rows; grammar-invalid uppercase still fails
+the earlier lowercase rule.
+
 ### Raw-byte affected-path and native-status evidence
 
-Consume T1B's merged native Git reader/status classifier rather than
-reimplementing line parsing. It exposes closed endpoint modes for
-`status --porcelain=v1 -z`, cached diff, commit/parent diff, and quiet
-difference. Preserve Buffer/NUL records, reject malformed/final-NUL/duplicate/
-noncanonical paths, and classify only native `0` as no difference, `1` as
-difference, and every other/start/signal outcome as tool failure.
+Add dependency-free `.github/workflows/Read-NativeGitEvidence.mjs`, versioned
+`Read-NativeGitEvidence.v1`, as T2's reusable native Git reader/status
+classifier. It accepts exactly one closed endpoint mode
+`worktree|index|commit-parent|quiet`, an exact full commit only for
+`commit-parent`, and the literal affected-path table below after `--`. It
+resolves one ordinary Git executable, invokes it directly with a constructed
+argv and closed stdin, captures stdout/stderr as bounded Buffers, and never
+uses a shell, command string, ambient diff driver, pager, alias, or text
+decoder before raw validation.
 
-Apply independent endpoint checks to the exact nine T2 paths at worktree,
+The helper owns the exact native operations: `status --porcelain=v1 -z` for
+worktree, cached name-only `-z` diff for index, commit/parent name-only `-z`
+diff for the supplied commit, and `diff --quiet` for quiet comparison. It
+preserves Buffer/NUL records, rejects malformed/final-NUL/duplicate/
+noncanonical paths, disables external diff/text conversion, and classifies
+only native `0` as no difference, `1` as difference where the endpoint
+documents it, and every other/start/signal outcome as tool failure. Its
+canonical JSON result has version, endpoint, native class, and sorted
+base64url path bytes only; stderr is retained only as a bounded redacted
+diagnostic class.
+
+Apply independent endpoint checks to the exact ten T2 paths at worktree,
 index, commit/parent, and post-generator layers. Record whether each expected
 set is equality, subset, or empty; never use one layer's status as evidence for
 another. Disposable Git fixtures include spaces, tabs, newline, leading dash,

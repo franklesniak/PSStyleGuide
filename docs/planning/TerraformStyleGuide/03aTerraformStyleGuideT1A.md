@@ -376,47 +376,47 @@ Transitions are closed:
    and moves to `Disposed`. Inspection/deletion failure stops immediately,
    records removed/retained entries, and moves to `RetainedUncertain`; no
    retry.
-3. `Disposed`: validate the full object and require all entries `Owned=false`;
-   revalidate parent components and enumerate only to prove the exact leaf is
-   absent. Absence returns the identical object/attempt/journal/summary with
-   zero deletion. Any ordinary file/directory, live/dangling link/reparse,
-   duplicate, unknown entry, or enumeration error moves to
-   `RetainedUncertain` as
-   `cleanup/candidate-disposed-leaf-reoccupied`, with zero deletion.
+3. `Disposed`: validate only the in-memory closed object schema and require all
+   entries `Owned=false`. Return the identical object, attempt, journal, and
+   summary with success and **zero provider, path, filesystem, or native
+   calls**. Do not inspect the released parent or leaf; any new occupant is
+   outside this capability.
 4. Entry in `CleanupInProgress` or `RetainedUncertain` returns stable nonzero
-   `cleanup/candidate-state-retained`, with no inspection below the safe
-   envelope and zero deletion.
+   `cleanup/candidate-state-retained`, with **zero provider, path, filesystem,
+   native, or deletion calls**.
 
-Parent enumeration, not `File.Exists`/`Directory.Exists`, defines absence.
-Nothing is followed or recursively removed. Caller-context cleanup may
-continue only when the exact candidate object is `Disposed` and leaf absence
-is re-proven; otherwise it makes the invocation context
-`RetainedUncertain`. Primary failure remains primary, with candidate/context
-cleanup outcomes attached separately.
+During the one Active cleanup, parent enumeration—not
+`File.Exists`/`Directory.Exists`—defines absence. Nothing is followed or
+recursively removed. After the transition, caller-context cleanup may continue
+only from the exact returned `Disposed` object and never reinspects the
+released candidate name. Any other candidate result makes the invocation
+context `RetainedUncertain`. Primary failure remains primary, with
+candidate/context cleanup outcomes attached separately.
 
 Candidate-lifecycle rows are atomic:
 
-| ID | Exact behavior |
-| --- | --- |
-| `T1A-K-03` | valid Disposed object, absent leaf, identical no-deletion success |
-| `T1A-K-05` | Disposed leaf reoccupied by ordinary file |
-| `T1A-K-06` | Disposed leaf reoccupied by ordinary directory |
-| `T1A-K-07` | Disposed leaf reoccupied by live link/reparse |
-| `T1A-K-08` | Disposed leaf reoccupied by dangling link |
-| `T1A-K-09` | Disposed leaf unreadable/unclassifiable |
-| `T1A-K-10` | NotCreated with absent leaf to Disposed |
-| `T1A-K-11` | NotCreated with occupied leaf to RetainedUncertain |
-| `T1A-K-12` | entry in CleanupInProgress |
-| `T1A-K-13` | entry in RetainedUncertain |
-| `T1A-K-14` | obsolete loose envelope/journal invocation |
-| `T1A-K-15` | Disposed journal reactivated with `Owned=true` |
-| `T1A-K-16` | CandidateId mutation |
-| `T1A-K-17` | immutable envelope/path mutation |
+| ID | `SemanticCase` | Singular oracle |
+| --- | --- | --- |
+| `T1A-K-03` | `cleanup.candidate.disposed-repeat` | valid Disposed object returns identical success with zero calls |
+| `T1A-K-05` | `cleanup.candidate.disposed-name-file` | new ordinary file at released name is untouched; identical success and zero calls |
+| `T1A-K-06` | `cleanup.candidate.disposed-name-directory` | new directory at released name is untouched; identical success and zero calls |
+| `T1A-K-07` | `cleanup.candidate.disposed-name-live-link` | new live link at released name is untouched; identical success and zero calls |
+| `T1A-K-08` | `cleanup.candidate.disposed-name-dangling-link` | new dangling link at released name is untouched; identical success and zero calls |
+| `T1A-K-09` | `cleanup.candidate.disposed-name-unreadable` | inaccessible sentinel at released name is not inspected; identical success and zero calls |
+| `T1A-K-10` | `cleanup.candidate.not-created-absent` | NotCreated with absent leaf transitions to Disposed |
+| `T1A-K-11` | `cleanup.candidate.not-created-occupied` | NotCreated with occupied leaf transitions to RetainedUncertain |
+| `T1A-K-12` | `cleanup.candidate.in-progress-repeat` | CleanupInProgress returns retained failure with zero calls |
+| `T1A-K-13` | `cleanup.candidate.retained-repeat` | RetainedUncertain returns retained failure with zero calls |
+| `T1A-K-14` | `cleanup.candidate.loose-state-rejected` | obsolete loose envelope/journal is invalid with zero calls |
+| `T1A-K-15` | `cleanup.candidate.disposed-owned-rejected` | Disposed journal reactivated with `Owned=true` is invalid with zero calls |
+| `T1A-K-16` | `cleanup.candidate.id-mutated-rejected` | CandidateId mutation is invalid with zero calls |
+| `T1A-K-17` | `cleanup.candidate.envelope-mutated-rejected` | immutable envelope/path mutation is invalid with zero calls |
 
-Every rejection has zero deletion and records CandidateId, transition,
-attempt count, exact removed/retained sequence, sentinel, and context
-consequence. `T1A-K-04` remains the primary-failure plus partial-cleanup-failure
-case.
+Every rejection has zero deletion and records CandidateId, transition, attempt
+count, exact removed/retained sequence, sentinel, and context consequence.
+Terminal repeat rows additionally use provider/path/filesystem/native spies and
+require an exact zero-call vector. `T1A-K-04` remains the primary-failure plus
+partial-cleanup-failure case.
 
 ### 10. Implement the permanent stable-ID harness
 
@@ -448,124 +448,124 @@ state exactly as stated. Parameter/download failures perform no archive work.
 
 | ID | SemanticCase | Fixture/invocation | Exact pre-teardown oracle |
 | --- | --- | --- | --- |
-| T1A-V-01 | `candidate.valid.case-01` | exact four-entry valid archive | success; four exact files; both production cleanups succeed |
-| T1A-V-02 | `candidate.valid.case-02` | valid entries with symlink-like external attributes | success; attributes ignored; four ordinary files |
-| T1A-P-01 | `candidate.path.case-01` | checkout sibling-prefix path | `containment`; candidate absent |
-| T1A-P-02 | `candidate.path.case-02` | filesystem-provider-qualified absolute inputs | success; normalized paths equal native-path control |
-| T1A-D-01 | `candidate.digest.case-01` | digest mismatch with all labels supplied | `digest`; candidate absent; all labels in diagnostics |
-| T1A-D-02 | `candidate.digest.case-02` | same mismatch with all labels omitted | `digest`; candidate absent; labels are `unavailable` |
-| T1A-D-03 | `candidate.digest.case-03` | 63-hex expected digest | `parameter`; candidate absent; archive unopened |
-| T1A-D-04 | `candidate.digest.case-04` | 64 characters containing nonhex | `parameter`; candidate absent; archive unopened |
-| T1A-D-05 | `candidate.digest.case-05` | `sha256:`-prefixed digest | `parameter`; candidate absent; archive unopened |
+| T1A-V-01 | `archive.valid.exact-four-files` | exact four-entry valid archive | success; four exact files; both production cleanups succeed |
+| T1A-V-02 | `archive.valid.external-attributes-ignored` | valid entries with symlink-like external attributes | success; attributes ignored; four ordinary files |
+| T1A-P-01 | `path.containment.checkout-sibling-prefix-rejected` | checkout sibling-prefix path | `containment`; candidate absent |
+| T1A-P-02 | `path.provider.filesystem-qualified-accepted` | filesystem-provider-qualified absolute inputs | success; normalized paths equal native-path control |
+| T1A-D-01 | `digest.mismatch.labels-supplied` | digest mismatch with all labels supplied | `digest`; candidate absent; all labels in diagnostics |
+| T1A-D-02 | `digest.mismatch.labels-omitted` | same mismatch with all labels omitted | `digest`; candidate absent; labels are `unavailable` |
+| T1A-D-03 | `digest.grammar.short-rejected` | 63-hex expected digest | `parameter`; candidate absent; archive unopened |
+| T1A-D-04 | `digest.grammar.nonhex-rejected` | 64 characters containing nonhex | `parameter`; candidate absent; archive unopened |
+| T1A-D-05 | `digest.grammar.prefixed-rejected` | `sha256:`-prefixed digest | `parameter`; candidate absent; archive unopened |
 | T1A-Z-01 | `archive.invalid.header-rejected` | invalid ZIP header with matching digest | `archive/invalid-zip`; candidate absent |
 | T1A-Z-02 | `archive.truncated.rejected` | truncated otherwise-valid ZIP with matching digest | `archive/truncated-zip`; candidate absent |
-| T1A-M-01 | `candidate.manifest.case-01` | one required entry missing | `manifest`; candidate absent |
-| T1A-M-02 | `candidate.manifest.case-02` | one extra entry | `manifest`; candidate absent |
-| T1A-M-03 | `candidate.manifest.case-03` | exact duplicate name | `manifest`; candidate absent |
-| T1A-M-04 | `candidate.manifest.case-04` | case-insensitive name collision | `manifest`; candidate absent |
-| T1A-M-05 | `candidate.manifest.case-05` | nested name using `/` | `manifest`; candidate absent |
-| T1A-M-06 | `candidate.manifest.case-06` | nested name using `\` | `manifest`; candidate absent |
-| T1A-M-07 | `candidate.manifest.case-07` | traversal name using `/` | `manifest`; candidate absent |
-| T1A-M-08 | `candidate.manifest.case-08` | traversal name using `\` | `manifest`; candidate absent |
-| T1A-M-09 | `candidate.manifest.case-09` | leading `/` | `manifest`; candidate absent |
-| T1A-M-10 | `candidate.manifest.case-10` | leading `\` | `manifest`; candidate absent |
-| T1A-M-11 | `candidate.manifest.case-11` | drive-qualified name | `manifest`; candidate absent |
-| T1A-M-12 | `candidate.manifest.case-12` | directory entry | `manifest`; candidate absent |
-| T1A-M-13 | `candidate.manifest.case-13` | file/directory collision | `manifest`; candidate absent |
-| T1A-M-14 | `candidate.manifest.case-14` | fixed reviewed raw ZIP with empty name | `manifest`; candidate absent; fixture SHA recorded |
+| T1A-M-01 | `manifest.entry.required-missing` | one required entry missing | `manifest`; candidate absent |
+| T1A-M-02 | `manifest.entry.extra-rejected` | one extra entry | `manifest`; candidate absent |
+| T1A-M-03 | `manifest.name.exact-duplicate-rejected` | exact duplicate name | `manifest`; candidate absent |
+| T1A-M-04 | `manifest.name.case-collision-rejected` | case-insensitive name collision | `manifest`; candidate absent |
+| T1A-M-05 | `manifest.name.forward-slash-nesting-rejected` | nested name using `/` | `manifest`; candidate absent |
+| T1A-M-06 | `manifest.name.backslash-nesting-rejected` | nested name using `\` | `manifest`; candidate absent |
+| T1A-M-07 | `manifest.name.forward-slash-traversal-rejected` | traversal name using `/` | `manifest`; candidate absent |
+| T1A-M-08 | `manifest.name.backslash-traversal-rejected` | traversal name using `\` | `manifest`; candidate absent |
+| T1A-M-09 | `manifest.name.leading-forward-slash-rejected` | leading `/` | `manifest`; candidate absent |
+| T1A-M-10 | `manifest.name.leading-backslash-rejected` | leading `\` | `manifest`; candidate absent |
+| T1A-M-11 | `manifest.name.drive-qualified-rejected` | drive-qualified name | `manifest`; candidate absent |
+| T1A-M-12 | `manifest.entry.directory-rejected` | directory entry | `manifest`; candidate absent |
+| T1A-M-13 | `manifest.entry.file-directory-collision-rejected` | file/directory collision | `manifest`; candidate absent |
+| T1A-M-14 | `manifest.name.raw-empty-rejected` | fixed reviewed raw ZIP with empty name | `manifest`; candidate absent; fixture SHA recorded |
 | T1A-E-01 | `path.download.outside-trusted-root-rejected` | download directory outside trusted root | `containment/download-outside`; candidate absent |
-| T1A-E-02 | `candidate.environment.case-02` | checkout and trusted roots equal | `root`; candidate absent |
-| T1A-E-03 | `candidate.environment.case-03` | checkout contains trusted root | `root`; candidate absent |
-| T1A-E-04 | `candidate.environment.case-04` | trusted root contains checkout | `root`; candidate absent |
+| T1A-E-02 | `path.roots.equal-rejected` | checkout and trusted roots equal | `root`; candidate absent |
+| T1A-E-03 | `path.roots.checkout-contains-trusted-rejected` | checkout contains trusted root | `root`; candidate absent |
+| T1A-E-04 | `path.roots.trusted-contains-checkout-rejected` | trusted root contains checkout | `root`; candidate absent |
 | T1A-E-05 | `path.working.relative-rejected` | relative working path | `parameter/path-not-fully-qualified`; candidate absent |
-| T1A-E-06 | `candidate.environment.case-06` | non-filesystem provider path | `parameter`; candidate absent |
-| T1A-E-07 | `candidate.environment.case-07` | Windows case variation of the same existing path envelope | Windows only: pass/status 0/`complete`; four valid files; candidate cleanup succeeds; context `Disposed`; sentinel unchanged |
-| T1A-E-08 | `candidate.environment.case-08` | Linux differently cased sibling outside trusted root | Linux only: fail/status 1/`containment/case-sensitive-outside`; candidate absent; context cleanup reaches `Disposed`; sentinel unchanged |
+| T1A-E-06 | `path.provider.nonfilesystem-rejected` | non-filesystem provider path | `parameter`; candidate absent |
+| T1A-E-07 | `path.case.windows-alias-accepted` | Windows case variation of the same existing path envelope | Windows only: pass/status 0/`complete`; four valid files; candidate cleanup succeeds; context `Disposed`; sentinel unchanged |
+| T1A-E-08 | `path.case.linux-sibling-rejected` | Linux differently cased sibling outside trusted root | Linux only: fail/status 1/`containment/case-sensitive-outside`; candidate absent; context cleanup reaches `Disposed`; sentinel unchanged |
 | T1A-E-09 | `path.root.reparse-rejected` | declared root is a link/reparse component | `root/root-reparse`; candidate absent |
-| T1A-E-10 | `candidate.environment.case-10` | below-root link/reparse component | fail/status 1/`containment/component-reparse`; candidate absent; context cleanup reaches `Disposed` |
+| T1A-E-10 | `path.component.reparse-rejected` | below-root link/reparse component | fail/status 1/`containment/component-reparse`; candidate absent; context cleanup reaches `Disposed` |
 | T1A-E-11 | `download.hidden-extra-entry-rejected` | hidden extra download entry | `download/extra-entry`; candidate absent |
 | T1A-E-12 | `path.root.wildcard-rejected` | wildcard root path | `parameter/path-wildcard`; candidate absent |
-| T1A-E-13 | `candidate.environment.case-13` | wildcard path capable of multiple matches under a resolving API | fail/status 1/`parameter/path-wildcard` before resolution/context creation; candidate absent |
-| T1A-E-14 | `candidate.environment.case-14` | checkout root missing | fail/status 1/`root/checkout-missing`; candidate absent |
-| T1A-E-15 | `candidate.environment.case-15` | checkout root is not a directory | fail/status 1/`root/checkout-not-directory`; candidate absent |
-| T1A-E-16 | `candidate.environment.case-16` | trusted root missing | fail/status 1/`root/trusted-missing`; candidate absent |
-| T1A-E-17 | `candidate.environment.case-17` | trusted root is not a directory | fail/status 1/`root/trusted-not-directory`; candidate absent |
-| T1A-E-18 | `candidate.environment.case-18` | download directory missing | fail/status 1/`download/directory-missing`; candidate absent |
-| T1A-E-19 | `candidate.environment.case-19` | download path is not a directory | fail/status 1/`download/not-directory`; candidate absent |
-| T1A-E-20 | `candidate.environment.case-20` | retained archive missing | fail/status 1/`download/archive-missing`; candidate absent |
-| T1A-E-21 | `candidate.environment.case-21` | retained archive is not an ordinary file | fail/status 1/`download/archive-not-file`; candidate absent |
-| T1A-E-22 | `candidate.environment.case-22` | candidate parent missing | fail/status 1/`destination/parent-missing`; candidate absent |
-| T1A-E-23 | `candidate.environment.case-23` | candidate parent is not a directory | fail/status 1/`destination/parent-not-directory`; candidate absent |
+| T1A-E-13 | `path.wildcard.multi-match-rejected` | wildcard path capable of multiple matches under a resolving API | fail/status 1/`parameter/path-wildcard` before resolution/context creation; candidate absent |
+| T1A-E-14 | `path.checkout.missing-rejected` | checkout root missing | fail/status 1/`root/checkout-missing`; candidate absent |
+| T1A-E-15 | `path.checkout.not-directory-rejected` | checkout root is not a directory | fail/status 1/`root/checkout-not-directory`; candidate absent |
+| T1A-E-16 | `path.trusted.missing-rejected` | trusted root missing | fail/status 1/`root/trusted-missing`; candidate absent |
+| T1A-E-17 | `path.trusted.not-directory-rejected` | trusted root is not a directory | fail/status 1/`root/trusted-not-directory`; candidate absent |
+| T1A-E-18 | `path.download.missing-rejected` | download directory missing | fail/status 1/`download/directory-missing`; candidate absent |
+| T1A-E-19 | `path.download.not-directory-rejected` | download path is not a directory | fail/status 1/`download/not-directory`; candidate absent |
+| T1A-E-20 | `path.archive.missing-rejected` | retained archive missing | fail/status 1/`download/archive-missing`; candidate absent |
+| T1A-E-21 | `path.archive.not-file-rejected` | retained archive is not an ordinary file | fail/status 1/`download/archive-not-file`; candidate absent |
+| T1A-E-22 | `path.candidate-parent.missing-rejected` | candidate parent missing | fail/status 1/`destination/parent-missing`; candidate absent |
+| T1A-E-23 | `path.candidate-parent.not-directory-rejected` | candidate parent is not a directory | fail/status 1/`destination/parent-not-directory`; candidate absent |
 | T1A-E-24 | `path.candidate.outside-trusted-root-rejected` | candidate path outside trusted root | `containment/candidate-outside`; candidate absent |
 | T1A-E-25 | `path.root.relative-rejected` | relative root path | `parameter/path-not-fully-qualified`; candidate absent |
 | T1A-E-26 | `path.ancestor.reparse-rejected` | ancestor below volume/share root is link/reparse | `root/ancestor-reparse`; candidate absent |
 | T1A-E-27 | `download.system-extra-entry-rejected` | system extra download entry | `download/extra-entry`; candidate absent |
 | T1A-E-28 | `path.working.wildcard-rejected` | wildcard working path | `parameter/path-wildcard`; candidate absent |
-| T1A-L-01 | `candidate.destination.case-01` | preexisting ordinary candidate file | `destination`; leaf unchanged |
-| T1A-L-02 | `candidate.destination.case-02` | preexisting candidate directory | `destination`; leaf unchanged |
-| T1A-L-03 | `candidate.destination.case-03` | live link/reparse candidate leaf | `destination`; target and leaf unchanged |
-| T1A-L-04 | `candidate.destination.case-04` | dangling link candidate leaf | `destination`; link unchanged |
-| T1A-B-01 | `candidate.bytes.case-01` | extracted file begins with UTF-8 BOM | `post-extraction`; owned partial removed |
-| T1A-B-02 | `candidate.bytes.case-02` | extracted file contains `0x0D` | `post-extraction`; owned partial removed |
-| T1A-K-01 | `candidate.cleanup.case-01` | unjournaled ordinary candidate child | `cleanup`; candidate retained; delete nothing further |
-| T1A-K-02 | `candidate.cleanup.case-02` | supported link/reparse substitution | `cleanup`; candidate retained; target unchanged |
-| T1A-K-03 | `candidate.cleanup.case-03` | repeated candidate cleanup after safe removal | success/no-op; no unrelated deletion |
-| T1A-K-04 | `candidate.cleanup.case-04` | primary failure then candidate-cleanup failure | both reasons reported; uncertain state retained |
-| T1A-C-01 | `context.cleanup.case-01` | normal caller-context teardown | success; journaled entries removed deepest first |
-| T1A-C-02 | `context.cleanup.case-02` | repeated caller-context teardown | success/no-op under disposed-context contract |
-| T1A-C-03 | `context.cleanup.case-03` | unjournaled ordinary context entry | `cleanup`; entire uncertain context retained |
-| T1A-C-04 | `context.cleanup.case-04` | link/reparse substitution in context | `cleanup`; context/target retained unchanged |
+| T1A-L-01 | `destination.preexisting.ordinary-file-retained` | preexisting ordinary candidate file | `destination`; leaf unchanged |
+| T1A-L-02 | `destination.preexisting.directory-retained` | preexisting candidate directory | `destination`; leaf unchanged |
+| T1A-L-03 | `destination.preexisting.live-reparse-retained` | live link/reparse candidate leaf | `destination`; target and leaf unchanged |
+| T1A-L-04 | `destination.preexisting.dangling-link-retained` | dangling link candidate leaf | `destination`; link unchanged |
+| T1A-B-01 | `output.bytes.utf8-bom-rejected` | extracted file begins with UTF-8 BOM | `post-extraction`; owned partial removed |
+| T1A-B-02 | `output.bytes.carriage-return-rejected` | extracted file contains `0x0D` | `post-extraction`; owned partial removed |
+| T1A-K-01 | `cleanup.candidate.unjournaled-entry-retained` | unjournaled ordinary candidate child | `cleanup`; candidate retained; delete nothing further |
+| T1A-K-02 | `cleanup.candidate.reparse-substitution-retained` | supported link/reparse substitution | `cleanup`; candidate retained; target unchanged |
+| T1A-K-03 | `cleanup.candidate.repeat-disposed` | repeated candidate cleanup after safe removal | success/no-op; zero provider/path/filesystem/native calls |
+| T1A-K-04 | `cleanup.candidate.primary-and-cleanup-failure` | primary failure then candidate-cleanup failure | both reasons reported; uncertain state retained |
+| T1A-C-01 | `cleanup.context.normal-disposal` | normal caller-context teardown | success; journaled entries removed deepest first |
+| T1A-C-02 | `cleanup.context.repeat-disposed` | repeated caller-context teardown | success/no-op under disposed-context contract |
+| T1A-C-03 | `cleanup.context.unjournaled-entry-retained` | unjournaled ordinary context entry | `cleanup`; entire uncertain context retained |
+| T1A-C-04 | `cleanup.context.reparse-substitution-retained` | link/reparse substitution in context | `cleanup`; context/target retained unchanged |
 | T1A-C-05 | `cleanup.context.journaled-entry-missing` | missing journaled context entry | `cleanup/context-entry-missing`; no further deletion |
-| T1A-C-06 | `context.cleanup.case-06` | primary failure then caller-cleanup failure | primary prominent; cleanup and retained root reported |
-| T1A-C-07 | `context.cleanup.case-07` | proven partial ordinary ownership journal | success; only journaled entries removed nonrecursively |
-| T1A-C-08 | `context.cleanup.case-08` | candidate cleanup then context cleanup | success; exact production lifecycles invoked in order |
+| T1A-C-06 | `cleanup.context.primary-and-cleanup-failure` | primary failure then caller-cleanup failure | primary prominent; cleanup and retained root reported |
+| T1A-C-07 | `cleanup.context.partial-journal` | proven partial ordinary ownership journal | success; only journaled entries removed nonrecursively |
+| T1A-C-08 | `cleanup.context.candidate-before-context` | candidate cleanup then context cleanup | success; exact production lifecycles invoked in order |
 | T1A-C-09 | `cleanup.context.journaled-entry-unreadable` | unreadable journaled context entry | `cleanup/context-entry-unreadable`; no further deletion |
-| T1A-R-01 | `candidate.limit.case-01` | entry one byte below 8 MiB | pass/status 0/`complete`; four valid files; candidate and context cleanups succeed; context `Disposed` |
-| T1A-R-02 | `candidate.limit.case-02` | entry exactly 8 MiB | pass/status 0/`complete`; four valid files; candidate and context cleanups succeed; context `Disposed` |
-| T1A-R-03 | `candidate.limit.case-03` | declared entry one byte above 8 MiB | `manifest`; candidate absent |
-| T1A-R-04 | `candidate.limit.case-04` | actual entry exceeds permitted/declared bytes | `extraction`; stop at first excess; owned partial removed |
-| T1A-R-05 | `candidate.limit.case-05` | declared total one byte below 32 MiB | pass/status 0/`complete`; four valid files; candidate and context cleanups succeed; context `Disposed` |
-| T1A-R-06 | `candidate.limit.case-06` | declared total exactly 32 MiB | pass/status 0/`complete`; four valid files; candidate and context cleanups succeed; context `Disposed` |
-| T1A-R-07 | `candidate.limit.case-07` | declared total one byte above 32 MiB | `manifest`; candidate absent |
-| T1A-R-08 | `candidate.limit.case-08` | actual cumulative output exceeds 32 MiB | `extraction`; stop at first excess; owned partial removed |
-| T1A-R-09 | `candidate.limit.case-09` | retained archive exactly 32 MiB | pass/status 0/`complete`; four valid files; candidate and context cleanups succeed; context `Disposed` |
-| T1A-R-10 | `candidate.limit.case-10` | retained archive one byte above 32 MiB | pre-ZIP limit failure; candidate absent |
+| T1A-R-01 | `limit.entry.below-8mib-accepted` | entry one byte below 8 MiB | pass/status 0/`complete`; four valid files; candidate and context cleanups succeed; context `Disposed` |
+| T1A-R-02 | `limit.entry.at-8mib-accepted` | entry exactly 8 MiB | pass/status 0/`complete`; four valid files; candidate and context cleanups succeed; context `Disposed` |
+| T1A-R-03 | `limit.entry.above-8mib-rejected` | declared entry one byte above 8 MiB | `manifest`; candidate absent |
+| T1A-R-04 | `limit.actual-entry-overrun-rejected` | actual entry exceeds permitted/declared bytes | `extraction`; stop at first excess; owned partial removed |
+| T1A-R-05 | `limit.declared-total.below-32mib-accepted` | declared total one byte below 32 MiB | pass/status 0/`complete`; four valid files; candidate and context cleanups succeed; context `Disposed` |
+| T1A-R-06 | `limit.declared-total.at-32mib-accepted` | declared total exactly 32 MiB | pass/status 0/`complete`; four valid files; candidate and context cleanups succeed; context `Disposed` |
+| T1A-R-07 | `limit.declared-total.above-32mib-rejected` | declared total one byte above 32 MiB | `manifest`; candidate absent |
+| T1A-R-08 | `limit.actual-total-overrun-rejected` | actual cumulative output exceeds 32 MiB | `extraction`; stop at first excess; owned partial removed |
+| T1A-R-09 | `limit.archive.at-32mib-accepted` | retained archive exactly 32 MiB | pass/status 0/`complete`; four valid files; candidate and context cleanups succeed; context `Disposed` |
+| T1A-R-10 | `limit.archive.above-32mib-rejected` | retained archive one byte above 32 MiB | pre-ZIP limit failure; candidate absent |
 | T1A-R-11 | `limit.raw-zip.negative-length-rejected` | raw ZIP with negative length state | `manifest/negative-length`; candidate absent; fixture SHA recorded |
-| T1A-R-12 | `candidate.limit.case-12` | length arithmetic overflow fixture | `manifest`; checked overflow; candidate absent |
-| T1A-R-13 | `candidate.limit.case-13` | retained archive one byte below 32 MiB | pass/status 0/`complete`; four valid files; candidate and context cleanups succeed; context `Disposed` |
+| T1A-R-12 | `limit.length-arithmetic.overflow-rejected` | length arithmetic overflow fixture | `manifest`; checked overflow; candidate absent |
+| T1A-R-13 | `limit.archive.below-32mib-accepted` | retained archive one byte below 32 MiB | pass/status 0/`complete`; four valid files; candidate and context cleanups succeed; context `Disposed` |
 | T1A-R-14 | `limit.raw-zip.inconsistent-length-rejected` | raw ZIP with inconsistent length fields | `manifest/inconsistent-length`; candidate absent; fixture SHA recorded |
-| T1A-W-01 | `candidate.download.case-01` | empty download directory | `download`; candidate absent |
-| T1A-W-02 | `candidate.download.case-02` | two top-level download entries | `download`; candidate absent |
-| T1A-W-03 | `candidate.download.case-03` | directory as sole download entry | `download`; candidate absent |
-| T1A-W-04 | `candidate.download.case-04` | link/reparse as sole download entry | `download`; target unchanged; candidate absent |
+| T1A-W-01 | `download.entry-count.zero-rejected` | empty download directory | `download`; candidate absent |
+| T1A-W-02 | `download.entry-count.two-rejected` | two top-level download entries | `download`; candidate absent |
+| T1A-W-03 | `download.entry.directory-rejected` | directory as sole download entry | `download`; candidate absent |
+| T1A-W-04 | `download.entry.reparse-rejected` | link/reparse as sole download entry | `download`; target unchanged; candidate absent |
 | T1A-W-05 | `download.entry.unreadable-rejected` | unreadable download entry | `download/entry-unreadable`; candidate absent |
 | T1A-W-06 | `download.entry.unclassifiable-rejected` | unclassifiable download entry | `download/entry-unclassifiable`; candidate absent |
-| T1A-S-01 | `harness.input.case-01` | missing helper script path | fail/status 1/`harness-input/script-missing`; no context; neither supplied script invoked; sentinel unchanged |
-| T1A-S-02 | `harness.input.case-02` | wildcard helper path | fail/status 1/`harness-input/path-wildcard`; no context; neither supplied script invoked; sentinel unchanged |
-| T1A-S-03 | `harness.input.case-03` | non-filesystem helper path | fail/status 1/`harness-input/path-provider`; no context; neither supplied script invoked; sentinel unchanged |
-| T1A-S-04 | `harness.input.case-04` | multi-match-capable wildcard helper path | fail/status 1/`harness-input/path-wildcard`; no resolution/context; neither script invoked |
-| T1A-S-05 | `harness.input.case-05` | reparse helper script | fail/status 1/`harness-input/script-reparse`; no context; neither script invoked; target unchanged |
-| T1A-S-06 | `harness.input.case-06` | missing context-manager path | fail/status 1/`harness-input/script-missing`; no context; neither supplied script invoked; sentinel unchanged |
-| T1A-S-07 | `harness.input.case-07` | wildcard context-manager path | fail/status 1/`harness-input/path-wildcard`; no context; neither supplied script invoked; sentinel unchanged |
-| T1A-S-08 | `harness.input.case-08` | non-filesystem context-manager path | fail/status 1/`harness-input/path-provider`; no context; neither supplied script invoked; sentinel unchanged |
-| T1A-S-09 | `harness.input.case-09` | multi-match-capable wildcard context-manager path | fail/status 1/`harness-input/path-wildcard`; no resolution/context; neither script invoked |
-| T1A-S-10 | `harness.input.case-10` | reparse context-manager script | fail/status 1/`harness-input/script-reparse`; no context; neither script invoked; target unchanged |
-| T1A-S-11 | `harness.input.case-11` | both scripts provider-qualified, exact tracked, and versioned | pass/status 0 through the `T1A-V-01` control; four valid files; context `Disposed` |
-| T1A-S-12 | `harness.input.case-12` | untracked ordinary helper script | fail/status 1/`harness-input/script-untracked`; no context; neither supplied script invoked |
-| T1A-S-13 | `harness.input.case-13` | untracked ordinary context-manager script | fail/status 1/`harness-input/script-untracked`; no context; neither supplied script invoked |
-| T1A-X-01 | `candidate.label.case-01` | explicit empty `ArtifactId` | `parameter`; candidate absent |
-| T1A-X-02 | `candidate.label.case-02` | explicit empty `RunId` | `parameter`; candidate absent |
-| T1A-X-03 | `candidate.label.case-03` | explicit empty `RunAttempt` | `parameter`; candidate absent |
-| T1A-X-04 | `candidate.label.case-04` | explicit null `ArtifactId` | `parameter`; candidate absent |
-| T1A-X-05 | `candidate.label.case-05` | explicit null `RunId` | `parameter`; candidate absent |
-| T1A-X-06 | `candidate.label.case-06` | explicit null `RunAttempt` | `parameter`; candidate absent |
-| T1A-X-07 | `candidate.label.case-07` | valid nonempty labels | selected failure preserves exact label text |
-| T1A-X-08 | `candidate.label.case-08` | array supplied as `ArtifactId` | fail/status 1/`parameter/label-not-scalar-string`; no filesystem work; candidate absent |
-| T1A-X-09 | `candidate.label.case-09` | array supplied as `RunId` | fail/status 1/`parameter/label-not-scalar-string`; no filesystem work; candidate absent |
-| T1A-X-10 | `candidate.label.case-10` | array supplied as `RunAttempt` | fail/status 1/`parameter/label-not-scalar-string`; no filesystem work; candidate absent |
-| T1A-X-11 | `candidate.label.case-11` | object supplied as `ArtifactId` | fail/status 1/`parameter/label-not-scalar-string`; no filesystem work; candidate absent |
-| T1A-X-12 | `candidate.label.case-12` | object supplied as `RunId` | fail/status 1/`parameter/label-not-scalar-string`; no filesystem work; candidate absent |
-| T1A-X-13 | `candidate.label.case-13` | object supplied as `RunAttempt` | fail/status 1/`parameter/label-not-scalar-string`; no filesystem work; candidate absent |
+| T1A-S-01 | `harness.input.helper-missing-rejected` | missing helper script path | fail/status 1/`harness-input/script-missing`; no context; neither supplied script invoked; sentinel unchanged |
+| T1A-S-02 | `harness.input.helper-wildcard-rejected` | wildcard helper path | fail/status 1/`harness-input/path-wildcard`; no context; neither supplied script invoked; sentinel unchanged |
+| T1A-S-03 | `harness.input.helper-nonfilesystem-rejected` | non-filesystem helper path | fail/status 1/`harness-input/path-provider`; no context; neither supplied script invoked; sentinel unchanged |
+| T1A-S-04 | `harness.input.helper-multimatch-rejected` | multi-match-capable wildcard helper path | fail/status 1/`harness-input/path-wildcard`; no resolution/context; neither script invoked |
+| T1A-S-05 | `harness.input.helper-reparse-rejected` | reparse helper script | fail/status 1/`harness-input/script-reparse`; no context; neither script invoked; target unchanged |
+| T1A-S-06 | `harness.input.context-missing-rejected` | missing context-manager path | fail/status 1/`harness-input/script-missing`; no context; neither supplied script invoked; sentinel unchanged |
+| T1A-S-07 | `harness.input.context-wildcard-rejected` | wildcard context-manager path | fail/status 1/`harness-input/path-wildcard`; no context; neither supplied script invoked; sentinel unchanged |
+| T1A-S-08 | `harness.input.context-nonfilesystem-rejected` | non-filesystem context-manager path | fail/status 1/`harness-input/path-provider`; no context; neither supplied script invoked; sentinel unchanged |
+| T1A-S-09 | `harness.input.context-multimatch-rejected` | multi-match-capable wildcard context-manager path | fail/status 1/`harness-input/path-wildcard`; no resolution/context; neither script invoked |
+| T1A-S-10 | `harness.input.context-reparse-rejected` | reparse context-manager script | fail/status 1/`harness-input/script-reparse`; no context; neither script invoked; target unchanged |
+| T1A-S-11 | `harness.input.provider-qualified-tracked-scripts-accepted` | both scripts provider-qualified, exact tracked, and versioned | pass/status 0 through the `T1A-V-01` control; four valid files; context `Disposed` |
+| T1A-S-12 | `harness.input.helper-untracked-rejected` | untracked ordinary helper script | fail/status 1/`harness-input/script-untracked`; no context; neither supplied script invoked |
+| T1A-S-13 | `harness.input.context-untracked-rejected` | untracked ordinary context-manager script | fail/status 1/`harness-input/script-untracked`; no context; neither supplied script invoked |
+| T1A-X-01 | `label.artifact.empty-rejected` | explicit empty `ArtifactId` | `parameter`; candidate absent |
+| T1A-X-02 | `label.run-id.empty-rejected` | explicit empty `RunId` | `parameter`; candidate absent |
+| T1A-X-03 | `label.run-attempt.empty-rejected` | explicit empty `RunAttempt` | `parameter`; candidate absent |
+| T1A-X-04 | `label.artifact.null-rejected` | explicit null `ArtifactId` | `parameter`; candidate absent |
+| T1A-X-05 | `label.run-id.null-rejected` | explicit null `RunId` | `parameter`; candidate absent |
+| T1A-X-06 | `label.run-attempt.null-rejected` | explicit null `RunAttempt` | `parameter`; candidate absent |
+| T1A-X-07 | `label.valid-text-preserved` | valid nonempty labels | selected failure preserves exact label text |
+| T1A-X-08 | `label.artifact.array-rejected` | array supplied as `ArtifactId` | fail/status 1/`parameter/label-not-scalar-string`; no filesystem work; candidate absent |
+| T1A-X-09 | `label.run-id.array-rejected` | array supplied as `RunId` | fail/status 1/`parameter/label-not-scalar-string`; no filesystem work; candidate absent |
+| T1A-X-10 | `label.run-attempt.array-rejected` | array supplied as `RunAttempt` | fail/status 1/`parameter/label-not-scalar-string`; no filesystem work; candidate absent |
+| T1A-X-11 | `label.artifact.object-rejected` | object supplied as `ArtifactId` | fail/status 1/`parameter/label-not-scalar-string`; no filesystem work; candidate absent |
+| T1A-X-12 | `label.run-id.object-rejected` | object supplied as `RunId` | fail/status 1/`parameter/label-not-scalar-string`; no filesystem work; candidate absent |
+| T1A-X-13 | `label.run-attempt.object-rejected` | object supplied as `RunAttempt` | fail/status 1/`parameter/label-not-scalar-string`; no filesystem work; candidate absent |
 
 Required postconditions:
 
@@ -688,7 +688,14 @@ authorization, so every Active cleanup revalidates actual ownership.
 ### 13. Make the case catalog and results structurally atomic
 
 The normative catalog version is `T1A-CASES-v1`; its immutable closed oracle
-dictionary is `T1A-ORACLES-v1`. Every row has exact fields:
+dictionary is `T1A-ORACLES-v1`. The 118-row table in section 10, the 13 new
+IDs in the candidate-lifecycle table in section 9 (`K-05` through `K-17`; the
+repeated `K-03` is one physical row), and the eight `I` rows below are the sole
+**139-row physical allocation**. There is no range record. Each ID maps
+literally to one materialized profile named `T1A-ORACLE-<ID>`; for example,
+`T1A-V-01` maps only to `T1A-ORACLE-T1A-V-01`. Every materialized profile
+copies the row's exact fixture/invocation and singular oracle and expands all
+remaining fields below before the issue is filed. Every row has exact fields:
 
 ```text
 Id SemanticCase Applicability Fixture InitialState OracleProfile
@@ -712,7 +719,9 @@ containing only `candidate-cleanup|candidate-cleanup-noop|context-cleanup|
 context-cleanup-noop|none`. Slash lists, “then,” “applicable,” `or`, or prose
 alternatives are invalid metadata.
 
-The oracle profiles expand as follows:
+The following oracle-family descriptions constrain those already materialized
+per-row profiles; they are not catalog rows, dynamic generators, or permission
+to choose a profile during implementation:
 
 | Profile | Immutable expansion; row-specific fields |
 | --- | --- |
@@ -729,19 +738,17 @@ The oracle profiles expand as follows:
 | `OP-SKIP-PRIMITIVE` | skip/null/`applicability`; no fixture; candidate not-applicable/context not-created; no cleanup; row supplies platform/probe/reason |
 | `OP-CATALOG-REJECTION` | rejection/1/`catalog`; candidate/context not-applicable; no cleanup; row supplies mutation/subreason |
 
-Each profile declares all fixed fields and only permitted row variations.
-Unknown fields/profiles, fixed-field override, missing variation, contradictory
-state, or prose alternative fails static catalog validation. Profiles and
-existing ID/key meanings are immutable after merge; new behavior appends a new
-row/profile.
+Each materialized profile declares all fixed fields and only the literal
+variations in its physical row. Unknown fields/profiles, a profile name that
+does not equal the row's literal bijection, fixed-field override, missing
+variation, contradictory state, or prose alternative fails static catalog
+validation. All 139 profiles and ID/key meanings are frozen by this issue; new
+behavior appends a new row/profile.
 
-Every existing case table row must be transcribed with one profile and exact
-variations before filing. A row mutates one parameter/path/separator/platform/
-leaf/outcome only. Split `root or ancestor link/reparse` and any other
-remaining disjunction into append-only rows. Replace ordinal semantic names
-with behavior names; at minimum use the mappings and catalog-integrity rows
-listed below. P1A must split grouped evidence before it can satisfy multiple
-Terraform keys.
+Each row mutates one parameter, path, separator, platform, leaf, or outcome
+only. The physical tables contain no `or` fixture and no ordinal
+`*.case-NN` semantic key. P1A must split grouped evidence before it can satisfy
+multiple Terraform keys.
 
 Startup expands profiles/rows, validates schema/unique sets, and computes exact
 applicable `(ID,runtime)` pairs. Completion requires one complete record for

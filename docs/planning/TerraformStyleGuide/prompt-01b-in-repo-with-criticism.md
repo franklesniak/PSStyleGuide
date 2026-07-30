@@ -25,9 +25,9 @@ I'm not asking you to critique these, but as an FYI: here is a similar proposed 
 
 ---
 
-Lastly, this feedback may be outdated (perhaps some of this has been already addressed), but here is some feedback from another person on the PSStyleGuide GitHub Issues slate:
+Lastly, this feedback may be outdated (perhaps some of this has been already addressed), but here is some feedback from another person on the TerraformStyleGuide GitHub Issues slate:
 
-- `docs\planning\PSStyleGuide\slate-criticism.md`
+- `docs\planning\TerraformStyleGuide\slate-criticism.md`
 
 In addition to your own thoughts, please review each of their recommendations, above, one by one. Start by confirming/denying the validity of the recommendation (note: me passing it along should not be regarded as an endorsement).
 

@@ -15,18 +15,22 @@ a shared cross-repository runtime dependency.
 
 ## Execution order
 
-This is the first issue in the default TerraformStyleGuide slate order.
+This issue begins the only authorized TerraformStyleGuide slate graph:
+**T1 → T1A → T1B → T2 → T3 → T4**. Every arrow is an actual GitHub
+blocked-by relationship and consumes the predecessor's ruleset-protected landed
+commit and handoff evidence.
 
 Before implementation, record a dated repository-policy decision for the
 current npm advisory state. The record must name the audit command/tool
 versions, high-severity findings, decision owner, evidence date, accepted
 waiting period, and selected order.
 
-- If policy permits the findings to remain temporarily, use the default order.
-- If policy requires immediate remediation, implement **Remediate Markdown lint
-  dependency advisories and add npm update governance** first. Then record that
-  issue's actual merge commit and rebaseline this issue's Node, action,
-  workflow, package, affected-file, and validation assumptions before editing.
+- If policy permits the findings to remain temporarily, record the bounded
+  exception and continue with this issue.
+- If policy requires immediate remediation, stop this slate. Do not implement
+  T3 first or partially import its package changes into T1. After remediation,
+  reissue/rebaseline all affected issue drafts from the new protected `main`
+  commit and begin again at T1.
 
 After it merges:
 
@@ -173,6 +177,22 @@ The final package versions, `engines.node`, hook runtime guard, advisory
 disposition, npm update policy, and contributor minimum belong to
 **Remediate Markdown lint dependency advisories and add npm update
 governance**.
+
+### 4a. Freeze the pre-merge supply inputs
+
+At implementation start retain one `T1-SUPPLY-FREEZE-v1` record containing the
+reviewed-head commit, exact `package.json` and `package-lock.json` blob IDs and
+SHA-256 values, resolved Node/npm pair, `npm ci` producer argv, installed
+package-tree identity, `npm audit --json` command/tool versions, normalized
+advisory IDs/severities/affected paths, and the dated policy decision above.
+
+Immediately before merge, re-read those two tracked blobs from the reviewed
+head, repeat the frozen install and audit with the same toolchain, and require
+exact equality of every recorded field. Any manifest, lock, package-tree,
+toolchain, advisory, or policy-decision drift stops merge and requires an
+explicit rebaseline of T1 and its successors. A Dependabot proposal, changed
+registry response, or locally refreshed lock is evidence of drift, not
+permission to update dependencies inside T1.
 
 ### 5. Pin and allowlist the current external actions
 

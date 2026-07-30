@@ -34,6 +34,26 @@ Markdown workflow.
 
 Record real blocked-by relationships and exact merge commits.
 
+### Mandatory internal review gates
+
+T4 remains one issue but has two separately approved evidence gates.
+
+**Gate A — nonmutating foundation:** implement and freeze only protected
+parent/path inspection, state-pull capture/publication, state inspection,
+difference review, address parsing/resolution, confirmation construction/read,
+case catalog, and their no-mutation harnesses. Record the reviewed commit/tree,
+every helper version/blob/SHA-256, exact role-table version, catalogs/results,
+platform/runtime/tool identities, and an operator plus independent peer
+approval. Gate A fixtures prove mutation child-call count is zero.
+
+**Gate B — destructive procedures:** may start only from Gate A's exact
+immutable identities and approvals. Any Gate A code, role, schema, path,
+limit, confirmation, or evidence change invalidates approval and returns to
+Gate A. Gate B adds/reviews push, rm, recovery, post-mutation verification, and
+failure/unknown-outcome handling; it records a second operator/independent-peer
+approval bound to the Gate A digest and final reviewed commit. No issue/PR
+approval, passing lint, or author self-review substitutes for either gate.
+
 ## Affected files
 
 Exactly these sixteen files may change:
@@ -155,19 +175,33 @@ and uses no ordinary native-output redirection. Both models protect against
 ordinary principals; Administrators/SYSTEM retain normal authority, so the
 operator also attests no authorized competing process.
 
-### Exact parent, path, and attestation tuple per state role
+### Complete state-bearing role authority
 
-Every state-bearing role has three separately supplied values:
+`T4-STATE-ROLES-v1` is the sole allocation. “Private” means a helper creates
+the path only beneath the already validated named invocation-context parent;
+it is never a caller value or ambient temporary path. `S` is the selected raw
+state maximum (`536870912` by default); `R` is 16 MiB; `M` is 65,536 bytes.
 
-| Surface/role | Parent | Path | Attestation |
-| --- | --- | --- | --- |
-| Standalone backup | `STATE_BACKUP_PARENT` | `STATE_BACKUP_PATH` | `STATE_BACKUP_PARENT_ATTESTATION` |
-| Push proposed source | `PUSH_PROPOSED_PARENT` | `PUSH_PROPOSED_PATH` | `PUSH_PROPOSED_PARENT_ATTESTATION` |
-| Push current backup | `PUSH_BACKUP_PARENT` | `PUSH_BACKUP_PATH` | `PUSH_BACKUP_PARENT_ATTESTATION` |
-| Push verification pull | `PUSH_VERIFY_PARENT` | `PUSH_VERIFY_PATH` | `PUSH_VERIFY_PARENT_ATTESTATION` |
-| Rm current backup | `RM_BACKUP_PARENT` | `RM_BACKUP_PATH` | `RM_BACKUP_PARENT_ATTESTATION` |
-| Rm command-created backup | `RM_COMMAND_BACKUP_PARENT` | `RM_COMMAND_BACKUP_PATH` | `RM_COMMAND_BACKUP_PARENT_ATTESTATION` |
-| Rm verification pull | `RM_VERIFY_PARENT` | `RM_VERIFY_PATH` | `RM_VERIFY_PARENT_ATTESTATION` |
+| Role | Creator → sole consumer | Parent/path/attestation authority | Identity, content, and bound | Lifetime, cleanup, failure postcondition |
+| --- | --- | --- | --- | --- |
+| Standalone final backup | pull publisher → operator/recovery | `STATE_BACKUP_PARENT` / `STATE_BACKUP_PATH` / `STATE_BACKUP_PARENT_ATTESTATION` | new ordinary protected file; strict state; `1..S` | retained recovery point; never auto-delete; failed publication leaves final absent |
+| Standalone capture temp | pull publisher → state inspector/final publisher | private under standalone invocation context | create-new ordinary same-device file; raw pull; `0..S+1` | unlink only while exact owned unpublished identity; uncertainty retains context |
+| Local corrupt preservation | no-replace local publisher → operator | `LOCAL_CORRUPT_PARENT` / `LOCAL_CORRUPT_PATH` / `LOCAL_CORRUPT_PARENT_ATTESTATION` | existing corrupt-source identity to new ordinary protected destination; `1..S` | retained incident evidence; no overwrite/delete on ambiguity |
+| Push proposed source | operator → difference review/one push | `PUSH_PROPOSED_PARENT` / `PUSH_PROPOSED_PATH` / `PUSH_PROPOSED_PARENT_ATTESTATION` | existing immutable reviewed strict state; `1..S` | retained until verified disposition; mutation never edits/deletes it |
+| Push current backup | pull publisher → diff/recovery | `PUSH_BACKUP_PARENT` / `PUSH_BACKUP_PATH` / `PUSH_BACKUP_PARENT_ATTESTATION` | fresh strict pre-push state; `1..S` | retained recovery point; failed pull leaves final absent |
+| Push verification pull | pull publisher → inspector/diff | `PUSH_VERIFY_PARENT` / `PUSH_VERIFY_PATH` / `PUSH_VERIFY_PARENT_ATTESTATION` | fresh strict post-push state; `1..S` | retained with change record; uncertain push retains all evidence |
+| Push difference report | difference helper → peer/confirmation | `PUSH_REVIEW_PARENT` / `PUSH_REVIEW_PATH` / `PUSH_REVIEW_PARENT_ATTESTATION` | new canonical state-derived report with no state values; `1..R` | retained review evidence; partial output removed only under exact ownership |
+| Rm current backup | pull publisher → recovery/peer | `RM_BACKUP_PARENT` / `RM_BACKUP_PATH` / `RM_BACKUP_PARENT_ATTESTATION` | fresh strict pre-rm state; `1..S` | retained recovery point; failed pull leaves final absent |
+| Rm command backup | Terraform local-mode rm → inspector | `RM_COMMAND_BACKUP_PARENT` / `RM_COMMAND_BACKUP_PATH` / `RM_COMMAND_BACKUP_PARENT_ATTESTATION` | absent ordinary path becoming strict local command backup; `1..S` | local mode only; retain after call; ambiguity stops without retry |
+| Rm exact-match capture | bounded list collector → address resolver | `RM_MATCH_PARENT` / `RM_MATCH_PATH` / `RM_MATCH_PARENT_ATTESTATION` | new ordinary exact address plus LF; `1..M`, at most 1,024 records | remove after resolver/confirmation only under exact identity; otherwise retain |
+| Rm resolver report | address resolver → peer/confirmation | `RM_REPORT_PARENT` / `RM_REPORT_PATH` / `RM_REPORT_PARENT_ATTESTATION` | new canonical metadata-only singleton report; `1..R` | retained review evidence; partial removed only while exact owned |
+| Rm verification pull | pull publisher → inspector/post-plan | `RM_VERIFY_PARENT` / `RM_VERIFY_PATH` / `RM_VERIFY_PARENT_ATTESTATION` | fresh strict post-rm state; `1..S` | retained with change record; unknown outcome retains all evidence |
+| Recovery desired backup | operator → recovery preparer/diff | `RECOVERY_DESIRED_PARENT` / `RECOVERY_DESIRED_PATH` / `RECOVERY_DESIRED_PARENT_ATTESTATION` | existing immutable reviewed strict state; `1..S` | retained recovery source; never modified/deleted by helper |
+| Recovery fresh remote | pull publisher → preparer/diff | `RECOVERY_CURRENT_PARENT` / `RECOVERY_CURRENT_PATH` / `RECOVERY_CURRENT_PARENT_ATTESTATION` | fresh strict authoritative state; `1..S` | retained until operation closes; drift restarts review |
+| Recovery candidate | recovery preparer → diff/one push | `RECOVERY_OUTPUT_PARENT` / `RECOVERY_OUTPUT_PATH` / `RECOVERY_OUTPUT_PARENT_ATTESTATION` | new strict state differing only by canonical serial token; `1..S` | retained until verified; partial removed only while exact owned |
+| Recovery preparation report | recovery preparer → peer/confirmation | `RECOVERY_REPORT_PARENT` / `RECOVERY_REPORT_PATH` / `RECOVERY_REPORT_PARENT_ATTESTATION` | new canonical metadata-only report; `1..R` | retained review evidence; uncertainty retains output and report |
+| Recovery verification pull | pull publisher → inspector/diff | `RECOVERY_VERIFY_PARENT` / `RECOVERY_VERIFY_PATH` / `RECOVERY_VERIFY_PARENT_ATTESTATION` | fresh strict post-recovery state; `1..S` | retained with incident record; unknown outcome never auto-rolls back |
+| Inspector/show private streams | inspector context → tokenizer/result | private under the exact caller role's invocation context | create-new raw/show streams; raw `0..S+1`, show per selected limit | always exact-owned cleanup after result; identity/cleanup uncertainty retains context |
 
 Every attestation is exactly
 `private-outside-vcs-no-competing-writers`. It means the operator reviewed
@@ -186,13 +220,37 @@ supplied canonical parent under T2's destination-leaf grammar. String-prefix
 or nested containment is invalid. Distinct roles stay distinct even when
 parent bytes match.
 
-Standalone, backup, command-backup, and verification destinations are fresh.
-`PUSH_PROPOSED_PATH` is an existing strict protected state identity.
-`terraform state rm` always receives exact
-`-backup="$RM_COMMAND_BACKUP_PATH"` (or the platform one-argument equivalent);
-an installed Terraform without this documented option is unsupported and
-stops, never falling back to a working-directory backup. Verification always
-uses a new path.
+Standalone, backup, command-backup, match/report, recovery output/report, and
+verification destinations are fresh. Proposed/desired inputs are existing
+strict protected identities. Unknown roles, a public path for a private role,
+tuple reuse by inference, or omitted lifetime/cleanup evidence fails the role
+catalog. Verification always uses a new path.
+
+### Backend-specific state-rm mode
+
+Before any rm capture or dry run, snapshot and validate exactly one
+`STATE_BACKEND_MODE` value: `local`, `hcp-cloud`, or `remote-backend`. Bind it
+to the reviewed initialized backend configuration, exact workspace,
+`EXPECTED_BACKEND_ID`, Terraform executable/version, and Gate A evidence. Every
+mode first creates the protected `RM_BACKUP_PATH` with `terraform state pull`
+and proves its state identity. Missing, ambiguous, changed, or mismatched mode
+stops before confirmation/mutation.
+
+The single mutation argv is constructed from the selected closed mode:
+
+| Mode | Exact state-rm argv after resolved Terraform executable |
+| --- | --- |
+| `local` | `state rm -backup=<RM_COMMAND_BACKUP_PATH> -lock-timeout=5m <RESOURCE_ADDRESS>` |
+| `hcp-cloud` | `state rm -lock-timeout=5m <RESOURCE_ADDRESS>` |
+| `remote-backend` | `state rm -lock-timeout=5m <RESOURCE_ADDRESS>` |
+
+`<...>` denotes one already validated argv element, never shell text. The
+local-only backup option is permitted only after the pinned version's
+`terraform state rm` help/official contract is revalidated and its separate
+fresh command-backup tuple is proved. HCP/remote construction cannot contain
+`-backup` and relies on the protected pre-mutation pull recovery point.
+Unknown-option, nonzero, signal, timeout, or unknown/partial outcome is one
+terminal mutation attempt: never retry with a different argv or backend mode.
 
 For each role/platform, atomic cases cover missing, empty, wrong literal,
 parent/path mismatch, nested path, sibling prefix, wrong owner/mode/DACL/type/
@@ -895,12 +953,14 @@ proof below.
    confirmation to a new path and require byte/digest/report equality.
 6. record the remote object's continued existence/ownership plan;
 7. require typed confirmation containing workspace and exact address;
-8. run with locking enabled and exactly `-lock-timeout=5m`;
-9. direct the command-created backup to exact fresh
+8. revalidate the closed `STATE_BACKEND_MODE` and run its one exact argv with
+   locking enabled and exactly `-lock-timeout=5m`;
+9. for `local` only, direct the command-created backup to exact fresh
    `RM_COMMAND_BACKUP_PATH` under its supplied tuple and inventory it
-   immediately; an installed Terraform without the controlled backup option
-   is unsupported and stops before mutation;
-10. prohibit `-lock=false`, `-ignore-remote-version`, and force-unlock; and
+   immediately; for `hcp-cloud`/`remote-backend`, prove argv contains no
+   `-backup` and retain the protected pre-mutation pull;
+10. prohibit retry after unknown-option/nonzero/unknown outcome,
+    `-lock=false`, `-ignore-remote-version`, and force-unlock; and
 11. pull/validate the new state, run plan, and prove only intended bindings
     changed.
 
@@ -916,10 +976,11 @@ configuration/workspace/backend identity, canonical address/address SHA-256,
 `matchCount:1`, match-set SHA-256, and `outcome:"exact-singleton"`. It never
 retains object ID/value, native/provider diagnostics, unreviewed address, or
 match fragments. Remove the match file only under exact identity proof.
-Confirmation consumes the shared parser. Mutation argv is exactly
-`terraform state rm -backup="$RM_COMMAND_BACKUP_PATH" -lock-timeout=5m
-"$RESOURCE_ADDRESS"` with closed stdin, one address argument, no glob/eval/
-word splitting/retry/bypass.
+Confirmation consumes the shared parser. Mutation argv is exactly the one
+backend-mode row above, with closed stdin, one address argument, no glob/eval/
+word splitting/retry/bypass. Fixtures prove local has exactly one validated
+`-backup` element, HCP/remote have none, and mode/config/workspace drift makes
+zero mutation calls.
 
 ### 5. Treat state locks and force-unlock accurately
 
@@ -1389,8 +1450,13 @@ From clean disposable clones:
       three-component grammar, with atomic 201/202/203 and component-boundary
       oracles on both platforms.
 - [ ] Every state-bearing role consumes its own exact parent/path/attestation
-      triple and records the distinction between operator attestation and
-      platform inspection.
+      triple or is helper-private under its one invocation context;
+      `T4-STATE-ROLES-v1` records creator, consumer, identity/content/size,
+      lifetime, cleanup order, failure postcondition, retained uncertainty,
+      and the distinction between operator attestation and platform inspection.
+- [ ] Gate A has independent approval and zero mutation calls before Gate B;
+      Gate B is bound to Gate A's immutable digest and has a second independent
+      approval, with any foundation drift returning the work to Gate A.
 - [ ] POSIX parent/file modes and Windows owner/protected-DACL/exact-SID ACEs
       are inspected at every required phase; no Windows acceptance uses
       `umask` as a security control.
@@ -1429,6 +1495,10 @@ From clean disposable clones:
       candidate helper—never a direct old-backup push.
 - [ ] Manual state push and state rm use exactly `-lock-timeout=5m`, never
       disable locking, and require external exclusion for a no-lock backend.
+- [ ] State rm attests exactly one `local|hcp-cloud|remote-backend` mode after a
+      protected pre-mutation pull; local alone has one validated `-backup` argv
+      element, HCP/remote have none, and no failed/unknown attempt is retried
+      with a different vector.
 - [ ] State rm prefers `removed` blocks, requires dry-run exact matches,
       canonical address parsing, Terraform-produced singleton equality, repeat
       match before confirmation, backup, lock, and post-plan evidence; every
