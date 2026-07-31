@@ -104,6 +104,10 @@ jobs:
           if ($intPolicyExit -ne 0 -or $arrPolicyResult.Count -ne 1) {
               throw "Workflow policy validation failed with native exit $intPolicyExit."
           }
+          $objPolicyResult = $arrPolicyResult[0] | ConvertFrom-Json
+          if ($objPolicyResult.casesPassed -ne 46) {
+              throw "Case catalog count mismatch: expected 46, got $($objPolicyResult.casesPassed)."
+          }
 
       - name: Run both Markdown lint surfaces
         working-directory: .github/workflows

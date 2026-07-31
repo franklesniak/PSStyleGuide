@@ -13,7 +13,7 @@ import {
 
 const VALIDATOR_VERSION = '1.0.0';
 const RESULT_SCHEMA = 'PSStyleGuide.WorkflowPolicyResult.v1';
-const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'cf810e1bfc49ec560e5f96356e0c0328ed6a482ce9dc057413b30283202a2414';
+const EXPECTED_CONTRACT_CANONICAL_SHA256 = '619edb29127acdaa9829fba91cd1d03addeafb5754e6188167e6d44356ec2a97';
 const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 const REQUIRED_ARGUMENTS = ['build.yml', 'markdownlint.yml'];
 const REQUIRED_RECIPROCAL_ROWS = [
@@ -493,6 +493,26 @@ function runCaseCatalog(catalog, workflows, dependabot, contract) {
     }
     ids.add(testCase.id);
     semanticKeys.add(testCase.semanticKey);
+    if (testCase.domain === 'workflow') {
+      if (
+        typeof testCase.workflow !== 'string'
+        || !Object.hasOwn(workflows, testCase.workflow)
+        || testCase.operation === null
+        || typeof testCase.operation !== 'object'
+      ) {
+        fail('case-catalog');
+      }
+    } else if (testCase.domain === 'contract' || testCase.domain === 'dependabot') {
+      if (testCase.operation === null || typeof testCase.operation !== 'object') {
+        fail('case-catalog');
+      }
+    } else if (testCase.domain === 'parser') {
+      if (typeof testCase.text !== 'string') {
+        fail('case-catalog');
+      }
+    } else if (testCase.domain !== 'baseline') {
+      fail('case-catalog');
+    }
     let observed = true;
     try {
       if (testCase.domain === 'baseline') {
@@ -512,10 +532,8 @@ function runCaseCatalog(catalog, workflows, dependabot, contract) {
         const fixture = clone(dependabot);
         applyOperation(fixture, testCase.operation);
         validateDependabot(fixture, contract);
-      } else if (testCase.domain === 'parser') {
-        parseStrictYaml(Buffer.from(testCase.text, 'utf8'), contract.limits);
       } else {
-        fail('case-domain');
+        parseStrictYaml(Buffer.from(testCase.text, 'utf8'), contract.limits);
       }
     } catch (error) {
       if (!(error instanceof PolicyError)) throw error;
