@@ -39,7 +39,15 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $arrResult = @(./.github/workflows/Generate-StyleGuideArtifacts.ps1)
+          $strPowerShellPath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
+          if (-not [System.IO.File]::Exists($strPowerShellPath)) {
+              throw 'The current PowerShell executable could not be resolved.'
+          }
+          $arrResult = @(& $strPowerShellPath `
+              -NoLogo `
+              -NoProfile `
+              -NonInteractive `
+              -File './.github/workflows/Generate-StyleGuideArtifacts.ps1')
           $intGeneratorExit = $LASTEXITCODE
           if ($arrResult.Count -ne 1) {
               throw 'The generator returned an unexpected output shape.'
