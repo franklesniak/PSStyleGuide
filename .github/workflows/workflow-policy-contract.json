@@ -74,7 +74,7 @@
       "compensatingControls": [
         "Every P1 workflow is read-only.",
         "npm lifecycle scripts are disabled.",
-        "The tooling must not process untrusted Markdown.",
+        "Pull-request Markdown is processed by the retained graph; exposure is bounded to a read-only job whose token is read-only and is not persisted.",
         "Dependency changes other than exact yaml@2.9.0 are prohibited."
       ],
       "gateAudit": {
@@ -140,7 +140,7 @@
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "15a94e0ebfad6afcb7f663c10178ac1cb0c4bb1e9dfc832cf175d09f45e5e27b"
+    "sha256": "90f9a1dff5209d6893a422f578d790b27e097e29efe3aa882fb0a963a0d6cf4f"
   },
   "actions": {
     "checkout": {
