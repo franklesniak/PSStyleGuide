@@ -112,6 +112,17 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          $objContract = Get-Content -LiteralPath 'workflow-policy-contract.json' -Raw |
+              ConvertFrom-Json
+          $strExpectedValidatorHash = [string]$objContract.validatorIdentity.sha256
+          if ($strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {
+              throw 'The contract did not record a reviewed validator digest.'
+          }
+          $strValidatorPath = 'Validate-WorkflowPolicy.mjs'
+          $strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $strValidatorPath).Hash
+          if ($strValidatorHash -ine $strExpectedValidatorHash) {
+              throw 'The policy validator does not match the reviewed digest; refusing to run it.'
+          }
           $arrPolicyResult = @(node Validate-WorkflowPolicy.mjs build.yml markdownlint.yml)
           $intPolicyExit = $LASTEXITCODE
           if ($intPolicyExit -ne 0 -or $arrPolicyResult.Count -ne 1) {

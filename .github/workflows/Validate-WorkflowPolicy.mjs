@@ -13,9 +13,10 @@ import {
 
 const VALIDATOR_VERSION = '1.0.0';
 const RESULT_SCHEMA = 'PSStyleGuide.WorkflowPolicyResult.v1';
-const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'a5fe7ad14038ea75ecc7c5f665a07bbb607440dcf4e70c32eeded4176e736d14';
+const EXPECTED_CONTRACT_CANONICAL_SHA256 = '7eef4ab5255edd238d531eeef930eb13c587f7246f5065b7ce03910cd2faadd6';
 const MINIMUM_CASE_COUNT = 46;
 const CASE_CATALOG_FILE_NAME = 'workflow-policy-cases.json';
+const VALIDATOR_FILE_NAME = 'Validate-WorkflowPolicy.mjs';
 const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 const REQUIRED_ARGUMENTS = ['build.yml', 'markdownlint.yml'];
 const REQUIRED_RECIPROCAL_ROWS = [
@@ -204,8 +205,21 @@ function parseStrictJson(bytes, limits, category) {
   }
 }
 
+// The contract records this validator's digest in validatorIdentity, while this
+// validator records the contract's canonical digest. Hashing the whole contract
+// here would make those two values mutually dependent and unsatisfiable: updating
+// either forces the other to change, with no fixed point. Excluding validatorIdentity
+// from the identity view breaks that cycle, so validatorIdentity is deliberately not
+// covered by contract-identity. It is covered instead by the independent Get-FileHash
+// gate in the workflow and by the validator-identity check in main().
+function contractIdentityView(contract) {
+  const view = clone(contract);
+  delete view.validatorIdentity;
+  return view;
+}
+
 function validateContract(contract) {
-  if (sha256(canonicalJson(contract)) !== EXPECTED_CONTRACT_CANONICAL_SHA256) {
+  if (sha256(canonicalJson(contractIdentityView(contract))) !== EXPECTED_CONTRACT_CANONICAL_SHA256) {
     fail('contract-identity');
   }
   expectExactKeys(contract, [
@@ -215,6 +229,7 @@ function validateContract(contract) {
     'supplyFreeze',
     'scriptVersions',
     'caseCatalog',
+    'validatorIdentity',
     'actions',
     'workflowPolicy',
     'dependabot',
@@ -224,6 +239,13 @@ function validateContract(contract) {
   if (
     contract.caseCatalog.path !== CASE_CATALOG_FILE_NAME
     || !/^[0-9a-f]{64}$/u.test(contract.caseCatalog.sha256)
+  ) {
+    fail('contract-shape');
+  }
+  expectExactKeys(contract.validatorIdentity, ['path', 'sha256'], 'contract-shape');
+  if (
+    contract.validatorIdentity.path !== VALIDATOR_FILE_NAME
+    || !/^[0-9a-f]{64}$/u.test(contract.validatorIdentity.sha256)
   ) {
     fail('contract-shape');
   }
@@ -585,6 +607,14 @@ function main() {
   };
   const contract = parseStrictJson(contractBytes, bootstrapLimits, 'contract-json');
   validateContract(contract);
+  const validatorBytes = readOrdinaryFile(
+    path.join(SCRIPT_DIRECTORY, VALIDATOR_FILE_NAME),
+    262144,
+    'validator-file',
+  );
+  if (sha256(validatorBytes) !== contract.validatorIdentity.sha256) {
+    fail('validator-identity');
+  }
   const caseCatalogBytes = readOrdinaryFile(
     path.join(SCRIPT_DIRECTORY, CASE_CATALOG_FILE_NAME),
     contract.limits.maximumJsonBytes,
@@ -622,7 +652,7 @@ function main() {
     schema: RESULT_SCHEMA,
     validatorVersion: VALIDATOR_VERSION,
     success: true,
-    contractCanonicalSha256: sha256(canonicalJson(contract)),
+    contractCanonicalSha256: sha256(canonicalJson(contractIdentityView(contract))),
     casesPassed: passedCases,
     workflowSha256: Object.fromEntries(
       REQUIRED_ARGUMENTS.map((fileName) => [fileName, sha256(Buffer.from(workflows[fileName].text, 'utf8'))]),
