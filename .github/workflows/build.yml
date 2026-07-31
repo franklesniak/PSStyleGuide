@@ -4,67 +4,136 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'STYLE_GUIDE.md'
-      - 'STYLE_GUIDE_RATIONALE.md'
   pull_request:
     branches:
       - main
-    paths:
-      - 'STYLE_GUIDE.md'
-      - 'STYLE_GUIDE_RATIONALE.md'
 
-permissions:
-  contents: write
+permissions: {}
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    
+  verify_generated_artifacts:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        id: checkout_repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-      
+          repository: ${{ github.repository }}
+          ref: ${{ github.sha }}
+          token: ${{ github.token }}
+          persist-credentials: false
+          clean: true
+          fetch-depth: 1
+          fetch-tags: false
+          show-progress: true
+          lfs: false
+          submodules: false
+          set-safe-directory: true
+          allow-unsafe-pr-checkout: false
+
       - name: Generate style guide artifacts
+        id: generate_style_guide_artifacts
         shell: pwsh
         run: |
-          ./.github/workflows/Generate-StyleGuideArtifacts.ps1
-      
-      - name: Check for changes
-        id: check_changes
-        shell: pwsh
-        run: |
-          $boolHasChanges = $false
-          $arrChangedFiles = @(git status --porcelain)
-          
-          if ($arrChangedFiles.Count -gt 0) {
-              $boolHasChanges = $true
-              Write-Host "Changes detected:"
-              git status --short
-          } else {
-              Write-Host "No changes detected"
+          $ErrorActionPreference = 'Stop'
+          $arrResult = @(./.github/workflows/Generate-StyleGuideArtifacts.ps1)
+          $intGeneratorExit = $LASTEXITCODE
+          if ($arrResult.Count -ne 1) {
+              throw 'The generator returned an unexpected output shape.'
           }
-          
-          # Output for GitHub Actions
-          "has_changes=$($boolHasChanges.ToString().ToLower())" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-      
-      - name: Commit and push changes
-        if: github.event_name == 'push' && steps.check_changes.outputs.has_changes == 'true'
+          $objResult = $arrResult[0] | ConvertFrom-Json
+          if ($intGeneratorExit -ne 0 -or
+              $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v1' -or
+              $objResult.GeneratorVersion -cne '1.0.20260731.0' -or
+              $objResult.Overall -notin @('Success', 'NoChange')) {
+              throw "Artifact generation failed with native exit $intGeneratorExit."
+          }
+
+      - name: Verify generated artifact drift
+        id: verify_generated_artifact_drift
+        shell: pwsh
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add copilot-instructions.md powershell.instructions.md STYLE_GUIDE_CHAT.md STYLE_GUIDE_FULL.md
-          git commit -m "chore: update generated style guide artifacts [skip ci]"
-          git push
-      
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+          $ErrorActionPreference = 'Stop'
+          $arrArtifactPaths = @(
+              'copilot-instructions.md',
+              'powershell.instructions.md',
+              'STYLE_GUIDE_CHAT.md',
+              'STYLE_GUIDE_FULL.md'
+          )
+          & git diff --exit-code --quiet --no-ext-diff --no-textconv -- $arrArtifactPaths
+          $intDiffExit = $LASTEXITCODE
+          if ($intDiffExit -eq 1) {
+              throw 'Generated artifact drift was detected.'
+          }
+          if ($intDiffExit -ne 0) {
+              throw "git diff failed with native exit $intDiffExit."
+          }
+          & ./.github/workflows/Test-ExactGitPathSet.ps1 `
+              -RepositoryRoot $env:GITHUB_WORKSPACE `
+              -ExpectedPath @() `
+              -Mode Working
+          $intPathSetExit = $LASTEXITCODE
+          if ($intPathSetExit -ne 0) {
+              throw "The working path set was not empty; verifier exit $intPathSetExit."
+          }
+
+      - name: Create failure diagnostics
+        id: create_failure_diagnostics
+        if: ${{ failure() && !cancelled() }}
+        continue-on-error: true
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $strDiagnosticsRoot = Join-Path $env:RUNNER_TEMP 'style-guide-verification-diagnostics'
+          if ([System.IO.Directory]::Exists($strDiagnosticsRoot) -or
+              [System.IO.File]::Exists($strDiagnosticsRoot)) {
+              throw 'The diagnostics path was not fresh.'
+          }
+          [void](New-Item -ItemType Directory -Path $strDiagnosticsRoot)
+          $listLines = [System.Collections.Generic.List[string]]::new()
+          $listLines.Add('schema=PSStyleGuide.VerificationDiagnostic.v1')
+          $listLines.Add('phase=generated-artifact-verification')
+          $listLines.Add('native-exit=unavailable')
+          foreach ($strPath in @(
+              'copilot-instructions.md',
+              'powershell.instructions.md',
+              'STYLE_GUIDE_CHAT.md',
+              'STYLE_GUIDE_FULL.md'
+          )) {
+              $strFullPath = [System.IO.Path]::GetFullPath((Join-Path $env:GITHUB_WORKSPACE $strPath))
+              $objInfo = [System.IO.FileInfo]::new($strFullPath)
+              if (-not $objInfo.Exists -or
+                  ($objInfo.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0 -or
+                  $objInfo.Length -gt 1048576) {
+                  throw 'A generated destination was not a bounded ordinary file.'
+              }
+              $strHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $strFullPath).Hash.ToLowerInvariant()
+              $listLines.Add("path=$strPath size=$($objInfo.Length) sha256=$strHash")
+          }
+          $strSummary = ($listLines.ToArray() -join "`n") + "`n"
+          $arrSummaryBytes = [System.Text.UTF8Encoding]::new($false).GetBytes($strSummary)
+          if ($arrSummaryBytes.Length -gt 16384) {
+              throw 'The diagnostic summary exceeded its bound.'
+          }
+          [System.IO.File]::WriteAllBytes(
+              (Join-Path $strDiagnosticsRoot 'summary.txt'),
+              $arrSummaryBytes
+          )
+
+      - name: Upload failure diagnostics
+        id: upload_failure_diagnostics
+        if: ${{ failure() && !cancelled() }}
+        continue-on-error: true
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: style-guide-artifacts
-          path: |
-            copilot-instructions.md
-            powershell.instructions.md
-            STYLE_GUIDE_CHAT.md
-            STYLE_GUIDE_FULL.md
+          name: style-guide-verification-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/style-guide-verification-diagnostics
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+          overwrite: false
+          include-hidden-files: false
+          archive: true
