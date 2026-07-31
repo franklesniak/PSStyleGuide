@@ -857,7 +857,7 @@ try {
 
     $strResultPhase = 'validate-fixed-authority'
     $strWorkflowRoot = Assert-OrdinaryAbsolutePath -LiteralPath $PSScriptRoot -ExpectedLeafType Directory
-    $strRepositoryRootCandidate = Join-Path $strWorkflowRoot '..\..'
+    $strRepositoryRootCandidate = Join-Path $strWorkflowRoot '..' '..'
     $strRepositoryRoot = Assert-OrdinaryAbsolutePath -LiteralPath (
         [System.IO.Path]::GetFullPath($strRepositoryRootCandidate)
     ) -ExpectedLeafType Directory
