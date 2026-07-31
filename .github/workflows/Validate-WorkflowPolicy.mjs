@@ -420,7 +420,22 @@ function pointerParts(pointer) {
 }
 
 function getPointer(root, pointer) {
-  return pointerParts(pointer).reduce((value, part) => value[part], root);
+  let value = root;
+  for (const part of pointerParts(pointer)) {
+    if (value === null || typeof value !== 'object' || !Object.hasOwn(value, part)) {
+      fail('case-operation');
+    }
+    value = value[part];
+  }
+  return value;
+}
+
+function getArrayPointer(root, pointer) {
+  const value = getPointer(root, pointer);
+  if (!Array.isArray(value)) {
+    fail('case-operation');
+  }
+  return value;
 }
 
 function getPointerParent(root, pointer) {
@@ -443,9 +458,9 @@ function applyOperation(root, operation) {
   } else if (operation.type === 'delete') {
     delete parent[key];
   } else if (operation.type === 'append') {
-    getPointer(root, operation.path).push(clone(operation.value));
+    getArrayPointer(root, operation.path).push(clone(operation.value));
   } else if (operation.type === 'append-copy') {
-    getPointer(root, operation.path).push(clone(getPointer(root, operation.source)));
+    getArrayPointer(root, operation.path).push(clone(getPointer(root, operation.source)));
   } else if (operation.type === 'swap') {
     const other = getPointerParent(root, operation.otherPath);
     const temporary = parent[key];

@@ -44,6 +44,8 @@
     { "id": "PS-P1-WFPOL-041", "semanticKey": "yaml-custom-tag", "domain": "parser", "text": "name: !unsafe x\non: {}\npermissions: {}\njobs: {}\n", "expected": false },
     { "id": "PS-P1-WFPOL-042", "semanticKey": "yaml-multidocument", "domain": "parser", "text": "name: x\non: {}\npermissions: {}\njobs: {}\n---\nname: y\n", "expected": false },
     { "id": "PS-P1-WFPOL-043", "semanticKey": "yaml-directive", "domain": "parser", "text": "%YAML 1.2\n---\nname: x\non: {}\npermissions: {}\njobs: {}\n", "expected": false },
-    { "id": "PS-P1-WFPOL-044", "semanticKey": "yaml-complex-key", "domain": "parser", "text": "name: x\non: {}\npermissions: {}\njobs:\n  ? [a, b]\n  : {}\n", "expected": false }
+    { "id": "PS-P1-WFPOL-044", "semanticKey": "yaml-complex-key", "domain": "parser", "text": "name: x\non: {}\npermissions: {}\njobs:\n  ? [a, b]\n  : {}\n", "expected": false },
+    { "id": "PS-P1-WFPOL-045", "semanticKey": "append-copy-missing-source-pointer", "domain": "workflow", "workflow": "build.yml", "operation": { "type": "append-copy", "path": "/jobs/verify_generated_artifacts/steps", "source": "/jobs/verify_generated_artifacts/steps/999/name" }, "expected": false },
+    { "id": "PS-P1-WFPOL-046", "semanticKey": "append-target-not-array", "domain": "dependabot", "operation": { "type": "append", "path": "/updates/0/schedule", "value": { "interval": "daily" } }, "expected": false }
   ]
 }
