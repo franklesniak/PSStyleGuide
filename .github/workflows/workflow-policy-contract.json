@@ -134,6 +134,10 @@
       "sha256": "86d54a194541184f43f8cd0d3097d57566f6bbbfe83ee0168531af04e43def79"
     }
   },
+  "caseCatalog": {
+    "path": "workflow-policy-cases.json",
+    "sha256": "afeb59002a2fa704dd4d5bbfb2e13581dee2d730b17c2bcb10fe488096b06953"
+  },
   "actions": {
     "checkout": {
       "repository": "actions/checkout",

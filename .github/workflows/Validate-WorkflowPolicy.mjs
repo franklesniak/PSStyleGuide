@@ -13,8 +13,9 @@ import {
 
 const VALIDATOR_VERSION = '1.0.0';
 const RESULT_SCHEMA = 'PSStyleGuide.WorkflowPolicyResult.v1';
-const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'fb886ede5a22c52e5e3b7d690fbb0fc6f02f26ba56bb22890dfd848081ad37e0';
+const EXPECTED_CONTRACT_CANONICAL_SHA256 = '37739272f216f9241a6b432ed68c67bc4bc392a9e2a7767fc3b46d27fff65829';
 const MINIMUM_CASE_COUNT = 46;
+const CASE_CATALOG_FILE_NAME = 'workflow-policy-cases.json';
 const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 const REQUIRED_ARGUMENTS = ['build.yml', 'markdownlint.yml'];
 const REQUIRED_RECIPROCAL_ROWS = [
@@ -213,11 +214,19 @@ function validateContract(contract) {
     'limits',
     'supplyFreeze',
     'scriptVersions',
+    'caseCatalog',
     'actions',
     'workflowPolicy',
     'dependabot',
     'reciprocalFoundation',
   ], 'contract-shape');
+  expectExactKeys(contract.caseCatalog, ['path', 'sha256'], 'contract-shape');
+  if (
+    contract.caseCatalog.path !== CASE_CATALOG_FILE_NAME
+    || !/^[0-9a-f]{64}$/u.test(contract.caseCatalog.sha256)
+  ) {
+    fail('contract-shape');
+  }
   if (contract.schema !== 'PSStyleGuide.WorkflowPolicyContract.v1' || contract.contractVersion !== 1) {
     fail('contract-version');
   }
@@ -576,15 +585,15 @@ function main() {
   };
   const contract = parseStrictJson(contractBytes, bootstrapLimits, 'contract-json');
   validateContract(contract);
-  const catalog = parseStrictJson(
-    readOrdinaryFile(
-      path.join(SCRIPT_DIRECTORY, 'workflow-policy-cases.json'),
-      contract.limits.maximumJsonBytes,
-      'case-file',
-    ),
-    contract.limits,
-    'case-json',
+  const caseCatalogBytes = readOrdinaryFile(
+    path.join(SCRIPT_DIRECTORY, CASE_CATALOG_FILE_NAME),
+    contract.limits.maximumJsonBytes,
+    'case-file',
   );
+  if (sha256(caseCatalogBytes) !== contract.caseCatalog.sha256) {
+    fail('case-catalog-identity');
+  }
+  const catalog = parseStrictJson(caseCatalogBytes, contract.limits, 'case-json');
 
   const workflows = {};
   for (const fileName of REQUIRED_ARGUMENTS) {
