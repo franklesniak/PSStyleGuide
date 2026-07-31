@@ -13,7 +13,8 @@ import {
 
 const VALIDATOR_VERSION = '1.0.0';
 const RESULT_SCHEMA = 'PSStyleGuide.WorkflowPolicyResult.v1';
-const EXPECTED_CONTRACT_CANONICAL_SHA256 = '619edb29127acdaa9829fba91cd1d03addeafb5754e6188167e6d44356ec2a97';
+const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'fb886ede5a22c52e5e3b7d690fbb0fc6f02f26ba56bb22890dfd848081ad37e0';
+const MINIMUM_CASE_COUNT = 46;
 const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 const REQUIRED_ARGUMENTS = ['build.yml', 'markdownlint.yml'];
 const REQUIRED_RECIPROCAL_ROWS = [
@@ -248,6 +249,9 @@ function validateContract(contract) {
   ) {
     fail('supply-freeze');
   }
+  if (new Date() > new Date(contract.supplyFreeze.advisoryDecision.expiresAtUtc)) {
+    fail('advisory-expired');
+  }
   const rows = contract.reciprocalFoundation.rows;
   if (!Array.isArray(rows) || rows.length !== REQUIRED_RECIPROCAL_ROWS.length) {
     fail('reciprocal-matrix');
@@ -372,16 +376,16 @@ function validateDependabot(value, contract) {
 }
 
 function validatePackageTuple(contract) {
-  const packageJson = parseStrictJson(
-    readOrdinaryFile(path.join(SCRIPT_DIRECTORY, 'package.json'), contract.limits.maximumJsonBytes, 'package-file'),
-    contract.limits,
-    'package-json',
-  );
-  const packageLock = parseStrictJson(
-    readOrdinaryFile(path.join(SCRIPT_DIRECTORY, 'package-lock.json'), contract.limits.maximumJsonBytes, 'lock-file'),
-    contract.limits,
-    'package-lock-json',
-  );
+  const packageJsonBytes = readOrdinaryFile(path.join(SCRIPT_DIRECTORY, 'package.json'), contract.limits.maximumJsonBytes, 'package-file');
+  const packageLockBytes = readOrdinaryFile(path.join(SCRIPT_DIRECTORY, 'package-lock.json'), contract.limits.maximumJsonBytes, 'lock-file');
+  if (
+    sha256(packageJsonBytes) !== contract.supplyFreeze.reviewedWorkingBytes.packageJson.sha256
+    || sha256(packageLockBytes) !== contract.supplyFreeze.reviewedWorkingBytes.packageLockJson.sha256
+  ) {
+    fail('package-graph');
+  }
+  const packageJson = parseStrictJson(packageJsonBytes, contract.limits, 'package-json');
+  const packageLock = parseStrictJson(packageLockBytes, contract.limits, 'package-lock-json');
   expectDeepEqual(packageJson.devDependencies, {
     glob: '^10.3.10',
     husky: '^9.1.7',
@@ -543,6 +547,9 @@ function runCaseCatalog(catalog, workflows, dependabot, contract) {
       fail('case-result');
     }
     passed += 1;
+  }
+  if (passed < MINIMUM_CASE_COUNT) {
+    fail('case-catalog');
   }
   return passed;
 }

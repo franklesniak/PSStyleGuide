@@ -227,7 +227,7 @@
               { "kind": "action", "role": "build.verify_generated_artifacts.checkout_repository", "name": "Checkout repository", "id": "checkout_repository", "action": "checkout" },
               { "kind": "run", "role": "build.verify_generated_artifacts.generate_style_guide_artifacts", "name": "Generate style guide artifacts", "id": "generate_style_guide_artifacts", "shell": "pwsh", "runSha256": "a4e665787f5cd0a11726e19a920a65c24659226e10db2077bc030f7721494402" },
               { "kind": "run", "role": "build.verify_generated_artifacts.verify_generated_artifact_drift", "name": "Verify generated artifact drift", "id": "verify_generated_artifact_drift", "shell": "pwsh", "runSha256": "11af88f59f622acb61606ee82be47b63ed2b7b37b383b5d003575effabdde42a" },
-              { "kind": "run", "role": "build.verify_generated_artifacts.create_failure_diagnostics", "name": "Create failure diagnostics", "id": "create_failure_diagnostics", "shell": "pwsh", "if": "${{ failure() && !cancelled() }}", "continueOnError": true, "runSha256": "99a661f948b184d167a6f68cf2f553b2c3211a06a357ae88655286b4b74b8df5" },
+              { "kind": "run", "role": "build.verify_generated_artifacts.create_failure_diagnostics", "name": "Create failure diagnostics", "id": "create_failure_diagnostics", "shell": "pwsh", "if": "${{ failure() && !cancelled() }}", "continueOnError": true, "runSha256": "c7ffffe2913b4fe43d733a7ba918b39b84903efb4822089393458d54d520ec45" },
               { "kind": "action", "role": "build.verify_generated_artifacts.upload_failure_diagnostics", "name": "Upload failure diagnostics", "id": "upload_failure_diagnostics", "action": "uploadArtifact", "if": "${{ failure() && !cancelled() }}", "continueOnError": true }
             ]
           }

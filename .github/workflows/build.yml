@@ -113,13 +113,16 @@ jobs:
           )) {
               $strFullPath = [System.IO.Path]::GetFullPath((Join-Path $env:GITHUB_WORKSPACE $strPath))
               $objInfo = [System.IO.FileInfo]::new($strFullPath)
-              if (-not $objInfo.Exists -or
-                  ($objInfo.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0 -or
-                  $objInfo.Length -gt 1048576) {
-                  throw 'A generated destination was not a bounded ordinary file.'
+              if (-not $objInfo.Exists) {
+                  $listLines.Add("path=$strPath status=missing")
+              } elseif (($objInfo.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+                  $listLines.Add("path=$strPath status=reparse-point")
+              } elseif ($objInfo.Length -gt 1048576) {
+                  $listLines.Add("path=$strPath status=too-large size=$($objInfo.Length)")
+              } else {
+                  $strHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $strFullPath).Hash.ToLowerInvariant()
+                  $listLines.Add("path=$strPath size=$($objInfo.Length) sha256=$strHash")
               }
-              $strHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $strFullPath).Hash.ToLowerInvariant()
-              $listLines.Add("path=$strPath size=$($objInfo.Length) sha256=$strHash")
           }
           $strSummary = ($listLines.ToArray() -join "`n") + "`n"
           $arrSummaryBytes = [System.Text.UTF8Encoding]::new($false).GetBytes($strSummary)
