@@ -17,6 +17,11 @@ const EXPECTED_CONTRACT_CANONICAL_SHA256 = '7eef4ab5255edd238d531eeef930eb13c587
 const MINIMUM_CASE_COUNT = 46;
 const CASE_CATALOG_FILE_NAME = 'workflow-policy-cases.json';
 const VALIDATOR_FILE_NAME = 'Validate-WorkflowPolicy.mjs';
+// Mapping keys that alias JavaScript object internals. Plain assignment to
+// '__proto__' mutates an object's prototype instead of creating an own property,
+// so these are rejected at the parse boundary and in JSON pointers rather than
+// being relied upon to fail incidentally in a later shape comparison.
+const FORBIDDEN_OBJECT_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 const REQUIRED_ARGUMENTS = ['build.yml', 'markdownlint.yml'];
 const REQUIRED_RECIPROCAL_ROWS = [
@@ -130,7 +135,12 @@ function inspectYamlNode(node, depth, state, limits) {
   }
   if (isMap(node)) {
     for (const pair of node.items) {
-      if (!isScalar(pair.key) || typeof pair.key.value !== 'string' || pair.key.value === '<<') {
+      if (
+        !isScalar(pair.key)
+        || typeof pair.key.value !== 'string'
+        || pair.key.value === '<<'
+        || FORBIDDEN_OBJECT_KEYS.has(pair.key.value)
+      ) {
         fail('yaml-key');
       }
       inspectYamlNode(pair.key, depth + 1, state, limits);
@@ -451,7 +461,13 @@ function validateScriptVersions(contract) {
 
 function pointerParts(pointer) {
   if (!pointer.startsWith('/')) fail('case-operation');
-  return pointer.slice(1).split('/').map((part) => part.replaceAll('~1', '/').replaceAll('~0', '~'));
+  const parts = pointer.slice(1).split('/').map((part) => part.replaceAll('~1', '/').replaceAll('~0', '~'));
+  for (const part of parts) {
+    if (FORBIDDEN_OBJECT_KEYS.has(part)) {
+      fail('case-operation');
+    }
+  }
+  return parts;
 }
 
 function getPointer(root, pointer) {
