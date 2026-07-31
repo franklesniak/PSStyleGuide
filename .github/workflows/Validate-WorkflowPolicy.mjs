@@ -13,7 +13,7 @@ import {
 
 const VALIDATOR_VERSION = '1.0.0';
 const RESULT_SCHEMA = 'PSStyleGuide.WorkflowPolicyResult.v1';
-const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'd54e95854204bb4b11d0bd3f02230b003b6a45c28babf89f2557bd8610ee78ab';
+const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'cf810e1bfc49ec560e5f96356e0c0328ed6a482ce9dc057413b30283202a2414';
 const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 const REQUIRED_ARGUMENTS = ['build.yml', 'markdownlint.yml'];
 const REQUIRED_RECIPROCAL_ROWS = [

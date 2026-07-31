@@ -126,7 +126,7 @@
     "generator": {
       "path": "Generate-StyleGuideArtifacts.ps1",
       "version": "1.0.20260731.0",
-      "sha256": "e780d03cb25fa82053d7854f3cea2727eec45b0a0f3d46874c3e2b9ab888ffb2"
+      "sha256": "c975276fc767b979aca3ea2aec53b91ae897064c9230ff7973475811d492f491"
     },
     "pathVerifier": {
       "path": "Test-ExactGitPathSet.ps1",
