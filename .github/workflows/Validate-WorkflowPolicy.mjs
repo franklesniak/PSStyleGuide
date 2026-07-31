@@ -13,7 +13,7 @@ import {
 
 const VALIDATOR_VERSION = '1.0.0';
 const RESULT_SCHEMA = 'PSStyleGuide.WorkflowPolicyResult.v1';
-const EXPECTED_CONTRACT_CANONICAL_SHA256 = '37739272f216f9241a6b432ed68c67bc4bc392a9e2a7767fc3b46d27fff65829';
+const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'a5fe7ad14038ea75ecc7c5f665a07bbb607440dcf4e70c32eeded4176e736d14';
 const MINIMUM_CASE_COUNT = 46;
 const CASE_CATALOG_FILE_NAME = 'workflow-policy-cases.json';
 const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
