@@ -94,13 +94,15 @@ jobs:
           }
           $strManifestHashBefore = (Get-FileHash -Algorithm SHA256 -LiteralPath 'package.json').Hash
           $strLockHashBefore = (Get-FileHash -Algorithm SHA256 -LiteralPath 'package-lock.json').Hash
-          $objReviewed = $objContract.supplyFreeze.reviewedWorkingBytes
-          $strExpectedManifestHash = [string]$objReviewed.packageJson.sha256
-          $strExpectedLockHash = [string]$objReviewed.packageLockJson.sha256
-          if ($strExpectedManifestHash -cnotmatch '^[0-9a-f]{64}$' -or
-              $strExpectedLockHash -cnotmatch '^[0-9a-f]{64}$') {
-              throw 'The contract did not record reviewed package digests.'
-          }
+          # Rooted here rather than read from the contract. The contract's
+          # authenticity rests on a constant inside the validator, and the
+          # validator is replaceable by the same pull request, so a gate that
+          # reads its expectations from the contract can be satisfied by an
+          # attacker who replaces both. These literals are independent of the
+          # validator and of the contract; keep them in step with
+          # supplyFreeze.reviewedWorkingBytes whenever the tuple is re-frozen.
+          $strExpectedManifestHash = 'c6a9a8ac9a574b01b99ceb6f5ad9741d592589a7db34c74ebaf8dba8632fe285'
+          $strExpectedLockHash = '5efc1286025cdc3ad03796c5f4e44cc697e674a30e61de05e299b2a30abad1a2'
           if ($strManifestHashBefore -ine $strExpectedManifestHash -or
               $strLockHashBefore -ine $strExpectedLockHash) {
               throw 'The npm package tuple does not match the reviewed digests; refusing to install.'
