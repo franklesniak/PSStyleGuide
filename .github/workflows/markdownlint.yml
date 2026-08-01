@@ -80,7 +80,9 @@ jobs:
           if ($strValidatorHash -ine $strExpectedValidatorHash) {
               throw 'The policy validator does not match the reviewed digest; refusing to run it.'
           }
-          $arrPreflight = @(node Validate-WorkflowPolicy.mjs --preflight)
+          $arrNodeCommands = @(Get-Command -Name node -CommandType Application -ErrorAction Stop)
+          $strNodePath = [string]$arrNodeCommands[0].Source
+          $arrPreflight = @(& $strNodePath Validate-WorkflowPolicy.mjs --preflight)
           $intPreflightExit = $LASTEXITCODE
           if ($intPreflightExit -ne 0 -or $arrPreflight.Count -ne 1) {
               throw "Preflight identity check failed with native exit $intPreflightExit."
@@ -103,11 +105,13 @@ jobs:
               $strLockHashBefore -ine $strExpectedLockHash) {
               throw 'The npm package tuple does not match the reviewed digests; refusing to install.'
           }
+          $arrNpmCommands = @(Get-Command -Name npm -CommandType Application -ErrorAction Stop)
+          $strNpmPath = [string]$arrNpmCommands[0].Source
           $boolHadCi = Test-Path -LiteralPath Env:CI
           $strPreviousCi = if ($boolHadCi) { $env:CI } else { $null }
           try {
               $env:CI = 'true'
-              & npm ci --ignore-scripts --no-audit --no-fund
+              & $strNpmPath ci --ignore-scripts --no-audit --no-fund
               $intInstallExit = $LASTEXITCODE
           } finally {
               if ($boolHadCi) {
@@ -142,7 +146,9 @@ jobs:
           if ($strValidatorHash -ine $strExpectedValidatorHash) {
               throw 'The policy validator does not match the reviewed digest; refusing to run it.'
           }
-          $arrPolicyResult = @(node Validate-WorkflowPolicy.mjs build.yml markdownlint.yml)
+          $arrNodeCommands = @(Get-Command -Name node -CommandType Application -ErrorAction Stop)
+          $strNodePath = [string]$arrNodeCommands[0].Source
+          $arrPolicyResult = @(& $strNodePath Validate-WorkflowPolicy.mjs build.yml markdownlint.yml)
           $intPolicyExit = $LASTEXITCODE
           if ($intPolicyExit -ne 0 -or $arrPolicyResult.Count -ne 1) {
               throw "Workflow policy validation failed with native exit $intPolicyExit."
@@ -157,9 +163,11 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          & npm run lint:md
+          $arrNpmCommands = @(Get-Command -Name npm -CommandType Application -ErrorAction Stop)
+          $strNpmPath = [string]$arrNpmCommands[0].Source
+          & $strNpmPath run lint:md
           $intOuterExit = $LASTEXITCODE
-          & npm run lint:md:nested
+          & $strNpmPath run lint:md:nested
           $intNestedExit = $LASTEXITCODE
           if ($intOuterExit -ne 0 -or $intNestedExit -ne 0) {
               throw "Markdown lint failed: outer=$intOuterExit nested=$intNestedExit."
