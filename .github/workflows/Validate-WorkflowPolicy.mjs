@@ -486,11 +486,13 @@ function readContractWithoutDependencies() {
   }
   // validatorIdentity is excluded from the identity view, so a contract that
   // omits it entirely would still match the digest. Check its shape explicitly.
+  // Identical to the check validateContract() applies. Preflight gates the
+  // install, so it must not be laxer than the full run about the one field the
+  // identity view cannot cover.
+  expectExactKeys(contract.validatorIdentity, ['path', 'sha256'], 'contract-shape');
   if (
-    contract.validatorIdentity === null
-    || typeof contract.validatorIdentity !== 'object'
-    || Array.isArray(contract.validatorIdentity)
-    || typeof contract.validatorIdentity.sha256 !== 'string'
+    contract.validatorIdentity.path !== VALIDATOR_FILE_NAME
+    || !/^[0-9a-f]{64}$/u.test(contract.validatorIdentity.sha256)
   ) {
     fail('contract-shape');
   }
