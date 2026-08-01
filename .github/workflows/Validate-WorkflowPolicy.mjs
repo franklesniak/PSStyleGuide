@@ -51,6 +51,9 @@ const AUTHORIZED_ADVISORY_FINDING_KEYS = [
   'picomatch',
 ];
 const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
+// Every input the validator reads lives under .github/, so that directory is the
+// containment boundary for readOrdinaryFile().
+const POLICY_ROOT = path.resolve(SCRIPT_DIRECTORY, '..');
 const REQUIRED_ARGUMENTS = ['build.yml', 'markdownlint.yml'];
 const REQUIRED_RECIPROCAL_ROWS = [
   'GF-PARAMETERS',
@@ -144,11 +147,40 @@ function expectDeepEqual(actual, expected, category) {
   }
 }
 
+// path.resolve() collapses '..' lexically and never follows symlinks, so testing
+// only the leaf would let a symlinked directory component carry a read outside the
+// intended tree while the leaf still looked ordinary. Every component below the
+// boundary is walked instead. SCRIPT_DIRECTORY is already symlink-free, because
+// Node resolves module paths before setting import.meta.url, but that is a
+// non-local invariant of how the validator happens to be launched (and
+// --preserve-symlinks would void it); state the requirement here rather than
+// inherit it.
+function verifyOrdinaryPathComponents(resolved, category) {
+  const relative = path.relative(POLICY_ROOT, resolved);
+  if (relative === '' || relative.startsWith('..') || path.isAbsolute(relative)) {
+    fail(category);
+  }
+  let current = POLICY_ROOT;
+  for (const component of relative.split(path.sep).slice(0, -1)) {
+    current = path.join(current, component);
+    let stat;
+    try {
+      stat = fs.lstatSync(current);
+    } catch {
+      fail(category);
+    }
+    if (stat.isSymbolicLink() || !stat.isDirectory()) {
+      fail(category);
+    }
+  }
+}
+
 // A missing or unreadable file is a policy outcome, not a tool defect. Letting
 // the native error escape would surface it as an unclassified tool-failure and
 // lose which input was at fault, so both syscalls report the caller's category.
 function readOrdinaryFile(filePath, maximumBytes, category) {
   const resolved = path.resolve(filePath);
+  verifyOrdinaryPathComponents(resolved, category);
   let stat;
   try {
     stat = fs.lstatSync(resolved);
@@ -508,9 +540,20 @@ function readContractWithoutDependencies() {
     524288,
     'contract-file',
   );
+  // parseStrictYaml() applies this same byte gate before the full run parses the
+  // contract, but preflight cannot call it: it routes through the yaml package,
+  // which is precisely what has not been authenticated yet. Applying the gate
+  // here keeps the install gate from being laxer than the validation it fronts.
+  // JSON.parse happens to reject a leading BOM, and the identity digest happens
+  // to reject the replacement characters that invalid UTF-8 decodes to, but both
+  // are incidental properties of other checks; state the requirement instead.
+  const text = bytes.toString('utf8');
+  if (Buffer.from(text, 'utf8').compare(bytes) !== 0 || text.charCodeAt(0) === 0xfeff) {
+    fail('contract-encoding');
+  }
   let contract;
   try {
-    contract = JSON.parse(bytes.toString('utf8'));
+    contract = JSON.parse(text);
   } catch {
     fail('contract-json');
   }

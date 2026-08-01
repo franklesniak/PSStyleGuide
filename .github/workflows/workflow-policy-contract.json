@@ -140,7 +140,7 @@
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "8c0cc643d0ebdeaa200a82c7679ef991ae56eca16ba9563ae4e3bc53104cf05a"
+    "sha256": "8177e3ebb7b69d5724e930e9e43193665632bdaf79f679a48ef06f339b4daee5"
   },
   "actions": {
     "checkout": {
