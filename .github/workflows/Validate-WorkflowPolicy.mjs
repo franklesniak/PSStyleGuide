@@ -3,17 +3,33 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
-import {
-  isAlias,
-  isMap,
-  isScalar,
-  isSeq,
-  parseAllDocuments,
-} from 'yaml';
+
+// 'yaml' is an installed dependency, so importing it executes third-party code.
+// It is loaded on demand rather than at module load so that --preflight can
+// establish contract, validator, and package identity using only Node built-ins,
+// before anything is installed. Nothing here may import an installed package at
+// module scope without reopening that ordering hole.
+let isAlias;
+let isMap;
+let isScalar;
+let isSeq;
+let parseAllDocuments;
+
+async function loadYamlBindings() {
+  ({
+    isAlias,
+    isMap,
+    isScalar,
+    isSeq,
+    parseAllDocuments,
+  } = await import('yaml'));
+}
 
 const VALIDATOR_VERSION = '1.0.0';
 const RESULT_SCHEMA = 'PSStyleGuide.WorkflowPolicyResult.v1';
-const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'ecdd1211159a8589afa3776509e47630de4f0125c6e4b1c61dba86a118d9b5b5';
+const PREFLIGHT_SCHEMA = 'PSStyleGuide.WorkflowPreflightResult.v1';
+const PREFLIGHT_ARGUMENTS = ['--preflight'];
+const EXPECTED_CONTRACT_CANONICAL_SHA256 = '53550c1ac43ad05d3d9376d29384985fd29aa4e9c7194df22137e2c892b5badd';
 const MINIMUM_CASE_COUNT = 46;
 const CASE_CATALOG_FILE_NAME = 'workflow-policy-cases.json';
 const VALIDATOR_FILE_NAME = 'Validate-WorkflowPolicy.mjs';
@@ -416,7 +432,9 @@ function validateDependabot(value, contract) {
   expectExactKeys(value.updates[0].schedule, ['interval'], 'dependabot-policy');
 }
 
-function validatePackageTuple(contract) {
+// Raw-byte comparison only, so this is safe to call before any dependency is
+// installed. Deliberately free of parseStrictJson, which needs the yaml package.
+function verifyPackageDigests(contract) {
   const packageJsonBytes = readOrdinaryFile(path.join(SCRIPT_DIRECTORY, 'package.json'), contract.limits.maximumJsonBytes, 'package-file');
   const packageLockBytes = readOrdinaryFile(path.join(SCRIPT_DIRECTORY, 'package-lock.json'), contract.limits.maximumJsonBytes, 'lock-file');
   if (
@@ -425,6 +443,68 @@ function validatePackageTuple(contract) {
   ) {
     fail('package-graph');
   }
+  return { packageJsonBytes, packageLockBytes };
+}
+
+function verifyValidatorIdentity(contract) {
+  const validatorBytes = readOrdinaryFile(
+    path.join(SCRIPT_DIRECTORY, VALIDATOR_FILE_NAME),
+    262144,
+    'validator-file',
+  );
+  if (sha256(validatorBytes) !== contract.validatorIdentity.sha256) {
+    fail('validator-identity');
+  }
+}
+
+// Reads and authenticates the contract using only Node built-ins. JSON.parse
+// replaces parseStrictJson here because the latter routes through the yaml
+// package; the strict parse still runs later, once dependencies are trusted.
+function readContractWithoutDependencies() {
+  const bytes = readOrdinaryFile(
+    path.join(SCRIPT_DIRECTORY, 'workflow-policy-contract.json'),
+    524288,
+    'contract-file',
+  );
+  let contract;
+  try {
+    contract = JSON.parse(bytes.toString('utf8'));
+  } catch {
+    fail('contract-json');
+  }
+  if (contract === null || typeof contract !== 'object' || Array.isArray(contract)) {
+    fail('contract-json');
+  }
+  // validatorIdentity is excluded from the identity view, so a contract that
+  // omits it entirely would still match the digest. Check its shape explicitly.
+  if (
+    contract.validatorIdentity === null
+    || typeof contract.validatorIdentity !== 'object'
+    || Array.isArray(contract.validatorIdentity)
+    || typeof contract.validatorIdentity.sha256 !== 'string'
+  ) {
+    fail('contract-shape');
+  }
+  if (sha256(canonicalJson(contractIdentityView(contract))) !== EXPECTED_CONTRACT_CANONICAL_SHA256) {
+    fail('contract-identity');
+  }
+  return contract;
+}
+
+function preflight() {
+  const contract = readContractWithoutDependencies();
+  verifyValidatorIdentity(contract);
+  verifyPackageDigests(contract);
+  return {
+    schema: PREFLIGHT_SCHEMA,
+    validatorVersion: VALIDATOR_VERSION,
+    success: true,
+    contractCanonicalSha256: sha256(canonicalJson(contractIdentityView(contract))),
+  };
+}
+
+function validatePackageTuple(contract) {
+  const { packageJsonBytes, packageLockBytes } = verifyPackageDigests(contract);
   const packageJson = parseStrictJson(packageJsonBytes, contract.limits, 'package-json');
   const packageLock = parseStrictJson(packageLockBytes, contract.limits, 'package-lock-json');
   expectDeepEqual(packageJson.devDependencies, {
@@ -608,8 +688,12 @@ function validateArguments() {
   }
 }
 
-function main() {
+async function main() {
   validateArguments();
+  // Authenticate the contract and this validator before importing any installed
+  // package, so third-party code never runs against an unverified tree.
+  verifyValidatorIdentity(readContractWithoutDependencies());
+  await loadYamlBindings();
   const contractBytes = readOrdinaryFile(
     path.join(SCRIPT_DIRECTORY, 'workflow-policy-contract.json'),
     524288,
@@ -623,14 +707,7 @@ function main() {
   };
   const contract = parseStrictJson(contractBytes, bootstrapLimits, 'contract-json');
   validateContract(contract);
-  const validatorBytes = readOrdinaryFile(
-    path.join(SCRIPT_DIRECTORY, VALIDATOR_FILE_NAME),
-    262144,
-    'validator-file',
-  );
-  if (sha256(validatorBytes) !== contract.validatorIdentity.sha256) {
-    fail('validator-identity');
-  }
+  verifyValidatorIdentity(contract);
   const caseCatalogBytes = readOrdinaryFile(
     path.join(SCRIPT_DIRECTORY, CASE_CATALOG_FILE_NAME),
     contract.limits.maximumJsonBytes,
@@ -676,12 +753,14 @@ function main() {
   };
 }
 
+const isPreflight = canonicalJson(process.argv.slice(2)) === canonicalJson(PREFLIGHT_ARGUMENTS);
+
 try {
-  process.stdout.write(`${JSON.stringify(main())}\n`);
+  process.stdout.write(`${JSON.stringify(isPreflight ? preflight() : await main())}\n`);
 } catch (error) {
   const category = error instanceof PolicyError ? error.category : 'tool-failure';
   process.stdout.write(`${JSON.stringify({
-    schema: RESULT_SCHEMA,
+    schema: isPreflight ? PREFLIGHT_SCHEMA : RESULT_SCHEMA,
     validatorVersion: VALIDATOR_VERSION,
     success: false,
     category,

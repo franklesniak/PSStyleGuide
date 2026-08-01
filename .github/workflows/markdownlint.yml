@@ -71,19 +71,27 @@ jobs:
           $ErrorActionPreference = 'Stop'
           $strContractPath = 'workflow-policy-contract.json'
           $objContract = Get-Content -LiteralPath $strContractPath -Raw | ConvertFrom-Json
-          $objReviewed = $objContract.supplyFreeze.reviewedWorkingBytes
-          $strExpectedManifestHash = [string]$objReviewed.packageJson.sha256
-          $strExpectedLockHash = [string]$objReviewed.packageLockJson.sha256
-          if ($strExpectedManifestHash -cnotmatch '^[0-9a-f]{64}$' -or
-              $strExpectedLockHash -cnotmatch '^[0-9a-f]{64}$') {
-              throw 'The contract did not record reviewed package digests.'
+          $strExpectedValidatorHash = [string]$objContract.validatorIdentity.sha256
+          if ($strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {
+              throw 'The contract did not record a reviewed validator digest.'
+          }
+          $strValidatorPath = 'Validate-WorkflowPolicy.mjs'
+          $strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $strValidatorPath).Hash
+          if ($strValidatorHash -ine $strExpectedValidatorHash) {
+              throw 'The policy validator does not match the reviewed digest; refusing to run it.'
+          }
+          $arrPreflight = @(node Validate-WorkflowPolicy.mjs --preflight)
+          $intPreflightExit = $LASTEXITCODE
+          if ($intPreflightExit -ne 0 -or $arrPreflight.Count -ne 1) {
+              throw "Preflight identity check failed with native exit $intPreflightExit."
+          }
+          $objPreflight = $arrPreflight[0] | ConvertFrom-Json
+          if ($objPreflight.schema -cne 'PSStyleGuide.WorkflowPreflightResult.v1' -or
+              $objPreflight.success -ne $true) {
+              throw 'Preflight identity check did not succeed; refusing to install.'
           }
           $strManifestHashBefore = (Get-FileHash -Algorithm SHA256 -LiteralPath 'package.json').Hash
           $strLockHashBefore = (Get-FileHash -Algorithm SHA256 -LiteralPath 'package-lock.json').Hash
-          if ($strManifestHashBefore -ine $strExpectedManifestHash -or
-              $strLockHashBefore -ine $strExpectedLockHash) {
-              throw 'The npm package tuple does not match the reviewed digests; refusing to install.'
-          }
           $boolHadCi = Test-Path -LiteralPath Env:CI
           $strPreviousCi = if ($boolHadCi) { $env:CI } else { $null }
           try {
