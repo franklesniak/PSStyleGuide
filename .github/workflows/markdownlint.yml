@@ -1,51 +1,182 @@
-# Markdownlint CI Workflow
-#
-# This workflow uses markdownlint by David Anson (@DavidAnson)
-# Licensed under MIT License
-# Source: https://github.com/DavidAnson/markdownlint
-#
-# Purpose: Enforce consistent Markdown formatting across the repository
-# Runs on: push and pull_request events
-
 name: Markdown Lint
 
 on:
   push:
-    branches: ["**"]
+    branches:
+      - main
   pull_request:
-    branches: ["**"]
+    branches:
+      - main
+
+permissions: {}
 
 jobs:
   markdownlint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        id: checkout_repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ github.sha }}
+          token: ${{ github.token }}
+          persist-credentials: false
+          clean: true
+          fetch-depth: 1
+          fetch-tags: false
+          show-progress: true
+          lfs: false
+          submodules: false
+          set-safe-directory: true
+          allow-unsafe-pr-checkout: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        id: setup_node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: '20'
+          node-version: '24.18.1'
+          check-latest: false
+          token: ${{ github.token }}
+          package-manager-cache: false
 
-      - name: Install dependencies
-        working-directory: .github/workflows
-        run: npm ci
-
-      - name: Run markdownlint on outer files
-        id: lint-outer
-        continue-on-error: true
-        working-directory: .github/workflows
-        run: npm run lint:md
-
-      - name: Run markdownlint on nested Markdown code fences
-        id: lint-nested
-        continue-on-error: true
-        working-directory: .github/workflows
-        run: npm run lint:md:nested
-
-      - name: Check linting results
-        if: steps.lint-outer.outcome == 'failure' || steps.lint-nested.outcome == 'failure'
+      - name: Verify Node and npm identities
+        shell: pwsh
         run: |
-          echo "::error::Markdown linting failed. Check the logs above for details."
-          exit 1
+          $ErrorActionPreference = 'Stop'
+          $arrNodeCommands = @(Get-Command -Name node -CommandType Application -ErrorAction Stop)
+          $arrNpmCommands = @(Get-Command -Name npm -CommandType Application -ErrorAction Stop)
+          $strNodePath = [string]$arrNodeCommands[0].Source
+          $strNpmPath = [string]$arrNpmCommands[0].Source
+          $arrNodeVersion = @(& $strNodePath --version)
+          $intNodeExit = $LASTEXITCODE
+          $arrNpmVersion = @(& $strNpmPath --version)
+          $intNpmExit = $LASTEXITCODE
+          if ($intNodeExit -ne 0 -or $arrNodeVersion.Count -ne 1 -or
+              $arrNodeVersion[0] -cne 'v24.18.1') {
+              throw "Unexpected Node identity at $strNodePath."
+          }
+          if ($intNpmExit -ne 0 -or $arrNpmVersion.Count -ne 1 -or
+              $arrNpmVersion[0] -cne '11.16.0') {
+              throw "Unexpected npm identity at $strNpmPath."
+          }
+
+      - name: Install frozen dependencies
+        working-directory: .github/workflows
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $strContractPath = 'workflow-policy-contract.json'
+          $objContract = Get-Content -LiteralPath $strContractPath -Raw | ConvertFrom-Json
+          $strExpectedValidatorHash = [string]$objContract.validatorIdentity.sha256
+          if ($strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {
+              throw 'The contract did not record a reviewed validator digest.'
+          }
+          $strValidatorPath = 'Validate-WorkflowPolicy.mjs'
+          $strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $strValidatorPath).Hash
+          if ($strValidatorHash -ine $strExpectedValidatorHash) {
+              throw 'The policy validator does not match the reviewed digest; refusing to run it.'
+          }
+          $arrNodeCommands = @(Get-Command -Name node -CommandType Application -ErrorAction Stop)
+          $strNodePath = [string]$arrNodeCommands[0].Source
+          $arrPreflight = @(& $strNodePath Validate-WorkflowPolicy.mjs --preflight)
+          $intPreflightExit = $LASTEXITCODE
+          if ($intPreflightExit -ne 0 -or $arrPreflight.Count -ne 1) {
+              throw "Preflight identity check failed with native exit $intPreflightExit."
+          }
+          $objPreflight = $arrPreflight[0] | ConvertFrom-Json
+          if ($objPreflight.schema -cne 'PSStyleGuide.WorkflowPreflightResult.v1' -or
+              $objPreflight.success -ne $true) {
+              throw 'Preflight identity check did not succeed; refusing to install.'
+          }
+          $strManifestHashBefore = (Get-FileHash -Algorithm SHA256 -LiteralPath 'package.json').Hash
+          $strLockHashBefore = (Get-FileHash -Algorithm SHA256 -LiteralPath 'package-lock.json').Hash
+          # Rooted here rather than read from the contract. The contract's
+          # authenticity rests on a constant inside the validator, and the
+          # validator is replaceable by the same pull request, so a gate that
+          # reads its expectations from the contract can be satisfied by an
+          # attacker who replaces both. These literals are independent of the
+          # validator and of the contract; keep them in step with
+          # supplyFreeze.reviewedWorkingBytes whenever the tuple is re-frozen.
+          $strExpectedManifestHash = 'c6a9a8ac9a574b01b99ceb6f5ad9741d592589a7db34c74ebaf8dba8632fe285'
+          $strExpectedLockHash = '5efc1286025cdc3ad03796c5f4e44cc697e674a30e61de05e299b2a30abad1a2'
+          if ($strManifestHashBefore -ine $strExpectedManifestHash -or
+              $strLockHashBefore -ine $strExpectedLockHash) {
+              throw 'The npm package tuple does not match the reviewed digests; refusing to install.'
+          }
+          $arrNpmCommands = @(Get-Command -Name npm -CommandType Application -ErrorAction Stop)
+          $strNpmPath = [string]$arrNpmCommands[0].Source
+          $boolHadCi = Test-Path -LiteralPath Env:CI
+          $strPreviousCi = if ($boolHadCi) { $env:CI } else { $null }
+          try {
+              $env:CI = 'true'
+              & $strNpmPath ci --ignore-scripts --no-audit --no-fund
+              $intInstallExit = $LASTEXITCODE
+          } finally {
+              if ($boolHadCi) {
+                  $env:CI = $strPreviousCi
+              } else {
+                  Remove-Item -LiteralPath Env:CI -ErrorAction SilentlyContinue
+              }
+          }
+          if ($intInstallExit -ne 0) {
+              throw "npm ci failed with native exit $intInstallExit."
+          }
+          $strManifestHashAfter = (Get-FileHash -Algorithm SHA256 -LiteralPath 'package.json').Hash
+          $strLockHashAfter = (Get-FileHash -Algorithm SHA256 -LiteralPath 'package-lock.json').Hash
+          if ($strManifestHashBefore -cne $strManifestHashAfter -or
+              $strLockHashBefore -cne $strLockHashAfter) {
+              throw 'The frozen npm consumer changed package metadata.'
+          }
+
+      - name: Validate workflow policy offline
+        working-directory: .github/workflows
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $objContract = Get-Content -LiteralPath 'workflow-policy-contract.json' -Raw |
+              ConvertFrom-Json
+          $strExpectedValidatorHash = [string]$objContract.validatorIdentity.sha256
+          if ($strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {
+              throw 'The contract did not record a reviewed validator digest.'
+          }
+          $strValidatorPath = 'Validate-WorkflowPolicy.mjs'
+          $strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $strValidatorPath).Hash
+          if ($strValidatorHash -ine $strExpectedValidatorHash) {
+              throw 'The policy validator does not match the reviewed digest; refusing to run it.'
+          }
+          $arrNodeCommands = @(Get-Command -Name node -CommandType Application -ErrorAction Stop)
+          $strNodePath = [string]$arrNodeCommands[0].Source
+          $arrPolicyResult = @(& $strNodePath Validate-WorkflowPolicy.mjs build.yml markdownlint.yml)
+          $intPolicyExit = $LASTEXITCODE
+          if ($intPolicyExit -ne 0 -or $arrPolicyResult.Count -ne 1) {
+              throw "Workflow policy validation failed with native exit $intPolicyExit."
+          }
+          $objPolicyResult = $arrPolicyResult[0] | ConvertFrom-Json
+          if ($objPolicyResult.schema -cne 'PSStyleGuide.WorkflowPolicyResult.v1') {
+              throw 'The policy validator returned an unexpected result schema.'
+          }
+          if ($objPolicyResult.success -ne $true) {
+              throw "Workflow policy validation rejected the tree: $($objPolicyResult.category)."
+          }
+          if ($objPolicyResult.casesPassed -ne 46) {
+              throw "Case catalog count mismatch: expected 46, got $($objPolicyResult.casesPassed)."
+          }
+
+      - name: Run both Markdown lint surfaces
+        working-directory: .github/workflows
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $arrNpmCommands = @(Get-Command -Name npm -CommandType Application -ErrorAction Stop)
+          $strNpmPath = [string]$arrNpmCommands[0].Source
+          & $strNpmPath run lint:md
+          $intOuterExit = $LASTEXITCODE
+          & $strNpmPath run lint:md:nested
+          $intNestedExit = $LASTEXITCODE
+          if ($intOuterExit -ne 0 -or $intNestedExit -ne 0) {
+              throw "Markdown lint failed: outer=$intOuterExit nested=$intNestedExit."
+          }
