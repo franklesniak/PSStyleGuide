@@ -508,6 +508,14 @@ function validateDependabot(value, contract) {
 
 // Raw-byte comparison only, so this is safe to call before any dependency is
 // installed. Deliberately free of parseStrictJson, which needs the yaml package.
+//
+// This reads supplyFreeze.reviewedWorkingBytes, not supplyFreeze.baseline. The
+// baseline records what the two files looked like before the dependency change
+// and has no consumer anywhere: it is provenance for a human auditor, not a
+// gate. Verifying it would mean reading Git objects, which this validator
+// deliberately cannot do, and which a fetch-depth-1 checkout may not even have.
+// That gap is accepted, with the reasoning and a manual check recorded in
+// docs/decisions/0002-accept-unverifiable-baseline-provenance.md.
 function verifyPackageDigests(contract) {
   const packageJsonBytes = readOrdinaryFile(path.join(SCRIPT_DIRECTORY, 'package.json'), contract.limits.maximumJsonBytes, 'package-file');
   const packageLockBytes = readOrdinaryFile(path.join(SCRIPT_DIRECTORY, 'package-lock.json'), contract.limits.maximumJsonBytes, 'lock-file');
