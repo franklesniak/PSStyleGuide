@@ -22,7 +22,7 @@ For convenience, this repository automatically generates four additional version
 
 - **[STYLE_GUIDE_FULL.md](STYLE_GUIDE_FULL.md)** - A merged version combining the actionable rules from [STYLE_GUIDE.md](STYLE_GUIDE.md) with the design rationale from [STYLE_GUIDE_RATIONALE.md](STYLE_GUIDE_RATIONALE.md). This is the comprehensive version intended for human readers who want both the rules and the reasoning behind them in a single document.
 
-These files are automatically updated whenever [STYLE_GUIDE.md](STYLE_GUIDE.md) or [STYLE_GUIDE_RATIONALE.md](STYLE_GUIDE_RATIONALE.md) changes.
+These files are generated from [STYLE_GUIDE.md](STYLE_GUIDE.md) and [STYLE_GUIDE_RATIONALE.md](STYLE_GUIDE_RATIONALE.md). They are not published by CI: the build workflow runs with read-only permissions and only verifies that the checked-in artifacts match their sources, failing if they have drifted. When you change either source, regenerate the artifacts with `.github/workflows/Generate-StyleGuideArtifacts.ps1` and commit the result alongside your source change.
 
 ### Table of Contents
 

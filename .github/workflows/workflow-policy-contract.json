@@ -18,8 +18,8 @@
       },
       "packageLockJson": {
         "blob": "7e96fd1fd41765ba31488762f60c2f74ba17d3a8",
-        "length": 66425,
-        "sha256": "b62a88911061660cb2a6cb6415be5ec71c9f7327b2f7fff2169c85eb16e228a1"
+        "length": 64608,
+        "sha256": "25ffbe3c4e5b26615318235dffe2908dbddcf2788a40f7c7bdb620ec0314415d"
       }
     },
     "reviewedWorkingBytes": {
@@ -125,8 +125,8 @@
   "scriptVersions": {
     "generator": {
       "path": "Generate-StyleGuideArtifacts.ps1",
-      "version": "1.0.20260801.0",
-      "sha256": "dc1a887e2b69570648f42f0787f9ff3946a63f36c6ccdc9d38ba37c9be604ef7"
+      "version": "1.0.20260801.1",
+      "sha256": "7b2489a00293a491a03bae826320ccfc789036d0fb2b8a71cbc233adc95d7406"
     },
     "pathVerifier": {
       "path": "Test-ExactGitPathSet.ps1",
@@ -140,7 +140,7 @@
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "955a17c80b2457039d16e6e418f9691109ad4366fa55e509262710f1a18219af"
+    "sha256": "4e6f002994e418aa1f142e5686dff93663503d56c9564126ccfedb2bf2e5a396"
   },
   "actions": {
     "checkout": {
@@ -233,7 +233,7 @@
             "permissions": { "contents": "read" },
             "steps": [
               { "kind": "action", "role": "build.verify_generated_artifacts.checkout_repository", "name": "Checkout repository", "id": "checkout_repository", "action": "checkout" },
-              { "kind": "run", "role": "build.verify_generated_artifacts.generate_style_guide_artifacts", "name": "Generate style guide artifacts", "id": "generate_style_guide_artifacts", "shell": "pwsh", "runSha256": "d02f1735c6a1c8ec7e8c68e14046301f683e2f768e39c2f8db0c1672b19c9bc3" },
+              { "kind": "run", "role": "build.verify_generated_artifacts.generate_style_guide_artifacts", "name": "Generate style guide artifacts", "id": "generate_style_guide_artifacts", "shell": "pwsh", "runSha256": "342e3e0ba72eec312558dc0fe8a39b42ebaaadbbc384ed629744f967ce40d14a" },
               { "kind": "run", "role": "build.verify_generated_artifacts.verify_generated_artifact_drift", "name": "Verify generated artifact drift", "id": "verify_generated_artifact_drift", "shell": "pwsh", "runSha256": "11af88f59f622acb61606ee82be47b63ed2b7b37b383b5d003575effabdde42a" },
               { "kind": "run", "role": "build.verify_generated_artifacts.create_failure_diagnostics", "name": "Create failure diagnostics", "id": "create_failure_diagnostics", "shell": "pwsh", "if": "${{ failure() && !cancelled() }}", "continueOnError": true, "runSha256": "c7ffffe2913b4fe43d733a7ba918b39b84903efb4822089393458d54d520ec45" },
               { "kind": "action", "role": "build.verify_generated_artifacts.upload_failure_diagnostics", "name": "Upload failure diagnostics", "id": "upload_failure_diagnostics", "action": "uploadArtifact", "if": "${{ failure() && !cancelled() }}", "continueOnError": true }

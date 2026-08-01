@@ -10,13 +10,13 @@ fixed destination. Serialization is UTF-8 without a BOM and normalizes CRLF
 and lone CR to LF at the final payload boundary.
 
 .NOTES
-Version: 1.0.20260801.0
+Version: 1.0.20260801.1
 #>
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:GeneratorVersion = '1.0.20260801.0'
+$script:GeneratorVersion = '1.0.20260801.1'
 $script:GeneratorResultSchema = 'PSStyleGuide.GeneratorResult.v1'
 $script:Utf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
 $script:Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
@@ -808,19 +808,21 @@ function Write-StyleGuideArtifact {
             throw "candidate-not-consumed"
         }
         [void](Assert-OrdinaryAbsolutePath -LiteralPath $strDestinationPath -ExpectedLeafType File)
-        $strFinalSha256 = Get-FileSha256Hex -LiteralPath $strDestinationPath
-        if ($strFinalSha256 -cne $hashtableRecord.CandidateSha256) {
+        # Record what was observed before comparing it. Drift is precisely the case
+        # where the observed destination state is the evidence needed to diagnose or
+        # recover, so comparing first and throwing would empty the record of the one
+        # thing it exists to carry.
+        $hashtableRecord.FinalSha256 = Get-FileSha256Hex -LiteralPath $strDestinationPath
+        $hashtableRecord.FinalLength = [System.IO.FileInfo]::new($strDestinationPath).Length
+        $hashtableRecord.FinalOrdinaryIdentity = Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath
+        if ($hashtableRecord.FinalSha256 -cne $hashtableRecord.CandidateSha256) {
             $hashtableRecord.Status = 'ReplacementStateUncertain'
             throw "final-content-drift"
         }
-        $intFinalLength = [System.IO.FileInfo]::new($strDestinationPath).Length
-        if ($intFinalLength -ne $CompletePayloadBytes.Length) {
+        if ($hashtableRecord.FinalLength -ne $CompletePayloadBytes.Length) {
             $hashtableRecord.Status = 'ReplacementStateUncertain'
             throw "final-length-drift"
         }
-        $hashtableRecord.FinalLength = $intFinalLength
-        $hashtableRecord.FinalSha256 = $strFinalSha256
-        $hashtableRecord.FinalOrdinaryIdentity = Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath
         $hashtableRecord.Status = 'Success'
         return $hashtableRecord
     } catch {
