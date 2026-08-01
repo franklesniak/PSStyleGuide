@@ -66,7 +66,7 @@
     },
     "advisoryDecision": {
       "decisionOwner": "PSStyleGuide repository owner/administrator",
-      "recordedAtUtc": "2026-07-31T12:20:28.725Z",
+      "recordedAtUtc": "2026-08-01T05:30:51.000Z",
       "expiresAtUtc": "2026-08-30T23:59:59.000Z",
       "expiresEarlierOn": "Completion of issue 149",
       "policy": "Temporarily retain the observed npm findings through issues 145-148; issue 149 owns remediation.",
@@ -140,7 +140,7 @@
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "c81305c8bd471f041c470fbb6125cac5be4a66cc8e266e195364c4c0712ef01d"
+    "sha256": "8c0cc643d0ebdeaa200a82c7679ef991ae56eca16ba9563ae4e3bc53104cf05a"
   },
   "actions": {
     "checkout": {
