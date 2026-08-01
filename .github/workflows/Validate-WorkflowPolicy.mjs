@@ -38,6 +38,18 @@ const VALIDATOR_FILE_NAME = 'Validate-WorkflowPolicy.mjs';
 // so these are rejected at the parse boundary and in JSON pointers rather than
 // being relied upon to fail incidentally in a later shape comparison.
 const FORBIDDEN_OBJECT_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+// The owner's advisory approval authorizes exactly these findings and states
+// that a critical finding stops implementation and merge. Both are asserted
+// below, so the approval's terms are enforced rather than merely recorded.
+const AUTHORIZED_ADVISORY_FINDING_KEYS = [
+  'brace-expansion',
+  'js-yaml',
+  'linkify-it',
+  'markdown-it',
+  'markdownlint-cli2',
+  'minimatch',
+  'picomatch',
+];
 const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 const REQUIRED_ARGUMENTS = ['build.yml', 'markdownlint.yml'];
 const REQUIRED_RECIPROCAL_ROWS = [
@@ -316,9 +328,17 @@ function validateContract(contract) {
     || contract.supplyFreeze.yaml.version !== '2.9.0'
     || contract.supplyFreeze.advisoryDecision.producerAudit.vulnerabilities.high !== 5
     || contract.supplyFreeze.advisoryDecision.producerAudit.vulnerabilities.moderate !== 2
+    || contract.supplyFreeze.advisoryDecision.producerAudit.vulnerabilities.critical !== 0
   ) {
     fail('supply-freeze');
   }
+  // Counts alone would let the finding set change identity while staying at
+  // 5 high and 2 moderate, so the authorized packages are pinned as well.
+  expectDeepEqual(
+    contract.supplyFreeze.advisoryDecision.producerAudit.findingKeys,
+    AUTHORIZED_ADVISORY_FINDING_KEYS,
+    'supply-freeze',
+  );
   // Date.parse returns NaN for an unparsable value, and every comparison against
   // NaN is false, so comparing directly would silently skip the expiry gate rather
   // than trip it. Require a finite timestamp before the comparison is trusted.
