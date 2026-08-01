@@ -125,8 +125,8 @@
   "scriptVersions": {
     "generator": {
       "path": "Generate-StyleGuideArtifacts.ps1",
-      "version": "1.0.20260731.0",
-      "sha256": "c975276fc767b979aca3ea2aec53b91ae897064c9230ff7973475811d492f491"
+      "version": "1.0.20260801.0",
+      "sha256": "dc1a887e2b69570648f42f0787f9ff3946a63f36c6ccdc9d38ba37c9be604ef7"
     },
     "pathVerifier": {
       "path": "Test-ExactGitPathSet.ps1",
@@ -140,7 +140,7 @@
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "8177e3ebb7b69d5724e930e9e43193665632bdaf79f679a48ef06f339b4daee5"
+    "sha256": "955a17c80b2457039d16e6e418f9691109ad4366fa55e509262710f1a18219af"
   },
   "actions": {
     "checkout": {
@@ -233,7 +233,7 @@
             "permissions": { "contents": "read" },
             "steps": [
               { "kind": "action", "role": "build.verify_generated_artifacts.checkout_repository", "name": "Checkout repository", "id": "checkout_repository", "action": "checkout" },
-              { "kind": "run", "role": "build.verify_generated_artifacts.generate_style_guide_artifacts", "name": "Generate style guide artifacts", "id": "generate_style_guide_artifacts", "shell": "pwsh", "runSha256": "a4e665787f5cd0a11726e19a920a65c24659226e10db2077bc030f7721494402" },
+              { "kind": "run", "role": "build.verify_generated_artifacts.generate_style_guide_artifacts", "name": "Generate style guide artifacts", "id": "generate_style_guide_artifacts", "shell": "pwsh", "runSha256": "d02f1735c6a1c8ec7e8c68e14046301f683e2f768e39c2f8db0c1672b19c9bc3" },
               { "kind": "run", "role": "build.verify_generated_artifacts.verify_generated_artifact_drift", "name": "Verify generated artifact drift", "id": "verify_generated_artifact_drift", "shell": "pwsh", "runSha256": "11af88f59f622acb61606ee82be47b63ed2b7b37b383b5d003575effabdde42a" },
               { "kind": "run", "role": "build.verify_generated_artifacts.create_failure_diagnostics", "name": "Create failure diagnostics", "id": "create_failure_diagnostics", "shell": "pwsh", "if": "${{ failure() && !cancelled() }}", "continueOnError": true, "runSha256": "c7ffffe2913b4fe43d733a7ba918b39b84903efb4822089393458d54d520ec45" },
               { "kind": "action", "role": "build.verify_generated_artifacts.upload_failure_diagnostics", "name": "Upload failure diagnostics", "id": "upload_failure_diagnostics", "action": "uploadArtifact", "if": "${{ failure() && !cancelled() }}", "continueOnError": true }
@@ -252,7 +252,7 @@
               { "kind": "action", "role": "markdownlint.markdownlint.setup_node", "name": "Setup Node.js", "id": "setup_node", "action": "setupNode" },
               { "kind": "run", "role": "markdownlint.markdownlint.verify_node_npm", "name": "Verify Node and npm identities", "shell": "pwsh", "runSha256": "386c76b358d0dc5c588e73d3fa7be034ec01ce984f725e8bb09e7f468cc8c513" },
               { "kind": "run", "role": "markdownlint.markdownlint.install_dependencies", "name": "Install frozen dependencies", "workingDirectory": ".github/workflows", "shell": "pwsh", "runSha256": "6166d97c4bcf249ac90ace0c52dc7ff2cd3db9a1462d81fd2504ede63ddeab3a" },
-              { "kind": "run", "role": "markdownlint.markdownlint.validate_workflow_policy", "name": "Validate workflow policy offline", "workingDirectory": ".github/workflows", "shell": "pwsh", "runSha256": "96982c531c43be2695123af0849a9919b19062b5c36bd880aa61544fbdf94aef" },
+              { "kind": "run", "role": "markdownlint.markdownlint.validate_workflow_policy", "name": "Validate workflow policy offline", "workingDirectory": ".github/workflows", "shell": "pwsh", "runSha256": "52c5ee87de8fc5e26d0b7c4596571dbff1b2a6db9dc768e0e47b154b9ab1ec79" },
               { "kind": "run", "role": "markdownlint.markdownlint.lint", "name": "Run both Markdown lint surfaces", "workingDirectory": ".github/workflows", "shell": "pwsh", "runSha256": "ebf88f0dc100390363457571de315937b2dbe5de733941b2c6904e203cf5c521" }
             ]
           }

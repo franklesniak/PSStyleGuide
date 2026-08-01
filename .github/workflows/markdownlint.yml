@@ -156,6 +156,12 @@ jobs:
               throw "Workflow policy validation failed with native exit $intPolicyExit."
           }
           $objPolicyResult = $arrPolicyResult[0] | ConvertFrom-Json
+          if ($objPolicyResult.schema -cne 'PSStyleGuide.WorkflowPolicyResult.v1') {
+              throw 'The policy validator returned an unexpected result schema.'
+          }
+          if ($objPolicyResult.success -ne $true) {
+              throw "Workflow policy validation rejected the tree: $($objPolicyResult.category)."
+          }
           if ($objPolicyResult.casesPassed -ne 46) {
               throw "Case catalog count mismatch: expected 46, got $($objPolicyResult.casesPassed)."
           }

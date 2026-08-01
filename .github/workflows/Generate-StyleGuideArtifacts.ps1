@@ -10,13 +10,13 @@ fixed destination. Serialization is UTF-8 without a BOM and normalizes CRLF
 and lone CR to LF at the final payload boundary.
 
 .NOTES
-Version: 1.0.20260731.0
+Version: 1.0.20260801.0
 #>
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:GeneratorVersion = '1.0.20260731.0'
+$script:GeneratorVersion = '1.0.20260801.0'
 $script:GeneratorResultSchema = 'PSStyleGuide.GeneratorResult.v1'
 $script:Utf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
 $script:Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
@@ -794,9 +794,33 @@ function Write-StyleGuideArtifact {
         $hashtableRecord.ReplaceReturned = $true
         $hashtableRecord.TemporaryDisposition = 'ConsumedByReplace'
         $hashtableRecord.CleanupResult = 'NotRequired'
-        $hashtableRecord.FinalLength = $CompletePayloadBytes.Length
-        $hashtableRecord.FinalSha256 = $hashtableRecord.CandidateSha256
-        $hashtableRecord.FinalOrdinaryIdentity = $strCandidateIdentity
+        # Measure the destination rather than assert it. File.Replace throws on
+        # failure, so reaching here means it returned, but every other field in
+        # this record is proven; recording the candidate's values as the
+        # destination's would make the evidence a claim instead of a result. The
+        # replacement has already happened by this point, so a mismatch here is
+        # ReplacementStateUncertain rather than Failed.
+        $strPhase = 'verify-replacement'
+        if ([System.IO.File]::Exists($strTemporaryPath)) {
+            $hashtableRecord.TemporaryDisposition = 'RetainedForRecovery'
+            $hashtableRecord.CleanupResult = 'NotAttempted'
+            $hashtableRecord.Status = 'ReplacementStateUncertain'
+            throw "candidate-not-consumed"
+        }
+        [void](Assert-OrdinaryAbsolutePath -LiteralPath $strDestinationPath -ExpectedLeafType File)
+        $strFinalSha256 = Get-FileSha256Hex -LiteralPath $strDestinationPath
+        if ($strFinalSha256 -cne $hashtableRecord.CandidateSha256) {
+            $hashtableRecord.Status = 'ReplacementStateUncertain'
+            throw "final-content-drift"
+        }
+        $intFinalLength = [System.IO.FileInfo]::new($strDestinationPath).Length
+        if ($intFinalLength -ne $CompletePayloadBytes.Length) {
+            $hashtableRecord.Status = 'ReplacementStateUncertain'
+            throw "final-length-drift"
+        }
+        $hashtableRecord.FinalLength = $intFinalLength
+        $hashtableRecord.FinalSha256 = $strFinalSha256
+        $hashtableRecord.FinalOrdinaryIdentity = Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath
         $hashtableRecord.Status = 'Success'
         return $hashtableRecord
     } catch {
