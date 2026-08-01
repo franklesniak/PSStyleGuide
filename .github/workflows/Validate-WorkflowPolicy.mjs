@@ -132,13 +132,26 @@ function expectDeepEqual(actual, expected, category) {
   }
 }
 
+// A missing or unreadable file is a policy outcome, not a tool defect. Letting
+// the native error escape would surface it as an unclassified tool-failure and
+// lose which input was at fault, so both syscalls report the caller's category.
 function readOrdinaryFile(filePath, maximumBytes, category) {
   const resolved = path.resolve(filePath);
-  const stat = fs.lstatSync(resolved);
+  let stat;
+  try {
+    stat = fs.lstatSync(resolved);
+  } catch {
+    fail(category);
+  }
   if (!stat.isFile() || stat.isSymbolicLink() || stat.size > maximumBytes) {
     fail(category);
   }
-  return fs.readFileSync(resolved);
+  try {
+    return fs.readFileSync(resolved);
+  } catch {
+    fail(category);
+  }
+  return undefined;
 }
 
 function inspectYamlNode(node, depth, state, limits) {
