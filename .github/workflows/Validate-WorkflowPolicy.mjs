@@ -306,7 +306,16 @@ function validateContract(contract) {
   ) {
     fail('supply-freeze');
   }
-  if (new Date() > new Date(contract.supplyFreeze.advisoryDecision.expiresAtUtc)) {
+  // Date.parse returns NaN for an unparsable value, and every comparison against
+  // NaN is false, so comparing directly would silently skip the expiry gate rather
+  // than trip it. Require a finite timestamp before the comparison is trusted.
+  const intExpiresAt = typeof contract.supplyFreeze.advisoryDecision.expiresAtUtc === 'string'
+    ? Date.parse(contract.supplyFreeze.advisoryDecision.expiresAtUtc)
+    : Number.NaN;
+  if (!Number.isFinite(intExpiresAt)) {
+    fail('advisory-expiry-unparsable');
+  }
+  if (Date.now() > intExpiresAt) {
     fail('advisory-expired');
   }
   const rows = contract.reciprocalFoundation.rows;
@@ -517,10 +526,10 @@ function validatePackageTuple(contract) {
   }, 'package-graph');
   if (
     packageLock.lockfileVersion !== 3
-    || packageLock.packages[''].devDependencies.yaml !== '2.9.0'
-    || packageLock.packages['node_modules/yaml'].version !== '2.9.0'
-    || packageLock.packages['node_modules/yaml'].resolved !== contract.supplyFreeze.yaml.tarball
-    || packageLock.packages['node_modules/yaml'].integrity !== contract.supplyFreeze.yaml.integrity
+    || packageLock.packages?.['']?.devDependencies?.yaml !== '2.9.0'
+    || packageLock.packages?.['node_modules/yaml']?.version !== '2.9.0'
+    || packageLock.packages?.['node_modules/yaml']?.resolved !== contract.supplyFreeze.yaml.tarball
+    || packageLock.packages?.['node_modules/yaml']?.integrity !== contract.supplyFreeze.yaml.integrity
   ) {
     fail('package-graph');
   }
