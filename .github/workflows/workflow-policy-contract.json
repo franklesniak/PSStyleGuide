@@ -140,7 +140,7 @@
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "75a1bd9ff9565892c9767156ba9cec234ee83d8c4486c33b4caf72b54d6c653c"
+    "sha256": "bf9fd3b4c874913af0f6f7da91e9cf4c14dffa19e40b8b1ba8eaf0cb68d99411"
   },
   "actions": {
     "checkout": {
@@ -251,7 +251,7 @@
               { "kind": "action", "role": "markdownlint.markdownlint.checkout_repository", "name": "Checkout repository", "id": "checkout_repository", "action": "checkout" },
               { "kind": "action", "role": "markdownlint.markdownlint.setup_node", "name": "Setup Node.js", "id": "setup_node", "action": "setupNode" },
               { "kind": "run", "role": "markdownlint.markdownlint.verify_node_npm", "name": "Verify Node and npm identities", "shell": "pwsh", "runSha256": "386c76b358d0dc5c588e73d3fa7be034ec01ce984f725e8bb09e7f468cc8c513" },
-              { "kind": "run", "role": "markdownlint.markdownlint.install_dependencies", "name": "Install frozen dependencies", "workingDirectory": ".github/workflows", "shell": "pwsh", "runSha256": "43be69c78beebddb668db43ceaba404cf070fdc0e31e4cef542d7ddaf614c53c" },
+              { "kind": "run", "role": "markdownlint.markdownlint.install_dependencies", "name": "Install frozen dependencies", "workingDirectory": ".github/workflows", "shell": "pwsh", "runSha256": "aa24d3e0a908b1544ee5a011e84ea48bb1493cf48de951cd887f2f8be9f6314e" },
               { "kind": "run", "role": "markdownlint.markdownlint.validate_workflow_policy", "name": "Validate workflow policy offline", "workingDirectory": ".github/workflows", "shell": "pwsh", "runSha256": "9bd16504139add7493a1487ad66dc8a372cb8718c91ea81b749c2a0bc1d2de2a" },
               { "kind": "run", "role": "markdownlint.markdownlint.lint", "name": "Run both Markdown lint surfaces", "workingDirectory": ".github/workflows", "shell": "pwsh", "runSha256": "ea9abf2ffcae37e288b1fdef7bdc92504b2c6a590197b56e7cef8a4a5a38e083" }
             ]

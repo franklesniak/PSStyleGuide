@@ -92,6 +92,17 @@ jobs:
           }
           $strManifestHashBefore = (Get-FileHash -Algorithm SHA256 -LiteralPath 'package.json').Hash
           $strLockHashBefore = (Get-FileHash -Algorithm SHA256 -LiteralPath 'package-lock.json').Hash
+          $objReviewed = $objContract.supplyFreeze.reviewedWorkingBytes
+          $strExpectedManifestHash = [string]$objReviewed.packageJson.sha256
+          $strExpectedLockHash = [string]$objReviewed.packageLockJson.sha256
+          if ($strExpectedManifestHash -cnotmatch '^[0-9a-f]{64}$' -or
+              $strExpectedLockHash -cnotmatch '^[0-9a-f]{64}$') {
+              throw 'The contract did not record reviewed package digests.'
+          }
+          if ($strManifestHashBefore -ine $strExpectedManifestHash -or
+              $strLockHashBefore -ine $strExpectedLockHash) {
+              throw 'The npm package tuple does not match the reviewed digests; refusing to install.'
+          }
           $boolHadCi = Test-Path -LiteralPath Env:CI
           $strPreviousCi = if ($boolHadCi) { $env:CI } else { $null }
           try {

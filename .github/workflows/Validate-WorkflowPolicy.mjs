@@ -29,7 +29,7 @@ const VALIDATOR_VERSION = '1.0.0';
 const RESULT_SCHEMA = 'PSStyleGuide.WorkflowPolicyResult.v1';
 const PREFLIGHT_SCHEMA = 'PSStyleGuide.WorkflowPreflightResult.v1';
 const PREFLIGHT_ARGUMENTS = ['--preflight'];
-const EXPECTED_CONTRACT_CANONICAL_SHA256 = '53550c1ac43ad05d3d9376d29384985fd29aa4e9c7194df22137e2c892b5badd';
+const EXPECTED_CONTRACT_CANONICAL_SHA256 = '87d29170dee83cf7060cc7ca75cdd4beae76a9805e6e07ac35b94a4614422532';
 const MINIMUM_CASE_COUNT = 46;
 const CASE_CATALOG_FILE_NAME = 'workflow-policy-cases.json';
 const VALIDATOR_FILE_NAME = 'Validate-WorkflowPolicy.mjs';
@@ -701,7 +701,13 @@ async function main() {
   validateArguments();
   // Authenticate the contract and this validator before importing any installed
   // package, so third-party code never runs against an unverified tree.
-  verifyValidatorIdentity(readContractWithoutDependencies());
+  const bootstrapContract = readContractWithoutDependencies();
+  verifyValidatorIdentity(bootstrapContract);
+  // The package digests must be authenticated before the deferred import, not
+  // merely before validatePackageTuple(). Importing yaml executes whatever is
+  // installed, so checking the tuple afterwards would reject a substituted
+  // graph only after its code had already run.
+  verifyPackageDigests(bootstrapContract);
   await loadYamlBindings();
   const contractBytes = readOrdinaryFile(
     path.join(SCRIPT_DIRECTORY, 'workflow-policy-contract.json'),
