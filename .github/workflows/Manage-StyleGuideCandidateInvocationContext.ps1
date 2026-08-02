@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260802.10
+Version: 1.0.20260802.11
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260802.10'
+$versionCandidateContext = [System.Version]'1.0.20260802.11'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -1034,7 +1034,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.10
+    # Version: 1.0.20260802.11
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1121,6 +1121,19 @@ function New-StyleGuideCandidateInvocationContext {
 
             $null = [System.IO.Directory]::CreateDirectory($strInvocationRoot)
 
+            # Prove the path is an ordinary link-free directory before anything
+            # reads or writes through it. CreateDirectory succeeds on a name
+            # that is already a symbolic link to a directory, and both checks
+            # below reach through the path: the enumeration would describe the
+            # link's target and the claim would be written inside it, outside
+            # trusted storage. The parent enumeration above skips names that
+            # already exist, so such a link can only appear in the window
+            # between that enumeration and this create -- which is exactly the
+            # window these checks exist to close, so they cannot be the first
+            # thing to assume it is shut.
+            [void](& $scriptBlockAssertCandidateOrdinaryDirectoryEnvelope `
+                -LiteralPath $strInvocationRoot)
+
             # CreateDirectory returns the same thing whether it made the
             # directory or found one already there, so on its own it is not
             # evidence of ownership -- and ownership is what later authorises
@@ -1176,8 +1189,6 @@ function New-StyleGuideCandidateInvocationContext {
 
             $boolRootCreated = $true
             $objContext.OwnershipJournal[0].EntryState = 'Created'
-            [void](& $scriptBlockAssertCandidateOrdinaryDirectoryEnvelope `
-                -LiteralPath $strInvocationRoot)
 
             $null = [System.IO.Directory]::CreateDirectory($strDownloadDirectory)
             $objContext.OwnershipJournal[1].EntryState = 'Created'
@@ -1266,7 +1277,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.10
+    # Version: 1.0.20260802.11
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
