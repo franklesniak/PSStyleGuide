@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.31
+Version: 1.0.20260802.32
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.31'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.32'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260802.17'
@@ -562,6 +562,73 @@ $script:scriptBlockAssertResourceGuardsReached = {
     $strTrustedRoot = [System.IO.Path]::Combine($strProbeRoot, 'trusted')
     [void][System.IO.Directory]::CreateDirectory($strTrustedRoot)
 
+    # One expansion of one freshly created context through whichever copy is
+    # named. Each call builds its own context and archive: sharing them would
+    # let one variant's outcome decide the next one's.
+    $scriptBlockDriveOneExpansion = {
+        param (
+            [Parameter(Mandatory = $true)]
+            [string]$ScriptPath
+        )
+
+        $objProbeContext = New-StyleGuideCandidateInvocationContext `
+            -TrustedTemporaryRoot $strTrustedRoot
+        $strArchivePath = [System.IO.Path]::Combine(
+            $objProbeContext.DownloadDirectoryPath,
+            'artifact.zip'
+        )
+        $objArchive = [System.IO.Compression.ZipFile]::Open(
+            $strArchivePath,
+            [System.IO.Compression.ZipArchiveMode]::Create
+        )
+        try {
+            foreach ($strEntryName in @(
+                'copilot-instructions.md',
+                'powershell.instructions.md',
+                'STYLE_GUIDE_CHAT.md',
+                'STYLE_GUIDE_FULL.md'
+            )) {
+                $objEntry = $objArchive.CreateEntry($strEntryName)
+                $objEntryWriter = New-Object System.IO.StreamWriter($objEntry.Open())
+                try {
+                    $objEntryWriter.Write('# ' + $strEntryName)
+                } finally {
+                    $objEntryWriter.Dispose()
+                }
+            }
+        } finally {
+            $objArchive.Dispose()
+        }
+        $objSha256 = [System.Security.Cryptography.SHA256]::Create()
+        try {
+            $objArchiveStream = [System.IO.File]::OpenRead($strArchivePath)
+            try {
+                $strExpectedDigest = (
+                    [System.BitConverter]::ToString(
+                        $objSha256.ComputeHash($objArchiveStream)
+                    ) -replace '-', ''
+                ).ToLowerInvariant()
+            } finally {
+                $objArchiveStream.Dispose()
+            }
+        } finally {
+            $objSha256.Dispose()
+        }
+
+        try {
+            [void](& $ScriptPath `
+                -Context $objProbeContext `
+                -CheckoutRoot $strCheckoutRoot `
+                -TrustedTemporaryRoot $strTrustedRoot `
+                -DownloadDirectory $objProbeContext.DownloadDirectoryPath `
+                -CandidateDirectory $objProbeContext.CandidatePath `
+                -ExpectedDigest $strExpectedDigest)
+            return $true
+        } catch {
+            return $false
+        }
+    }
+
     # A throw with no diagnostic code of its own. The helper maps it through its
     # own taxonomy, so this deliberately asserts only that the expansion failed,
     # never which text came back -- tying the check to a wrapped message would
@@ -614,69 +681,124 @@ $script:scriptBlockAssertResourceGuardsReached = {
             } else {
                 $strPoisonedPath
             }
-            $objProbeContext = New-StyleGuideCandidateInvocationContext `
-                -TrustedTemporaryRoot $strTrustedRoot
-            $strArchivePath = [System.IO.Path]::Combine(
-                $objProbeContext.DownloadDirectoryPath,
-                'artifact.zip'
-            )
-            $objArchive = [System.IO.Compression.ZipFile]::Open(
-                $strArchivePath,
-                [System.IO.Compression.ZipArchiveMode]::Create
-            )
-            try {
-                foreach ($strEntryName in @(
-                    'copilot-instructions.md',
-                    'powershell.instructions.md',
-                    'STYLE_GUIDE_CHAT.md',
-                    'STYLE_GUIDE_FULL.md'
-                )) {
-                    $objEntry = $objArchive.CreateEntry($strEntryName)
-                    $objEntryWriter = New-Object System.IO.StreamWriter($objEntry.Open())
-                    try {
-                        $objEntryWriter.Write('# ' + $strEntryName)
-                    } finally {
-                        $objEntryWriter.Dispose()
-                    }
-                }
-            } finally {
-                $objArchive.Dispose()
-            }
-            $objSha256 = [System.Security.Cryptography.SHA256]::Create()
-            try {
-                $objArchiveStream = [System.IO.File]::OpenRead($strArchivePath)
-                try {
-                    $strExpectedDigest = (
-                        [System.BitConverter]::ToString(
-                            $objSha256.ComputeHash($objArchiveStream)
-                        ) -replace '-', ''
-                    ).ToLowerInvariant()
-                } finally {
-                    $objArchiveStream.Dispose()
-                }
-            } finally {
-                $objSha256.Dispose()
-            }
-
-            $boolSucceeded = $false
-            try {
-                [void](& $strVariantPath `
-                    -Context $objProbeContext `
-                    -CheckoutRoot $strCheckoutRoot `
-                    -TrustedTemporaryRoot $strTrustedRoot `
-                    -DownloadDirectory $objProbeContext.DownloadDirectoryPath `
-                    -CandidateDirectory $objProbeContext.CandidatePath `
-                    -ExpectedDigest $strExpectedDigest)
-                $boolSucceeded = $true
-            } catch {
-                $boolSucceeded = $false
-            }
-            $hashtableOutcome[$strVariant] = $boolSucceeded
+            $hashtableOutcome[$strVariant] = & $scriptBlockDriveOneExpansion `
+                -ScriptPath $strVariantPath
         }
 
         # Verbatim must succeed, or the probe proves nothing about the poison.
         # Poisoned must fail, or production never reached the guard.
         if (-not $hashtableOutcome['verbatim'] -or $hashtableOutcome['poisoned']) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' -Detail 'production-resource-guard-reached'
+        }
+    }
+
+    # Poisoning a guard poisons every one of its call sites at once, so the runs
+    # above prove only that some site is reachable. One guard is called from two
+    # phases, and parking the manifest call in an unreachable branch with its
+    # arithmetic inlined leaves the structural count satisfied, the poisoned run
+    # still failing from the surviving extraction call, and the pre-creation
+    # bound gone. Both checks stay green while the archive is read unbounded.
+    #
+    # Inference from a failure cannot separate those sites: it observes that
+    # something stopped, never which call did the stopping. So this records
+    # instead of stopping. Each guard is replaced by a body that appends its
+    # phase to a file and returns what the guard returns, and the expansion is
+    # required to succeed and to have visited every phase the guard serves.
+    $strTracePath = [System.IO.Path]::Combine($strProbeRoot, 'trace.txt')
+    $strTraceLiteral = $strTracePath.Replace("'", "''")
+    # For a valid archive no limit fires, so plain addition returns exactly what
+    # the real guard would. If that were ever untrue the traced run would fail,
+    # and a failed traced run is itself asserted below.
+    $hashtableTracerBody = @{
+        'scriptBlockAddCandidateHelperDeclaredLength' = "{`n" +
+            "    param (`n" +
+            "        [Parameter(Mandatory = `$true)][uint64]`$CurrentTotal,`n" +
+            "        [Parameter(Mandatory = `$true)][long]`$DeclaredLength`n" +
+            "    )`n`n" +
+            "    [System.IO.File]::AppendAllText('$strTraceLiteral',`n" +
+            "        'declared' + [System.Environment]::NewLine)`n" +
+            "    return [uint64](`$CurrentTotal + [uint64]`$DeclaredLength)`n" +
+            "}`n"
+        'scriptBlockAddCandidateHelperActualLength' = "{`n" +
+            "    param (`n" +
+            "        [Parameter(Mandatory = `$true)][uint64]`$CurrentEntryLength,`n" +
+            "        [Parameter(Mandatory = `$true)][uint64]`$CurrentTotalLength,`n" +
+            "        [Parameter(Mandatory = `$true)][uint64]`$ReadLength,`n" +
+            "        [Parameter(Mandatory = `$true)][uint64]`$DeclaredEntryLength,`n" +
+            "        [Parameter(Mandatory = `$true)][string]`$Phase,`n" +
+            "        [Parameter(Mandatory = `$true)][string]`$DiagnosticCode`n" +
+            "    )`n`n" +
+            "    [System.IO.File]::AppendAllText('$strTraceLiteral',`n" +
+            "        'actual:' + `$Phase + [System.Environment]::NewLine)`n" +
+            "    return [ordered]@{`n" +
+            "        EntryLength = [uint64](`$CurrentEntryLength + `$ReadLength)`n" +
+            "        TotalLength = [uint64](`$CurrentTotalLength + `$ReadLength)`n" +
+            "    }`n" +
+            "}`n"
+    }
+    # Splice from the last definition backwards so an earlier replacement cannot
+    # move the offsets of a later one.
+    $listDefinition = New-Object 'System.Collections.Generic.List[object]'
+    foreach ($strGuardName in $arrGuardName) {
+        $arrAssignment = @($objScriptAst.FindAll(
+            {
+                param ($objNode)
+                $objNode -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                    $objNode.Left -is
+                        [System.Management.Automation.Language.VariableExpressionAst] -and
+                    $objNode.Left.VariablePath.UserPath -ceq ('script:' + $strGuardName)
+            },
+            $true
+        ))
+        if ($arrAssignment.Count -ne 1) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' -Detail 'production-resource-guard-reached'
+        }
+        $listDefinition.Add([pscustomobject]@{
+            Name = $strGuardName
+            Start = [int]$arrAssignment[0].Right.Extent.StartOffset
+            End = [int]$arrAssignment[0].Right.Extent.EndOffset
+        })
+    }
+    $strTraced = $strSource
+    foreach ($objDefinition in @($listDefinition | Sort-Object -Property Start -Descending)) {
+        $strTraced = $strTraced.Substring(0, $objDefinition.Start) +
+            $hashtableTracerBody[$objDefinition.Name] +
+            $strTraced.Substring($objDefinition.End)
+    }
+    $strTracedPath = [System.IO.Path]::Combine($strProbeRoot, 'traced.ps1')
+    [System.IO.File]::WriteAllText($strTracedPath, $strTraced, $objEncoding)
+    if ([System.IO.File]::Exists($strTracePath)) {
+        [System.IO.File]::Delete($strTracePath)
+    }
+
+    $boolTracedSucceeded = & $scriptBlockDriveOneExpansion -ScriptPath $strTracedPath
+    if (-not $boolTracedSucceeded -or -not [System.IO.File]::Exists($strTracePath)) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'production-resource-guard-reached'
+    }
+    $objObservedSite = New-Object 'System.Collections.Generic.HashSet[string]' (
+        [System.StringComparer]::Ordinal
+    )
+    foreach ($strLine in [System.IO.File]::ReadAllLines($strTracePath)) {
+        if ($strLine.Length -ne 0) {
+            [void]$objObservedSite.Add([string]$strLine)
+        }
+    }
+    # Every phase each guard serves in production, named here so removing a call
+    # site has to be admitted in this table before the suite will pass.
+    $arrRequiredSite = [string[]]@(
+        'declared',
+        'actual:manifest',
+        'actual:extraction'
+    )
+    if ($objObservedSite.Count -ne $arrRequiredSite.Count) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'production-resource-guard-reached'
+    }
+    foreach ($strRequiredSite in $arrRequiredSite) {
+        if (-not $objObservedSite.Contains($strRequiredSite)) {
             & $script:scriptBlockStopHarness `
                 -Code 'catalog-invalid' -Detail 'production-resource-guard-reached'
         }
@@ -4433,7 +4555,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.31
+    # Version: 1.0.20260802.32
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
