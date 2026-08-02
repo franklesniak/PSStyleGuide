@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.24
+Version: 1.0.20260802.25
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.24'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.25'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260802.12'
-$script:strCandidateExpectedContextVersion = '1.0.20260802.7'
+$script:strCandidateExpectedHelperVersion = '1.0.20260802.13'
+$script:strCandidateExpectedContextVersion = '1.0.20260802.8'
 $script:strCandidateCatalogVersion = '1.0.20260802.4'
 $script:strCandidateAllocationSha256 = 'ce7b29de7bb4812f1de9defb1672c1b7eac47d6f6b584db571a9bc0d86726e02'
 $script:strCandidateHelperRelativePath = '.github/workflows/Expand-StyleGuideCandidateArtifact.ps1'
@@ -2750,10 +2750,26 @@ $script:scriptBlockInvokeExpansionFixture = {
                 [void](New-StyleGuideCandidateInvocationContext `
                     -TrustedTemporaryRoot 'Variable::PSStyleGuideCandidateFixture')
             } catch {
+                # The fallback converted an absent diagnostic into the expected
+                # one, and phase and subreason were assigned unconditionally, so
+                # any unrelated creation failure satisfied this case even with
+                # the production provider check removed. Require the structured
+                # rejection instead. Creation wraps its failure, so the category
+                # and composite shape are what is readable here.
+                $strObservedCode = & $script:scriptBlockGetProductionFailureField `
+                    -ErrorRecord $_ `
+                    -Key 'PSStyleGuideDiagnosticCode' `
+                    -Fallback 'none'
+                if ($strObservedCode -cne 'root-invalid' -or
+                    $_.Exception.Message.IndexOf(
+                        'PSStyleGuide.ContextCreate.v1|category=root-invalid|cleanup=not-required',
+                        [System.StringComparison]::Ordinal) -lt 0) {
+                    & $script:scriptBlockStopHarness `
+                        -Code 'fixture-failed' -Detail 'provider-evidence'
+                }
                 $objObservation.Phase = 'root'
                 $objObservation.Subreason = 'provider'
-                $objObservation.DiagnosticCode = & $script:scriptBlockGetProductionFailureField `
-                    -ErrorRecord $_ -Key 'PSStyleGuideDiagnosticCode' -Fallback 'root-invalid'
+                $objObservation.DiagnosticCode = 'root-invalid'
             }
             return $objObservation
         }
@@ -4093,7 +4109,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.24
+    # Version: 1.0.20260802.25
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()

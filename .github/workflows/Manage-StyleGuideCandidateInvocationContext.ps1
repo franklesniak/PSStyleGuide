@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260802.7
+Version: 1.0.20260802.8
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260802.7'
+$versionCandidateContext = [System.Version]'1.0.20260802.8'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -286,6 +286,10 @@ $scriptBlockGetCandidateImmediateEntry = {
         [Parameter(Mandatory = $true)]
         [string]$LiteralPath,
 
+        [string]$FailureCode,
+
+        [string]$FailurePhase,
+
         [ref]$ReferenceToFilesystemCallCount
     )
 
@@ -295,12 +299,23 @@ $scriptBlockGetCandidateImmediateEntry = {
     # caller a cleanup had failed when no cleanup had run. This mirrors the
     # ordinary-directory envelope check above rather than inventing a second
     # convention in the same file.
-    $strFailureCode = if ($null -ne $ReferenceToFilesystemCallCount) {
+    # The counter separates cleanup from creation, but creation has more than
+    # one meaning: enumerating the caller's trusted parent is a root claim,
+    # while enumerating the invocation root after creating it is context
+    # verification. The check immediately following that second call already
+    # reports context-create-verification, so inferring both values from the
+    # counter alone made the two disagree about the same enumeration. A call
+    # site that knows its own phase states it.
+    $strFailureCode = if ($FailureCode.Length -ne 0) {
+        $FailureCode
+    } elseif ($null -ne $ReferenceToFilesystemCallCount) {
         'cleanup-owned-entry-uncertain'
     } else {
         'root-invalid'
     }
-    $strFailurePhase = if ($null -ne $ReferenceToFilesystemCallCount) {
+    $strFailurePhase = if ($FailurePhase.Length -ne 0) {
+        $FailurePhase
+    } elseif ($null -ne $ReferenceToFilesystemCallCount) {
         'cleanup'
     } else {
         'root'
@@ -996,7 +1011,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.7
+    # Version: 1.0.20260802.8
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1094,7 +1109,9 @@ function New-StyleGuideCandidateInvocationContext {
 
             $arrRootEntries = [string[]]@(
                 & $scriptBlockGetCandidateImmediateEntry `
-                    -LiteralPath $strInvocationRoot
+                    -LiteralPath $strInvocationRoot `
+                    -FailureCode 'context-create-verification' `
+                    -FailurePhase 'context'
             )
             if ($arrRootEntries.Count -ne 1 -or
                 -not (& $scriptBlockTestCandidateEntryPresent `
@@ -1172,7 +1189,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.7
+    # Version: 1.0.20260802.8
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
