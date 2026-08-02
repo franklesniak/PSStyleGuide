@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.23
+Version: 1.0.20260802.24
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.23'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.24'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260802.12'
@@ -403,26 +403,34 @@ $script:scriptBlockAssertResourceGuardsWired = {
     )
 
     # PS-P1A-R-10 through R-13 exercise the length guards by invoking them
-    # directly. That proves the guards behave correctly but not that production
-    # still calls them, so removing a call site would leave all four rows green
-    # while oversized or inconsistent archive data was accepted. Driving those
-    # rows through expansion instead is not available: the checked-overflow row
-    # needs a running total of UInt64.MaxValue that no real archive produces,
-    # and re-driving the actual-length rows would land them in a different phase
-    # than the frozen catalog records. The wiring is therefore asserted here.
-    $strText = & $script:scriptBlockConvertFromStrictUtf8 `
-        -Bytes ([System.IO.File]::ReadAllBytes($LiteralPath))
-    # Counting names alone is not enough: a guard left syntactically in place
-    # but fed a constant accumulator still matches, while counting nothing. The
-    # running totals must therefore be bound to variables at every call site.
+    # directly, which proves the guards behave correctly but not that production
+    # still calls them. Driving those rows through expansion is not available:
+    # the checked-overflow row needs a running total no real archive produces,
+    # and re-driving the actual-length rows would land them in a phase the
+    # frozen catalog does not record. The wiring is asserted here instead.
+    #
+    # This reads the parsed command tree rather than source text. Three earlier
+    # revisions scanned raw lines and each was bypassed in turn: by deleting a
+    # call site, by passing a literal, and by passing a zero-initialised decoy
+    # variable. Source text also cannot tell an executable invocation from a
+    # commented-out one. Only executable commands appear in the AST.
+    $objTokens = $null
+    $objParseErrors = $null
+    $objScriptAst = [System.Management.Automation.Language.Parser]::ParseFile(
+        $LiteralPath,
+        [ref]$objTokens,
+        [ref]$objParseErrors
+    )
+    if ($null -eq $objScriptAst -or @($objParseErrors).Count -ne 0) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'production-resource-guard'
+    }
     $hashtableRequiredInvocation = [ordered]@{
         'scriptBlockAddCandidateHelperDeclaredLength' = [ordered]@{
             Count = 1
             Required = [string[]]@('CurrentTotal', 'DeclaredLength')
-            # A variable-shaped argument is not enough: a decoy initialised once
-            # to zero is still a variable. Each accumulator must be the exact
-            # running total production carries forward, so changing the wiring
-            # has to change this table too.
+            # Each accumulator must be the exact running total production
+            # carries forward, so rewiring has to update this table too.
             Accumulator = [ordered]@{
                 CurrentTotal = [string[]]@('uintDeclaredTotal')
             }
@@ -438,40 +446,52 @@ $script:scriptBlockAssertResourceGuardsWired = {
             }
         }
     }
-    $arrLines = $strText.Split([char]10)
+    $arrCommandAst = @($objScriptAst.FindAll(
+        {
+            param ($objNode)
+            $objNode -is [System.Management.Automation.Language.CommandAst]
+        },
+        $true
+    ))
     foreach ($strName in $hashtableRequiredInvocation.Keys) {
         $hashtableRule = $hashtableRequiredInvocation[$strName]
         $intObserved = 0
-        for ($intIndex = 0; $intIndex -lt $arrLines.Count; $intIndex++) {
-            if ($arrLines[$intIndex] -notmatch ('&\s+\$script:' + [regex]::Escape($strName) + '\b')) {
+        foreach ($objCommandAst in $arrCommandAst) {
+            $arrElement = @($objCommandAst.CommandElements)
+            if ($arrElement.Count -lt 1 -or
+                -not ($arrElement[0] -is
+                    [System.Management.Automation.Language.VariableExpressionAst]) -or
+                $arrElement[0].VariablePath.UserPath -cne ('script:' + $strName)) {
                 continue
             }
-            # Gather the whole invocation, following backtick continuations.
-            $objInvocation = New-Object System.Text.StringBuilder
-            $intScan = $intIndex
-            while ($intScan -lt $arrLines.Count) {
-                [void]$objInvocation.Append($arrLines[$intScan])
-                [void]$objInvocation.Append(' ')
-                if ($arrLines[$intScan].TrimEnd() -notmatch '`$') {
-                    break
+            # Bind parameter names to their argument nodes. A separated
+            # argument is the following element; an attached one is carried on
+            # the parameter node itself.
+            $hashtableBoundArgument = @{}
+            for ($intIndex = 1; $intIndex -lt $arrElement.Count; $intIndex++) {
+                if (-not ($arrElement[$intIndex] -is
+                        [System.Management.Automation.Language.CommandParameterAst])) {
+                    continue
                 }
-                $intScan++
+                $objArgumentAst = $arrElement[$intIndex].Argument
+                if ($null -eq $objArgumentAst -and ($intIndex + 1) -lt $arrElement.Count) {
+                    $objArgumentAst = $arrElement[$intIndex + 1]
+                }
+                $hashtableBoundArgument[$arrElement[$intIndex].ParameterName] = $objArgumentAst
             }
-            $strInvocation = $objInvocation.ToString()
             foreach ($strParameter in $hashtableRule.Required) {
-                if ($strInvocation -notmatch ('-' + $strParameter + '\s+\S')) {
+                if (-not $hashtableBoundArgument.ContainsKey($strParameter) -or
+                    $null -eq $hashtableBoundArgument[$strParameter]) {
                     & $script:scriptBlockStopHarness `
                         -Code 'catalog-invalid' -Detail 'production-resource-guard'
                 }
             }
             foreach ($strParameter in $hashtableRule.Accumulator.Keys) {
-                $boolAccumulatorBound = $false
-                foreach ($strVariable in $hashtableRule.Accumulator[$strParameter]) {
-                    if ($strInvocation -cmatch ('-' + $strParameter + '\s+\$' + $strVariable + '\b')) {
-                        $boolAccumulatorBound = $true
-                    }
-                }
-                if (-not $boolAccumulatorBound) {
+                $objArgumentAst = $hashtableBoundArgument[$strParameter]
+                if (-not ($objArgumentAst -is
+                        [System.Management.Automation.Language.VariableExpressionAst]) -or
+                    $objArgumentAst.VariablePath.UserPath -cnotin
+                        $hashtableRule.Accumulator[$strParameter]) {
                     & $script:scriptBlockStopHarness `
                         -Code 'catalog-invalid' -Detail 'production-resource-guard'
                 }
@@ -4073,7 +4093,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.23
+    # Version: 1.0.20260802.24
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
