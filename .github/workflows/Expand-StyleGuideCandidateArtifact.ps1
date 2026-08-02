@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260802.15
+Version: 1.0.20260802.16
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260802.15'
+$script:versionCandidateHelper = [System.Version]'1.0.20260802.16'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.9'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -1050,10 +1050,64 @@ $script:scriptBlockGetCandidateHelperIdentityChain = {
     # such as a same-filesystem bind alias, and device alone cannot either
     # because an alias shares it. Inode is what separates them. The chain holds
     # every ancestor identity, so an alias of an ancestor is caught as well as
-    # an alias of the path itself. Windows returns an empty chain; the identity
-    # rule there is not implemented and the lexical rules still apply.
+    # an alias of the path itself.
+    #
+    # The caller compares one chain against the head of the other, so what the
+    # entries mean is this function's business alone: they only have to be
+    # equal when, and only when, they name the same directory. Each platform
+    # picks the strongest identity it can express.
     $listIdentity = New-Object 'System.Collections.Generic.List[string]'
     if ($script:boolCandidateHelperIsWindows) {
+        # Windows has its own aliasing that carries no reparse point and no
+        # tilde to look for: a volume with 8.3 names enabled answers to a short
+        # alias for any component, so C:\work\REPOSI~1\temp and
+        # C:\work\Repository\temp are the same directory spelled two ways and
+        # every lexical test passes. Screening for the alias by shape is ruled
+        # out at the source: GetLongPathName's documentation states that not
+        # all file systems put a tilde in a short name, and that the call must
+        # not be skipped on that basis.
+        #
+        # The identity used here is the canonical spelling. Each component is
+        # resolved by asking its parent for the entry of that name; the
+        # directory query matches a short alias and answers with the name as
+        # stored, so both spellings converge on one string. This is the
+        # component-by-component resolution the same documentation names as
+        # the alternative where GetLongPathName is unavailable, and it needs no
+        # P/Invoke, no compiler, and no elevation.
+        #
+        # Wildcards would otherwise be read as a pattern here, and are already
+        # refused for every path parameter that reaches this function.
+        $listWindowsComponent = New-Object 'System.Collections.Generic.List[string]'
+        $objWalk = New-Object System.IO.DirectoryInfo($LiteralPath)
+        while ($null -ne $objWalk.Parent) {
+            $listWindowsComponent.Add([string]$objWalk.Name)
+            $objWalk = $objWalk.Parent
+        }
+        $strCanonical = [string]$objWalk.FullName
+        for ($intComponent = $listWindowsComponent.Count - 1; $intComponent -ge 0; $intComponent--) {
+            $arrMatch = @()
+            try {
+                $arrMatch = @([System.IO.Directory]::EnumerateDirectories(
+                    $strCanonical,
+                    $listWindowsComponent[$intComponent]
+                ))
+            } catch {
+                & $script:scriptBlockStopCandidateHelperOperation `
+                    -Code 'root-invalid' -Phase 'root' -Subreason 'identity'
+            }
+            if ($arrMatch.Count -ne 1) {
+                & $script:scriptBlockStopCandidateHelperOperation `
+                    -Code 'root-invalid' -Phase 'root' -Subreason 'identity'
+            }
+            $strCanonical = [string]$arrMatch[0]
+        }
+        # Deepest first, so entry zero is this path's own identity and the rest
+        # are its ancestors, matching what the caller reads on every platform.
+        $objEmit = New-Object System.IO.DirectoryInfo($strCanonical)
+        while ($null -ne $objEmit) {
+            $listIdentity.Add([string]$objEmit.FullName)
+            $objEmit = $objEmit.Parent
+        }
         return ,[string[]]$listIdentity.ToArray()
     }
     $arrStatCommands = @(Get-Command -Name 'stat' `
@@ -1277,7 +1331,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.15
+    # Version: 1.0.20260802.16
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
