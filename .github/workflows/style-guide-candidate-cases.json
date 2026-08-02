@@ -1,6 +1,6 @@
 {
   "SchemaVersion": 1,
-  "CatalogVersion": "1.0.20260802.1",
+  "CatalogVersion": "1.0.20260802.2",
   "CaseCount": 110,
   "CaseIdPattern": "^PS-P1A-[A-Z]+-[0-9]{2}$",
   "SemanticCasePattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$",
@@ -1835,7 +1835,7 @@
       "ExpectedCleanupSequence": "context",
       "ExpectedCandidateFinalState": "Absent",
       "ExpectedContextFinalState": "CleanupFailed",
-      "ExpectedFilesystemCallCount": 5,
+      "ExpectedFilesystemCallCount": 0,
       "ExpectedSentinelState": "intact",
       "ExpectedSourceState": "unchanged",
       "FixtureLength": null,

@@ -31,7 +31,7 @@ None. The script writes one JSON object per case to the success stream and
 uses its process exit code to report the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.1
+Version: 1.0.20260802.2
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,12 +53,12 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.1'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.2'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260802.1'
+$script:strCandidateExpectedHelperVersion = '1.0.20260802.2'
 $script:strCandidateExpectedContextVersion = '1.0.20260802.1'
-$script:strCandidateCatalogVersion = '1.0.20260802.1'
+$script:strCandidateCatalogVersion = '1.0.20260802.2'
 $script:strCandidateAllocationSha256 = 'ce7b29de7bb4812f1de9defb1672c1b7eac47d6f6b584db571a9bc0d86726e02'
 $script:strCandidateHelperRelativePath = '.github/workflows/Expand-StyleGuideCandidateArtifact.ps1'
 $script:strCandidateContextRelativePath = '.github/workflows/Manage-StyleGuideCandidateInvocationContext.ps1'
@@ -2942,6 +2942,82 @@ $script:scriptBlockInvokeContextCleanupFixture = {
             return $objObservation
         }
 
+        if ($strSemantic -ceq 'context.cleanup.primary-and-cleanup-failure') {
+            # Drive a real expansion failure whose caller cleanup also fails, and
+            # prove both survive. Two download entries reject in the download
+            # phase, which is past the parameter phase, so the helper runs its
+            # production cleanup transition and aggregates the cleanup category
+            # with the primary failure instead of replacing it.
+            $objContext = New-StyleGuideCandidateInvocationContext `
+                -TrustedTemporaryRoot $hashtableLayout.Trusted
+            $objObservation.InvocationId = $objContext.InvocationId
+            $objObservation.PreCleanupState = 'Active'
+            foreach ($strDownloadLeaf in @('candidate-artifact.bin', 'unexpected.bin')) {
+                [System.IO.File]::WriteAllBytes(
+                    [System.IO.Path]::Combine($objContext.DownloadDirectoryPath, $strDownloadLeaf),
+                    [byte[]](0x78)
+                )
+            }
+
+            $objPrimaryError = $null
+            try {
+                [void](& $HelperLiteralPath `
+                    -Context $objContext `
+                    -CheckoutRoot $hashtableLayout.Checkout `
+                    -TrustedTemporaryRoot $hashtableLayout.Trusted `
+                    -DownloadDirectory $objContext.DownloadDirectoryPath `
+                    -CandidateDirectory $objContext.CandidatePath `
+                    -ExpectedDigest ('0' * 64))
+            } catch {
+                $objPrimaryError = $_
+            }
+            if ($null -eq $objPrimaryError) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'fixture-failed' -Detail 'composite-accepted'
+            }
+
+            $strPrimaryCode = & $script:scriptBlockGetProductionFailureField `
+                -ErrorRecord $objPrimaryError `
+                -Key 'PSStyleGuideDiagnosticCode' `
+                -Fallback 'none'
+            $strPrimaryPhase = & $script:scriptBlockGetProductionFailureField `
+                -ErrorRecord $objPrimaryError `
+                -Key 'PSStyleGuidePhase' `
+                -Fallback 'none'
+            $strCompositeCleanupCode = & $script:scriptBlockGetProductionFailureField `
+                -ErrorRecord $objPrimaryError `
+                -Key 'PSStyleGuideCleanupCode' `
+                -Fallback 'none'
+            # The primary failure must be a real non-parameter production
+            # rejection, and the cleanup category must ride alongside it rather
+            # than overwrite it. Either half missing is a fixture failure.
+            if ($strPrimaryCode -cne 'download-invalid' -or
+                $strPrimaryPhase -cne 'download' -or
+                $strCompositeCleanupCode -cne 'cleanup-owned-entry-uncertain' -or
+                $objContext.LifecycleState -cne 'CleanupFailed') {
+                & $script:scriptBlockStopHarness `
+                    -Code 'fixture-failed' -Detail 'composite-evidence'
+            }
+
+            # The terminal repeat is the observable cleanup result on this path,
+            # and it must stay zero-call while retaining the uncertainty evidence.
+            $objCleanupResult = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+            if ($objCleanupResult.Success -or
+                $objCleanupResult.FilesystemCallCount -ne [uint32]0 -or
+                $objCleanupResult.RetainedRecordSequences.Count -eq 0) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'fixture-failed' -Detail 'composite-terminal-repeat'
+            }
+            & $script:scriptBlockSetCleanupObservation `
+                -Observation $objObservation `
+                -CleanupResult $objCleanupResult `
+                -Subreason 'primary-and-cleanup' `
+                -CleanupSequence 'context' `
+                -Context $objContext
+            $objObservation.DiagnosticCode = $strCompositeCleanupCode
+            return $objObservation
+        }
+
         $objContext = New-StyleGuideCandidateInvocationContext `
             -TrustedTemporaryRoot $hashtableLayout.Trusted
         $objObservation.InvocationId = $objContext.InvocationId
@@ -2972,13 +3048,6 @@ $script:scriptBlockInvokeContextCleanupFixture = {
             'context.cleanup.missing-entry' {
                 [System.IO.Directory]::Delete($objContext.DownloadDirectoryPath, $false)
                 $strSubreason = 'missing-entry'
-            }
-            'context.cleanup.primary-and-cleanup-failure' {
-                [System.IO.File]::WriteAllBytes(
-                    [System.IO.Path]::Combine($objContext.DownloadDirectoryPath, 'unexpected.bin'),
-                    [byte[]](0x78)
-                )
-                $strSubreason = 'primary-and-cleanup'
             }
             'context.cleanup.partial-journal' {
                 $objContext.OwnershipJournal = [object[]]@($objContext.OwnershipJournal[0])
@@ -3534,7 +3603,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.1
+    # Version: 1.0.20260802.2
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
