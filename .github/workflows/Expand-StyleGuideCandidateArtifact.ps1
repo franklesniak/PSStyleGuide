@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260802.18
+Version: 1.0.20260802.19
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260802.18'
+$script:versionCandidateHelper = [System.Version]'1.0.20260802.19'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.9'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -926,12 +926,53 @@ $script:scriptBlockAssertCandidateHelperArchiveEntryCount = {
         & $script:scriptBlockStopCandidateHelperOperation `
             -Code 'manifest-invalid' -Phase 'manifest' -Subreason 'entry-count'
     }
-    # A central directory record is 46 bytes plus its name, extra field, and
-    # comment. Four records with the longest manifest name and a generous 512
-    # bytes of per-record slack stay far below this, while the smallest record
-    # any reader would build is 46 bytes, so this admits fewer than ninety
-    # records in the worst case and no amplification with it.
-    if ($lngDirectorySize -gt 4096) {
+    # Count the records instead of capping the bytes they occupy. A byte cap is
+    # a proxy for the count, and the wrong one: entry comments and extra fields
+    # are legal and unbounded, so four entries carrying a kilobyte of comment
+    # each fill more than four kilobytes of directory while still materializing
+    # exactly four entries. Rejecting that is a rejection of valid input.
+    #
+    # Walking the records answers the real question and stays bounded while
+    # doing it. Only the fixed 46-byte head of each record is read, five times
+    # at most; the name, extra field, and comment are stepped over by moving
+    # the stream position, never by reading them. A fifth record proves the
+    # archive holds more than the manifest allows, whatever any field claims.
+    $lngPosition = $lngDirectoryOffset
+    $arrRecordHead = New-Object byte[] 46
+    $intRecordCount = 0
+    while ($lngPosition -lt $lngTrailerPosition -and $intRecordCount -le 4) {
+        if (($lngTrailerPosition - $lngPosition) -lt 46) {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'manifest-invalid' -Phase 'manifest' -Subreason 'entry-count'
+        }
+        $Stream.Position = $lngPosition
+        $intHeadFilled = 0
+        while ($intHeadFilled -lt 46) {
+            $intHeadRead = $Stream.Read($arrRecordHead, $intHeadFilled, 46 - $intHeadFilled)
+            if ($intHeadRead -le 0) {
+                & $script:scriptBlockStopCandidateHelperOperation `
+                    -Code 'manifest-invalid' -Phase 'manifest' -Subreason 'entry-count'
+            }
+            $intHeadFilled += $intHeadRead
+        }
+        if ($arrRecordHead[0] -ne 0x50 -or $arrRecordHead[1] -ne 0x4B -or
+            $arrRecordHead[2] -ne 0x01 -or $arrRecordHead[3] -ne 0x02) {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'manifest-invalid' -Phase 'manifest' -Subreason 'entry-count'
+        }
+        $intRecordCount++
+        if ($intRecordCount -gt 4) {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'manifest-invalid' -Phase 'manifest' -Subreason 'entry-count'
+        }
+        $lngNameLength = [int64]$arrRecordHead[28] -bor ([int64]$arrRecordHead[29] -shl 8)
+        $lngExtraLength = [int64]$arrRecordHead[30] -bor ([int64]$arrRecordHead[31] -shl 8)
+        $lngCommentLength = [int64]$arrRecordHead[32] -bor ([int64]$arrRecordHead[33] -shl 8)
+        $lngPosition = $lngPosition + 46 + $lngNameLength + $lngExtraLength + $lngCommentLength
+    }
+    # The walk must land exactly on the trailer. Stopping short means a record
+    # was mis-sized; overshooting means one claimed more than the directory holds.
+    if ($lngPosition -ne $lngTrailerPosition) {
         & $script:scriptBlockStopCandidateHelperOperation `
             -Code 'manifest-invalid' -Phase 'manifest' -Subreason 'entry-count'
     }
@@ -1375,7 +1416,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.18
+    # Version: 1.0.20260802.19
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
