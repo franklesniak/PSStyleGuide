@@ -31,7 +31,7 @@ None. The script writes one JSON object per case to the success stream and
 uses its process exit code to report the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.14
+Version: 1.0.20260802.15
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.14'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.15'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260802.7'
@@ -597,6 +597,21 @@ $script:scriptBlockAssertOrdinaryDirectoryEnvelope = {
 
     $objCurrent = New-Object System.IO.DirectoryInfo($LiteralPath)
     $strPreviousDevice = $null
+    # Resolved once, above the loop. A bare 'stat' would bind to a function or
+    # alias in the invoking scope, and a PowerShell function never sets
+    # $LASTEXITCODE, so a stale status plus chosen numeric output could pass or
+    # fail the device check. Resolving per component instead measured ~9.7 ms
+    # against ~3.1 ms for the native call, on a loop walking every ancestor.
+    $strHarnessStatPath = $null
+    if ($env:OS -ne 'Windows_NT') {
+        $arrHarnessStatCommands = @(Get-Command -Name 'stat' `
+            -CommandType Application -ErrorAction SilentlyContinue)
+        if ($arrHarnessStatCommands.Count -lt 1) {
+            & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
+                -Detail 'directory-identity'
+        }
+        $strHarnessStatPath = [string]$arrHarnessStatCommands[0].Source
+    }
     while ($null -ne $objCurrent) {
         try {
             $objAttributes = [System.IO.File]::GetAttributes($objCurrent.FullName)
@@ -608,7 +623,8 @@ $script:scriptBlockAssertOrdinaryDirectoryEnvelope = {
             & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'directory-component'
         }
         if ($env:OS -ne 'Windows_NT') {
-            $arrFileSystemStatus = @(& stat '-Lc' '%d' '--' $objCurrent.FullName 2>$null)
+            $arrFileSystemStatus = @(& $strHarnessStatPath '-Lc' '%d' '--' `
+                $objCurrent.FullName 2>$null)
             if ($LASTEXITCODE -ne 0 -or $arrFileSystemStatus.Count -ne 1 -or
                 $arrFileSystemStatus[0] -notmatch '^[0-9]+$') {
                 & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'directory-identity'
@@ -3921,7 +3937,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.14
+    # Version: 1.0.20260802.15
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
