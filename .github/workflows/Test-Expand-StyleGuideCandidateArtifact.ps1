@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.25
+Version: 1.0.20260802.26
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.25'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.26'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260802.13'
@@ -2747,8 +2747,13 @@ $script:scriptBlockInvokeExpansionFixture = {
 
         if ($strSemantic -ceq 'environment.trusted.nonfilesystem-provider') {
             try {
+                # PSVersionTable exists on both editions, so this path
+                # resolves and reaches the provider comparison. The previous
+                # fixture named a variable that does not exist, so resolution
+                # threw first and the non-filesystem-provider rejection this
+                # case is named for was never exercised.
                 [void](New-StyleGuideCandidateInvocationContext `
-                    -TrustedTemporaryRoot 'Variable::PSStyleGuideCandidateFixture')
+                    -TrustedTemporaryRoot 'Variable::PSVersionTable')
             } catch {
                 # The fallback converted an absent diagnostic into the expected
                 # one, and phase and subreason were assigned unconditionally, so
@@ -4109,7 +4114,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.25
+    # Version: 1.0.20260802.26
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
