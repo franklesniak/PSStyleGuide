@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.20
+Version: 1.0.20260802.21
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.20'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.21'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260802.10'
@@ -403,16 +403,58 @@ $script:scriptBlockAssertResourceGuardsWired = {
     # than the frozen catalog records. The wiring is therefore asserted here.
     $strText = & $script:scriptBlockConvertFromStrictUtf8 `
         -Bytes ([System.IO.File]::ReadAllBytes($LiteralPath))
+    # Counting names alone is not enough: a guard left syntactically in place
+    # but fed a constant accumulator still matches, while counting nothing. The
+    # running totals must therefore be bound to variables at every call site.
     $hashtableRequiredInvocation = [ordered]@{
-        'scriptBlockAddCandidateHelperDeclaredLength' = 1
-        'scriptBlockAddCandidateHelperActualLength' = 2
+        'scriptBlockAddCandidateHelperDeclaredLength' = [ordered]@{
+            Count = 1
+            Accumulator = [string[]]@('CurrentTotal')
+            Required = [string[]]@('CurrentTotal', 'DeclaredLength')
+        }
+        'scriptBlockAddCandidateHelperActualLength' = [ordered]@{
+            Count = 2
+            Accumulator = [string[]]@('CurrentEntryLength', 'CurrentTotalLength')
+            Required = [string[]]@(
+                'CurrentEntryLength', 'CurrentTotalLength', 'ReadLength', 'DeclaredEntryLength'
+            )
+        }
     }
+    $arrLines = $strText.Split([char]10)
     foreach ($strName in $hashtableRequiredInvocation.Keys) {
-        $intCount = @([regex]::Matches(
-            $strText,
-            '&\s+\$script:' + [regex]::Escape($strName) + '\b'
-        )).Count
-        if ($intCount -lt $hashtableRequiredInvocation[$strName]) {
+        $hashtableRule = $hashtableRequiredInvocation[$strName]
+        $intObserved = 0
+        for ($intIndex = 0; $intIndex -lt $arrLines.Count; $intIndex++) {
+            if ($arrLines[$intIndex] -notmatch ('&\s+\$script:' + [regex]::Escape($strName) + '\b')) {
+                continue
+            }
+            # Gather the whole invocation, following backtick continuations.
+            $objInvocation = New-Object System.Text.StringBuilder
+            $intScan = $intIndex
+            while ($intScan -lt $arrLines.Count) {
+                [void]$objInvocation.Append($arrLines[$intScan])
+                [void]$objInvocation.Append(' ')
+                if ($arrLines[$intScan].TrimEnd() -notmatch '`$') {
+                    break
+                }
+                $intScan++
+            }
+            $strInvocation = $objInvocation.ToString()
+            foreach ($strParameter in $hashtableRule.Required) {
+                if ($strInvocation -notmatch ('-' + $strParameter + '\s+\S')) {
+                    & $script:scriptBlockStopHarness `
+                        -Code 'catalog-invalid' -Detail 'production-resource-guard'
+                }
+            }
+            foreach ($strParameter in $hashtableRule.Accumulator) {
+                if ($strInvocation -notmatch ('-' + $strParameter + '\s+\$[A-Za-z0-9_]+')) {
+                    & $script:scriptBlockStopHarness `
+                        -Code 'catalog-invalid' -Detail 'production-resource-guard'
+                }
+            }
+            $intObserved++
+        }
+        if ($intObserved -lt $hashtableRule.Count) {
             & $script:scriptBlockStopHarness `
                 -Code 'catalog-invalid' -Detail 'production-resource-guard'
         }
@@ -4007,7 +4049,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.20
+    # Version: 1.0.20260802.21
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
