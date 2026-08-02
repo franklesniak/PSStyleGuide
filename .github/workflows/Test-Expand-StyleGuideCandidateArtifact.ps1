@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.27
+Version: 1.0.20260802.28
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.27'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.28'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260802.14'
-$script:strCandidateExpectedContextVersion = '1.0.20260802.8'
+$script:strCandidateExpectedHelperVersion = '1.0.20260802.15'
+$script:strCandidateExpectedContextVersion = '1.0.20260802.9'
 $script:strCandidateCatalogVersion = '1.0.20260802.4'
 $script:strCandidateAllocationSha256 = 'ce7b29de7bb4812f1de9defb1672c1b7eac47d6f6b584db571a9bc0d86726e02'
 $script:strCandidateHelperRelativePath = '.github/workflows/Expand-StyleGuideCandidateArtifact.ps1'
@@ -501,6 +501,147 @@ $script:scriptBlockAssertResourceGuardsWired = {
         if ($intObserved -lt $hashtableRule.Count) {
             & $script:scriptBlockStopHarness `
                 -Code 'catalog-invalid' -Detail 'production-resource-guard'
+        }
+    }
+}
+
+$script:scriptBlockAssertLifecycleRecordStatesRejected = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$RunRoot
+    )
+
+    # Both production validators pair each lifecycle state with the exact set of
+    # record states that state admits. That pairing is the only thing between a
+    # caller-supplied journal and the two terminal branches, which perform no
+    # filesystem work and report owned entries rather than removing them. A
+    # CleanupFailed context carrying a surviving Created record names an entry
+    # that is owned and present on disk yet absent from RetainedRecordSequences,
+    # so nothing removes it and nothing tells the operator it is there.
+    #
+    # The catalog cannot reach this. Every one of its cases begins Active or
+    # NotCreated, so no row ever hands a terminal context to either entry point.
+    # The check lives here instead.
+    #
+    # It drives the real public functions rather than reading source text.
+    # Source-shaped assertions in this file have been defeated by moving code
+    # into a deleted call site, a literal argument, a decoy variable, a comment,
+    # and an unreachable branch; a check that observes returned results cannot
+    # be satisfied by any of those.
+    #
+    # Both directions are asserted. Rejection rows alone would also pass against
+    # a validator that refused everything, so the well-formed terminal contexts
+    # are required to be accepted and to report exactly the sequences they own.
+    $arrScenario = @(
+        @{
+            Name = 'active-retained'
+            LifecycleState = 'Active'
+            Mutation = @(@{ Index = 2; EntryState = 'RetainedUncertain' })
+            ExpectedDiagnosticCode = 'cleanup-context-invalid'
+            ExpectedRetainedSequence = [uint32[]]@()
+        },
+        @{
+            Name = 'disposed-created'
+            LifecycleState = 'Disposed'
+            Mutation = @()
+            ExpectedDiagnosticCode = 'cleanup-context-invalid'
+            ExpectedRetainedSequence = [uint32[]]@()
+        },
+        @{
+            Name = 'disposed-retained'
+            LifecycleState = 'Disposed'
+            Mutation = @(
+                @{ Index = 0; EntryState = 'Deleted' },
+                @{ Index = 1; EntryState = 'Deleted' },
+                @{ Index = 2; EntryState = 'RetainedUncertain' }
+            )
+            ExpectedDiagnosticCode = 'cleanup-context-invalid'
+            ExpectedRetainedSequence = [uint32[]]@()
+        },
+        @{
+            Name = 'failed-created'
+            LifecycleState = 'CleanupFailed'
+            Mutation = @(@{ Index = 1; EntryState = 'RetainedUncertain' })
+            ExpectedDiagnosticCode = 'cleanup-context-invalid'
+            ExpectedRetainedSequence = [uint32[]]@()
+        },
+        @{
+            Name = 'failed-unretained'
+            LifecycleState = 'CleanupFailed'
+            Mutation = @(
+                @{ Index = 0; EntryState = 'Deleted' },
+                @{ Index = 1; EntryState = 'Deleted' }
+            )
+            ExpectedDiagnosticCode = 'cleanup-context-invalid'
+            ExpectedRetainedSequence = [uint32[]]@()
+        },
+        @{
+            Name = 'failed-retained'
+            LifecycleState = 'CleanupFailed'
+            Mutation = @(
+                @{ Index = 0; EntryState = 'RetainedUncertain' },
+                @{ Index = 1; EntryState = 'RetainedUncertain' }
+            )
+            ExpectedDiagnosticCode = 'cleanup-terminal-failure'
+            ExpectedRetainedSequence = [uint32[]]@([uint32]0, [uint32]1)
+        },
+        @{
+            Name = 'disposed-clean'
+            LifecycleState = 'Disposed'
+            Mutation = @(
+                @{ Index = 0; EntryState = 'Deleted' },
+                @{ Index = 1; EntryState = 'Deleted' }
+            )
+            ExpectedDiagnosticCode = 'cleanup-already-disposed'
+            ExpectedRetainedSequence = [uint32[]]@()
+        }
+    )
+
+    $strScenarioRoot = [System.IO.Path]::Combine($RunRoot, 'lifecycle-record-state')
+    [void][System.IO.Directory]::CreateDirectory($strScenarioRoot)
+    foreach ($hashtableScenario in $arrScenario) {
+        # Each entry point is handed its own freshly created context. Sharing
+        # one would let the first call's outcome decide the second's, and a
+        # rejected context is left exactly as the caller supplied it.
+        foreach ($strEntryPoint in @(
+            'Remove-StyleGuideCandidateInvocationContext',
+            'Remove-StyleGuideCandidateInvocationState'
+        )) {
+            $strTrustedParent = [System.IO.Path]::Combine(
+                $strScenarioRoot,
+                [System.IO.Path]::GetRandomFileName()
+            )
+            [void][System.IO.Directory]::CreateDirectory($strTrustedParent)
+            $objContext = New-StyleGuideCandidateInvocationContext `
+                -TrustedTemporaryRoot $strTrustedParent
+            if ($objContext.OwnershipJournal.Count -ne 3) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'orchestration-failed' -Detail 'lifecycle-record-state'
+            }
+            foreach ($hashtableMutation in $hashtableScenario.Mutation) {
+                $objContext.OwnershipJournal[$hashtableMutation.Index].EntryState =
+                    [string]$hashtableMutation.EntryState
+            }
+            $objContext.LifecycleState = [string]$hashtableScenario.LifecycleState
+
+            $objResult = & $strEntryPoint -Context $objContext
+            if ($objResult.DiagnosticCode -cne $hashtableScenario.ExpectedDiagnosticCode -or
+                $objResult.FilesystemCallCount -ne [uint32]0) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'orchestration-failed' -Detail 'lifecycle-record-state'
+            }
+            $arrObserved = [uint32[]]@($objResult.RetainedRecordSequences)
+            $arrExpected = [uint32[]]@($hashtableScenario.ExpectedRetainedSequence)
+            if ($arrObserved.Count -ne $arrExpected.Count) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'orchestration-failed' -Detail 'lifecycle-record-state'
+            }
+            for ($intIndex = 0; $intIndex -lt $arrExpected.Count; $intIndex++) {
+                if ($arrObserved[$intIndex] -ne $arrExpected[$intIndex]) {
+                    & $script:scriptBlockStopHarness `
+                        -Code 'orchestration-failed' -Detail 'lifecycle-record-state'
+                }
+            }
         }
     }
 }
@@ -4114,7 +4255,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.27
+    # Version: 1.0.20260802.28
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -4279,6 +4420,7 @@ function Invoke-StyleGuideCandidateHarness {
         & $script:scriptBlockAssertCatalogMutationsRejected `
             -Catalog $objCatalog `
             -RunRoot $strRunRoot
+        & $script:scriptBlockAssertLifecycleRecordStatesRejected -RunRoot $strRunRoot
         & $script:scriptBlockAssertUnauthorizedSkipsRejected `
             -Catalog $objCatalog `
             -OperatingSystem $strOperatingSystem `

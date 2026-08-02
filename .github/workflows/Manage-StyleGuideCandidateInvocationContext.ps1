@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260802.8
+Version: 1.0.20260802.9
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260802.8'
+$versionCandidateContext = [System.Version]'1.0.20260802.9'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -820,11 +820,11 @@ $scriptBlockAssertCandidateInMemoryContext = {
         $objDownloadDirectoryRecord = @($Context.OwnershipJournal | Where-Object {
             $_.Kind -eq 'DownloadDirectory'
         })[0]
+        # Which record states an Active context may carry at all is settled by
+        # the admitted-state table below. What remains here is the part that
+        # table cannot express: the states these two specific kinds must hold.
         if ($objRootRecord.EntryState -cne 'Created' -or
-            $objDownloadDirectoryRecord.EntryState -cnotin @('Created', 'ExpectedAbsent') -or
-            @($Context.OwnershipJournal | Where-Object {
-                $_.EntryState -eq 'RetainedUncertain'
-            }).Count -ne 0) {
+            $objDownloadDirectoryRecord.EntryState -cnotin @('Created', 'ExpectedAbsent')) {
             throw 'cleanup-context-invalid'
         }
 
@@ -849,21 +849,44 @@ $scriptBlockAssertCandidateInMemoryContext = {
             }
         }
     }
-    if ($Context.LifecycleState -eq 'Disposed') {
-        foreach ($objRecord in $Context.OwnershipJournal) {
-            if ($objRecord.EntryState -in @('Created', 'RetainedUncertain')) {
-                throw 'cleanup-context-invalid'
-            }
+    # Each lifecycle state admits an exact set of record states, and one state
+    # additionally demands a member. Stating the pairing as data rather than as
+    # a block per lifecycle state keeps every combination classified: an
+    # unlisted record state is refused because it was never admitted, not
+    # because someone remembered to name it. A per-state deny list would let a
+    # record state added later pass silently everywhere it was not yet listed.
+    #
+    # CleanupFailed is terminal and does no filesystem work, so it reports the
+    # owned entries it could not resolve instead of removing them. A surviving
+    # Created record would name an entry that is owned and present yet absent
+    # from that report, so Created is not admitted here: the producing failure
+    # path retypes every Created record before reaching this state.
+    $hashtableAdmittedEntryState = @{
+        'Active' = [string[]]@('ExpectedAbsent', 'Created', 'Deleted')
+        'CleanupFailed' = [string[]]@('ExpectedAbsent', 'Deleted', 'RetainedUncertain')
+        'Disposed' = [string[]]@('ExpectedAbsent', 'Deleted')
+    }
+    $hashtableRequiredEntryState = @{
+        'CleanupFailed' = 'RetainedUncertain'
+    }
+    if (-not $hashtableAdmittedEntryState.ContainsKey($Context.LifecycleState)) {
+        throw 'cleanup-context-invalid'
+    }
+    $arrAdmittedEntryState = [string[]]$hashtableAdmittedEntryState[$Context.LifecycleState]
+    foreach ($objRecord in $Context.OwnershipJournal) {
+        if ($objRecord.EntryState -cnotin $arrAdmittedEntryState) {
+            throw 'cleanup-context-invalid'
         }
     }
-    if ($Context.LifecycleState -eq 'CleanupFailed') {
-        $boolRetained = $false
+    if ($hashtableRequiredEntryState.ContainsKey($Context.LifecycleState)) {
+        $strRequiredEntryState = [string]$hashtableRequiredEntryState[$Context.LifecycleState]
+        $boolRequiredPresent = $false
         foreach ($objRecord in $Context.OwnershipJournal) {
-            if ($objRecord.EntryState -eq 'RetainedUncertain') {
-                $boolRetained = $true
+            if ($objRecord.EntryState -ceq $strRequiredEntryState) {
+                $boolRequiredPresent = $true
             }
         }
-        if (-not $boolRetained) {
+        if (-not $boolRequiredPresent) {
             throw 'cleanup-context-invalid'
         }
     }
@@ -1011,7 +1034,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.8
+    # Version: 1.0.20260802.9
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1189,7 +1212,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.8
+    # Version: 1.0.20260802.9
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
