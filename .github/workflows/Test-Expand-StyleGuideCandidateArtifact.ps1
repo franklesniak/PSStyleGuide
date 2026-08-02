@@ -31,7 +31,7 @@ None. The script writes one JSON object per case to the success stream and
 uses its process exit code to report the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.5
+Version: 1.0.20260802.6
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.5'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.6'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260802.4'
@@ -363,13 +363,53 @@ $script:scriptBlockAssertProductionTaxonomyClosed = {
         }
 
         # A literal fallback is emitted verbatim when an exception carries no
-        # annotation, so it must be a declared value of some closed set.
-        # Scanning only -Code and -Subreason would let these escape.
+        # annotation, so it must be declared for the field it lands in. Checking
+        # the union of the closed sets is not enough: a diagnostic fallback
+        # spelled with a declared subreason would pass the union test while the
+        # runtime emitted an undeclared DiagnosticCode. Resolve the destination
+        # field from the invocation, then validate against that field alone.
         foreach ($objMatch in [regex]::Matches($strText, "-Fallback\s+'([^']*)'")) {
             $strFallback = $objMatch.Groups[1].Value
-            if (-not $objSubreason.Contains($strFallback) -and
-                -not $objDiagnostic.Contains($strFallback) -and
-                -not $objPhase.Contains($strFallback)) {
+            $intInvocationStart = $strText.LastIndexOf(
+                '& $script',
+                $objMatch.Index,
+                [System.StringComparison]::Ordinal
+            )
+            if ($intInvocationStart -lt 0) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'catalog-invalid' -Detail 'production-fallback-field'
+            }
+            $strInvocation = $strText.Substring(
+                $intInvocationStart,
+                $objMatch.Index - $intInvocationStart
+            )
+            # An explicit -Key names the destination directly. The
+            # diagnostic-code helper takes no key and names it by identity.
+            $objDestinationSet = $null
+            if ($strInvocation.IndexOf(
+                    "-Key 'PSStyleGuideDiagnosticCode'",
+                    [System.StringComparison]::Ordinal) -ge 0) {
+                $objDestinationSet = $objDiagnostic
+            } elseif ($strInvocation.IndexOf(
+                    "-Key 'PSStyleGuidePhase'",
+                    [System.StringComparison]::Ordinal) -ge 0) {
+                $objDestinationSet = $objPhase
+            } elseif ($strInvocation.IndexOf(
+                    "-Key 'PSStyleGuideSubreason'",
+                    [System.StringComparison]::Ordinal) -ge 0) {
+                $objDestinationSet = $objSubreason
+            } elseif ($strInvocation.IndexOf(
+                    'GetCandidateDiagnosticCode',
+                    [System.StringComparison]::Ordinal) -ge 0) {
+                $objDestinationSet = $objDiagnostic
+            }
+            # An unresolvable destination fails closed rather than falling back
+            # to the union test this check replaced.
+            if ($null -eq $objDestinationSet) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'catalog-invalid' -Detail 'production-fallback-field'
+            }
+            if (-not $objDestinationSet.Contains($strFallback)) {
                 & $script:scriptBlockStopHarness `
                     -Code 'catalog-invalid' -Detail 'production-fallback'
             }
@@ -3669,7 +3709,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.5
+    # Version: 1.0.20260802.6
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
