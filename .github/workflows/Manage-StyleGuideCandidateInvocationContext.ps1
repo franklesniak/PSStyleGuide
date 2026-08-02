@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260802.9
+Version: 1.0.20260802.10
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260802.9'
+$versionCandidateContext = [System.Version]'1.0.20260802.10'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -1034,7 +1034,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.9
+    # Version: 1.0.20260802.10
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1120,6 +1120,60 @@ function New-StyleGuideCandidateInvocationContext {
                 -CandidatePath $strCandidatePath
 
             $null = [System.IO.Directory]::CreateDirectory($strInvocationRoot)
+
+            # CreateDirectory returns the same thing whether it made the
+            # directory or found one already there, so on its own it is not
+            # evidence of ownership -- and ownership is what later authorises
+            # deleting this tree. Prove it twice before recording it.
+            #
+            # An unpredictable leaf makes the pre-existing case unlikely rather
+            # than impossible, and unlikely is the wrong footing for a claim
+            # that drives a delete. Neither failure below removes anything: a
+            # directory that fails these tests is by definition not this
+            # invocation's to delete, so the loop leaves it alone and takes a
+            # different name.
+            $arrClaimEntries = [string[]]@(
+                & $scriptBlockGetCandidateImmediateEntry `
+                    -LiteralPath $strInvocationRoot `
+                    -FailureCode 'context-create-verification' `
+                    -FailurePhase 'context'
+            )
+            if ($arrClaimEntries.Count -ne 0) {
+                continue
+            }
+            # Emptiness alone would still admit an empty directory someone else
+            # made. An exclusive create refuses the name outright if another
+            # participant already holds it, which no pre-existing directory can
+            # satisfy on our behalf.
+            $strClaimPath = [System.IO.Path]::Combine(
+                $strInvocationRoot,
+                'claim-' + [System.Guid]::NewGuid().ToString('N')
+            )
+            try {
+                $objClaimStream = New-Object System.IO.FileStream(
+                    $strClaimPath,
+                    [System.IO.FileMode]::CreateNew,
+                    [System.IO.FileAccess]::Write,
+                    [System.IO.FileShare]::None
+                )
+                $objClaimStream.Dispose()
+            } catch {
+                continue
+            }
+            # The claim is transient by necessity: the verification below
+            # requires the root to hold exactly the download directory, so a
+            # marker left behind would fail the very check it precedes.
+            try {
+                [System.IO.File]::Delete($strClaimPath)
+            } catch {
+                & $scriptBlockStopCandidateOperation -Code 'context-create-verification' `
+                    -Message 'PSStyleGuide.Context.v1|phase=context|reason=claim-residue'
+            }
+            if ([System.IO.File]::Exists($strClaimPath)) {
+                & $scriptBlockStopCandidateOperation -Code 'context-create-verification' `
+                    -Message 'PSStyleGuide.Context.v1|phase=context|reason=claim-residue'
+            }
+
             $boolRootCreated = $true
             $objContext.OwnershipJournal[0].EntryState = 'Created'
             [void](& $scriptBlockAssertCandidateOrdinaryDirectoryEnvelope `
@@ -1212,7 +1266,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.9
+    # Version: 1.0.20260802.10
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
