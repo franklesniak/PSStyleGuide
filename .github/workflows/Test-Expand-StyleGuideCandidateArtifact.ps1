@@ -31,7 +31,7 @@ None. The script writes one JSON object per case to the success stream and
 uses its process exit code to report the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.4
+Version: 1.0.20260802.5
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.4'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.5'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260802.4'
@@ -728,7 +728,7 @@ $script:scriptBlockAssertCandidateWorkingObjectId = {
     }
 }
 
-$script:scriptBlockAssertTrackedScriptIdentity = {
+$script:scriptBlockAssertTrackedBlobIdentity = {
     param (
         [Parameter(Mandatory = $true)]
         [string]$RepositoryRoot,
@@ -740,13 +740,7 @@ $script:scriptBlockAssertTrackedScriptIdentity = {
         [string]$LiteralPath,
 
         [Parameter(Mandatory = $true)]
-        [string]$RelativePath,
-
-        [Parameter(Mandatory = $true)]
-        [string]$ExpectedVersion,
-
-        [Parameter(Mandatory = $true)]
-        [uint32]$ExpectedFunctionCount
+        [string]$RelativePath
     )
 
     [void](& $script:scriptBlockAssertOrdinaryDirectoryEnvelope -LiteralPath $RepositoryRoot)
@@ -810,6 +804,36 @@ $script:scriptBlockAssertTrackedScriptIdentity = {
         -ObjectId $strWorkingObjectId `
         -ObjectIdLength $intObjectIdLength `
         -ExpectedObjectId $strHeadObjectId)
+
+    return $strHeadObjectId
+}
+
+$script:scriptBlockAssertTrackedScriptIdentity = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$RepositoryRoot,
+
+        [Parameter(Mandatory = $true)]
+        [string]$GitPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RelativePath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ExpectedVersion,
+
+        [Parameter(Mandatory = $true)]
+        [uint32]$ExpectedFunctionCount
+    )
+
+    $strHeadObjectId = & $script:scriptBlockAssertTrackedBlobIdentity `
+        -RepositoryRoot $RepositoryRoot `
+        -GitPath $GitPath `
+        -LiteralPath $LiteralPath `
+        -RelativePath $RelativePath
 
     $arrFileBytes = [System.IO.File]::ReadAllBytes($LiteralPath)
     $strScriptText = & $script:scriptBlockConvertFromStrictUtf8 -Bytes $arrFileBytes
@@ -3645,7 +3669,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.4
+    # Version: 1.0.20260802.5
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -3720,6 +3744,17 @@ function Invoke-StyleGuideCandidateHarness {
         -ExpectedVersion $script:strCandidateExpectedContextVersion `
         -ExpectedFunctionCount ([uint32]2))
 
+    # The catalog is the oracle. Authenticate it against HEAD, the index, and the
+    # no-filter working object before consuming a single expectation, exactly as
+    # the two production scripts are authenticated. The allocation hash binds only
+    # case IDs, semantic names, and profile names, so without this a staged or
+    # unstaged catalog edit could rewrite expected diagnostics, states, counts, or
+    # closed sets and still be accepted as the oracle.
+    [void](& $script:scriptBlockAssertTrackedBlobIdentity `
+        -RepositoryRoot $strRepositoryRoot `
+        -GitPath $strGitPath `
+        -LiteralPath $strCatalogPath `
+        -RelativePath $script:strCandidateCatalogRelativePath)
     $objCatalog = & $script:scriptBlockReadCandidateCatalog -LiteralPath $strCatalogPath
     [void](& $script:scriptBlockAssertProductionTaxonomyClosed `
         -Catalog $objCatalog `
