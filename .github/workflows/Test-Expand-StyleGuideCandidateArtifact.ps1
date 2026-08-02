@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.28
+Version: 1.0.20260802.29
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.28'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.29'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260802.15'
@@ -501,6 +501,184 @@ $script:scriptBlockAssertResourceGuardsWired = {
         if ($intObserved -lt $hashtableRule.Count) {
             & $script:scriptBlockStopHarness `
                 -Code 'catalog-invalid' -Detail 'production-resource-guard'
+        }
+    }
+}
+
+$script:scriptBlockAssertResourceGuardsReached = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RunRoot
+    )
+
+    # The assertion above proves each guard is named in an executable command
+    # with the right parameters and accumulators. It cannot prove that command
+    # ever runs. Parking a call inside a branch whose condition is constantly
+    # false, or after a return, or in a script block nothing invokes, satisfies
+    # every structural check while the guard never executes -- and inlining the
+    # guard's body at the call site keeps the catalog green, because the
+    # observable diagnostics are unchanged. That was the sixth way this file's
+    # wiring check has been satisfied without the wiring being real.
+    #
+    # Structure cannot settle this question: parseable is not reachable, and no
+    # amount of pattern matching over an unexecuted tree becomes evidence of
+    # execution. So this observes execution instead. For each guard, the helper
+    # is copied twice -- once verbatim, once with that guard's body replaced by
+    # a throw -- and one expansion is driven through each copy. The verbatim
+    # copy must succeed and the poisoned copy must fail. If production no longer
+    # reaches the guard, poisoning it changes nothing and both copies succeed,
+    # which is the failure this asserts.
+    #
+    # The two checks answer different questions and neither subsumes the other.
+    # Poisoning a guard poisons every one of its call sites at once, so this
+    # proves at least one runs, not how many; the structural check is what pins
+    # the call count and the accumulator each site carries forward.
+    $arrGuardName = [string[]]@(
+        'scriptBlockAddCandidateHelperDeclaredLength',
+        'scriptBlockAddCandidateHelperActualLength'
+    )
+
+    $objTokens = $null
+    $objParseErrors = $null
+    $objScriptAst = [System.Management.Automation.Language.Parser]::ParseFile(
+        $LiteralPath,
+        [ref]$objTokens,
+        [ref]$objParseErrors
+    )
+    if ($null -eq $objScriptAst -or @($objParseErrors).Count -ne 0) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'production-resource-guard-reached'
+    }
+    $strSource = [System.IO.File]::ReadAllText($LiteralPath)
+    $objEncoding = New-Object System.Text.UTF8Encoding($false)
+
+    $strProbeRoot = [System.IO.Path]::Combine($RunRoot, 'resource-guard-reached')
+    [void][System.IO.Directory]::CreateDirectory($strProbeRoot)
+    $strCheckoutRoot = [System.IO.Path]::Combine($strProbeRoot, 'checkout')
+    [void][System.IO.Directory]::CreateDirectory($strCheckoutRoot)
+    $strTrustedRoot = [System.IO.Path]::Combine($strProbeRoot, 'trusted')
+    [void][System.IO.Directory]::CreateDirectory($strTrustedRoot)
+
+    # A throw with no diagnostic code of its own. The helper maps it through its
+    # own taxonomy, so this deliberately asserts only that the expansion failed,
+    # never which text came back -- tying the check to a wrapped message would
+    # make it a source-shaped assertion again.
+    $strStubBody = "{`n" +
+        "    param (`n" +
+        "        [Parameter(ValueFromRemainingArguments = `$true)]`n" +
+        "        [AllowNull()]`n" +
+        "        [AllowEmptyCollection()]`n" +
+        "        [object[]]`$Ignored`n" +
+        "    )`n`n" +
+        "    throw (New-Object System.InvalidOperationException('guard-reached-probe'))`n" +
+        "}`n"
+
+    foreach ($strGuardName in $arrGuardName) {
+        $arrAssignment = @($objScriptAst.FindAll(
+            {
+                param ($objNode)
+                $objNode -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                    $objNode.Left -is
+                        [System.Management.Automation.Language.VariableExpressionAst] -and
+                    $objNode.Left.VariablePath.UserPath -ceq ('script:' + $strGuardName)
+            },
+            $true
+        ))
+        if ($arrAssignment.Count -ne 1) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' -Detail 'production-resource-guard-reached'
+        }
+        $objDefinition = $arrAssignment[0].Right
+        $strPoisoned = $strSource.Substring(0, $objDefinition.Extent.StartOffset) +
+            $strStubBody +
+            $strSource.Substring($objDefinition.Extent.EndOffset)
+
+        $strVerbatimPath = [System.IO.Path]::Combine(
+            $strProbeRoot,
+            'verbatim-' + $strGuardName + '.ps1'
+        )
+        $strPoisonedPath = [System.IO.Path]::Combine(
+            $strProbeRoot,
+            'poisoned-' + $strGuardName + '.ps1'
+        )
+        [System.IO.File]::WriteAllText($strVerbatimPath, $strSource, $objEncoding)
+        [System.IO.File]::WriteAllText($strPoisonedPath, $strPoisoned, $objEncoding)
+
+        $hashtableOutcome = @{}
+        foreach ($strVariant in @('verbatim', 'poisoned')) {
+            $strVariantPath = if ($strVariant -ceq 'verbatim') {
+                $strVerbatimPath
+            } else {
+                $strPoisonedPath
+            }
+            $objProbeContext = New-StyleGuideCandidateInvocationContext `
+                -TrustedTemporaryRoot $strTrustedRoot
+            $strArchivePath = [System.IO.Path]::Combine(
+                $objProbeContext.DownloadDirectoryPath,
+                'artifact.zip'
+            )
+            $objArchive = [System.IO.Compression.ZipFile]::Open(
+                $strArchivePath,
+                [System.IO.Compression.ZipArchiveMode]::Create
+            )
+            try {
+                foreach ($strEntryName in @(
+                    'copilot-instructions.md',
+                    'powershell.instructions.md',
+                    'STYLE_GUIDE_CHAT.md',
+                    'STYLE_GUIDE_FULL.md'
+                )) {
+                    $objEntry = $objArchive.CreateEntry($strEntryName)
+                    $objEntryWriter = New-Object System.IO.StreamWriter($objEntry.Open())
+                    try {
+                        $objEntryWriter.Write('# ' + $strEntryName)
+                    } finally {
+                        $objEntryWriter.Dispose()
+                    }
+                }
+            } finally {
+                $objArchive.Dispose()
+            }
+            $objSha256 = [System.Security.Cryptography.SHA256]::Create()
+            try {
+                $objArchiveStream = [System.IO.File]::OpenRead($strArchivePath)
+                try {
+                    $strExpectedDigest = (
+                        [System.BitConverter]::ToString(
+                            $objSha256.ComputeHash($objArchiveStream)
+                        ) -replace '-', ''
+                    ).ToLowerInvariant()
+                } finally {
+                    $objArchiveStream.Dispose()
+                }
+            } finally {
+                $objSha256.Dispose()
+            }
+
+            $boolSucceeded = $false
+            try {
+                [void](& $strVariantPath `
+                    -Context $objProbeContext `
+                    -CheckoutRoot $strCheckoutRoot `
+                    -TrustedTemporaryRoot $strTrustedRoot `
+                    -DownloadDirectory $objProbeContext.DownloadDirectoryPath `
+                    -CandidateDirectory $objProbeContext.CandidatePath `
+                    -ExpectedDigest $strExpectedDigest)
+                $boolSucceeded = $true
+            } catch {
+                $boolSucceeded = $false
+            }
+            $hashtableOutcome[$strVariant] = $boolSucceeded
+        }
+
+        # Verbatim must succeed, or the probe proves nothing about the poison.
+        # Poisoned must fail, or production never reached the guard.
+        if (-not $hashtableOutcome['verbatim'] -or $hashtableOutcome['poisoned']) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' -Detail 'production-resource-guard-reached'
         }
     }
 }
@@ -4255,7 +4433,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.28
+    # Version: 1.0.20260802.29
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -4421,6 +4599,9 @@ function Invoke-StyleGuideCandidateHarness {
             -Catalog $objCatalog `
             -RunRoot $strRunRoot
         & $script:scriptBlockAssertLifecycleRecordStatesRejected -RunRoot $strRunRoot
+        & $script:scriptBlockAssertResourceGuardsReached `
+            -LiteralPath $strHelperLiteralPath `
+            -RunRoot $strRunRoot
         & $script:scriptBlockAssertUnauthorizedSkipsRejected `
             -Catalog $objCatalog `
             -OperatingSystem $strOperatingSystem `
