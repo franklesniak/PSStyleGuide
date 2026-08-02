@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260802.7
+Version: 1.0.20260802.8
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260802.7'
+$script:versionCandidateHelper = [System.Version]'1.0.20260802.8'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.5'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -804,6 +804,44 @@ $script:scriptBlockTestCandidateHelperEntryPresent = {
     return $intMatches -eq 1
 }
 
+$script:scriptBlockGetCandidateHelperIdentityChain = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath
+    )
+
+    # Lexical comparison cannot see two spellings that name the same directory,
+    # such as a same-filesystem bind alias, and device alone cannot either
+    # because an alias shares it. Inode is what separates them. The chain holds
+    # every ancestor identity, so an alias of an ancestor is caught as well as
+    # an alias of the path itself. Windows returns an empty chain; the identity
+    # rule there is not implemented and the lexical rules still apply.
+    $listIdentity = New-Object 'System.Collections.Generic.List[string]'
+    if ($env:OS -eq 'Windows_NT') {
+        return ,[string[]]$listIdentity.ToArray()
+    }
+    $arrStatCommands = @(Get-Command -Name 'stat' `
+        -CommandType Application -ErrorAction SilentlyContinue)
+    if ($arrStatCommands.Count -lt 1) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'root-invalid' -Phase 'root' -Subreason 'identity'
+    }
+    $strStatPath = [string]$arrStatCommands[0].Source
+    $objCurrent = New-Object System.IO.DirectoryInfo($LiteralPath)
+    while ($null -ne $objCurrent) {
+        $arrStatus = @(& $strStatPath '-Lc' '%d:%i' '--' $objCurrent.FullName 2>$null)
+        if ($LASTEXITCODE -ne 0 -or $arrStatus.Count -ne 1 -or
+            $arrStatus[0] -notmatch '^[0-9]+:[0-9]+$') {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'root-invalid' -Phase 'root' -Subreason 'identity'
+        }
+        $listIdentity.Add([string]$arrStatus[0])
+        $objCurrent = $objCurrent.Parent
+    }
+    # The unary comma keeps a single-element chain an array.
+    return ,[string[]]$listIdentity.ToArray()
+}
+
 $script:scriptBlockAssertCandidateHelperDirectoryEnvelope = {
     param (
         [Parameter(Mandatory = $true)]
@@ -1003,7 +1041,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.7
+    # Version: 1.0.20260802.8
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1535,6 +1573,22 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
             -Root $strTrustedPath `
             -Candidate $strCheckoutPath
         if ($boolRootsEqual -or $boolCheckoutContainsTrusted -or $boolTrustedContainsCheckout) {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'root-invalid' -Phase 'root' -Subreason 'overlap'
+        }
+
+        # The checks above are string comparisons, so two different spellings of
+        # the same directory pass them. Compare filesystem identity as well:
+        # equal identity means the same directory, and finding one root's
+        # identity anywhere in the other's ancestor chain means one contains the
+        # other however it was spelled.
+        $arrCheckoutIdentity = & $script:scriptBlockGetCandidateHelperIdentityChain `
+            -LiteralPath $strCheckoutPath
+        $arrTrustedIdentity = & $script:scriptBlockGetCandidateHelperIdentityChain `
+            -LiteralPath $strTrustedPath
+        if ($arrCheckoutIdentity.Count -gt 0 -and $arrTrustedIdentity.Count -gt 0 -and
+            ($arrTrustedIdentity -ccontains $arrCheckoutIdentity[0] -or
+                $arrCheckoutIdentity -ccontains $arrTrustedIdentity[0])) {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'root-invalid' -Phase 'root' -Subreason 'overlap'
         }
