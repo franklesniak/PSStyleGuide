@@ -1,6 +1,6 @@
 {
   "SchemaVersion": 1,
-  "CatalogVersion": "1.0.20260802.3",
+  "CatalogVersion": "1.0.20260802.4",
   "CaseCount": 110,
   "CaseIdPattern": "^PS-P1A-[A-Z]+-[0-9]{2}$",
   "SemanticCasePattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$",
@@ -1658,18 +1658,18 @@
       "InitialState": "Active",
       "ExpectedResult": "rejection",
       "ExpectedStatus": "failed",
-      "ExpectedPhase": "cleanup",
+      "ExpectedPhase": "post-extraction",
       "ExpectedSubreason": "primary-and-cleanup",
-      "ExpectedDiagnosticCode": "cleanup-owned-entry-uncertain",
+      "ExpectedDiagnosticCode": "post-extraction-invalid",
       "ExpectedPreCleanupState": "Active",
       "ExpectedCleanupSequence": "helper-context",
-      "ExpectedCandidateFinalState": "RetainedUncertain",
-      "ExpectedContextFinalState": "CleanupFailed",
-      "ExpectedFilesystemCallCount": 2,
+      "ExpectedCandidateFinalState": "Absent",
+      "ExpectedContextFinalState": "Disposed",
+      "ExpectedFilesystemCallCount": 0,
       "ExpectedSentinelState": "intact",
       "ExpectedSourceState": "unchanged",
-      "FixtureLength": 607,
-      "FixtureSha256": "7ccc1a6f4f0250a8bc7ee7fddf67f1b90b782d85c3b0cffa30c0fa130a888406"
+      "FixtureLength": 584,
+      "FixtureSha256": "aa2e3c9e7069f602cabe94ad2645d10b4bd237bea9073e563144ce5d7440d41b"
     },
     {
       "CaseId": "PS-P1A-C-01",

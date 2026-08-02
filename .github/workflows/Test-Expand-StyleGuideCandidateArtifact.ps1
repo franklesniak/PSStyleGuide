@@ -31,7 +31,7 @@ None. The script writes one JSON object per case to the success stream and
 uses its process exit code to report the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.7
+Version: 1.0.20260802.8
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,12 +53,12 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.7'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.8'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260802.5'
 $script:strCandidateExpectedContextVersion = '1.0.20260802.3'
-$script:strCandidateCatalogVersion = '1.0.20260802.3'
+$script:strCandidateCatalogVersion = '1.0.20260802.4'
 $script:strCandidateAllocationSha256 = 'ce7b29de7bb4812f1de9defb1672c1b7eac47d6f6b584db571a9bc0d86726e02'
 $script:strCandidateHelperRelativePath = '.github/workflows/Expand-StyleGuideCandidateArtifact.ps1'
 $script:strCandidateContextRelativePath = '.github/workflows/Manage-StyleGuideCandidateInvocationContext.ps1'
@@ -3210,6 +3210,98 @@ $script:scriptBlockInvokeHelperCleanupFixture = {
     $objContext = $null
     try {
         $strSemantic = [string]$Case.SemanticCase
+        if ($strSemantic -ceq 'helper.cleanup.primary-and-cleanup-failure') {
+            # Drive a real expansion failure and prove the primary diagnostic
+            # survives the cleanup transition instead of being replaced by it.
+            # A candidate file carrying a carriage return is rejected in
+            # post-extraction, past the parameter phase, so the helper runs its
+            # production cleanup and aggregates the cleanup category alongside
+            # the primary failure.
+            #
+            # Issue #146 states this row's oracle as both failures surviving.
+            # The candidate-cleanup leg cannot be made to fail here: every
+            # candidate-cleanup failure requires the candidate directory to
+            # diverge from the journal between extraction and the helper's own
+            # cleanup, inside one call, which needs the competing writer the
+            # issue lists as a non-goal. This asserts the reachable half - that
+            # cleanup never overwrites or suppresses the primary failure - and
+            # the retained-uncertainty half stays covered by K-01 and K-02.
+            $objContext = New-StyleGuideCandidateInvocationContext `
+                -TrustedTemporaryRoot $hashtableLayout.Trusted
+            $objObservation.InvocationId = $objContext.InvocationId
+            $objObservation.PreCleanupState = 'Active'
+            $strArchivePath = [System.IO.Path]::Combine(
+                $objContext.DownloadDirectoryPath,
+                'candidate-artifact.bin'
+            )
+            $hashtableEvidence = & $script:scriptBlockNewZipFixture `
+                -LiteralPath $strArchivePath `
+                -SemanticCase 'output.bytes.cr'
+            $objObservation.FixtureLength = [uint64]$hashtableEvidence.Length
+            $objObservation.FixtureSha256 = [string]$hashtableEvidence.Sha256
+
+            $objPrimaryError = $null
+            try {
+                [void](& $HelperLiteralPath `
+                    -Context $objContext `
+                    -CheckoutRoot $hashtableLayout.Checkout `
+                    -TrustedTemporaryRoot $hashtableLayout.Trusted `
+                    -DownloadDirectory $objContext.DownloadDirectoryPath `
+                    -CandidateDirectory $objContext.CandidatePath `
+                    -ExpectedDigest $hashtableEvidence.Sha256)
+            } catch {
+                $objPrimaryError = $_
+            }
+            if ($null -eq $objPrimaryError) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'fixture-failed' -Detail 'composite-accepted'
+            }
+
+            $strPrimaryCode = & $script:scriptBlockGetProductionFailureField `
+                -ErrorRecord $objPrimaryError `
+                -Key 'PSStyleGuideDiagnosticCode' `
+                -Fallback 'none'
+            $strPrimaryPhase = & $script:scriptBlockGetProductionFailureField `
+                -ErrorRecord $objPrimaryError `
+                -Key 'PSStyleGuidePhase' `
+                -Fallback 'none'
+            $strCompositeCleanupCode = & $script:scriptBlockGetProductionFailureField `
+                -ErrorRecord $objPrimaryError `
+                -Key 'PSStyleGuideCleanupCode' `
+                -Fallback 'none'
+            # The primary failure must still be the one reported, and the
+            # cleanup category must ride alongside it as its own value. A
+            # missing cleanup code, or one that has taken the primary's place,
+            # is the regression this row exists to catch.
+            if ($strPrimaryCode -cne 'post-extraction-invalid' -or
+                $strPrimaryPhase -cne 'post-extraction' -or
+                $strCompositeCleanupCode -ceq 'none' -or
+                $strCompositeCleanupCode -ceq $strPrimaryCode) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'fixture-failed' -Detail 'composite-evidence'
+            }
+
+            # The terminal repeat is the observable cleanup result on this path.
+            $objCleanupResult = Remove-StyleGuideCandidateInvocationState -Context $objContext
+            $objObservation.Result = 'rejection'
+            $objObservation.Status = 'failed'
+            $objObservation.Phase = $strPrimaryPhase
+            $objObservation.Subreason = 'primary-and-cleanup'
+            $objObservation.DiagnosticCode = $strPrimaryCode
+            $objObservation.CleanupSequence = 'helper-context'
+            $objObservation.ContextFinalState = [string]$objContext.LifecycleState
+            $objObservation.FilesystemCallCount = [uint32]$objCleanupResult.FilesystemCallCount
+            $objObservation.CandidateFinalState = if (
+                [System.IO.Directory]::Exists($objContext.CandidatePath) -or
+                [System.IO.File]::Exists($objContext.CandidatePath)
+            ) {
+                'RetainedUncertain'
+            } else {
+                'Absent'
+            }
+            return $objObservation
+        }
+
         $hashtableExpanded = & $script:scriptBlockNewExpandedFixture `
             -Layout $hashtableLayout `
             -HelperLiteralPath $HelperLiteralPath
@@ -3220,19 +3312,12 @@ $script:scriptBlockInvokeHelperCleanupFixture = {
         $objObservation.PreCleanupState = 'Active'
         $strSubreason = 'succeeded'
 
-        if ($strSemantic -in @(
-            'helper.cleanup.unjournaled-entry',
-            'helper.cleanup.primary-and-cleanup-failure'
-        )) {
+        if ($strSemantic -ceq 'helper.cleanup.unjournaled-entry') {
             [System.IO.File]::WriteAllBytes(
                 [System.IO.Path]::Combine($objContext.CandidatePath, 'unexpected.bin'),
                 [byte[]](0x78)
             )
-            $strSubreason = if ($strSemantic -ceq 'helper.cleanup.unjournaled-entry') {
-                'candidate-cardinality'
-            } else {
-                'primary-and-cleanup'
-            }
+            $strSubreason = 'candidate-cardinality'
         } elseif ($strSemantic -ceq 'helper.cleanup.link-substitution') {
             $objFileRecord = @($objContext.OwnershipJournal | Where-Object {
                 $_.Kind -ceq 'CandidateFile'
@@ -3709,7 +3794,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.7
+    # Version: 1.0.20260802.8
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
