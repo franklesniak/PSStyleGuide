@@ -31,7 +31,7 @@ None. The script writes one JSON object per case to the success stream and
 uses its process exit code to report the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.13
+Version: 1.0.20260802.14
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.13'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.14'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260802.7'
@@ -3302,13 +3302,20 @@ $script:scriptBlockInvokeHelperCleanupFixture = {
             # the primary failure.
             #
             # Issue #146 states this row's oracle as both failures surviving.
-            # The candidate-cleanup leg cannot be made to fail here: every
-            # candidate-cleanup failure requires the candidate directory to
-            # diverge from the journal between extraction and the helper's own
-            # cleanup, inside one call, which needs the competing writer the
-            # issue lists as a non-goal. This asserts the reachable half - that
-            # cleanup never overwrites or suppresses the primary failure - and
-            # the retained-uncertainty half stays covered by K-01 and K-02.
+            # Stated plainly, this row does not deliver that oracle, and the
+            # assertions below do not pretend otherwise. The candidate-cleanup
+            # leg cannot be made to fail here: every candidate-cleanup failure
+            # requires the candidate directory to diverge from the journal
+            # between extraction and the helper's own cleanup, inside one call,
+            # which needs the competing writer the issue lists as a non-goal.
+            #
+            # What this row does prove is that the primary failure survives the
+            # cleanup transition and that the cleanup category is carried as its
+            # own separately readable value with its own exact outcome. The
+            # retained-uncertainty half stays covered by K-01 and K-02. The
+            # conflict between this row's oracle and the issue's non-goal is
+            # tracked in issue #154 and needs an issue-level decision, not a
+            # harness workaround.
             $objContext = New-StyleGuideCandidateInvocationContext `
                 -TrustedTemporaryRoot $hashtableLayout.Trusted
             $objObservation.InvocationId = $objContext.InvocationId
@@ -3356,10 +3363,16 @@ $script:scriptBlockInvokeHelperCleanupFixture = {
             # cleanup category must ride alongside it as its own value. A
             # missing cleanup code, or one that has taken the primary's place,
             # is the regression this row exists to catch.
+            # The cleanup leg reachable here succeeds, so its code is pinned to
+            # that exact value rather than to "anything that is not the primary
+            # code." Accepting any non-primary value let a success code stand in
+            # for a failure code, which is the whole distinction this row is
+            # supposed to police. Pinning it means a regression that drops the
+            # cleanup field, overwrites it with the primary code, or changes the
+            # cleanup outcome all fail here.
             if ($strPrimaryCode -cne 'post-extraction-invalid' -or
                 $strPrimaryPhase -cne 'post-extraction' -or
-                $strCompositeCleanupCode -ceq 'none' -or
-                $strCompositeCleanupCode -ceq $strPrimaryCode) {
+                $strCompositeCleanupCode -cne 'cleanup-succeeded') {
                 & $script:scriptBlockStopHarness `
                     -Code 'fixture-failed' -Detail 'composite-evidence'
             }
@@ -3908,7 +3921,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.13
+    # Version: 1.0.20260802.14
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
