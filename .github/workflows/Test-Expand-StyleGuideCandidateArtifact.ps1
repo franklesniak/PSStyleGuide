@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.36
+Version: 1.0.20260802.37
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.36'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.37'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260802.20'
@@ -796,13 +796,17 @@ $script:scriptBlockAssertResourceGuardsReached = {
     # inlined, and a decoy left behind to satisfy this.
     #
     # How often the guard runs is what separates those. Each guard is invoked
-    # once per manifest entry or per read chunk, so a manifest of four entries
-    # drives each of these at least four times, and the decoy can only produce
-    # one. The count is what the decoy cannot forge without doing the work.
+    # once per manifest entry or per read chunk, so the fixture's own entry
+    # count is the floor, and the decoy can only produce one. The count is what
+    # the decoy cannot forge without doing the work it was removed to avoid.
+    #
+    # The floor is read from the fixture rather than written as a number, so a
+    # change to what the probe archive contains cannot silently weaken it.
+    $intFixtureEntryCount = @($script:arrCandidateExpectedName).Count
     $hashtableRequiredSite = [ordered]@{
-        'declared' = 4
-        'actual:manifest' = 4
-        'actual:extraction' = 4
+        'declared' = $intFixtureEntryCount
+        'actual:manifest' = $intFixtureEntryCount
+        'actual:extraction' = $intFixtureEntryCount
     }
     if ($hashtableObservedSite.Count -ne $hashtableRequiredSite.Count) {
         & $script:scriptBlockStopHarness `
@@ -4568,7 +4572,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.36
+    # Version: 1.0.20260802.37
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
