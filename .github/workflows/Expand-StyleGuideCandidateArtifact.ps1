@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260802.10
+Version: 1.0.20260802.11
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260802.10'
+$script:versionCandidateHelper = [System.Version]'1.0.20260802.11'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.6'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -870,29 +870,66 @@ $script:scriptBlockGetCandidateHelperMountResolvedPath = {
         & $script:scriptBlockStopCandidateHelperOperation `
             -Code 'root-invalid' -Phase 'root' -Subreason 'mount'
     }
-    $strBestMountPoint = $null
-    $strBestDevice = $null
-    $strBestFsRoot = $null
+    # Parse first, decide second. Line order in mountinfo does not track
+    # visibility: MS_MOVE can place the visible record before the one it
+    # hides, so picking the later line can select a hidden filesystem root.
+    $listCandidate = New-Object 'System.Collections.Generic.List[object]'
+    $objParentIdentifiers = New-Object 'System.Collections.Generic.HashSet[string]' (
+        [System.StringComparer]::Ordinal
+    )
     foreach ($strLine in $arrMountLines) {
         $arrFields = $strLine.Split(' ')
         if ($arrFields.Count -lt 5) {
             continue
         }
-        $strDevice = & $script:scriptBlockExpandCandidateHelperMountField -Value $arrFields[2]
-        $strFsRoot = & $script:scriptBlockExpandCandidateHelperMountField -Value $arrFields[3]
         $strMountPoint = & $script:scriptBlockExpandCandidateHelperMountField -Value $arrFields[4]
         if (-not (& $script:scriptBlockTestCandidateHelperPathPrefix `
                 -Prefix $strMountPoint -Path $LiteralPath)) {
             continue
         }
-        # Longest mount point wins, and a later entry shadows an earlier one at
-        # the same point, which is how the kernel resolves overmounts.
-        if ($null -eq $strBestMountPoint -or
-            $strMountPoint.Length -ge $strBestMountPoint.Length) {
-            $strBestMountPoint = $strMountPoint
-            $strBestDevice = $strDevice
-            $strBestFsRoot = $strFsRoot
+        $listCandidate.Add([pscustomobject][ordered]@{
+            MountId = [string]$arrFields[0]
+            ParentId = [string]$arrFields[1]
+            Device = & $script:scriptBlockExpandCandidateHelperMountField -Value $arrFields[2]
+            FsRoot = & $script:scriptBlockExpandCandidateHelperMountField -Value $arrFields[3]
+            MountPoint = $strMountPoint
+        })
+    }
+    $intLongest = -1
+    foreach ($objCandidate in $listCandidate) {
+        if ($objCandidate.MountPoint.Length -gt $intLongest) {
+            $intLongest = $objCandidate.MountPoint.Length
         }
+    }
+    # Only the deepest mount point can govern this path. Within that group,
+    # mounting B over A records B.ParentId as A.MountId, so the visible mount
+    # is the one no sibling at the same point claims as its parent.
+    foreach ($objCandidate in $listCandidate) {
+        if ($objCandidate.MountPoint.Length -eq $intLongest) {
+            [void]$objParentIdentifiers.Add($objCandidate.ParentId)
+        }
+    }
+    $strBestMountPoint = $null
+    $strBestDevice = $null
+    $strBestFsRoot = $null
+    $intVisibleCount = 0
+    foreach ($objCandidate in $listCandidate) {
+        if ($objCandidate.MountPoint.Length -ne $intLongest) {
+            continue
+        }
+        if ($objParentIdentifiers.Contains($objCandidate.MountId)) {
+            continue
+        }
+        $intVisibleCount++
+        $strBestMountPoint = $objCandidate.MountPoint
+        $strBestDevice = $objCandidate.Device
+        $strBestFsRoot = $objCandidate.FsRoot
+    }
+    # Exactly one record in the group must be unclaimed. Anything else means
+    # the topology was not understood, which fails closed rather than guessing.
+    if ($intVisibleCount -ne 1) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'root-invalid' -Phase 'root' -Subreason 'mount'
     }
     if ($null -eq $strBestMountPoint) {
         & $script:scriptBlockStopCandidateHelperOperation `
@@ -1151,7 +1188,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.10
+    # Version: 1.0.20260802.11
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1475,9 +1512,9 @@ $script:scriptBlockReadCandidateHelperValidatedFile = {
                 [void]$objSha256.TransformBlock($arrBuffer, 0, $intRead, $null, 0)
             }
             [void]$objSha256.TransformFinalBlock((New-Object byte[] 0), 0, 0)
-        $strActualSha256 = (
-            [System.BitConverter]::ToString($objSha256.Hash) -replace '-', ''
-        ).ToLowerInvariant()
+            $strActualSha256 = (
+                [System.BitConverter]::ToString($objSha256.Hash) -replace '-', ''
+            ).ToLowerInvariant()
         } finally {
             $objSha256.Dispose()
         }

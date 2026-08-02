@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.21
+Version: 1.0.20260802.22
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,10 +53,10 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.21'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.22'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260802.10'
+$script:strCandidateExpectedHelperVersion = '1.0.20260802.11'
 $script:strCandidateExpectedContextVersion = '1.0.20260802.6'
 $script:strCandidateCatalogVersion = '1.0.20260802.4'
 $script:strCandidateAllocationSha256 = 'ce7b29de7bb4812f1de9defb1672c1b7eac47d6f6b584db571a9bc0d86726e02'
@@ -409,15 +409,24 @@ $script:scriptBlockAssertResourceGuardsWired = {
     $hashtableRequiredInvocation = [ordered]@{
         'scriptBlockAddCandidateHelperDeclaredLength' = [ordered]@{
             Count = 1
-            Accumulator = [string[]]@('CurrentTotal')
             Required = [string[]]@('CurrentTotal', 'DeclaredLength')
+            # A variable-shaped argument is not enough: a decoy initialised once
+            # to zero is still a variable. Each accumulator must be the exact
+            # running total production carries forward, so changing the wiring
+            # has to change this table too.
+            Accumulator = [ordered]@{
+                CurrentTotal = [string[]]@('uintDeclaredTotal')
+            }
         }
         'scriptBlockAddCandidateHelperActualLength' = [ordered]@{
             Count = 2
-            Accumulator = [string[]]@('CurrentEntryLength', 'CurrentTotalLength')
             Required = [string[]]@(
                 'CurrentEntryLength', 'CurrentTotalLength', 'ReadLength', 'DeclaredEntryLength'
             )
+            Accumulator = [ordered]@{
+                CurrentEntryLength = [string[]]@('uintEvidenceLength', 'uintEntryActual')
+                CurrentTotalLength = [string[]]@('uintEvidenceTotal', 'uintActualTotal')
+            }
         }
     }
     $arrLines = $strText.Split([char]10)
@@ -446,8 +455,14 @@ $script:scriptBlockAssertResourceGuardsWired = {
                         -Code 'catalog-invalid' -Detail 'production-resource-guard'
                 }
             }
-            foreach ($strParameter in $hashtableRule.Accumulator) {
-                if ($strInvocation -notmatch ('-' + $strParameter + '\s+\$[A-Za-z0-9_]+')) {
+            foreach ($strParameter in $hashtableRule.Accumulator.Keys) {
+                $boolAccumulatorBound = $false
+                foreach ($strVariable in $hashtableRule.Accumulator[$strParameter]) {
+                    if ($strInvocation -cmatch ('-' + $strParameter + '\s+\$' + $strVariable + '\b')) {
+                        $boolAccumulatorBound = $true
+                    }
+                }
+                if (-not $boolAccumulatorBound) {
                     & $script:scriptBlockStopHarness `
                         -Code 'catalog-invalid' -Detail 'production-resource-guard'
                 }
@@ -4049,7 +4064,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.21
+    # Version: 1.0.20260802.22
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
