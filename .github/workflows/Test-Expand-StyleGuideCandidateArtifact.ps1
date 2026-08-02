@@ -31,7 +31,7 @@ None. The script writes one JSON object per case to the success stream and
 uses its process exit code to report the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.12
+Version: 1.0.20260802.13
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.12'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.13'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260802.7'
@@ -3820,6 +3820,37 @@ $script:scriptBlockInvokeScriptIdentityFixture = {
             $objIdentityError = $_
         }
 
+        # An expected rejection is satisfied only by the refusal that case
+        # exists to prove. A fixture-failed error from repository setup or
+        # mutation, or any unrelated exception, reaches the same catch, and
+        # relabelling it as the intended rejection lets the case pass without
+        # exercising the check at all. Five semantics are refused by the raw
+        # path grammar before any Git work and so carry 'parameter'; every
+        # other identity semantic must reach the identity proof itself.
+        if ($boolRejected) {
+            $strRequiredHarnessCode = switch -CaseSensitive ($strSemantic) {
+                'script.helper.path-wildcard' { 'parameter' }
+                'script.context.path-wildcard' { 'parameter' }
+                'script.helper.nonfilesystem-provider' { 'parameter' }
+                'script.helper.raw-array' { 'parameter' }
+                'script.context.raw-object' { 'parameter' }
+                default { 'script-identity-invalid' }
+            }
+            $strObservedHarnessCode = ''
+            if ($null -ne $objIdentityError.Exception -and
+                $null -ne $objIdentityError.Exception.Data -and
+                $objIdentityError.Exception.Data.Contains('PSStyleGuideHarnessCode')) {
+                $objObservedCode = $objIdentityError.Exception.Data['PSStyleGuideHarnessCode']
+                if ($null -ne $objObservedCode -and
+                    $objObservedCode.GetType() -eq [System.String]) {
+                    $strObservedHarnessCode = [string]$objObservedCode
+                }
+            }
+            if ($strObservedHarnessCode -cne $strRequiredHarnessCode) {
+                throw $objIdentityError
+            }
+        }
+
         if ($boolExpectedSuccess -and $boolRejected) {
             throw $objIdentityError
         }
@@ -3877,7 +3908,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.12
+    # Version: 1.0.20260802.13
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
