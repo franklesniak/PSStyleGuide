@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260802.20
+Version: 1.0.20260802.21
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260802.20'
+$script:versionCandidateHelper = [System.Version]'1.0.20260802.21'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.9'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -941,19 +941,43 @@ $script:scriptBlockAssertCandidateHelperArchiveEntryCount = {
     $arrRecordHead = New-Object byte[] 46
     $intRecordCount = 0
     while ($lngPosition -lt $lngTrailerPosition -and $intRecordCount -le 4) {
-        if (($lngTrailerPosition - $lngPosition) -lt 46) {
+        # A record head is 46 bytes, except the optional digital-signature
+        # record, whose head is 6. Read what is available up to 46 so the short
+        # record can be recognized, and require at least its 6 bytes.
+        $lngAvailable = $lngTrailerPosition - $lngPosition
+        if ($lngAvailable -lt 6) {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'manifest-invalid' -Phase 'manifest' -Subreason 'entry-count'
         }
+        $intHeadWanted = [int][System.Math]::Min([int64]46, $lngAvailable)
         $Stream.Position = $lngPosition
         $intHeadFilled = 0
-        while ($intHeadFilled -lt 46) {
-            $intHeadRead = $Stream.Read($arrRecordHead, $intHeadFilled, 46 - $intHeadFilled)
+        while ($intHeadFilled -lt $intHeadWanted) {
+            $intHeadRead = $Stream.Read(
+                $arrRecordHead, $intHeadFilled, $intHeadWanted - $intHeadFilled)
             if ($intHeadRead -le 0) {
                 & $script:scriptBlockStopCandidateHelperOperation `
                     -Code 'manifest-invalid' -Phase 'manifest' -Subreason 'entry-count'
             }
             $intHeadFilled += $intHeadRead
+        }
+        # A central directory may legally end with a digital-signature record.
+        # It creates no entry and cannot weaken the four-entry bound, so
+        # treating its signature as a fifth file header would reject an archive
+        # that is valid and within the manifest. Skip it by its own declared
+        # length, count nothing for it, and let the exact-landing check below
+        # confirm it accounted for the rest of the span.
+        if ($arrRecordHead[0] -eq 0x50 -and $arrRecordHead[1] -eq 0x4B -and
+            $arrRecordHead[2] -eq 0x05 -and $arrRecordHead[3] -eq 0x05) {
+            $lngSignatureLength = [int64]$arrRecordHead[4] -bor
+                ([int64]$arrRecordHead[5] -shl 8)
+            $lngPosition = $lngPosition + 6 + $lngSignatureLength
+            continue
+        }
+        # Anything that is not the signature record must be a full file header.
+        if ($intHeadWanted -lt 46) {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'manifest-invalid' -Phase 'manifest' -Subreason 'entry-count'
         }
         if ($arrRecordHead[0] -ne 0x50 -or $arrRecordHead[1] -ne 0x4B -or
             $arrRecordHead[2] -ne 0x01 -or $arrRecordHead[3] -ne 0x02) {
@@ -1416,7 +1440,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.20
+    # Version: 1.0.20260802.21
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1696,27 +1720,44 @@ $script:scriptBlockTestCandidateHelperRootsShareStorage = {
     #
     # Nothing is written outside the trusted root, and the checkout is only ever
     # read, so a read-only checkout is unaffected.
-    # The sentinel goes in storage this invocation created, not in the caller's
-    # trusted parent. Creating a file directly in that parent is a permission
-    # this code never otherwise needs: a Windows ACL can grant create-folder
-    # there and deny create-file, which context creation satisfies because it
-    # only makes the invocation root, and which a probe writing to the parent
-    # would turn into a rejection of every valid expansion.
+    # The sentinel goes where this workflow already creates files. Neither the
+    # caller's trusted parent nor the invocation root is such a place: files
+    # are only ever written beneath the download and candidate directories, so
+    # a Windows ACL granting create-folder and denying create-file on either of
+    # the first two is a configuration the rest of the design supports, and a
+    # probe writing there would turn it into a rejection of every valid
+    # expansion. The download directory demands nothing this expansion does not
+    # already demand.
     #
-    # Testing from one level down loses nothing. Candidate state is created
-    # under the invocation root, so that is the directory whose position
-    # actually matters, and the trusted parent is still covered because the
-    # invocation root's own leaf is carried in the paths below.
+    # Testing from further down loses nothing. Candidate state is created
+    # under the invocation root, so that is the position that matters, and the
+    # directories above the sentinel are still covered because their leaves are
+    # carried in the paths below.
     $strSentinelName = 'psstyleguide-root-probe-' +
         [System.Guid]::NewGuid().ToString('N') + '.tmp'
     $strSentinelPath = [System.IO.Path]::Combine($SentinelDirectory, $strSentinelName)
-    $strSentinelLeaf = [System.IO.Path]::GetFileName(
-        $SentinelDirectory.TrimEnd(
-            $script:chrCandidateHelperDirectorySeparator,
-            $script:chrCandidateHelperAlternateSeparator
-        )
-    )
+    # Leaves between the sentinel and the trusted parent, deepest first. Each
+    # checkout ancestor is tested with every suffix of this chain, so an
+    # ancestor equal to any directory on the path to the sentinel is caught.
+    $listSentinelLeaf = New-Object 'System.Collections.Generic.List[string]'
+    $objLeafWalk = New-Object System.IO.DirectoryInfo($SentinelDirectory)
+    while ($null -ne $objLeafWalk -and
+        -not [System.String]::Equals(
+            $objLeafWalk.FullName,
+            $TrustedPath,
+            $script:objCandidateHelperPathComparison)) {
+        $listSentinelLeaf.Add([string]$objLeafWalk.Name)
+        $objLeafWalk = $objLeafWalk.Parent
+    }
     $boolShared = $false
+    # Prove the path to the sentinel is ordinary and link-free before writing
+    # through it. The context recorded these directories at creation time, and
+    # a directory replaced by a link since then would otherwise take this write
+    # outside trusted storage -- which is precisely the guarantee the probe is
+    # asserting, so it cannot be left until the later envelope check.
+    [void](& $script:scriptBlockAssertCandidateHelperDirectoryEnvelope `
+        -LiteralPath $SentinelDirectory `
+        -Phase 'root')
     try {
         try {
             [System.IO.File]::WriteAllBytes($strSentinelPath, [byte[]]@())
@@ -1737,14 +1778,20 @@ $script:scriptBlockTestCandidateHelperRootsShareStorage = {
         # Two candidates per ancestor: the ancestor may be the sentinel's own
         # directory, or the trusted parent one level above it.
         $objAncestor = New-Object System.IO.DirectoryInfo($CheckoutPath)
-        while ($null -ne $objAncestor) {
+        while ($null -ne $objAncestor -and -not $boolShared) {
+            $strSuffix = $strSentinelName
             if ([System.IO.File]::Exists(
-                    [System.IO.Path]::Combine($objAncestor.FullName, $strSentinelName)) -or
-                [System.IO.File]::Exists([System.IO.Path]::Combine(
-                    [System.IO.Path]::Combine($objAncestor.FullName, $strSentinelLeaf),
-                    $strSentinelName))) {
+                    [System.IO.Path]::Combine($objAncestor.FullName, $strSuffix))) {
                 $boolShared = $true
                 break
+            }
+            for ($intLeaf = 0; $intLeaf -lt $listSentinelLeaf.Count; $intLeaf++) {
+                $strSuffix = [System.IO.Path]::Combine($listSentinelLeaf[$intLeaf], $strSuffix)
+                if ([System.IO.File]::Exists(
+                        [System.IO.Path]::Combine($objAncestor.FullName, $strSuffix))) {
+                    $boolShared = $true
+                    break
+                }
             }
             $objAncestor = $objAncestor.Parent
         }
@@ -2090,7 +2137,7 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         if (& $script:scriptBlockTestCandidateHelperRootsShareStorage `
                 -CheckoutPath $strCheckoutPath `
                 -TrustedPath $strTrustedPath `
-                -SentinelDirectory $Context.InvocationRootPath) {
+                -SentinelDirectory $strDownloadPath) {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'root-invalid' -Phase 'root' -Subreason 'overlap'
         }

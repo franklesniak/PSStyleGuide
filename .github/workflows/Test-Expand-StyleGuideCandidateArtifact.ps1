@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.38
+Version: 1.0.20260802.39
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,10 +53,10 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.38'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.39'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260802.20'
+$script:strCandidateExpectedHelperVersion = '1.0.20260802.21'
 $script:strCandidateExpectedContextVersion = '1.0.20260802.9'
 $script:strCandidateCatalogVersion = '1.0.20260802.4'
 $script:strCandidateAllocationSha256 = 'ce7b29de7bb4812f1de9defb1672c1b7eac47d6f6b584db571a9bc0d86726e02'
@@ -2843,7 +2843,20 @@ $script:scriptBlockNewSymbolicLink = {
             $null = New-Item -ItemType $strItemType -Path $LinkPath -Target $TargetPath `
                 -ErrorAction Stop
         } else {
-            $arrOutput = @(& ln '-s' '--' $TargetPath $LinkPath 2>$null)
+            # A bare command name resolves alias, then function, then cmdlet,
+            # then application, so a defined ln in the invoking scope binds
+            # ahead of the utility. Such a command never sets $LASTEXITCODE,
+            # leaving a stale zero that reads as success, and the reparse-point
+            # check below then reports the link primitive as unavailable --
+            # which silently drops every required link case on a host that
+            # supports them. Resolve the application and invoke it by path.
+            $arrLinkCommand = @(Get-Command -Name 'ln' `
+                -CommandType Application -ErrorAction SilentlyContinue)
+            if ($arrLinkCommand.Count -lt 1) {
+                throw 'link-utility'
+            }
+            $strLinkPath = [string]$arrLinkCommand[0].Source
+            $arrOutput = @(& $strLinkPath '-s' '--' $TargetPath $LinkPath 2>$null)
             if ($LASTEXITCODE -ne 0 -or $arrOutput.Count -ne 0) {
                 throw 'link'
             }
@@ -4631,7 +4644,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.38
+    # Version: 1.0.20260802.39
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
