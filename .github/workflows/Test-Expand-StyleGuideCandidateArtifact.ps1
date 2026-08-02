@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.22
+Version: 1.0.20260802.23
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.22'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.23'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260802.11'
-$script:strCandidateExpectedContextVersion = '1.0.20260802.6'
+$script:strCandidateExpectedHelperVersion = '1.0.20260802.12'
+$script:strCandidateExpectedContextVersion = '1.0.20260802.7'
 $script:strCandidateCatalogVersion = '1.0.20260802.4'
 $script:strCandidateAllocationSha256 = 'ce7b29de7bb4812f1de9defb1672c1b7eac47d6f6b584db571a9bc0d86726e02'
 $script:strCandidateHelperRelativePath = '.github/workflows/Expand-StyleGuideCandidateArtifact.ps1'
@@ -114,7 +114,16 @@ $script:arrCandidateExpectedName = [string[]]@(
 $script:strCandidateResultTypeName = 'PSStyleGuide.CandidateCaseResult.v1'
 $script:strCandidateEmptySha256 = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
 $script:intCandidateBufferSize = 65536
-$script:objCandidatePathComparison = if ($env:OS -eq 'Windows_NT') {
+# The platform decides which comparison, path grammar, link primitive, and
+# filesystem-identity rules apply, so it must not be something a caller can
+# assert. The OS environment variable is ordinary and inheritable: exporting
+# it as Windows_NT to PowerShell 7 on Linux makes every one of those branches
+# take its Windows form, which silently disables mount and inode resolution
+# and switches path comparison to case-insensitive. OSVersion.Platform is a
+# runtime property with no environment input, and is available on both
+# Windows PowerShell 5.1 and PowerShell 7.
+$script:boolCandidateIsWindows = [System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT
+$script:objCandidatePathComparison = if ($script:boolCandidateIsWindows) {
     [System.StringComparison]::OrdinalIgnoreCase
 } else {
     [System.StringComparison]::Ordinal
@@ -692,7 +701,7 @@ $script:scriptBlockAssertOrdinaryDirectoryEnvelope = {
     # fail the device check. Resolving per component instead measured ~9.7 ms
     # against ~3.1 ms for the native call, on a loop walking every ancestor.
     $strHarnessStatPath = $null
-    if ($env:OS -ne 'Windows_NT') {
+    if (-not $script:boolCandidateIsWindows) {
         $arrHarnessStatCommands = @(Get-Command -Name 'stat' `
             -CommandType Application -ErrorAction SilentlyContinue)
         if ($arrHarnessStatCommands.Count -lt 1) {
@@ -711,7 +720,7 @@ $script:scriptBlockAssertOrdinaryDirectoryEnvelope = {
             ($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
             & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'directory-component'
         }
-        if ($env:OS -ne 'Windows_NT') {
+        if (-not $script:boolCandidateIsWindows) {
             $arrFileSystemStatus = @(& $strHarnessStatPath '-Lc' '%d' '--' `
                 $objCurrent.FullName 2>$null)
             if ($LASTEXITCODE -ne 0 -or $arrFileSystemStatus.Count -ne 1 -or
@@ -2288,7 +2297,7 @@ $script:scriptBlockNewSymbolicLink = {
             $boolTargetIsDirectory -ne $Directory) {
             throw 'link-target-type'
         }
-        if ($env:OS -eq 'Windows_NT') {
+        if ($script:boolCandidateIsWindows) {
             $strItemType = if ($Directory -and $boolTargetIsDirectory) {
                 'Junction'
             } else {
@@ -2947,7 +2956,7 @@ $script:scriptBlockInvokeExpansionFixture = {
                 '.hidden-extra'
             )
             [System.IO.File]::WriteAllBytes($strHiddenPath, [byte[]](0x78))
-            if ($env:OS -eq 'Windows_NT') {
+            if ($script:boolCandidateIsWindows) {
                 [System.IO.File]::SetAttributes(
                     $strHiddenPath,
                     [System.IO.FileAttributes]::Hidden
@@ -4064,7 +4073,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.22
+    # Version: 1.0.20260802.23
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -4176,7 +4185,7 @@ function Invoke-StyleGuideCandidateHarness {
         }
     }
 
-    $strOperatingSystem = if ($env:OS -eq 'Windows_NT') { 'Windows' } else { 'Linux' }
+    $strOperatingSystem = if ($script:boolCandidateIsWindows) { 'Windows' } else { 'Linux' }
     $strPowerShellEdition = if ($PSVersionTable.PSEdition -eq 'Desktop') {
         'Desktop'
     } else {

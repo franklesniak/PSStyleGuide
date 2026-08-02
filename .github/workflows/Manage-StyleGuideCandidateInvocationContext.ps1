@@ -21,23 +21,32 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260802.6
+Version: 1.0.20260802.7
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260802.6'
+$versionCandidateContext = [System.Version]'1.0.20260802.7'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
-$objCandidatePathComparison = if ($env:OS -eq 'Windows_NT') {
+# The platform decides which comparison, path grammar, link primitive, and
+# filesystem-identity rules apply, so it must not be something a caller can
+# assert. The OS environment variable is ordinary and inheritable: exporting
+# it as Windows_NT to PowerShell 7 on Linux makes every one of those branches
+# take its Windows form, which silently disables mount and inode resolution
+# and switches path comparison to case-insensitive. OSVersion.Platform is a
+# runtime property with no environment input, and is available on both
+# Windows PowerShell 5.1 and PowerShell 7.
+$boolCandidateIsWindows = [System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT
+$objCandidatePathComparison = if ($boolCandidateIsWindows) {
     [System.StringComparison]::OrdinalIgnoreCase
 } else {
     [System.StringComparison]::Ordinal
 }
-$objCandidatePathComparer = if ($env:OS -eq 'Windows_NT') {
+$objCandidatePathComparer = if ($boolCandidateIsWindows) {
     [System.StringComparer]::OrdinalIgnoreCase
 } else {
     [System.StringComparer]::Ordinal
@@ -229,7 +238,7 @@ $scriptBlockAssertCandidateOrdinaryDirectoryEnvelope = {
     # makes reading an unset one throw. Hoisting it out of the loop keeps the
     # lookup off the per-component path.
     $strStatPath = $null
-    if ($env:OS -ne 'Windows_NT') {
+    if (-not $boolCandidateIsWindows) {
         $arrStatCommands = @(Get-Command -Name 'stat' `
             -CommandType Application -ErrorAction SilentlyContinue)
         if ($arrStatCommands.Count -lt 1) {
@@ -253,7 +262,7 @@ $scriptBlockAssertCandidateOrdinaryDirectoryEnvelope = {
                 -Message "PSStyleGuide.Context.v1|phase=$strFailurePhase|reason=nonordinary"
         }
 
-        if ($env:OS -ne 'Windows_NT') {
+        if (-not $boolCandidateIsWindows) {
             $arrFileSystemStatus = @(& $strStatPath '-Lc' '%d' '--' $strComponent 2>$null)
             $intFileSystemStatusExitCode = $LASTEXITCODE
             if ($intFileSystemStatusExitCode -ne 0 -or
@@ -491,7 +500,7 @@ $scriptBlockAssertCandidateCanonicalStoredPath = {
         }
     }
 
-    if ($env:OS -eq 'Windows_NT') {
+    if ($boolCandidateIsWindows) {
         if ($Value.IndexOf([char]'/') -ge 0) {
             throw 'cleanup-context-invalid'
         }
@@ -524,8 +533,8 @@ $scriptBlockAssertCandidateCanonicalStoredPath = {
         $strComponent = $arrComponents[$intIndex]
         $boolAllowedTrailingEmpty = $intIndex -eq ($arrComponents.Count - 1) -and
             $strComponent.Length -eq 0 -and
-            (($env:OS -eq 'Windows_NT' -and $boolDriveRooted -and $Value.Length -eq 3) -or
-                ($env:OS -ne 'Windows_NT' -and $Value.Length -eq 1))
+            (($boolCandidateIsWindows -and $boolDriveRooted -and $Value.Length -eq 3) -or
+                (-not $boolCandidateIsWindows -and $Value.Length -eq 1))
         if (-not $boolAllowedTrailingEmpty -and
             ($strComponent.Length -eq 0 -or $strComponent -in @('.', '..'))) {
             throw 'cleanup-context-invalid'
@@ -987,7 +996,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.6
+    # Version: 1.0.20260802.7
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1163,7 +1172,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.6
+    # Version: 1.0.20260802.7
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260802.11
+Version: 1.0.20260802.12
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260802.11'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.6'
+$script:versionCandidateHelper = [System.Version]'1.0.20260802.12'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.7'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -136,12 +136,21 @@ $script:uintCandidateHelperMaximumEntryByte = [uint64](8 * 1024 * 1024)
 $script:uintCandidateHelperMaximumTotalByte = [uint64](32 * 1024 * 1024)
 $script:uintCandidateHelperMaximumArchiveByte = [uint64](32 * 1024 * 1024)
 $script:intCandidateHelperBufferSize = 65536
-$script:objCandidateHelperPathComparison = if ($env:OS -eq 'Windows_NT') {
+# The platform decides which comparison, path grammar, link primitive, and
+# filesystem-identity rules apply, so it must not be something a caller can
+# assert. The OS environment variable is ordinary and inheritable: exporting
+# it as Windows_NT to PowerShell 7 on Linux makes every one of those branches
+# take its Windows form, which silently disables mount and inode resolution
+# and switches path comparison to case-insensitive. OSVersion.Platform is a
+# runtime property with no environment input, and is available on both
+# Windows PowerShell 5.1 and PowerShell 7.
+$script:boolCandidateHelperIsWindows = [System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT
+$script:objCandidateHelperPathComparison = if ($script:boolCandidateHelperIsWindows) {
     [System.StringComparison]::OrdinalIgnoreCase
 } else {
     [System.StringComparison]::Ordinal
 }
-$script:objCandidateHelperPathComparer = if ($env:OS -eq 'Windows_NT') {
+$script:objCandidateHelperPathComparer = if ($script:boolCandidateHelperIsWindows) {
     [System.StringComparer]::OrdinalIgnoreCase
 } else {
     [System.StringComparer]::Ordinal
@@ -283,7 +292,7 @@ $script:scriptBlockAssertCandidateHelperCanonicalStoredPath = {
         }
     }
 
-    if ($env:OS -eq 'Windows_NT') {
+    if ($script:boolCandidateHelperIsWindows) {
         if ($Value.IndexOf([char]'/') -ge 0) {
             throw 'context-invalid'
         }
@@ -316,8 +325,8 @@ $script:scriptBlockAssertCandidateHelperCanonicalStoredPath = {
         $strComponent = $arrComponents[$intIndex]
         $boolAllowedTrailingEmpty = $intIndex -eq ($arrComponents.Count - 1) -and
             $strComponent.Length -eq 0 -and
-            (($env:OS -eq 'Windows_NT' -and $boolDriveRooted -and $Value.Length -eq 3) -or
-                ($env:OS -ne 'Windows_NT' -and $Value.Length -eq 1))
+            (($script:boolCandidateHelperIsWindows -and $boolDriveRooted -and $Value.Length -eq 3) -or
+                (-not $script:boolCandidateHelperIsWindows -and $Value.Length -eq 1))
         if (-not $boolAllowedTrailingEmpty -and
             ($strComponent.Length -eq 0 -or $strComponent -in @('.', '..'))) {
             throw 'context-invalid'
@@ -859,7 +868,7 @@ $script:scriptBlockGetCandidateHelperMountResolvedPath = {
     # so neither the path text nor the identity chain can see the relationship.
     # Mount topology is the only place it is recorded, so each root is resolved
     # to the device and in-filesystem subtree it actually occupies.
-    if ($env:OS -eq 'Windows_NT') {
+    if ($script:boolCandidateHelperIsWindows) {
         return $null
     }
     try {
@@ -964,7 +973,7 @@ $script:scriptBlockGetCandidateHelperIdentityChain = {
     # an alias of the path itself. Windows returns an empty chain; the identity
     # rule there is not implemented and the lexical rules still apply.
     $listIdentity = New-Object 'System.Collections.Generic.List[string]'
-    if ($env:OS -eq 'Windows_NT') {
+    if ($script:boolCandidateHelperIsWindows) {
         return ,[string[]]$listIdentity.ToArray()
     }
     $arrStatCommands = @(Get-Command -Name 'stat' `
@@ -1025,7 +1034,7 @@ $script:scriptBlockAssertCandidateHelperDirectoryEnvelope = {
     # makes reading an unset one throw. Hoisting it out of the loop keeps the
     # lookup off the per-component path.
     $strStatPath = $null
-    if ($env:OS -ne 'Windows_NT') {
+    if (-not $script:boolCandidateHelperIsWindows) {
         $arrStatCommands = @(Get-Command -Name 'stat' `
             -CommandType Application -ErrorAction SilentlyContinue)
         if ($arrStatCommands.Count -lt 1) {
@@ -1048,7 +1057,7 @@ $script:scriptBlockAssertCandidateHelperDirectoryEnvelope = {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code $strFailureCode -Phase $Phase -Subreason 'nonordinary-directory'
         }
-        if ($env:OS -ne 'Windows_NT') {
+        if (-not $script:boolCandidateHelperIsWindows) {
             $arrFileSystemStatus = @(& $strStatPath '-Lc' '%d' '--' $strComponent 2>$null)
             $intFileSystemStatusExitCode = $LASTEXITCODE
             if ($intFileSystemStatusExitCode -ne 0 -or
@@ -1188,7 +1197,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.11
+    # Version: 1.0.20260802.12
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
