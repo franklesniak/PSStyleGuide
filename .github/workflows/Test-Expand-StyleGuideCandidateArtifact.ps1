@@ -1,0 +1,3767 @@
+#Requires -Version 5.1
+
+<#
+.SYNOPSIS
+Runs the permanent adversarial style-guide candidate validation suite.
+
+.DESCRIPTION
+Authenticates the fixed helper and context-manager blobs against HEAD, the
+stage-0 index, and the no-filter working object before loading them. It then
+executes the versioned 110-case catalog and emits one bounded canonical JSONL
+result per catalog row.
+
+.PARAMETER HelperPath
+Specifies the raw, fixed path claim for the candidate-expansion helper.
+
+.PARAMETER ContextManagerPath
+Specifies the raw, fixed path claim for the invocation-context manager.
+
+.EXAMPLE
+PS> .\Test-Expand-StyleGuideCandidateArtifact.ps1 `
+    -HelperPath (Resolve-Path .github/workflows/Expand-StyleGuideCandidateArtifact.ps1).Path `
+    -ContextManagerPath (Resolve-Path .github/workflows/Manage-StyleGuideCandidateInvocationContext.ps1).Path
+
+Authenticates both scripts and executes the complete candidate-case catalog.
+
+.INPUTS
+None. You can't pipe objects to this script.
+
+.OUTPUTS
+None. The script writes one JSON object per case to the success stream and
+uses its process exit code to report the aggregate result.
+
+.NOTES
+Version: 1.0.20260802.0
+#>
+
+[CmdletBinding(PositionalBinding = $false)]
+[OutputType([string])]
+param (
+    [Parameter(Mandatory = $true)]
+    [AllowNull()]
+    [AllowEmptyString()]
+    [AllowEmptyCollection()]
+    [object]$HelperPath,
+
+    [Parameter(Mandatory = $true)]
+    [AllowNull()]
+    [AllowEmptyString()]
+    [AllowEmptyCollection()]
+    [object]$ContextManagerPath
+)
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
+
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.0'
+$script:objCandidateHelperPathClaim = $HelperPath
+$script:objCandidateContextManagerPathClaim = $ContextManagerPath
+$script:strCandidateExpectedHelperVersion = '1.0.20260802.0'
+$script:strCandidateExpectedContextVersion = '1.0.20260802.0'
+$script:strCandidateCatalogVersion = '1.0.20260802.0'
+$script:strCandidateAllocationSha256 = 'ce7b29de7bb4812f1de9defb1672c1b7eac47d6f6b584db571a9bc0d86726e02'
+$script:strCandidateHelperRelativePath = '.github/workflows/Expand-StyleGuideCandidateArtifact.ps1'
+$script:strCandidateContextRelativePath = '.github/workflows/Manage-StyleGuideCandidateInvocationContext.ps1'
+$script:strCandidateCatalogRelativePath = '.github/workflows/style-guide-candidate-cases.json'
+$script:arrCandidateExpectedName = [string[]]@(
+    'copilot-instructions.md',
+    'powershell.instructions.md',
+    'STYLE_GUIDE_CHAT.md',
+    'STYLE_GUIDE_FULL.md'
+)
+$script:strCandidateResultTypeName = 'PSStyleGuide.CandidateCaseResult.v1'
+$script:strCandidateEmptySha256 = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+$script:intCandidateBufferSize = 65536
+$script:objCandidatePathComparison = if ($env:OS -eq 'Windows_NT') {
+    [System.StringComparison]::OrdinalIgnoreCase
+} else {
+    [System.StringComparison]::Ordinal
+}
+
+$script:scriptBlockNewHarnessException = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$Code,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Detail
+    )
+
+    $objException = New-Object System.InvalidOperationException(
+        "PSStyleGuide.CandidateHarness.v1|code=$Code|detail=$Detail"
+    )
+    $objException.Data['PSStyleGuideHarnessCode'] = $Code
+    return $objException
+}
+
+$script:scriptBlockStopHarness = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$Code,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Detail
+    )
+
+    throw (& $script:scriptBlockNewHarnessException -Code $Code -Detail $Detail)
+}
+
+$script:scriptBlockAssertRawString = {
+    param (
+        [AllowNull()]
+        [object]$Value,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+
+    if ($null -eq $Value -or $Value.GetType() -ne [System.String]) {
+        & $script:scriptBlockStopHarness -Code 'parameter' -Detail "$Name-type"
+    }
+    $strValue = [string]$Value
+    if ($strValue.Length -eq 0 -or [System.String]::IsNullOrWhiteSpace($strValue)) {
+        & $script:scriptBlockStopHarness -Code 'parameter' -Detail "$Name-empty"
+    }
+    foreach ($chrValue in $strValue.ToCharArray()) {
+        if ([System.Char]::IsControl($chrValue)) {
+            & $script:scriptBlockStopHarness -Code 'parameter' -Detail "$Name-control"
+        }
+    }
+    return $strValue
+}
+
+$script:scriptBlockConvertToNativeArgumentString = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string[]]$ArgumentList
+    )
+
+    $listQuoted = New-Object 'System.Collections.Generic.List[string]'
+    foreach ($strArgument in $ArgumentList) {
+        if ($strArgument.Length -eq 0) {
+            $listQuoted.Add('""')
+            continue
+        }
+        if ($strArgument -notmatch '[\x20\x09"]') {
+            $listQuoted.Add($strArgument)
+            continue
+        }
+        $objBuilder = New-Object System.Text.StringBuilder
+        [void]$objBuilder.Append('"')
+        $intBackslashes = 0
+        foreach ($chrCharacter in $strArgument.ToCharArray()) {
+            if ($chrCharacter -eq '\') {
+                $intBackslashes++
+                continue
+            }
+            if ($chrCharacter -eq '"') {
+                [void]$objBuilder.Append(('\' * (($intBackslashes * 2) + 1)))
+                [void]$objBuilder.Append('"')
+                $intBackslashes = 0
+                continue
+            }
+            if ($intBackslashes -gt 0) {
+                [void]$objBuilder.Append(('\' * $intBackslashes))
+                $intBackslashes = 0
+            }
+            [void]$objBuilder.Append($chrCharacter)
+        }
+        if ($intBackslashes -gt 0) {
+            [void]$objBuilder.Append(('\' * ($intBackslashes * 2)))
+        }
+        [void]$objBuilder.Append('"')
+        $listQuoted.Add($objBuilder.ToString())
+    }
+    return $listQuoted.ToArray() -join ' '
+}
+
+$script:scriptBlockInvokeNativeRaw = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$FilePath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$WorkingDirectory,
+
+        [Parameter(Mandatory = $true)]
+        [string[]]$ArgumentList
+    )
+
+    $objProcessStartInformation = New-Object System.Diagnostics.ProcessStartInfo
+    $objProcessStartInformation.FileName = $FilePath
+    $objProcessStartInformation.WorkingDirectory = $WorkingDirectory
+    $objProcessStartInformation.UseShellExecute = $false
+    $objProcessStartInformation.CreateNoWindow = $true
+    $objProcessStartInformation.RedirectStandardInput = $true
+    $objProcessStartInformation.RedirectStandardOutput = $true
+    $objProcessStartInformation.RedirectStandardError = $true
+    if ($null -ne $objProcessStartInformation.PSObject.Properties['ArgumentList']) {
+        foreach ($strArgument in $ArgumentList) {
+            [void]$objProcessStartInformation.ArgumentList.Add($strArgument)
+        }
+    } else {
+        $objProcessStartInformation.Arguments = (
+            & $script:scriptBlockConvertToNativeArgumentString -ArgumentList $ArgumentList
+        )
+    }
+
+    $objProcess = New-Object System.Diagnostics.Process
+    $objProcess.StartInfo = $objProcessStartInformation
+    $objStandardOutputStream = New-Object System.IO.MemoryStream
+    $objStandardErrorStream = New-Object System.IO.MemoryStream
+    try {
+        if (-not $objProcess.Start()) {
+            & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'native-start'
+        }
+        $objProcess.StandardInput.Close()
+        $objStandardOutputTask = $objProcess.StandardOutput.BaseStream.CopyToAsync(
+            $objStandardOutputStream
+        )
+        $objStandardErrorTask = $objProcess.StandardError.BaseStream.CopyToAsync(
+            $objStandardErrorStream
+        )
+        $objProcess.WaitForExit()
+        [System.Threading.Tasks.Task]::WaitAll(@(
+            $objStandardOutputTask,
+            $objStandardErrorTask
+        ))
+        if ($objStandardOutputStream.Length -gt 4194304 -or
+            $objStandardErrorStream.Length -gt 4194304) {
+            & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'native-output-limit'
+        }
+        return [ordered]@{
+            ExitCode = [int]$objProcess.ExitCode
+            StandardOutput = [byte[]]$objStandardOutputStream.ToArray()
+            StandardErrorLength = [uint32]$objStandardErrorStream.Length
+        }
+    } finally {
+        $objStandardOutputStream.Dispose()
+        $objStandardErrorStream.Dispose()
+        $objProcess.Dispose()
+    }
+}
+
+$script:scriptBlockConvertFromStrictUtf8 = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [byte[]]$Bytes
+    )
+
+    if ($Bytes.Length -ge 3 -and
+        $Bytes[0] -eq 0xEF -and $Bytes[1] -eq 0xBB -and $Bytes[2] -eq 0xBF) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'bom'
+    }
+    if ($Bytes -contains [byte]0x0D) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'cr'
+    }
+    try {
+        return (New-Object System.Text.UTF8Encoding($false, $true)).GetString($Bytes)
+    } catch {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'utf8'
+    }
+}
+
+$script:scriptBlockGetScriptVersionRecord = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$ScriptText,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ExpectedVersion
+    )
+
+    $objFirstFunction = [regex]::Match(
+        $ScriptText,
+        '(?m)^function[\x20\x09]+[A-Za-z0-9_-]+[\x20\x09]*\{'
+    )
+    if (-not $objFirstFunction.Success) {
+        & $script:scriptBlockStopHarness -Code 'invalid-version' -Detail 'function'
+    }
+    $strPreamble = $ScriptText.Substring(0, $objFirstFunction.Index)
+    $arrNoteBlocks = @([regex]::Matches(
+        $strPreamble,
+        '(?s)<#(?:(?!#>).)*\.NOTES(?:(?!#>).)*#>'
+    ))
+    $arrAllMarkers = @([regex]::Matches($ScriptText, '(?m)^Version:[^\r\n]*$'))
+    if ($arrNoteBlocks.Count -ne 1 -or $arrAllMarkers.Count -ne 1) {
+        & $script:scriptBlockStopHarness -Code 'invalid-version' -Detail 'marker-count'
+    }
+    $arrMarkers = @([regex]::Matches(
+        $arrNoteBlocks[0].Value,
+        '(?m)^Version: ([0-9]+)\.([0-9]+)\.([0-9]{8})\.([0-9]+)$'
+    ))
+    if ($arrMarkers.Count -ne 1 -or $arrMarkers[0].Value -cne $arrAllMarkers[0].Value) {
+        & $script:scriptBlockStopHarness -Code 'invalid-version' -Detail 'marker-grammar'
+    }
+    $arrParts = [string[]]@(
+        $arrMarkers[0].Groups[1].Value,
+        $arrMarkers[0].Groups[2].Value,
+        $arrMarkers[0].Groups[3].Value,
+        $arrMarkers[0].Groups[4].Value
+    )
+    foreach ($strPart in $arrParts) {
+        $intPart = 0L
+        if (($strPart.Length -gt 1 -and $strPart[0] -eq '0') -or
+            -not [int64]::TryParse(
+                $strPart,
+                [System.Globalization.NumberStyles]::None,
+                [System.Globalization.CultureInfo]::InvariantCulture,
+                [ref]$intPart
+            ) -or $intPart -gt [int]::MaxValue) {
+            & $script:scriptBlockStopHarness -Code 'invalid-version' -Detail 'component'
+        }
+    }
+    $objDate = [datetime]::MinValue
+    if (-not [datetime]::TryParseExact(
+        $arrParts[2],
+        'yyyyMMdd',
+        [System.Globalization.CultureInfo]::InvariantCulture,
+        [System.Globalization.DateTimeStyles]::None,
+        [ref]$objDate
+    )) {
+        & $script:scriptBlockStopHarness -Code 'invalid-version' -Detail 'date'
+    }
+    $strVersion = $arrParts -join '.'
+    $objVersion = New-Object System.Version(
+        [int]$arrParts[0],
+        [int]$arrParts[1],
+        [int]$arrParts[2],
+        [int]$arrParts[3]
+    )
+    if ($objVersion.ToString() -cne $strVersion -or $strVersion -cne $ExpectedVersion) {
+        & $script:scriptBlockStopHarness -Code 'unexpected-version' -Detail 'binding'
+    }
+    return $objVersion
+}
+
+$script:scriptBlockAssertOrdinaryDirectoryEnvelope = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath
+    )
+
+    $objCurrent = New-Object System.IO.DirectoryInfo($LiteralPath)
+    $strPreviousDevice = $null
+    while ($null -ne $objCurrent) {
+        try {
+            $objAttributes = [System.IO.File]::GetAttributes($objCurrent.FullName)
+        } catch {
+            & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'directory-attribute'
+        }
+        if (($objAttributes -band [System.IO.FileAttributes]::Directory) -eq 0 -or
+            ($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+            & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'directory-component'
+        }
+        if ($env:OS -ne 'Windows_NT') {
+            $arrFileSystemStatus = @(& stat '-Lc' '%d' '--' $objCurrent.FullName 2>$null)
+            if ($LASTEXITCODE -ne 0 -or $arrFileSystemStatus.Count -ne 1 -or
+                $arrFileSystemStatus[0] -notmatch '^[0-9]+$') {
+                & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'directory-identity'
+            }
+            if ($null -ne $strPreviousDevice -and
+                $strPreviousDevice -cne $arrFileSystemStatus[0]) {
+                & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'directory-mount'
+            }
+            $strPreviousDevice = [string]$arrFileSystemStatus[0]
+        }
+        $objCurrent = $objCurrent.Parent
+    }
+}
+
+$script:scriptBlockResolveFixedScriptClaim = {
+    param (
+        [AllowNull()]
+        [object]$Value,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ExpectedPath
+    )
+
+    $strValue = & $script:scriptBlockAssertRawString -Value $Value -Name $Name
+    if ([System.Management.Automation.WildcardPattern]::ContainsWildcardCharacters($strValue)) {
+        & $script:scriptBlockStopHarness -Code 'parameter' -Detail "$Name-wildcard"
+    }
+    $strProviderPath = $strValue
+    $intSeparator = $strValue.IndexOf('::', [System.StringComparison]::Ordinal)
+    if ($intSeparator -ge 0) {
+        $strProviderName = $strValue.Substring(0, $intSeparator)
+        if ($strProviderName -cnotin @(
+            'FileSystem',
+            'Microsoft.PowerShell.Core\FileSystem'
+        )) {
+            & $script:scriptBlockStopHarness -Code 'parameter' -Detail "$Name-provider"
+        }
+        $strProviderPath = $strValue.Substring($intSeparator + 2)
+    }
+    $boolDriveRelative = $strProviderPath.Length -ge 2 -and
+        [System.Char]::IsLetter($strProviderPath[0]) -and
+        $strProviderPath[1] -eq [char]':' -and
+        ($strProviderPath.Length -eq 2 -or
+            ($strProviderPath[2] -ne [char]'\' -and $strProviderPath[2] -ne [char]'/'))
+    if ($boolDriveRelative -or -not [System.IO.Path]::IsPathRooted($strProviderPath)) {
+        & $script:scriptBlockStopHarness -Code 'parameter' -Detail "$Name-relative"
+    }
+    try {
+        $strFullPath = [System.IO.Path]::GetFullPath($strProviderPath)
+    } catch {
+        & $script:scriptBlockStopHarness -Code 'parameter' -Detail "$Name-normalization"
+    }
+    if (-not [System.String]::Equals(
+        $strFullPath,
+        $ExpectedPath,
+        $script:objCandidatePathComparison
+    )) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail "$Name-fixed-path"
+    }
+    return $strFullPath
+}
+
+$script:scriptBlockTestByteSequenceEqual = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [byte[]]$Left,
+
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [byte[]]$Right
+    )
+
+    if ($Left.Length -ne $Right.Length) {
+        return $false
+    }
+    for ($intIndex = 0; $intIndex -lt $Left.Length; $intIndex++) {
+        if ($Left[$intIndex] -ne $Right[$intIndex]) {
+            return $false
+        }
+    }
+    return $true
+}
+
+$script:scriptBlockConvertFromAsciiMetadata = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [byte[]]$Bytes
+    )
+
+    foreach ($bytValue in $Bytes) {
+        if ($bytValue -lt 0x20 -or $bytValue -gt 0x7E) {
+            & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'metadata-byte'
+        }
+    }
+    return [System.Text.Encoding]::ASCII.GetString($Bytes)
+}
+
+$script:scriptBlockSplitOneNulGitRecord = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [byte[]]$Bytes,
+
+        [Parameter(Mandatory = $true)]
+        [byte[]]$ExpectedPathBytes
+    )
+
+    if ($Bytes.Length -lt 3 -or $Bytes[$Bytes.Length - 1] -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'record-termination'
+    }
+    $intNullByteCount = @($Bytes | Where-Object { $_ -eq 0 }).Count
+    if ($intNullByteCount -ne 1) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'record-cardinality'
+    }
+    $intTab = -1
+    for ($intIndex = 0; $intIndex -lt ($Bytes.Length - 1); $intIndex++) {
+        if ($Bytes[$intIndex] -eq 9) {
+            if ($intTab -ne -1) {
+                & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'record-tab'
+            }
+            $intTab = $intIndex
+        }
+    }
+    if ($intTab -le 0) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'record-tab'
+    }
+    $arrMetadata = New-Object byte[] $intTab
+    [System.Array]::Copy($Bytes, 0, $arrMetadata, 0, $intTab)
+    $intPathLength = $Bytes.Length - $intTab - 2
+    $arrPath = New-Object byte[] $intPathLength
+    [System.Array]::Copy($Bytes, $intTab + 1, $arrPath, 0, $intPathLength)
+    if (-not (& $script:scriptBlockTestByteSequenceEqual -Left $arrPath -Right $ExpectedPathBytes)) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'literal-path'
+    }
+    return & $script:scriptBlockConvertFromAsciiMetadata -Bytes $arrMetadata
+}
+
+$script:scriptBlockGetTrimmedAsciiLine = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [byte[]]$Bytes
+    )
+
+    $intContentLength = $Bytes.Length
+    if ($intContentLength -gt 0 -and $Bytes[$intContentLength - 1] -eq 0x0A) {
+        $intContentLength--
+        if ($intContentLength -gt 0 -and $Bytes[$intContentLength - 1] -eq 0x0D) {
+            $intContentLength--
+        }
+    }
+    if ($intContentLength -eq 0) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'native-line'
+    }
+    for ($intIndex = 0; $intIndex -lt $intContentLength; $intIndex++) {
+        if ($Bytes[$intIndex] -lt 0x20 -or $Bytes[$intIndex] -gt 0x7E) {
+            & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'native-line'
+        }
+    }
+    $intExpectedLength = $intContentLength
+    if ($Bytes.Length -gt $intContentLength) {
+        $intExpectedLength += if ($Bytes[$intContentLength] -eq 0x0D) { 2 } else { 1 }
+    }
+    if ($Bytes.Length -ne $intExpectedLength) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'native-line'
+    }
+    return [System.Text.Encoding]::ASCII.GetString($Bytes, 0, $intContentLength)
+}
+
+$script:scriptBlockGetCandidateTreeObjectId = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$Metadata,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet(40, 64)]
+        [int]$ObjectIdLength
+    )
+
+    $objTreeMatch = [regex]::Match(
+        $Metadata,
+        '^100644 blob ([0-9a-f]+)$',
+        [System.Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    if (-not $objTreeMatch.Success -or
+        $objTreeMatch.Groups[1].Value.Length -ne $ObjectIdLength) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'tree-record'
+    }
+    return $objTreeMatch.Groups[1].Value
+}
+
+$script:scriptBlockGetCandidateIndexObjectId = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$Metadata,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet(40, 64)]
+        [int]$ObjectIdLength,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ExpectedObjectId
+    )
+
+    $objIndexMatch = [regex]::Match(
+        $Metadata,
+        '^100644 ([0-9a-f]+) 0$',
+        [System.Text.RegularExpressions.RegexOptions]::CultureInvariant
+    )
+    if (-not $objIndexMatch.Success -or
+        $objIndexMatch.Groups[1].Value.Length -ne $ObjectIdLength -or
+        $objIndexMatch.Groups[1].Value -cne $ExpectedObjectId) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'index-record'
+    }
+    return $objIndexMatch.Groups[1].Value
+}
+
+$script:scriptBlockAssertCandidateWorkingObjectId = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$ObjectId,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet(40, 64)]
+        [int]$ObjectIdLength,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ExpectedObjectId
+    )
+
+    if ($ObjectId.Length -ne $ObjectIdLength -or
+        $ObjectId -cnotmatch '^[0-9a-f]+$' -or
+        $ObjectId -cne $ExpectedObjectId) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'working-object'
+    }
+}
+
+$script:scriptBlockAssertTrackedScriptIdentity = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$RepositoryRoot,
+
+        [Parameter(Mandatory = $true)]
+        [string]$GitPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RelativePath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ExpectedVersion,
+
+        [Parameter(Mandatory = $true)]
+        [uint32]$ExpectedFunctionCount
+    )
+
+    [void](& $script:scriptBlockAssertOrdinaryDirectoryEnvelope -LiteralPath $RepositoryRoot)
+    $objFile = New-Object System.IO.FileInfo($LiteralPath)
+    if (-not $objFile.Exists -or
+        ($objFile.Attributes -band [System.IO.FileAttributes]::Directory) -ne 0 -or
+        ($objFile.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'working-file-type'
+    }
+    [void](& $script:scriptBlockAssertOrdinaryDirectoryEnvelope -LiteralPath $objFile.Directory.FullName)
+
+    $arrRelativeBytes = [System.Text.Encoding]::ASCII.GetBytes($RelativePath)
+    $objFormatResult = & $script:scriptBlockInvokeNativeRaw -FilePath $GitPath -WorkingDirectory $RepositoryRoot `
+        -ArgumentList @('rev-parse', '--show-object-format')
+    if ($objFormatResult.ExitCode -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'object-format-status'
+    }
+    $strObjectFormat = & $script:scriptBlockGetTrimmedAsciiLine `
+        -Bytes $objFormatResult.StandardOutput
+    $intObjectIdLength = if ($strObjectFormat -ceq 'sha1') {
+        40
+    } elseif ($strObjectFormat -ceq 'sha256') {
+        64
+    } else {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'object-format'
+    }
+
+    $objTreeResult = & $script:scriptBlockInvokeNativeRaw -FilePath $GitPath -WorkingDirectory $RepositoryRoot `
+        -ArgumentList @('ls-tree', '-z', 'HEAD', '--', $RelativePath)
+    if ($objTreeResult.ExitCode -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'tree-status'
+    }
+    $strTreeMetadata = & $script:scriptBlockSplitOneNulGitRecord `
+        -Bytes $objTreeResult.StandardOutput `
+        -ExpectedPathBytes $arrRelativeBytes
+    $strHeadObjectId = & $script:scriptBlockGetCandidateTreeObjectId `
+        -Metadata $strTreeMetadata `
+        -ObjectIdLength $intObjectIdLength
+
+    $objIndexResult = & $script:scriptBlockInvokeNativeRaw -FilePath $GitPath -WorkingDirectory $RepositoryRoot `
+        -ArgumentList @('ls-files', '--stage', '-z', '--', $RelativePath)
+    if ($objIndexResult.ExitCode -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'index-status'
+    }
+    $strIndexMetadata = & $script:scriptBlockSplitOneNulGitRecord `
+        -Bytes $objIndexResult.StandardOutput `
+        -ExpectedPathBytes $arrRelativeBytes
+    [void](& $script:scriptBlockGetCandidateIndexObjectId `
+        -Metadata $strIndexMetadata `
+        -ObjectIdLength $intObjectIdLength `
+        -ExpectedObjectId $strHeadObjectId)
+
+    $objWorkingResult = & $script:scriptBlockInvokeNativeRaw -FilePath $GitPath -WorkingDirectory $RepositoryRoot `
+        -ArgumentList @('hash-object', '--no-filters', '--', $RelativePath)
+    if ($objWorkingResult.ExitCode -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'working-status'
+    }
+    $strWorkingObjectId = & $script:scriptBlockGetTrimmedAsciiLine `
+        -Bytes $objWorkingResult.StandardOutput
+    [void](& $script:scriptBlockAssertCandidateWorkingObjectId `
+        -ObjectId $strWorkingObjectId `
+        -ObjectIdLength $intObjectIdLength `
+        -ExpectedObjectId $strHeadObjectId)
+
+    $arrFileBytes = [System.IO.File]::ReadAllBytes($LiteralPath)
+    $strScriptText = & $script:scriptBlockConvertFromStrictUtf8 -Bytes $arrFileBytes
+    [void](& $script:scriptBlockGetScriptVersionRecord `
+        -ScriptText $strScriptText `
+        -ExpectedVersion $ExpectedVersion)
+    $arrParseErrors = $null
+    $arrTokens = $null
+    $objAbstractSyntaxTree = [System.Management.Automation.Language.Parser]::ParseInput(
+        $strScriptText,
+        [ref]$arrTokens,
+        [ref]$arrParseErrors
+    )
+    if ($arrParseErrors.Count -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'parser'
+    }
+    $arrFunctions = @($objAbstractSyntaxTree.FindAll({
+        param ($objNode)
+        $objNode -is [System.Management.Automation.Language.FunctionDefinitionAst]
+    }, $true))
+    if ($arrFunctions.Count -ne $ExpectedFunctionCount) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'function-count'
+    }
+    return $strHeadObjectId
+}
+
+$script:scriptBlockAssertExactPropertyNames = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [object]$Value,
+
+        [Parameter(Mandatory = $true)]
+        [string[]]$Names,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Detail
+    )
+
+    if ($null -eq $Value) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail "$Detail-null"
+    }
+    $arrProperties = @($Value.PSObject.Properties)
+    if ($arrProperties.Count -ne $Names.Count) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail "$Detail-property-count"
+    }
+    for ($intIndex = 0; $intIndex -lt $Names.Count; $intIndex++) {
+        if ($arrProperties[$intIndex].Name -cne $Names[$intIndex] -or
+            $arrProperties[$intIndex].MemberType -ne
+                [System.Management.Automation.PSMemberTypes]::NoteProperty) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail "$Detail-property-order"
+        }
+    }
+}
+
+$script:scriptBlockReadCandidateCatalog = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath
+    )
+
+    $objFile = New-Object System.IO.FileInfo($LiteralPath)
+    if (-not $objFile.Exists -or
+        ($objFile.Attributes -band [System.IO.FileAttributes]::Directory) -ne 0 -or
+        ($objFile.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'file-type'
+    }
+    $arrBytes = [System.IO.File]::ReadAllBytes($LiteralPath)
+    $strText = & $script:scriptBlockConvertFromStrictUtf8 -Bytes $arrBytes
+    try {
+        $objCatalog = $strText | ConvertFrom-Json
+    } catch {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'json'
+    }
+    & $script:scriptBlockAssertExactPropertyNames -Value $objCatalog -Names @(
+        'SchemaVersion',
+        'CatalogVersion',
+        'CaseCount',
+        'CaseIdPattern',
+        'SemanticCasePattern',
+        'OracleProfilePattern',
+        'ClosedSets',
+        'Cases'
+    ) -Detail 'catalog'
+    if ($null -eq $objCatalog.SchemaVersion -or
+        $objCatalog.SchemaVersion.GetType() -notin @([System.Int32], [System.Int64]) -or
+        $objCatalog.SchemaVersion -ne 1 -or
+        $null -eq $objCatalog.CatalogVersion -or
+        $objCatalog.CatalogVersion.GetType() -ne [System.String] -or
+        $objCatalog.CatalogVersion -cne $script:strCandidateCatalogVersion -or
+        $null -eq $objCatalog.CaseCount -or
+        $objCatalog.CaseCount.GetType() -notin @([System.Int32], [System.Int64]) -or
+        $objCatalog.CaseCount -ne 110 -or
+        $null -eq $objCatalog.CaseIdPattern -or
+        $objCatalog.CaseIdPattern.GetType() -ne [System.String] -or
+        $objCatalog.CaseIdPattern -cne '^PS-P1A-[A-Z]+-[0-9]{2}$' -or
+        $null -eq $objCatalog.SemanticCasePattern -or
+        $objCatalog.SemanticCasePattern.GetType() -ne [System.String] -or
+        $objCatalog.SemanticCasePattern -cne '^[a-z0-9]+(?:[.-][a-z0-9]+)*$' -or
+        $null -eq $objCatalog.OracleProfilePattern -or
+        $objCatalog.OracleProfilePattern.GetType() -ne [System.String] -or
+        $objCatalog.OracleProfilePattern -cne '^oracle\.ps-p1a-[a-z]+-[0-9]{2}\.v1$' -or
+        $null -eq $objCatalog.Cases -or
+        $objCatalog.Cases.GetType() -ne [System.Object[]] -or
+        $objCatalog.Cases.Count -ne 110) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'header'
+    }
+    & $script:scriptBlockAssertExactPropertyNames -Value $objCatalog.ClosedSets -Names @(
+        'Applicability',
+        'RequiredRuntime',
+        'PrimitiveProbeRule',
+        'InitialState',
+        'Result',
+        'Status',
+        'Phase',
+        'Subreason',
+        'DiagnosticCode',
+        'PreCleanupState',
+        'CleanupSequence',
+        'CandidateFinalState',
+        'ContextFinalState',
+        'SentinelState',
+        'SourceState',
+        'HarnessVerdict',
+        'HarnessDiagnosticCode'
+    ) -Detail 'closed-sets'
+    foreach ($objClosedSetProperty in $objCatalog.ClosedSets.PSObject.Properties) {
+        if ($null -eq $objClosedSetProperty.Value -or
+            $objClosedSetProperty.Value.GetType() -ne [System.Object[]] -or
+            $objClosedSetProperty.Value.Count -eq 0) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'closed-set-type'
+        }
+        $objClosedSetValues = New-Object 'System.Collections.Generic.HashSet[string]' (
+            [System.StringComparer]::Ordinal
+        )
+        foreach ($objClosedSetValue in $objClosedSetProperty.Value) {
+            if ($null -eq $objClosedSetValue -or
+                $objClosedSetValue.GetType() -ne [System.String] -or
+                $objClosedSetValue.Length -eq 0 -or
+                -not $objClosedSetValues.Add($objClosedSetValue)) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'catalog-invalid' `
+                    -Detail 'closed-set-value'
+            }
+        }
+    }
+
+    $objCaseIds = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+    $objSemantics = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+    $objProfiles = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+    $objAllocationBuilder = New-Object System.Text.StringBuilder
+    foreach ($objCase in $objCatalog.Cases) {
+        & $script:scriptBlockAssertExactPropertyNames -Value $objCase -Names @(
+            'CaseId',
+            'SemanticCase',
+            'SemanticVariant',
+            'OracleProfile',
+            'FixtureRecipe',
+            'RequiredRuntimes',
+            'Applicability',
+            'PrimitiveProbeRule',
+            'InitialState',
+            'ExpectedResult',
+            'ExpectedStatus',
+            'ExpectedPhase',
+            'ExpectedSubreason',
+            'ExpectedDiagnosticCode',
+            'ExpectedPreCleanupState',
+            'ExpectedCleanupSequence',
+            'ExpectedCandidateFinalState',
+            'ExpectedContextFinalState',
+            'ExpectedFilesystemCallCount',
+            'ExpectedSentinelState',
+            'ExpectedSourceState',
+            'FixtureLength',
+            'FixtureSha256'
+        ) -Detail 'case'
+        foreach ($strProperty in @(
+            'CaseId','SemanticCase','OracleProfile','FixtureRecipe','Applicability',
+            'PrimitiveProbeRule','InitialState',
+            'ExpectedResult','ExpectedStatus','ExpectedPhase','ExpectedSubreason',
+            'ExpectedDiagnosticCode','ExpectedPreCleanupState','ExpectedCleanupSequence',
+            'ExpectedCandidateFinalState','ExpectedContextFinalState',
+            'ExpectedSentinelState','ExpectedSourceState'
+        )) {
+            if ($null -eq $objCase.$strProperty -or
+                $objCase.$strProperty.GetType() -ne [System.String] -or
+                $objCase.$strProperty.Length -eq 0) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'case-string'
+            }
+        }
+        if ($objCase.CaseId -cnotmatch $objCatalog.CaseIdPattern -or
+            $objCase.SemanticCase -cnotmatch $objCatalog.SemanticCasePattern -or
+            ($null -ne $objCase.SemanticVariant -and
+                ($objCase.SemanticVariant.GetType() -ne [System.String] -or
+                    $objCase.SemanticVariant -cnotmatch $objCatalog.SemanticCasePattern)) -or
+            $objCase.OracleProfile -cnotmatch $objCatalog.OracleProfilePattern -or
+            $null -eq $objCase.RequiredRuntimes -or
+            $objCase.RequiredRuntimes.GetType() -ne [System.Object[]] -or
+            $objCase.RequiredRuntimes.Count -ne 3 -or
+            $objCase.RequiredRuntimes[0] -cne 'WindowsPowerShell5.1' -or
+            $objCase.RequiredRuntimes[1] -cne 'PowerShell7Windows' -or
+            $objCase.RequiredRuntimes[2] -cne 'PowerShell7Ubuntu' -or
+            -not $objCaseIds.Add($objCase.CaseId) -or
+            -not $objSemantics.Add($objCase.SemanticCase) -or
+            -not $objProfiles.Add($objCase.OracleProfile) -or
+            $null -eq $objCase.ExpectedFilesystemCallCount -or
+            $objCase.ExpectedFilesystemCallCount.GetType() -notin @(
+                [System.Int32],
+                [System.Int64]
+            ) -or
+            $objCase.ExpectedFilesystemCallCount -lt 0 -or
+            ($null -ne $objCase.FixtureLength -and
+                ($objCase.FixtureLength.GetType() -notin @(
+                        [System.Int32],
+                        [System.Int64]
+                    ) -or
+                    $objCase.FixtureLength -lt 0)) -or
+            ($null -ne $objCase.FixtureSha256 -and
+                ($objCase.FixtureSha256.GetType() -ne [System.String] -or
+                    $objCase.FixtureSha256 -cnotmatch '^[0-9a-f]{64}$'))) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'case-value'
+        }
+        $hashtableSetMap = [ordered]@{
+            Applicability = 'Applicability'
+            PrimitiveProbeRule = 'PrimitiveProbeRule'
+            InitialState = 'InitialState'
+            ExpectedResult = 'Result'
+            ExpectedStatus = 'Status'
+            ExpectedPhase = 'Phase'
+            ExpectedSubreason = 'Subreason'
+            ExpectedDiagnosticCode = 'DiagnosticCode'
+            ExpectedPreCleanupState = 'PreCleanupState'
+            ExpectedCleanupSequence = 'CleanupSequence'
+            ExpectedCandidateFinalState = 'CandidateFinalState'
+            ExpectedContextFinalState = 'ContextFinalState'
+            ExpectedSentinelState = 'SentinelState'
+            ExpectedSourceState = 'SourceState'
+        }
+        foreach ($strCaseProperty in $hashtableSetMap.Keys) {
+            $strSetProperty = $hashtableSetMap[$strCaseProperty]
+            if ($objCase.$strCaseProperty -cnotin @($objCatalog.ClosedSets.$strSetProperty)) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'case-enum'
+            }
+        }
+        foreach ($strRequiredRuntime in $objCase.RequiredRuntimes) {
+            if ($null -eq $strRequiredRuntime -or
+                $strRequiredRuntime.GetType() -ne [System.String] -or
+                $strRequiredRuntime -cnotin @($objCatalog.ClosedSets.RequiredRuntime)) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'case-runtime'
+            }
+        }
+        $boolLinkSemanticCase = & $script:scriptBlockTestLinkSemanticCase `
+            -SemanticCase $objCase.SemanticCase
+        if (($boolLinkSemanticCase -and $objCase.PrimitiveProbeRule -cne 'required-link') -or
+            (-not $boolLinkSemanticCase -and $objCase.PrimitiveProbeRule -cne 'none')) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'case-probe-rule'
+        }
+        $boolNotCreatedCase = $objCase.SemanticCase.StartsWith(
+            'script.',
+            [System.StringComparison]::Ordinal
+        ) -or $objCase.SemanticCase -in @(
+            'environment.trusted.nonfilesystem-provider',
+            'environment.trusted.link-component',
+            'environment.trusted.wrong-type'
+        )
+        if (($boolNotCreatedCase -and $objCase.InitialState -cne 'NotCreated') -or
+            (-not $boolNotCreatedCase -and $objCase.InitialState -cne 'Active')) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'case-initial-state'
+        }
+        [void]$objAllocationBuilder.Append($objCase.CaseId)
+        [void]$objAllocationBuilder.Append([char]0)
+        [void]$objAllocationBuilder.Append($objCase.SemanticCase)
+        [void]$objAllocationBuilder.Append([char]0)
+        [void]$objAllocationBuilder.Append($objCase.OracleProfile)
+        [void]$objAllocationBuilder.Append([char]10)
+    }
+    $arrAllocationBytes = (New-Object System.Text.UTF8Encoding($false)).GetBytes(
+        $objAllocationBuilder.ToString()
+    )
+    $strAllocationSha256 = & $script:scriptBlockGetByteArraySha256 -Bytes $arrAllocationBytes
+    if ($strAllocationSha256 -cne $script:strCandidateAllocationSha256) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'allocation-identity'
+    }
+    return $objCatalog
+}
+
+$script:scriptBlockAssertCatalogMutationsRejected = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [object]$Catalog,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RunRoot
+    )
+
+    $arrMutationSpecifications = @(
+        [pscustomobject][ordered]@{
+            Name = 'missing-property'
+            Apply = {
+                param ([object]$CatalogMutation)
+                [void]$CatalogMutation.Cases[0].PSObject.Properties.Remove('SemanticVariant')
+            }
+        },
+        [pscustomobject][ordered]@{
+            Name = 'missing-case'
+            Apply = {
+                param ([object]$CatalogMutation)
+                $CatalogMutation.Cases = [object[]]@(
+                    $CatalogMutation.Cases | Select-Object -First 109
+                )
+            }
+        },
+        [pscustomobject][ordered]@{
+            Name = 'unknown-property'
+            Apply = {
+                param ([object]$CatalogMutation)
+                Add-Member `
+                    -InputObject $CatalogMutation.Cases[0] `
+                    -MemberType NoteProperty `
+                    -Name 'UnknownProperty' `
+                    -Value $true
+            }
+        },
+        [pscustomobject][ordered]@{
+            Name = 'duplicate-case-id'
+            Apply = {
+                param ([object]$CatalogMutation)
+                $CatalogMutation.Cases[1].CaseId = $CatalogMutation.Cases[0].CaseId
+            }
+        },
+        [pscustomobject][ordered]@{
+            Name = 'duplicate-semantic-case'
+            Apply = {
+                param ([object]$CatalogMutation)
+                $CatalogMutation.Cases[1].SemanticCase = $CatalogMutation.Cases[0].SemanticCase
+            }
+        },
+        [pscustomobject][ordered]@{
+            Name = 'duplicate-oracle-profile'
+            Apply = {
+                param ([object]$CatalogMutation)
+                $CatalogMutation.Cases[1].OracleProfile = $CatalogMutation.Cases[0].OracleProfile
+            }
+        },
+        [pscustomobject][ordered]@{
+            Name = 'invalid-semantic-rename'
+            Apply = {
+                param ([object]$CatalogMutation)
+                $CatalogMutation.Cases[0].SemanticCase = 'archive.valid.renamed'
+            }
+        },
+        [pscustomobject][ordered]@{
+            Name = 'slash-list-applicability'
+            Apply = {
+                param ([object]$CatalogMutation)
+                $CatalogMutation.Cases[0].Applicability = 'Windows/Linux'
+            }
+        },
+        [pscustomobject][ordered]@{
+            Name = 'runtime-set-order'
+            Apply = {
+                param ([object]$CatalogMutation)
+                $CatalogMutation.Cases[0].RequiredRuntimes = [object[]]@(
+                    'PowerShell7Windows',
+                    'WindowsPowerShell5.1',
+                    'PowerShell7Ubuntu'
+                )
+            }
+        },
+        [pscustomobject][ordered]@{
+            Name = 'primitive-probe-rule'
+            Apply = {
+                param ([object]$CatalogMutation)
+                $CatalogMutation.Cases[0].PrimitiveProbeRule = 'required-link'
+            }
+        },
+        [pscustomobject][ordered]@{
+            Name = 'initial-state-relationship'
+            Apply = {
+                param ([object]$CatalogMutation)
+                $CatalogMutation.Cases[0].InitialState = 'NotCreated'
+            }
+        },
+        [pscustomobject][ordered]@{
+            Name = 'closed-set-null'
+            Apply = {
+                param ([object]$CatalogMutation)
+                $CatalogMutation.ClosedSets.Status = $null
+            }
+        },
+        [pscustomobject][ordered]@{
+            Name = 'case-count'
+            Apply = {
+                param ([object]$CatalogMutation)
+                $CatalogMutation.CaseCount = 109
+            }
+        },
+        [pscustomobject][ordered]@{
+            Name = 'semantic-variant-grammar'
+            Apply = {
+                param ([object]$CatalogMutation)
+                $CatalogMutation.Cases[0].SemanticVariant = 'invalid/variant'
+            }
+        },
+        [pscustomobject][ordered]@{
+            Name = 'fixture-sha256-grammar'
+            Apply = {
+                param ([object]$CatalogMutation)
+                $CatalogMutation.Cases[0].FixtureSha256 = 'ABC'
+            }
+        },
+        [pscustomobject][ordered]@{
+            Name = 'header-pattern'
+            Apply = {
+                param ([object]$CatalogMutation)
+                $CatalogMutation.CaseIdPattern = '.*'
+            }
+        }
+    )
+    $objUtf8WithoutBom = New-Object System.Text.UTF8Encoding($false)
+    foreach ($objMutationSpecification in $arrMutationSpecifications) {
+        $strCatalogJson = $Catalog | ConvertTo-Json -Depth 32 -Compress
+        $objCatalogMutation = $strCatalogJson | ConvertFrom-Json
+        & $objMutationSpecification.Apply $objCatalogMutation
+        $strMutationPath = [System.IO.Path]::Combine(
+            $RunRoot,
+            'catalog-mutation-' + $objMutationSpecification.Name + '.json'
+        )
+        $strMutationJson = $objCatalogMutation | ConvertTo-Json -Depth 32 -Compress
+        [System.IO.File]::WriteAllText($strMutationPath, $strMutationJson, $objUtf8WithoutBom)
+        try {
+            $boolRejected = $false
+            try {
+                [void](& $script:scriptBlockReadCandidateCatalog -LiteralPath $strMutationPath)
+            } catch {
+                if ($_.Exception.Data['PSStyleGuideHarnessCode'] -cne 'catalog-invalid') {
+                    throw
+                }
+                $boolRejected = $true
+            }
+            if (-not $boolRejected) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'orchestration-failed' `
+                    -Detail ('catalog-mutation-' + $objMutationSpecification.Name)
+            }
+        } finally {
+            [System.IO.File]::Delete($strMutationPath)
+        }
+    }
+}
+
+$script:scriptBlockGetFileEvidence = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath
+    )
+
+    $objStream = New-Object System.IO.FileStream(
+        $LiteralPath,
+        [System.IO.FileMode]::Open,
+        [System.IO.FileAccess]::Read,
+        [System.IO.FileShare]::Read
+    )
+    try {
+        $objSha256 = [System.Security.Cryptography.SHA256]::Create()
+        try {
+            $strSha256 = ([System.BitConverter]::ToString(
+                $objSha256.ComputeHash($objStream)
+            ) -replace '-', '').ToLowerInvariant()
+        } finally {
+            $objSha256.Dispose()
+        }
+        return [ordered]@{
+            Length = [uint64]$objStream.Length
+            Sha256 = [string]$strSha256
+        }
+    } finally {
+        $objStream.Dispose()
+    }
+}
+
+$script:scriptBlockGetByteArraySha256 = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [byte[]]$Bytes
+    )
+
+    $objSha256 = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        return ([System.BitConverter]::ToString(
+            $objSha256.ComputeHash($Bytes)
+        ) -replace '-', '').ToLowerInvariant()
+    } finally {
+        $objSha256.Dispose()
+    }
+}
+
+$script:scriptBlockWriteRepeatedBytes = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [System.IO.Stream]$Stream,
+
+        [Parameter(Mandatory = $true)]
+        [uint64]$Length,
+
+        [Parameter(Mandatory = $true)]
+        [byte]$Value,
+
+        [AllowNull()]
+        [byte[]]$Prefix
+    )
+
+    $uintWritten = [uint64]0
+    if ($null -ne $Prefix -and $Prefix.Length -gt 0) {
+        if ([uint64]$Prefix.Length -gt $Length) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'prefix-length'
+        }
+        $Stream.Write($Prefix, 0, $Prefix.Length)
+        $uintWritten = [uint64]$Prefix.Length
+    }
+    $arrBuffer = New-Object byte[] $script:intCandidateBufferSize
+    for ($intIndex = 0; $intIndex -lt $arrBuffer.Length; $intIndex++) {
+        $arrBuffer[$intIndex] = $Value
+    }
+    while ($uintWritten -lt $Length) {
+        $uintRemaining = [uint64]($Length - $uintWritten)
+        $intWrite = if ($uintRemaining -gt [uint64]$arrBuffer.Length) {
+            $arrBuffer.Length
+        } else {
+            [int]$uintRemaining
+        }
+        $Stream.Write($arrBuffer, 0, $intWrite)
+        $uintWritten = [uint64]($uintWritten + [uint64]$intWrite)
+    }
+}
+
+$script:scriptBlockNewEntrySpecification = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$Name,
+
+        [Parameter(Mandatory = $true)]
+        [uint64]$Length,
+
+        [Parameter(Mandatory = $true)]
+        [byte]$Value,
+
+        [AllowNull()]
+        [byte[]]$Prefix,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Compression,
+
+        [Parameter()]
+        [int]$ExternalAttributes = 0
+    )
+
+    return [pscustomobject][ordered]@{
+        Name = $Name
+        Length = [uint64]$Length
+        Value = [byte]$Value
+        Prefix = $Prefix
+        Compression = $Compression
+        ExternalAttributes = [int]$ExternalAttributes
+    }
+}
+
+$script:scriptBlockGetDefaultEntrySpecifications = {
+    $listEntries = New-Object 'System.Collections.Generic.List[object]'
+    $bytValue = [byte]0x41
+    foreach ($strName in $script:arrCandidateExpectedName) {
+        $arrPrefix = [System.Text.Encoding]::UTF8.GetBytes("# $strName`n")
+        $listEntries.Add((& $script:scriptBlockNewEntrySpecification `
+            -Name $strName `
+            -Length ([uint64]$arrPrefix.Length) `
+            -Value $bytValue `
+            -Prefix $arrPrefix `
+            -Compression 'Optimal'))
+        $bytValue = [byte]($bytValue + 1)
+    }
+    return [object[]]$listEntries.ToArray()
+}
+
+$script:scriptBlockNormalizeZipFixtureHeaders = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [uint16]$ExpectedEntryCount
+    )
+
+    if (-not [System.BitConverter]::IsLittleEndian) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'zip-endianness'
+    }
+    $arrBytes = [System.IO.File]::ReadAllBytes($LiteralPath)
+    $intEndOfCentralDirectoryOffset = $arrBytes.Length - 22
+    if ($intEndOfCentralDirectoryOffset -lt 0 -or
+        [System.BitConverter]::ToUInt32($arrBytes, $intEndOfCentralDirectoryOffset) -ne
+            [uint32]0x06054B50 -or
+        [System.BitConverter]::ToUInt16($arrBytes, $intEndOfCentralDirectoryOffset + 8) -ne
+            $ExpectedEntryCount -or
+        [System.BitConverter]::ToUInt16($arrBytes, $intEndOfCentralDirectoryOffset + 10) -ne
+            $ExpectedEntryCount -or
+        [System.BitConverter]::ToUInt16($arrBytes, $intEndOfCentralDirectoryOffset + 20) -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'zip-end-record'
+    }
+    $uintCentralDirectorySize = [System.BitConverter]::ToUInt32(
+        $arrBytes,
+        $intEndOfCentralDirectoryOffset + 12
+    )
+    $uintCentralDirectoryOffset = [System.BitConverter]::ToUInt32(
+        $arrBytes,
+        $intEndOfCentralDirectoryOffset + 16
+    )
+    if ([uint64]$uintCentralDirectoryOffset + [uint64]$uintCentralDirectorySize -ne
+        [uint64]$intEndOfCentralDirectoryOffset) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'zip-central-bounds'
+    }
+
+    $intCentralEntryOffset = [int]$uintCentralDirectoryOffset
+    for ($intEntryIndex = 0; $intEntryIndex -lt $ExpectedEntryCount; $intEntryIndex++) {
+        if ($intCentralEntryOffset -gt ($intEndOfCentralDirectoryOffset - 46) -or
+            [System.BitConverter]::ToUInt32($arrBytes, $intCentralEntryOffset) -ne
+                [uint32]0x02014B50) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'zip-central-entry'
+        }
+        $arrBytes[$intCentralEntryOffset + 4] = [byte]20
+        $arrBytes[$intCentralEntryOffset + 5] = [byte]0
+        $uintNameLength = [System.BitConverter]::ToUInt16($arrBytes, $intCentralEntryOffset + 28)
+        $uintExtraLength = [System.BitConverter]::ToUInt16($arrBytes, $intCentralEntryOffset + 30)
+        $uintCommentLength = [System.BitConverter]::ToUInt16($arrBytes, $intCentralEntryOffset + 32)
+        $intCentralEntryOffset += 46 + [int]$uintNameLength +
+            [int]$uintExtraLength + [int]$uintCommentLength
+    }
+    if ($intCentralEntryOffset -ne $intEndOfCentralDirectoryOffset) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'zip-central-cardinality'
+    }
+    [System.IO.File]::WriteAllBytes($LiteralPath, $arrBytes)
+}
+
+$script:scriptBlockRewriteZipFixtureAsStored = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [object[]]$Specifications
+    )
+
+    if (-not [System.BitConverter]::IsLittleEndian -or
+        $Specifications.Count -eq 0 -or
+        $Specifications.Count -gt [uint16]::MaxValue) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'stored-zip-platform'
+    }
+    $arrOriginalBytes = [System.IO.File]::ReadAllBytes($LiteralPath)
+    $intEndOfCentralDirectoryOffset = $arrOriginalBytes.Length - 22
+    if ($intEndOfCentralDirectoryOffset -lt 0 -or
+        [System.BitConverter]::ToUInt32($arrOriginalBytes, $intEndOfCentralDirectoryOffset) -ne
+            [uint32]0x06054B50 -or
+        [System.BitConverter]::ToUInt16(
+            $arrOriginalBytes,
+            $intEndOfCentralDirectoryOffset + 10
+        ) -ne [uint16]$Specifications.Count) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'stored-zip-end-record'
+    }
+    $uintOriginalCentralOffset = [System.BitConverter]::ToUInt32(
+        $arrOriginalBytes,
+        $intEndOfCentralDirectoryOffset + 16
+    )
+    $arrCrc32 = New-Object uint32[] $Specifications.Count
+    $intOriginalCentralEntryOffset = [int]$uintOriginalCentralOffset
+    for ($intEntryIndex = 0; $intEntryIndex -lt $Specifications.Count; $intEntryIndex++) {
+        $objSpecification = $Specifications[$intEntryIndex]
+        if ($objSpecification.Compression -cne 'NoCompression' -or
+            $null -ne $objSpecification.Prefix -or
+            [uint64]$objSpecification.Length -gt [uint32]::MaxValue -or
+            $intOriginalCentralEntryOffset -gt ($intEndOfCentralDirectoryOffset - 46) -or
+            [System.BitConverter]::ToUInt32(
+                $arrOriginalBytes,
+                $intOriginalCentralEntryOffset
+            ) -ne [uint32]0x02014B50) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'stored-zip-entry'
+        }
+        $uintNameLength = [System.BitConverter]::ToUInt16(
+            $arrOriginalBytes,
+            $intOriginalCentralEntryOffset + 28
+        )
+        $uintExtraLength = [System.BitConverter]::ToUInt16(
+            $arrOriginalBytes,
+            $intOriginalCentralEntryOffset + 30
+        )
+        $uintCommentLength = [System.BitConverter]::ToUInt16(
+            $arrOriginalBytes,
+            $intOriginalCentralEntryOffset + 32
+        )
+        $arrExpectedNameBytes = [System.Text.Encoding]::UTF8.GetBytes(
+            [string]$objSpecification.Name
+        )
+        $arrOriginalNameBytes = New-Object byte[] ([int]$uintNameLength)
+        [System.Array]::Copy(
+            $arrOriginalBytes,
+            $intOriginalCentralEntryOffset + 46,
+            $arrOriginalNameBytes,
+            0,
+            $arrOriginalNameBytes.Length
+        )
+        if (-not (& $script:scriptBlockTestByteSequenceEqual `
+                -Left $arrOriginalNameBytes `
+                -Right $arrExpectedNameBytes) -or
+            [System.BitConverter]::ToUInt32(
+                $arrOriginalBytes,
+                $intOriginalCentralEntryOffset + 24
+            ) -ne [uint32]$objSpecification.Length) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'stored-zip-evidence'
+        }
+        $arrCrc32[$intEntryIndex] = [System.BitConverter]::ToUInt32(
+            $arrOriginalBytes,
+            $intOriginalCentralEntryOffset + 16
+        )
+        $intOriginalCentralEntryOffset += 46 + [int]$uintNameLength +
+            [int]$uintExtraLength + [int]$uintCommentLength
+    }
+    if ($intOriginalCentralEntryOffset -ne $intEndOfCentralDirectoryOffset) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'stored-zip-cardinality'
+    }
+
+    [System.IO.File]::Delete($LiteralPath)
+    $objArchiveStream = $null
+    $objBinaryWriter = $null
+    try {
+        $objArchiveStream = New-Object System.IO.FileStream(
+            $LiteralPath,
+            [System.IO.FileMode]::CreateNew,
+            [System.IO.FileAccess]::Write,
+            [System.IO.FileShare]::None
+        )
+        $objBinaryWriter = New-Object System.IO.BinaryWriter(
+            $objArchiveStream,
+            [System.Text.Encoding]::UTF8,
+            $true
+        )
+        $arrRelativeOffsets = New-Object uint32[] $Specifications.Count
+        for ($intEntryIndex = 0; $intEntryIndex -lt $Specifications.Count; $intEntryIndex++) {
+            $objSpecification = $Specifications[$intEntryIndex]
+            $arrNameBytes = [System.Text.Encoding]::UTF8.GetBytes([string]$objSpecification.Name)
+            if ($arrNameBytes.Length -gt [uint16]::MaxValue -or
+                $objArchiveStream.Position -gt [uint32]::MaxValue) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'stored-zip-bounds'
+            }
+            $arrRelativeOffsets[$intEntryIndex] = [uint32]$objArchiveStream.Position
+            $objBinaryWriter.Write([uint32]0x04034B50)
+            $objBinaryWriter.Write([uint16]20)
+            $objBinaryWriter.Write([uint16]0)
+            $objBinaryWriter.Write([uint16]0)
+            $objBinaryWriter.Write([uint16]0)
+            $objBinaryWriter.Write([uint16]0x2821)
+            $objBinaryWriter.Write([uint32]$arrCrc32[$intEntryIndex])
+            $objBinaryWriter.Write([uint32]$objSpecification.Length)
+            $objBinaryWriter.Write([uint32]$objSpecification.Length)
+            $objBinaryWriter.Write([uint16]$arrNameBytes.Length)
+            $objBinaryWriter.Write([uint16]0)
+            $objBinaryWriter.Write($arrNameBytes)
+            & $script:scriptBlockWriteRepeatedBytes `
+                -Stream $objArchiveStream `
+                -Length ([uint64]$objSpecification.Length) `
+                -Value ([byte]$objSpecification.Value) `
+                -Prefix $null
+        }
+
+        $uintCentralDirectoryOffset = [uint32]$objArchiveStream.Position
+        for ($intEntryIndex = 0; $intEntryIndex -lt $Specifications.Count; $intEntryIndex++) {
+            $objSpecification = $Specifications[$intEntryIndex]
+            $arrNameBytes = [System.Text.Encoding]::UTF8.GetBytes([string]$objSpecification.Name)
+            $objBinaryWriter.Write([uint32]0x02014B50)
+            $objBinaryWriter.Write([uint16]20)
+            $objBinaryWriter.Write([uint16]20)
+            $objBinaryWriter.Write([uint16]0)
+            $objBinaryWriter.Write([uint16]0)
+            $objBinaryWriter.Write([uint16]0)
+            $objBinaryWriter.Write([uint16]0x2821)
+            $objBinaryWriter.Write([uint32]$arrCrc32[$intEntryIndex])
+            $objBinaryWriter.Write([uint32]$objSpecification.Length)
+            $objBinaryWriter.Write([uint32]$objSpecification.Length)
+            $objBinaryWriter.Write([uint16]$arrNameBytes.Length)
+            $objBinaryWriter.Write([uint16]0)
+            $objBinaryWriter.Write([uint16]0)
+            $objBinaryWriter.Write([uint16]0)
+            $objBinaryWriter.Write([uint16]0)
+            $objBinaryWriter.Write([uint32]$objSpecification.ExternalAttributes)
+            $objBinaryWriter.Write([uint32]$arrRelativeOffsets[$intEntryIndex])
+            $objBinaryWriter.Write($arrNameBytes)
+        }
+        $uintCentralDirectorySize = [uint32](
+            $objArchiveStream.Position - [long]$uintCentralDirectoryOffset
+        )
+        $objBinaryWriter.Write([uint32]0x06054B50)
+        $objBinaryWriter.Write([uint16]0)
+        $objBinaryWriter.Write([uint16]0)
+        $objBinaryWriter.Write([uint16]$Specifications.Count)
+        $objBinaryWriter.Write([uint16]$Specifications.Count)
+        $objBinaryWriter.Write($uintCentralDirectorySize)
+        $objBinaryWriter.Write($uintCentralDirectoryOffset)
+        $objBinaryWriter.Write([uint16]0)
+    } finally {
+        if ($null -ne $objBinaryWriter) {
+            $objBinaryWriter.Dispose()
+        }
+        if ($null -ne $objArchiveStream) {
+            $objArchiveStream.Dispose()
+        }
+    }
+}
+
+$script:scriptBlockWriteZipFromSpecifications = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [object[]]$Specifications
+    )
+
+    Add-Type -AssemblyName System.IO.Compression -ErrorAction Stop
+    try {
+        Add-Type -AssemblyName System.IO.Compression.FileSystem -ErrorAction Stop
+    } catch {
+        if (-not ('System.IO.Compression.ZipArchive' -as [type])) {
+            throw
+        }
+    }
+    $objArchiveStream = New-Object System.IO.FileStream(
+        $LiteralPath,
+        [System.IO.FileMode]::CreateNew,
+        [System.IO.FileAccess]::Write,
+        [System.IO.FileShare]::None
+    )
+    try {
+        $objArchive = New-Object System.IO.Compression.ZipArchive(
+            $objArchiveStream,
+            [System.IO.Compression.ZipArchiveMode]::Create,
+            $true
+        )
+        try {
+            foreach ($objSpecification in $Specifications) {
+                $objCompression = if ($objSpecification.Compression -ceq 'NoCompression') {
+                    [System.IO.Compression.CompressionLevel]::NoCompression
+                } else {
+                    [System.IO.Compression.CompressionLevel]::Optimal
+                }
+                $objEntry = $objArchive.CreateEntry(
+                    $objSpecification.Name,
+                    $objCompression
+                )
+                $objEntry.LastWriteTime = New-Object System.DateTimeOffset(
+                    2000,
+                    1,
+                    1,
+                    0,
+                    0,
+                    0,
+                    [System.TimeSpan]::Zero
+                )
+                $objEntry.ExternalAttributes = $objSpecification.ExternalAttributes
+                $objEntryStream = $objEntry.Open()
+                try {
+                    & $script:scriptBlockWriteRepeatedBytes `
+                        -Stream $objEntryStream `
+                        -Length ([uint64]$objSpecification.Length) `
+                        -Value ([byte]$objSpecification.Value) `
+                        -Prefix $objSpecification.Prefix
+                } finally {
+                    $objEntryStream.Dispose()
+                }
+            }
+        } finally {
+            $objArchive.Dispose()
+        }
+    } finally {
+        $objArchiveStream.Dispose()
+    }
+    & $script:scriptBlockNormalizeZipFixtureHeaders `
+        -LiteralPath $LiteralPath `
+        -ExpectedEntryCount ([uint16]$Specifications.Count)
+}
+
+$script:scriptBlockSetResourceLengths = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [object[]]$Specifications,
+
+        [Parameter(Mandatory = $true)]
+        [uint64[]]$Lengths,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Compression
+    )
+
+    if ($Specifications.Count -ne $Lengths.Count) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'resource-cardinality'
+    }
+    for ($intIndex = 0; $intIndex -lt $Specifications.Count; $intIndex++) {
+        $Specifications[$intIndex].Length = [uint64]$Lengths[$intIndex]
+        $Specifications[$intIndex].Prefix = $null
+        $Specifications[$intIndex].Compression = $Compression
+    }
+    return [object[]]$Specifications
+}
+
+$script:scriptBlockRemoveLastCentralDirectoryName = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath
+    )
+
+    if (-not [System.BitConverter]::IsLittleEndian) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'zip-endianness'
+    }
+    $arrBytes = [System.IO.File]::ReadAllBytes($LiteralPath)
+    $listCentralOffset = New-Object 'System.Collections.Generic.List[int]'
+    $intEndOfCentralDirectoryOffset = -1
+    for ($intIndex = 0; $intIndex -le ($arrBytes.Length - 4); $intIndex++) {
+        $uintSignature = [System.BitConverter]::ToUInt32($arrBytes, $intIndex)
+        if ($uintSignature -eq [uint32]0x02014B50) {
+            $listCentralOffset.Add($intIndex)
+        } elseif ($uintSignature -eq [uint32]0x06054B50) {
+            $intEndOfCentralDirectoryOffset = $intIndex
+        }
+    }
+    if ($listCentralOffset.Count -ne 4 -or $intEndOfCentralDirectoryOffset -lt 0) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'zip-central-shape'
+    }
+    $intCentralOffset = $listCentralOffset[$listCentralOffset.Count - 1]
+    $uintNameLength = [System.BitConverter]::ToUInt16($arrBytes, $intCentralOffset + 28)
+    $uintExtraLength = [System.BitConverter]::ToUInt16($arrBytes, $intCentralOffset + 30)
+    $uintCommentLength = [System.BitConverter]::ToUInt16($arrBytes, $intCentralOffset + 32)
+    if ($uintNameLength -eq 0 -or $uintExtraLength -ne 0 -or $uintCommentLength -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'zip-central-name'
+    }
+    $intNameOffset = $intCentralOffset + 46
+    $intAfterNameOffset = $intNameOffset + [int]$uintNameLength
+    $uintCentralSize = [System.BitConverter]::ToUInt32(
+        $arrBytes,
+        $intEndOfCentralDirectoryOffset + 12
+    )
+    [System.Array]::Copy(
+        [System.BitConverter]::GetBytes([uint16]0),
+        0,
+        $arrBytes,
+        $intCentralOffset + 28,
+        2
+    )
+    $arrRewritten = New-Object byte[] ($arrBytes.Length - [int]$uintNameLength)
+    [System.Array]::Copy($arrBytes, 0, $arrRewritten, 0, $intNameOffset)
+    [System.Array]::Copy(
+        $arrBytes,
+        $intAfterNameOffset,
+        $arrRewritten,
+        $intNameOffset,
+        $arrBytes.Length - $intAfterNameOffset
+    )
+    $intNewEndOfCentralDirectoryOffset = $intEndOfCentralDirectoryOffset - [int]$uintNameLength
+    [System.Array]::Copy(
+        [System.BitConverter]::GetBytes([uint32]($uintCentralSize - $uintNameLength)),
+        0,
+        $arrRewritten,
+        $intNewEndOfCentralDirectoryOffset + 12,
+        4
+    )
+    [System.IO.File]::WriteAllBytes($LiteralPath, $arrRewritten)
+}
+
+$script:scriptBlockSetZipCommentLength = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [uint64]$TargetLength
+    )
+
+    if (-not [System.BitConverter]::IsLittleEndian) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'zip-endianness'
+    }
+    $arrBytes = [System.IO.File]::ReadAllBytes($LiteralPath)
+    if ($arrBytes.Length -lt 22 -or
+        [System.BitConverter]::ToUInt32($arrBytes, $arrBytes.Length - 22) -ne
+            [uint32]0x06054B50 -or
+        [System.BitConverter]::ToUInt16($arrBytes, $arrBytes.Length - 2) -ne 0 -or
+        $TargetLength -lt [uint64]$arrBytes.Length) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'zip-comment-shape'
+    }
+    $uintGap = [uint64]($TargetLength - [uint64]$arrBytes.Length)
+    if ($uintGap -gt [uint16]::MaxValue -or $TargetLength -gt [int]::MaxValue) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'zip-comment-length'
+    }
+    [System.Array]::Copy(
+        [System.BitConverter]::GetBytes([uint16]$uintGap),
+        0,
+        $arrBytes,
+        $arrBytes.Length - 2,
+        2
+    )
+    $arrRewritten = New-Object byte[] ([int]$TargetLength)
+    [System.Array]::Copy($arrBytes, 0, $arrRewritten, 0, $arrBytes.Length)
+    for ($intIndex = $arrBytes.Length; $intIndex -lt $arrRewritten.Length; $intIndex++) {
+        $arrRewritten[$intIndex] = [byte]0x43
+    }
+    [System.IO.File]::WriteAllBytes($LiteralPath, $arrRewritten)
+}
+
+$script:scriptBlockNewZipFixture = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$SemanticCase
+    )
+
+    $arrSpecifications = [object[]]@(& $script:scriptBlockGetDefaultEntrySpecifications)
+    switch -Exact ($SemanticCase) {
+        'archive.attributes.linklike-ignored' {
+            foreach ($objEntrySpecification in $arrSpecifications) {
+                $objEntrySpecification.ExternalAttributes = [int]0xA1FF0000
+            }
+        }
+        'manifest.entry.missing' {
+            $arrSpecifications = [object[]]@($arrSpecifications | Select-Object -First 3)
+        }
+        'manifest.entry.extra' {
+            $arrSpecifications += & $script:scriptBlockNewEntrySpecification `
+                -Name 'extra.md' -Length ([uint64]2) -Value ([byte]0x0A) `
+                -Prefix ([byte[]](0x78, 0x0A)) -Compression 'Optimal'
+        }
+        'manifest.entry.duplicate-exact' {
+            $arrSpecifications[3].Name = $arrSpecifications[0].Name
+        }
+        'manifest.entry.duplicate-case' {
+            $arrSpecifications[3].Name = $arrSpecifications[0].Name.ToUpperInvariant()
+        }
+        'manifest.path.nested-forward' {
+            $arrSpecifications[3].Name = 'nested/STYLE_GUIDE_FULL.md'
+        }
+        'manifest.path.nested-back' {
+            $arrSpecifications[3].Name = 'nested\STYLE_GUIDE_FULL.md'
+        }
+        'manifest.path.traversal-forward' {
+            $arrSpecifications[3].Name = '../STYLE_GUIDE_FULL.md'
+        }
+        'manifest.path.traversal-back' {
+            $arrSpecifications[3].Name = '..\STYLE_GUIDE_FULL.md'
+        }
+        'manifest.path.leading-forward' {
+            $arrSpecifications[3].Name = '/STYLE_GUIDE_FULL.md'
+        }
+        'manifest.path.leading-back' {
+            $arrSpecifications[3].Name = '\STYLE_GUIDE_FULL.md'
+        }
+        'manifest.path.drive-qualified' {
+            $arrSpecifications[3].Name = 'C:\STYLE_GUIDE_FULL.md'
+        }
+        'manifest.entry.directory' {
+            $arrSpecifications[3].Name = 'STYLE_GUIDE_FULL.md/'
+            $arrSpecifications[3].Length = [uint64]0
+            $arrSpecifications[3].Prefix = $null
+        }
+        'manifest.entry.file-directory-collision' {
+            $arrSpecifications[2].Name = 'STYLE_GUIDE_FULL.md/'
+            $arrSpecifications[2].Length = [uint64]0
+            $arrSpecifications[2].Prefix = $null
+        }
+        'manifest.entry.raw-empty-name' {
+            $arrSpecifications[3].Name = 'x'
+        }
+        'output.bytes.bom' {
+            $arrSpecifications[0].Length = [uint64]5
+            $arrSpecifications[0].Prefix = [byte[]](0xEF, 0xBB, 0xBF, 0x78, 0x0A)
+        }
+        'output.bytes.cr' {
+            $arrSpecifications[0].Length = [uint64]3
+            $arrSpecifications[0].Prefix = [byte[]](0x78, 0x0D, 0x0A)
+        }
+        'resource.entry.below' {
+            $arrSpecifications = & $script:scriptBlockSetResourceLengths -Specifications $arrSpecifications `
+                -Lengths ([uint64[]]@((8MB - 1), 0, 0, 0)) -Compression 'Optimal'
+        }
+        'resource.entry.at' {
+            $arrSpecifications = & $script:scriptBlockSetResourceLengths -Specifications $arrSpecifications `
+                -Lengths ([uint64[]]@((8MB), 0, 0, 0)) -Compression 'Optimal'
+        }
+        'resource.entry.above' {
+            $arrSpecifications = & $script:scriptBlockSetResourceLengths -Specifications $arrSpecifications `
+                -Lengths ([uint64[]]@((8MB + 1), 0, 0, 0)) -Compression 'Optimal'
+        }
+        'resource.total.below' {
+            $arrSpecifications = & $script:scriptBlockSetResourceLengths -Specifications $arrSpecifications `
+                -Lengths ([uint64[]]@((8MB), (8MB), (8MB), (8MB - 1))) -Compression 'Optimal'
+        }
+        'resource.total.at' {
+            $arrSpecifications = & $script:scriptBlockSetResourceLengths -Specifications $arrSpecifications `
+                -Lengths ([uint64[]]@((8MB), (8MB), (8MB), (8MB))) -Compression 'Optimal'
+        }
+        'resource.total.above' {
+            $arrSpecifications = & $script:scriptBlockSetResourceLengths -Specifications $arrSpecifications `
+                -Lengths ([uint64[]]@((8MB), (8MB), (8MB), (8MB + 1))) -Compression 'Optimal'
+        }
+        'resource.archive.below' {
+            $arrSpecifications = & $script:scriptBlockSetResourceLengths `
+                -Specifications $arrSpecifications `
+                -Lengths ([uint64[]]@(
+                    (8MB - 16KB),
+                    (8MB - 16KB),
+                    (8MB - 16KB),
+                    (8MB - 16KB)
+                )) `
+                -Compression 'NoCompression'
+        }
+        'resource.archive.at' {
+            $arrSpecifications = & $script:scriptBlockSetResourceLengths `
+                -Specifications $arrSpecifications `
+                -Lengths ([uint64[]]@(
+                    (8MB - 16KB),
+                    (8MB - 16KB),
+                    (8MB - 16KB),
+                    (8MB - 16KB)
+                )) `
+                -Compression 'NoCompression'
+        }
+        default {}
+    }
+
+    & $script:scriptBlockWriteZipFromSpecifications `
+        -LiteralPath $LiteralPath `
+        -Specifications $arrSpecifications
+    if ($SemanticCase -in @('resource.archive.below', 'resource.archive.at')) {
+        & $script:scriptBlockRewriteZipFixtureAsStored `
+            -LiteralPath $LiteralPath `
+            -Specifications $arrSpecifications
+    }
+
+    if ($SemanticCase -ceq 'manifest.entry.raw-empty-name') {
+        & $script:scriptBlockRemoveLastCentralDirectoryName -LiteralPath $LiteralPath
+    }
+    if ($SemanticCase -ceq 'resource.archive.below') {
+        & $script:scriptBlockSetZipCommentLength `
+            -LiteralPath $LiteralPath `
+            -TargetLength ([uint64](32MB - 1))
+    }
+    if ($SemanticCase -ceq 'resource.archive.at') {
+        & $script:scriptBlockSetZipCommentLength `
+            -LiteralPath $LiteralPath `
+            -TargetLength ([uint64](32MB))
+    }
+
+    if ($SemanticCase -ceq 'archive.zip.truncated') {
+        $objStream = New-Object System.IO.FileStream(
+            $LiteralPath,
+            [System.IO.FileMode]::Open,
+            [System.IO.FileAccess]::Write,
+            [System.IO.FileShare]::None
+        )
+        try {
+            if ($objStream.Length -lt 8) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'truncate-length'
+            }
+            $objStream.SetLength($objStream.Length - 7)
+        } finally {
+            $objStream.Dispose()
+        }
+    }
+    if ($SemanticCase -ceq 'resource.archive.above') {
+        $objStream = New-Object System.IO.FileStream(
+            $LiteralPath,
+            [System.IO.FileMode]::Open,
+            [System.IO.FileAccess]::Write,
+            [System.IO.FileShare]::None
+        )
+        try {
+            $objStream.SetLength([long](32MB + 1))
+        } finally {
+            $objStream.Dispose()
+        }
+    }
+    return & $script:scriptBlockGetFileEvidence -LiteralPath $LiteralPath
+}
+
+$script:scriptBlockTestLinkSemanticCase = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$SemanticCase
+    )
+
+    return $SemanticCase -in @(
+        'environment.checkout.link-component',
+        'environment.trusted.link-component',
+        'candidate.preexisting.live-link',
+        'candidate.preexisting.dangling-link',
+        'helper.cleanup.link-substitution',
+        'context.cleanup.link-substitution',
+        'download.entry.link',
+        'script.helper.link',
+        'script.context.link'
+    )
+}
+
+$script:scriptBlockNewSymbolicLink = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LinkPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$TargetPath,
+
+        [Parameter(Mandatory = $true)]
+        [bool]$Directory
+    )
+
+    try {
+        $boolTargetIsDirectory = [System.IO.Directory]::Exists($TargetPath)
+        $boolTargetIsFile = [System.IO.File]::Exists($TargetPath)
+        if (($boolTargetIsDirectory -or $boolTargetIsFile) -and
+            $boolTargetIsDirectory -ne $Directory) {
+            throw 'link-target-type'
+        }
+        if ($env:OS -eq 'Windows_NT') {
+            $strItemType = if ($Directory -and $boolTargetIsDirectory) {
+                'Junction'
+            } else {
+                'SymbolicLink'
+            }
+            $null = New-Item -ItemType $strItemType -Path $LinkPath -Target $TargetPath `
+                -ErrorAction Stop
+        } else {
+            $arrOutput = @(& ln '-s' '--' $TargetPath $LinkPath 2>$null)
+            if ($LASTEXITCODE -ne 0 -or $arrOutput.Count -ne 0) {
+                throw 'link'
+            }
+        }
+        $objAttributes = [System.IO.File]::GetAttributes($LinkPath)
+        if (($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -eq 0) {
+            throw 'link-attribute'
+        }
+        return $true
+    } catch {
+        return $false
+    }
+}
+
+$script:scriptBlockRemoveTestTree = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ApprovedParent
+    )
+
+    $strFullPath = [System.IO.Path]::GetFullPath($LiteralPath)
+    $strParent = [System.IO.Path]::GetFullPath($ApprovedParent).TrimEnd(
+        [System.IO.Path]::DirectorySeparatorChar,
+        [System.IO.Path]::AltDirectorySeparatorChar
+    ) + [System.IO.Path]::DirectorySeparatorChar
+    if (-not $strFullPath.StartsWith($strParent, $script:objCandidatePathComparison)) {
+        & $script:scriptBlockStopHarness -Code 'orchestration-failed' -Detail 'teardown-containment'
+    }
+    if (-not [System.IO.Directory]::Exists($strFullPath) -and
+        -not [System.IO.File]::Exists($strFullPath)) {
+        return
+    }
+
+    $objRootAttributes = [System.IO.File]::GetAttributes($strFullPath)
+    if (($objRootAttributes -band [System.IO.FileAttributes]::Directory) -eq 0 -or
+        ($objRootAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'orchestration-failed' -Detail 'teardown-root-type'
+    }
+    $stackPendingDirectory = New-Object 'System.Collections.Generic.Stack[string]'
+    $listDirectory = New-Object 'System.Collections.Generic.List[string]'
+    $stackPendingDirectory.Push($strFullPath)
+    while ($stackPendingDirectory.Count -gt 0) {
+        $strDirectory = $stackPendingDirectory.Pop()
+        $listDirectory.Add($strDirectory)
+        foreach ($strEntry in [System.IO.Directory]::EnumerateFileSystemEntries($strDirectory)) {
+            $objAttributes = [System.IO.File]::GetAttributes($strEntry)
+            $boolDirectory = ($objAttributes -band [System.IO.FileAttributes]::Directory) -ne 0
+            $boolReparse = ($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0
+            if ($boolReparse) {
+                if ($boolDirectory) {
+                    [System.IO.Directory]::Delete($strEntry, $false)
+                } else {
+                    [System.IO.File]::SetAttributes($strEntry, [System.IO.FileAttributes]::Normal)
+                    [System.IO.File]::Delete($strEntry)
+                }
+            } elseif ($boolDirectory) {
+                $stackPendingDirectory.Push($strEntry)
+            } else {
+                [System.IO.File]::SetAttributes($strEntry, [System.IO.FileAttributes]::Normal)
+                [System.IO.File]::Delete($strEntry)
+            }
+        }
+    }
+    for ($intIndex = $listDirectory.Count - 1; $intIndex -ge 0; $intIndex--) {
+        [System.IO.File]::SetAttributes(
+            $listDirectory[$intIndex],
+            [System.IO.FileAttributes]::Directory
+        )
+        [System.IO.Directory]::Delete($listDirectory[$intIndex], $false)
+    }
+}
+
+$script:scriptBlockGetProductionFailureField = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [System.Management.Automation.ErrorRecord]$ErrorRecord,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Key,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Fallback
+    )
+
+    if ($null -ne $ErrorRecord.Exception -and
+        $null -ne $ErrorRecord.Exception.Data -and
+        $ErrorRecord.Exception.Data.Contains($Key)) {
+        $objValue = $ErrorRecord.Exception.Data[$Key]
+        if ($null -ne $objValue -and $objValue.GetType() -eq [System.String] -and
+            $objValue.Length -gt 0 -and $objValue.Length -le 96 -and
+            $objValue -match '^[A-Za-z0-9-]+$') {
+            return [string]$objValue
+        }
+    }
+    return $Fallback
+}
+
+$script:scriptBlockNewObservation = {
+    return [ordered]@{
+        Result = 'rejection'
+        Status = 'failed'
+        Phase = 'none'
+        Subreason = 'fixture'
+        DiagnosticCode = 'orchestration-failed'
+        PreCleanupState = 'NotCreated'
+        CleanupSequence = 'none'
+        CandidateFinalState = 'NotCreated'
+        ContextFinalState = 'NotCreated'
+        FilesystemCallCount = [uint32]0
+        FixtureLength = [uint64]0
+        FixtureSha256 = $script:strCandidateEmptySha256
+        InvocationId = [System.Guid]::NewGuid()
+        SentinelState = 'intact'
+        SourceState = 'unchanged'
+        AuthorizedSkip = $false
+        SkipCode = $null
+    }
+}
+
+$script:scriptBlockNewCaseResult = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [object]$Case,
+
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IDictionary]$Observation,
+
+        [Parameter(Mandatory = $true)]
+        [string]$OperatingSystem,
+
+        [Parameter(Mandatory = $true)]
+        [string]$PowerShellEdition,
+
+        [Parameter(Mandatory = $true)]
+        [System.Version]$PowerShellVersion
+    )
+
+    $boolMatched = $Case.ExpectedResult -ceq $Observation.Result -and
+        $Case.ExpectedStatus -ceq $Observation.Status -and
+        $Case.ExpectedPhase -ceq $Observation.Phase -and
+        $Case.ExpectedSubreason -ceq $Observation.Subreason -and
+        $Case.ExpectedDiagnosticCode -ceq $Observation.DiagnosticCode -and
+        $Case.ExpectedPreCleanupState -ceq $Observation.PreCleanupState -and
+        $Case.ExpectedCleanupSequence -ceq $Observation.CleanupSequence -and
+        $Case.ExpectedCandidateFinalState -ceq $Observation.CandidateFinalState -and
+        $Case.ExpectedContextFinalState -ceq $Observation.ContextFinalState -and
+        [uint32]$Case.ExpectedFilesystemCallCount -eq $Observation.FilesystemCallCount -and
+        $Case.ExpectedSentinelState -ceq $Observation.SentinelState -and
+        $Case.ExpectedSourceState -ceq $Observation.SourceState
+    if ($null -ne $Case.FixtureLength) {
+        $boolMatched = $boolMatched -and
+            [uint64]$Case.FixtureLength -eq $Observation.FixtureLength
+    }
+    if ($null -ne $Case.FixtureSha256) {
+        $boolMatched = $boolMatched -and
+            $Case.FixtureSha256 -ceq $Observation.FixtureSha256
+    }
+
+    $boolOppositePlatformSkip = $Observation.SkipCode -ceq 'skip-opposite-platform' -and
+        $Case.Applicability -cne 'All' -and
+        $Case.Applicability -cne $OperatingSystem
+    $boolPrimitiveSkip = $Observation.SkipCode -ceq 'skip-link-primitive-unavailable' -and
+        $Case.PrimitiveProbeRule -ceq 'required-link'
+    $boolSkipAuthorized = $Observation.AuthorizedSkip -and
+        ($boolOppositePlatformSkip -or $boolPrimitiveSkip)
+    $strVerdict = if ($Observation.AuthorizedSkip -and -not $boolSkipAuthorized) {
+        'fail'
+    } elseif ($boolSkipAuthorized) {
+        'skip'
+    } elseif ($boolMatched) {
+        'pass'
+    } else {
+        'fail'
+    }
+    $strHarnessCode = if ($Observation.AuthorizedSkip -and -not $boolSkipAuthorized) {
+        'orchestration-failed'
+    } elseif ($boolSkipAuthorized) {
+        [string]$Observation.SkipCode
+    } elseif ($boolMatched) {
+        'None'
+    } else {
+        'orchestration-failed'
+    }
+    $strActualResult = if ($Observation.AuthorizedSkip) { 'rejection' } else { $Observation.Result }
+    $strActualStatus = if ($Observation.AuthorizedSkip) { 'failed' } else { $Observation.Status }
+
+    $objResult = [pscustomobject][ordered]@{
+        SchemaVersion = [uint32]1
+        CaseId = [string]$Case.CaseId
+        SemanticCase = [string]$Case.SemanticCase
+        SemanticVariant = $Case.SemanticVariant
+        OperatingSystem = [string]$OperatingSystem
+        PowerShellEdition = [string]$PowerShellEdition
+        PowerShellVersion = $PowerShellVersion
+        ExpectedResult = [string]$Case.ExpectedResult
+        ActualResult = [string]$strActualResult
+        ExpectedStatus = [string]$Case.ExpectedStatus
+        ActualStatus = [string]$strActualStatus
+        ExpectedPhase = [string]$Case.ExpectedPhase
+        ActualPhase = [string]$Observation.Phase
+        ExpectedDiagnosticCode = [string]$Case.ExpectedDiagnosticCode
+        ActualDiagnosticCode = [string]$Observation.DiagnosticCode
+        ExpectedPreCleanupState = [string]$Case.ExpectedPreCleanupState
+        ActualPreCleanupState = [string]$Observation.PreCleanupState
+        ExpectedCleanupSequence = [string]$Case.ExpectedCleanupSequence
+        ActualCleanupSequence = [string]$Observation.CleanupSequence
+        ExpectedCandidateFinalState = [string]$Case.ExpectedCandidateFinalState
+        ActualCandidateFinalState = [string]$Observation.CandidateFinalState
+        ExpectedContextFinalState = [string]$Case.ExpectedContextFinalState
+        ActualContextFinalState = [string]$Observation.ContextFinalState
+        FixtureLength = [uint64]$Observation.FixtureLength
+        FixtureSha256 = [string]$Observation.FixtureSha256
+        InvocationId = [System.Guid]$Observation.InvocationId
+        HarnessVerdict = [string]$strVerdict
+        HarnessDiagnosticCode = [string]$strHarnessCode
+        FilesystemCallCount = [uint32]$Observation.FilesystemCallCount
+    }
+    $objResult.PSObject.TypeNames.Insert(0, $script:strCandidateResultTypeName)
+    return $objResult
+}
+
+$script:scriptBlockAssertUnauthorizedSkipsRejected = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [object]$Catalog,
+
+        [Parameter(Mandatory = $true)]
+        [string]$OperatingSystem,
+
+        [Parameter(Mandatory = $true)]
+        [string]$PowerShellEdition,
+
+        [Parameter(Mandatory = $true)]
+        [System.Version]$PowerShellVersion
+    )
+
+    $objCase = $Catalog.Cases[0]
+    foreach ($strSkipCode in @(
+        'unexpected-skip',
+        'skip-opposite-platform',
+        'skip-link-primitive-unavailable'
+    )) {
+        $hashtableObservation = & $script:scriptBlockNewObservation
+        $hashtableObservation.AuthorizedSkip = $true
+        $hashtableObservation.SkipCode = $strSkipCode
+        $objResult = & $script:scriptBlockNewCaseResult `
+            -Case $objCase `
+            -Observation $hashtableObservation `
+            -OperatingSystem $OperatingSystem `
+            -PowerShellEdition $PowerShellEdition `
+            -PowerShellVersion $PowerShellVersion
+        if ($objResult.HarnessVerdict -cne 'fail' -or
+            $objResult.HarnessDiagnosticCode -cne 'orchestration-failed') {
+            & $script:scriptBlockStopHarness `
+                -Code 'orchestration-failed' `
+                -Detail 'unauthorized-skip-accepted'
+        }
+    }
+}
+
+$script:scriptBlockConvertToCanonicalCaseJson = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [object]$Result
+    )
+
+    $hashtableProjection = [ordered]@{
+        SchemaVersion = [uint32]$Result.SchemaVersion
+        CaseId = [string]$Result.CaseId
+        SemanticCase = [string]$Result.SemanticCase
+        SemanticVariant = $Result.SemanticVariant
+        OperatingSystem = [string]$Result.OperatingSystem
+        PowerShellEdition = [string]$Result.PowerShellEdition
+        PowerShellVersion = $Result.PowerShellVersion.ToString()
+        ExpectedResult = [string]$Result.ExpectedResult
+        ActualResult = [string]$Result.ActualResult
+        ExpectedStatus = [string]$Result.ExpectedStatus
+        ActualStatus = [string]$Result.ActualStatus
+        ExpectedPhase = [string]$Result.ExpectedPhase
+        ActualPhase = [string]$Result.ActualPhase
+        ExpectedDiagnosticCode = [string]$Result.ExpectedDiagnosticCode
+        ActualDiagnosticCode = [string]$Result.ActualDiagnosticCode
+        ExpectedPreCleanupState = [string]$Result.ExpectedPreCleanupState
+        ActualPreCleanupState = [string]$Result.ActualPreCleanupState
+        ExpectedCleanupSequence = [string]$Result.ExpectedCleanupSequence
+        ActualCleanupSequence = [string]$Result.ActualCleanupSequence
+        ExpectedCandidateFinalState = [string]$Result.ExpectedCandidateFinalState
+        ActualCandidateFinalState = [string]$Result.ActualCandidateFinalState
+        ExpectedContextFinalState = [string]$Result.ExpectedContextFinalState
+        ActualContextFinalState = [string]$Result.ActualContextFinalState
+        FixtureLength = [uint64]$Result.FixtureLength
+        FixtureSha256 = [string]$Result.FixtureSha256
+        InvocationId = $Result.InvocationId.ToString('D')
+        HarnessVerdict = [string]$Result.HarnessVerdict
+        HarnessDiagnosticCode = [string]$Result.HarnessDiagnosticCode
+        FilesystemCallCount = [uint32]$Result.FilesystemCallCount
+    }
+    return ($hashtableProjection | ConvertTo-Json -Compress)
+}
+
+$script:scriptBlockNewCaseFixtureLayout = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$RunRoot,
+
+        [Parameter(Mandatory = $true)]
+        [string]$CaseId
+    )
+
+    $strLeaf = $CaseId.ToLowerInvariant() + '-' +
+        [System.Guid]::NewGuid().ToString('N').Substring(0, 8)
+    $strCaseRoot = [System.IO.Path]::GetFullPath(
+        [System.IO.Path]::Combine($RunRoot, $strLeaf)
+    )
+    $strCheckout = [System.IO.Path]::Combine($strCaseRoot, 'checkout')
+    $strTrusted = [System.IO.Path]::Combine($strCaseRoot, 'trusted')
+    $strSentinelDirectory = [System.IO.Path]::Combine($strCaseRoot, 'sentinel')
+    $strSentinelFile = [System.IO.Path]::Combine($strSentinelDirectory, 'sentinel.bin')
+    [void][System.IO.Directory]::CreateDirectory($strCheckout)
+    [void][System.IO.Directory]::CreateDirectory($strTrusted)
+    [void][System.IO.Directory]::CreateDirectory($strSentinelDirectory)
+    [System.IO.File]::WriteAllBytes(
+        $strSentinelFile,
+        [byte[]](0x50, 0x31, 0x41, 0x0A)
+    )
+    return [ordered]@{
+        CaseRoot = $strCaseRoot
+        Checkout = $strCheckout
+        Trusted = $strTrusted
+        SentinelDirectory = $strSentinelDirectory
+        SentinelFile = $strSentinelFile
+        SentinelSha256 = (& $script:scriptBlockGetFileEvidence -LiteralPath $strSentinelFile).Sha256
+    }
+}
+
+$script:scriptBlockTestSentinelIntact = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IDictionary]$Layout
+    )
+
+    try {
+        $objEvidence = & $script:scriptBlockGetFileEvidence -LiteralPath $Layout.SentinelFile
+        return $objEvidence.Sha256 -ceq $Layout.SentinelSha256 -and
+            $objEvidence.Length -eq [uint64]4
+    } catch {
+        return $false
+    }
+}
+
+$script:scriptBlockAddTestDownloadRecord = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [object]$Context,
+
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [uint64]$Length,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Sha256
+    )
+
+    $objRecord = [pscustomobject][ordered]@{
+        SchemaVersion = [uint32]1
+        Sequence = [uint32]$Context.NextSequence
+        Kind = [string]'DownloadFile'
+        Path = [string]$LiteralPath
+        ParentPath = [string]$Context.DownloadDirectoryPath
+        LeafName = [string][System.IO.Path]::GetFileName($LiteralPath)
+        ExpectedEntryType = [string]'File'
+        CreationPhase = [string]'download'
+        EntryState = [string]'Created'
+        ContentLength = [uint64]$Length
+        ContentSha256 = [string]$Sha256
+    }
+    $objRecord.PSObject.TypeNames.Insert(
+        0,
+        'PSStyleGuide.CandidateOwnershipRecord.v1'
+    )
+    $arrJournal = New-Object object[] ($Context.OwnershipJournal.Count + 1)
+    [System.Array]::Copy(
+        $Context.OwnershipJournal,
+        0,
+        $arrJournal,
+        0,
+        $Context.OwnershipJournal.Count
+    )
+    $arrJournal[$arrJournal.Length - 1] = $objRecord
+    $Context.OwnershipJournal = [object[]]$arrJournal
+    $Context.NextSequence = [uint32]($Context.NextSequence + 1)
+}
+
+$script:scriptBlockInvokeExpansionFixture = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [object]$Case,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RunRoot,
+
+        [Parameter(Mandatory = $true)]
+        [string]$HelperLiteralPath
+    )
+
+    $objObservation = & $script:scriptBlockNewObservation
+    $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId $Case.CaseId
+    $objContext = $null
+    $objHeldStream = $null
+    $boolFixtureLinkCreated = $true
+    try {
+        $strSemantic = [string]$Case.SemanticCase
+
+        if ($strSemantic -ceq 'environment.trusted.nonfilesystem-provider') {
+            try {
+                [void](New-StyleGuideCandidateInvocationContext `
+                    -TrustedTemporaryRoot 'Variable::PSStyleGuideCandidateFixture')
+            } catch {
+                $objObservation.Phase = 'root'
+                $objObservation.Subreason = 'provider'
+                $objObservation.DiagnosticCode = & $script:scriptBlockGetProductionFailureField `
+                    -ErrorRecord $_ -Key 'PSStyleGuideDiagnosticCode' -Fallback 'root-invalid'
+            }
+            return $objObservation
+        }
+        if ($strSemantic -ceq 'environment.trusted.wrong-type') {
+            $strWrongType = [System.IO.Path]::Combine($hashtableLayout.CaseRoot, 'trusted-file')
+            [System.IO.File]::WriteAllBytes($strWrongType, [byte[]](0x78))
+            try {
+                [void](New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $strWrongType)
+            } catch {
+                $objObservation.Phase = 'root'
+                $objObservation.Subreason = 'nonordinary-directory'
+                $objObservation.DiagnosticCode = 'root-invalid'
+            }
+            return $objObservation
+        }
+        if ($strSemantic -ceq 'environment.trusted.link-component') {
+            $strTarget = [System.IO.Path]::Combine($hashtableLayout.CaseRoot, 'trusted-target')
+            $strLink = [System.IO.Path]::Combine($hashtableLayout.CaseRoot, 'trusted-link')
+            [void][System.IO.Directory]::CreateDirectory($strTarget)
+            $boolFixtureLinkCreated = & $script:scriptBlockNewSymbolicLink `
+                -LinkPath $strLink -TargetPath $strTarget -Directory $true
+            if (-not $boolFixtureLinkCreated) {
+                $objObservation.AuthorizedSkip = $true
+                $objObservation.SkipCode = 'skip-link-primitive-unavailable'
+                return $objObservation
+            }
+            try {
+                [void](New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $strLink)
+            } catch {
+                $objObservation.Phase = 'root'
+                $objObservation.Subreason = 'nonordinary-directory'
+                $objObservation.DiagnosticCode = 'root-invalid'
+            }
+            return $objObservation
+        }
+
+        if ($strSemantic -ceq 'environment.roots.trusted-ancestor') {
+            $hashtableLayout.Checkout = [System.IO.Path]::Combine(
+                $hashtableLayout.Trusted,
+                'checkout-child'
+            )
+            [void][System.IO.Directory]::CreateDirectory($hashtableLayout.Checkout)
+        } elseif ($strSemantic -ceq 'environment.roots.checkout-ancestor') {
+            $hashtableLayout.Trusted = [System.IO.Path]::Combine(
+                $hashtableLayout.Checkout,
+                'trusted-child'
+            )
+            [void][System.IO.Directory]::CreateDirectory($hashtableLayout.Trusted)
+        }
+
+        $objContext = New-StyleGuideCandidateInvocationContext `
+            -TrustedTemporaryRoot $hashtableLayout.Trusted
+        $objObservation.InvocationId = $objContext.InvocationId
+        $objObservation.PreCleanupState = 'Active'
+        $objObservation.CandidateFinalState = 'Absent'
+        $objObservation.ContextFinalState = 'Active'
+
+        if ($strSemantic -ceq 'path.containment.sibling-prefix') {
+            $strSibling = $hashtableLayout.Trusted + '-sibling'
+            if (& $script:scriptBlockTestCandidateHelperPathContained `
+                -Root $hashtableLayout.Trusted -Candidate $strSibling) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'sibling-prefix-accepted'
+            }
+            $objObservation.Phase = 'containment'
+            $objObservation.Subreason = 'relationship'
+            $objObservation.DiagnosticCode = 'containment-invalid'
+            $objCleanup = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+            $objObservation.CleanupSequence = 'context'
+            $objObservation.ContextFinalState = $objCleanup.FinalState
+            $objObservation.FilesystemCallCount = [uint32]$objCleanup.FilesystemCallCount
+            return $objObservation
+        }
+
+        $strArchivePath = [System.IO.Path]::Combine(
+            $objContext.DownloadDirectoryPath,
+            'candidate-artifact.bin'
+        )
+        $boolCreateDefaultArchive = $strSemantic -cnotin @(
+            'download.entries.empty',
+            'download.entries.two-files',
+            'download.entry.directory',
+            'download.entry.link'
+        )
+        if ($strSemantic -ceq 'download.entries.two-files') {
+            [System.IO.File]::WriteAllBytes(
+                [System.IO.Path]::Combine($objContext.DownloadDirectoryPath, 'one'),
+                [byte[]](1)
+            )
+            [System.IO.File]::WriteAllBytes(
+                [System.IO.Path]::Combine($objContext.DownloadDirectoryPath, 'two'),
+                [byte[]](2)
+            )
+        } elseif ($strSemantic -ceq 'download.entry.directory') {
+            [void][System.IO.Directory]::CreateDirectory($strArchivePath)
+        } elseif ($strSemantic -ceq 'download.entry.link') {
+            $boolFixtureLinkCreated = & $script:scriptBlockNewSymbolicLink `
+                -LinkPath $strArchivePath `
+                -TargetPath $hashtableLayout.SentinelDirectory `
+                -Directory $true
+            if (-not $boolFixtureLinkCreated) {
+                $objObservation.AuthorizedSkip = $true
+                $objObservation.SkipCode = 'skip-link-primitive-unavailable'
+                return $objObservation
+            }
+        } elseif ($boolCreateDefaultArchive) {
+            $hashtableFixtureEvidence = & $script:scriptBlockNewZipFixture `
+                -LiteralPath $strArchivePath `
+                -SemanticCase $strSemantic
+            $objObservation.FixtureLength = [uint64]$hashtableFixtureEvidence.Length
+            $objObservation.FixtureSha256 = [string]$hashtableFixtureEvidence.Sha256
+        }
+
+        if ($strSemantic -in @(
+            'resource.actual.entry-overrun',
+            'resource.actual.total-overrun',
+            'resource.declared.negative-inconsistent',
+            'resource.arithmetic.checked-overflow'
+        )) {
+            $objResourceError = $null
+            try {
+                switch -Exact ($strSemantic) {
+                    'resource.actual.entry-overrun' {
+                        [void](& $script:scriptBlockAddCandidateHelperActualLength `
+                            -CurrentEntryLength ([uint64](8MB)) `
+                            -CurrentTotalLength ([uint64]0) `
+                            -ReadLength ([uint64]1) `
+                            -DeclaredEntryLength ([uint64](8MB)) `
+                            -Phase 'manifest' `
+                            -DiagnosticCode 'manifest-invalid')
+                    }
+                    'resource.actual.total-overrun' {
+                        [void](& $script:scriptBlockAddCandidateHelperActualLength `
+                            -CurrentEntryLength ([uint64]0) `
+                            -CurrentTotalLength ([uint64](32MB)) `
+                            -ReadLength ([uint64]1) `
+                            -DeclaredEntryLength ([uint64](8MB)) `
+                            -Phase 'manifest' `
+                            -DiagnosticCode 'manifest-invalid')
+                    }
+                    'resource.declared.negative-inconsistent' {
+                        [void](& $script:scriptBlockAddCandidateHelperDeclaredLength `
+                            -CurrentTotal ([uint64]0) `
+                            -DeclaredLength ([long]-1))
+                    }
+                    'resource.arithmetic.checked-overflow' {
+                        [void](& $script:scriptBlockAddCandidateHelperDeclaredLength `
+                            -CurrentTotal ([uint64]::MaxValue) `
+                            -DeclaredLength ([long]1))
+                    }
+                }
+            } catch {
+                $objResourceError = $_
+            }
+            if ($null -eq $objResourceError) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'fixture-failed' `
+                    -Detail 'resource-guard-accepted'
+            }
+            $objObservation.Phase = & $script:scriptBlockGetProductionFailureField `
+                -ErrorRecord $objResourceError `
+                -Key 'PSStyleGuidePhase' `
+                -Fallback 'none'
+            $objObservation.Subreason = & $script:scriptBlockGetProductionFailureField `
+                -ErrorRecord $objResourceError `
+                -Key 'PSStyleGuideSubreason' `
+                -Fallback 'failure'
+            $objObservation.DiagnosticCode = & $script:scriptBlockGetProductionFailureField `
+                -ErrorRecord $objResourceError `
+                -Key 'PSStyleGuideDiagnosticCode' `
+                -Fallback 'orchestration-failed'
+            [System.IO.File]::Delete($strArchivePath)
+            $objCleanup = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+            $objObservation.CleanupSequence = 'context'
+            $objObservation.ContextFinalState = [string]$objContext.LifecycleState
+            $objObservation.FilesystemCallCount = [uint32]$objCleanup.FilesystemCallCount
+            return $objObservation
+        }
+
+        if ($strSemantic -ceq 'environment.hidden-extra-detected') {
+            $strHiddenPath = [System.IO.Path]::Combine(
+                $objContext.DownloadDirectoryPath,
+                '.hidden-extra'
+            )
+            [System.IO.File]::WriteAllBytes($strHiddenPath, [byte[]](0x78))
+            if ($env:OS -eq 'Windows_NT') {
+                [System.IO.File]::SetAttributes(
+                    $strHiddenPath,
+                    [System.IO.FileAttributes]::Hidden
+                )
+            }
+        }
+        if ($strSemantic -ceq 'download.entry.unreadable' -and
+            [System.IO.File]::Exists($strArchivePath)) {
+            $objHeldStream = New-Object System.IO.FileStream(
+                $strArchivePath,
+                [System.IO.FileMode]::Open,
+                [System.IO.FileAccess]::ReadWrite,
+                [System.IO.FileShare]::None
+            )
+        }
+
+        if ($strSemantic -ceq 'environment.checkout.link-component') {
+            $strCheckoutTarget = [System.IO.Path]::Combine(
+                $hashtableLayout.CaseRoot,
+                'checkout-target'
+            )
+            $strCheckoutLink = [System.IO.Path]::Combine(
+                $hashtableLayout.CaseRoot,
+                'checkout-link'
+            )
+            [void][System.IO.Directory]::CreateDirectory($strCheckoutTarget)
+            $boolFixtureLinkCreated = & $script:scriptBlockNewSymbolicLink `
+                -LinkPath $strCheckoutLink -TargetPath $strCheckoutTarget -Directory $true
+            if (-not $boolFixtureLinkCreated) {
+                $objObservation.AuthorizedSkip = $true
+                $objObservation.SkipCode = 'skip-link-primitive-unavailable'
+                return $objObservation
+            }
+            $hashtableLayout.Checkout = $strCheckoutLink
+        } elseif ($strSemantic -ceq 'environment.roots.equal') {
+            $hashtableLayout.Checkout = $hashtableLayout.Trusted
+        } elseif ($strSemantic -ceq 'environment.roots.case-alias') {
+            $hashtableLayout.Checkout = $hashtableLayout.Trusted.ToUpperInvariant()
+        } elseif ($strSemantic -ceq 'environment.checkout.missing') {
+            $hashtableLayout.Checkout = [System.IO.Path]::Combine(
+                $hashtableLayout.CaseRoot,
+                'missing-checkout'
+            )
+        }
+
+        if ($strSemantic -ceq 'environment.candidate.case-collision') {
+            [System.IO.File]::WriteAllBytes(
+                [System.IO.Path]::Combine($objContext.InvocationRootPath, 'Candidate'),
+                [byte[]](0x78)
+            )
+        } elseif ($strSemantic -ceq 'candidate.preexisting.file') {
+            [System.IO.File]::WriteAllBytes($objContext.CandidatePath, [byte[]](0x78))
+        } elseif ($strSemantic -ceq 'candidate.preexisting.directory') {
+            [void][System.IO.Directory]::CreateDirectory($objContext.CandidatePath)
+        } elseif ($strSemantic -ceq 'candidate.preexisting.live-link') {
+            $boolFixtureLinkCreated = & $script:scriptBlockNewSymbolicLink `
+                -LinkPath $objContext.CandidatePath `
+                -TargetPath $hashtableLayout.SentinelDirectory `
+                -Directory $true
+        } elseif ($strSemantic -ceq 'candidate.preexisting.dangling-link') {
+            $boolFixtureLinkCreated = & $script:scriptBlockNewSymbolicLink `
+                -LinkPath $objContext.CandidatePath `
+                -TargetPath ([System.IO.Path]::Combine($hashtableLayout.CaseRoot, 'absent-target')) `
+                -Directory $true
+        }
+        if ((& $script:scriptBlockTestLinkSemanticCase -SemanticCase $strSemantic) -and
+            -not $boolFixtureLinkCreated) {
+            $objObservation.AuthorizedSkip = $true
+            $objObservation.SkipCode = 'skip-link-primitive-unavailable'
+            return $objObservation
+        }
+
+        $objCheckoutClaim = [object]$hashtableLayout.Checkout
+        $objTrustedClaim = [object]$hashtableLayout.Trusted
+        $objDownloadClaim = [object]$objContext.DownloadDirectoryPath
+        $objCandidateClaim = [object]$objContext.CandidatePath
+        $objExpectedDigest = [object]$objObservation.FixtureSha256
+        $hashtableOptional = @{}
+
+        switch -Exact ($strSemantic) {
+            'path.provider.filesystem-qualified' {
+                $objCheckoutClaim = 'FileSystem::' + $hashtableLayout.Checkout
+                $objTrustedClaim = 'Microsoft.PowerShell.Core\FileSystem::' + $hashtableLayout.Trusted
+                $objDownloadClaim = 'FileSystem::' + $objContext.DownloadDirectoryPath
+                $objCandidateClaim = 'FileSystem::' + $objContext.CandidatePath
+            }
+            'digest.mismatch.labels-omitted' { $objExpectedDigest = '0' * 64 }
+            'digest.mismatch.labels-present' {
+                $objExpectedDigest = '0' * 64
+                $hashtableOptional.ArtifactId = 'artifact-146'
+                $hashtableOptional.RunId = '9001'
+                $hashtableOptional.RunAttempt = '2'
+            }
+            'digest.grammar.short' { $objExpectedDigest = '0' * 63 }
+            'digest.grammar.nonhex' { $objExpectedDigest = 'g' * 64 }
+            'digest.grammar.prefixed' { $objExpectedDigest = 'sha256:' + ('0' * 64) }
+            'environment.checkout.relative' { $objCheckoutClaim = 'relative-checkout' }
+            'environment.path.wildcard' { $objCheckoutClaim = $hashtableLayout.Checkout + '*' }
+            'environment.path.raw-array' { $objCheckoutClaim = [object[]]@($hashtableLayout.Checkout) }
+            'environment.path.raw-object' {
+                $objCheckoutClaim = [pscustomobject]@{
+                    Path = $hashtableLayout.Checkout
+                }
+            }
+            'label.artifact.explicit-null' { $hashtableOptional.ArtifactId = $null }
+            'label.artifact.empty' { $hashtableOptional.ArtifactId = '' }
+            'label.artifact.whitespace' { $hashtableOptional.ArtifactId = '   ' }
+            'label.artifact.raw-array' { $hashtableOptional.ArtifactId = [object[]]@('artifact-146') }
+            'label.runid.raw-object' { $hashtableOptional.RunId = [pscustomobject]@{ Value = '9001' } }
+            'label.runattempt.control' { $hashtableOptional.RunAttempt = "2`n" }
+            'label.artifact.over-limit' { $hashtableOptional.ArtifactId = 'x' * 129 }
+            'label.artifact.valid' { $hashtableOptional.ArtifactId = 'artifact-146' }
+            'label.run-identities.valid' {
+                $hashtableOptional.RunId = '9001'
+                $hashtableOptional.RunAttempt = '2'
+            }
+            default {}
+        }
+
+        $objExpansionError = $null
+        $objReturnedContext = $null
+        try {
+            $objReturnedContext = & $HelperLiteralPath `
+                -Context $objContext `
+                -CheckoutRoot $objCheckoutClaim `
+                -TrustedTemporaryRoot $objTrustedClaim `
+                -DownloadDirectory $objDownloadClaim `
+                -CandidateDirectory $objCandidateClaim `
+                -ExpectedDigest $objExpectedDigest `
+                @hashtableOptional
+        } catch {
+            $objExpansionError = $_
+        } finally {
+            if ($null -ne $objHeldStream) {
+                $objHeldStream.Dispose()
+                $objHeldStream = $null
+            }
+        }
+
+        if ($null -eq $objExpansionError) {
+            if (-not [object]::ReferenceEquals($objContext, $objReturnedContext)) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'context-reference'
+            }
+            $objObservation.Result = 'success'
+            $objObservation.Status = 'succeeded'
+            $objObservation.Phase = 'none'
+            $objObservation.Subreason = 'none'
+            $objObservation.DiagnosticCode = 'none'
+            $objObservation.CleanupSequence = 'helper-context'
+            $objCleanup = Remove-StyleGuideCandidateInvocationState -Context $objContext
+            $objObservation.FilesystemCallCount = [uint32]$objCleanup.FilesystemCallCount
+        } else {
+            $objObservation.Result = 'rejection'
+            $objObservation.Status = 'failed'
+            $objObservation.Phase = & $script:scriptBlockGetProductionFailureField `
+                -ErrorRecord $objExpansionError `
+                -Key 'PSStyleGuidePhase' `
+                -Fallback 'none'
+            $objObservation.Subreason = & $script:scriptBlockGetProductionFailureField `
+                -ErrorRecord $objExpansionError `
+                -Key 'PSStyleGuideSubreason' `
+                -Fallback 'failure'
+            $objObservation.DiagnosticCode = & $script:scriptBlockGetProductionFailureField `
+                -ErrorRecord $objExpansionError `
+                -Key 'PSStyleGuideDiagnosticCode' `
+                -Fallback 'orchestration-failed'
+            if ($objObservation.Phase -ceq 'parameter') {
+                $objObservation.CleanupSequence = 'context'
+                foreach ($strEntry in [System.IO.Directory]::EnumerateFileSystemEntries(
+                    $objContext.DownloadDirectoryPath
+                )) {
+                    $objAttributes = [System.IO.File]::GetAttributes($strEntry)
+                    if (($objAttributes -band [System.IO.FileAttributes]::Directory) -eq 0 -and
+                        ($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -eq 0) {
+                        [System.IO.File]::Delete($strEntry)
+                    }
+                }
+                $objCleanup = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+                $objObservation.FilesystemCallCount = [uint32]$objCleanup.FilesystemCallCount
+            } else {
+                $objObservation.CleanupSequence = 'helper-context'
+            }
+        }
+
+        $objObservation.ContextFinalState = [string]$objContext.LifecycleState
+        if ([System.IO.Directory]::Exists($objContext.CandidatePath) -or
+            [System.IO.File]::Exists($objContext.CandidatePath)) {
+            $objObservation.CandidateFinalState = if ($objContext.LifecycleState -ceq 'CleanupFailed') {
+                'RetainedUncertain'
+            } else {
+                'Present'
+            }
+        } else {
+            $objObservation.CandidateFinalState = 'Absent'
+        }
+        if (-not (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout)) {
+            $objObservation.SentinelState = 'changed'
+        }
+        return $objObservation
+    } finally {
+        if ($null -ne $objHeldStream) {
+            $objHeldStream.Dispose()
+        }
+        if (-not (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout)) {
+            $objObservation.SentinelState = 'changed'
+        }
+        & $script:scriptBlockRemoveTestTree `
+            -LiteralPath $hashtableLayout.CaseRoot `
+            -ApprovedParent $RunRoot
+    }
+}
+
+$script:scriptBlockNewExpandedFixture = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IDictionary]$Layout,
+
+        [Parameter(Mandatory = $true)]
+        [string]$HelperLiteralPath
+    )
+
+    $objContext = New-StyleGuideCandidateInvocationContext `
+        -TrustedTemporaryRoot $Layout.Trusted
+    $strArchivePath = [System.IO.Path]::Combine(
+        $objContext.DownloadDirectoryPath,
+        'candidate-artifact.bin'
+    )
+    $hashtableEvidence = & $script:scriptBlockNewZipFixture `
+        -LiteralPath $strArchivePath `
+        -SemanticCase 'archive.valid.exact'
+    $objReturnedContext = & $HelperLiteralPath `
+        -Context $objContext `
+        -CheckoutRoot $Layout.Checkout `
+        -TrustedTemporaryRoot $Layout.Trusted `
+        -DownloadDirectory $objContext.DownloadDirectoryPath `
+        -CandidateDirectory $objContext.CandidatePath `
+        -ExpectedDigest $hashtableEvidence.Sha256
+    if (-not [object]::ReferenceEquals($objContext, $objReturnedContext)) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'expanded-context-reference'
+    }
+    return [ordered]@{
+        Context = $objContext
+        ArchivePath = $strArchivePath
+        FixtureLength = [uint64]$hashtableEvidence.Length
+        FixtureSha256 = [string]$hashtableEvidence.Sha256
+    }
+}
+
+$script:scriptBlockSetCleanupObservation = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IDictionary]$Observation,
+
+        [Parameter(Mandatory = $true)]
+        [object]$CleanupResult,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Subreason,
+
+        [Parameter(Mandatory = $true)]
+        [string]$CleanupSequence,
+
+        [Parameter(Mandatory = $true)]
+        [object]$Context
+    )
+
+    $Observation.Result = if ($CleanupResult.Success) { 'success' } else { 'rejection' }
+    $Observation.Status = if ($CleanupResult.Success) { 'succeeded' } else { 'failed' }
+    $Observation.Phase = 'cleanup'
+    $Observation.Subreason = $Subreason
+    $Observation.DiagnosticCode = [string]$CleanupResult.DiagnosticCode
+    $Observation.CleanupSequence = $CleanupSequence
+    $Observation.ContextFinalState = [string]$Context.LifecycleState
+    $Observation.FilesystemCallCount = [uint32]$CleanupResult.FilesystemCallCount
+    $Observation.CandidateFinalState = if (
+        [System.IO.Directory]::Exists($Context.CandidatePath) -or
+        [System.IO.File]::Exists($Context.CandidatePath)
+    ) {
+        if ($CleanupResult.FinalState -ceq 'CleanupFailed') {
+            'RetainedUncertain'
+        } else {
+            'Present'
+        }
+    } else {
+        'Absent'
+    }
+}
+
+$script:scriptBlockInvokeContextCleanupFixture = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [object]$Case,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RunRoot,
+
+        [Parameter(Mandatory = $true)]
+        [string]$HelperLiteralPath
+    )
+
+    $objObservation = & $script:scriptBlockNewObservation
+    $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout `
+        -RunRoot $RunRoot `
+        -CaseId $Case.CaseId
+    $objContext = $null
+    try {
+        $strSemantic = [string]$Case.SemanticCase
+        if ($strSemantic -ceq 'context.cleanup.candidate-then-context') {
+            $hashtableExpanded = & $script:scriptBlockNewExpandedFixture `
+                -Layout $hashtableLayout `
+                -HelperLiteralPath $HelperLiteralPath
+            $objContext = $hashtableExpanded.Context
+            $objObservation.FixtureLength = $hashtableExpanded.FixtureLength
+            $objObservation.FixtureSha256 = $hashtableExpanded.FixtureSha256
+            $objObservation.InvocationId = $objContext.InvocationId
+            $objObservation.PreCleanupState = 'Active'
+            $objCleanupResult = Remove-StyleGuideCandidateInvocationState -Context $objContext
+            & $script:scriptBlockSetCleanupObservation `
+                -Observation $objObservation `
+                -CleanupResult $objCleanupResult `
+                -Subreason 'candidate-before-context' `
+                -CleanupSequence 'helper-context' `
+                -Context $objContext
+            return $objObservation
+        }
+
+        $objContext = New-StyleGuideCandidateInvocationContext `
+            -TrustedTemporaryRoot $hashtableLayout.Trusted
+        $objObservation.InvocationId = $objContext.InvocationId
+        $objObservation.PreCleanupState = 'Active'
+        $strSubreason = 'succeeded'
+
+        switch -Exact ($strSemantic) {
+            'context.cleanup.unjournaled-entry' {
+                [System.IO.File]::WriteAllBytes(
+                    [System.IO.Path]::Combine($objContext.DownloadDirectoryPath, 'unexpected.bin'),
+                    [byte[]](0x78)
+                )
+                $strSubreason = 'root-cardinality'
+            }
+            'context.cleanup.link-substitution' {
+                [System.IO.Directory]::Delete($objContext.DownloadDirectoryPath, $false)
+                $boolLinkCreated = & $script:scriptBlockNewSymbolicLink `
+                    -LinkPath $objContext.DownloadDirectoryPath `
+                    -TargetPath $hashtableLayout.SentinelDirectory `
+                    -Directory $true
+                if (-not $boolLinkCreated) {
+                    $objObservation.AuthorizedSkip = $true
+                    $objObservation.SkipCode = 'skip-link-primitive-unavailable'
+                    return $objObservation
+                }
+                $strSubreason = 'nonordinary'
+            }
+            'context.cleanup.missing-entry' {
+                [System.IO.Directory]::Delete($objContext.DownloadDirectoryPath, $false)
+                $strSubreason = 'missing-entry'
+            }
+            'context.cleanup.primary-and-cleanup-failure' {
+                [System.IO.File]::WriteAllBytes(
+                    [System.IO.Path]::Combine($objContext.DownloadDirectoryPath, 'unexpected.bin'),
+                    [byte[]](0x78)
+                )
+                $strSubreason = 'primary-and-cleanup'
+            }
+            'context.cleanup.partial-journal' {
+                $objContext.OwnershipJournal = [object[]]@($objContext.OwnershipJournal[0])
+                $strSubreason = 'context-invalid'
+            }
+            default {}
+        }
+
+        if ($strSemantic -ceq 'context.cleanup.disposed-repeat') {
+            $objFirstCleanup = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+            if (-not $objFirstCleanup.Success -or $objFirstCleanup.FinalState -cne 'Disposed') {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'context-first-cleanup'
+            }
+            $objObservation.PreCleanupState = 'Disposed'
+            $objCleanupResult = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+            $strSubreason = 'already-disposed'
+        } else {
+            $objCleanupResult = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+        }
+
+        & $script:scriptBlockSetCleanupObservation `
+            -Observation $objObservation `
+            -CleanupResult $objCleanupResult `
+            -Subreason $strSubreason `
+            -CleanupSequence 'context' `
+            -Context $objContext
+        return $objObservation
+    } finally {
+        if (-not (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout)) {
+            $objObservation.SentinelState = 'changed'
+        }
+        & $script:scriptBlockRemoveTestTree `
+            -LiteralPath $hashtableLayout.CaseRoot `
+            -ApprovedParent $RunRoot
+    }
+}
+
+$script:scriptBlockInvokeHelperCleanupFixture = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [object]$Case,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RunRoot,
+
+        [Parameter(Mandatory = $true)]
+        [string]$HelperLiteralPath
+    )
+
+    $objObservation = & $script:scriptBlockNewObservation
+    $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout `
+        -RunRoot $RunRoot `
+        -CaseId $Case.CaseId
+    $objContext = $null
+    try {
+        $strSemantic = [string]$Case.SemanticCase
+        $hashtableExpanded = & $script:scriptBlockNewExpandedFixture `
+            -Layout $hashtableLayout `
+            -HelperLiteralPath $HelperLiteralPath
+        $objContext = $hashtableExpanded.Context
+        $objObservation.InvocationId = $objContext.InvocationId
+        $objObservation.FixtureLength = $hashtableExpanded.FixtureLength
+        $objObservation.FixtureSha256 = $hashtableExpanded.FixtureSha256
+        $objObservation.PreCleanupState = 'Active'
+        $strSubreason = 'succeeded'
+
+        if ($strSemantic -in @(
+            'helper.cleanup.unjournaled-entry',
+            'helper.cleanup.primary-and-cleanup-failure'
+        )) {
+            [System.IO.File]::WriteAllBytes(
+                [System.IO.Path]::Combine($objContext.CandidatePath, 'unexpected.bin'),
+                [byte[]](0x78)
+            )
+            $strSubreason = if ($strSemantic -ceq 'helper.cleanup.unjournaled-entry') {
+                'candidate-cardinality'
+            } else {
+                'primary-and-cleanup'
+            }
+        } elseif ($strSemantic -ceq 'helper.cleanup.link-substitution') {
+            $objFileRecord = @($objContext.OwnershipJournal | Where-Object {
+                $_.Kind -ceq 'CandidateFile'
+            })[0]
+            [System.IO.File]::Delete($objFileRecord.Path)
+            $boolLinkCreated = & $script:scriptBlockNewSymbolicLink `
+                -LinkPath $objFileRecord.Path `
+                -TargetPath $hashtableLayout.SentinelFile `
+                -Directory $false
+            if (-not $boolLinkCreated) {
+                $objObservation.AuthorizedSkip = $true
+                $objObservation.SkipCode = 'skip-link-primitive-unavailable'
+                return $objObservation
+            }
+            $strSubreason = 'candidate-identity'
+        }
+
+        if ($strSemantic -ceq 'helper.cleanup.disposed-repeat') {
+            $objFirstCleanup = Remove-StyleGuideCandidateInvocationState -Context $objContext
+            if (-not $objFirstCleanup.Success -or $objFirstCleanup.FinalState -cne 'Disposed') {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'helper-first-cleanup'
+            }
+            $objObservation.PreCleanupState = 'Disposed'
+            $objCleanupResult = Remove-StyleGuideCandidateInvocationState -Context $objContext
+            $strSubreason = 'already-disposed'
+        } else {
+            $objCleanupResult = Remove-StyleGuideCandidateInvocationState -Context $objContext
+        }
+
+        & $script:scriptBlockSetCleanupObservation `
+            -Observation $objObservation `
+            -CleanupResult $objCleanupResult `
+            -Subreason $strSubreason `
+            -CleanupSequence 'helper-context' `
+            -Context $objContext
+        return $objObservation
+    } finally {
+        if (-not (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout)) {
+            $objObservation.SentinelState = 'changed'
+        }
+        & $script:scriptBlockRemoveTestTree `
+            -LiteralPath $hashtableLayout.CaseRoot `
+            -ApprovedParent $RunRoot
+    }
+}
+
+$script:scriptBlockInvokeRequiredIdentityGit = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$GitPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RepositoryRoot,
+
+        [Parameter(Mandatory = $true)]
+        [string[]]$ArgumentList
+    )
+
+    $objResult = & $script:scriptBlockInvokeNativeRaw `
+        -FilePath $GitPath `
+        -WorkingDirectory $RepositoryRoot `
+        -ArgumentList $ArgumentList
+    if ($objResult.ExitCode -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'identity-git-command'
+    }
+    return $objResult
+}
+
+$script:scriptBlockNewIdentityRepository = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IDictionary]$Layout,
+
+        [Parameter(Mandatory = $true)]
+        [string]$GitPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$HelperSourcePath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ContextSourcePath
+    )
+
+    $strRepositoryRoot = [System.IO.Path]::Combine($Layout.CaseRoot, 'identity-repository')
+    $strWorkflowDirectory = [System.IO.Path]::Combine(
+        $strRepositoryRoot,
+        '.github',
+        'workflows'
+    )
+    [void][System.IO.Directory]::CreateDirectory($strWorkflowDirectory)
+    $strHelperPath = [System.IO.Path]::Combine(
+        $strRepositoryRoot,
+        $script:strCandidateHelperRelativePath.Replace('/', [System.IO.Path]::DirectorySeparatorChar)
+    )
+    $strContextPath = [System.IO.Path]::Combine(
+        $strRepositoryRoot,
+        $script:strCandidateContextRelativePath.Replace('/', [System.IO.Path]::DirectorySeparatorChar)
+    )
+    [System.IO.File]::WriteAllBytes(
+        $strHelperPath,
+        [System.IO.File]::ReadAllBytes($HelperSourcePath)
+    )
+    [System.IO.File]::WriteAllBytes(
+        $strContextPath,
+        [System.IO.File]::ReadAllBytes($ContextSourcePath)
+    )
+    [void](& $script:scriptBlockInvokeRequiredIdentityGit `
+        -GitPath $GitPath -RepositoryRoot $strRepositoryRoot -ArgumentList @('init', '-q'))
+    [void](& $script:scriptBlockInvokeRequiredIdentityGit `
+        -GitPath $GitPath -RepositoryRoot $strRepositoryRoot `
+        -ArgumentList @('config', 'user.name', 'PSStyleGuide Harness'))
+    [void](& $script:scriptBlockInvokeRequiredIdentityGit `
+        -GitPath $GitPath -RepositoryRoot $strRepositoryRoot `
+        -ArgumentList @('config', 'user.email', 'harness@example.invalid'))
+    [void](& $script:scriptBlockInvokeRequiredIdentityGit `
+        -GitPath $GitPath -RepositoryRoot $strRepositoryRoot -ArgumentList @('add', '--', '.'))
+    [void](& $script:scriptBlockInvokeRequiredIdentityGit `
+        -GitPath $GitPath -RepositoryRoot $strRepositoryRoot `
+        -ArgumentList @('commit', '-q', '-m', 'identity baseline'))
+    $objBranchResult = & $script:scriptBlockInvokeRequiredIdentityGit `
+        -GitPath $GitPath -RepositoryRoot $strRepositoryRoot `
+        -ArgumentList @('branch', '--show-current')
+    $strInitialBranch = & $script:scriptBlockGetTrimmedAsciiLine `
+        -Bytes $objBranchResult.StandardOutput
+    return [ordered]@{
+        RepositoryRoot = $strRepositoryRoot
+        HelperPath = $strHelperPath
+        ContextPath = $strContextPath
+        InitialBranch = $strInitialBranch
+    }
+}
+
+$script:scriptBlockInvokeScriptIdentityFixture = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [object]$Case,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RunRoot,
+
+        [Parameter(Mandatory = $true)]
+        [string]$GitPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$HelperSourcePath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ContextSourcePath
+    )
+
+    $objObservation = & $script:scriptBlockNewObservation
+    $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout `
+        -RunRoot $RunRoot `
+        -CaseId $Case.CaseId
+    try {
+        $strSemantic = [string]$Case.SemanticCase
+        $boolExpectedSuccess = $strSemantic -in @(
+            'script.helper.provider-qualified-valid',
+            'script.context.provider-qualified-valid'
+        )
+        $boolRejected = $false
+        $objIdentityError = $null
+        try {
+            $hashtableRepository = & $script:scriptBlockNewIdentityRepository `
+                -Layout $hashtableLayout `
+                -GitPath $GitPath `
+                -HelperSourcePath $HelperSourcePath `
+                -ContextSourcePath $ContextSourcePath
+            $boolHelperCase = $strSemantic.StartsWith(
+                'script.helper.',
+                [System.StringComparison]::Ordinal
+            )
+            $strLiteralPath = if ($boolHelperCase) {
+                $hashtableRepository.HelperPath
+            } else {
+                $hashtableRepository.ContextPath
+            }
+            $strRelativePath = if ($boolHelperCase) {
+                $script:strCandidateHelperRelativePath
+            } else {
+                $script:strCandidateContextRelativePath
+            }
+            $strExpectedVersion = if ($boolHelperCase) {
+                $script:strCandidateExpectedHelperVersion
+            } else {
+                $script:strCandidateExpectedContextVersion
+            }
+            $uintFunctionCount = if ($boolHelperCase) { [uint32]1 } else { [uint32]2 }
+
+            switch -Exact ($strSemantic) {
+                'script.helper.path-missing' {
+                    $strLiteralPath = [System.IO.Path]::Combine(
+                        $hashtableRepository.RepositoryRoot,
+                        'missing-helper.ps1'
+                    )
+                    $strRelativePath = 'missing-helper.ps1'
+                }
+                'script.context.path-missing' {
+                    $strLiteralPath = [System.IO.Path]::Combine(
+                        $hashtableRepository.RepositoryRoot,
+                        'missing-context.ps1'
+                    )
+                    $strRelativePath = 'missing-context.ps1'
+                }
+                'script.helper.path-wildcard' {
+                    [void](& $script:scriptBlockResolveFixedScriptClaim `
+                        -Value ($strLiteralPath + '*') `
+                        -Name 'HelperPath' `
+                        -ExpectedPath $strLiteralPath)
+                    return $objObservation
+                }
+                'script.context.path-wildcard' {
+                    [void](& $script:scriptBlockResolveFixedScriptClaim `
+                        -Value ($strLiteralPath + '*') `
+                        -Name 'ContextManagerPath' `
+                        -ExpectedPath $strLiteralPath)
+                    return $objObservation
+                }
+                'script.helper.nonfilesystem-provider' {
+                    [void](& $script:scriptBlockResolveFixedScriptClaim `
+                        -Value 'Variable::PSStyleGuideCandidateFixture' `
+                        -Name 'HelperPath' `
+                        -ExpectedPath $strLiteralPath)
+                    return $objObservation
+                }
+                'script.helper.raw-array' {
+                    [void](& $script:scriptBlockResolveFixedScriptClaim `
+                        -Value ([object[]]@($strLiteralPath)) `
+                        -Name 'HelperPath' `
+                        -ExpectedPath $strLiteralPath)
+                    return $objObservation
+                }
+                'script.context.raw-object' {
+                    [void](& $script:scriptBlockResolveFixedScriptClaim `
+                        -Value ([pscustomobject]@{ Path = $strLiteralPath }) `
+                        -Name 'ContextManagerPath' `
+                        -ExpectedPath $strLiteralPath)
+                    return $objObservation
+                }
+                'script.helper.link' {
+                    $strLinkPath = [System.IO.Path]::Combine(
+                        $hashtableRepository.RepositoryRoot,
+                        'helper-link.ps1'
+                    )
+                    $boolLinkCreated = & $script:scriptBlockNewSymbolicLink `
+                        -LinkPath $strLinkPath -TargetPath $strLiteralPath -Directory $false
+                    if (-not $boolLinkCreated) {
+                        $objObservation.AuthorizedSkip = $true
+                        $objObservation.SkipCode = 'skip-link-primitive-unavailable'
+                        return $objObservation
+                    }
+                    $strLiteralPath = $strLinkPath
+                }
+                'script.context.link' {
+                    $strLinkPath = [System.IO.Path]::Combine(
+                        $hashtableRepository.RepositoryRoot,
+                        'context-link.ps1'
+                    )
+                    $boolLinkCreated = & $script:scriptBlockNewSymbolicLink `
+                        -LinkPath $strLinkPath -TargetPath $strLiteralPath -Directory $false
+                    if (-not $boolLinkCreated) {
+                        $objObservation.AuthorizedSkip = $true
+                        $objObservation.SkipCode = 'skip-link-primitive-unavailable'
+                        return $objObservation
+                    }
+                    $strLiteralPath = $strLinkPath
+                }
+                'script.helper.provider-qualified-valid' {
+                    $strLiteralPath = & $script:scriptBlockResolveFixedScriptClaim `
+                        -Value ('FileSystem::' + $strLiteralPath) `
+                        -Name 'HelperPath' `
+                        -ExpectedPath $strLiteralPath
+                }
+                'script.context.provider-qualified-valid' {
+                    $strLiteralPath = & $script:scriptBlockResolveFixedScriptClaim `
+                        -Value ('Microsoft.PowerShell.Core\FileSystem::' + $strLiteralPath) `
+                        -Name 'ContextManagerPath' `
+                        -ExpectedPath $strLiteralPath
+                }
+                'script.helper.untracked' {
+                    $strLiteralPath = [System.IO.Path]::Combine(
+                        $hashtableRepository.RepositoryRoot,
+                        'untracked-helper.ps1'
+                    )
+                    [System.IO.File]::WriteAllBytes(
+                        $strLiteralPath,
+                        [System.IO.File]::ReadAllBytes($HelperSourcePath)
+                    )
+                    $strRelativePath = 'untracked-helper.ps1'
+                }
+                'script.context.head-absent' {
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit `
+                        -GitPath $GitPath -RepositoryRoot $hashtableRepository.RepositoryRoot `
+                        -ArgumentList @('rm', '--cached', '--', $strRelativePath))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit `
+                        -GitPath $GitPath -RepositoryRoot $hashtableRepository.RepositoryRoot `
+                        -ArgumentList @('commit', '-q', '-m', 'remove context from head'))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit `
+                        -GitPath $GitPath -RepositoryRoot $hashtableRepository.RepositoryRoot `
+                        -ArgumentList @('add', '--', $strRelativePath))
+                }
+                'script.helper.index-absent' {
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit `
+                        -GitPath $GitPath -RepositoryRoot $hashtableRepository.RepositoryRoot `
+                        -ArgumentList @('rm', '--cached', '--', $strRelativePath))
+                }
+                'script.context.conflict-stage' {
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit `
+                        -GitPath $GitPath -RepositoryRoot $hashtableRepository.RepositoryRoot `
+                        -ArgumentList @('checkout', '-q', '-b', 'identity-side'))
+                    [System.IO.File]::WriteAllBytes($strLiteralPath, [byte[]](0x73, 0x0A))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit `
+                        -GitPath $GitPath -RepositoryRoot $hashtableRepository.RepositoryRoot `
+                        -ArgumentList @('add', '--', $strRelativePath))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit `
+                        -GitPath $GitPath -RepositoryRoot $hashtableRepository.RepositoryRoot `
+                        -ArgumentList @('commit', '-q', '-m', 'side context'))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit `
+                        -GitPath $GitPath -RepositoryRoot $hashtableRepository.RepositoryRoot `
+                        -ArgumentList @('checkout', '-q', $hashtableRepository.InitialBranch))
+                    [System.IO.File]::WriteAllBytes($strLiteralPath, [byte[]](0x6D, 0x0A))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit `
+                        -GitPath $GitPath -RepositoryRoot $hashtableRepository.RepositoryRoot `
+                        -ArgumentList @('add', '--', $strRelativePath))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit `
+                        -GitPath $GitPath -RepositoryRoot $hashtableRepository.RepositoryRoot `
+                        -ArgumentList @('commit', '-q', '-m', 'main context'))
+                    [void](& $script:scriptBlockInvokeNativeRaw `
+                        -FilePath $GitPath `
+                        -WorkingDirectory $hashtableRepository.RepositoryRoot `
+                        -ArgumentList @('merge', '--no-edit', 'identity-side'))
+                }
+                'script.helper.staged-replacement' {
+                    [System.IO.File]::WriteAllBytes($strLiteralPath, [byte[]](0x78, 0x0A))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit `
+                        -GitPath $GitPath -RepositoryRoot $hashtableRepository.RepositoryRoot `
+                        -ArgumentList @('add', '--', $strRelativePath))
+                }
+                'script.context.unstaged-replacement' {
+                    [System.IO.File]::WriteAllBytes($strLiteralPath, [byte[]](0x78, 0x0A))
+                }
+                'script.helper.wrong-mode' {
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit `
+                        -GitPath $GitPath -RepositoryRoot $hashtableRepository.RepositoryRoot `
+                        -ArgumentList @('update-index', '--chmod=+x', '--', $strRelativePath))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit `
+                        -GitPath $GitPath -RepositoryRoot $hashtableRepository.RepositoryRoot `
+                        -ArgumentList @('commit', '-q', '-m', 'wrong mode'))
+                }
+                'script.context.wrong-tree-type' {
+                    [System.IO.File]::Delete($strLiteralPath)
+                    [void][System.IO.Directory]::CreateDirectory($strLiteralPath)
+                    [System.IO.File]::WriteAllBytes(
+                        [System.IO.Path]::Combine($strLiteralPath, 'child'),
+                        [byte[]](0x78)
+                    )
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit `
+                        -GitPath $GitPath -RepositoryRoot $hashtableRepository.RepositoryRoot `
+                        -ArgumentList @('add', '-A', '--', $strRelativePath))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit `
+                        -GitPath $GitPath -RepositoryRoot $hashtableRepository.RepositoryRoot `
+                        -ArgumentList @('commit', '-q', '-m', 'wrong tree type'))
+                }
+                'script.git.ls-tree-malformed' {
+                    [void](& $script:scriptBlockGetCandidateTreeObjectId `
+                        -Metadata ('100755 blob ' + ('0' * 40)) `
+                        -ObjectIdLength 40)
+                    return $objObservation
+                }
+                'script.git.ls-files-malformed' {
+                    [void](& $script:scriptBlockGetCandidateIndexObjectId `
+                        -Metadata ('100644 ' + ('0' * 40) + ' 1') `
+                        -ObjectIdLength 40 `
+                        -ExpectedObjectId ('0' * 40))
+                    return $objObservation
+                }
+                'script.git.object-id-abbreviated' {
+                    [void](& $script:scriptBlockAssertCandidateWorkingObjectId `
+                        -ObjectId ('0' * 12) `
+                        -ObjectIdLength 40 `
+                        -ExpectedObjectId ('0' * 40))
+                    return $objObservation
+                }
+                'script.git.object-id-wrong-format' {
+                    [void](& $script:scriptBlockAssertCandidateWorkingObjectId `
+                        -ObjectId ('0' * 64) `
+                        -ObjectIdLength 40 `
+                        -ExpectedObjectId ('0' * 40))
+                    return $objObservation
+                }
+                'script.git.native-status-failure' {
+                    $strLiteralPath = $HelperSourcePath
+                    $strRelativePath = $script:strCandidateHelperRelativePath
+                    $hashtableRepository.RepositoryRoot = $hashtableLayout.CaseRoot
+                }
+                'script.git.hostile-literal-substitution' {
+                    $arrHostileRecord = [System.Text.Encoding]::ASCII.GetBytes(
+                        '100644 blob ' + ('0' * 40) + "`thostile.ps1`0"
+                    )
+                    [void](& $script:scriptBlockSplitOneNulGitRecord `
+                        -Bytes $arrHostileRecord `
+                        -ExpectedPathBytes ([System.Text.Encoding]::ASCII.GetBytes($strRelativePath)))
+                    return $objObservation
+                }
+                default {}
+            }
+
+            [void](& $script:scriptBlockAssertTrackedScriptIdentity `
+                -RepositoryRoot $hashtableRepository.RepositoryRoot `
+                -GitPath $GitPath `
+                -LiteralPath $strLiteralPath `
+                -RelativePath $strRelativePath `
+                -ExpectedVersion $strExpectedVersion `
+                -ExpectedFunctionCount $uintFunctionCount)
+        } catch {
+            $boolRejected = $true
+            $objIdentityError = $_
+        }
+
+        if ($boolExpectedSuccess -and $boolRejected) {
+            throw $objIdentityError
+        }
+        if (-not $boolExpectedSuccess -and -not $boolRejected) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'identity-accepted'
+        }
+
+        $objObservation.Result = if ($boolExpectedSuccess) { 'success' } else { 'rejection' }
+        $objObservation.Status = if ($boolExpectedSuccess) { 'succeeded' } else { 'failed' }
+        $objObservation.Phase = 'identity'
+        $objObservation.Subreason = $strSemantic.Substring('script.'.Length).Replace('.', '-')
+        $objObservation.DiagnosticCode = if ($boolExpectedSuccess) {
+            'none'
+        } else {
+            'script-identity-invalid'
+        }
+        return $objObservation
+    } finally {
+        if (-not (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout)) {
+            $objObservation.SentinelState = 'changed'
+        }
+        & $script:scriptBlockRemoveTestTree `
+            -LiteralPath $hashtableLayout.CaseRoot `
+            -ApprovedParent $RunRoot
+    }
+}
+
+function Invoke-StyleGuideCandidateHarness {
+    # .SYNOPSIS
+    # Executes the fixed 110-case style-guide candidate harness.
+    #
+    # .DESCRIPTION
+    # Authenticates the fixed production scripts, loads their public functions,
+    # executes every catalog row once for the current runtime, emits canonical
+    # JSONL evidence, and fails if any result or required primitive differs
+    # from its singular oracle.
+    #
+    # .EXAMPLE
+    # Invoke-StyleGuideCandidateHarness
+    #
+    # # Emits exactly one canonical JSON object for every catalog row.
+    #
+    # .EXAMPLE
+    # $arrCaseJson = @(Invoke-StyleGuideCandidateHarness)
+    #
+    # # Captures the complete canonical JSONL projection for further validation.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [string] One canonical JSON object per style-guide candidate case.
+    #
+    # .NOTES
+    # This function consumes only the fixed script parameters and repository
+    # paths established by the enclosing trusted harness.
+    #
+    # Version: 1.0.20260802.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param ()
+
+    Set-StrictMode -Version Latest
+
+    $strRepositoryRoot = [System.IO.Path]::GetFullPath(
+        [System.IO.Path]::Combine($PSScriptRoot, '..', '..')
+    )
+    [void](& $script:scriptBlockAssertOrdinaryDirectoryEnvelope `
+        -LiteralPath $strRepositoryRoot)
+    $strExpectedHelperPath = [System.IO.Path]::GetFullPath(
+        [System.IO.Path]::Combine(
+            $strRepositoryRoot,
+            $script:strCandidateHelperRelativePath.Replace(
+                '/',
+                [System.IO.Path]::DirectorySeparatorChar
+            )
+        )
+    )
+    $strExpectedContextPath = [System.IO.Path]::GetFullPath(
+        [System.IO.Path]::Combine(
+            $strRepositoryRoot,
+            $script:strCandidateContextRelativePath.Replace(
+                '/',
+                [System.IO.Path]::DirectorySeparatorChar
+            )
+        )
+    )
+    $strCatalogPath = [System.IO.Path]::GetFullPath(
+        [System.IO.Path]::Combine(
+            $strRepositoryRoot,
+            $script:strCandidateCatalogRelativePath.Replace(
+                '/',
+                [System.IO.Path]::DirectorySeparatorChar
+            )
+        )
+    )
+    $strHelperLiteralPath = & $script:scriptBlockResolveFixedScriptClaim `
+        -Value $script:objCandidateHelperPathClaim `
+        -Name 'HelperPath' `
+        -ExpectedPath $strExpectedHelperPath
+    $strContextLiteralPath = & $script:scriptBlockResolveFixedScriptClaim `
+        -Value $script:objCandidateContextManagerPathClaim `
+        -Name 'ContextManagerPath' `
+        -ExpectedPath $strExpectedContextPath
+
+    $arrGitCommands = @(Get-Command -Name git -CommandType Application -All)
+    if ($arrGitCommands.Count -lt 1) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'git-missing'
+    }
+    $strGitPath = [string]$arrGitCommands[0].Source
+    $hashtableHelperEvidenceBefore = & $script:scriptBlockGetFileEvidence `
+        -LiteralPath $strHelperLiteralPath
+    $hashtableContextEvidenceBefore = & $script:scriptBlockGetFileEvidence `
+        -LiteralPath $strContextLiteralPath
+    $hashtableCatalogEvidenceBefore = & $script:scriptBlockGetFileEvidence `
+        -LiteralPath $strCatalogPath
+
+    [void](& $script:scriptBlockAssertTrackedScriptIdentity `
+        -RepositoryRoot $strRepositoryRoot `
+        -GitPath $strGitPath `
+        -LiteralPath $strHelperLiteralPath `
+        -RelativePath $script:strCandidateHelperRelativePath `
+        -ExpectedVersion $script:strCandidateExpectedHelperVersion `
+        -ExpectedFunctionCount ([uint32]1))
+    [void](& $script:scriptBlockAssertTrackedScriptIdentity `
+        -RepositoryRoot $strRepositoryRoot `
+        -GitPath $strGitPath `
+        -LiteralPath $strContextLiteralPath `
+        -RelativePath $script:strCandidateContextRelativePath `
+        -ExpectedVersion $script:strCandidateExpectedContextVersion `
+        -ExpectedFunctionCount ([uint32]2))
+
+    $objCatalog = & $script:scriptBlockReadCandidateCatalog -LiteralPath $strCatalogPath
+    $arrContextLoadOutput = @(. $strContextLiteralPath)
+    if ($arrContextLoadOutput.Count -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'context-load-output'
+    }
+    $arrHelperLoadOutput = @(. $strHelperLiteralPath)
+    if ($arrHelperLoadOutput.Count -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'helper-load-output'
+    }
+    foreach ($strFunctionName in @(
+        'New-StyleGuideCandidateInvocationContext',
+        'Remove-StyleGuideCandidateInvocationContext',
+        'Remove-StyleGuideCandidateInvocationState'
+    )) {
+        $arrFunctions = @(Get-Command -Name $strFunctionName -CommandType Function -All)
+        if ($arrFunctions.Count -ne 1) {
+            & $script:scriptBlockStopHarness `
+                -Code 'script-identity-invalid' `
+                -Detail 'loaded-function-cardinality'
+        }
+    }
+
+    $strOperatingSystem = if ($env:OS -eq 'Windows_NT') { 'Windows' } else { 'Linux' }
+    $strPowerShellEdition = if ($PSVersionTable.PSEdition -eq 'Desktop') {
+        'Desktop'
+    } else {
+        'Core'
+    }
+    $versionPowerShell = [System.Version]$PSVersionTable.PSVersion
+    $strRequiredRuntime = if ($strOperatingSystem -ceq 'Windows' -and
+        $strPowerShellEdition -ceq 'Desktop') {
+        'WindowsPowerShell5.1'
+    } elseif ($strOperatingSystem -ceq 'Windows' -and
+        $strPowerShellEdition -ceq 'Core') {
+        'PowerShell7Windows'
+    } elseif ($strOperatingSystem -ceq 'Linux' -and
+        $strPowerShellEdition -ceq 'Core') {
+        'PowerShell7Ubuntu'
+    } else {
+        & $script:scriptBlockStopHarness -Code 'orchestration-failed' -Detail 'unsupported-runtime'
+    }
+    $strTemporaryParent = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath())
+    [void](& $script:scriptBlockAssertOrdinaryDirectoryEnvelope `
+        -LiteralPath $strTemporaryParent)
+    if ($strTemporaryParent.StartsWith(
+        $strRepositoryRoot.TrimEnd(
+            [System.IO.Path]::DirectorySeparatorChar,
+            [System.IO.Path]::AltDirectorySeparatorChar
+        ) + [System.IO.Path]::DirectorySeparatorChar,
+        $script:objCandidatePathComparison
+    )) {
+        & $script:scriptBlockStopHarness -Code 'orchestration-failed' -Detail 'temporary-inside-repository'
+    }
+    $strRunRoot = [System.IO.Path]::Combine(
+        $strTemporaryParent,
+        'psstyleguide-candidate-' + [System.IO.Path]::GetRandomFileName()
+    )
+    if ([System.IO.Directory]::Exists($strRunRoot) -or [System.IO.File]::Exists($strRunRoot)) {
+        & $script:scriptBlockStopHarness -Code 'orchestration-failed' -Detail 'run-root-collision'
+    }
+    [void][System.IO.Directory]::CreateDirectory($strRunRoot)
+
+    $uintPassCount = [uint32]0
+    $uintFailCount = [uint32]0
+    $uintSkipCount = [uint32]0
+    $objExecutedCaseIds = New-Object 'System.Collections.Generic.HashSet[string]' (
+        [System.StringComparer]::Ordinal
+    )
+    $objExecutedLinkCategories = New-Object 'System.Collections.Generic.HashSet[string]' (
+        [System.StringComparer]::Ordinal
+    )
+    try {
+        & $script:scriptBlockAssertCatalogMutationsRejected `
+            -Catalog $objCatalog `
+            -RunRoot $strRunRoot
+        & $script:scriptBlockAssertUnauthorizedSkipsRejected `
+            -Catalog $objCatalog `
+            -OperatingSystem $strOperatingSystem `
+            -PowerShellEdition $strPowerShellEdition `
+            -PowerShellVersion $versionPowerShell
+        foreach ($objCase in $objCatalog.Cases) {
+            if (-not $objExecutedCaseIds.Add([string]$objCase.CaseId)) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'duplicate-execution'
+            }
+            if ($strRequiredRuntime -cnotin @($objCase.RequiredRuntimes)) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'orchestration-failed' `
+                    -Detail 'case-runtime-undeclared'
+            }
+
+            [void](& $script:scriptBlockAssertTrackedScriptIdentity `
+                -RepositoryRoot $strRepositoryRoot `
+                -GitPath $strGitPath `
+                -LiteralPath $strHelperLiteralPath `
+                -RelativePath $script:strCandidateHelperRelativePath `
+                -ExpectedVersion $script:strCandidateExpectedHelperVersion `
+                -ExpectedFunctionCount ([uint32]1))
+            [void](& $script:scriptBlockAssertTrackedScriptIdentity `
+                -RepositoryRoot $strRepositoryRoot `
+                -GitPath $strGitPath `
+                -LiteralPath $strContextLiteralPath `
+                -RelativePath $script:strCandidateContextRelativePath `
+                -ExpectedVersion $script:strCandidateExpectedContextVersion `
+                -ExpectedFunctionCount ([uint32]2))
+
+            $objObservation = $null
+            $boolApplicable = $objCase.Applicability -ceq 'All' -or
+                $objCase.Applicability -ceq $strOperatingSystem
+            if (-not $boolApplicable) {
+                $objObservation = & $script:scriptBlockNewObservation
+                $objObservation.AuthorizedSkip = $true
+                $objObservation.SkipCode = 'skip-opposite-platform'
+            } else {
+                try {
+                    if ($objCase.SemanticCase.StartsWith(
+                        'script.',
+                        [System.StringComparison]::Ordinal
+                    )) {
+                        $objObservation = & $script:scriptBlockInvokeScriptIdentityFixture `
+                            -Case $objCase `
+                            -RunRoot $strRunRoot `
+                            -GitPath $strGitPath `
+                            -HelperSourcePath $strHelperLiteralPath `
+                            -ContextSourcePath $strContextLiteralPath
+                    } elseif ($objCase.SemanticCase.StartsWith(
+                        'context.cleanup.',
+                        [System.StringComparison]::Ordinal
+                    )) {
+                        $objObservation = & $script:scriptBlockInvokeContextCleanupFixture `
+                            -Case $objCase `
+                            -RunRoot $strRunRoot `
+                            -HelperLiteralPath $strHelperLiteralPath
+                    } elseif ($objCase.SemanticCase.StartsWith(
+                        'helper.cleanup.',
+                        [System.StringComparison]::Ordinal
+                    )) {
+                        $objObservation = & $script:scriptBlockInvokeHelperCleanupFixture `
+                            -Case $objCase `
+                            -RunRoot $strRunRoot `
+                            -HelperLiteralPath $strHelperLiteralPath
+                    } else {
+                        $objObservation = & $script:scriptBlockInvokeExpansionFixture `
+                            -Case $objCase `
+                            -RunRoot $strRunRoot `
+                            -HelperLiteralPath $strHelperLiteralPath
+                    }
+                } catch {
+                    $objObservation = & $script:scriptBlockNewObservation
+                }
+            }
+
+            if (-not $objObservation.AuthorizedSkip) {
+                $strLinkCategory = switch -Exact ($objCase.SemanticCase) {
+                    'environment.checkout.link-component' { 'root' }
+                    'environment.trusted.link-component' { 'root' }
+                    'download.entry.link' { 'below-root' }
+                    'candidate.preexisting.live-link' { 'candidate' }
+                    'helper.cleanup.link-substitution' { 'candidate' }
+                    'context.cleanup.link-substitution' { 'context' }
+                    default { $null }
+                }
+                if ($null -ne $strLinkCategory) {
+                    [void]$objExecutedLinkCategories.Add($strLinkCategory)
+                }
+            }
+
+            $objResult = & $script:scriptBlockNewCaseResult `
+                -Case $objCase `
+                -Observation $objObservation `
+                -OperatingSystem $strOperatingSystem `
+                -PowerShellEdition $strPowerShellEdition `
+                -PowerShellVersion $versionPowerShell
+            switch -Exact ($objResult.HarnessVerdict) {
+                'pass' { $uintPassCount++ }
+                'fail' { $uintFailCount++ }
+                'skip' { $uintSkipCount++ }
+                default {
+                    & $script:scriptBlockStopHarness `
+                        -Code 'orchestration-failed' `
+                        -Detail 'result-verdict'
+                }
+            }
+            Write-Output (& $script:scriptBlockConvertToCanonicalCaseJson -Result $objResult)
+        }
+
+        if ($objExecutedCaseIds.Count -ne 110 -or
+            [uint32]($uintPassCount + $uintFailCount + $uintSkipCount) -ne [uint32]110) {
+            & $script:scriptBlockStopHarness -Code 'orchestration-failed' -Detail 'result-total'
+        }
+        foreach ($strRequiredLinkCategory in @('root', 'below-root', 'candidate', 'context')) {
+            if (-not $objExecutedLinkCategories.Contains($strRequiredLinkCategory)) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'orchestration-failed' `
+                    -Detail 'required-link-coverage'
+            }
+        }
+
+        [void](& $script:scriptBlockAssertTrackedScriptIdentity `
+            -RepositoryRoot $strRepositoryRoot `
+            -GitPath $strGitPath `
+            -LiteralPath $strHelperLiteralPath `
+            -RelativePath $script:strCandidateHelperRelativePath `
+            -ExpectedVersion $script:strCandidateExpectedHelperVersion `
+            -ExpectedFunctionCount ([uint32]1))
+        [void](& $script:scriptBlockAssertTrackedScriptIdentity `
+            -RepositoryRoot $strRepositoryRoot `
+            -GitPath $strGitPath `
+            -LiteralPath $strContextLiteralPath `
+            -RelativePath $script:strCandidateContextRelativePath `
+            -ExpectedVersion $script:strCandidateExpectedContextVersion `
+            -ExpectedFunctionCount ([uint32]2))
+        $hashtableHelperEvidenceAfter = & $script:scriptBlockGetFileEvidence `
+            -LiteralPath $strHelperLiteralPath
+        $hashtableContextEvidenceAfter = & $script:scriptBlockGetFileEvidence `
+            -LiteralPath $strContextLiteralPath
+        $hashtableCatalogEvidenceAfter = & $script:scriptBlockGetFileEvidence `
+            -LiteralPath $strCatalogPath
+        foreach ($strEvidenceName in @('Length', 'Sha256')) {
+            if ($hashtableHelperEvidenceBefore[$strEvidenceName] -cne
+                    $hashtableHelperEvidenceAfter[$strEvidenceName] -or
+                $hashtableContextEvidenceBefore[$strEvidenceName] -cne
+                    $hashtableContextEvidenceAfter[$strEvidenceName] -or
+                $hashtableCatalogEvidenceBefore[$strEvidenceName] -cne
+                    $hashtableCatalogEvidenceAfter[$strEvidenceName]) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'orchestration-failed' `
+                    -Detail 'source-state-changed'
+            }
+        }
+        if ($uintFailCount -ne 0) {
+            & $script:scriptBlockStopHarness -Code 'orchestration-failed' -Detail 'case-failure'
+        }
+    } finally {
+        & $script:scriptBlockRemoveTestTree `
+            -LiteralPath $strRunRoot `
+            -ApprovedParent $strTemporaryParent
+    }
+}
+
+try {
+    Invoke-StyleGuideCandidateHarness
+} catch {
+    Write-Error -ErrorRecord $_
+    exit 1
+}
