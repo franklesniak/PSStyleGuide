@@ -31,7 +31,7 @@ None. The script writes one JSON object per case to the success stream and
 uses its process exit code to report the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.3
+Version: 1.0.20260802.4
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,12 +53,12 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.3'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.4'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260802.3'
+$script:strCandidateExpectedHelperVersion = '1.0.20260802.4'
 $script:strCandidateExpectedContextVersion = '1.0.20260802.2'
-$script:strCandidateCatalogVersion = '1.0.20260802.2'
+$script:strCandidateCatalogVersion = '1.0.20260802.3'
 $script:strCandidateAllocationSha256 = 'ce7b29de7bb4812f1de9defb1672c1b7eac47d6f6b584db571a9bc0d86726e02'
 $script:strCandidateHelperRelativePath = '.github/workflows/Expand-StyleGuideCandidateArtifact.ps1'
 $script:strCandidateContextRelativePath = '.github/workflows/Manage-StyleGuideCandidateInvocationContext.ps1'
@@ -67,6 +67,13 @@ $script:strCandidateCatalogRelativePath = '.github/workflows/style-guide-candida
 # helper builds these subreasons by interpolation, so the closed catalog can only
 # stay closed if every declared parameter/suffix pair is present in it. An
 # interpolated suffix that is absent from this table is itself a failure.
+# Phases whose '<phase>-invalid' diagnostic the production code builds by
+# interpolation. Every one must be declared in the catalog, so a new phase
+# cannot silently widen the taxonomy.
+$script:arrCandidateComputedDiagnosticPhase = [string[]]@(
+    'archive', 'containment', 'destination', 'digest', 'download',
+    'extraction', 'manifest', 'parameter', 'post-extraction', 'root'
+)
 $script:hashtableCandidateSubreasonFamily = [ordered]@{
     type = [string[]]@(
         'ArtifactId', 'CandidateDirectory', 'CheckoutRoot', 'DownloadDirectory',
@@ -318,6 +325,12 @@ $script:scriptBlockAssertProductionTaxonomyClosed = {
     foreach ($strValue in $Catalog.ClosedSets.DiagnosticCode) {
         [void]$objDiagnostic.Add([string]$strValue)
     }
+    $objPhase = New-Object 'System.Collections.Generic.HashSet[string]' (
+        [System.StringComparer]::Ordinal
+    )
+    foreach ($strValue in $Catalog.ClosedSets.Phase) {
+        [void]$objPhase.Add([string]$strValue)
+    }
 
     foreach ($strLiteralPath in $LiteralPath) {
         $strText = & $script:scriptBlockConvertFromStrictUtf8 `
@@ -345,6 +358,35 @@ $script:scriptBlockAssertProductionTaxonomyClosed = {
                 if (-not $objSubreason.Contains($strParameter + '-' + $strSuffix)) {
                     & $script:scriptBlockStopHarness `
                         -Code 'catalog-invalid' -Detail 'production-subreason-family'
+                }
+            }
+        }
+
+        # A literal fallback is emitted verbatim when an exception carries no
+        # annotation, so it must be a declared value of some closed set.
+        # Scanning only -Code and -Subreason would let these escape.
+        foreach ($objMatch in [regex]::Matches($strText, "-Fallback\s+'([^']*)'")) {
+            $strFallback = $objMatch.Groups[1].Value
+            if (-not $objSubreason.Contains($strFallback) -and
+                -not $objDiagnostic.Contains($strFallback) -and
+                -not $objPhase.Contains($strFallback)) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'catalog-invalid' -Detail 'production-fallback'
+            }
+        }
+
+        # A phase-derived code is built by interpolation, so every phase that can
+        # reach the fallback must have its '<phase>-invalid' form declared.
+        $arrComputed = @([regex]::Matches($strText, '-(?:Code|Fallback)\s+"\$[A-Za-z0-9_]+-([A-Za-z-]+)"'))
+        foreach ($objMatch in $arrComputed) {
+            if ($objMatch.Groups[1].Value -cne 'invalid') {
+                & $script:scriptBlockStopHarness `
+                    -Code 'catalog-invalid' -Detail 'production-computed-code'
+            }
+            foreach ($strPhase in $script:arrCandidateComputedDiagnosticPhase) {
+                if (-not $objDiagnostic.Contains($strPhase + '-invalid')) {
+                    & $script:scriptBlockStopHarness `
+                        -Code 'catalog-invalid' -Detail 'production-computed-code'
                 }
             }
         }
@@ -3603,7 +3645,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.3
+    # Version: 1.0.20260802.4
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()

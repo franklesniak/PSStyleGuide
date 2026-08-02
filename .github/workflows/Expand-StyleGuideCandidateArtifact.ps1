@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260802.3
+Version: 1.0.20260802.4
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260802.3'
+$script:versionCandidateHelper = [System.Version]'1.0.20260802.4'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.2'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -735,9 +735,21 @@ $script:scriptBlockGetCandidateHelperEntry = {
         [Parameter(Mandatory = $true)]
         [string]$LiteralPath,
 
+        [Parameter(Mandatory = $true)]
+        [string]$Phase,
+
         [ref]$ReferenceToFilesystemCallCount
     )
 
+    # The caller supplies the phase. Enumeration runs during download,
+    # destination, extraction, post-extraction, and cleanup, so hard-coding a
+    # cleanup failure here would report an earlier phase's failure as a cleanup
+    # failure and let it match the wrong oracle.
+    $strFailureCode = if ($Phase -ceq 'cleanup') {
+        'cleanup-owned-entry-uncertain'
+    } else {
+        "$Phase-invalid"
+    }
     try {
         if ($null -ne $ReferenceToFilesystemCallCount) {
             $ReferenceToFilesystemCallCount.Value = [uint32]($ReferenceToFilesystemCallCount.Value + 1)
@@ -745,7 +757,7 @@ $script:scriptBlockGetCandidateHelperEntry = {
         return [string[]]@([System.IO.Directory]::EnumerateFileSystemEntries($LiteralPath))
     } catch {
         & $script:scriptBlockStopCandidateHelperOperation `
-            -Code 'cleanup-owned-entry-uncertain' -Phase 'cleanup' -Subreason 'enumeration'
+            -Code $strFailureCode -Phase $Phase -Subreason 'enumeration'
     }
 }
 
@@ -953,7 +965,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.3
+    # Version: 1.0.20260802.4
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1039,6 +1051,7 @@ function Remove-StyleGuideCandidateInvocationState {
             $arrCandidateEntries = [string[]]@(
                 & $script:scriptBlockGetCandidateHelperEntry `
                     -LiteralPath $Context.CandidatePath `
+                    -Phase 'cleanup' `
                     -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
             )
             $arrOwnedCandidateFiles = @($arrCandidateFileRecords | Where-Object {
@@ -1073,6 +1086,7 @@ function Remove-StyleGuideCandidateInvocationState {
                 $arrRemaining = [string[]]@(
                     & $script:scriptBlockGetCandidateHelperEntry `
                         -LiteralPath $Context.CandidatePath `
+                        -Phase 'cleanup' `
                         -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
                 )
                 if (& $script:scriptBlockTestCandidateHelperEntryPresent `
@@ -1089,6 +1103,7 @@ function Remove-StyleGuideCandidateInvocationState {
             $arrRootEntries = [string[]]@(
                 & $script:scriptBlockGetCandidateHelperEntry `
                     -LiteralPath $Context.InvocationRootPath `
+                    -Phase 'cleanup' `
                     -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
             )
             if (& $script:scriptBlockTestCandidateHelperEntryPresent `
@@ -1216,7 +1231,7 @@ $script:scriptBlockAssertCandidateHelperEntryAbsent = {
     )
 
     $arrEntries = [string[]]@(
-        & $script:scriptBlockGetCandidateHelperEntry -LiteralPath $ParentPath
+        & $script:scriptBlockGetCandidateHelperEntry -LiteralPath $ParentPath -Phase $Phase
     )
     foreach ($strEntry in $arrEntries) {
         if ([System.String]::Equals(
@@ -1515,7 +1530,8 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
 
         $strPhase = 'download'
         $arrDownloadEntries = [string[]]@(
-            & $script:scriptBlockGetCandidateHelperEntry -LiteralPath $strDownloadPath
+            & $script:scriptBlockGetCandidateHelperEntry -LiteralPath $strDownloadPath `
+                -Phase 'download'
         )
         if ($arrDownloadEntries.Count -ne 1) {
             & $script:scriptBlockStopCandidateHelperOperation `
@@ -1866,7 +1882,8 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
             -LiteralPath $strCandidatePath `
             -Phase 'post-extraction')
         $arrCandidateEntries = [string[]]@(
-            & $script:scriptBlockGetCandidateHelperEntry -LiteralPath $strCandidatePath
+            & $script:scriptBlockGetCandidateHelperEntry -LiteralPath $strCandidatePath `
+                -Phase 'post-extraction'
         )
         if ($arrCandidateEntries.Count -ne 4) {
             & $script:scriptBlockStopCandidateHelperOperation `
