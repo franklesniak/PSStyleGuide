@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.34
+Version: 1.0.20260802.35
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.34'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.35'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260802.19'
@@ -778,27 +778,40 @@ $script:scriptBlockAssertResourceGuardsReached = {
         & $script:scriptBlockStopHarness `
             -Code 'catalog-invalid' -Detail 'production-resource-guard-reached'
     }
-    $objObservedSite = New-Object 'System.Collections.Generic.HashSet[string]' (
-        [System.StringComparer]::Ordinal
-    )
+    $hashtableObservedSite = @{}
     foreach ($strLine in [System.IO.File]::ReadAllLines($strTracePath)) {
-        if ($strLine.Length -ne 0) {
-            [void]$objObservedSite.Add([string]$strLine)
+        if ($strLine.Length -eq 0) {
+            continue
         }
+        if (-not $hashtableObservedSite.ContainsKey($strLine)) {
+            $hashtableObservedSite[$strLine] = 0
+        }
+        $hashtableObservedSite[$strLine] = [int]$hashtableObservedSite[$strLine] + 1
     }
-    # Every phase each guard serves in production, named here so removing a call
-    # site has to be admitted in this table before the suite will pass.
-    $arrRequiredSite = [string[]]@(
-        'declared',
-        'actual:manifest',
-        'actual:extraction'
-    )
-    if ($objObservedSite.Count -ne $arrRequiredSite.Count) {
+
+    # Presence alone is too weak. The guard reports the phase its caller passed,
+    # so a single reachable call carrying the right phase and a zero read length
+    # produces the same evidence as a guard that runs on every read -- which
+    # means the real call could be lifted out of the read loop, its arithmetic
+    # inlined, and a decoy left behind to satisfy this.
+    #
+    # How often the guard runs is what separates those. Each guard is invoked
+    # once per manifest entry or per read chunk, so a manifest of four entries
+    # drives each of these at least four times, and the decoy can only produce
+    # one. The count is what the decoy cannot forge without doing the work.
+    $hashtableRequiredSite = [ordered]@{
+        'declared' = 4
+        'actual:manifest' = 4
+        'actual:extraction' = 4
+    }
+    if ($hashtableObservedSite.Count -ne $hashtableRequiredSite.Count) {
         & $script:scriptBlockStopHarness `
             -Code 'catalog-invalid' -Detail 'production-resource-guard-reached'
     }
-    foreach ($strRequiredSite in $arrRequiredSite) {
-        if (-not $objObservedSite.Contains($strRequiredSite)) {
+    foreach ($strRequiredSite in $hashtableRequiredSite.Keys) {
+        if (-not $hashtableObservedSite.ContainsKey($strRequiredSite) -or
+            [int]$hashtableObservedSite[$strRequiredSite] -lt
+                [int]$hashtableRequiredSite[$strRequiredSite]) {
             & $script:scriptBlockStopHarness `
                 -Code 'catalog-invalid' -Detail 'production-resource-guard-reached'
         }
@@ -4555,7 +4568,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.34
+    # Version: 1.0.20260802.35
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
