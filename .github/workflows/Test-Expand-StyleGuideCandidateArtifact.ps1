@@ -31,7 +31,7 @@ None. The script writes one JSON object per case to the success stream and
 uses its process exit code to report the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.0
+Version: 1.0.20260802.1
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,16 +53,51 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.0'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.1'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260802.0'
-$script:strCandidateExpectedContextVersion = '1.0.20260802.0'
-$script:strCandidateCatalogVersion = '1.0.20260802.0'
+$script:strCandidateExpectedHelperVersion = '1.0.20260802.1'
+$script:strCandidateExpectedContextVersion = '1.0.20260802.1'
+$script:strCandidateCatalogVersion = '1.0.20260802.1'
 $script:strCandidateAllocationSha256 = 'ce7b29de7bb4812f1de9defb1672c1b7eac47d6f6b584db571a9bc0d86726e02'
 $script:strCandidateHelperRelativePath = '.github/workflows/Expand-StyleGuideCandidateArtifact.ps1'
 $script:strCandidateContextRelativePath = '.github/workflows/Manage-StyleGuideCandidateInvocationContext.ps1'
 $script:strCandidateCatalogRelativePath = '.github/workflows/style-guide-candidate-cases.json'
+# Declared expansion of the helper's parameter-prefixed subreason families. The
+# helper builds these subreasons by interpolation, so the closed catalog can only
+# stay closed if every declared parameter/suffix pair is present in it. An
+# interpolated suffix that is absent from this table is itself a failure.
+$script:hashtableCandidateSubreasonFamily = [ordered]@{
+    type = [string[]]@(
+        'ArtifactId', 'CandidateDirectory', 'CheckoutRoot', 'DownloadDirectory',
+        'ExpectedDigest', 'RunAttempt', 'RunId', 'TrustedTemporaryRoot'
+    )
+    empty = [string[]]@(
+        'ArtifactId', 'CandidateDirectory', 'CheckoutRoot', 'DownloadDirectory',
+        'ExpectedDigest', 'RunAttempt', 'RunId', 'TrustedTemporaryRoot'
+    )
+    control = [string[]]@(
+        'ArtifactId', 'CandidateDirectory', 'CheckoutRoot', 'DownloadDirectory',
+        'ExpectedDigest', 'RunAttempt', 'RunId', 'TrustedTemporaryRoot'
+    )
+    length = [string[]]@('ArtifactId', 'RunAttempt', 'RunId')
+    wildcard = [string[]]@(
+        'CandidateDirectory', 'CheckoutRoot', 'DownloadDirectory', 'TrustedTemporaryRoot'
+    )
+    provider = [string[]]@(
+        'CandidateDirectory', 'CheckoutRoot', 'DownloadDirectory', 'TrustedTemporaryRoot'
+    )
+    relative = [string[]]@(
+        'CandidateDirectory', 'CheckoutRoot', 'DownloadDirectory', 'TrustedTemporaryRoot'
+    )
+    normalization = [string[]]@(
+        'CandidateDirectory', 'CheckoutRoot', 'DownloadDirectory', 'TrustedTemporaryRoot'
+    )
+    missing = [string[]]@(
+        'CandidateDirectory', 'CheckoutRoot', 'Context', 'DownloadDirectory',
+        'ExpectedDigest', 'TrustedTemporaryRoot'
+    )
+}
 $script:arrCandidateExpectedName = [string[]]@(
     'copilot-instructions.md',
     'powershell.instructions.md',
@@ -259,6 +294,60 @@ $script:scriptBlockConvertFromStrictUtf8 = {
         return (New-Object System.Text.UTF8Encoding($false, $true)).GetString($Bytes)
     } catch {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'utf8'
+    }
+}
+
+$script:scriptBlockAssertProductionTaxonomyClosed = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [object]$Catalog,
+
+        [Parameter(Mandatory = $true)]
+        [string[]]$LiteralPath
+    )
+
+    $objSubreason = New-Object 'System.Collections.Generic.HashSet[string]' (
+        [System.StringComparer]::Ordinal
+    )
+    foreach ($strValue in $Catalog.ClosedSets.Subreason) {
+        [void]$objSubreason.Add([string]$strValue)
+    }
+    $objDiagnostic = New-Object 'System.Collections.Generic.HashSet[string]' (
+        [System.StringComparer]::Ordinal
+    )
+    foreach ($strValue in $Catalog.ClosedSets.DiagnosticCode) {
+        [void]$objDiagnostic.Add([string]$strValue)
+    }
+
+    foreach ($strLiteralPath in $LiteralPath) {
+        $strText = & $script:scriptBlockConvertFromStrictUtf8 `
+            -Bytes ([System.IO.File]::ReadAllBytes($strLiteralPath))
+
+        foreach ($objMatch in [regex]::Matches($strText, "-Subreason\s+'([^']*)'")) {
+            if (-not $objSubreason.Contains($objMatch.Groups[1].Value)) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'catalog-invalid' -Detail 'production-subreason'
+            }
+        }
+        foreach ($objMatch in [regex]::Matches($strText, "-(?:Code|DiagnosticCode)\s+'([^']*)'")) {
+            if (-not $objDiagnostic.Contains($objMatch.Groups[1].Value)) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'catalog-invalid' -Detail 'production-diagnostic'
+            }
+        }
+        foreach ($objMatch in [regex]::Matches($strText, '-Subreason\s+"\$[A-Za-z0-9_]+-([A-Za-z]+)"')) {
+            $strSuffix = $objMatch.Groups[1].Value
+            if (-not $script:hashtableCandidateSubreasonFamily.Contains($strSuffix)) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'catalog-invalid' -Detail 'production-subreason-family'
+            }
+            foreach ($strParameter in $script:hashtableCandidateSubreasonFamily[$strSuffix]) {
+                if (-not $objSubreason.Contains($strParameter + '-' + $strSuffix)) {
+                    & $script:scriptBlockStopHarness `
+                        -Code 'catalog-invalid' -Detail 'production-subreason-family'
+                }
+            }
+        }
     }
 }
 
@@ -3445,7 +3534,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.0
+    # Version: 1.0.20260802.1
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -3521,6 +3610,9 @@ function Invoke-StyleGuideCandidateHarness {
         -ExpectedFunctionCount ([uint32]2))
 
     $objCatalog = & $script:scriptBlockReadCandidateCatalog -LiteralPath $strCatalogPath
+    [void](& $script:scriptBlockAssertProductionTaxonomyClosed `
+        -Catalog $objCatalog `
+        -LiteralPath ([string[]]@($strHelperLiteralPath, $strContextLiteralPath)))
     $arrContextLoadOutput = @(. $strContextLiteralPath)
     if ($arrContextLoadOutput.Count -ne 0) {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'context-load-output'

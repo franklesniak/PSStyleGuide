@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260802.0
+Version: 1.0.20260802.1
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260802.0'
+$versionCandidateContext = [System.Version]'1.0.20260802.1'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -918,7 +918,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.0
+    # Version: 1.0.20260802.1
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1094,7 +1094,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.0
+    # Version: 1.0.20260802.1
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1283,8 +1283,13 @@ function Remove-StyleGuideCandidateInvocationContext {
             -ReferenceToFilesystemCallCount $uintFilesystemCallCount `
             -RetainedRecordSequences ([uint32[]]@()))
     } catch {
+        # Only entries this invocation actually created can be uncertain. An
+        # ExpectedAbsent record names a path that was never created, so it stays
+        # ExpectedAbsent; retyping it would contradict the record schema, which
+        # binds every non-ExpectedAbsent candidate-directory record to the
+        # destination phase, and would invalidate the terminal context.
         foreach ($objRecord in $Context.OwnershipJournal) {
-            if ($objRecord.EntryState -in @('Created', 'ExpectedAbsent')) {
+            if ($objRecord.EntryState -eq 'Created') {
                 $objRecord.EntryState = 'RetainedUncertain'
             }
         }
