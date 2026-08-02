@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260802.5
+Version: 1.0.20260802.6
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260802.5'
+$versionCandidateContext = [System.Version]'1.0.20260802.6'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -280,14 +280,30 @@ $scriptBlockGetCandidateImmediateEntry = {
         [ref]$ReferenceToFilesystemCallCount
     )
 
+    # Both lifecycles call this, and the supplied call counter is what tells
+    # them apart: cleanup passes one, creation does not. Reporting a cleanup
+    # code and phase for a creation-time enumeration failure would tell the
+    # caller a cleanup had failed when no cleanup had run. This mirrors the
+    # ordinary-directory envelope check above rather than inventing a second
+    # convention in the same file.
+    $strFailureCode = if ($null -ne $ReferenceToFilesystemCallCount) {
+        'cleanup-owned-entry-uncertain'
+    } else {
+        'root-invalid'
+    }
+    $strFailurePhase = if ($null -ne $ReferenceToFilesystemCallCount) {
+        'cleanup'
+    } else {
+        'root'
+    }
     try {
         if ($null -ne $ReferenceToFilesystemCallCount) {
             $ReferenceToFilesystemCallCount.Value = [uint32]($ReferenceToFilesystemCallCount.Value + 1)
         }
         return [string[]]@([System.IO.Directory]::EnumerateFileSystemEntries($LiteralPath))
     } catch {
-        & $scriptBlockStopCandidateOperation -Code 'cleanup-owned-entry-uncertain' `
-            -Message 'PSStyleGuide.Context.v1|phase=cleanup|reason=enumeration'
+        & $scriptBlockStopCandidateOperation -Code $strFailureCode `
+            -Message "PSStyleGuide.Context.v1|phase=$strFailurePhase|reason=enumeration"
     }
 }
 
@@ -971,7 +987,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.5
+    # Version: 1.0.20260802.6
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1147,7 +1163,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.5
+    # Version: 1.0.20260802.6
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
