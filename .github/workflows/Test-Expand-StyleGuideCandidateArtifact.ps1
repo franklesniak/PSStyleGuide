@@ -31,7 +31,7 @@ None. The script writes one JSON object per case to the success stream and
 uses its process exit code to report the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.17
+Version: 1.0.20260802.18
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.17'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.18'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260802.8'
@@ -384,6 +384,38 @@ $script:scriptBlockConvertFromStrictUtf8 = {
         return (New-Object System.Text.UTF8Encoding($false, $true)).GetString($Bytes)
     } catch {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'utf8'
+    }
+}
+
+$script:scriptBlockAssertResourceGuardsWired = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath
+    )
+
+    # PS-P1A-R-10 through R-13 exercise the length guards by invoking them
+    # directly. That proves the guards behave correctly but not that production
+    # still calls them, so removing a call site would leave all four rows green
+    # while oversized or inconsistent archive data was accepted. Driving those
+    # rows through expansion instead is not available: the checked-overflow row
+    # needs a running total of UInt64.MaxValue that no real archive produces,
+    # and re-driving the actual-length rows would land them in a different phase
+    # than the frozen catalog records. The wiring is therefore asserted here.
+    $strText = & $script:scriptBlockConvertFromStrictUtf8 `
+        -Bytes ([System.IO.File]::ReadAllBytes($LiteralPath))
+    $hashtableRequiredInvocation = [ordered]@{
+        'scriptBlockAddCandidateHelperDeclaredLength' = 1
+        'scriptBlockAddCandidateHelperActualLength' = 2
+    }
+    foreach ($strName in $hashtableRequiredInvocation.Keys) {
+        $intCount = @([regex]::Matches(
+            $strText,
+            '&\s+\$script:' + [regex]::Escape($strName) + '\b'
+        )).Count
+        if ($intCount -lt $hashtableRequiredInvocation[$strName]) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' -Detail 'production-resource-guard'
+        }
     }
 }
 
@@ -3975,7 +4007,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.17
+    # Version: 1.0.20260802.18
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -4065,6 +4097,7 @@ function Invoke-StyleGuideCandidateHarness {
     [void](& $script:scriptBlockAssertProductionTaxonomyClosed `
         -Catalog $objCatalog `
         -LiteralPath ([string[]]@($strHelperLiteralPath, $strContextLiteralPath)))
+    [void](& $script:scriptBlockAssertResourceGuardsWired -LiteralPath $strHelperLiteralPath)
     $arrContextLoadOutput = @(. $strContextLiteralPath)
     if ($arrContextLoadOutput.Count -ne 0) {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'context-load-output'
