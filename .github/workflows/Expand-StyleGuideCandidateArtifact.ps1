@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260802.6
+Version: 1.0.20260802.7
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260802.6'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.4'
+$script:versionCandidateHelper = [System.Version]'1.0.20260802.7'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.5'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -591,8 +591,16 @@ $script:scriptBlockAssertCandidateHelperContext = {
         $objDownloadDirectoryRecord = @($ContextValue.OwnershipJournal | Where-Object {
             $_.Kind -eq 'DownloadDirectory'
         })[0]
+        # An ExpectedAbsent download directory is only ever produced by the
+        # context manager's own creation-failure cleanup, which never hands a
+        # context back. Everything reaching this script therefore had its
+        # download directory created, and accepting the relaxed state here
+        # would let a forged context journal an archive and candidate beneath a
+        # directory its own record says was never created. Cleanup would then
+        # exclude that directory, see it as an unexpected root entry, and reach
+        # CleanupFailed after a successful expansion.
         if ($objRootRecord.EntryState -cne 'Created' -or
-            $objDownloadDirectoryRecord.EntryState -cnotin @('Created', 'ExpectedAbsent') -or
+            $objDownloadDirectoryRecord.EntryState -cne 'Created' -or
             @($ContextValue.OwnershipJournal | Where-Object {
                 $_.EntryState -eq 'RetainedUncertain'
             }).Count -ne 0) {
@@ -995,7 +1003,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.6
+    # Version: 1.0.20260802.7
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

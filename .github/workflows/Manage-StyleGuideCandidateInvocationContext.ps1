@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260802.4
+Version: 1.0.20260802.5
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260802.4'
+$versionCandidateContext = [System.Version]'1.0.20260802.5'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -787,6 +787,27 @@ $scriptBlockAssertCandidateInMemoryContext = {
             }).Count -ne 0) {
             throw 'cleanup-context-invalid'
         }
+
+        # ExpectedAbsent is reachable only from bounded creation-failure
+        # cleanup, where nothing was ever placed beneath the download
+        # directory. Rather than trusting which caller asked, require the
+        # journal to agree with itself: a download directory that was never
+        # created cannot contain a download file, and no candidate can have
+        # been created either.
+        if ($objDownloadDirectoryRecord.EntryState -ceq 'ExpectedAbsent') {
+            $objCandidateRecord = @($Context.OwnershipJournal | Where-Object {
+                $_.Kind -eq 'CandidateDirectory'
+            })[0]
+            if (@($Context.OwnershipJournal | Where-Object {
+                        $_.Kind -eq 'DownloadFile'
+                    }).Count -ne 0 -or
+                @($Context.OwnershipJournal | Where-Object {
+                        $_.Kind -eq 'CandidateFile'
+                    }).Count -ne 0 -or
+                $objCandidateRecord.EntryState -cne 'ExpectedAbsent') {
+                throw 'cleanup-context-invalid'
+            }
+        }
     }
     if ($Context.LifecycleState -eq 'Disposed') {
         foreach ($objRecord in $Context.OwnershipJournal) {
@@ -950,7 +971,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.4
+    # Version: 1.0.20260802.5
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1126,7 +1147,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.4
+    # Version: 1.0.20260802.5
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
