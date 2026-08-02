@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.37
+Version: 1.0.20260802.38
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.37'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.38'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260802.20'
@@ -393,6 +393,65 @@ $script:scriptBlockConvertFromStrictUtf8 = {
         return (New-Object System.Text.UTF8Encoding($false, $true)).GetString($Bytes)
     } catch {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'utf8'
+    }
+}
+
+$script:scriptBlockAssertVersionMarkersConsistent = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ExpectedVersion,
+
+        [Parameter(Mandatory = $true)]
+        [uint32]$ExpectedFunctionCount
+    )
+
+    # Each production script states its version in three places: the help
+    # block's Version line, the constant the code compares against, and a
+    # comment inside every public function. Nothing keeps them equal but the
+    # hand that edits them, and in this review loop that hand has missed one
+    # three separate times -- each caught downstream as a puzzling symptom
+    # rather than as what it was.
+    #
+    # The harness already knows the version it expects, so requiring every
+    # marker in the file to equal it costs one pass over the text and turns a
+    # recurring editing slip into an immediate, named failure. Any version
+    # literal anywhere in the file that is not the expected one is a
+    # desynchronisation, so no marker can be added without being covered.
+    $strText = [System.IO.File]::ReadAllText($LiteralPath)
+    $arrMatch = @([System.Text.RegularExpressions.Regex]::Matches(
+        $strText,
+        '\b\d+\.\d+\.\d{8}\.\d+\b'
+    ))
+    $intExpectedMarker = 0
+    foreach ($objMatch in $arrMatch) {
+        if ($objMatch.Value -ceq $ExpectedVersion) {
+            $intExpectedMarker++
+            continue
+        }
+        # A version literal that is not this file's own is only legitimate when
+        # it names the other script this one is pinned to, which the harness
+        # verifies separately. Anything else is a stale marker.
+        if ($objMatch.Value -cne $script:strCandidateExpectedHelperVersion -and
+            $objMatch.Value -cne $script:strCandidateExpectedContextVersion) {
+            & $script:scriptBlockStopHarness `
+                -Code 'script-identity-invalid' -Detail 'version-marker'
+        }
+    }
+    # A deleted marker leaves the survivors agreeing with each other, so the
+    # equality test above cannot see it; only a count can. That count is
+    # derived rather than written down: the help block states the version once,
+    # the constant states it once, and every public function repeats it, so a
+    # file with two public functions carries four markers and a file with one
+    # carries three. Writing a number here would be the same kind of defect
+    # this assertion exists to catch, and was: the first revision hard-coded
+    # three and silently accepted a deletion from the two-function file.
+    $intRequiredMarker = 2 + [int]$ExpectedFunctionCount
+    if ($intExpectedMarker -ne $intRequiredMarker) {
+        & $script:scriptBlockStopHarness `
+            -Code 'script-identity-invalid' -Detail 'version-marker'
     }
 }
 
@@ -4572,7 +4631,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.37
+    # Version: 1.0.20260802.38
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -4662,6 +4721,14 @@ function Invoke-StyleGuideCandidateHarness {
     [void](& $script:scriptBlockAssertProductionTaxonomyClosed `
         -Catalog $objCatalog `
         -LiteralPath ([string[]]@($strHelperLiteralPath, $strContextLiteralPath)))
+    [void](& $script:scriptBlockAssertVersionMarkersConsistent `
+        -LiteralPath $strHelperLiteralPath `
+        -ExpectedVersion $script:strCandidateExpectedHelperVersion `
+        -ExpectedFunctionCount ([uint32]1))
+    [void](& $script:scriptBlockAssertVersionMarkersConsistent `
+        -LiteralPath $strContextLiteralPath `
+        -ExpectedVersion $script:strCandidateExpectedContextVersion `
+        -ExpectedFunctionCount ([uint32]2))
     [void](& $script:scriptBlockAssertResourceGuardsWired -LiteralPath $strHelperLiteralPath)
     $arrContextLoadOutput = @(. $strContextLiteralPath)
     if ($arrContextLoadOutput.Count -ne 0) {
