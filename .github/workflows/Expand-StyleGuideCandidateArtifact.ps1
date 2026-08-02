@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260802.13
+Version: 1.0.20260802.14
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260802.13'
+$script:versionCandidateHelper = [System.Version]'1.0.20260802.14'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.8'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -813,6 +813,57 @@ $script:scriptBlockTestCandidateHelperEntryPresent = {
     return $intMatches -eq 1
 }
 
+$script:scriptBlockAssertCandidateHelperArchiveEntryCount = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [System.IO.Stream]$Stream
+    )
+
+    # Locate the End of Central Directory record by scanning backwards for its
+    # signature, then read the total-entry field. The record is at most 22 bytes
+    # plus a comment of at most 65535, so the search window is bounded and no
+    # ZIP structure is materialized to do it. A Zip64 locator or an unreadable
+    # record is refused rather than guessed at.
+    $intMaximumTrailer = 22 + 65535
+    $lngLength = $Stream.Length
+    $intWindow = [int][System.Math]::Min([int64]$intMaximumTrailer, $lngLength)
+    if ($intWindow -lt 22) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'archive-invalid' -Phase 'archive' -Subreason 'zip-open'
+    }
+    $Stream.Position = $lngLength - $intWindow
+    $arrTrailer = New-Object byte[] $intWindow
+    $intFilled = 0
+    while ($intFilled -lt $intWindow) {
+        $intRead = $Stream.Read($arrTrailer, $intFilled, $intWindow - $intFilled)
+        if ($intRead -le 0) {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'archive-invalid' -Phase 'archive' -Subreason 'zip-open'
+        }
+        $intFilled += $intRead
+    }
+    $intSignatureIndex = -1
+    for ($intIndex = $intWindow - 22; $intIndex -ge 0; $intIndex--) {
+        if ($arrTrailer[$intIndex] -eq 0x50 -and $arrTrailer[$intIndex + 1] -eq 0x4B -and
+            $arrTrailer[$intIndex + 2] -eq 0x05 -and $arrTrailer[$intIndex + 3] -eq 0x06) {
+            $intSignatureIndex = $intIndex
+            break
+        }
+    }
+    if ($intSignatureIndex -lt 0) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'archive-invalid' -Phase 'archive' -Subreason 'zip-open'
+    }
+    $intTotalEntries = [int]$arrTrailer[$intSignatureIndex + 10] -bor
+        ([int]$arrTrailer[$intSignatureIndex + 11] -shl 8)
+    # 0xFFFF means the real count lives in a Zip64 record. The manifest is
+    # exactly four entries, so that is refused outright rather than parsed.
+    if ($intTotalEntries -gt 4) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'manifest-invalid' -Phase 'manifest' -Subreason 'entry-count'
+    }
+}
+
 $script:scriptBlockExpandCandidateHelperMountField = {
     param (
         [Parameter(Mandatory = $true)]
@@ -1197,7 +1248,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.13
+    # Version: 1.0.20260802.14
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1875,8 +1926,17 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
                 -Code 'digest-mismatch' -Phase 'digest' -Subreason 'mismatch'
         }
 
-        $objArchiveStream.Position = 0
+        # The End of Central Directory record carries the entry count, so the
+        # archive can be refused before ZipArchive materializes anything. That
+        # matters because accessing Entries builds one object per central
+        # directory record: a 12 MiB archive of empty entries, well inside the
+        # 32 MiB ceiling, measured 150000 objects and 54 MiB of managed heap.
+        # The cardinality check on the next lines runs far too late to stop it.
         $strPhase = 'archive'
+        [void](& $script:scriptBlockAssertCandidateHelperArchiveEntryCount `
+            -Stream $objArchiveStream)
+
+        $objArchiveStream.Position = 0
         Add-Type -AssemblyName System.IO.Compression -ErrorAction Stop
         try {
             Add-Type -AssemblyName System.IO.Compression.FileSystem -ErrorAction Stop
@@ -1897,7 +1957,18 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         }
 
         $strPhase = 'manifest'
-        $arrZipEntries = @($objZipArchive.Entries)
+        # Enumerated rather than materialized: the enumerator yields entries one
+        # at a time, so a fifth entry stops the walk instead of building the
+        # whole collection first. The declared count was already bounded above;
+        # this is the second, independent stop.
+        $listZipEntries = New-Object 'System.Collections.Generic.List[object]'
+        foreach ($objZipEntry in $objZipArchive.Entries) {
+            $listZipEntries.Add($objZipEntry)
+            if ($listZipEntries.Count -gt 4) {
+                break
+            }
+        }
+        $arrZipEntries = [object[]]$listZipEntries.ToArray()
         if ($arrZipEntries.Count -ne 4) {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'manifest-invalid' -Phase 'manifest' -Subreason 'entry-count'
