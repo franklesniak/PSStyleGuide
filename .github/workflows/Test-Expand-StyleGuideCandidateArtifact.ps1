@@ -31,7 +31,7 @@ None. The script writes one JSON object per case to the success stream and
 uses its process exit code to report the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.16
+Version: 1.0.20260802.17
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.16'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.17'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260802.8'
@@ -2645,6 +2645,25 @@ $script:scriptBlockInvokeExpansionFixture = {
             try {
                 [void](New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $strWrongType)
             } catch {
+                # Any exception from context creation reached this catch and the
+                # expected phase, subreason, and diagnostic were then recorded
+                # unconditionally, so the case passed even when the production
+                # rejection under test never ran. Require the structured
+                # diagnostic the production check actually emits instead. The
+                # creation failure is wrapped, so the inner reason is not
+                # readable here; the category and composite shape are, and an
+                # unrelated failure carries neither.
+                $strObservedCode = & $script:scriptBlockGetProductionFailureField `
+                    -ErrorRecord $_ `
+                    -Key 'PSStyleGuideDiagnosticCode' `
+                    -Fallback 'none'
+                if ($strObservedCode -cne 'root-invalid' -or
+                    $_.Exception.Message.IndexOf(
+                        'PSStyleGuide.ContextCreate.v1|category=root-invalid|cleanup=not-required',
+                        [System.StringComparison]::Ordinal) -lt 0) {
+                    & $script:scriptBlockStopHarness `
+                        -Code 'fixture-failed' -Detail 'wrong-type-evidence'
+                }
                 $objObservation.Phase = 'root'
                 $objObservation.Subreason = 'nonordinary-directory'
                 $objObservation.DiagnosticCode = 'root-invalid'
@@ -2665,6 +2684,25 @@ $script:scriptBlockInvokeExpansionFixture = {
             try {
                 [void](New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $strLink)
             } catch {
+                # Any exception from context creation reached this catch and the
+                # expected phase, subreason, and diagnostic were then recorded
+                # unconditionally, so the case passed even when the production
+                # rejection under test never ran. Require the structured
+                # diagnostic the production check actually emits instead. The
+                # creation failure is wrapped, so the inner reason is not
+                # readable here; the category and composite shape are, and an
+                # unrelated failure carries neither.
+                $strObservedCode = & $script:scriptBlockGetProductionFailureField `
+                    -ErrorRecord $_ `
+                    -Key 'PSStyleGuideDiagnosticCode' `
+                    -Fallback 'none'
+                if ($strObservedCode -cne 'root-invalid' -or
+                    $_.Exception.Message.IndexOf(
+                        'PSStyleGuide.ContextCreate.v1|category=root-invalid|cleanup=not-required',
+                        [System.StringComparison]::Ordinal) -lt 0) {
+                    & $script:scriptBlockStopHarness `
+                        -Code 'fixture-failed' -Detail 'link-component-evidence'
+                }
                 $objObservation.Phase = 'root'
                 $objObservation.Subreason = 'nonordinary-directory'
                 $objObservation.DiagnosticCode = 'root-invalid'
@@ -3937,7 +3975,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.16
+    # Version: 1.0.20260802.17
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
