@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260802.16
+Version: 1.0.20260802.17
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260802.16'
+$script:versionCandidateHelper = [System.Version]'1.0.20260802.17'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.9'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -891,6 +891,50 @@ $script:scriptBlockAssertCandidateHelperArchiveEntryCount = {
         & $script:scriptBlockStopCandidateHelperOperation `
             -Code 'manifest-invalid' -Phase 'manifest' -Subreason 'entry-count'
     }
+
+    # The count above is a declared field, and declaring it is free. Patching
+    # both count fields to four leaves a central directory of any size intact:
+    # the reader walks the records themselves, so it builds every one of them
+    # and only then notices the mismatch, which is the whole amplification this
+    # function exists to prevent. The count cannot be the bound.
+    #
+    # What cannot be declared is where the directory physically sits. The
+    # trailer position was found by scanning for its signature, so the bytes
+    # between the recorded directory start and that position are a real span,
+    # and a four-entry directory cannot fill much of it. Bounding the span
+    # bounds the work regardless of what any header claims.
+    $lngTrailerPosition = $lngLength - $intWindow + $intSignatureIndex
+    $lngDirectorySize = [int64]$arrTrailer[$intSignatureIndex + 12] -bor
+        ([int64]$arrTrailer[$intSignatureIndex + 13] -shl 8) -bor
+        ([int64]$arrTrailer[$intSignatureIndex + 14] -shl 16) -bor
+        ([int64]$arrTrailer[$intSignatureIndex + 15] -shl 24)
+    $lngDirectoryOffset = [int64]$arrTrailer[$intSignatureIndex + 16] -bor
+        ([int64]$arrTrailer[$intSignatureIndex + 17] -shl 8) -bor
+        ([int64]$arrTrailer[$intSignatureIndex + 18] -shl 16) -bor
+        ([int64]$arrTrailer[$intSignatureIndex + 19] -shl 24)
+    # Either field at its maximum is the Zip64 marker, refused here for the
+    # same reason the count marker is: this manifest never needs Zip64.
+    if ($lngDirectorySize -eq 0xFFFFFFFF -or $lngDirectoryOffset -eq 0xFFFFFFFF) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'manifest-invalid' -Phase 'manifest' -Subreason 'entry-count'
+    }
+    # A directory that does not start before the trailer and end exactly at it
+    # is not describing this archive.
+    if ($lngDirectoryOffset -lt 0 -or $lngDirectorySize -lt 0 -or
+        $lngDirectoryOffset -gt $lngTrailerPosition -or
+        ($lngDirectoryOffset + $lngDirectorySize) -ne $lngTrailerPosition) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'manifest-invalid' -Phase 'manifest' -Subreason 'entry-count'
+    }
+    # A central directory record is 46 bytes plus its name, extra field, and
+    # comment. Four records with the longest manifest name and a generous 512
+    # bytes of per-record slack stay far below this, while the smallest record
+    # any reader would build is 46 bytes, so this admits fewer than ninety
+    # records in the worst case and no amplification with it.
+    if ($lngDirectorySize -gt 4096) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'manifest-invalid' -Phase 'manifest' -Subreason 'entry-count'
+    }
 }
 
 $script:scriptBlockExpandCandidateHelperMountField = {
@@ -1331,7 +1375,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.16
+    # Version: 1.0.20260802.17
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
