@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260802.19
+Version: 1.0.20260802.20
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260802.19'
+$script:versionCandidateHelper = [System.Version]'1.0.20260802.20'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.9'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -1416,7 +1416,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.19
+    # Version: 1.0.20260802.20
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1675,7 +1675,10 @@ $script:scriptBlockTestCandidateHelperRootsShareStorage = {
         [string]$CheckoutPath,
 
         [Parameter(Mandatory = $true)]
-        [string]$TrustedPath
+        [string]$TrustedPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$SentinelDirectory
     )
 
     # Every check before this one reasons about names. Names are exactly what
@@ -1693,9 +1696,26 @@ $script:scriptBlockTestCandidateHelperRootsShareStorage = {
     #
     # Nothing is written outside the trusted root, and the checkout is only ever
     # read, so a read-only checkout is unaffected.
+    # The sentinel goes in storage this invocation created, not in the caller's
+    # trusted parent. Creating a file directly in that parent is a permission
+    # this code never otherwise needs: a Windows ACL can grant create-folder
+    # there and deny create-file, which context creation satisfies because it
+    # only makes the invocation root, and which a probe writing to the parent
+    # would turn into a rejection of every valid expansion.
+    #
+    # Testing from one level down loses nothing. Candidate state is created
+    # under the invocation root, so that is the directory whose position
+    # actually matters, and the trusted parent is still covered because the
+    # invocation root's own leaf is carried in the paths below.
     $strSentinelName = 'psstyleguide-root-probe-' +
         [System.Guid]::NewGuid().ToString('N') + '.tmp'
-    $strSentinelPath = [System.IO.Path]::Combine($TrustedPath, $strSentinelName)
+    $strSentinelPath = [System.IO.Path]::Combine($SentinelDirectory, $strSentinelName)
+    $strSentinelLeaf = [System.IO.Path]::GetFileName(
+        $SentinelDirectory.TrimEnd(
+            $script:chrCandidateHelperDirectorySeparator,
+            $script:chrCandidateHelperAlternateSeparator
+        )
+    )
     $boolShared = $false
     try {
         try {
@@ -1714,10 +1734,15 @@ $script:scriptBlockTestCandidateHelperRootsShareStorage = {
         # Is the checkout inside the trusted root? Then some ancestor of the
         # checkout is the trusted root under another spelling, and the sentinel
         # is visible directly beneath that ancestor.
+        # Two candidates per ancestor: the ancestor may be the sentinel's own
+        # directory, or the trusted parent one level above it.
         $objAncestor = New-Object System.IO.DirectoryInfo($CheckoutPath)
         while ($null -ne $objAncestor) {
             if ([System.IO.File]::Exists(
-                    [System.IO.Path]::Combine($objAncestor.FullName, $strSentinelName))) {
+                    [System.IO.Path]::Combine($objAncestor.FullName, $strSentinelName)) -or
+                [System.IO.File]::Exists([System.IO.Path]::Combine(
+                    [System.IO.Path]::Combine($objAncestor.FullName, $strSentinelLeaf),
+                    $strSentinelName))) {
                 $boolShared = $true
                 break
             }
@@ -1729,7 +1754,7 @@ $script:scriptBlockTestCandidateHelperRootsShareStorage = {
         # a lexical prefix of the trusted root, so the remainder is known, and
         # appending it to the checkout reaches the sentinel if the two are one.
         if (-not $boolShared) {
-            $objAncestor = New-Object System.IO.DirectoryInfo($TrustedPath)
+            $objAncestor = New-Object System.IO.DirectoryInfo($SentinelDirectory)
             $strRelative = $strSentinelName
             while ($null -ne $objAncestor) {
                 if ([System.IO.File]::Exists(
@@ -2064,7 +2089,8 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         # applies unchanged on both platforms.
         if (& $script:scriptBlockTestCandidateHelperRootsShareStorage `
                 -CheckoutPath $strCheckoutPath `
-                -TrustedPath $strTrustedPath) {
+                -TrustedPath $strTrustedPath `
+                -SentinelDirectory $Context.InvocationRootPath) {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'root-invalid' -Phase 'root' -Subreason 'overlap'
         }
