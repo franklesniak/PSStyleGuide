@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260802.5
+Version: 1.0.20260802.6
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260802.5'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.3'
+$script:versionCandidateHelper = [System.Version]'1.0.20260802.6'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.4'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -482,9 +482,21 @@ $script:scriptBlockAssertCandidateHelperContext = {
             }
         }
 
-        if ($objRecord.Kind -in @('InvocationRootDirectory', 'DownloadDirectory')) {
+        if ($objRecord.Kind -eq 'InvocationRootDirectory') {
             if ($objRecord.CreationPhase -cne 'context' -or
                 $objRecord.EntryState -eq 'ExpectedAbsent') {
+                throw 'context-invalid'
+            }
+        } elseif ($objRecord.Kind -eq 'DownloadDirectory') {
+            # ExpectedAbsent is legitimate here and only here. Creation records
+            # the invocation root, then creates the download directory, so a
+            # failure between those steps leaves this record never created while
+            # the root is already owned. Modelling that state lets the creation
+            # failure path hand a valid context to cleanup, which skips
+            # ExpectedAbsent records and still removes the root instead of
+            # leaking it. The reverse - an owned download directory under a root
+            # that was never created - remains invalid.
+            if ($objRecord.CreationPhase -cne 'context') {
                 throw 'context-invalid'
             }
         } elseif ($objRecord.Kind -eq 'DownloadFile') {
@@ -580,7 +592,7 @@ $script:scriptBlockAssertCandidateHelperContext = {
             $_.Kind -eq 'DownloadDirectory'
         })[0]
         if ($objRootRecord.EntryState -cne 'Created' -or
-            $objDownloadDirectoryRecord.EntryState -cne 'Created' -or
+            $objDownloadDirectoryRecord.EntryState -cnotin @('Created', 'ExpectedAbsent') -or
             @($ContextValue.OwnershipJournal | Where-Object {
                 $_.EntryState -eq 'RetainedUncertain'
             }).Count -ne 0) {
@@ -983,7 +995,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.5
+    # Version: 1.0.20260802.6
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

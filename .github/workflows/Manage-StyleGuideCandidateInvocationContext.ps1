@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260802.3
+Version: 1.0.20260802.4
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260802.3'
+$versionCandidateContext = [System.Version]'1.0.20260802.4'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -671,9 +671,21 @@ $scriptBlockAssertCandidateInMemoryContext = {
             }
         }
 
-        if ($objRecord.Kind -in @('InvocationRootDirectory', 'DownloadDirectory')) {
+        if ($objRecord.Kind -eq 'InvocationRootDirectory') {
             if ($objRecord.CreationPhase -cne 'context' -or
                 $objRecord.EntryState -eq 'ExpectedAbsent') {
+                throw 'cleanup-context-invalid'
+            }
+        } elseif ($objRecord.Kind -eq 'DownloadDirectory') {
+            # ExpectedAbsent is legitimate here and only here. Creation records
+            # the invocation root, then creates the download directory, so a
+            # failure between those steps leaves this record never created while
+            # the root is already owned. Modelling that state lets the creation
+            # failure path hand a valid context to cleanup, which skips
+            # ExpectedAbsent records and still removes the root instead of
+            # leaking it. The reverse - an owned download directory under a root
+            # that was never created - remains invalid.
+            if ($objRecord.CreationPhase -cne 'context') {
                 throw 'cleanup-context-invalid'
             }
         } elseif ($objRecord.Kind -eq 'DownloadFile') {
@@ -769,7 +781,7 @@ $scriptBlockAssertCandidateInMemoryContext = {
             $_.Kind -eq 'DownloadDirectory'
         })[0]
         if ($objRootRecord.EntryState -cne 'Created' -or
-            $objDownloadDirectoryRecord.EntryState -cne 'Created' -or
+            $objDownloadDirectoryRecord.EntryState -cnotin @('Created', 'ExpectedAbsent') -or
             @($Context.OwnershipJournal | Where-Object {
                 $_.EntryState -eq 'RetainedUncertain'
             }).Count -ne 0) {
@@ -938,7 +950,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.3
+    # Version: 1.0.20260802.4
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1114,7 +1126,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.3
+    # Version: 1.0.20260802.4
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
