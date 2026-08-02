@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260802.9
+Version: 1.0.20260802.10
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260802.9'
+$script:versionCandidateHelper = [System.Version]'1.0.20260802.10'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.6'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -804,6 +804,116 @@ $script:scriptBlockTestCandidateHelperEntryPresent = {
     return $intMatches -eq 1
 }
 
+$script:scriptBlockExpandCandidateHelperMountField = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [string]$Value
+    )
+
+    # mountinfo escapes space, tab, newline, and backslash as three octal
+    # digits. Decoded in one pass so an already-decoded backslash cannot be
+    # re-read as the start of another escape.
+    $objBuilder = New-Object System.Text.StringBuilder
+    for ($intIndex = 0; $intIndex -lt $Value.Length; $intIndex++) {
+        if ($Value[$intIndex] -eq '\' -and ($intIndex + 3) -lt $Value.Length) {
+            $strOctal = $Value.Substring($intIndex + 1, 3)
+            if ($strOctal -cmatch '^[0-7]{3}$') {
+                [void]$objBuilder.Append([char][System.Convert]::ToInt32($strOctal, 8))
+                $intIndex += 3
+                continue
+            }
+        }
+        [void]$objBuilder.Append($Value[$intIndex])
+    }
+    return $objBuilder.ToString()
+}
+
+$script:scriptBlockTestCandidateHelperPathPrefix = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$Prefix,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    if ($Prefix -ceq '/') {
+        return $true
+    }
+    if (-not $Path.StartsWith($Prefix, [System.StringComparison]::Ordinal)) {
+        return $false
+    }
+    return ($Path.Length -eq $Prefix.Length -or $Path[$Prefix.Length] -eq '/')
+}
+
+$script:scriptBlockGetCandidateHelperMountResolvedPath = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath
+    )
+
+    # A bind mount makes lexical ancestry lie. With /b bound from /a/sub,
+    # everything created below /b is physically inside /a, yet walking /b's
+    # parents never reaches /a and the two directories have different inodes,
+    # so neither the path text nor the identity chain can see the relationship.
+    # Mount topology is the only place it is recorded, so each root is resolved
+    # to the device and in-filesystem subtree it actually occupies.
+    if ($env:OS -eq 'Windows_NT') {
+        return $null
+    }
+    try {
+        $arrMountLines = [string[]]@(
+            [System.IO.File]::ReadAllLines('/proc/self/mountinfo')
+        )
+    } catch {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'root-invalid' -Phase 'root' -Subreason 'mount'
+    }
+    $strBestMountPoint = $null
+    $strBestDevice = $null
+    $strBestFsRoot = $null
+    foreach ($strLine in $arrMountLines) {
+        $arrFields = $strLine.Split(' ')
+        if ($arrFields.Count -lt 5) {
+            continue
+        }
+        $strDevice = & $script:scriptBlockExpandCandidateHelperMountField -Value $arrFields[2]
+        $strFsRoot = & $script:scriptBlockExpandCandidateHelperMountField -Value $arrFields[3]
+        $strMountPoint = & $script:scriptBlockExpandCandidateHelperMountField -Value $arrFields[4]
+        if (-not (& $script:scriptBlockTestCandidateHelperPathPrefix `
+                -Prefix $strMountPoint -Path $LiteralPath)) {
+            continue
+        }
+        # Longest mount point wins, and a later entry shadows an earlier one at
+        # the same point, which is how the kernel resolves overmounts.
+        if ($null -eq $strBestMountPoint -or
+            $strMountPoint.Length -ge $strBestMountPoint.Length) {
+            $strBestMountPoint = $strMountPoint
+            $strBestDevice = $strDevice
+            $strBestFsRoot = $strFsRoot
+        }
+    }
+    if ($null -eq $strBestMountPoint) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'root-invalid' -Phase 'root' -Subreason 'mount'
+    }
+    $strRelative = if ($strBestMountPoint -ceq '/') {
+        $LiteralPath
+    } else {
+        $LiteralPath.Substring($strBestMountPoint.Length)
+    }
+    $strTruePath = if ($strBestFsRoot -ceq '/') {
+        $strRelative
+    } else {
+        $strBestFsRoot + $strRelative
+    }
+    if ($strTruePath.Length -eq 0) {
+        $strTruePath = '/'
+    }
+    return [string[]]@($strBestDevice, $strTruePath)
+}
+
 $script:scriptBlockGetCandidateHelperIdentityChain = {
     param (
         [Parameter(Mandatory = $true)]
@@ -1041,7 +1151,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.9
+    # Version: 1.0.20260802.10
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1589,6 +1699,24 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         if ($arrCheckoutIdentity.Count -gt 0 -and $arrTrustedIdentity.Count -gt 0 -and
             ($arrTrustedIdentity -ccontains $arrCheckoutIdentity[0] -or
                 $arrCheckoutIdentity -ccontains $arrTrustedIdentity[0])) {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'root-invalid' -Phase 'root' -Subreason 'overlap'
+        }
+
+        # Identity comparison sees an alias of a root, but not an alias of a
+        # directory below one: /b bound from /a/sub shares no inode with /a and
+        # never lists /a as an ancestor. Resolving both roots through mount
+        # topology exposes the subtree each one really occupies.
+        $arrCheckoutMount = & $script:scriptBlockGetCandidateHelperMountResolvedPath `
+            -LiteralPath $strCheckoutPath
+        $arrTrustedMount = & $script:scriptBlockGetCandidateHelperMountResolvedPath `
+            -LiteralPath $strTrustedPath
+        if ($null -ne $arrCheckoutMount -and $null -ne $arrTrustedMount -and
+            $arrCheckoutMount[0] -ceq $arrTrustedMount[0] -and
+            ((& $script:scriptBlockTestCandidateHelperPathPrefix `
+                    -Prefix $arrCheckoutMount[1] -Path $arrTrustedMount[1]) -or
+                (& $script:scriptBlockTestCandidateHelperPathPrefix `
+                    -Prefix $arrTrustedMount[1] -Path $arrCheckoutMount[1]))) {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'root-invalid' -Phase 'root' -Subreason 'overlap'
         }
