@@ -31,7 +31,7 @@ None. The script writes one JSON object per case to the success stream and
 uses its process exit code to report the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.9
+Version: 1.0.20260802.10
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -237,13 +237,67 @@ $script:scriptBlockInvokeNativeRaw = {
     $objProcessStartInformation.RedirectStandardInput = $true
     $objProcessStartInformation.RedirectStandardOutput = $true
     $objProcessStartInformation.RedirectStandardError = $true
+
+    # Git is the only program this harness starts, so the child environment is
+    # built as a Git environment. An inherited GIT_DIR, GIT_WORK_TREE,
+    # GIT_INDEX_FILE, object/alternate-object, namespace, ceiling, or
+    # GIT_CONFIG_ variable would let the caller choose which repository, index,
+    # and object store answer the HEAD, index, and no-filter working-blob
+    # queries. Those three answers are the whole trusted-script proof, and they
+    # stop being independent evidence about this checkout the moment any of
+    # them can be redirected, so no inherited GIT_ variable survives at all.
+    # Git also exports GIT_DIR and GIT_INDEX_FILE to every hook it runs, so
+    # this is reached without an attacker whenever the harness runs under a
+    # pre-commit hook or `git rebase --exec`.
+    $objChildEnvironment = $objProcessStartInformation.EnvironmentVariables
+    $listInheritedGitName = New-Object System.Collections.Generic.List[string]
+    foreach ($objName in $objChildEnvironment.Keys) {
+        $strName = [string]$objName
+        if ($strName.StartsWith('GIT_', [System.StringComparison]::OrdinalIgnoreCase)) {
+            $listInheritedGitName.Add($strName)
+        }
+    }
+    foreach ($strName in $listInheritedGitName) {
+        [void]$objChildEnvironment.Remove($strName)
+    }
+    $objChildEnvironment['GIT_LITERAL_PATHSPECS'] = '1'
+    $objChildEnvironment['GIT_OPTIONAL_LOCKS'] = '0'
+
+    # .NET Framework lowercases these names and .NET on Linux does not, so the
+    # readback is deliberately case-insensitive. Anything other than exactly
+    # the two names set above means the removal did not take effect on this
+    # runtime, which fails closed rather than running Git with an unproved
+    # environment.
+    $intChildGitNameCount = 0
+    foreach ($objName in $objChildEnvironment.Keys) {
+        $strName = [string]$objName
+        if (-not $strName.StartsWith('GIT_', [System.StringComparison]::OrdinalIgnoreCase)) {
+            continue
+        }
+        if ($strName -ine 'GIT_LITERAL_PATHSPECS' -and $strName -ine 'GIT_OPTIONAL_LOCKS') {
+            & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
+                -Detail 'native-environment'
+        }
+        $intChildGitNameCount++
+    }
+    if ($intChildGitNameCount -ne 2) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
+            -Detail 'native-environment'
+    }
+
+    # Replace refs live in the repository rather than the environment, so
+    # scrubbing cannot reach them; --no-replace-objects keeps a replaced blob
+    # out of the HEAD answer. --no-pager costs nothing and keeps the contract
+    # true even if a caller ever stops redirecting output.
+    $arrEffectiveArgument = @('--no-pager', '--no-replace-objects') + $ArgumentList
     if ($null -ne $objProcessStartInformation.PSObject.Properties['ArgumentList']) {
-        foreach ($strArgument in $ArgumentList) {
-            [void]$objProcessStartInformation.ArgumentList.Add($strArgument)
+        foreach ($strArgument in $arrEffectiveArgument) {
+            [void]$objProcessStartInformation.ArgumentList.Add([string]$strArgument)
         }
     } else {
         $objProcessStartInformation.Arguments = (
-            & $script:scriptBlockConvertToNativeArgumentString -ArgumentList $ArgumentList
+            & $script:scriptBlockConvertToNativeArgumentString `
+                -ArgumentList ([string[]]$arrEffectiveArgument)
         )
     }
 
