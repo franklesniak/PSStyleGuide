@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260802.17
+Version: 1.0.20260802.18
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260802.17'
+$script:versionCandidateHelper = [System.Version]'1.0.20260802.18'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.9'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -1375,7 +1375,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.17
+    # Version: 1.0.20260802.18
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1626,6 +1626,96 @@ $script:scriptBlockTestCandidateHelperPathContained = {
         $script:chrCandidateHelperAlternateSeparator
     ) + $script:chrCandidateHelperDirectorySeparator
     return $Candidate.StartsWith($strRootPrefix, $script:objCandidateHelperPathComparison)
+}
+
+$script:scriptBlockTestCandidateHelperRootsShareStorage = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$CheckoutPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$TrustedPath
+    )
+
+    # Every check before this one reasons about names. Names are exactly what
+    # aliasing breaks: a substituted drive letter, a directory junction, a
+    # mapped network drive, and a short-name alias each give one directory two
+    # spellings that share no text and no reparse point on the path itself.
+    # Resolving them by name means resolving each mechanism, and the list of
+    # mechanisms is not closed.
+    #
+    # Visibility is closed. If two spellings name one directory, a file created
+    # through one is visible through the other, whatever made them equal. So
+    # one uniquely named file is placed in the trusted root -- which this
+    # invocation owns and is about to populate anyway -- and the two containment
+    # questions are asked as questions about where that file can be seen.
+    #
+    # Nothing is written outside the trusted root, and the checkout is only ever
+    # read, so a read-only checkout is unaffected.
+    $strSentinelName = 'psstyleguide-root-probe-' +
+        [System.Guid]::NewGuid().ToString('N') + '.tmp'
+    $strSentinelPath = [System.IO.Path]::Combine($TrustedPath, $strSentinelName)
+    $boolShared = $false
+    try {
+        try {
+            [System.IO.File]::WriteAllBytes($strSentinelPath, [byte[]]@())
+        } catch {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'root-invalid' -Phase 'root' -Subreason 'identity'
+        }
+        # The probe is only evidence if the file it looks for exists. A silent
+        # write failure would otherwise read as "not shared" everywhere.
+        if (-not [System.IO.File]::Exists($strSentinelPath)) {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'root-invalid' -Phase 'root' -Subreason 'identity'
+        }
+
+        # Is the checkout inside the trusted root? Then some ancestor of the
+        # checkout is the trusted root under another spelling, and the sentinel
+        # is visible directly beneath that ancestor.
+        $objAncestor = New-Object System.IO.DirectoryInfo($CheckoutPath)
+        while ($null -ne $objAncestor) {
+            if ([System.IO.File]::Exists(
+                    [System.IO.Path]::Combine($objAncestor.FullName, $strSentinelName))) {
+                $boolShared = $true
+                break
+            }
+            $objAncestor = $objAncestor.Parent
+        }
+
+        # Is the trusted root inside the checkout? Then some ancestor of the
+        # trusted root is the checkout under another spelling. That ancestor is
+        # a lexical prefix of the trusted root, so the remainder is known, and
+        # appending it to the checkout reaches the sentinel if the two are one.
+        if (-not $boolShared) {
+            $objAncestor = New-Object System.IO.DirectoryInfo($TrustedPath)
+            $strRelative = $strSentinelName
+            while ($null -ne $objAncestor) {
+                if ([System.IO.File]::Exists(
+                        [System.IO.Path]::Combine($CheckoutPath, $strRelative))) {
+                    $boolShared = $true
+                    break
+                }
+                $strRelative = [System.IO.Path]::Combine($objAncestor.Name, $strRelative)
+                $objAncestor = $objAncestor.Parent
+            }
+        }
+    } finally {
+        try {
+            if ([System.IO.File]::Exists($strSentinelPath)) {
+                [System.IO.File]::Delete($strSentinelPath)
+            }
+        } catch {
+            # Reported below rather than here: a delete failure must not mask
+            # the answer the probe already reached.
+            $boolShared = $boolShared
+        }
+    }
+    if ([System.IO.File]::Exists($strSentinelPath)) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'root-invalid' -Phase 'root' -Subreason 'identity'
+    }
+    return $boolShared
 }
 
 $script:scriptBlockAssertCandidateHelperEntryAbsent = {
@@ -1923,6 +2013,17 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         if ($arrCheckoutIdentity.Count -gt 0 -and $arrTrustedIdentity.Count -gt 0 -and
             ($arrTrustedIdentity -ccontains $arrCheckoutIdentity[0] -or
                 $arrCheckoutIdentity -ccontains $arrTrustedIdentity[0])) {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'root-invalid' -Phase 'root' -Subreason 'overlap'
+        }
+
+        # Names and stored spellings are still names. Ask the filesystem where
+        # the trusted root's contents can actually be seen, which settles every
+        # aliasing mechanism at once and is the only one of these layers that
+        # applies unchanged on both platforms.
+        if (& $script:scriptBlockTestCandidateHelperRootsShareStorage `
+                -CheckoutPath $strCheckoutPath `
+                -TrustedPath $strTrustedPath) {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'root-invalid' -Phase 'root' -Subreason 'overlap'
         }
