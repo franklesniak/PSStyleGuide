@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260802.2
+Version: 1.0.20260802.3
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260802.2'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.1'
+$script:versionCandidateHelper = [System.Version]'1.0.20260802.3'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.2'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -685,7 +685,9 @@ $script:scriptBlockGetCandidateHelperRetainedSequence = {
             $listSequences.Add([uint32]$objRecord.Sequence)
         }
     }
-    return [uint32[]]$listSequences.ToArray()
+    # The unary comma keeps an empty result an empty array. Returning it
+    # bare would unroll to null and break the closed result schema.
+    return ,[uint32[]]$listSequences.ToArray()
 }
 
 $script:scriptBlockNewCandidateHelperCleanupResult = {
@@ -951,7 +953,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.2
+    # Version: 1.0.20260802.3
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1118,9 +1120,13 @@ function Remove-StyleGuideCandidateInvocationState {
         # ExpectedAbsent; retyping it would contradict the record schema, which
         # binds every non-ExpectedAbsent candidate-directory record to the
         # destination phase, and would invalidate the terminal context.
+        #
+        # Every Created record is retained, not just the candidate ones. This
+        # cleanup can fail before it delegates to the caller, leaving the
+        # invocation root and download entries present and owned, and a
+        # CleanupFailed context must name at least one retained record.
         foreach ($objRecord in $Context.OwnershipJournal) {
-            if ($objRecord.Kind -in @('CandidateDirectory', 'CandidateFile') -and
-                $objRecord.EntryState -eq 'Created') {
+            if ($objRecord.EntryState -eq 'Created') {
                 $objRecord.EntryState = 'RetainedUncertain'
             }
         }

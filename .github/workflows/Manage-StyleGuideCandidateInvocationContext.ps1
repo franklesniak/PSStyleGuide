@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260802.1
+Version: 1.0.20260802.2
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260802.1'
+$versionCandidateContext = [System.Version]'1.0.20260802.2'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -790,7 +790,9 @@ $scriptBlockGetCandidateRetainedSequence = {
             $listSequences.Add([uint32]$objRecord.Sequence)
         }
     }
-    return [uint32[]]$listSequences.ToArray()
+    # The unary comma keeps an empty result an empty array. Returning it
+    # bare would unroll to null and break the closed result schema.
+    return ,[uint32[]]$listSequences.ToArray()
 }
 
 $scriptBlockNewCandidateCleanupResult = {
@@ -918,7 +920,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.1
+    # Version: 1.0.20260802.2
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1094,7 +1096,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.1
+    # Version: 1.0.20260802.2
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
