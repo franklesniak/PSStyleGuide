@@ -31,7 +31,7 @@ None. The script writes one JSON object per case to the success stream and
 uses its process exit code to report the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.10
+Version: 1.0.20260802.11
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.9'
+$script:versionCandidateHarness = [System.Version]'1.0.20260802.11'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260802.6'
@@ -260,27 +260,48 @@ $script:scriptBlockInvokeNativeRaw = {
     foreach ($strName in $listInheritedGitName) {
         [void]$objChildEnvironment.Remove($strName)
     }
+
+    # Removing every GIT_ name also removes any isolation the caller had set.
+    # GIT_CONFIG_GLOBAL pointing at an empty path is how a CI job hides
+    # $HOME/.gitconfig, and dropping it lets a global core.hooksPath,
+    # commit.gpgsign, alias, or core.pager reach the fixture commits. Config
+    # state is therefore set rather than inherited: system config is disabled
+    # outright, and global config points at a name that is never created. Git
+    # reads a missing config file as empty. The name is unpredictable and
+    # chosen per call so it cannot be planted in advance.
+    $strAbsentGlobalConfigPath = [System.IO.Path]::Combine(
+        [System.IO.Path]::GetTempPath(),
+        'psstyleguide-absent-global-' + [System.IO.Path]::GetRandomFileName()
+    )
     $objChildEnvironment['GIT_LITERAL_PATHSPECS'] = '1'
     $objChildEnvironment['GIT_OPTIONAL_LOCKS'] = '0'
+    $objChildEnvironment['GIT_CONFIG_NOSYSTEM'] = '1'
+    $objChildEnvironment['GIT_CONFIG_GLOBAL'] = $strAbsentGlobalConfigPath
 
     # .NET Framework lowercases these names and .NET on Linux does not, so the
     # readback is deliberately case-insensitive. Anything other than exactly
-    # the two names set above means the removal did not take effect on this
+    # the four names set above means the removal did not take effect on this
     # runtime, which fails closed rather than running Git with an unproved
     # environment.
+    $arrRequiredGitName = @(
+        'GIT_LITERAL_PATHSPECS',
+        'GIT_OPTIONAL_LOCKS',
+        'GIT_CONFIG_NOSYSTEM',
+        'GIT_CONFIG_GLOBAL'
+    )
     $intChildGitNameCount = 0
     foreach ($objName in $objChildEnvironment.Keys) {
         $strName = [string]$objName
         if (-not $strName.StartsWith('GIT_', [System.StringComparison]::OrdinalIgnoreCase)) {
             continue
         }
-        if ($strName -ine 'GIT_LITERAL_PATHSPECS' -and $strName -ine 'GIT_OPTIONAL_LOCKS') {
+        if ($arrRequiredGitName -inotcontains $strName) {
             & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
                 -Detail 'native-environment'
         }
         $intChildGitNameCount++
     }
-    if ($intChildGitNameCount -ne 2) {
+    if ($intChildGitNameCount -ne $arrRequiredGitName.Count) {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
             -Detail 'native-environment'
     }
@@ -288,8 +309,16 @@ $script:scriptBlockInvokeNativeRaw = {
     # Replace refs live in the repository rather than the environment, so
     # scrubbing cannot reach them; --no-replace-objects keeps a replaced blob
     # out of the HEAD answer. --no-pager costs nothing and keeps the contract
-    # true even if a caller ever stops redirecting output.
-    $arrEffectiveArgument = @('--no-pager', '--no-replace-objects') + $ArgumentList
+    # true even if a caller ever stops redirecting output. safe.directory is
+    # granted for exactly the directory this call already targets, because
+    # disabling global config also drops any ownership grant recorded there;
+    # command-line config is protected configuration, so Git honors it.
+    $arrEffectiveArgument = @(
+        '--no-pager',
+        '--no-replace-objects',
+        '-c',
+        ('safe.directory=' + $WorkingDirectory)
+    ) + $ArgumentList
     if ($null -ne $objProcessStartInformation.PSObject.Properties['ArgumentList']) {
         foreach ($strArgument in $arrEffectiveArgument) {
             [void]$objProcessStartInformation.ArgumentList.Add([string]$strArgument)
@@ -3848,7 +3877,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.9
+    # Version: 1.0.20260802.11
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
