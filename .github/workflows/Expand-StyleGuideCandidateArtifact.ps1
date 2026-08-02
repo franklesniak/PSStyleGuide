@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260802.4
+Version: 1.0.20260802.5
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260802.4'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.2'
+$script:versionCandidateHelper = [System.Version]'1.0.20260802.5'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.3'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -811,6 +811,24 @@ $script:scriptBlockAssertCandidateHelperDirectoryEnvelope = {
         $listComponents.Add($objCurrent.FullName)
         $objCurrent = $objCurrent.Parent
     }
+    # Resolve stat as an Application once per envelope check, before the
+    # component loop. A bare command name can bind to a function or alias, which
+    # never sets $LASTEXITCODE, so the check would read a stale exit code from an
+    # earlier native call and pass silently. The resolution is a local, not a
+    # $script: cache: this file is both dot-sourced and invoked, so a script-scope
+    # cache is not guaranteed to exist in the resolved scope and Set-StrictMode
+    # makes reading an unset one throw. Hoisting it out of the loop keeps the
+    # lookup off the per-component path.
+    $strStatPath = $null
+    if ($env:OS -ne 'Windows_NT') {
+        $arrStatCommands = @(Get-Command -Name 'stat' `
+            -CommandType Application -ErrorAction SilentlyContinue)
+        if ($arrStatCommands.Count -lt 1) {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code $strFailureCode -Phase $Phase -Subreason 'identity'
+        }
+        $strStatPath = [string]$arrStatCommands[0].Source
+    }
     $strPreviousDevice = $null
     for ($intIndex = $listComponents.Count - 1; $intIndex -ge 0; $intIndex--) {
         $strComponent = $listComponents[$intIndex]
@@ -826,7 +844,7 @@ $script:scriptBlockAssertCandidateHelperDirectoryEnvelope = {
                 -Code $strFailureCode -Phase $Phase -Subreason 'nonordinary-directory'
         }
         if ($env:OS -ne 'Windows_NT') {
-            $arrFileSystemStatus = @(& stat '-Lc' '%d' '--' $strComponent 2>$null)
+            $arrFileSystemStatus = @(& $strStatPath '-Lc' '%d' '--' $strComponent 2>$null)
             $intFileSystemStatusExitCode = $LASTEXITCODE
             if ($intFileSystemStatusExitCode -ne 0 -or
                 $arrFileSystemStatus.Count -ne 1 -or
@@ -965,7 +983,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.4
+    # Version: 1.0.20260802.5
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

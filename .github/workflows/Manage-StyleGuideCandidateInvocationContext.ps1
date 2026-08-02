@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260802.2
+Version: 1.0.20260802.3
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260802.2'
+$versionCandidateContext = [System.Version]'1.0.20260802.3'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -220,6 +220,24 @@ $scriptBlockAssertCandidateOrdinaryDirectoryEnvelope = {
         $objCurrent = $objCurrent.Parent
     }
 
+    # Resolve stat as an Application once per envelope check, before the
+    # component loop. A bare command name can bind to a function or alias, which
+    # never sets $LASTEXITCODE, so the check would read a stale exit code from an
+    # earlier native call and pass silently. The resolution is a local, not a
+    # $script: cache: this file is both dot-sourced and invoked, so a script-scope
+    # cache is not guaranteed to exist in the resolved scope and Set-StrictMode
+    # makes reading an unset one throw. Hoisting it out of the loop keeps the
+    # lookup off the per-component path.
+    $strStatPath = $null
+    if ($env:OS -ne 'Windows_NT') {
+        $arrStatCommands = @(Get-Command -Name 'stat' `
+            -CommandType Application -ErrorAction SilentlyContinue)
+        if ($arrStatCommands.Count -lt 1) {
+            & $scriptBlockStopCandidateOperation -Code $strFailureCode `
+                -Message "PSStyleGuide.Context.v1|phase=$strFailurePhase|reason=identity"
+        }
+        $strStatPath = [string]$arrStatCommands[0].Source
+    }
     $strPreviousDevice = $null
     for ($intIndex = $listComponents.Count - 1; $intIndex -ge 0; $intIndex--) {
         $strComponent = $listComponents[$intIndex]
@@ -236,7 +254,7 @@ $scriptBlockAssertCandidateOrdinaryDirectoryEnvelope = {
         }
 
         if ($env:OS -ne 'Windows_NT') {
-            $arrFileSystemStatus = @(& stat '-Lc' '%d' '--' $strComponent 2>$null)
+            $arrFileSystemStatus = @(& $strStatPath '-Lc' '%d' '--' $strComponent 2>$null)
             $intFileSystemStatusExitCode = $LASTEXITCODE
             if ($intFileSystemStatusExitCode -ne 0 -or
                 $arrFileSystemStatus.Count -ne 1 -or
@@ -920,7 +938,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.2
+    # Version: 1.0.20260802.3
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1096,7 +1114,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.2
+    # Version: 1.0.20260802.3
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
