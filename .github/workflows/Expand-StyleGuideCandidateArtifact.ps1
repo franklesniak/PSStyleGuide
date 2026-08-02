@@ -1017,6 +1017,18 @@ function Remove-StyleGuideCandidateInvocationState {
             $_.Kind -eq 'CandidateFile'
         })
 
+        # Prove the trusted context-manager cleanup function is loaded before any
+        # filesystem work. Deleting candidate entries first and only then finding
+        # the caller cleanup missing would destroy owned state that this function
+        # can no longer hand off, so the precondition is checked while the
+        # filesystem is still untouched.
+        $arrCommands = @(Get-Command -Name Remove-StyleGuideCandidateInvocationContext `
+            -CommandType Function -ErrorAction SilentlyContinue)
+        if ($arrCommands.Count -ne 1) {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'cleanup-context-invalid' -Phase 'cleanup' -Subreason 'context-manager-not-loaded'
+        }
+
         if ($objCandidateDirectoryRecord.EntryState -eq 'Created') {
             [void](& $script:scriptBlockAssertCandidateHelperDirectoryEnvelope `
                 -LiteralPath $Context.CandidatePath `
@@ -1090,12 +1102,6 @@ function Remove-StyleGuideCandidateInvocationState {
                 -Code 'cleanup-context-invalid' -Phase 'cleanup' -Subreason 'candidate-journal'
         }
 
-        $arrCommands = @(Get-Command -Name Remove-StyleGuideCandidateInvocationContext `
-            -CommandType Function -ErrorAction SilentlyContinue)
-        if ($arrCommands.Count -ne 1) {
-            & $script:scriptBlockStopCandidateHelperOperation `
-                -Code 'cleanup-context-invalid' -Phase 'cleanup' -Subreason 'context-manager-not-loaded'
-        }
         $objContextResult = Remove-StyleGuideCandidateInvocationContext -Context $Context
         $uintCombinedCalls = [uint32]($uintFilesystemCallCount + $objContextResult.FilesystemCallCount)
         return (& $script:scriptBlockNewCandidateHelperCleanupResult `
