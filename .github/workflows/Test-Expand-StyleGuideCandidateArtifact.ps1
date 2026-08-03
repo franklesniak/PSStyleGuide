@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.6
+Version: 1.0.20260803.7
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.6'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.7'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.6'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.3'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.7'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.4'
 $script:strCandidateCatalogVersion = '1.0.20260802.4'
 $script:strCandidateAllocationSha256 = 'ce7b29de7bb4812f1de9defb1672c1b7eac47d6f6b584db571a9bc0d86726e02'
 $script:strCandidateHelperRelativePath = '.github/workflows/Expand-StyleGuideCandidateArtifact.ps1'
@@ -114,6 +114,33 @@ $script:arrCandidateExpectedName = [string[]]@(
 $script:strCandidateResultTypeName = 'PSStyleGuide.CandidateCaseResult.v1'
 $script:strCandidateEmptySha256 = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
 $script:intCandidateBufferSize = 65536
+# The harness resolves its own native commands from fixed absolute locations
+# for the same reason the production scripts do: Get-Command
+# -CommandType Application closes command precedence but still searches PATH,
+# and on a hosted runner any earlier step can put itself first in PATH with one
+# line appended to $env:GITHUB_PATH. These two are test-side rather than
+# security-critical -- git is the one that roots trust, and it is resolved
+# separately at the identity check -- but a harness that resolves differently
+# from the code it authenticates is a difference waiting to be discovered.
+$script:scriptBlockResolveHarnessNativePath = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string[]]$CandidatePath
+    )
+
+    foreach ($strCandidatePath in $CandidatePath) {
+        try {
+            $objCommandAttributes = [System.IO.File]::GetAttributes($strCandidatePath)
+        } catch {
+            continue
+        }
+        if (($objCommandAttributes -band [System.IO.FileAttributes]::Directory) -ne 0) {
+            continue
+        }
+        return [string]$strCandidatePath
+    }
+    return ''
+}
 # The platform decides which comparison, path grammar, link primitive, and
 # filesystem-identity rules apply, so it must not be something a caller can
 # assert. The OS environment variable is ordinary and inheritable: exporting
@@ -1740,13 +1767,12 @@ $script:scriptBlockAssertOrdinaryDirectoryEnvelope = {
     # against ~3.1 ms for the native call, on a loop walking every ancestor.
     $strHarnessStatPath = $null
     if (-not $script:boolCandidateIsWindows) {
-        $arrHarnessStatCommands = @(Get-Command -Name 'stat' `
-            -CommandType Application -ErrorAction SilentlyContinue)
-        if ($arrHarnessStatCommands.Count -lt 1) {
+        $strHarnessStatPath = [string](& $script:scriptBlockResolveHarnessNativePath `
+            -CandidatePath ([string[]]@('/usr/bin/stat', '/bin/stat', '/usr/local/bin/stat')))
+        if ($strHarnessStatPath.Length -eq 0) {
             & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
                 -Detail 'directory-identity'
         }
-        $strHarnessStatPath = [string]$arrHarnessStatCommands[0].Source
     }
     while ($null -ne $objCurrent) {
         try {
@@ -3351,12 +3377,11 @@ $script:scriptBlockNewSymbolicLink = {
             # check below then reports the link primitive as unavailable --
             # which silently drops every required link case on a host that
             # supports them. Resolve the application and invoke it by path.
-            $arrLinkCommand = @(Get-Command -Name 'ln' `
-                -CommandType Application -ErrorAction SilentlyContinue)
-            if ($arrLinkCommand.Count -lt 1) {
+            $strLinkPath = [string](& $script:scriptBlockResolveHarnessNativePath `
+                -CandidatePath ([string[]]@('/usr/bin/ln', '/bin/ln', '/usr/local/bin/ln')))
+            if ($strLinkPath.Length -eq 0) {
                 throw 'link-utility'
             }
-            $strLinkPath = [string]$arrLinkCommand[0].Source
             $arrOutput = @(& $strLinkPath '-s' '--' $TargetPath $LinkPath 2>$null)
             if ($LASTEXITCODE -ne 0 -or $arrOutput.Count -ne 0) {
                 throw 'link'
@@ -5145,7 +5170,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.6
+    # Version: 1.0.20260803.7
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -5193,11 +5218,61 @@ function Invoke-StyleGuideCandidateHarness {
         -Name 'ContextManagerPath' `
         -ExpectedPath $strExpectedContextPath
 
-    $arrGitCommands = @(Get-Command -Name git -CommandType Application -All)
-    if ($arrGitCommands.Count -lt 1) {
+    # Git is the root of this harness's trust: every HEAD, index, mode, and
+    # working-object claim below is whatever this binary says it is. Resolving
+    # it through PATH made that root as movable as PATH, and PATH is not a
+    # trusted input. Get-Command -CommandType Application closes command
+    # *precedence* -- no alias or function can shadow the name -- but -All
+    # returns PATH order, so element zero is simply the earliest PATH match. On
+    # a GitHub-hosted runner any earlier step, composite action, or third-party
+    # action becomes that match by appending one line to $env:GITHUB_PATH,
+    # which the platform documents as "Prepends a directory to the system PATH
+    # variable and automatically makes it available to all subsequent actions
+    # in the current job." No compromise is required, and a benign action that
+    # ships its own bin directory would silently author the identity proof.
+    #
+    # Reproduced before this change: a shell script named git placed on PATH
+    # resolved as element zero and passed through to the real binary
+    # convincingly enough to look ordinary.
+    #
+    # The fixed locations below are read through GetFolderPath rather than
+    # %ProgramFiles% so the Windows list does not depend on another environment
+    # variable. What remains trusted is the resolved file itself: an attacker
+    # who can write /usr/bin/git or the Program Files copy already owns the
+    # runner, and no check here would survive that.
+    $arrGitCandidatePath = if ($script:boolCandidateIsWindows) {
+        $strProgramFiles = [System.Environment]::GetFolderPath(
+            [System.Environment+SpecialFolder]::ProgramFiles)
+        $strProgramFilesX86 = [System.Environment]::GetFolderPath(
+            [System.Environment+SpecialFolder]::ProgramFilesX86)
+        [string[]]@(
+            [System.IO.Path]::Combine($strProgramFiles, 'Git', 'cmd', 'git.exe'),
+            [System.IO.Path]::Combine($strProgramFiles, 'Git', 'bin', 'git.exe'),
+            [System.IO.Path]::Combine($strProgramFilesX86, 'Git', 'cmd', 'git.exe'),
+            [System.IO.Path]::Combine($strProgramFilesX86, 'Git', 'bin', 'git.exe')
+        )
+    } else {
+        [string[]]@('/usr/bin/git', '/bin/git', '/usr/local/bin/git')
+    }
+    $strGitPath = ''
+    foreach ($strGitCandidate in $arrGitCandidatePath) {
+        if ($strGitCandidate.Length -eq 0) {
+            continue
+        }
+        try {
+            $objGitAttributes = [System.IO.File]::GetAttributes($strGitCandidate)
+        } catch {
+            continue
+        }
+        if (($objGitAttributes -band [System.IO.FileAttributes]::Directory) -ne 0) {
+            continue
+        }
+        $strGitPath = [string]$strGitCandidate
+        break
+    }
+    if ($strGitPath.Length -eq 0) {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'git-missing'
     }
-    $strGitPath = [string]$arrGitCommands[0].Source
     $hashtableHelperEvidenceBefore = & $script:scriptBlockGetFileEvidence `
         -LiteralPath $strHelperLiteralPath
     $hashtableContextEvidenceBefore = & $script:scriptBlockGetFileEvidence `

@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.3
+Version: 1.0.20260803.4
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.3'
+$versionCandidateContext = [System.Version]'1.0.20260803.4'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -59,6 +59,46 @@ $objCandidatePathComparer = if ($boolCandidateIsWindows) {
 $chrCandidateDirectorySeparator = [System.IO.Path]::DirectorySeparatorChar
 $chrCandidateAlternateSeparator = [System.IO.Path]::AltDirectorySeparatorChar
 $intCandidateCreationAttemptMaximum = 16
+$arrCandidateStatPath = [string[]]@(
+    '/usr/bin/stat',
+    '/bin/stat',
+    '/usr/local/bin/stat'
+)
+# Native commands are resolved from a fixed absolute list, never from PATH.
+# Get-Command -CommandType Application closes command *precedence* -- an alias
+# or function can no longer shadow the name -- but it still searches PATH, in
+# PATH order, and PATH is not a trusted input here. On a GitHub-hosted runner
+# any earlier step, composite action, or third-party action makes itself first
+# in PATH by appending one line to $env:GITHUB_PATH, which is a documented
+# platform feature rather than a compromise: "Prepends a directory to the
+# system PATH variable and automatically makes it available to all subsequent
+# actions in the current job." So a benign action shipping its own bin
+# directory becomes this check's source of truth without anyone intending it.
+#
+# Resolving from a fixed list removes PATH from the decision. What it cannot
+# remove is the trust in the resolved file itself: an attacker who can write
+# /usr/bin/stat owns the runner, and nothing this script does would survive
+# that. That residual is named rather than implied.
+$scriptBlockResolveCandidateNativePath = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string[]]$CandidatePath
+    )
+
+    foreach ($strCandidatePath in $CandidatePath) {
+        try {
+            $objCommandAttributes = [System.IO.File]::GetAttributes($strCandidatePath)
+        } catch {
+            continue
+        }
+        # A directory at the name is not a program to run.
+        if (($objCommandAttributes -band [System.IO.FileAttributes]::Directory) -ne 0) {
+            continue
+        }
+        return [string]$strCandidatePath
+    }
+    return ''
+}
 
 $scriptBlockNewCandidateException = {
     param (
@@ -244,13 +284,12 @@ $scriptBlockAssertCandidateOrdinaryDirectoryEnvelope = {
     # lookup off the per-component path.
     $strStatPath = $null
     if (-not $boolCandidateIsWindows) {
-        $arrStatCommands = @(Get-Command -Name 'stat' `
-            -CommandType Application -ErrorAction SilentlyContinue)
-        if ($arrStatCommands.Count -lt 1) {
+        $strStatPath = [string](& $scriptBlockResolveCandidateNativePath `
+            -CandidatePath $arrCandidateStatPath)
+        if ($strStatPath.Length -eq 0) {
             & $scriptBlockStopCandidateOperation -Code $strFailureCode `
                 -Message "PSStyleGuide.Context.v1|phase=$strFailurePhase|reason=identity"
         }
-        $strStatPath = [string]$arrStatCommands[0].Source
     }
     $strPreviousDevice = $null
     for ($intIndex = $listComponents.Count - 1; $intIndex -ge 0; $intIndex--) {
@@ -1100,7 +1139,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.3
+    # Version: 1.0.20260803.4
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1374,7 +1413,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.3
+    # Version: 1.0.20260803.4
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
