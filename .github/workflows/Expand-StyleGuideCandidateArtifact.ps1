@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.7
+Version: 1.0.20260803.8
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.7'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.8'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.4'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -1612,7 +1612,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.7
+    # Version: 1.0.20260803.8
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2176,6 +2176,7 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
     Set-StrictMode -Version Latest
 
     $objArchiveStream = $null
+    $objArchiveBuffer = $null
     $objZipArchive = $null
     $objPrimaryError = $null
     $objValidatedContext = $null
@@ -2410,10 +2411,47 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'archive-invalid' -Phase 'archive' -Subreason 'stream'
         }
+        # Read the archive exactly once into a private buffer, then let the file
+        # go. Holding the handle open across the hash and the parse was the
+        # contract until issue #146 amendment 1, and it does not do what it
+        # looks like it does: FileShare.Read is a Windows sharing concept that
+        # .NET does not enforce on Unix, so the handle never froze the file.
+        # Measured on Ubuntu: hash 20a7ec84..., an external dd conv=notrunc on
+        # the same path, then f5a5fd42... re-read through that same handle. The
+        # digest authenticated the original bytes while the directory walk and
+        # every entry read saw the modified ones -- and because the evidence
+        # pass and the extraction pass both read after the change, comparing
+        # them to each other agreed too. Every check passed on a candidate that
+        # was not what was authenticated.
+        #
+        # A private buffer cannot be edited by anyone else, so the bytes hashed
+        # below and the bytes parsed afterwards are the same bytes by
+        # construction rather than by assumption. The 32 MiB ceiling already
+        # checked above is what makes this affordable.
+        $arrArchiveByte = New-Object byte[] ([int]$objArchiveStream.Length)
+        $intArchiveFilled = 0
+        while ($intArchiveFilled -lt $arrArchiveByte.Length) {
+            $intArchiveRead = $objArchiveStream.Read(
+                $arrArchiveByte,
+                $intArchiveFilled,
+                $arrArchiveByte.Length - $intArchiveFilled
+            )
+            if ($intArchiveRead -le 0) {
+                & $script:scriptBlockStopCandidateHelperOperation `
+                    -Code 'archive-invalid' -Phase 'archive' -Subreason 'stream'
+            }
+            $intArchiveFilled += $intArchiveRead
+        }
+        # The file has given up everything it is going to give up. Releasing it
+        # here means no later phase can read the path a second time even by
+        # accident, which is the property the amendment asks for.
+        $objArchiveStream.Dispose()
+        $objArchiveStream = $null
+        $objArchiveBuffer = New-Object System.IO.MemoryStream(, $arrArchiveByte)
         $objArchiveSha256 = [System.Security.Cryptography.SHA256]::Create()
         try {
             $strActualDigest = ([System.BitConverter]::ToString(
-                $objArchiveSha256.ComputeHash($objArchiveStream)
+                $objArchiveSha256.ComputeHash($arrArchiveByte)
             ) -replace '-', '').ToLowerInvariant()
         } finally {
             $objArchiveSha256.Dispose()
@@ -2430,7 +2468,7 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
             -ParentPath $strDownloadPath `
             -LeafName ([System.IO.Path]::GetFileName($strArchivePath)) `
             -CreationPhase 'download' `
-            -ContentLength ([uint64]$objArchiveStream.Length) `
+            -ContentLength ([uint64]$arrArchiveByte.Length) `
             -ContentSha256 $strActualDigest
         [void](& $script:scriptBlockAddCandidateHelperRecord `
             -ContextValue $Context `
@@ -2454,9 +2492,9 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         # The cardinality check on the next lines runs far too late to stop it.
         $strPhase = 'archive'
         [void](& $script:scriptBlockAssertCandidateHelperArchiveEntryCount `
-            -Stream $objArchiveStream)
+            -Stream $objArchiveBuffer)
 
-        $objArchiveStream.Position = 0
+        $objArchiveBuffer.Position = 0
         Add-Type -AssemblyName System.IO.Compression -ErrorAction Stop
         try {
             Add-Type -AssemblyName System.IO.Compression.FileSystem -ErrorAction Stop
@@ -2467,7 +2505,7 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         }
         try {
             $objZipArchive = New-Object System.IO.Compression.ZipArchive(
-                $objArchiveStream,
+                $objArchiveBuffer,
                 [System.IO.Compression.ZipArchiveMode]::Read,
                 $true
             )
@@ -2787,6 +2825,9 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
     } finally {
         if ($null -ne $objZipArchive) {
             $objZipArchive.Dispose()
+        }
+        if ($null -ne $objArchiveBuffer) {
+            $objArchiveBuffer.Dispose()
         }
         if ($null -ne $objArchiveStream) {
             $objArchiveStream.Dispose()
