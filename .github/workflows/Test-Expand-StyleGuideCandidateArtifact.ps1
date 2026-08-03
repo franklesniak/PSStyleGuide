@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.9
+Version: 1.0.20260803.10
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,12 +53,12 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.9'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.10'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.9'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.10'
 $script:strCandidateExpectedContextVersion = '1.0.20260803.4'
-$script:strCandidateCatalogVersion = '1.0.20260803.1'
+$script:strCandidateCatalogVersion = '1.0.20260803.2'
 # The physical allocation size, stated once. It was previously two bare literals
 # inside the header check, which is why growing the catalog failed with an
 # unhelpful 'header' detail rather than naming the count.
@@ -4795,25 +4795,48 @@ $script:scriptBlockInvokeHelperCleanupFixture = {
             # terminal context to both entry points and requires each to answer
             # from the journal alone: no filesystem call, no re-inspection of
             # names the lifecycle has already released.
-            $objDispose = Remove-StyleGuideCandidateInvocationState -Context $objContext
-            if (-not $objDispose.Success -or $objDispose.FinalState -cne 'Disposed') {
-                & $script:scriptBlockStopHarness `
-                    -Code 'fixture-failed' -Detail 'terminal-initial-dispose'
-            }
-            $objObservation.PreCleanupState = 'Disposed'
-            $objContextEntry = Remove-StyleGuideCandidateInvocationContext -Context $objContext
-            if (-not $objContextEntry.Success -or
-                $objContextEntry.FinalState -cne 'Disposed' -or
-                $objContextEntry.FilesystemCallCount -ne [uint32]0) {
-                & $script:scriptBlockStopHarness `
-                    -Code 'fixture-failed' -Detail 'terminal-initial-context-entry'
-            }
-            $objCleanupResult = Remove-StyleGuideCandidateInvocationState -Context $objContext
-            if ($objCleanupResult.FilesystemCallCount -ne [uint32]0) {
+            # A terminal context is not automatically a valid one. CleanupFailed
+            # admits ExpectedAbsent, Deleted, and RetainedUncertain records and
+            # nothing else, because a surviving Created record would name an
+            # entry that is owned and present on disk yet absent from the
+            # retained-sequence report -- so nothing would remove it and nothing
+            # would tell the operator it is there. This row forges exactly that
+            # state and requires both entry points to refuse it from the journal
+            # alone, touching no filesystem name the lifecycle has released.
+            #
+            # An earlier revision of this row disposed the context and re-called
+            # both entry points, which exercised the already-disposed success
+            # path instead. That proved the repeat was cheap, not that a
+            # malformed terminal context is rejected, and it duplicated K-03.
+            $objContext.LifecycleState = 'CleanupFailed'
+            $objContext.OwnershipJournal[0].EntryState = 'Created'
+            $objObservation.PreCleanupState = 'CleanupFailed'
+            $objHelperEntry = Remove-StyleGuideCandidateInvocationState -Context $objContext
+            if ($objHelperEntry.Success -or
+                $objHelperEntry.DiagnosticCode -cne 'cleanup-context-invalid' -or
+                $objHelperEntry.FilesystemCallCount -ne [uint32]0) {
                 & $script:scriptBlockStopHarness `
                     -Code 'fixture-failed' -Detail 'terminal-initial-helper-entry'
             }
-            $strSubreason = 'already-disposed'
+            $objCleanupResult = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+            if ($objCleanupResult.Success -or
+                $objCleanupResult.FilesystemCallCount -ne [uint32]0) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'fixture-failed' -Detail 'terminal-initial-context-entry'
+            }
+            # Both entry points refused without touching the filesystem, which
+            # means the candidate tree they declined to act on is still there.
+            # Restoring the lifecycle value the forge overwrote makes the context
+            # valid again so the real production cleanup can remove it; the
+            # rejection above stays the recorded result. Without this the row
+            # would have to declare a candidate final state no other row uses.
+            $objContext.LifecycleState = 'Active'
+            $objTeardown = Remove-StyleGuideCandidateInvocationState -Context $objContext
+            if (-not $objTeardown.Success) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'fixture-failed' -Detail 'terminal-initial-teardown'
+            }
+            $strSubreason = 'context-invalid'
         } elseif ($strSemantic -ceq 'helper.cleanup.disposed-repeat') {
             $objFirstCleanup = Remove-StyleGuideCandidateInvocationState -Context $objContext
             if (-not $objFirstCleanup.Success -or $objFirstCleanup.FinalState -cne 'Disposed') {
@@ -5304,7 +5327,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.9
+    # Version: 1.0.20260803.10
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
