@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.14
+Version: 1.0.20260803.15
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.14'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.15'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.10'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.4'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.11'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.5'
 $script:strCandidateCatalogVersion = '1.0.20260803.2'
 # The physical allocation size, stated once. It was previously two bare literals
 # inside the header check, which is why growing the catalog failed with an
@@ -1530,6 +1530,87 @@ $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
     if ($strVerbatimOutcome -cne 'accepted' -or $strPoisonedOutcome -ceq 'accepted') {
         & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
             -Detail ('trailer-guard-poison-' + $strVerbatimOutcome + '-' + $strPoisonedOutcome)
+    }
+}
+
+# Round 15 bounded the enumerations that ask "does this directory hold exactly
+# N entries?"; round 16 found one this sweep had missed, in context cleanup. The
+# verdict there was correct either way, so nothing failed and nothing could --
+# which is why a second manual sweep is not the remedy. This asserts the rule
+# instead of re-checking the instances.
+#
+# Two directions are pinned. A new unbounded call fails, because its path is not
+# a declared absence proof. Bounding an existing absence proof also fails,
+# because the count drops: absence cannot be concluded from a partial listing,
+# so those three reads must stay unbounded, and a well-meaning "fix" that
+# bounded one would be a correctness regression this check refuses to accept.
+$script:arrCandidateUnboundedEnumerationPath = [string[]]@(
+    '$strTrustedParent',
+    '$objRecord.ParentPath'
+)
+$script:intCandidateUnboundedEnumerationCount = 3
+
+$script:scriptBlockAssertEnumerationBoundsDeclared = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string[]]$LiteralPath
+    )
+
+    $intUnbounded = 0
+    foreach ($strScriptPath in $LiteralPath) {
+        $objErrors = $null
+        $objAst = [System.Management.Automation.Language.Parser]::ParseFile(
+            $strScriptPath, [ref]$null, [ref]$objErrors)
+        if ($null -eq $objAst -or @($objErrors).Count -ne 0) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' -Detail 'enumeration-bounds-parse'
+        }
+        $arrCall = @($objAst.FindAll(
+                {
+                    param ($objNode)
+                    $objNode -is [System.Management.Automation.Language.CommandAst] -and
+                    @($objNode.CommandElements).Count -gt 0 -and
+                    $objNode.CommandElements[0] -is
+                        [System.Management.Automation.Language.VariableExpressionAst] -and
+                    $objNode.CommandElements[0].VariablePath.UserPath -ceq
+                        'scriptBlockGetCandidateImmediateEntry'
+                },
+                $true
+            ))
+        if ($arrCall.Count -eq 0) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' -Detail 'enumeration-bounds-no-call'
+        }
+        foreach ($objCall in $arrCall) {
+            $boolBounded = $false
+            $strTargetText = ''
+            for ($intIndex = 1; $intIndex -lt @($objCall.CommandElements).Count; $intIndex++) {
+                $objElement = $objCall.CommandElements[$intIndex]
+                if ($objElement -isnot
+                    [System.Management.Automation.Language.CommandParameterAst]) {
+                    continue
+                }
+                if ($objElement.ParameterName -ceq 'MaximumEntry') {
+                    $boolBounded = $true
+                }
+                if ($objElement.ParameterName -ceq 'LiteralPath' -and
+                    ($intIndex + 1) -lt @($objCall.CommandElements).Count) {
+                    $strTargetText = [string]$objCall.CommandElements[$intIndex + 1].Extent.Text
+                }
+            }
+            if ($boolBounded) {
+                continue
+            }
+            $intUnbounded++
+            if ($strTargetText -cnotin $script:arrCandidateUnboundedEnumerationPath) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                    -Detail ('enumeration-unbounded-' + $strTargetText)
+            }
+        }
+    }
+    if ($intUnbounded -ne $script:intCandidateUnboundedEnumerationCount) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+            -Detail ('enumeration-absence-count-' + $intUnbounded)
     }
 }
 
@@ -5506,7 +5587,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.14
+    # Version: 1.0.20260803.15
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -5729,6 +5810,8 @@ function Invoke-StyleGuideCandidateHarness {
         & $script:scriptBlockAssertCatalogMutationsRejected `
             -Catalog $objCatalog `
             -RunRoot $strRunRoot
+        & $script:scriptBlockAssertEnumerationBoundsDeclared `
+            -LiteralPath ([string[]]@($strHelperLiteralPath, $strContextLiteralPath))
         & $script:scriptBlockAssertLifecycleRecordStatesRejected -RunRoot $strRunRoot
         & $script:scriptBlockAssertResourceGuardsReached `
             -LiteralPath $strHelperLiteralPath `

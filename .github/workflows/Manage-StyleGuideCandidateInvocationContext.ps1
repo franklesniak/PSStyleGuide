@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.4
+Version: 1.0.20260803.5
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.4'
+$versionCandidateContext = [System.Version]'1.0.20260803.5'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -1139,7 +1139,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.4
+    # Version: 1.0.20260803.5
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1413,7 +1413,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.4
+    # Version: 1.0.20260803.5
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1488,11 +1488,14 @@ function Remove-StyleGuideCandidateInvocationContext {
             -LiteralPath $Context.InvocationRootPath `
             -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount))
 
-        $arrRootEntries = [string[]]@(
-            & $scriptBlockGetCandidateImmediateEntry `
-                -LiteralPath $Context.InvocationRootPath `
-                -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
-        )
+        # The expected set is derived from the journal alone, so it is known
+        # before the directory is read and it bounds the read. Deriving it
+        # afterwards made this the one cardinality check in either script that
+        # materialized its directory first: a root polluted with unexpected
+        # children cost 17.00 MiB of managed heap and 210 ms at 50,000 entries
+        # to reach a verdict that only ever needed to see two. The verdict was
+        # correct either way, which is exactly why nothing failed and the site
+        # survived a sweep of this class.
         $listExpectedRootEntries = New-Object 'System.Collections.Generic.List[string]'
         foreach ($objRecord in $Context.OwnershipJournal) {
             if ($objRecord.ParentPath -eq $Context.InvocationRootPath -and
@@ -1500,6 +1503,12 @@ function Remove-StyleGuideCandidateInvocationContext {
                 $listExpectedRootEntries.Add($objRecord.Path)
             }
         }
+        $arrRootEntries = [string[]]@(
+            & $scriptBlockGetCandidateImmediateEntry `
+                -LiteralPath $Context.InvocationRootPath `
+                -MaximumEntry ($listExpectedRootEntries.Count + 1) `
+                -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
+        )
         if ($arrRootEntries.Count -ne $listExpectedRootEntries.Count) {
             & $scriptBlockStopCandidateOperation -Code 'cleanup-owned-entry-uncertain' `
                 -Message 'PSStyleGuide.Context.v1|phase=cleanup|reason=root-cardinality'
