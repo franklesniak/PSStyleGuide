@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260802.12
+Version: 1.0.20260803.1
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260802.12'
+$versionCandidateContext = [System.Version]'1.0.20260803.1'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -290,6 +290,8 @@ $scriptBlockGetCandidateImmediateEntry = {
 
         [string]$FailurePhase,
 
+        [int]$MaximumEntry,
+
         [ref]$ReferenceToFilesystemCallCount
     )
 
@@ -320,11 +322,37 @@ $scriptBlockGetCandidateImmediateEntry = {
     } else {
         'root'
     }
+    # A caller that only needs to know whether the entry count matches a fixed
+    # expectation does not need every path. Materializing the whole listing to
+    # answer "is this exactly one file?" makes a directory holding hundreds of
+    # thousands of entries cost proportional managed memory before any archive
+    # ceiling applies -- 200000 empty files measured 19.11 MiB against 0.16 MiB
+    # for a bounded read, and no ceiling is in force at that point because no
+    # archive has been opened. MaximumEntry stops the enumerator once that many
+    # paths have been seen; a caller expecting N passes N + 1, so "exactly N"
+    # and "more than N" stay distinguishable. Because the enumerator ends on
+    # its own whenever fewer than MaximumEntry paths exist, a returned count
+    # below the bound is still the complete listing, which is what the presence
+    # checks downstream rely on. Callers proving a path ABSENT must not pass a
+    # bound: absence cannot be concluded from a partial listing.
     try {
         if ($null -ne $ReferenceToFilesystemCallCount) {
             $ReferenceToFilesystemCallCount.Value = [uint32]($ReferenceToFilesystemCallCount.Value + 1)
         }
-        return [string[]]@([System.IO.Directory]::EnumerateFileSystemEntries($LiteralPath))
+        if ($MaximumEntry -le 0) {
+            return [string[]]@([System.IO.Directory]::EnumerateFileSystemEntries($LiteralPath))
+        }
+        $listEntry = New-Object 'System.Collections.Generic.List[string]'
+        $objEnumerator = [System.IO.Directory]::EnumerateFileSystemEntries(
+            $LiteralPath).GetEnumerator()
+        try {
+            while ($listEntry.Count -lt $MaximumEntry -and $objEnumerator.MoveNext()) {
+                $listEntry.Add([string]$objEnumerator.Current)
+            }
+        } finally {
+            $objEnumerator.Dispose()
+        }
+        return [string[]]@($listEntry.ToArray())
     } catch {
         & $scriptBlockStopCandidateOperation -Code $strFailureCode `
             -Message "PSStyleGuide.Context.v1|phase=$strFailurePhase|reason=enumeration"
@@ -1034,7 +1062,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.12
+    # Version: 1.0.20260803.1
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1164,11 +1192,15 @@ function New-StyleGuideCandidateInvocationContext {
             # portable .NET does not offer; the leaf is unpredictable, and an
             # attacker who guessed it would have their empty directory adopted,
             # populated, and removed.
+            # One observed path already answers this: the directory is not
+            # empty, so it is not ours. Reading the rest costs memory to reach
+            # the same conclusion.
             $arrClaimEntries = [string[]]@(
                 & $scriptBlockGetCandidateImmediateEntry `
                     -LiteralPath $strInvocationRoot `
                     -FailureCode 'context-create-verification' `
-                    -FailurePhase 'context'
+                    -FailurePhase 'context' `
+                    -MaximumEntry 1
             )
             if ($arrClaimEntries.Count -ne 0) {
                 continue
@@ -1186,7 +1218,8 @@ function New-StyleGuideCandidateInvocationContext {
                 & $scriptBlockGetCandidateImmediateEntry `
                     -LiteralPath $strInvocationRoot `
                     -FailureCode 'context-create-verification' `
-                    -FailurePhase 'context'
+                    -FailurePhase 'context' `
+                    -MaximumEntry 2
             )
             if ($arrRootEntries.Count -ne 1 -or
                 -not (& $scriptBlockTestCandidateEntryPresent `
@@ -1264,7 +1297,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.12
+    # Version: 1.0.20260803.1
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1371,14 +1404,17 @@ function Remove-StyleGuideCandidateInvocationContext {
             [void](& $scriptBlockAssertCandidateOrdinaryDirectoryEnvelope `
                 -LiteralPath $Context.DownloadDirectoryPath `
                 -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount))
-            $arrDownloadEntries = [string[]]@(
-                & $scriptBlockGetCandidateImmediateEntry `
-                    -LiteralPath $Context.DownloadDirectoryPath `
-                    -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
-            )
+            # As above, the journal supplies the expectation without touching
+            # the filesystem, so it can bound the read that checks it.
             $arrDownloadRecords = @($Context.OwnershipJournal | Where-Object {
                 $_.Kind -eq 'DownloadFile' -and $_.EntryState -eq 'Created'
             })
+            $arrDownloadEntries = [string[]]@(
+                & $scriptBlockGetCandidateImmediateEntry `
+                    -LiteralPath $Context.DownloadDirectoryPath `
+                    -MaximumEntry ($arrDownloadRecords.Count + 1) `
+                    -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
+            )
             if ($arrDownloadEntries.Count -ne $arrDownloadRecords.Count) {
                 & $scriptBlockStopCandidateOperation -Code 'cleanup-owned-entry-uncertain' `
                     -Message 'PSStyleGuide.Context.v1|phase=cleanup|reason=download-cardinality'

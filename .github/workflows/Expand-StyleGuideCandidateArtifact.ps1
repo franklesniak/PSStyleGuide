@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.1
+Version: 1.0.20260803.2
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.1'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.12'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.2'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.1'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -796,6 +796,8 @@ $script:scriptBlockGetCandidateHelperEntry = {
         [Parameter(Mandatory = $true)]
         [string]$Phase,
 
+        [int]$MaximumEntry,
+
         [ref]$ReferenceToFilesystemCallCount
     )
 
@@ -808,11 +810,37 @@ $script:scriptBlockGetCandidateHelperEntry = {
     } else {
         "$Phase-invalid"
     }
+    # A caller that only needs to know whether the entry count matches a fixed
+    # expectation does not need every path. Materializing the whole listing to
+    # answer "is this exactly one file?" makes a directory holding hundreds of
+    # thousands of entries cost proportional managed memory before any archive
+    # ceiling applies -- 200000 empty files measured 19.11 MiB against 0.16 MiB
+    # for a bounded read, and no ceiling is in force at that point because no
+    # archive has been opened. MaximumEntry stops the enumerator once that many
+    # paths have been seen; a caller expecting N passes N + 1, so "exactly N"
+    # and "more than N" stay distinguishable. Because the enumerator ends on
+    # its own whenever fewer than MaximumEntry paths exist, a returned count
+    # below the bound is still the complete listing, which is what the presence
+    # checks downstream rely on. Callers proving a path ABSENT must not pass a
+    # bound: absence cannot be concluded from a partial listing.
     try {
         if ($null -ne $ReferenceToFilesystemCallCount) {
             $ReferenceToFilesystemCallCount.Value = [uint32]($ReferenceToFilesystemCallCount.Value + 1)
         }
-        return [string[]]@([System.IO.Directory]::EnumerateFileSystemEntries($LiteralPath))
+        if ($MaximumEntry -le 0) {
+            return [string[]]@([System.IO.Directory]::EnumerateFileSystemEntries($LiteralPath))
+        }
+        $listEntry = New-Object 'System.Collections.Generic.List[string]'
+        $objEnumerator = [System.IO.Directory]::EnumerateFileSystemEntries(
+            $LiteralPath).GetEnumerator()
+        try {
+            while ($listEntry.Count -lt $MaximumEntry -and $objEnumerator.MoveNext()) {
+                $listEntry.Add([string]$objEnumerator.Current)
+            }
+        } finally {
+            $objEnumerator.Dispose()
+        }
+        return [string[]]@($listEntry.ToArray())
     } catch {
         & $script:scriptBlockStopCandidateHelperOperation `
             -Code $strFailureCode -Phase $Phase -Subreason 'enumeration'
@@ -1513,7 +1541,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.1
+    # Version: 1.0.20260803.2
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1596,15 +1624,18 @@ function Remove-StyleGuideCandidateInvocationState {
                 -LiteralPath $Context.CandidatePath `
                 -Phase 'cleanup' `
                 -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount))
+            # The expectation comes from the journal, which costs no I/O, so it
+            # is available before the directory is read and can bound the read.
+            $arrOwnedCandidateFiles = @($arrCandidateFileRecords | Where-Object {
+                $_.EntryState -eq 'Created'
+            })
             $arrCandidateEntries = [string[]]@(
                 & $script:scriptBlockGetCandidateHelperEntry `
                     -LiteralPath $Context.CandidatePath `
                     -Phase 'cleanup' `
+                    -MaximumEntry ($arrOwnedCandidateFiles.Count + 1) `
                     -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
             )
-            $arrOwnedCandidateFiles = @($arrCandidateFileRecords | Where-Object {
-                $_.EntryState -eq 'Created'
-            })
             if ($arrCandidateEntries.Count -ne $arrOwnedCandidateFiles.Count) {
                 & $script:scriptBlockStopCandidateHelperOperation `
                     -Code 'cleanup-owned-entry-uncertain' -Phase 'cleanup' -Subreason 'candidate-cardinality'
@@ -2261,9 +2292,11 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
             -Phase 'containment')
 
         $strPhase = 'download'
+        # Two is all this needs: one says conforming, two says refuse, and any
+        # further path costs memory to reach the same verdict.
         $arrDownloadEntries = [string[]]@(
             & $script:scriptBlockGetCandidateHelperEntry -LiteralPath $strDownloadPath `
-                -Phase 'download'
+                -Phase 'download' -MaximumEntry 2
         )
         if ($arrDownloadEntries.Count -ne 1) {
             & $script:scriptBlockStopCandidateHelperOperation `
@@ -2635,7 +2668,7 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
             -Phase 'post-extraction')
         $arrCandidateEntries = [string[]]@(
             & $script:scriptBlockGetCandidateHelperEntry -LiteralPath $strCandidatePath `
-                -Phase 'post-extraction'
+                -Phase 'post-extraction' -MaximumEntry 5
         )
         if ($arrCandidateEntries.Count -ne 4) {
             & $script:scriptBlockStopCandidateHelperOperation `
