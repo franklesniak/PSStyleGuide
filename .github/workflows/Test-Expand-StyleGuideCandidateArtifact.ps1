@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.17
+Version: 1.0.20260803.18
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.17'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.18'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.11'
@@ -1536,46 +1536,68 @@ $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
 }
 
 # Round 15 bounded the enumerations that ask "does this directory hold exactly
-# N entries?"; round 16 found one this sweep had missed, in context cleanup. The
-# verdict there was correct either way, so nothing failed and nothing could --
-# which is why a second manual sweep is not the remedy. This asserts the rule
-# instead of re-checking the instances.
+# N entries?"; round 16 found one this sweep had missed; round 17 found that the
+# check written for round 16 did not carry its own invariant.
 #
-# Two directions are pinned. A new unbounded call fails, because its path is not
-# a declared absence proof. Bounding an existing absence proof also fails,
-# because the count drops: absence cannot be concluded from a partial listing,
-# so those three reads must stay unbounded, and a well-meaning "fix" that
-# bounded one would be a correctness regression this check refuses to accept.
+# That check pinned an aggregate -- how many calls are unbounded, and whether
+# each unbounded target is on an allow-list. Two pairs of call sites share a
+# target expression while differing in boundedness, so moving -MaximumEntry from
+# the bounded member of a pair to the unbounded one preserved both the count and
+# the allow-list. Measured: the suite passed 115 of 115 with the cardinality read
+# unbounded AND the absence proof reduced to a partial listing -- two defects at
+# once, one of them a correctness bug, and the assertion silent.
+#
+# So boundedness is pinned per call site instead of in aggregate. The table below
+# is every enumeration call in source order, and the check compares position by
+# position. Swapping a bound between two sites reorders the table; adding,
+# removing, or re-purposing a call breaks the comparison until the table is
+# updated on purpose, which is the same discipline the round-15 site pin uses.
+#
+# The unbounded entries all prove a path ABSENT -- the chosen child name before
+# creation, and the post-delete "is it really gone?" reads. A partial listing
+# cannot establish absence, so bounding one of those would be a correctness
+# regression, not a hardening, and this table refuses it in that direction too.
 $script:arrCandidateEnumerationScriptBlockName = [string[]]@(
     'scriptBlockGetCandidateImmediateEntry',
     'scriptBlockGetCandidateHelperEntry'
 )
-# Every unbounded call proves a path ABSENT -- the chosen child name before
-# creation, and the four post-delete "is it really gone?" reads. A partial
-# listing cannot establish absence, so these must stay unbounded.
-$script:arrCandidateUnboundedEnumerationPath = [string[]]@(
-    '$strTrustedParent',
-    '$objRecord.ParentPath',
-    '$Context.CandidatePath',
-    '$Context.InvocationRootPath',
-    '$ParentPath'
+$script:arrCandidateContextEnumerationSite = @(
+    @{ Target = '$strTrustedParent'; Bounded = $false },
+    @{ Target = '$strInvocationRoot'; Bounded = $true },
+    @{ Target = '$strDownloadDirectory'; Bounded = $true },
+    @{ Target = '$strInvocationRoot'; Bounded = $true },
+    @{ Target = '$Context.InvocationRootPath'; Bounded = $true },
+    @{ Target = '$Context.DownloadDirectoryPath'; Bounded = $true },
+    @{ Target = '$objRecord.ParentPath'; Bounded = $false },
+    @{ Target = '$objRecord.ParentPath'; Bounded = $false }
 )
-# The count is the load-bearing half. The path list alone would not notice an
-# existing bounded call losing its bound, because two absence proofs share a
-# target expression with a bounded cardinality check; the count does notice.
-$script:intCandidateUnboundedEnumerationCount = 6
+$script:arrCandidateHelperEnumerationSite = @(
+    @{ Target = '$Context.CandidatePath'; Bounded = $true },
+    @{ Target = '$Context.CandidatePath'; Bounded = $false },
+    @{ Target = '$Context.InvocationRootPath'; Bounded = $false },
+    @{ Target = '$ParentPath'; Bounded = $false },
+    @{ Target = '$strDownloadPath'; Bounded = $true },
+    @{ Target = '$strCandidatePath'; Bounded = $true },
+    @{ Target = '$strCandidatePath'; Bounded = $true }
+)
 
 $script:scriptBlockAssertEnumerationBoundsDeclared = {
     param (
         [Parameter(Mandatory = $true)]
-        [string[]]$LiteralPath
+        [string]$HelperLiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ContextLiteralPath
     )
 
-    $intUnbounded = 0
-    foreach ($strScriptPath in $LiteralPath) {
+    $arrScriptSite = @(
+        @{ Path = $HelperLiteralPath; Site = $script:arrCandidateHelperEnumerationSite },
+        @{ Path = $ContextLiteralPath; Site = $script:arrCandidateContextEnumerationSite }
+    )
+    foreach ($hashtableScript in $arrScriptSite) {
         $objErrors = $null
         $objAst = [System.Management.Automation.Language.Parser]::ParseFile(
-            $strScriptPath, [ref]$null, [ref]$objErrors)
+            [string]$hashtableScript.Path, [ref]$null, [ref]$objErrors)
         if ($null -eq $objAst -or @($objErrors).Count -ne 0) {
             & $script:scriptBlockStopHarness `
                 -Code 'catalog-invalid' -Detail 'enumeration-bounds-parse'
@@ -1592,12 +1614,14 @@ $script:scriptBlockAssertEnumerationBoundsDeclared = {
                             '^script:', '')
                 },
                 $true
-            ))
-        if ($arrCall.Count -eq 0) {
-            & $script:scriptBlockStopHarness `
-                -Code 'catalog-invalid' -Detail 'enumeration-bounds-no-call'
+            )) | Sort-Object -Property { $_.Extent.StartOffset }
+        $arrExpectedSite = @($hashtableScript.Site)
+        if (@($arrCall).Count -ne $arrExpectedSite.Count) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('enumeration-site-count-' + @($arrCall).Count)
         }
-        foreach ($objCall in $arrCall) {
+        for ($intSite = 0; $intSite -lt $arrExpectedSite.Count; $intSite++) {
+            $objCall = @($arrCall)[$intSite]
             $boolBounded = $false
             $strTargetText = ''
             for ($intIndex = 1; $intIndex -lt @($objCall.CommandElements).Count; $intIndex++) {
@@ -1614,19 +1638,15 @@ $script:scriptBlockAssertEnumerationBoundsDeclared = {
                     $strTargetText = [string]$objCall.CommandElements[$intIndex + 1].Extent.Text
                 }
             }
-            if ($boolBounded) {
-                continue
-            }
-            $intUnbounded++
-            if ($strTargetText -cnotin $script:arrCandidateUnboundedEnumerationPath) {
+            if ($strTargetText -cne [string]$arrExpectedSite[$intSite].Target) {
                 & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-                    -Detail ('enumeration-unbounded-' + $strTargetText)
+                    -Detail ('enumeration-site-target-' + $intSite + '-' + $strTargetText)
+            }
+            if ($boolBounded -ne [bool]$arrExpectedSite[$intSite].Bounded) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                    -Detail ('enumeration-site-bound-' + $intSite + '-' + $strTargetText)
             }
         }
-    }
-    if ($intUnbounded -ne $script:intCandidateUnboundedEnumerationCount) {
-        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-            -Detail ('enumeration-absence-count-' + $intUnbounded)
     }
 }
 
@@ -5603,7 +5623,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.17
+    # Version: 1.0.20260803.18
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -5827,7 +5847,8 @@ function Invoke-StyleGuideCandidateHarness {
             -Catalog $objCatalog `
             -RunRoot $strRunRoot
         & $script:scriptBlockAssertEnumerationBoundsDeclared `
-            -LiteralPath ([string[]]@($strHelperLiteralPath, $strContextLiteralPath))
+            -HelperLiteralPath $strHelperLiteralPath `
+            -ContextLiteralPath $strContextLiteralPath
         & $script:scriptBlockAssertLifecycleRecordStatesRejected -RunRoot $strRunRoot
         & $script:scriptBlockAssertResourceGuardsReached `
             -LiteralPath $strHelperLiteralPath `
