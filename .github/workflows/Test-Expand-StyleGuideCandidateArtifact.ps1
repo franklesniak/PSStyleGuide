@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.15
+Version: 1.0.20260803.16
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.15'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.16'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.11'
@@ -1544,11 +1544,24 @@ $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
 # because the count drops: absence cannot be concluded from a partial listing,
 # so those three reads must stay unbounded, and a well-meaning "fix" that
 # bounded one would be a correctness regression this check refuses to accept.
+$script:arrCandidateEnumerationScriptBlockName = [string[]]@(
+    'scriptBlockGetCandidateImmediateEntry',
+    'scriptBlockGetCandidateHelperEntry'
+)
+# Every unbounded call proves a path ABSENT -- the chosen child name before
+# creation, and the four post-delete "is it really gone?" reads. A partial
+# listing cannot establish absence, so these must stay unbounded.
 $script:arrCandidateUnboundedEnumerationPath = [string[]]@(
     '$strTrustedParent',
-    '$objRecord.ParentPath'
+    '$objRecord.ParentPath',
+    '$Context.CandidatePath',
+    '$Context.InvocationRootPath',
+    '$ParentPath'
 )
-$script:intCandidateUnboundedEnumerationCount = 3
+# The count is the load-bearing half. The path list alone would not notice an
+# existing bounded call losing its bound, because two absence proofs share a
+# target expression with a bounded cardinality check; the count does notice.
+$script:intCandidateUnboundedEnumerationCount = 6
 
 $script:scriptBlockAssertEnumerationBoundsDeclared = {
     param (
@@ -1572,8 +1585,9 @@ $script:scriptBlockAssertEnumerationBoundsDeclared = {
                     @($objNode.CommandElements).Count -gt 0 -and
                     $objNode.CommandElements[0] -is
                         [System.Management.Automation.Language.VariableExpressionAst] -and
-                    $objNode.CommandElements[0].VariablePath.UserPath -ceq
-                        'scriptBlockGetCandidateImmediateEntry'
+                    $script:arrCandidateEnumerationScriptBlockName -ccontains
+                        ($objNode.CommandElements[0].VariablePath.UserPath -creplace
+                            '^script:', '')
                 },
                 $true
             ))
@@ -5587,7 +5601,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.15
+    # Version: 1.0.20260803.16
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
