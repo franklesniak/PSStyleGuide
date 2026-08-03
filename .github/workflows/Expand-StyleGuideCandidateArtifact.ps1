@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.4
+Version: 1.0.20260803.6
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.4'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.2'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.6'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.3'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -1574,7 +1574,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.4
+    # Version: 1.0.20260803.6
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2593,6 +2593,22 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         [void](& $script:scriptBlockAssertCandidateHelperDirectoryEnvelope `
             -LiteralPath $strCandidatePath `
             -Phase 'destination')
+        # The absence check a few lines up proved this name was free, and
+        # CreateDirectory should therefore have made it -- but it returns the
+        # same thing either way, so an empty directory placed here in between
+        # would be adopted silently and extracted into. Requiring it to be
+        # empty is the same evidence the context manager uses for the roots it
+        # creates: it cannot expose an empty squatter, and it does refuse a
+        # directory that already holds anything, which extraction would
+        # otherwise write alongside.
+        $arrDestinationEntries = [string[]]@(
+            & $script:scriptBlockGetCandidateHelperEntry -LiteralPath $strCandidatePath `
+                -Phase 'destination' -MaximumEntry 1
+        )
+        if ($arrDestinationEntries.Count -ne 0) {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'destination-invalid' -Phase 'destination' -Subreason 'entry-count'
+        }
 
         $strPhase = 'extraction'
         $uintActualTotal = [uint64]0

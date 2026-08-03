@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.2
+Version: 1.0.20260803.3
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.2'
+$versionCandidateContext = [System.Version]'1.0.20260803.3'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -1100,7 +1100,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.2
+    # Version: 1.0.20260803.3
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1186,6 +1186,18 @@ function New-StyleGuideCandidateInvocationContext {
                 -CandidatePath $strCandidatePath
 
             $null = [System.IO.Directory]::CreateDirectory($strInvocationRoot)
+            # Ownership is claimed here, on the call that may have created the
+            # directory, and not after the checks below have approved of it.
+            # CreateDirectory cannot say whether it made the directory or found
+            # one, so from this line on the only safe assumption is that this
+            # invocation made it -- and everything that follows must be able to
+            # report the directory rather than walk away from it. Marking
+            # ownership after the checks meant a directory this invocation had
+            # just created, which something else then wrote into, was abandoned
+            # by the retry below with no record anywhere that it existed:
+            # neither the caller nor cleanup could name it, let alone remove it.
+            $boolRootCreated = $true
+            $objContext.OwnershipJournal[0].EntryState = 'Created'
 
             # Prove the path is an ordinary link-free directory before anything
             # reads or writes through it. CreateDirectory succeeds on a name
@@ -1230,9 +1242,18 @@ function New-StyleGuideCandidateInvocationContext {
             # portable .NET does not offer; the leaf is unpredictable, and an
             # attacker who guessed it would have their empty directory adopted,
             # populated, and removed.
-            # One observed path already answers this: the directory is not
-            # empty, so it is not ours. Reading the rest costs memory to reach
-            # the same conclusion.
+            #
+            # A non-empty directory here is not a name collision to retry past.
+            # The parent enumeration above already skipped every name that
+            # existed, so this state can only arise from the race window, and in
+            # that window there is no way to tell a directory this invocation
+            # created and something else then populated from one that was
+            # already there. Retrying assumed the second reading and leaked the
+            # first. Failing here reports it instead: the root is journaled as
+            # owned, so the creation failure path runs cleanup and names the
+            # residual in its diagnostic rather than losing it.
+            #
+            # One observed path answers the question, so the read stops there.
             $arrClaimEntries = [string[]]@(
                 & $scriptBlockGetCandidateImmediateEntry `
                     -LiteralPath $strInvocationRoot `
@@ -1241,16 +1262,34 @@ function New-StyleGuideCandidateInvocationContext {
                     -MaximumEntry 1
             )
             if ($arrClaimEntries.Count -ne 0) {
-                continue
+                & $scriptBlockStopCandidateOperation -Code 'context-create-verification' `
+                    -Message 'PSStyleGuide.Context.v1|phase=context|reason=unexpected-entry'
             }
-
-            $boolRootCreated = $true
-            $objContext.OwnershipJournal[0].EntryState = 'Created'
 
             $null = [System.IO.Directory]::CreateDirectory($strDownloadDirectory)
             $objContext.OwnershipJournal[1].EntryState = 'Created'
             [void](& $scriptBlockAssertCandidateOrdinaryDirectoryEnvelope `
                 -LiteralPath $strDownloadDirectory)
+
+            # The root was proven empty a few lines ago and this name is under
+            # it, so CreateDirectory should have made this directory. It cannot
+            # say so, and an observer that had learned the root's name could
+            # have placed an empty directory here first, which this call would
+            # adopt and cleanup would later remove. Emptiness is the same
+            # evidence used for the root and carries the same limit -- an empty
+            # squatter is indistinguishable -- but anything already inside is
+            # proof the directory is not this invocation's to use.
+            $arrDownloadClaimEntries = [string[]]@(
+                & $scriptBlockGetCandidateImmediateEntry `
+                    -LiteralPath $strDownloadDirectory `
+                    -FailureCode 'context-create-verification' `
+                    -FailurePhase 'context' `
+                    -MaximumEntry 1
+            )
+            if ($arrDownloadClaimEntries.Count -ne 0) {
+                & $scriptBlockStopCandidateOperation -Code 'context-create-verification' `
+                    -Message 'PSStyleGuide.Context.v1|phase=context|reason=unexpected-entry'
+            }
 
             $arrRootEntries = [string[]]@(
                 & $scriptBlockGetCandidateImmediateEntry `
@@ -1335,7 +1374,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.2
+    # Version: 1.0.20260803.3
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
