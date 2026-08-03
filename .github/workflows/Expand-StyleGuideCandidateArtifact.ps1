@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260802.25
+Version: 1.0.20260802.26
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260802.25'
+$script:versionCandidateHelper = [System.Version]'1.0.20260802.26'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.12'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -1420,7 +1420,19 @@ $script:scriptBlockAssertCandidateHelperOrdinaryFileMetadata = {
             throw 'nonordinary'
         }
         $objFile = New-Object System.IO.FileInfo($LiteralPath)
-        if (-not $objFile.Exists -or $objFile.Length -lt 0) {
+        # A named pipe carries no Directory or ReparsePoint attribute and
+        # reports a length of zero, so the checks above accept it as an
+        # ordinary file -- and opening one for reading blocks until a writer
+        # appears, which for an untrusted download entry means the workflow
+        # hangs before any archive or resource ceiling is ever consulted.
+        #
+        # Refusing a zero length closes that without asking an external tool
+        # what the entry is: pipes, sockets, and device nodes all report zero,
+        # and a regular file of zero bytes cannot be an archive either, because
+        # the end-of-central-directory record alone is twenty-two bytes. The
+        # size floor already implied by the format is therefore applied here,
+        # before the open rather than after it.
+        if (-not $objFile.Exists -or $objFile.Length -le 0) {
             throw 'missing'
         }
         return [uint64]$objFile.Length
@@ -1467,7 +1479,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.25
+    # Version: 1.0.20260802.26
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
