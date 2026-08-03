@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260802.23
+Version: 1.0.20260802.24
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260802.23'
+$script:versionCandidateHelper = [System.Version]'1.0.20260802.24'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.11'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -969,9 +969,23 @@ $script:scriptBlockAssertCandidateHelperArchiveEntryCount = {
         # confirm it accounted for the rest of the span.
         if ($arrRecordHead[0] -eq 0x50 -and $arrRecordHead[1] -eq 0x4B -and
             $arrRecordHead[2] -eq 0x05 -and $arrRecordHead[3] -eq 0x05) {
+            # There is one digital-signature record and it is the last thing in
+            # the central directory, so skipping it must land on the trailer.
+            # Requiring that is what bounds this loop. Counting nothing for the
+            # record means the four-entry limit cannot end the walk, and a
+            # header declaring a zero-length signature costs only six bytes, so
+            # without this a directory packed with them buys an iteration per
+            # six bytes -- an archive at the size ceiling would spend tens of
+            # seconds here and still be accepted, since the walk lands exactly
+            # where it should. Landing correctly bounds the answer, not the
+            # work.
             $lngSignatureLength = [int64]$arrRecordHead[4] -bor
                 ([int64]$arrRecordHead[5] -shl 8)
-            $lngPosition = $lngPosition + 6 + $lngSignatureLength
+            if (($lngPosition + 6 + $lngSignatureLength) -ne $lngTrailerPosition) {
+                & $script:scriptBlockStopCandidateHelperOperation `
+                    -Code 'manifest-invalid' -Phase 'manifest' -Subreason 'entry-count'
+            }
+            $lngPosition = $lngTrailerPosition
             continue
         }
         # Anything that is not the signature record must be a full file header.
@@ -1440,7 +1454,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.23
+    # Version: 1.0.20260802.24
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
