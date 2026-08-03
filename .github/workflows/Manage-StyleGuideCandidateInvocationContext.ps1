@@ -21,17 +21,22 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.1
+Version: 1.0.20260803.2
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.1'
+$versionCandidateContext = [System.Version]'1.0.20260803.2'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
+# The same ceilings the expansion helper enforces. They are restated rather
+# than imported because either script may be loaded without the other, and a
+# journal this script accepts must be one that script would accept too.
+$uintCandidateMaximumEntryByte = [uint64](8 * 1024 * 1024)
+$uintCandidateMaximumArchiveByte = [uint64](32 * 1024 * 1024)
 # The platform decides which comparison, path grammar, link primitive, and
 # filesystem-identity rules apply, so it must not be something a caller can
 # assert. The OS environment variable is ordinary and inheritable: exporting
@@ -728,10 +733,24 @@ $scriptBlockAssertCandidateInMemoryContext = {
                 throw 'cleanup-context-invalid'
             }
         } else {
+            # A record's ContentLength is caller-supplied and, until here,
+            # unbounded: a forged journal could claim any 64-bit size. Cleanup
+            # trusts that number to decide how much evidence to gather, so an
+            # uncapped value is an instruction to read an arbitrarily large
+            # file. The ceilings that already govern this manifest are the
+            # right bound -- a download record can be as large as the archive
+            # ceiling, a candidate file as large as one entry -- and nothing
+            # legitimate reaches either.
+            $uintRecordLengthCeiling = if ($objRecord.Kind -ceq 'DownloadFile') {
+                $uintCandidateMaximumArchiveByte
+            } else {
+                $uintCandidateMaximumEntryByte
+            }
             if ($objRecord.ExpectedEntryType -cne 'File' -or
                 $objRecord.EntryState -eq 'ExpectedAbsent' -or
                 $null -eq $objRecord.ContentLength -or
                 $objRecord.ContentLength.GetType() -ne [System.UInt64] -or
+                $objRecord.ContentLength -gt $uintRecordLengthCeiling -or
                 $null -eq $objRecord.ContentSha256 -or
                 $objRecord.ContentSha256.GetType() -ne [System.String] -or
                 $objRecord.ContentSha256 -cnotmatch '^[0-9a-f]{64}$') {
@@ -983,6 +1002,9 @@ $scriptBlockGetCandidateFileEvidence = {
         [string]$LiteralPath,
 
         [Parameter(Mandatory = $true)]
+        [uint64]$ExpectedLength,
+
+        [Parameter(Mandatory = $true)]
         [ref]$ReferenceToFilesystemCallCount
     )
 
@@ -1002,6 +1024,22 @@ $scriptBlockGetCandidateFileEvidence = {
         )
         try {
             $uintLength = [uint64]$objStream.Length
+            # The caller compares this length against the journal before it
+            # looks at the digest, so a file whose length already disagrees is
+            # refused whatever the hash says -- and hashing it first means
+            # reading every byte of a file the journal has already failed to
+            # describe. A forged record naming a very large file made that read
+            # unbounded. The length is decided here instead, and the digest is
+            # computed only for a file the journal still might match. The empty
+            # string returned in the other case can never equal a 64-character
+            # digest, so a caller that skipped the length comparison entirely
+            # would still fail closed.
+            if ($uintLength -ne $ExpectedLength) {
+                return [ordered]@{
+                    Length = $uintLength
+                    Sha256 = ''
+                }
+            }
             $objSha256 = [System.Security.Cryptography.SHA256]::Create()
             try {
                 $strHash = (
@@ -1062,7 +1100,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.1
+    # Version: 1.0.20260803.2
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1297,7 +1335,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.1
+    # Version: 1.0.20260803.2
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1428,6 +1466,7 @@ function Remove-StyleGuideCandidateInvocationContext {
                 }
                 $hashtableEvidence = & $scriptBlockGetCandidateFileEvidence `
                     -LiteralPath $objRecord.Path `
+                    -ExpectedLength ([uint64]$objRecord.ContentLength) `
                     -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
                 if ($hashtableEvidence.Length -ne $objRecord.ContentLength -or
                     $hashtableEvidence.Sha256 -cne $objRecord.ContentSha256) {

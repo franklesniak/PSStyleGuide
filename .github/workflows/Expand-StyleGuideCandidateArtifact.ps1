@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.3
+Version: 1.0.20260803.4
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.3'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.1'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.4'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.2'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -480,10 +480,24 @@ $script:scriptBlockAssertCandidateHelperContext = {
                 throw 'context-invalid'
             }
         } else {
+            # A record's ContentLength is caller-supplied and, until here,
+            # unbounded: a forged journal could claim any 64-bit size. Cleanup
+            # trusts that number to decide how much evidence to gather, so an
+            # uncapped value is an instruction to read an arbitrarily large
+            # file. The ceilings that already govern this manifest are the
+            # right bound -- a download record can be as large as the archive
+            # ceiling, a candidate file as large as one entry -- and nothing
+            # legitimate reaches either.
+            $uintRecordLengthCeiling = if ($objRecord.Kind -ceq 'DownloadFile') {
+                $script:uintCandidateHelperMaximumArchiveByte
+            } else {
+                $script:uintCandidateHelperMaximumEntryByte
+            }
             if ($objRecord.ExpectedEntryType -cne 'File' -or
                 $objRecord.EntryState -eq 'ExpectedAbsent' -or
                 $null -eq $objRecord.ContentLength -or
                 $objRecord.ContentLength.GetType() -ne [System.UInt64] -or
+                $objRecord.ContentLength -gt $uintRecordLengthCeiling -or
                 $null -eq $objRecord.ContentSha256 -or
                 $objRecord.ContentSha256.GetType() -ne [System.String] -or
                 $objRecord.ContentSha256 -cnotmatch '^[0-9a-f]{64}$') {
@@ -1416,6 +1430,9 @@ $script:scriptBlockGetCandidateHelperFileEvidence = {
         [Parameter(Mandatory = $true)]
         [string]$Phase,
 
+        [Parameter(Mandatory = $true)]
+        [uint64]$ExpectedLength,
+
         [ref]$ReferenceToFilesystemCallCount
     )
 
@@ -1444,6 +1461,22 @@ $script:scriptBlockGetCandidateHelperFileEvidence = {
         )
         try {
             $uintLength = [uint64]$objStream.Length
+            # The caller compares this length against the journal before it
+            # looks at the digest, so a file whose length already disagrees is
+            # refused whatever the hash says -- and hashing it first means
+            # reading every byte of a file the journal has already failed to
+            # describe. A forged record naming a very large file made that read
+            # unbounded. The length is decided here instead, and the digest is
+            # computed only for a file the journal still might match. The empty
+            # string returned in the other case can never equal a 64-character
+            # digest, so a caller that skipped the length comparison entirely
+            # would still fail closed.
+            if ($uintLength -ne $ExpectedLength) {
+                return [ordered]@{
+                    Length = $uintLength
+                    Sha256 = ''
+                }
+            }
             $objSha256 = [System.Security.Cryptography.SHA256]::Create()
             try {
                 $strSha256 = (
@@ -1541,7 +1574,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.3
+    # Version: 1.0.20260803.4
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1650,6 +1683,7 @@ function Remove-StyleGuideCandidateInvocationState {
                 $hashtableEvidence = & $script:scriptBlockGetCandidateHelperFileEvidence `
                     -LiteralPath $objRecord.Path `
                     -Phase 'cleanup' `
+                    -ExpectedLength ([uint64]$objRecord.ContentLength) `
                     -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
                 if ($hashtableEvidence.Length -ne $objRecord.ContentLength -or
                     $hashtableEvidence.Sha256 -cne $objRecord.ContentSha256) {
