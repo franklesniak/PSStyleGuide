@@ -4808,9 +4808,22 @@ $script:scriptBlockInvokeHelperCleanupFixture = {
             # both entry points, which exercised the already-disposed success
             # path instead. That proved the repeat was cheap, not that a
             # malformed terminal context is rejected, and it duplicated K-03.
-            $objContext.LifecycleState = 'CleanupFailed'
+            # Dispose normally first, so every field of the context is exactly
+            # what production itself produced, then flip one record to a state
+            # the reached lifecycle does not admit. Disposed admits only
+            # ExpectedAbsent and Deleted, so Created violates the admitted-state
+            # table and nothing else -- no required-state rule applies to
+            # Disposed, and every other invariant still holds. That isolation is
+            # the point: an earlier revision forged CleanupFailed with a Created
+            # record, which tripped several checks at once, so removing any one
+            # of them left the row still passing and it proved nothing.
+            $objDispose = Remove-StyleGuideCandidateInvocationState -Context $objContext
+            if (-not $objDispose.Success -or $objDispose.FinalState -cne 'Disposed') {
+                & $script:scriptBlockStopHarness `
+                    -Code 'fixture-failed' -Detail 'terminal-initial-dispose'
+            }
             $objContext.OwnershipJournal[0].EntryState = 'Created'
-            $objObservation.PreCleanupState = 'CleanupFailed'
+            $objObservation.PreCleanupState = 'Disposed'
             $objHelperEntry = Remove-StyleGuideCandidateInvocationState -Context $objContext
             if ($objHelperEntry.Success -or
                 $objHelperEntry.DiagnosticCode -cne 'cleanup-context-invalid' -or
@@ -4830,12 +4843,7 @@ $script:scriptBlockInvokeHelperCleanupFixture = {
             # valid again so the real production cleanup can remove it; the
             # rejection above stays the recorded result. Without this the row
             # would have to declare a candidate final state no other row uses.
-            $objContext.LifecycleState = 'Active'
-            $objTeardown = Remove-StyleGuideCandidateInvocationState -Context $objContext
-            if (-not $objTeardown.Success) {
-                & $script:scriptBlockStopHarness `
-                    -Code 'fixture-failed' -Detail 'terminal-initial-teardown'
-            }
+            $objContext.OwnershipJournal[0].EntryState = 'Deleted'
             $strSubreason = 'context-invalid'
         } elseif ($strSemantic -ceq 'helper.cleanup.disposed-repeat') {
             $objFirstCleanup = Remove-StyleGuideCandidateInvocationState -Context $objContext
