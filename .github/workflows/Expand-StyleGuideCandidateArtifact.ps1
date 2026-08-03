@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260802.24
+Version: 1.0.20260802.25
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260802.24'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.11'
+$script:versionCandidateHelper = [System.Version]'1.0.20260802.25'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.12'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -871,13 +871,26 @@ $script:scriptBlockAssertCandidateHelperArchiveEntryCount = {
         }
         $intFilled += $intRead
     }
+    # The signature alone does not identify the trailer. An archive comment is
+    # arbitrary bytes and may legally contain this signature, so a backward
+    # scan that stops at the first match can select a decoy inside the comment
+    # and then read its bytes as counts and offsets -- rejecting a conforming
+    # archive. The trailer is the record whose own declared comment length
+    # reaches exactly the end of the file, which the comment's contents cannot
+    # fake without being the trailer.
     $intSignatureIndex = -1
     for ($intIndex = $intWindow - 22; $intIndex -ge 0; $intIndex--) {
-        if ($arrTrailer[$intIndex] -eq 0x50 -and $arrTrailer[$intIndex + 1] -eq 0x4B -and
-            $arrTrailer[$intIndex + 2] -eq 0x05 -and $arrTrailer[$intIndex + 3] -eq 0x06) {
-            $intSignatureIndex = $intIndex
-            break
+        if ($arrTrailer[$intIndex] -ne 0x50 -or $arrTrailer[$intIndex + 1] -ne 0x4B -or
+            $arrTrailer[$intIndex + 2] -ne 0x05 -or $arrTrailer[$intIndex + 3] -ne 0x06) {
+            continue
         }
+        $lngCommentLength = [int64]$arrTrailer[$intIndex + 20] -bor
+            ([int64]$arrTrailer[$intIndex + 21] -shl 8)
+        if (($lngLength - $intWindow + $intIndex + 22 + $lngCommentLength) -ne $lngLength) {
+            continue
+        }
+        $intSignatureIndex = $intIndex
+        break
     }
     if ($intSignatureIndex -lt 0) {
         & $script:scriptBlockStopCandidateHelperOperation `
@@ -1454,7 +1467,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.24
+    # Version: 1.0.20260802.25
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

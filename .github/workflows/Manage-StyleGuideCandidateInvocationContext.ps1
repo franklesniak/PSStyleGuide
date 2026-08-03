@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260802.11
+Version: 1.0.20260802.12
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260802.11'
+$versionCandidateContext = [System.Version]'1.0.20260802.12'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -1034,7 +1034,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.11
+    # Version: 1.0.20260802.12
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1137,14 +1137,33 @@ function New-StyleGuideCandidateInvocationContext {
             # CreateDirectory returns the same thing whether it made the
             # directory or found one already there, so on its own it is not
             # evidence of ownership -- and ownership is what later authorises
-            # deleting this tree. Prove it twice before recording it.
+            # deleting this tree.
             #
-            # An unpredictable leaf makes the pre-existing case unlikely rather
-            # than impossible, and unlikely is the wrong footing for a claim
-            # that drives a delete. Neither failure below removes anything: a
-            # directory that fails these tests is by definition not this
-            # invocation's to delete, so the loop leaves it alone and takes a
-            # different name.
+            # Refusing a directory that already holds anything is what can be
+            # done about that here, and it costs nothing: enumeration needs no
+            # permission this code does not already use, and the path it
+            # enumerates has just been proven ordinary and link-free. A
+            # populated directory is by definition not this invocation's, so
+            # the loop leaves it untouched and takes a different name; nothing
+            # is deleted on that path, and nothing was created on it either.
+            #
+            # An exclusive marker file inside the directory was tried here and
+            # removed. It proved nothing: an exclusive create on a fresh random
+            # child name succeeds just as readily inside a directory someone
+            # else made, so it never distinguished who created the root. It
+            # also required creating a file directly in the invocation root,
+            # which the surrounding design deliberately avoids -- files are
+            # written only beneath the download and candidate directories, so a
+            # Windows ACL granting create-folder and denying create-file there
+            # is supported everywhere else and would have failed sixteen times
+            # and then reported a collision limit.
+            #
+            # What remains unclosed is an empty directory placed at this exact
+            # name in the window between the parent enumeration and the create.
+            # Closing it needs an atomic exclusive directory create, which
+            # portable .NET does not offer; the leaf is unpredictable, and an
+            # attacker who guessed it would have their empty directory adopted,
+            # populated, and removed.
             $arrClaimEntries = [string[]]@(
                 & $scriptBlockGetCandidateImmediateEntry `
                     -LiteralPath $strInvocationRoot `
@@ -1153,38 +1172,6 @@ function New-StyleGuideCandidateInvocationContext {
             )
             if ($arrClaimEntries.Count -ne 0) {
                 continue
-            }
-            # Emptiness alone would still admit an empty directory someone else
-            # made. An exclusive create refuses the name outright if another
-            # participant already holds it, which no pre-existing directory can
-            # satisfy on our behalf.
-            $strClaimPath = [System.IO.Path]::Combine(
-                $strInvocationRoot,
-                'claim-' + [System.Guid]::NewGuid().ToString('N')
-            )
-            try {
-                $objClaimStream = New-Object System.IO.FileStream(
-                    $strClaimPath,
-                    [System.IO.FileMode]::CreateNew,
-                    [System.IO.FileAccess]::Write,
-                    [System.IO.FileShare]::None
-                )
-                $objClaimStream.Dispose()
-            } catch {
-                continue
-            }
-            # The claim is transient by necessity: the verification below
-            # requires the root to hold exactly the download directory, so a
-            # marker left behind would fail the very check it precedes.
-            try {
-                [System.IO.File]::Delete($strClaimPath)
-            } catch {
-                & $scriptBlockStopCandidateOperation -Code 'context-create-verification' `
-                    -Message 'PSStyleGuide.Context.v1|phase=context|reason=claim-residue'
-            }
-            if ([System.IO.File]::Exists($strClaimPath)) {
-                & $scriptBlockStopCandidateOperation -Code 'context-create-verification' `
-                    -Message 'PSStyleGuide.Context.v1|phase=context|reason=claim-residue'
             }
 
             $boolRootCreated = $true
@@ -1277,7 +1264,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.11
+    # Version: 1.0.20260802.12
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
