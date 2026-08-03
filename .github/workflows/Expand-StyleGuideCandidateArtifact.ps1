@@ -1000,9 +1000,14 @@ $script:scriptBlockAssertCandidateHelperArchiveEntryCount = {
         ([int]$arrTrailer[$intSignatureIndex + 5] -shl 8)
     $intDirectoryDisk = [int]$arrTrailer[$intSignatureIndex + 6] -bor
         ([int]$arrTrailer[$intSignatureIndex + 7] -shl 8)
+    # Its own subreason, not the shared entry-count one. The downstream record
+    # walk also refuses this archive, so sharing a subreason made the catalog row
+    # for this gate pass whether or not the gate existed -- coverage that proved
+    # nothing. A distinct value is the only thing that separates "the Zip64 gate
+    # refused it" from "something later refused it anyway".
     if ($intDiskNumber -ne 0 -or $intDirectoryDisk -ne 0) {
         & $script:scriptBlockStopCandidateHelperOperation `
-            -Code 'manifest-invalid' -Phase 'manifest' -Subreason 'entry-count'
+            -Code 'manifest-invalid' -Phase 'manifest' -Subreason 'zip64-locator'
     }
     $intDiskEntries = [int]$arrTrailer[$intSignatureIndex + 8] -bor
         ([int]$arrTrailer[$intSignatureIndex + 9] -shl 8)

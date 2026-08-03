@@ -7,7 +7,7 @@ Runs the permanent adversarial style-guide candidate validation suite.
 .DESCRIPTION
 Authenticates the fixed helper and context-manager blobs against HEAD, the
 stage-0 index, and the no-filter working object before loading them. It then
-executes the versioned 110-case catalog and emits one bounded canonical JSONL
+executes the versioned 115-case catalog and emits one bounded canonical JSONL
 result per catalog row.
 
 .PARAMETER HelperPath
@@ -58,8 +58,12 @@ $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.9'
 $script:strCandidateExpectedContextVersion = '1.0.20260803.4'
-$script:strCandidateCatalogVersion = '1.0.20260802.4'
-$script:strCandidateAllocationSha256 = 'ce7b29de7bb4812f1de9defb1672c1b7eac47d6f6b584db571a9bc0d86726e02'
+$script:strCandidateCatalogVersion = '1.0.20260803.1'
+# The physical allocation size, stated once. It was previously two bare literals
+# inside the header check, which is why growing the catalog failed with an
+# unhelpful 'header' detail rather than naming the count.
+$script:intCandidateCaseCount = 115
+$script:strCandidateAllocationSha256 = '1670cdfcfdd2c7c22ca21b4ace19f59cd7bdb104d2503d8791b8639a28918c0e'
 $script:strCandidateHelperRelativePath = '.github/workflows/Expand-StyleGuideCandidateArtifact.ps1'
 $script:strCandidateContextRelativePath = '.github/workflows/Manage-StyleGuideCandidateInvocationContext.ps1'
 $script:strCandidateCatalogRelativePath = '.github/workflows/style-guide-candidate-cases.json'
@@ -2257,7 +2261,7 @@ $script:scriptBlockReadCandidateCatalog = {
         $objCatalog.CatalogVersion -cne $script:strCandidateCatalogVersion -or
         $null -eq $objCatalog.CaseCount -or
         $objCatalog.CaseCount.GetType() -notin @([System.Int32], [System.Int64]) -or
-        $objCatalog.CaseCount -ne 110 -or
+        $objCatalog.CaseCount -ne $script:intCandidateCaseCount -or
         $null -eq $objCatalog.CaseIdPattern -or
         $objCatalog.CaseIdPattern.GetType() -ne [System.String] -or
         $objCatalog.CaseIdPattern -cne '^PS-P1A-[A-Z]+-[0-9]{2}$' -or
@@ -2269,7 +2273,7 @@ $script:scriptBlockReadCandidateCatalog = {
         $objCatalog.OracleProfilePattern -cne '^oracle\.ps-p1a-[a-z]+-[0-9]{2}\.v1$' -or
         $null -eq $objCatalog.Cases -or
         $objCatalog.Cases.GetType() -ne [System.Object[]] -or
-        $objCatalog.Cases.Count -ne 110) {
+        $objCatalog.Cases.Count -ne $script:intCandidateCaseCount) {
         & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'header'
     }
     & $script:scriptBlockAssertExactPropertyNames -Value $objCatalog.ClosedSets -Names @(
@@ -2431,7 +2435,19 @@ $script:scriptBlockReadCandidateCatalog = {
             'environment.trusted.link-component',
             'environment.trusted.wrong-type'
         )
-        if (($boolNotCreatedCase -and $objCase.InitialState -cne 'NotCreated') -or
+        # Every other case begins Active, which left the terminal lifecycle states
+        # unreachable from the catalog: no row could hand an already-terminal
+        # context to an entry point. The exception is named rather than the rule
+        # relaxed, so admitting one terminal-start case does not quietly admit a
+        # wrong initial state everywhere else.
+        $arrTerminalStartCase = [string[]]@('helper.cleanup.terminal-initial-state')
+        $boolTerminalStartCase = $objCase.SemanticCase -cin $arrTerminalStartCase
+        if ($boolTerminalStartCase) {
+            if ($objCase.InitialState -cnotin @('CleanupFailed', 'Disposed')) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'catalog-invalid' -Detail 'case-initial-state'
+            }
+        } elseif (($boolNotCreatedCase -and $objCase.InitialState -cne 'NotCreated') -or
             (-not $boolNotCreatedCase -and $objCase.InitialState -cne 'Active')) {
             & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'case-initial-state'
         }
@@ -3351,6 +3367,21 @@ $script:scriptBlockNewZipFixture = {
             $objStream.Dispose()
         }
     }
+    if ($SemanticCase -ceq 'archive.trailer.decoy' -or
+        $SemanticCase -ceq 'archive.trailer.zip64-gate') {
+        # Built by the same function the trailer-agreement assertion uses, so the
+        # two cannot drift. The oversized directory is small here: the case only
+        # needs the archive refused, while the assertion needs it to be a real
+        # amplification and asks for a much larger one.
+        $strBypassVariant = if ($SemanticCase -ceq 'archive.trailer.decoy') {
+            'decoy'
+        } else {
+            'zip64'
+        }
+        $arrBypassByte = & $script:scriptBlockNewTrailerBypassArchiveByte `
+            -Variant $strBypassVariant -FatEntryCount 8
+        [System.IO.File]::WriteAllBytes($LiteralPath, $arrBypassByte)
+    }
     return & $script:scriptBlockGetFileEvidence -LiteralPath $LiteralPath
 }
 
@@ -3981,8 +4012,24 @@ $script:scriptBlockInvokeExpansionFixture = {
             'download.entries.empty',
             'download.entries.two-files',
             'download.entry.directory',
-            'download.entry.link'
+            'download.entry.link',
+            'download.entry.nonregular'
         )
+        if ($strSemantic -ceq 'download.entry.nonregular') {
+            # A FIFO reports Normal attributes and zero length, so nothing in the
+            # ordinary-file predicate distinguishes it from an archive; opening one
+            # for reading blocks until a writer appears. Linux-only: Windows has no
+            # equivalent the download path can encounter.
+            $strFifoPath = [string](& $script:scriptBlockResolveHarnessNativePath `
+                -CandidatePath ([string[]]@('/usr/bin/mkfifo', '/bin/mkfifo')))
+            if ($strFifoPath.Length -eq 0) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'fifo-utility'
+            }
+            $arrFifoOutput = @(& $strFifoPath '--' $strArchivePath 2>$null)
+            if ($LASTEXITCODE -ne 0 -or $arrFifoOutput.Count -ne 0) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'fifo-create'
+            }
+        }
         if ($strSemantic -ceq 'download.entries.two-files') {
             [System.IO.File]::WriteAllBytes(
                 [System.IO.Path]::Combine($objContext.DownloadDirectoryPath, 'one'),
@@ -4494,6 +4541,37 @@ $script:scriptBlockInvokeContextCleanupFixture = {
         $strSubreason = 'succeeded'
 
         switch -Exact ($strSemantic) {
+            'context.cleanup.forged-length' {
+                # A caller-supplied journal decides how much evidence cleanup
+                # gathers. A record claiming more than the archive ceiling is
+                # refused by the context validator before any filesystem call,
+                # so a forged length cannot direct an unbounded read.
+                $objForgedRecord = [pscustomobject][ordered]@{
+                    SchemaVersion = [uint32]1
+                    Sequence = [uint32]$objContext.OwnershipJournal.Count
+                    Kind = 'DownloadFile'
+                    Path = [System.IO.Path]::Combine(
+                        $objContext.DownloadDirectoryPath, 'forged.zip')
+                    ParentPath = $objContext.DownloadDirectoryPath
+                    LeafName = 'forged.zip'
+                    ExpectedEntryType = 'File'
+                    CreationPhase = 'download'
+                    EntryState = 'Created'
+                    ContentLength = [uint64](32MB + 1)
+                    ContentSha256 = ('0' * 64)
+                }
+                $objForgedRecord.PSObject.TypeNames.Insert(
+                    0, 'PSStyleGuide.CandidateOwnershipRecord.v1')
+                $arrForgedJournal = New-Object object[] (
+                    $objContext.OwnershipJournal.Count + 1)
+                [System.Array]::Copy(
+                    $objContext.OwnershipJournal, $arrForgedJournal,
+                    $objContext.OwnershipJournal.Count)
+                $arrForgedJournal[$arrForgedJournal.Length - 1] = $objForgedRecord
+                $objContext.OwnershipJournal = [object[]]$arrForgedJournal
+                $objContext.NextSequence = [uint32]$arrForgedJournal.Length
+                $strSubreason = 'context-invalid'
+            }
             'context.cleanup.unjournaled-entry' {
                 [System.IO.File]::WriteAllBytes(
                     [System.IO.Path]::Combine($objContext.DownloadDirectoryPath, 'unexpected.bin'),
@@ -4711,7 +4789,32 @@ $script:scriptBlockInvokeHelperCleanupFixture = {
             $strSubreason = 'candidate-identity'
         }
 
-        if ($strSemantic -ceq 'helper.cleanup.disposed-repeat') {
+        if ($strSemantic -ceq 'helper.cleanup.terminal-initial-state') {
+            # Every other row begins Active, so the terminal states were reachable
+            # only as an outcome, never as an input. This row hands an already
+            # terminal context to both entry points and requires each to answer
+            # from the journal alone: no filesystem call, no re-inspection of
+            # names the lifecycle has already released.
+            $objDispose = Remove-StyleGuideCandidateInvocationState -Context $objContext
+            if (-not $objDispose.Success -or $objDispose.FinalState -cne 'Disposed') {
+                & $script:scriptBlockStopHarness `
+                    -Code 'fixture-failed' -Detail 'terminal-initial-dispose'
+            }
+            $objObservation.PreCleanupState = 'Disposed'
+            $objContextEntry = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+            if (-not $objContextEntry.Success -or
+                $objContextEntry.FinalState -cne 'Disposed' -or
+                $objContextEntry.FilesystemCallCount -ne [uint32]0) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'fixture-failed' -Detail 'terminal-initial-context-entry'
+            }
+            $objCleanupResult = Remove-StyleGuideCandidateInvocationState -Context $objContext
+            if ($objCleanupResult.FilesystemCallCount -ne [uint32]0) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'fixture-failed' -Detail 'terminal-initial-helper-entry'
+            }
+            $strSubreason = 'already-disposed'
+        } elseif ($strSemantic -ceq 'helper.cleanup.disposed-repeat') {
             $objFirstCleanup = Remove-StyleGuideCandidateInvocationState -Context $objContext
             if (-not $objFirstCleanup.Success -or $objFirstCleanup.FinalState -cne 'Disposed') {
                 & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'helper-first-cleanup'
@@ -5173,7 +5276,7 @@ $script:scriptBlockInvokeScriptIdentityFixture = {
 
 function Invoke-StyleGuideCandidateHarness {
     # .SYNOPSIS
-    # Executes the fixed 110-case style-guide candidate harness.
+    # Executes the fixed 115-case style-guide candidate harness.
     #
     # .DESCRIPTION
     # Authenticates the fixed production scripts, loads their public functions,
@@ -5545,8 +5648,9 @@ function Invoke-StyleGuideCandidateHarness {
             Write-Output (& $script:scriptBlockConvertToCanonicalCaseJson -Result $objResult)
         }
 
-        if ($objExecutedCaseIds.Count -ne 110 -or
-            [uint32]($uintPassCount + $uintFailCount + $uintSkipCount) -ne [uint32]110) {
+        if ($objExecutedCaseIds.Count -ne $script:intCandidateCaseCount -or
+            [uint32]($uintPassCount + $uintFailCount + $uintSkipCount) -ne
+                [uint32]$script:intCandidateCaseCount) {
             & $script:scriptBlockStopHarness -Code 'orchestration-failed' -Detail 'result-total'
         }
         foreach ($strRequiredLinkCategory in @('root', 'below-root', 'candidate', 'context')) {
