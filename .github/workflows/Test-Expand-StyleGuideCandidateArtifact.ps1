@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.13
+Version: 1.0.20260803.14
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.13'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.14'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.10'
@@ -1236,6 +1236,14 @@ $script:scriptBlockNewTrailerBypassArchiveByte = {
     return , $arrZip64File
 }
 
+# Recorded when the script loads, which is the earliest point the run exists.
+$script:strCandidateRunStartedUtc = [System.DateTime]::UtcNow.ToString(
+    'yyyy-MM-ddTHH:mm:ss.fffffffZ', [System.Globalization.CultureInfo]::InvariantCulture)
+# Whether each adversarial trailer fixture is a live bypass is a property of the
+# reader and differs by .NET version, so what this runtime actually observed is
+# recorded rather than left implicit in a passing suite.
+$script:arrCandidateFixtureClassification = @()
+
 $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
     param (
         [Parameter(Mandatory = $true)]
@@ -1328,6 +1336,15 @@ $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
         }
         # -1 means the reader threw rather than materializing anything.
         $intReaderSeen = [int](& $scriptBlockCountReaderEntry -ArchiveByte $arrHostileByte)
+        $script:arrCandidateFixtureClassification += , ([ordered]@{
+            Fixture = if ($strHostileVariant -ceq 'decoy') {
+                'archive.trailer.decoy'
+            } else {
+                'archive.trailer.zip64-gate'
+            }
+            ReaderRefused = [bool]($intReaderSeen -lt 0)
+            ReaderEntryCount = if ($intReaderSeen -lt 0) { $null } else { [uint32]$intReaderSeen }
+        })
         if ($intReaderSeen -ge 0 -and $intReaderSeen -le $intFixtureEntryCount) {
             & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                 -Detail ('reader-fixture-degenerate-' + $strHostileVariant + '-' + $intReaderSeen)
@@ -3820,6 +3837,47 @@ $script:scriptBlockConvertToCanonicalCaseJson = {
     return ($hashtableProjection | ConvertTo-Json -Compress)
 }
 
+# #146 permits a bounded run envelope carrying UTC start/end, tool and catalog
+# hashes, and the runtime-observed classification of any adversarial fixture
+# whose hostility depends on the .NET version. It is a separate object, so
+# per-case equality is untouched: every consumer selects case results by the
+# presence of CaseId, which this object deliberately does not carry.
+#
+# The .NET version is recorded because without it the classification says only
+# "on some runtime the decoy was refused", which is not evidence of anything.
+# It is part of the observation, not an addition to it.
+$script:scriptBlockConvertToCanonicalEnvelopeJson = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [object]$HelperEvidence,
+
+        [Parameter(Mandatory = $true)]
+        [object]$ContextEvidence,
+
+        [Parameter(Mandatory = $true)]
+        [object]$CatalogEvidence
+    )
+
+    $hashtableEnvelope = [ordered]@{
+        Schema = 'PSStyleGuide.CandidateRunEnvelope.v1'
+        SchemaVersion = [uint32]1
+        StartedUtc = [string]$script:strCandidateRunStartedUtc
+        CompletedUtc = [System.DateTime]::UtcNow.ToString(
+            'yyyy-MM-ddTHH:mm:ss.fffffffZ',
+            [System.Globalization.CultureInfo]::InvariantCulture)
+        HarnessVersion = $script:versionCandidateHarness.ToString()
+        HelperVersion = [string]$script:strCandidateExpectedHelperVersion
+        ContextVersion = [string]$script:strCandidateExpectedContextVersion
+        CatalogVersion = [string]$script:strCandidateCatalogVersion
+        HelperSha256 = [string]$HelperEvidence.Sha256
+        ContextSha256 = [string]$ContextEvidence.Sha256
+        CatalogSha256 = [string]$CatalogEvidence.Sha256
+        RuntimeVersion = [System.Environment]::Version.ToString()
+        AdversarialFixtureClassification = @($script:arrCandidateFixtureClassification)
+    }
+    return ($hashtableEnvelope | ConvertTo-Json -Depth 4 -Compress)
+}
+
 $script:scriptBlockNewCaseFixtureLayout = {
     param (
         [Parameter(Mandatory = $true)]
@@ -5448,7 +5506,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.13
+    # Version: 1.0.20260803.14
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -5837,6 +5895,11 @@ function Invoke-StyleGuideCandidateHarness {
                     -Detail 'source-state-changed'
             }
         }
+        Write-Output (& $script:scriptBlockConvertToCanonicalEnvelopeJson `
+                -HelperEvidence $hashtableHelperEvidenceAfter `
+                -ContextEvidence $hashtableContextEvidenceAfter `
+                -CatalogEvidence $hashtableCatalogEvidenceAfter)
+
         if ($uintFailCount -ne 0) {
             & $script:scriptBlockStopHarness -Code 'orchestration-failed' -Detail 'case-failure'
         }
