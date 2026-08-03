@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.11
+Version: 1.0.20260803.12
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.11'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.12'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.5'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -1617,7 +1617,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.11
+    # Version: 1.0.20260803.12
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1885,6 +1885,27 @@ $script:scriptBlockTestCandidateHelperRootsShareStorage = {
         [Parameter(Mandatory = $true)]
         [string]$SentinelDirectory
     )
+
+    # This probe creates a file in SentinelDirectory and then walks upward from
+    # it until it reaches TrustedPath, so it presumes that directory really is a
+    # descendant of the trusted root and is not inside the checkout. Both facts
+    # come from untrusted input, and the containment phase that establishes them
+    # runs after this probe. Without the check below, a forged but
+    # self-consistent context -- one whose supplied paths agree with each other
+    # and with a real directory the caller chose -- gets a file created and
+    # deleted in that directory before anything rejects the invocation, and the
+    # upward walk runs to the filesystem root instead of terminating.
+    #
+    # Proving it here costs no filesystem call: containment is a string prefix
+    # test. It is stated as the probe's own precondition rather than at the one
+    # call site so that the write cannot be reached from anywhere without it.
+    if (-not (& $script:scriptBlockTestCandidateHelperPathContained `
+                -Root $TrustedPath -Candidate $SentinelDirectory) -or
+        (& $script:scriptBlockTestCandidateHelperPathContained `
+            -Root $CheckoutPath -Candidate $SentinelDirectory)) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'containment-invalid' -Phase 'containment' -Subreason 'relationship'
+    }
 
     # Every check before this one reasons about names. Names are exactly what
     # aliasing breaks: a substituted drive letter, a directory junction, a
