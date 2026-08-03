@@ -4029,6 +4029,22 @@ $script:scriptBlockInvokeExpansionFixture = {
             if ($LASTEXITCODE -ne 0 -or $arrFifoOutput.Count -ne 0) {
                 & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'fifo-create'
             }
+            # A blocking defect cannot report itself. If the gate this row covers
+            # is removed, production opens the pipe and waits for a writer that
+            # never arrives, so the whole suite stops -- the run dies of a job
+            # timeout naming nothing, instead of this row failing and naming the
+            # cause. A detached writer opens the pipe after a delay far longer
+            # than a correct refusal needs. With the gate present production has
+            # already refused and this process is inert; without it the open
+            # returns, production continues on an empty archive, and the row
+            # fails on its own diagnostic like every other row.
+            $strFifoWriterPath = [string](& $script:scriptBlockResolveHarnessNativePath `
+                -CandidatePath ([string[]]@('/bin/sh', '/usr/bin/sh')))
+            if ($strFifoWriterPath.Length -eq 0) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'fifo-writer'
+            }
+            $null = Start-Process -FilePath $strFifoWriterPath `
+                -ArgumentList '-c', ('sleep 20; : > ' + [char]39 + $strArchivePath + [char]39)
         }
         if ($strSemantic -ceq 'download.entries.two-files') {
             [System.IO.File]::WriteAllBytes(
