@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.10
+Version: 1.0.20260803.11
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.10'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.11'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.10'
@@ -186,6 +186,40 @@ $script:scriptBlockStopHarness = {
     )
 
     throw (& $script:scriptBlockNewHarnessException -Code $Code -Detail $Detail)
+}
+
+# ZipFile lives in System.IO.Compression.FileSystem, which .NET Framework does
+# not load by default, so Windows PowerShell 5.1 cannot resolve
+# [System.IO.Compression.ZipFile] until that assembly is added. Loading both
+# compression assemblies here, at script scope, rather than inside whichever
+# helper happens to build a fixture first, is what keeps the ordering honest:
+# an assertion that runs before any fixture is written still needs the types,
+# and a load buried in one helper silently makes every earlier caller depend on
+# that helper having run. .NET Core carries both types in assemblies that are
+# always present, where Add-Type is either a no-op or fails harmlessly -- so
+# each load is tolerated and the resolvable-type check below, not the loader,
+# is what decides whether this runtime can proceed.
+foreach ($strCandidateCompressionAssembly in @(
+    'System.IO.Compression',
+    'System.IO.Compression.FileSystem'
+)) {
+    try {
+        Add-Type -AssemblyName $strCandidateCompressionAssembly -ErrorAction Stop
+    } catch {
+        # Tolerated only if the check below still finds both types.
+        $null = $_
+    }
+}
+foreach ($strCandidateCompressionType in @(
+    'System.IO.Compression.ZipFile',
+    'System.IO.Compression.ZipArchive',
+    'System.IO.Compression.ZipArchiveMode'
+)) {
+    if ($null -eq ($strCandidateCompressionType -as [type])) {
+        & $script:scriptBlockStopHarness `
+            -Code 'orchestration-failed' `
+            -Detail 'compression-type-unavailable'
+    }
 }
 
 $script:scriptBlockAssertRawString = {
@@ -5376,7 +5410,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.10
+    # Version: 1.0.20260803.11
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
