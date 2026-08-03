@@ -1111,7 +1111,13 @@ $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
     # so no rewrite of the guard's shape can satisfy this without the archive
     # actually being refused before extraction.
     $scriptBlockRunProbeExpansion = {
-        param ([byte[]]$ArchiveByte)
+        param (
+            [byte[]]$ArchiveByte,
+            [string]$ScriptPath
+        )
+        if ([string]::IsNullOrEmpty($ScriptPath)) {
+            $ScriptPath = $LiteralPath
+        }
         # Each call builds its own context, as the resource-guard probe does, so
         # one fixture's outcome cannot decide the next one's. The contexts are
         # left in place: they live under the harness run root, which is removed
@@ -1131,7 +1137,7 @@ $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
             $objProbeSha256.Dispose()
         }
         try {
-            [void](& $LiteralPath `
+            [void](& $ScriptPath `
                     -Context $objProbeContext `
                     -CheckoutRoot $strProbeCheckout `
                     -TrustedTemporaryRoot $strProbeTrusted `
@@ -1154,6 +1160,107 @@ $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
     # Refusing everything would satisfy the rows above, so a conforming archive
     # is required to still expand.
     if ([string](& $scriptBlockRunProbeExpansion -ArchiveByte $arrHonestByte) -cne 'accepted') {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
+    }
+
+    # The rows above are necessary and nowhere near sufficient. The manifest's
+    # own four-entry check rejects both fixtures as well, just after the reader
+    # has already built the directory the pre-check exists to bound -- so an
+    # expansion that fails proves only that something failed, and a regression
+    # in the trailer scan would keep every row above green. Two further
+    # assertions pin the part that matters.
+    #
+    # First: the pre-check itself, called on the same bytes, has to refuse them,
+    # and has to accept a conforming archive. That is the property, stated
+    # directly, with nothing downstream able to stand in for it.
+    $scriptBlockTestPreCheckRefuses = {
+        param ([byte[]]$ArchiveByte)
+        $objProbeStream = New-Object System.IO.MemoryStream(, $ArchiveByte)
+        try {
+            [void](& $script:scriptBlockAssertCandidateHelperArchiveEntryCount `
+                    -Stream $objProbeStream)
+            return $false
+        } catch {
+            return $true
+        } finally {
+            $objProbeStream.Dispose()
+        }
+    }
+    foreach ($arrHostileByte in @($arrDecoyFile, $arrZip64File)) {
+        if (-not (& $scriptBlockTestPreCheckRefuses -ArchiveByte $arrHostileByte)) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
+        }
+    }
+    if (& $scriptBlockTestPreCheckRefuses -ArchiveByte $arrHonestByte) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
+    }
+
+    # Second: a pre-check nothing calls refuses nothing, and no observation of
+    # its return value can tell. So the guard's body is replaced by a throw in a
+    # copy of the helper and a conforming expansion is driven through both
+    # copies. The verbatim copy must succeed and the poisoned copy must fail; if
+    # production stops reaching the guard, poisoning it changes nothing and both
+    # succeed, which is the failure this asserts.
+    $strGuardName = 'scriptBlockAssertCandidateHelperArchiveEntryCount'
+    $objGuardTokens = $null
+    $objGuardParseErrors = $null
+    $objGuardAst = [System.Management.Automation.Language.Parser]::ParseFile(
+        $LiteralPath,
+        [ref]$objGuardTokens,
+        [ref]$objGuardParseErrors
+    )
+    if ($null -eq $objGuardAst -or @($objGuardParseErrors).Count -ne 0) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
+    }
+    $arrGuardAssignment = @($objGuardAst.FindAll(
+            {
+                param ($objNode)
+                $objNode -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                $objNode.Left.Extent.Text -ceq ('$script:' + $strGuardName) -and
+                $objNode.Right -is
+                    [System.Management.Automation.Language.CommandExpressionAst] -and
+                $objNode.Right.Expression -is
+                    [System.Management.Automation.Language.ScriptBlockExpressionAst]
+            },
+            $true
+        ))
+    if ($arrGuardAssignment.Count -ne 1) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
+    }
+    $objGuardExtent = $arrGuardAssignment[0].Right.Expression.Extent
+    $strGuardSource = [System.IO.File]::ReadAllText($LiteralPath)
+    # A throw carrying no diagnostic code of its own: the helper maps it through
+    # its own taxonomy, so this asserts only that the expansion failed and never
+    # which text came back.
+    $strGuardStub = "{`n" +
+        "    param (`n" +
+        "        [Parameter(ValueFromRemainingArguments = `$true)]`n" +
+        "        [AllowNull()]`n" +
+        "        [AllowEmptyCollection()]`n" +
+        "        [object[]]`$Ignored`n" +
+        "    )`n`n" +
+        "    throw (New-Object System.InvalidOperationException('trailer-guard-probe'))`n" +
+        "}`n"
+    $objGuardEncoding = New-Object System.Text.UTF8Encoding($false)
+    $strVerbatimPath = [System.IO.Path]::Combine($strProbeRoot, 'helper-verbatim.ps1')
+    [System.IO.File]::WriteAllText($strVerbatimPath, $strGuardSource, $objGuardEncoding)
+    $strPoisonedPath = [System.IO.Path]::Combine($strProbeRoot, 'helper-poisoned.ps1')
+    [System.IO.File]::WriteAllText(
+        $strPoisonedPath,
+        $strGuardSource.Substring(0, $objGuardExtent.StartOffset) + $strGuardStub +
+        $strGuardSource.Substring($objGuardExtent.EndOffset),
+        $objGuardEncoding
+    )
+    $strVerbatimOutcome = [string](& $scriptBlockRunProbeExpansion `
+            -ArchiveByte $arrHonestByte -ScriptPath $strVerbatimPath)
+    $strPoisonedOutcome = [string](& $scriptBlockRunProbeExpansion `
+            -ArchiveByte $arrHonestByte -ScriptPath $strPoisonedPath)
+    if ($strVerbatimOutcome -cne 'accepted' -or $strPoisonedOutcome -ceq 'accepted') {
         & $script:scriptBlockStopHarness `
             -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
     }
