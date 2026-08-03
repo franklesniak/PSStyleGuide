@@ -4029,22 +4029,47 @@ $script:scriptBlockInvokeExpansionFixture = {
             if ($LASTEXITCODE -ne 0 -or $arrFifoOutput.Count -ne 0) {
                 & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'fifo-create'
             }
-            # A blocking defect cannot report itself. If the gate this row covers
-            # is removed, production opens the pipe and waits for a writer that
-            # never arrives, so the whole suite stops -- the run dies of a job
-            # timeout naming nothing, instead of this row failing and naming the
-            # cause. A detached writer opens the pipe after a delay far longer
-            # than a correct refusal needs. With the gate present production has
-            # already refused and this process is inert; without it the open
-            # returns, production continues on an empty archive, and the row
-            # fails on its own diagnostic like every other row.
+            # A blocking defect cannot report itself. If the gate this row
+            # covers is removed, production opens the pipe and waits for a
+            # writer that never arrives, so the whole suite stops: the run dies
+            # of a job timeout naming nothing, instead of this row failing and
+            # naming the cause. A detached writer therefore blocks on the write
+            # end for the life of the case. With the gate present production
+            # never opens the pipe at all, so that writer stays blocked and is
+            # reaped by its own timeout; without the gate the two opens meet,
+            # the writer closes an empty stream, production continues on an
+            # empty archive, and this row fails on its own diagnostic like
+            # every other row. conv=nocreat keeps the writer from putting an
+            # ordinary file where the pipe was if cleanup unlinks it first.
+            $strFifoTimeoutPath = [string](& $script:scriptBlockResolveHarnessNativePath `
+                -CandidatePath ([string[]]@('/usr/bin/timeout', '/bin/timeout')))
             $strFifoWriterPath = [string](& $script:scriptBlockResolveHarnessNativePath `
-                -CandidatePath ([string[]]@('/bin/sh', '/usr/bin/sh')))
-            if ($strFifoWriterPath.Length -eq 0) {
+                -CandidatePath ([string[]]@('/usr/bin/dd', '/bin/dd')))
+            if ($strFifoTimeoutPath.Length -eq 0 -or $strFifoWriterPath.Length -eq 0) {
                 & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'fifo-writer'
             }
-            $null = Start-Process -FilePath $strFifoWriterPath `
-                -ArgumentList '-c', ('sleep 20; : > ' + [char]39 + $strArchivePath + [char]39)
+            $objFifoWriterStart = New-Object System.Diagnostics.ProcessStartInfo
+            $objFifoWriterStart.FileName = $strFifoTimeoutPath
+            $objFifoWriterStart.UseShellExecute = $false
+            $objFifoWriterStart.CreateNoWindow = $true
+            $arrFifoWriterArgument = [string[]]@(
+                '20',
+                $strFifoWriterPath,
+                'if=/dev/null',
+                ('of=' + $strArchivePath),
+                'conv=nocreat'
+            )
+            if ($null -ne $objFifoWriterStart.PSObject.Properties['ArgumentList']) {
+                foreach ($strFifoWriterArgument in $arrFifoWriterArgument) {
+                    [void]$objFifoWriterStart.ArgumentList.Add([string]$strFifoWriterArgument)
+                }
+            } else {
+                $objFifoWriterStart.Arguments = (
+                    & $script:scriptBlockConvertToNativeArgumentString `
+                        -ArgumentList $arrFifoWriterArgument
+                )
+            }
+            $null = [System.Diagnostics.Process]::Start($objFifoWriterStart)
         }
         if ($strSemantic -ceq 'download.entries.two-files') {
             [System.IO.File]::WriteAllBytes(
