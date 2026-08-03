@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.2
+Version: 1.0.20260803.3
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,10 +53,10 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.2'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.3'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.2'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.3'
 $script:strCandidateExpectedContextVersion = '1.0.20260803.1'
 $script:strCandidateCatalogVersion = '1.0.20260802.4'
 $script:strCandidateAllocationSha256 = 'ce7b29de7bb4812f1de9defb1672c1b7eac47d6f6b584db571a9bc0d86726e02'
@@ -877,6 +877,117 @@ $script:scriptBlockAssertResourceGuardsReached = {
                 [int]$hashtableRequiredSite[$strRequiredSite]) {
             & $script:scriptBlockStopHarness `
                 -Code 'catalog-invalid' -Detail 'production-resource-guard-reached'
+        }
+    }
+}
+
+$script:scriptBlockAssertDirectoryReadsBounded = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ContextLiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RunRoot
+    )
+
+    # Reading a whole directory to decide whether it holds exactly one entry
+    # costs memory proportional to what is there, and at the download check no
+    # archive ceiling is in force yet because no archive has been opened. The
+    # fix bounds the read; the difficulty is that bounding it changes no
+    # observable output, so the catalog cannot see it either way and a silent
+    # removal would leave every case green.
+    #
+    # Two assertions, because neither alone is enough. The first is
+    # behavioural: the helpers really do stop early, and really do return
+    # everything when unbounded -- otherwise a bound of two would be
+    # indistinguishable from an enumeration that is simply broken. The second
+    # is structural, and admitted as such: it pins the bound at the call sites
+    # whose cardinality is fixed. Structure is a weak form of evidence and this
+    # file says so elsewhere, but a resource property with no output to observe
+    # leaves nothing else to check at the call site.
+    $strProbeRoot = [System.IO.Path]::Combine($RunRoot, 'bounded-directory-read')
+    [void][System.IO.Directory]::CreateDirectory($strProbeRoot)
+    $strCrowded = [System.IO.Path]::Combine($strProbeRoot, 'crowded')
+    [void][System.IO.Directory]::CreateDirectory($strCrowded)
+    $intSeeded = 512
+    for ($intEntry = 0; $intEntry -lt $intSeeded; $intEntry++) {
+        [System.IO.File]::WriteAllBytes(
+            [System.IO.Path]::Combine($strCrowded, ('e{0}.bin' -f $intEntry)),
+            [byte[]]@()
+        )
+    }
+
+    $arrBounded = [string[]]@(& $script:scriptBlockGetCandidateHelperEntry `
+            -LiteralPath $strCrowded -Phase 'download' -MaximumEntry 2)
+    $arrUnbounded = [string[]]@(& $script:scriptBlockGetCandidateHelperEntry `
+            -LiteralPath $strCrowded -Phase 'download')
+    if ($arrBounded.Count -ne 2 -or $arrUnbounded.Count -ne $intSeeded) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'bounded-directory-read'
+    }
+    $arrContextBounded = [string[]]@(& $scriptBlockGetCandidateImmediateEntry `
+            -LiteralPath $strCrowded -FailureCode 'root-invalid' `
+            -FailurePhase 'root' -MaximumEntry 1)
+    $arrContextUnbounded = [string[]]@(& $scriptBlockGetCandidateImmediateEntry `
+            -LiteralPath $strCrowded -FailureCode 'root-invalid' -FailurePhase 'root')
+    if ($arrContextBounded.Count -ne 1 -or $arrContextUnbounded.Count -ne $intSeeded) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'bounded-directory-read'
+    }
+
+    # A directory holding fewer paths than the bound must still come back whole,
+    # because the presence checks downstream treat a short result as complete.
+    $strSparse = [System.IO.Path]::Combine($strProbeRoot, 'sparse')
+    [void][System.IO.Directory]::CreateDirectory($strSparse)
+    [System.IO.File]::WriteAllBytes(
+        [System.IO.Path]::Combine($strSparse, 'only.bin'), [byte[]]@())
+    if ([string[]]@(& $script:scriptBlockGetCandidateHelperEntry `
+                -LiteralPath $strSparse -Phase 'download' -MaximumEntry 2).Count -ne 1) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'bounded-directory-read'
+    }
+
+    $hashtableBoundedSite = [ordered]@{
+        $LiteralPath = [int]3
+        $ContextLiteralPath = [int]3
+    }
+    foreach ($strScriptPath in $hashtableBoundedSite.Keys) {
+        $objSiteTokens = $null
+        $objSiteParseErrors = $null
+        $objSiteAst = [System.Management.Automation.Language.Parser]::ParseFile(
+            $strScriptPath,
+            [ref]$objSiteTokens,
+            [ref]$objSiteParseErrors
+        )
+        if ($null -eq $objSiteAst -or @($objSiteParseErrors).Count -ne 0) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' -Detail 'bounded-directory-read'
+        }
+        $intBoundedCall = @($objSiteAst.FindAll(
+                {
+                    param ($objNode)
+                    if ($objNode -isnot
+                        [System.Management.Automation.Language.CommandAst]) {
+                        return $false
+                    }
+                    $boolNamed = $false
+                    foreach ($objElement in $objNode.CommandElements) {
+                        if ($objElement -is
+                            [System.Management.Automation.Language.CommandParameterAst] -and
+                            $objElement.ParameterName -ceq 'MaximumEntry') {
+                            $boolNamed = $true
+                        }
+                    }
+                    return $boolNamed
+                },
+                $true
+            )).Count
+        if ($intBoundedCall -ne [int]$hashtableBoundedSite[$strScriptPath]) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' -Detail 'bounded-directory-read'
         }
     }
 }
@@ -5029,7 +5140,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.2
+    # Version: 1.0.20260803.3
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -5208,6 +5319,10 @@ function Invoke-StyleGuideCandidateHarness {
             -RunRoot $strRunRoot
         & $script:scriptBlockAssertArchiveTrailerAgreementEnforced `
             -LiteralPath $strHelperLiteralPath `
+            -RunRoot $strRunRoot
+        & $script:scriptBlockAssertDirectoryReadsBounded `
+            -LiteralPath $strHelperLiteralPath `
+            -ContextLiteralPath $strContextLiteralPath `
             -RunRoot $strRunRoot
         & $script:scriptBlockAssertUnauthorizedSkipsRejected `
             -Catalog $objCatalog `
