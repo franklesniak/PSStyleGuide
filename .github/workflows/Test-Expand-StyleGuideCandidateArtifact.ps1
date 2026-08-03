@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.12
+Version: 1.0.20260803.13
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.12'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.13'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.10'
@@ -1299,6 +1299,27 @@ $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
             $objStream.Dispose()
         }
     }
+    # Whether a fixture is a live bypass is a property of the reader, not of this
+    # file, and the two do not agree across runtimes. Measured: .NET Framework
+    # 4.8 and .NET 8 both materialize 2000 entries from each fixture, while
+    # .NET 10 hardened the trailer scan and throws
+    # "End of Central Directory record could not be found" on the decoy -- yet
+    # still materializes 2000 from the Zip64 fixture. Production refuses all
+    # four combinations, because the pre-check reads bytes rather than asking
+    # the reader.
+    #
+    # So the regime is classified instead of assumed. A reader that materializes
+    # more than the manifest allows means the bypass is live here and the
+    # pre-check has to bound it. A reader that refuses the bytes outright has
+    # reached the same verdict by itself, and the pre-check refusing them too is
+    # agreement, not evidence of a bypass. What is never acceptable is a fixture
+    # that degenerates into an ordinary readable archive: that is the shape a
+    # fixture takes when it silently stops testing anything, which is exactly how
+    # an earlier version of this file asserted a property it did not hold.
+    #
+    # Demanding a live bypass on every runtime was the alternative and was
+    # rejected: it would turn a future framework hardening -- a security
+    # improvement -- into a red suite, which is the wrong thing to reward.
     foreach ($strHostileVariant in @('decoy', 'zip64')) {
         $arrHostileByte = if ($strHostileVariant -ceq 'decoy') {
             $arrDecoyFile
@@ -1307,9 +1328,9 @@ $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
         }
         # -1 means the reader threw rather than materializing anything.
         $intReaderSeen = [int](& $scriptBlockCountReaderEntry -ArchiveByte $arrHostileByte)
-        if ($intReaderSeen -le $intFixtureEntryCount) {
+        if ($intReaderSeen -ge 0 -and $intReaderSeen -le $intFixtureEntryCount) {
             & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-                -Detail ('reader-not-bypassed-' + $strHostileVariant + '-' + $intReaderSeen)
+                -Detail ('reader-fixture-degenerate-' + $strHostileVariant + '-' + $intReaderSeen)
         }
     }
     $intHonestSeen = [int](& $scriptBlockCountReaderEntry -ArchiveByte $arrHonestByte)
@@ -5427,7 +5448,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.12
+    # Version: 1.0.20260803.13
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
