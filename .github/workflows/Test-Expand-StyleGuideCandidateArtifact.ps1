@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260802.44
+Version: 1.0.20260803.1
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,10 +53,10 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260802.44'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.1'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260802.26'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.1'
 $script:strCandidateExpectedContextVersion = '1.0.20260802.12'
 $script:strCandidateCatalogVersion = '1.0.20260802.4'
 $script:strCandidateAllocationSha256 = 'ce7b29de7bb4812f1de9defb1672c1b7eac47d6f6b584db571a9bc0d86726e02'
@@ -878,6 +878,284 @@ $script:scriptBlockAssertResourceGuardsReached = {
             & $script:scriptBlockStopHarness `
                 -Code 'catalog-invalid' -Detail 'production-resource-guard-reached'
         }
+    }
+}
+
+$script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RunRoot
+    )
+
+    # The entry-count pre-check exists to bound what ZipArchive materializes, and
+    # it can only do that if it inspects the same trailer ZipArchive will. Two
+    # ways of breaking that agreement have already shipped in this file, so the
+    # property is asserted here rather than trusted.
+    #
+    # System.IO.Compression locates the trailer by seeking to 18 bytes before the
+    # end and taking the LAST occurrence of the signature at or before length-22,
+    # searching at most 65539 further bytes. It then commits: no validation, no
+    # second candidate. A pre-check that skips a candidate the reader would have
+    # taken is therefore describing a different archive than the one about to be
+    # parsed, and a pre-check that ignores the disk fields misses the Zip64
+    # locator gate, which lets the reader replace the entry count and directory
+    # offset outright with values from elsewhere in the file.
+    #
+    # Each fixture below is proven hostile before it is used as evidence: the
+    # harness confirms that ZipArchive really does materialize more than the
+    # manifest's four entries from those bytes. A fixture that stopped being a
+    # bypass would otherwise keep passing while proving nothing, which is how an
+    # earlier version of this file asserted a property it did not hold.
+    $intFixtureEntryCount = @($script:arrCandidateExpectedName).Count
+    $intFatEntryCount = 2000
+
+    $scriptBlockReadUInt = {
+        param ([byte[]]$Buffer, [int]$Index, [int]$Width)
+        $lngValue = [int64]0
+        for ($intByte = 0; $intByte -lt $Width; $intByte++) {
+            $lngValue = $lngValue -bor ([int64]$Buffer[$Index + $intByte] -shl (8 * $intByte))
+        }
+        return $lngValue
+    }
+    $scriptBlockWriteUInt = {
+        param ([byte[]]$Buffer, [int]$Index, [int64]$Value, [int]$Width)
+        for ($intByte = 0; $intByte -lt $Width; $intByte++) {
+            $Buffer[$Index + $intByte] = [byte](($Value -shr (8 * $intByte)) -band 0xFF)
+        }
+    }
+    $scriptBlockBuildArchiveByte = {
+        param ([string[]]$EntryName)
+        $objMemory = New-Object System.IO.MemoryStream
+        $objBuilder = New-Object System.IO.Compression.ZipArchive(
+            $objMemory,
+            [System.IO.Compression.ZipArchiveMode]::Create,
+            $true
+        )
+        try {
+            foreach ($strEntryName in $EntryName) {
+                $objEntryStream = $objBuilder.CreateEntry(
+                    $strEntryName,
+                    [System.IO.Compression.CompressionLevel]::NoCompression
+                ).Open()
+                $objEntryStream.Dispose()
+            }
+        } finally {
+            $objBuilder.Dispose()
+        }
+        $arrByte = $objMemory.ToArray()
+        $objMemory.Dispose()
+        return , $arrByte
+    }
+
+    $arrFatByte = & $scriptBlockBuildArchiveByte -EntryName ([string[]]@(
+            1..$intFatEntryCount | ForEach-Object { 'fat{0}.txt' -f $_ }))
+    $arrHonestByte = & $scriptBlockBuildArchiveByte `
+        -EntryName ([string[]]@($script:arrCandidateExpectedName))
+    # Neither builder writes an archive comment, so each trailer is the final 22
+    # bytes and its fields can be read without searching for it.
+    $intFatTrailer = $arrFatByte.Length - 22
+    $intHonestTrailer = $arrHonestByte.Length - 22
+    $intFatCount = [int](& $scriptBlockReadUInt -Buffer $arrFatByte `
+            -Index ($intFatTrailer + 10) -Width 2)
+    $lngFatSize = & $scriptBlockReadUInt -Buffer $arrFatByte `
+        -Index ($intFatTrailer + 12) -Width 4
+    $lngFatOffset = & $scriptBlockReadUInt -Buffer $arrFatByte `
+        -Index ($intFatTrailer + 16) -Width 4
+    $lngHonestSize = & $scriptBlockReadUInt -Buffer $arrHonestByte `
+        -Index ($intHonestTrailer + 12) -Width 4
+    $lngHonestOffset = & $scriptBlockReadUInt -Buffer $arrHonestByte `
+        -Index ($intHonestTrailer + 16) -Width 4
+    if ($intFatCount -ne $intFatEntryCount -or $intHonestTrailer -lt 1) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
+    }
+
+    # Fixture one: the honest four-entry directory sits after the fat one and is
+    # described by a trailer that declares a 22-byte comment. Those 22 bytes are
+    # a second trailer, at the highest offset a signature can occupy, declaring
+    # a comment length no bytes satisfy. A scan that skips it on that ground
+    # validates the honest directory; the reader takes it and builds the fat one.
+    $objDecoyMemory = New-Object System.IO.MemoryStream
+    $objDecoyMemory.Write($arrFatByte, 0, $intFatTrailer)
+    $objDecoyMemory.Write($arrHonestByte, 0, $intHonestTrailer)
+    $arrRealTrailer = New-Object byte[] 22
+    [void](& $scriptBlockWriteUInt -Buffer $arrRealTrailer -Index 0 -Value 0x06054B50 -Width 4)
+    [void](& $scriptBlockWriteUInt -Buffer $arrRealTrailer -Index 8 `
+            -Value $intFixtureEntryCount -Width 2)
+    [void](& $scriptBlockWriteUInt -Buffer $arrRealTrailer -Index 10 `
+            -Value $intFixtureEntryCount -Width 2)
+    [void](& $scriptBlockWriteUInt -Buffer $arrRealTrailer -Index 12 -Value $lngHonestSize -Width 4)
+    [void](& $scriptBlockWriteUInt -Buffer $arrRealTrailer -Index 16 `
+            -Value ($intFatTrailer + $lngHonestOffset) -Width 4)
+    [void](& $scriptBlockWriteUInt -Buffer $arrRealTrailer -Index 20 -Value 22 -Width 2)
+    $objDecoyMemory.Write($arrRealTrailer, 0, 22)
+    $arrDecoyTrailer = New-Object byte[] 22
+    [void](& $scriptBlockWriteUInt -Buffer $arrDecoyTrailer -Index 0 -Value 0x06054B50 -Width 4)
+    [void](& $scriptBlockWriteUInt -Buffer $arrDecoyTrailer -Index 8 -Value $intFatCount -Width 2)
+    [void](& $scriptBlockWriteUInt -Buffer $arrDecoyTrailer -Index 10 -Value $intFatCount -Width 2)
+    [void](& $scriptBlockWriteUInt -Buffer $arrDecoyTrailer -Index 12 -Value $lngFatSize -Width 4)
+    [void](& $scriptBlockWriteUInt -Buffer $arrDecoyTrailer -Index 16 -Value $lngFatOffset -Width 4)
+    [void](& $scriptBlockWriteUInt -Buffer $arrDecoyTrailer -Index 20 -Value 5 -Width 2)
+    $objDecoyMemory.Write($arrDecoyTrailer, 0, 22)
+    $arrDecoyFile = $objDecoyMemory.ToArray()
+    $objDecoyMemory.Dispose()
+
+    # Fixture two: one trailer, honest counts, and both disk fields at 0xFFFF.
+    # That is the reader's whole condition for consulting a Zip64 locator, and
+    # the locator lives in the last 20 bytes of the fourth central directory
+    # record's comment -- inside the span the record walk accounts for, so the
+    # walk still lands exactly on the trailer.
+    $intZip64Pad = 76
+    $intLastRecord = [int]$lngHonestOffset
+    $intPosition = [int]$lngHonestOffset
+    for ($intRecord = 0; $intRecord -lt $intFixtureEntryCount; $intRecord++) {
+        $intLastRecord = $intPosition
+        $intPosition = $intPosition + 46 +
+            [int](& $scriptBlockReadUInt -Buffer $arrHonestByte `
+                    -Index ($intPosition + 28) -Width 2) +
+            [int](& $scriptBlockReadUInt -Buffer $arrHonestByte `
+                    -Index ($intPosition + 30) -Width 2) +
+            [int](& $scriptBlockReadUInt -Buffer $arrHonestByte `
+                    -Index ($intPosition + 32) -Width 2)
+    }
+    if ($intPosition -ne $intHonestTrailer) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
+    }
+    $arrHonestWork = $arrHonestByte.Clone()
+    [void](& $scriptBlockWriteUInt -Buffer $arrHonestWork -Index ($intLastRecord + 32) `
+            -Value $intZip64Pad -Width 2)
+    $objZipMemory = New-Object System.IO.MemoryStream
+    $objZipMemory.Write($arrFatByte, 0, $intFatTrailer)
+    $objZipMemory.Write($arrHonestWork, 0, $intHonestTrailer)
+    $lngZip64Record = $objZipMemory.Length
+    $arrZip64Record = New-Object byte[] 56
+    [void](& $scriptBlockWriteUInt -Buffer $arrZip64Record -Index 0 -Value 0x06064B50 -Width 4)
+    [void](& $scriptBlockWriteUInt -Buffer $arrZip64Record -Index 4 -Value 44 -Width 8)
+    [void](& $scriptBlockWriteUInt -Buffer $arrZip64Record -Index 12 -Value 45 -Width 2)
+    [void](& $scriptBlockWriteUInt -Buffer $arrZip64Record -Index 14 -Value 45 -Width 2)
+    [void](& $scriptBlockWriteUInt -Buffer $arrZip64Record -Index 24 -Value $intFatCount -Width 8)
+    [void](& $scriptBlockWriteUInt -Buffer $arrZip64Record -Index 32 -Value $intFatCount -Width 8)
+    [void](& $scriptBlockWriteUInt -Buffer $arrZip64Record -Index 40 -Value $lngFatSize -Width 8)
+    [void](& $scriptBlockWriteUInt -Buffer $arrZip64Record -Index 48 -Value $lngFatOffset -Width 8)
+    $objZipMemory.Write($arrZip64Record, 0, 56)
+    $arrZip64Locator = New-Object byte[] 20
+    [void](& $scriptBlockWriteUInt -Buffer $arrZip64Locator -Index 0 -Value 0x07064B50 -Width 4)
+    [void](& $scriptBlockWriteUInt -Buffer $arrZip64Locator -Index 8 -Value $lngZip64Record -Width 8)
+    [void](& $scriptBlockWriteUInt -Buffer $arrZip64Locator -Index 16 -Value 1 -Width 4)
+    $objZipMemory.Write($arrZip64Locator, 0, 20)
+    $arrZip64Trailer = New-Object byte[] 22
+    [void](& $scriptBlockWriteUInt -Buffer $arrZip64Trailer -Index 0 -Value 0x06054B50 -Width 4)
+    [void](& $scriptBlockWriteUInt -Buffer $arrZip64Trailer -Index 4 -Value 0xFFFF -Width 2)
+    [void](& $scriptBlockWriteUInt -Buffer $arrZip64Trailer -Index 6 -Value 0xFFFF -Width 2)
+    [void](& $scriptBlockWriteUInt -Buffer $arrZip64Trailer -Index 8 `
+            -Value $intFixtureEntryCount -Width 2)
+    [void](& $scriptBlockWriteUInt -Buffer $arrZip64Trailer -Index 10 `
+            -Value $intFixtureEntryCount -Width 2)
+    [void](& $scriptBlockWriteUInt -Buffer $arrZip64Trailer -Index 12 `
+            -Value ($lngHonestSize + $intZip64Pad) -Width 4)
+    [void](& $scriptBlockWriteUInt -Buffer $arrZip64Trailer -Index 16 `
+            -Value ($intFatTrailer + $lngHonestOffset) -Width 4)
+    $objZipMemory.Write($arrZip64Trailer, 0, 22)
+    $arrZip64File = $objZipMemory.ToArray()
+    $objZipMemory.Dispose()
+
+    # Each hostile fixture must actually be hostile: the reader has to build more
+    # than the manifest's entries from it, or refusing it proves nothing.
+    $scriptBlockCountReaderEntry = {
+        param ([byte[]]$ArchiveByte)
+        $objStream = New-Object System.IO.MemoryStream(, $ArchiveByte)
+        try {
+            $objReader = New-Object System.IO.Compression.ZipArchive(
+                $objStream,
+                [System.IO.Compression.ZipArchiveMode]::Read,
+                $true
+            )
+            try {
+                $intSeen = 0
+                foreach ($objReaderEntry in $objReader.Entries) { $intSeen++ }
+                return $intSeen
+            } finally {
+                $objReader.Dispose()
+            }
+        } catch {
+            return -1
+        } finally {
+            $objStream.Dispose()
+        }
+    }
+    foreach ($arrHostileByte in @($arrDecoyFile, $arrZip64File)) {
+        if ([int](& $scriptBlockCountReaderEntry -ArchiveByte $arrHostileByte) -le
+            $intFixtureEntryCount) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
+        }
+    }
+    if ([int](& $scriptBlockCountReaderEntry -ArchiveByte $arrHonestByte) -ne
+        $intFixtureEntryCount) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
+    }
+
+    $strProbeRoot = [System.IO.Path]::Combine($RunRoot, 'archive-trailer-agreement')
+    [void][System.IO.Directory]::CreateDirectory($strProbeRoot)
+    $strProbeCheckout = [System.IO.Path]::Combine($strProbeRoot, 'checkout')
+    [void][System.IO.Directory]::CreateDirectory($strProbeCheckout)
+    $strProbeTrusted = [System.IO.Path]::Combine($strProbeRoot, 'trusted')
+    [void][System.IO.Directory]::CreateDirectory($strProbeTrusted)
+
+    # Driven through the production entry point rather than the internal guard,
+    # so no rewrite of the guard's shape can satisfy this without the archive
+    # actually being refused before extraction.
+    $scriptBlockRunProbeExpansion = {
+        param ([byte[]]$ArchiveByte)
+        # Each call builds its own context, as the resource-guard probe does, so
+        # one fixture's outcome cannot decide the next one's. The contexts are
+        # left in place: they live under the harness run root, which is removed
+        # when the run ends, and cleaning up a succeeded expansion here would
+        # mean asserting on cleanup's result instead of the archive's.
+        $objProbeContext = New-StyleGuideCandidateInvocationContext `
+            -TrustedTemporaryRoot $strProbeTrusted
+        $strProbeArchive = [System.IO.Path]::Combine(
+            $objProbeContext.DownloadDirectoryPath, 'artifact.zip')
+        [System.IO.File]::WriteAllBytes($strProbeArchive, $ArchiveByte)
+        $objProbeSha256 = [System.Security.Cryptography.SHA256]::Create()
+        try {
+            $strProbeDigest = ([System.BitConverter]::ToString(
+                    $objProbeSha256.ComputeHash($ArchiveByte)) -replace '-', ''
+            ).ToLowerInvariant()
+        } finally {
+            $objProbeSha256.Dispose()
+        }
+        try {
+            [void](& $LiteralPath `
+                    -Context $objProbeContext `
+                    -CheckoutRoot $strProbeCheckout `
+                    -TrustedTemporaryRoot $strProbeTrusted `
+                    -DownloadDirectory $objProbeContext.DownloadDirectoryPath `
+                    -CandidateDirectory $objProbeContext.CandidatePath `
+                    -ExpectedDigest $strProbeDigest)
+            return 'accepted'
+        } catch {
+            return [string]$_.Exception.Data['PSStyleGuideDiagnosticCode']
+        }
+    }
+
+    foreach ($arrHostileByte in @($arrDecoyFile, $arrZip64File)) {
+        $strOutcome = [string](& $scriptBlockRunProbeExpansion -ArchiveByte $arrHostileByte)
+        if ($strOutcome -cnotin @('archive-invalid', 'manifest-invalid')) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
+        }
+    }
+    # Refusing everything would satisfy the rows above, so a conforming archive
+    # is required to still expand.
+    if ([string](& $scriptBlockRunProbeExpansion -ArchiveByte $arrHonestByte) -cne 'accepted') {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
     }
 }
 
@@ -4644,7 +4922,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260802.44
+    # Version: 1.0.20260803.1
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -4819,6 +5097,9 @@ function Invoke-StyleGuideCandidateHarness {
             -RunRoot $strRunRoot
         & $script:scriptBlockAssertLifecycleRecordStatesRejected -RunRoot $strRunRoot
         & $script:scriptBlockAssertResourceGuardsReached `
+            -LiteralPath $strHelperLiteralPath `
+            -RunRoot $strRunRoot
+        & $script:scriptBlockAssertArchiveTrailerAgreementEnforced `
             -LiteralPath $strHelperLiteralPath `
             -RunRoot $strRunRoot
         & $script:scriptBlockAssertUnauthorizedSkipsRejected `

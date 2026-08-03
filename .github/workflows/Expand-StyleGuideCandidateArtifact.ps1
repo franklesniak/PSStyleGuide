@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260802.26
+Version: 1.0.20260803.1
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260802.26'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.1'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260802.12'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -871,33 +871,67 @@ $script:scriptBlockAssertCandidateHelperArchiveEntryCount = {
         }
         $intFilled += $intRead
     }
-    # The signature alone does not identify the trailer. An archive comment is
-    # arbitrary bytes and may legally contain this signature, so a backward
-    # scan that stops at the first match can select a decoy inside the comment
-    # and then read its bytes as counts and offsets -- rejecting a conforming
-    # archive. The trailer is the record whose own declared comment length
-    # reaches exactly the end of the file, which the comment's contents cannot
-    # fake without being the trailer.
+    # The signature alone does not identify the trailer, and neither does the
+    # comment length a candidate declares for itself: for any position in the
+    # window a crafted comment can declare the one length that reaches the end
+    # of the file, so filtering on it removes nothing an attacker would choose.
+    # The only property that matters is agreeing with the reader that parses
+    # this same stream a few lines later. System.IO.Compression seeks to 18
+    # bytes before the end and takes the LAST occurrence of the signature at or
+    # before length-22, searching at most 65539 further bytes, then commits to
+    # it with no validation and no second attempt -- the same rule on .NET
+    # Framework 4.8 and on .NET 8. So the trailer is that occurrence, and a
+    # candidate that fails validation is refused rather than scanned past:
+    # continuing would validate a record the reader is never going to read, and
+    # a file whose highest signature is a decoy would pass this check while the
+    # reader builds the directory the decoy points at.
     $intSignatureIndex = -1
     for ($intIndex = $intWindow - 22; $intIndex -ge 0; $intIndex--) {
-        if ($arrTrailer[$intIndex] -ne 0x50 -or $arrTrailer[$intIndex + 1] -ne 0x4B -or
-            $arrTrailer[$intIndex + 2] -ne 0x05 -or $arrTrailer[$intIndex + 3] -ne 0x06) {
-            continue
+        if ($arrTrailer[$intIndex] -eq 0x50 -and $arrTrailer[$intIndex + 1] -eq 0x4B -and
+            $arrTrailer[$intIndex + 2] -eq 0x05 -and $arrTrailer[$intIndex + 3] -eq 0x06) {
+            $intSignatureIndex = $intIndex
+            break
         }
-        $lngCommentLength = [int64]$arrTrailer[$intIndex + 20] -bor
-            ([int64]$arrTrailer[$intIndex + 21] -shl 8)
-        if (($lngLength - $intWindow + $intIndex + 22 + $lngCommentLength) -ne $lngLength) {
-            continue
-        }
-        $intSignatureIndex = $intIndex
-        break
     }
     if ($intSignatureIndex -lt 0) {
         & $script:scriptBlockStopCandidateHelperOperation `
             -Code 'archive-invalid' -Phase 'archive' -Subreason 'zip-open'
     }
+    # A trailer whose declared comment does not reach exactly the end of the
+    # file is malformed. Refusing costs no conforming input: the reader takes
+    # this same record and reads these same fields either way.
+    $lngCommentLength = [int64]$arrTrailer[$intSignatureIndex + 20] -bor
+        ([int64]$arrTrailer[$intSignatureIndex + 21] -shl 8)
+    if (($intSignatureIndex + 22 + $lngCommentLength) -ne $intWindow) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'archive-invalid' -Phase 'archive' -Subreason 'zip-open'
+    }
+    # Either disk field at its 16-bit maximum sends the reader looking for a
+    # Zip64 locator in the twenty bytes immediately before this record, and a
+    # locator found there replaces both the entry count and the directory
+    # offset with 64-bit values read from somewhere else in the file. Twenty
+    # bytes fit inside a central directory record's comment, so the walk below
+    # can land exactly on the trailer while the reader goes on to build a
+    # completely different directory. Single-disk archives declare zero in both
+    # fields, so requiring that shuts the gate before it opens.
+    $intDiskNumber = [int]$arrTrailer[$intSignatureIndex + 4] -bor
+        ([int]$arrTrailer[$intSignatureIndex + 5] -shl 8)
+    $intDirectoryDisk = [int]$arrTrailer[$intSignatureIndex + 6] -bor
+        ([int]$arrTrailer[$intSignatureIndex + 7] -shl 8)
+    if ($intDiskNumber -ne 0 -or $intDirectoryDisk -ne 0) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'manifest-invalid' -Phase 'manifest' -Subreason 'entry-count'
+    }
+    $intDiskEntries = [int]$arrTrailer[$intSignatureIndex + 8] -bor
+        ([int]$arrTrailer[$intSignatureIndex + 9] -shl 8)
     $intTotalEntries = [int]$arrTrailer[$intSignatureIndex + 10] -bor
         ([int]$arrTrailer[$intSignatureIndex + 11] -shl 8)
+    # The reader refuses a record whose two counts disagree, so a check here
+    # keeps this function answering the question the reader will ask.
+    if ($intDiskEntries -ne $intTotalEntries) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'manifest-invalid' -Phase 'manifest' -Subreason 'entry-count'
+    }
     # 0xFFFF means the real count lives in a Zip64 record. The manifest is
     # exactly four entries, so that is refused outright rather than parsed.
     if ($intTotalEntries -gt 4) {
@@ -1479,7 +1513,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260802.26
+    # Version: 1.0.20260803.1
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
