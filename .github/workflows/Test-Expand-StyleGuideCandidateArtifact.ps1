@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.11
+Version: 1.0.20260803.12
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.11'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.12'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.10'
@@ -1138,7 +1138,7 @@ $script:scriptBlockNewTrailerBypassArchiveByte = {
         -Index ($intHonestTrailer + 16) -Width 4
     if ($intFatCount -ne $FatEntryCount -or $intHonestTrailer -lt 1) {
         & $script:scriptBlockStopHarness `
-            -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
+            -Code 'catalog-invalid' -Detail 'trailer-fixture-fields'
     }
 
     # Fixture one: the honest four-entry directory sits after the fat one and is
@@ -1191,7 +1191,7 @@ $script:scriptBlockNewTrailerBypassArchiveByte = {
     }
     if ($intPosition -ne $intHonestTrailer) {
         & $script:scriptBlockStopHarness `
-            -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
+            -Code 'catalog-invalid' -Detail 'trailer-fixture-record-walk'
     }
     $arrHonestWork = $arrHonestByte.Clone()
     [void](& $script:scriptBlockWriteArchiveUInt -Buffer $arrHonestWork -Index ($intLastRecord + 32) `
@@ -1299,17 +1299,23 @@ $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
             $objStream.Dispose()
         }
     }
-    foreach ($arrHostileByte in @($arrDecoyFile, $arrZip64File)) {
-        if ([int](& $scriptBlockCountReaderEntry -ArchiveByte $arrHostileByte) -le
-            $intFixtureEntryCount) {
-            & $script:scriptBlockStopHarness `
-                -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
+    foreach ($strHostileVariant in @('decoy', 'zip64')) {
+        $arrHostileByte = if ($strHostileVariant -ceq 'decoy') {
+            $arrDecoyFile
+        } else {
+            $arrZip64File
+        }
+        # -1 means the reader threw rather than materializing anything.
+        $intReaderSeen = [int](& $scriptBlockCountReaderEntry -ArchiveByte $arrHostileByte)
+        if ($intReaderSeen -le $intFixtureEntryCount) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('reader-not-bypassed-' + $strHostileVariant + '-' + $intReaderSeen)
         }
     }
-    if ([int](& $scriptBlockCountReaderEntry -ArchiveByte $arrHonestByte) -ne
-        $intFixtureEntryCount) {
-        & $script:scriptBlockStopHarness `
-            -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
+    $intHonestSeen = [int](& $scriptBlockCountReaderEntry -ArchiveByte $arrHonestByte)
+    if ($intHonestSeen -ne $intFixtureEntryCount) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+            -Detail ('reader-honest-count-' + $intHonestSeen)
     }
 
     $strProbeRoot = [System.IO.Path]::Combine($RunRoot, 'archive-trailer-agreement')
@@ -1362,18 +1368,24 @@ $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
         }
     }
 
-    foreach ($arrHostileByte in @($arrDecoyFile, $arrZip64File)) {
+    foreach ($strHostileVariant in @('decoy', 'zip64')) {
+        $arrHostileByte = if ($strHostileVariant -ceq 'decoy') {
+            $arrDecoyFile
+        } else {
+            $arrZip64File
+        }
         $strOutcome = [string](& $scriptBlockRunProbeExpansion -ArchiveByte $arrHostileByte)
         if ($strOutcome -cnotin @('archive-invalid', 'manifest-invalid')) {
-            & $script:scriptBlockStopHarness `
-                -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('production-accepted-' + $strHostileVariant + '-' + $strOutcome)
         }
     }
     # Refusing everything would satisfy the rows above, so a conforming archive
     # is required to still expand.
-    if ([string](& $scriptBlockRunProbeExpansion -ArchiveByte $arrHonestByte) -cne 'accepted') {
-        & $script:scriptBlockStopHarness `
-            -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
+    $strHonestOutcome = [string](& $scriptBlockRunProbeExpansion -ArchiveByte $arrHonestByte)
+    if ($strHonestOutcome -cne 'accepted') {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+            -Detail ('production-refused-honest-' + $strHonestOutcome)
     }
 
     # The rows above are necessary and nowhere near sufficient. The manifest's
@@ -1399,15 +1411,20 @@ $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
             $objProbeStream.Dispose()
         }
     }
-    foreach ($arrHostileByte in @($arrDecoyFile, $arrZip64File)) {
+    foreach ($strHostileVariant in @('decoy', 'zip64')) {
+        $arrHostileByte = if ($strHostileVariant -ceq 'decoy') {
+            $arrDecoyFile
+        } else {
+            $arrZip64File
+        }
         if (-not (& $scriptBlockTestPreCheckRefuses -ArchiveByte $arrHostileByte)) {
-            & $script:scriptBlockStopHarness `
-                -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('precheck-accepted-' + $strHostileVariant)
         }
     }
     if (& $scriptBlockTestPreCheckRefuses -ArchiveByte $arrHonestByte) {
         & $script:scriptBlockStopHarness `
-            -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
+            -Code 'catalog-invalid' -Detail 'precheck-refused-honest'
     }
 
     # Second: a pre-check nothing calls refuses nothing, and no observation of
@@ -1426,7 +1443,7 @@ $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
     )
     if ($null -eq $objGuardAst -or @($objGuardParseErrors).Count -ne 0) {
         & $script:scriptBlockStopHarness `
-            -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
+            -Code 'catalog-invalid' -Detail 'trailer-guard-parse'
     }
     $arrGuardAssignment = @($objGuardAst.FindAll(
             {
@@ -1442,7 +1459,7 @@ $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
         ))
     if ($arrGuardAssignment.Count -ne 1) {
         & $script:scriptBlockStopHarness `
-            -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
+            -Code 'catalog-invalid' -Detail 'trailer-guard-assignment'
     }
     $objGuardExtent = $arrGuardAssignment[0].Right.Expression.Extent
     $strGuardSource = [System.IO.File]::ReadAllText($LiteralPath)
@@ -1473,8 +1490,8 @@ $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
     $strPoisonedOutcome = [string](& $scriptBlockRunProbeExpansion `
             -ArchiveByte $arrHonestByte -ScriptPath $strPoisonedPath)
     if ($strVerbatimOutcome -cne 'accepted' -or $strPoisonedOutcome -ceq 'accepted') {
-        & $script:scriptBlockStopHarness `
-            -Code 'catalog-invalid' -Detail 'archive-trailer-agreement'
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+            -Detail ('trailer-guard-poison-' + $strVerbatimOutcome + '-' + $strPoisonedOutcome)
     }
 }
 
@@ -5410,7 +5427,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.11
+    # Version: 1.0.20260803.12
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
