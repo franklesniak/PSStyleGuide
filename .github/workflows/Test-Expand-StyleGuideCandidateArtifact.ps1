@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.16
+Version: 1.0.20260803.17
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.16'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.17'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.11'
@@ -1020,9 +1020,11 @@ $script:scriptBlockAssertDirectoryReadsBounded = {
     # The cost is that a legitimate new bounded read has to be recorded here --
     # the same deliberate step the version markers require, and it has already
     # caught one addition that would otherwise have slipped past unrecorded.
+    # Context gained a fifth bounded site when round 16 found its invocation-root
+    # cleanup read deriving its expected set after the read instead of before it.
     $hashtableBoundedSite = [ordered]@{
         $LiteralPath = [int]4
-        $ContextLiteralPath = [int]4
+        $ContextLiteralPath = [int]5
     }
     foreach ($strScriptPath in $hashtableBoundedSite.Keys) {
         $objSiteTokens = $null
@@ -5601,7 +5603,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.16
+    # Version: 1.0.20260803.17
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
