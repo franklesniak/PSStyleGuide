@@ -2047,6 +2047,11 @@ $script:arrCandidateContextPermittedCommand = [string[]]@(
     'Remove-StyleGuideCandidateInvocationContext',
     # Round 41: this file severs the names its private registers were reachable
     # through, because a dot-sourced script creates them in the CALLER's scope.
+    # Constrained in round 46 to exactly those three names -- see the argument
+    # rule below. Allow-listing the command outright would have let a future
+    # change unbind a script-block or native-path variable before an
+    # already-admitted `& $x`, so the lookup falls through to caller state
+    # while the harness still reports the call as internal.
     'Remove-Variable',
     'Set-Item',
     'Set-StrictMode',
@@ -2195,7 +2200,25 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                             $false
                         )
                         -not ($boolLiteral -or $boolSelfClosure)
-                    }).Count -eq 0
+                    }).Count -eq 0 -and
+                    # ...and at least one of them must be an actual literal.
+                    # A variable whose ONLY assignment is `$x = $x.GetNewClosure()`
+                    # has no source in this file at all: in a dot-sourced script
+                    # the value it closes over comes from the CALLER's scope, so
+                    # admitting it would let `& $x` invoke caller-supplied code
+                    # while the rule reported an internal script block. The
+                    # self-closure form preserves what a variable holds; it
+                    # cannot establish it.
+                    @($_.Group | Where-Object {
+                        $null -ne $_.Right.Find(
+                            {
+                                param ($objInner)
+                                $objInner -is
+                                    [System.Management.Automation.Language.ScriptBlockExpressionAst]
+                            },
+                            $false
+                        )
+                    }).Count -ge 1
                 } | ForEach-Object { [string]$_.Name })
 
         # The native-path variables whose EVERY assignment came from the
@@ -2325,6 +2348,78 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                             [string]$objCommand.Extent.StartLineNumber)
                 }
                 continue
+            }
+            if ($strCommandName -ceq 'Remove-Variable') {
+                # Only the register names, and only as a literal list. This
+                # command exists in the permitted set for exactly one purpose:
+                # taking the issuance registers out of a dot-sourced caller's
+                # scope. Anything else it could unbind is an invocation target
+                # some other rule has already admitted by its assignment.
+                $arrRemovableName = [string[]]@(
+                    'arrCandidateIssuedContext',
+                    'arrCandidateIssuedSnapshot',
+                    'arrCandidateIssuedState'
+                )
+                # Only what -Name receives. Other literals in the call are
+                # parameter values like SilentlyContinue and are not targets.
+                $arrElement = @($objCommand.CommandElements)
+                for ($intElement = 1; $intElement -lt $arrElement.Count; $intElement++) {
+                    $objPrevious = $arrElement[$intElement - 1]
+                    if (-not ($objPrevious -is
+                            [System.Management.Automation.Language.CommandParameterAst] -and
+                            ([string]$objPrevious.ParameterName) -ceq 'Name')) {
+                        continue
+                    }
+                    $objTarget = $arrElement[$intElement]
+                    if ($objTarget -is
+                        [System.Management.Automation.Language.StringConstantExpressionAst]) {
+                        if ($arrRemovableName -cnotcontains [string]$objTarget.Value) {
+                            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                                -Detail ('remove-variable-target-not-permitted-' +
+                                    [string]$objCommand.Extent.StartLineNumber)
+                        }
+                        continue
+                    }
+                    # A variable target is admitted only when every literal
+                    # reaching it in this file is a register name -- which is
+                    # how production spells it, looping over the three.
+                    $strTargetName = ''
+                    if ($objTarget -is
+                        [System.Management.Automation.Language.VariableExpressionAst]) {
+                        $strTargetName = [string]$objTarget.VariablePath.UserPath
+                    }
+                    if ($strTargetName.Length -eq 0) {
+                        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                            -Detail ('remove-variable-target-not-permitted-' +
+                                [string]$objCommand.Extent.StartLineNumber)
+                    }
+                    foreach ($objLoop in @($objAst.FindAll(
+                                {
+                                    param ($objNode)
+                                    $objNode -is
+                                        [System.Management.Automation.Language.ForEachStatementAst]
+                                },
+                                $true
+                            ))) {
+                        if (([string]$objLoop.Variable.VariablePath.UserPath) -cne $strTargetName) {
+                            continue
+                        }
+                        foreach ($objLiteral in @($objLoop.Condition.FindAll(
+                                    {
+                                        param ($objNode)
+                                        $objNode -is
+                                            [System.Management.Automation.Language.StringConstantExpressionAst]
+                                    },
+                                    $true
+                                ))) {
+                            if ($arrRemovableName -cnotcontains [string]$objLiteral.Value) {
+                                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                                    -Detail ('remove-variable-source-not-permitted-' +
+                                        [string]$objLoop.Extent.StartLineNumber)
+                            }
+                        }
+                    }
+                }
             }
             if (@($hashtableSurface.Command) -cnotcontains $strCommandName) {
                 & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
