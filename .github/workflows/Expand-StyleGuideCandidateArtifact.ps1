@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.46
+Version: 1.0.20260803.47
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.46'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.36'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.47'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.37'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -2109,7 +2109,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.46
+    # Version: 1.0.20260803.47
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2130,10 +2130,21 @@ function Remove-StyleGuideCandidateInvocationState {
     $uintFilesystemCallCount = [uint32]0
     $guidInvocationId = [System.Guid]::Empty
     $strPreviousState = 'Invalid'
+    # Captured once, and everything below reads the capture. Round 33 did this
+    # inside the context manager and stopped there; this function is the sibling
+    # that sweep did not reach, and it had the same defect the manager's fix was
+    # written for. Measured before this change, with a concurrent runspace
+    # flipping LifecycleState: 13 of 40 runs on .NET 8 and 5 of 30 on .NET 10
+    # returned cleanup-already-disposed with Success true and zero filesystem
+    # calls while the invocation root was still on disk.
+    $strCapturedTrustedParent = ''
+    $strCapturedInvocationRoot = ''
     try {
         [void](& $script:scriptBlockAssertCandidateHelperContext -ContextValue $Context)
         $guidInvocationId = $Context.InvocationId
         $strPreviousState = $Context.LifecycleState
+        $strCapturedTrustedParent = [string]$Context.TrustedParentPath
+        $strCapturedInvocationRoot = [string]$Context.InvocationRootPath
     } catch {
         return (& $script:scriptBlockNewCandidateHelperCleanupResult `
             -InvocationId $guidInvocationId `
@@ -2156,12 +2167,21 @@ function Remove-StyleGuideCandidateInvocationState {
         Get-Command -Name Test-StyleGuideCandidateInvocationContextIssued `
             -CommandType Function -ErrorAction SilentlyContinue
     )
+    #
+    # The CAPTURED state is what gets authenticated, not the live property.
+    # Authenticating the property and then re-reading it to branch is two reads
+    # of a mutable field, and the second one decides. Capturing first and
+    # authenticating the property instead does not help either -- measured, 5 of
+    # 40 runs still produced the false success, because the capture and the
+    # authenticated read are then the two different reads. Only passing the
+    # captured value to the manager makes checked and used one value.
     $boolEarlyIssued = $false
     if ($arrEarlyIssuanceCommands.Count -eq 1) {
         $objEarlyProbe = [pscustomobject]@{ CandidateNeverIssued = $true }
         if (-not (Test-StyleGuideCandidateInvocationContextIssued -Context $objEarlyProbe)) {
             $boolEarlyIssued = [bool](
-                Test-StyleGuideCandidateInvocationContextIssued -Context $Context)
+                Test-StyleGuideCandidateInvocationContextIssued `
+                    -Context $Context -ExpectedState $strPreviousState)
         }
     }
     if (-not $boolEarlyIssued) {
@@ -2175,9 +2195,9 @@ function Remove-StyleGuideCandidateInvocationState {
             -RetainedRecordSequences ([uint32[]]@()))
     }
 
-    if ($Context.LifecycleState -eq 'Disposed') {
+    if ($strPreviousState -eq 'Disposed') {
         return (& $script:scriptBlockNewCandidateHelperCleanupResult `
-            -InvocationId $Context.InvocationId `
+            -InvocationId $guidInvocationId `
             -PreviousState 'Disposed' `
             -FinalState 'Disposed' `
             -Success $true `
@@ -2185,10 +2205,10 @@ function Remove-StyleGuideCandidateInvocationState {
             -ReferenceToFilesystemCallCount ([uint32]0) `
             -RetainedRecordSequences ([uint32[]]@()))
     }
-    if ($Context.LifecycleState -eq 'CleanupFailed') {
+    if ($strPreviousState -eq 'CleanupFailed') {
         $arrRetained = & $script:scriptBlockGetCandidateHelperRetainedSequence -ContextValue $Context
         return (& $script:scriptBlockNewCandidateHelperCleanupResult `
-            -InvocationId $Context.InvocationId `
+            -InvocationId $guidInvocationId `
             -PreviousState 'CleanupFailed' `
             -FinalState 'CleanupFailed' `
             -Success $false `
@@ -2248,11 +2268,18 @@ function Remove-StyleGuideCandidateInvocationState {
         # already knows no cleanup happened. The case this protects is the one
         # where the harm exists: an honest caller in a session where something
         # else rebound the name.
+        #
+        # Against the CAPTURED root, not a fresh read. The delegate is handed
+        # the same mutable object, so a fake that rewrites InvocationRootPath to
+        # some absent sibling before returning Success true would have this
+        # proof pass over a tree that is still there -- the check would confirm
+        # the absence of a path nobody ever created. The captured value is the
+        # one that was validated at entry, and a string cannot be repointed.
         if ($objContextResult.Success) {
             $uintFilesystemCallCount = [uint32]($uintFilesystemCallCount + 1)
             [void](& $script:scriptBlockAssertCandidateHelperEntryAbsent `
-                -ParentPath $Context.TrustedParentPath `
-                -ExpectedPath $Context.InvocationRootPath `
+                -ParentPath $strCapturedTrustedParent `
+                -ExpectedPath $strCapturedInvocationRoot `
                 -Phase 'cleanup' `
                 -Code 'cleanup-delete-failed')
         }
@@ -2276,12 +2303,22 @@ function Remove-StyleGuideCandidateInvocationState {
         # cleanup can fail before it delegates to the caller, leaving the
         # invocation root and download entries present and owned, and a
         # CleanupFailed context must name at least one retained record.
-        foreach ($objRecord in $Context.OwnershipJournal) {
-            if ($objRecord.EntryState -eq 'Created') {
-                $objRecord.EntryState = 'RetainedUncertain'
-            }
-        }
-        $Context.LifecycleState = 'CleanupFailed'
+        #
+        # THE TERMINAL STATE IS NOT WRITTEN HERE. The manager owns it: it keeps
+        # a private record of the state it last set, and a state written onto
+        # the object without going through the manager desynchronizes the two.
+        # A later retry with the genuine manager then refuses the context as
+        # altered instead of removing the still-owned root, so the tree leaks
+        # permanently -- worse than the failure that got here. Failures inside
+        # the manager are already transitioned by the manager; the only paths
+        # that reach this catch are ones where the manager never ran or never
+        # agreed, and for those the honest state is the one it last recorded.
+        #
+        # The record retyping goes with it, for the same reason: an Active
+        # context may not carry a RetainedUncertain record, so retyping without
+        # the matching transition produces a context the manager's own
+        # validator refuses. The failure is reported in the RESULT, which is
+        # what a caller acts on, rather than by editing the caller's object.
         $arrRetained = & $script:scriptBlockGetCandidateHelperRetainedSequence -ContextValue $Context
         $strCode = & $script:scriptBlockGetCandidateHelperFailureField `
             -ErrorRecord $_ `
@@ -2842,7 +2879,20 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'parameter' -Phase 'parameter' -Subreason 'context-unissued'
         }
+        # The authenticated values, captured. Everything from here on reads
+        # these strings rather than the caller's object, because the verifier
+        # above authenticates the values present at that instant and every
+        # later read is a different read: a same-session runspace can repoint
+        # the context immediately afterwards, and the containment probes, the
+        # sentinel write, the journaling parents and the candidate creation
+        # would then act on a tree the manager never authenticated. Strings are
+        # immutable, so nothing outside this scope can redirect them.
+        #
+        # This is round 33's capture-validate-act carried into the primary path.
+        # That round applied it inside the context manager and stopped, which is
+        # the sweep-by-mechanism mistake this PR keeps paying for.
         $objValidatedContext = $Context
+        $strAuthenticatedRoot = [string]$Context.InvocationRootPath
 
         $strCheckoutPath = & $script:scriptBlockConvertToCandidateHelperNormalizedPath `
             -Value $strCheckoutRoot -ParameterName 'CheckoutRoot'
@@ -2965,7 +3015,7 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
                 -Code 'containment-invalid' -Phase 'containment' -Subreason 'relationship'
         }
         [void](& $script:scriptBlockAssertCandidateHelperDirectoryEnvelope `
-            -LiteralPath $Context.InvocationRootPath `
+            -LiteralPath $strAuthenticatedRoot `
             -Phase 'containment')
         [void](& $script:scriptBlockAssertCandidateHelperDirectoryEnvelope `
             -LiteralPath $strDownloadPath `
@@ -3011,7 +3061,7 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
                 -Code 'download-invalid' -Phase 'download' -Subreason 'archive-limit'
         }
         [void](& $script:scriptBlockAssertCandidateHelperEntryAbsent `
-            -ParentPath $Context.InvocationRootPath `
+            -ParentPath $strAuthenticatedRoot `
             -ExpectedPath $strCandidatePath `
             -Phase 'destination')
 
@@ -3272,13 +3322,13 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
             -LiteralPath $strTrustedPath `
             -Phase 'destination')
         [void](& $script:scriptBlockAssertCandidateHelperDirectoryEnvelope `
-            -LiteralPath $Context.InvocationRootPath `
+            -LiteralPath $strAuthenticatedRoot `
             -Phase 'destination')
         [void](& $script:scriptBlockAssertCandidateHelperDirectoryEnvelope `
             -LiteralPath $strDownloadPath `
             -Phase 'destination')
         [void](& $script:scriptBlockAssertCandidateHelperEntryAbsent `
-            -ParentPath $Context.InvocationRootPath `
+            -ParentPath $strAuthenticatedRoot `
             -ExpectedPath $strCandidatePath `
             -Phase 'destination')
 

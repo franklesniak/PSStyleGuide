@@ -27,14 +27,14 @@ a caller that deletes first and validates afterwards has already
 deleted, so it needs a way to ask about issuance that changes nothing.
 
 .NOTES
-Version: 1.0.20260803.36
+Version: 1.0.20260803.37
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.36'
+$versionCandidateContext = [System.Version]'1.0.20260803.37'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -1748,7 +1748,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.36
+    # Version: 1.0.20260803.37
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2110,6 +2110,17 @@ function New-StyleGuideCandidateInvocationContext {
             -ErrorRecord $_ `
             -Fallback 'context-create-failed'
         if ($boolRootCreated -and $null -ne $objContext) {
+            # Codex is right that this resolves the public name and that a
+            # rebound name can return a success-shaped result while the tree
+            # this creation just made stays on disk. It is NOT fixed here, and
+            # the obvious fix is wrong: ${function:Remove-...} reads the same
+            # Function: provider a rebinder writes to, so it authenticates
+            # nothing. What would work is capturing the scriptblock at load
+            # time, before any caller can rebind it -- but that needs the
+            # nameless-invocation rule extended to admit the captured variable,
+            # and writing a rule at the tail of a round is how three of the
+            # holes in this file's own machinery got here. Recorded as
+            # validated and deferred rather than half-done.
             $objCleanupResult = Remove-StyleGuideCandidateInvocationContext -Context $objContext
             $strRecordSequences = (@($objContext.OwnershipJournal | ForEach-Object {
                 [string]$_.Sequence
@@ -2154,6 +2165,13 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # Specifies the raw PSStyleGuide.CandidateInvocationContext.v1 object to
     # test. Any value is accepted; anything unissued answers false.
     #
+    # .PARAMETER ExpectedState
+    # Specifies the lifecycle state the caller has already captured and intends
+    # to act on. When supplied, this is the value authenticated against the
+    # manager's own record instead of the object's current property. A caller
+    # that omits it and then re-reads the property to branch has authenticated
+    # one read and acted on another.
+    #
     # .EXAMPLE
     # if (-not (Test-StyleGuideCandidateInvocationContextIssued `
     #         -Context $objContext)) {
@@ -2161,6 +2179,15 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # }
     #
     # # Returns $true only for an unaltered context this manager issued.
+    #
+    # .EXAMPLE
+    # $strCapturedState = [string]$objContext.LifecycleState
+    # if (Test-StyleGuideCandidateInvocationContextIssued `
+    #         -Context $objContext -ExpectedState $strCapturedState) {
+    #     # Branch on $strCapturedState, never on a fresh read.
+    # }
+    #
+    # # Authenticates the captured value, so checked and used are one value.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
@@ -2172,13 +2199,15 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.36
+    # Version: 1.0.20260803.37
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param (
         [Parameter(Mandatory = $true)]
         [AllowNull()]
-        [object]$Context
+        [object]$Context,
+
+        [string]$ExpectedState = ''
     )
 
     # A question, not an assertion: every failure is an answer of false rather
@@ -2206,8 +2235,22 @@ function Test-StyleGuideCandidateInvocationContextIssued {
         # success over a tree that was never removed. What a caller needs before
         # it acts is whether the context is what this manager issued AND still
         # says what the manager last recorded, so that is what this answers.
-        return (([string]$arrCandidateIssuedState[$intIssuedIndex]) -ceq
-            [string]$Context.LifecycleState)
+        #
+        # ExpectedState exists because comparing against the live property
+        # authenticates a value the caller then has to read AGAIN before it can
+        # branch on it, and the second read is a different read. Measured: a
+        # caller that asked this question and then re-read LifecycleState to
+        # choose a terminal return produced cleanup-already-disposed with
+        # Success true and zero filesystem calls over an intact tree, in 13 of
+        # 40 runs, with a concurrent writer flipping the property. A caller that
+        # passes the value it captured gets that value authenticated instead, so
+        # what was checked and what gets used are one value by construction.
+        $strClaimedState = if ($ExpectedState.Length -eq 0) {
+            [string]$Context.LifecycleState
+        } else {
+            $ExpectedState
+        }
+        return (([string]$arrCandidateIssuedState[$intIssuedIndex]) -ceq $strClaimedState)
     } catch {
         return $false
     }
@@ -2250,7 +2293,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.36
+    # Version: 1.0.20260803.37
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
