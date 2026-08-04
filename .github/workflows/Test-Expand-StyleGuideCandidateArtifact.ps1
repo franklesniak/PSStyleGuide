@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.29
+Version: 1.0.20260803.30
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.29'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.30'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.20'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.9'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.21'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.10'
 $script:strCandidateCatalogVersion = '1.0.20260803.4'
 # The physical allocation size, stated once. It was previously two bare literals
 # inside the header check, which is why growing the catalog failed with an
@@ -987,20 +987,57 @@ $script:scriptBlockAssertDirectoryReadsBounded = {
 
     $arrBounded = [string[]]@(& $script:scriptBlockGetCandidateHelperEntry `
             -LiteralPath $strCrowded -Phase 'download' -MaximumEntry 2)
-    $arrUnbounded = [string[]]@(& $script:scriptBlockGetCandidateHelperEntry `
-            -LiteralPath $strCrowded -Phase 'download')
-    if ($arrBounded.Count -ne 2 -or $arrUnbounded.Count -ne $intSeeded) {
-        & $script:scriptBlockStopHarness `
-            -Code 'catalog-invalid' -Detail 'bounded-directory-read'
-    }
     $arrContextBounded = [string[]]@(& $scriptBlockGetCandidateImmediateEntry `
             -LiteralPath $strCrowded -FailureCode 'root-invalid' `
             -FailurePhase 'root' -MaximumEntry 1)
-    $arrContextUnbounded = [string[]]@(& $scriptBlockGetCandidateImmediateEntry `
-            -LiteralPath $strCrowded -FailureCode 'root-invalid' -FailurePhase 'root')
-    if ($arrContextBounded.Count -ne 1 -or $arrContextUnbounded.Count -ne $intSeeded) {
+    if ($arrBounded.Count -ne 2 -or $arrContextBounded.Count -ne 1) {
         & $script:scriptBlockStopHarness `
             -Code 'catalog-invalid' -Detail 'bounded-directory-read'
+    }
+    # These used to assert that a call carrying neither a bound nor a filter
+    # returned the whole directory, which documented the very mode that made the
+    # source-order site table defeasible: parking the expected call under
+    # `if ($false)` and performing the live read through a variable holding the
+    # same script block reached that mode without editing any call site, and the
+    # suite stayed green with the whole parent materialized. No production site
+    # has needed it since every read became bounded or filtered, so the mode is
+    # gone and what is asserted here is its absence. An absurd bound is refused
+    # for the same reason -- it is a bound in shape and not in effect, and the
+    # alias trick would otherwise simply pass one.
+    $arrRefusedShape = @(
+        @{
+            Name = 'helper-neither'
+            Probe = { & $script:scriptBlockGetCandidateHelperEntry `
+                    -LiteralPath $strCrowded -Phase 'download' }
+        },
+        @{
+            Name = 'helper-absurd'
+            Probe = { & $script:scriptBlockGetCandidateHelperEntry `
+                    -LiteralPath $strCrowded -Phase 'download' -MaximumEntry 999999 }
+        },
+        @{
+            Name = 'context-neither'
+            Probe = { & $scriptBlockGetCandidateImmediateEntry `
+                    -LiteralPath $strCrowded -FailureCode 'root-invalid' -FailurePhase 'root' }
+        },
+        @{
+            Name = 'context-absurd'
+            Probe = { & $scriptBlockGetCandidateImmediateEntry `
+                    -LiteralPath $strCrowded -FailureCode 'root-invalid' `
+                    -FailurePhase 'root' -MaximumEntry 999999 }
+        }
+    )
+    foreach ($hashtableRefused in $arrRefusedShape) {
+        $boolRefused = $false
+        try {
+            [void](& ([scriptblock]$hashtableRefused.Probe))
+        } catch {
+            $boolRefused = $true
+        }
+        if (-not $boolRefused) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('unbounded-read-admitted-' + $hashtableRefused.Name)
+        }
     }
 
     # A directory holding fewer paths than the bound must still come back whole,
@@ -5932,7 +5969,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.29
+    # Version: 1.0.20260803.30
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()

@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.20
+Version: 1.0.20260803.21
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.20'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.9'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.21'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.10'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -195,6 +195,10 @@ $script:objCandidateHelperPathComparer = if ($script:boolCandidateHelperIsWindow
 } else {
     [System.StringComparer]::Ordinal
 }
+# No read here counts higher than an owned-file count plus one, and the manifest
+# fixes that at four. The ceiling exists so that a bound cannot be satisfied in
+# shape while being no bound at all.
+$script:intCandidateHelperMaximumEntryCeiling = 64
 $script:chrCandidateHelperDirectorySeparator = [System.IO.Path]::DirectorySeparatorChar
 $script:chrCandidateHelperAlternateSeparator = [System.IO.Path]::AltDirectorySeparatorChar
 # A leaf used as an enumeration search pattern must be a literal, and only two
@@ -957,9 +961,25 @@ $script:scriptBlockGetCandidateHelperEntry = {
     # the same contradiction wearing the other hat -- it would reduce a named
     # absence proof to a partial listing again -- so the two are refused
     # together.
-    if (($PSBoundParameters.ContainsKey('MaximumEntry') -and $MaximumEntry -le 0) -or
+    # Exactly one of the two, always. There used to be a third shape -- neither,
+    # meaning read everything -- and no call site has needed it since every read
+    # became bounded or filtered. Keeping it meant an unbounded path existed for
+    # a caller to reach, and reaching it did not require editing any call site:
+    # parking the expected call under `if ($false)` so the source-order table
+    # still counted it, then performing the live read through a variable holding
+    # this same script block, left the suite green at 115 records and zero
+    # failures with the whole parent materialized. Source cannot settle that,
+    # because the indirection is unbounded in form; the mode is removed instead.
+    #
+    # The ceiling refuses the other half of the same trick. A bound is only a
+    # bound if it is small: the largest legitimate one here is an owned-file
+    # count plus one, and the manifest fixes that at four, so a value like
+    # 999999 is a bound in shape and not in effect.
+    if (($PSBoundParameters.ContainsKey('MaximumEntry') -eq
+            $PSBoundParameters.ContainsKey('MatchPath')) -or
         ($PSBoundParameters.ContainsKey('MaximumEntry') -and
-            $PSBoundParameters.ContainsKey('MatchPath'))) {
+            ($MaximumEntry -le 0 -or
+                $MaximumEntry -gt $script:intCandidateHelperMaximumEntryCeiling))) {
         & $script:scriptBlockStopCandidateHelperOperation `
             -Code $strFailureCode -Phase $Phase -Subreason 'enumeration-bound'
     }
@@ -983,9 +1003,6 @@ $script:scriptBlockGetCandidateHelperEntry = {
         if ($strMatchLeaf.Length -ne 0) {
             return [string[]]@([System.IO.Directory]::EnumerateFileSystemEntries(
                 $LiteralPath, $strMatchLeaf))
-        }
-        if ($MaximumEntry -le 0) {
-            return [string[]]@([System.IO.Directory]::EnumerateFileSystemEntries($LiteralPath))
         }
         $listEntry = New-Object 'System.Collections.Generic.List[string]'
         $objEnumerator = [System.IO.Directory]::EnumerateFileSystemEntries(
@@ -1844,7 +1861,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.20
+    # Version: 1.0.20260803.21
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

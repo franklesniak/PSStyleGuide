@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.9
+Version: 1.0.20260803.10
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.9'
+$versionCandidateContext = [System.Version]'1.0.20260803.10'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -87,6 +87,10 @@ $arrCandidateRejectedMatchCharacter = [char[]]@(
 )
 $chrCandidateDirectorySeparator = [System.IO.Path]::DirectorySeparatorChar
 $chrCandidateAlternateSeparator = [System.IO.Path]::AltDirectorySeparatorChar
+# No read here counts higher than a journal-record count plus one, and the
+# closed schema caps that well below this. The ceiling exists so that a bound
+# cannot be satisfied in shape while being no bound at all.
+$intCandidateMaximumEntryCeiling = 64
 $intCandidateCreationAttemptMaximum = 16
 $arrCandidateStatPath = [string[]]@(
     '/usr/bin/stat',
@@ -442,9 +446,24 @@ $scriptBlockGetCandidateImmediateEntry = {
     # the same contradiction wearing the other hat -- it would reduce a named
     # absence proof to a partial listing again -- so the two are refused
     # together.
-    if (($PSBoundParameters.ContainsKey('MaximumEntry') -and $MaximumEntry -le 0) -or
+    # Exactly one of the two, always. There used to be a third shape -- neither,
+    # meaning read everything -- and no call site has needed it since every read
+    # became bounded or filtered. Keeping it meant an unbounded path existed for
+    # a caller to reach, and reaching it did not require editing any call site:
+    # parking the expected call under `if ($false)` so the source-order table
+    # still counted it, then performing the live read through a variable holding
+    # this same script block, left the suite green at 115 records and zero
+    # failures with the whole parent materialized. Source cannot settle that,
+    # because the indirection is unbounded in form; the mode is removed instead.
+    #
+    # The ceiling refuses the other half of the same trick. A bound is only a
+    # bound if it is small: the largest legitimate one here is a journal-record
+    # count plus one, which the closed schema caps far below this, so a value
+    # like 999999 is a bound in shape and not in effect.
+    if (($PSBoundParameters.ContainsKey('MaximumEntry') -eq
+            $PSBoundParameters.ContainsKey('MatchPath')) -or
         ($PSBoundParameters.ContainsKey('MaximumEntry') -and
-            $PSBoundParameters.ContainsKey('MatchPath'))) {
+            ($MaximumEntry -le 0 -or $MaximumEntry -gt $intCandidateMaximumEntryCeiling))) {
         & $scriptBlockStopCandidateOperation -Code $strFailureCode `
             -Message "PSStyleGuide.Context.v1|phase=$strFailurePhase|reason=enumeration-bound"
     }
@@ -468,9 +487,6 @@ $scriptBlockGetCandidateImmediateEntry = {
         if ($strMatchLeaf.Length -ne 0) {
             return [string[]]@([System.IO.Directory]::EnumerateFileSystemEntries(
                 $LiteralPath, $strMatchLeaf))
-        }
-        if ($MaximumEntry -le 0) {
-            return [string[]]@([System.IO.Directory]::EnumerateFileSystemEntries($LiteralPath))
         }
         $listEntry = New-Object 'System.Collections.Generic.List[string]'
         $objEnumerator = [System.IO.Directory]::EnumerateFileSystemEntries(
@@ -1242,7 +1258,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.9
+    # Version: 1.0.20260803.10
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1517,7 +1533,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.9
+    # Version: 1.0.20260803.10
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
