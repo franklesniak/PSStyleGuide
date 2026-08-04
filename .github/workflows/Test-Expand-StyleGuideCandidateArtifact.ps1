@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.80
+Version: 1.0.20260804.0
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,12 +53,12 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.80'
+$script:versionCandidateHarness = [System.Version]'1.0.20260804.0'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.53'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.43'
-$script:strCandidateCatalogVersion = '1.0.20260803.12'
+$script:strCandidateExpectedHelperVersion = '1.0.20260804.0'
+$script:strCandidateExpectedContextVersion = '1.0.20260804.0'
+$script:strCandidateCatalogVersion = '1.0.20260804.0'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
 # outstanding read finish.
@@ -562,7 +562,13 @@ $script:scriptBlockAssertVersionMarkersConsistent = {
         [string]$ExpectedVersion,
 
         [Parameter(Mandatory = $true)]
-        [uint32]$ExpectedFunctionCount
+        [uint32]$ExpectedFunctionCount,
+
+        [Parameter(Mandatory = $true)]
+        [string]$OwnVersionVariableName,
+
+        [Parameter(Mandatory = $true)]
+        [uint32]$PinnedConstantCount
     )
 
     # Each production script states its version in three places: the help
@@ -572,30 +578,124 @@ $script:scriptBlockAssertVersionMarkersConsistent = {
     # three separate times -- each caught downstream as a puzzling symptom
     # rather than as what it was.
     #
-    # The harness already knows the version it expects, so requiring every
-    # marker in the file to equal it costs one pass over the text and turns a
-    # recurring editing slip into an immediate, named failure. Any version
-    # literal anywhere in the file that is not the expected one is a
-    # desynchronisation, so no marker can be added without being covered.
-    $strText = [System.IO.File]::ReadAllText($LiteralPath)
+    # A file may also carry one version that is not its own: the helper pins
+    # the context manager's version so it can refuse a mismatched pair. That
+    # pinned constant is a different thing from a marker and has to be told
+    # apart from one. Every earlier revision told them apart by value, which
+    # worked only for as long as the two scripts happened to carry different
+    # versions -- and they are both first publications of the same date, so
+    # the style guide's own versioning rule makes them the same string. The
+    # moment they were made equal, this assertion failed the compliant file
+    # and passed the non-compliant one. Value never identified the pinned
+    # constant; it only correlated with it, and the correlation was an
+    # accident of the versions being wrong.
+    #
+    # The pinned constant is now found by the name it is assigned to, which is
+    # what actually distinguishes it, and every remaining literal in the file
+    # must be a marker carrying this file's own version.
+    $objMarkerTokens = $null
+    $objMarkerErrors = $null
+    $objMarkerAst = [System.Management.Automation.Language.Parser]::ParseFile(
+        $LiteralPath, [ref]$objMarkerTokens, [ref]$objMarkerErrors)
+    if ($null -eq $objMarkerAst -or @($objMarkerErrors).Count -ne 0) {
+        & $script:scriptBlockStopHarness `
+            -Code 'script-identity-invalid' -Detail 'version-marker-parse'
+    }
+
+    $arrVersionConvert = @($objMarkerAst.FindAll(
+            {
+                param ($objNode)
+                $objNode -is [System.Management.Automation.Language.ConvertExpressionAst] -and
+                $objNode.Type.TypeName.FullName -match '^(System\.)?Version$'
+            },
+            $true
+        ))
+    $arrOwnConstant = @()
+    $arrForeignConstant = @()
+    foreach ($objConvert in $arrVersionConvert) {
+        # The conversion sits under a command expression under the assignment,
+        # so the assignment is reached by a bounded walk rather than by one
+        # .Parent hop. The bound keeps an unrelated enclosing assignment from
+        # being mistaken for this constant's own.
+        $objAssignment = $null
+        $objWalk = $objConvert.Parent
+        $intWalk = 0
+        while ($null -ne $objWalk -and $intWalk -lt 3) {
+            if ($objWalk -is [System.Management.Automation.Language.AssignmentStatementAst]) {
+                $objAssignment = $objWalk
+                break
+            }
+            $objWalk = $objWalk.Parent
+            $intWalk++
+        }
+        $strAssignedName = ''
+        if ($null -ne $objAssignment -and
+            $objAssignment.Left -is [System.Management.Automation.Language.VariableExpressionAst]) {
+            $strAssignedName = [string]$objAssignment.Left.VariablePath.UserPath
+        }
+        if ($strAssignedName -ceq $OwnVersionVariableName) {
+            $arrOwnConstant += $objConvert
+        } else {
+            $arrForeignConstant += $objConvert
+        }
+    }
+    if (@($arrOwnConstant).Count -ne 1) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
+            -Detail ('version-marker-constant-' + @($arrOwnConstant).Count)
+    }
+    if ([string]$arrOwnConstant[0].Child.Extent.Text -cne ("'" + $ExpectedVersion + "'")) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
+            -Detail 'version-marker-constant-value'
+    }
+    # Skipping the pinned constants by position means an extra one would be
+    # skipped too, so the file is allowed exactly the number it declares. This
+    # is the count the previous scheme got for free by counting every literal:
+    # dropping it here would let a planted constant sit in the file unnoticed,
+    # which is the kind of quiet permissiveness a fix keeps introducing.
+    if (@($arrForeignConstant).Count -ne [int]$PinnedConstantCount) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
+            -Detail ('version-marker-pinned-' + @($arrForeignConstant).Count)
+    }
+    # A constant that is not this file's own is only legitimate when it names
+    # the other script this one is pinned to, which the harness verifies
+    # separately. Anything else is a stale or planted constant.
+    foreach ($objForeign in $arrForeignConstant) {
+        $strForeignText = [string]$objForeign.Child.Extent.Text
+        if ($strForeignText -cne ("'" + $script:strCandidateExpectedHelperVersion + "'") -and
+            $strForeignText -cne ("'" + $script:strCandidateExpectedContextVersion + "'")) {
+            & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
+                -Detail 'version-marker-foreign'
+        }
+    }
+
+    # The text the parser saw, so the offsets below index the same string the
+    # extents were measured against.
+    $strText = [string]$objMarkerAst.Extent.Text
     $arrMatch = @([System.Text.RegularExpressions.Regex]::Matches(
         $strText,
         '\b\d+\.\d+\.\d{8}\.\d+\b'
     ))
     $intExpectedMarker = 0
     foreach ($objMatch in $arrMatch) {
-        if ($objMatch.Value -ceq $ExpectedVersion) {
-            $intExpectedMarker++
+        # A pinned constant is skipped by position, never by value, so this
+        # count stays correct when the pinned version and this file's own
+        # version are the same string.
+        $boolPinned = $false
+        foreach ($objForeign in $arrForeignConstant) {
+            if ($objMatch.Index -ge $objForeign.Extent.StartOffset -and
+                ($objMatch.Index + $objMatch.Length) -le $objForeign.Extent.EndOffset) {
+                $boolPinned = $true
+                break
+            }
+        }
+        if ($boolPinned) {
             continue
         }
-        # A version literal that is not this file's own is only legitimate when
-        # it names the other script this one is pinned to, which the harness
-        # verifies separately. Anything else is a stale marker.
-        if ($objMatch.Value -cne $script:strCandidateExpectedHelperVersion -and
-            $objMatch.Value -cne $script:strCandidateExpectedContextVersion) {
+        if ($objMatch.Value -cne $ExpectedVersion) {
             & $script:scriptBlockStopHarness `
                 -Code 'script-identity-invalid' -Detail 'version-marker'
         }
+        $intExpectedMarker++
     }
     # A deleted marker leaves the survivors agreeing with each other, so the
     # equality test above cannot see it; only a count can. That count is
@@ -620,29 +720,9 @@ $script:scriptBlockAssertVersionMarkersConsistent = {
     #
     # So each declared location is checked as a location. The literals are no
     # longer counted in the abstract; they are found where they are supposed to
-    # be, and a literal anywhere else is a stray rather than a substitute.
-    $objMarkerTokens = $null
-    $objMarkerErrors = $null
-    $objMarkerAst = [System.Management.Automation.Language.Parser]::ParseFile(
-        $LiteralPath, [ref]$objMarkerTokens, [ref]$objMarkerErrors)
-    if ($null -eq $objMarkerAst -or @($objMarkerErrors).Count -ne 0) {
-        & $script:scriptBlockStopHarness `
-            -Code 'script-identity-invalid' -Detail 'version-marker-parse'
-    }
-
-    # One [System.Version] constant carrying exactly this version.
-    $arrVersionConstant = @($objMarkerAst.FindAll(
-            {
-                param ($objNode)
-                $objNode -is [System.Management.Automation.Language.ConvertExpressionAst] -and
-                $objNode.Type.TypeName.FullName -match '^(System\.)?Version$'
-            },
-            $true
-        ) | Where-Object { [string]$_.Child.Extent.Text -ceq ("'" + $ExpectedVersion + "'") })
-    if ($arrVersionConstant.Count -ne 1) {
-        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
-            -Detail ('version-marker-constant-' + $arrVersionConstant.Count)
-    }
+    # be, and a literal anywhere else is a stray rather than a substitute. The
+    # file is parsed once, above, because the pinned-constant extents are
+    # needed before the count rather than after it.
 
     # One '# Version: <expected>' comment inside each public function, and none
     # anywhere else. Comments are tokens rather than syntax, so they are matched
@@ -7963,7 +8043,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.80
+    # Version: 1.0.20260804.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -8106,11 +8186,15 @@ function Invoke-StyleGuideCandidateHarness {
     [void](& $script:scriptBlockAssertVersionMarkersConsistent `
         -LiteralPath $strHelperLiteralPath `
         -ExpectedVersion $script:strCandidateExpectedHelperVersion `
-        -ExpectedFunctionCount ([uint32]1))
+        -ExpectedFunctionCount ([uint32]1) `
+        -OwnVersionVariableName 'script:versionCandidateHelper' `
+        -PinnedConstantCount ([uint32]1))
     [void](& $script:scriptBlockAssertVersionMarkersConsistent `
         -LiteralPath $strContextLiteralPath `
         -ExpectedVersion $script:strCandidateExpectedContextVersion `
-        -ExpectedFunctionCount ([uint32]3))
+        -ExpectedFunctionCount ([uint32]3) `
+        -OwnVersionVariableName 'versionCandidateContext' `
+        -PinnedConstantCount ([uint32]0))
     [void](& $script:scriptBlockAssertResourceGuardsWired -LiteralPath $strHelperLiteralPath)
     $arrContextLoadOutput = @(. $strContextLiteralPath)
     if ($arrContextLoadOutput.Count -ne 0) {
