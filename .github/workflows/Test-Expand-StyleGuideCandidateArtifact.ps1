@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.75
+Version: 1.0.20260803.76
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.75'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.76'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.47'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.37'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.48'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.38'
 $script:strCandidateCatalogVersion = '1.0.20260803.11'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
@@ -2216,6 +2216,53 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                     }).Count -eq 0
                 } | ForEach-Object { [string]$_.Name })
 
+        # A third admissible class, added in round 35: a variable whose every
+        # assignment is this file capturing one of its OWN function definitions
+        # at load time. Round 34 established the need -- a rollback that resolves
+        # a public name can be answered by a fake -- and that the obvious
+        # spelling at the call site, ${function:Name}, is not a fix, because it
+        # reads the same Function: provider a rebinder writes to. The load-time
+        # capture IS a fix, because this script's body runs before any caller
+        # can rebind anything.
+        #
+        # Admitted by the exact shape rather than by variable name, so the rule
+        # cannot be satisfied by calling a variable something suggestive: every
+        # assignment must be ${function:<Name>}.GetNewClosure() for a function
+        # THIS FILE defines. A capture of some other file's function, or a bare
+        # ${function:...} without the closure, is not on the list.
+        $arrOwnFunctionName = [string[]]@(@($objAst.FindAll(
+                    {
+                        param ($objNode)
+                        $objNode -is
+                            [System.Management.Automation.Language.FunctionDefinitionAst]
+                    },
+                    $true
+                )) | ForEach-Object { [string]$_.Name })
+        $arrOwnClosureVariable = [string[]]@(@($objAst.FindAll(
+                    {
+                        param ($objNode)
+                        return ($objNode -is
+                            [System.Management.Automation.Language.AssignmentStatementAst] -and
+                            $objNode.Left -is
+                            [System.Management.Automation.Language.VariableExpressionAst])
+                    },
+                    $true
+                )) | Group-Object -Property {
+                    [string]$_.Left.VariablePath.UserPath -creplace '^script:', ''
+                } | Where-Object {
+                    @($_.Group | Where-Object {
+                        $strRight = [string]$_.Right.Extent.Text
+                        $boolOwnCapture = $false
+                        foreach ($strOwnName in $arrOwnFunctionName) {
+                            if ($strRight -ceq
+                                ('${function:' + $strOwnName + '}.GetNewClosure()')) {
+                                $boolOwnCapture = $true
+                            }
+                        }
+                        -not $boolOwnCapture
+                    }).Count -eq 0
+                } | ForEach-Object { [string]$_.Name })
+
         # Every named command in the file, against the allow-list. A call
         # through a variable -- `& $script:scriptBlockFoo` -- has no command
         # name and is not one of these; those are the internal script blocks the
@@ -2254,7 +2301,8 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                 }
                 if ($strTarget.Length -eq 0 -or
                     -not ($arrScriptBlockVariable -ccontains $strTarget -or
-                        $arrNativePathVariable -ccontains $strTarget)) {
+                        $arrNativePathVariable -ccontains $strTarget -or
+                        $arrOwnClosureVariable -ccontains $strTarget)) {
                     & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                         -Detail ('nameless-command-not-permitted-' +
                             [string]$objCommand.Extent.StartLineNumber)
@@ -7665,7 +7713,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.75
+    # Version: 1.0.20260803.76
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()

@@ -27,14 +27,14 @@ a caller that deletes first and validates afterwards has already
 deleted, so it needs a way to ask about issuance that changes nothing.
 
 .NOTES
-Version: 1.0.20260803.37
+Version: 1.0.20260803.38
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.37'
+$versionCandidateContext = [System.Version]'1.0.20260803.38'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -1748,7 +1748,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.37
+    # Version: 1.0.20260803.38
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2110,18 +2110,29 @@ function New-StyleGuideCandidateInvocationContext {
             -ErrorRecord $_ `
             -Fallback 'context-create-failed'
         if ($boolRootCreated -and $null -ne $objContext) {
-            # Codex is right that this resolves the public name and that a
-            # rebound name can return a success-shaped result while the tree
-            # this creation just made stays on disk. It is NOT fixed here, and
-            # the obvious fix is wrong: ${function:Remove-...} reads the same
-            # Function: provider a rebinder writes to, so it authenticates
-            # nothing. What would work is capturing the scriptblock at load
-            # time, before any caller can rebind it -- but that needs the
-            # nameless-invocation rule extended to admit the captured variable,
-            # and writing a rule at the tail of a round is how three of the
-            # holes in this file's own machinery got here. Recorded as
-            # validated and deferred rather than half-done.
-            $objCleanupResult = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+            # Through this file's own captured closure, never the public
+            # name. This is the one moment where the caller holds no context to
+            # clean up with, because creation failed before returning one -- so
+            # a rebound name here returns a success-shaped result while the
+            # root and download tree this creation just made stay on disk, and
+            # nothing else will ever remove them.
+            #
+            # The capture already existed: the closure installed under the
+            # public name is built from the function definition at load time,
+            # before any caller can rebind anything, and it is held in a script
+            # variable this file alone can see. What was wrong was asking the
+            # session for it again.
+            #
+            # ${function:Remove-...} at this call site would NOT have worked
+            # and was rejected on that ground: it reads the same Function:
+            # provider a rebinder writes to. The harness's nameless-invocation
+            # rule refused that spelling, which is what exposed the error.
+            #
+            # Taking the closure before this one is assigned is safe, and that
+            # was measured rather than assumed: a closure captured before its
+            # assignment still resolves the value, because the lookup falls
+            # through to this script's scope at call time.
+            $objCleanupResult = & $scriptBlockRemoveContextFunction -Context $objContext
             $strRecordSequences = (@($objContext.OwnershipJournal | ForEach-Object {
                 [string]$_.Sequence
             })) -join ','
@@ -2199,7 +2210,7 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.37
+    # Version: 1.0.20260803.38
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param (
@@ -2293,7 +2304,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.37
+    # Version: 1.0.20260803.38
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
