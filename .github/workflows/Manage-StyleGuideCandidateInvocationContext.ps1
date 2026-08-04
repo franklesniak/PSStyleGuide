@@ -27,14 +27,14 @@ a caller that deletes first and validates afterwards has already
 deleted, so it needs a way to ask about issuance that changes nothing.
 
 .NOTES
-Version: 1.0.20260803.35
+Version: 1.0.20260803.36
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.35'
+$versionCandidateContext = [System.Version]'1.0.20260803.36'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -951,6 +951,10 @@ $scriptBlockAssertCandidateInMemoryContext = {
         throw 'cleanup-context-invalid'
     }
 
+    # This check must see the LIVE object: it is the one rule here about the
+    # object's shape rather than its contents, and it is what makes everything
+    # below safe to capture. Every property must be a note property, so no
+    # field can answer differently on a second read from inside this process.
     [void](& $scriptBlockAssertCandidateExactPropertySchema -Value $Context -ExpectedNames @(
         'SchemaVersion',
         'ContextScriptVersion',
@@ -965,45 +969,79 @@ $scriptBlockAssertCandidateInMemoryContext = {
         'OwnershipJournal'
     ))
 
-    if ($Context.SchemaVersion.GetType() -ne [System.UInt32] -or $Context.SchemaVersion -ne [uint32]1 -or
-        $Context.ContextScriptVersion.GetType() -ne [System.Version] -or
-        $Context.ContextScriptVersion -ne $versionCandidateContext -or
-        $Context.InvocationId.GetType() -ne [System.Guid] -or
-        $Context.InvocationId -eq [System.Guid]::Empty -or
-        $Context.DiagnosticLabel.GetType() -ne [System.String] -or
-        $Context.DiagnosticLabel.Length -eq 0 -or $Context.DiagnosticLabel.Length -gt 128 -or
-        [System.String]::IsNullOrWhiteSpace($Context.DiagnosticLabel) -or
-        $Context.TrustedParentPath.GetType() -ne [System.String] -or
-        $Context.TrustedParentPath.Length -eq 0 -or
-        $Context.InvocationRootPath.GetType() -ne [System.String] -or
-        $Context.InvocationRootPath.Length -eq 0 -or
-        $Context.DownloadDirectoryPath.GetType() -ne [System.String] -or
-        $Context.DownloadDirectoryPath.Length -eq 0 -or
-        $Context.CandidatePath.GetType() -ne [System.String] -or
-        $Context.CandidatePath.Length -eq 0 -or
-        $Context.LifecycleState.GetType() -ne [System.String] -or
-        $Context.LifecycleState -cnotin @('Active', 'CleanupFailed', 'Disposed') -or
-        $Context.NextSequence.GetType() -ne [System.UInt32] -or
-        $Context.OwnershipJournal.GetType() -ne [System.Object[]] -or
-        $Context.NextSequence -ne [uint32]$Context.OwnershipJournal.Count) {
+    # Captured once, here, and everything downstream -- every check in this
+    # function, and the whole of cleanup -- reads the capture instead of the
+    # caller's object. The order that matters is capture, then validate the
+    # capture, then act on the capture. Validating one read and acting on
+    # another is the defect this closes, and it was measured: with a second
+    # runspace in this process holding the same record, cleanup deleted a file
+    # OUTSIDE the invocation root while the authenticated file survived, and
+    # refused afterwards. A refusal after the deletion is a report.
+    #
+    # A note on the mechanism, because the previous fix in this file named the
+    # wrong one. Round 32 said a caller could replace Path with a script
+    # property answering differently per read. It cannot: the schema check
+    # above requires note properties and refuses a script property before any
+    # loop runs. What does work is another thread or runspace in this process
+    # writing the note property between two reads, and the fix is the same
+    # either way -- which is why the wrong reason produced the right code.
+    $objContextCapture = [pscustomobject]@{
+        SchemaVersion = $Context.SchemaVersion
+        ContextScriptVersion = $Context.ContextScriptVersion
+        InvocationId = $Context.InvocationId
+        DiagnosticLabel = $Context.DiagnosticLabel
+        TrustedParentPath = $Context.TrustedParentPath
+        InvocationRootPath = $Context.InvocationRootPath
+        DownloadDirectoryPath = $Context.DownloadDirectoryPath
+        CandidatePath = $Context.CandidatePath
+        LifecycleState = $Context.LifecycleState
+        NextSequence = $Context.NextSequence
+        Journal = [object[]]@()
+    }
+    $objJournalReference = $Context.OwnershipJournal
+
+    if ($objContextCapture.SchemaVersion.GetType() -ne [System.UInt32] -or
+        $objContextCapture.SchemaVersion -ne [uint32]1 -or
+        $objContextCapture.ContextScriptVersion.GetType() -ne [System.Version] -or
+        $objContextCapture.ContextScriptVersion -ne $versionCandidateContext -or
+        $objContextCapture.InvocationId.GetType() -ne [System.Guid] -or
+        $objContextCapture.InvocationId -eq [System.Guid]::Empty -or
+        $objContextCapture.DiagnosticLabel.GetType() -ne [System.String] -or
+        $objContextCapture.DiagnosticLabel.Length -eq 0 -or
+        $objContextCapture.DiagnosticLabel.Length -gt 128 -or
+        [System.String]::IsNullOrWhiteSpace($objContextCapture.DiagnosticLabel) -or
+        $objContextCapture.TrustedParentPath.GetType() -ne [System.String] -or
+        $objContextCapture.TrustedParentPath.Length -eq 0 -or
+        $objContextCapture.InvocationRootPath.GetType() -ne [System.String] -or
+        $objContextCapture.InvocationRootPath.Length -eq 0 -or
+        $objContextCapture.DownloadDirectoryPath.GetType() -ne [System.String] -or
+        $objContextCapture.DownloadDirectoryPath.Length -eq 0 -or
+        $objContextCapture.CandidatePath.GetType() -ne [System.String] -or
+        $objContextCapture.CandidatePath.Length -eq 0 -or
+        $objContextCapture.LifecycleState.GetType() -ne [System.String] -or
+        $objContextCapture.LifecycleState -cnotin @('Active', 'CleanupFailed', 'Disposed') -or
+        $objContextCapture.NextSequence.GetType() -ne [System.UInt32] -or
+        $null -eq $objJournalReference -or
+        $objJournalReference.GetType() -ne [System.Object[]] -or
+        $objContextCapture.NextSequence -ne [uint32]$objJournalReference.Count) {
         throw 'cleanup-context-invalid'
     }
 
     foreach ($strContextPath in @(
-        $Context.TrustedParentPath,
-        $Context.InvocationRootPath,
-        $Context.DownloadDirectoryPath,
-        $Context.CandidatePath
+        $objContextCapture.TrustedParentPath,
+        $objContextCapture.InvocationRootPath,
+        $objContextCapture.DownloadDirectoryPath,
+        $objContextCapture.CandidatePath
     )) {
         [void](& $scriptBlockAssertCandidateCanonicalStoredPath -Value $strContextPath)
     }
 
     # The label is scanned character by character, so its length is decided
     # first for the same reason the paths above are.
-    if ($Context.DiagnosticLabel.Length -gt $intCandidateMaximumLabelLength) {
+    if ($objContextCapture.DiagnosticLabel.Length -gt $intCandidateMaximumLabelLength) {
         throw 'cleanup-context-invalid'
     }
-    foreach ($chrLabel in $Context.DiagnosticLabel.ToCharArray()) {
+    foreach ($chrLabel in $objContextCapture.DiagnosticLabel.ToCharArray()) {
         if ([System.Char]::IsControl($chrLabel)) {
             throw 'cleanup-context-invalid'
         }
@@ -1034,19 +1072,23 @@ $scriptBlockAssertCandidateInMemoryContext = {
     # transcribing it cannot go stale. A literal count in this file has already
     # accepted a deletion once.
     $intMaximumJournalRecord = 4 + $intCandidateManifestEntryCount
-    if ($Context.OwnershipJournal.Count -gt $intMaximumJournalRecord) {
+    if ($objJournalReference.Count -gt $intMaximumJournalRecord) {
         throw 'cleanup-context-invalid'
     }
 
-    for ($intIndex = 0; $intIndex -lt $Context.OwnershipJournal.Count; $intIndex++) {
-        $objRecord = $Context.OwnershipJournal[$intIndex]
-        if ($null -eq $objRecord -or
-            $objRecord.GetType() -ne [System.Management.Automation.PSCustomObject] -or
-            $objRecord.PSObject.TypeNames.Count -eq 0 -or
-            $objRecord.PSObject.TypeNames[0] -cne $strCandidateRecordTypeName) {
+    $listJournalCapture = New-Object 'System.Collections.Generic.List[object]'
+    for ($intIndex = 0; $intIndex -lt $objJournalReference.Count; $intIndex++) {
+        $objLiveRecord = $objJournalReference[$intIndex]
+        if ($null -eq $objLiveRecord -or
+            $objLiveRecord.GetType() -ne [System.Management.Automation.PSCustomObject] -or
+            $objLiveRecord.PSObject.TypeNames.Count -eq 0 -or
+            $objLiveRecord.PSObject.TypeNames[0] -cne $strCandidateRecordTypeName) {
             throw 'cleanup-context-invalid'
         }
-        [void](& $scriptBlockAssertCandidateExactPropertySchema -Value $objRecord -ExpectedNames @(
+        # Shape first, on the live record, for the reason given at the context
+        # capture above: this is what establishes that a second read cannot
+        # answer differently by design, leaving only the concurrent writer.
+        [void](& $scriptBlockAssertCandidateExactPropertySchema -Value $objLiveRecord -ExpectedNames @(
             'SchemaVersion',
             'Sequence',
             'Kind',
@@ -1059,6 +1101,23 @@ $scriptBlockAssertCandidateInMemoryContext = {
             'ContentLength',
             'ContentSha256'
         ))
+        # Then one read of each field into values this manager owns. Record is
+        # kept so cleanup can WRITE EntryState back; nothing reads through it.
+        $objRecord = [pscustomobject]@{
+            SchemaVersion = $objLiveRecord.SchemaVersion
+            Sequence = $objLiveRecord.Sequence
+            Kind = $objLiveRecord.Kind
+            Path = $objLiveRecord.Path
+            ParentPath = $objLiveRecord.ParentPath
+            LeafName = $objLiveRecord.LeafName
+            ExpectedEntryType = $objLiveRecord.ExpectedEntryType
+            CreationPhase = $objLiveRecord.CreationPhase
+            EntryState = $objLiveRecord.EntryState
+            ContentLength = $objLiveRecord.ContentLength
+            ContentSha256 = $objLiveRecord.ContentSha256
+            Record = $objLiveRecord
+        }
+        [void]$listJournalCapture.Add($objRecord)
 
         if ($objRecord.SchemaVersion.GetType() -ne [System.UInt32] -or
             $objRecord.SchemaVersion -ne [uint32]1 -or
@@ -1163,11 +1222,11 @@ $scriptBlockAssertCandidateInMemoryContext = {
         if ($objRecord.Kind -eq 'InvocationRootDirectory') {
             if (-not [System.String]::Equals(
                 $objRecord.Path,
-                $Context.InvocationRootPath,
+                $objContextCapture.InvocationRootPath,
                 $objCandidatePathComparison
             ) -or -not [System.String]::Equals(
                 $objRecord.ParentPath,
-                $Context.TrustedParentPath,
+                $objContextCapture.TrustedParentPath,
                 $objCandidatePathComparison
             )) {
                 throw 'cleanup-context-invalid'
@@ -1175,11 +1234,11 @@ $scriptBlockAssertCandidateInMemoryContext = {
         } elseif ($objRecord.Kind -eq 'DownloadDirectory') {
             if (-not [System.String]::Equals(
                 $objRecord.Path,
-                $Context.DownloadDirectoryPath,
+                $objContextCapture.DownloadDirectoryPath,
                 $objCandidatePathComparison
             ) -or -not [System.String]::Equals(
                 $objRecord.ParentPath,
-                $Context.InvocationRootPath,
+                $objContextCapture.InvocationRootPath,
                 $objCandidatePathComparison
             )) {
                 throw 'cleanup-context-invalid'
@@ -1187,7 +1246,7 @@ $scriptBlockAssertCandidateInMemoryContext = {
         } elseif ($objRecord.Kind -eq 'DownloadFile') {
             if (-not [System.String]::Equals(
                 $objRecord.ParentPath,
-                $Context.DownloadDirectoryPath,
+                $objContextCapture.DownloadDirectoryPath,
                 $objCandidatePathComparison
             )) {
                 throw 'cleanup-context-invalid'
@@ -1195,18 +1254,18 @@ $scriptBlockAssertCandidateInMemoryContext = {
         } elseif ($objRecord.Kind -eq 'CandidateDirectory') {
             if (-not [System.String]::Equals(
                 $objRecord.Path,
-                $Context.CandidatePath,
+                $objContextCapture.CandidatePath,
                 $objCandidatePathComparison
             ) -or -not [System.String]::Equals(
                 $objRecord.ParentPath,
-                $Context.InvocationRootPath,
+                $objContextCapture.InvocationRootPath,
                 $objCandidatePathComparison
             )) {
                 throw 'cleanup-context-invalid'
             }
         } elseif (-not [System.String]::Equals(
             $objRecord.ParentPath,
-            $Context.CandidatePath,
+            $objContextCapture.CandidatePath,
             $objCandidatePathComparison
         )) {
             throw 'cleanup-context-invalid'
@@ -1219,10 +1278,10 @@ $scriptBlockAssertCandidateInMemoryContext = {
         $hashtableKindCount.DownloadFile -gt 1) {
         throw 'cleanup-context-invalid'
     }
-    $objCandidateDirectoryRecord = @($Context.OwnershipJournal | Where-Object {
+    $objCandidateDirectoryRecord = @($listJournalCapture | Where-Object {
         $_.Kind -eq 'CandidateDirectory'
     })[0]
-    $arrCandidateFileRecords = @($Context.OwnershipJournal | Where-Object {
+    $arrCandidateFileRecords = @($listJournalCapture | Where-Object {
         $_.Kind -eq 'CandidateFile'
     })
     if ($arrCandidateFileRecords.Count -gt 4 -or
@@ -1232,11 +1291,11 @@ $scriptBlockAssertCandidateInMemoryContext = {
             @($arrCandidateFileRecords | Where-Object { $_.EntryState -ne 'Deleted' }).Count -ne 0)) {
         throw 'cleanup-context-invalid'
     }
-    if ($Context.LifecycleState -eq 'Active') {
-        $objRootRecord = @($Context.OwnershipJournal | Where-Object {
+    if ($objContextCapture.LifecycleState -eq 'Active') {
+        $objRootRecord = @($listJournalCapture | Where-Object {
             $_.Kind -eq 'InvocationRootDirectory'
         })[0]
-        $objDownloadDirectoryRecord = @($Context.OwnershipJournal | Where-Object {
+        $objDownloadDirectoryRecord = @($listJournalCapture | Where-Object {
             $_.Kind -eq 'DownloadDirectory'
         })[0]
         # Which record states an Active context may carry at all is settled by
@@ -1254,13 +1313,13 @@ $scriptBlockAssertCandidateInMemoryContext = {
         # created cannot contain a download file, and no candidate can have
         # been created either.
         if ($objDownloadDirectoryRecord.EntryState -ceq 'ExpectedAbsent') {
-            $objCandidateRecord = @($Context.OwnershipJournal | Where-Object {
+            $objCandidateRecord = @($listJournalCapture | Where-Object {
                 $_.Kind -eq 'CandidateDirectory'
             })[0]
-            if (@($Context.OwnershipJournal | Where-Object {
+            if (@($listJournalCapture | Where-Object {
                         $_.Kind -eq 'DownloadFile'
                     }).Count -ne 0 -or
-                @($Context.OwnershipJournal | Where-Object {
+                @($listJournalCapture | Where-Object {
                         $_.Kind -eq 'CandidateFile'
                     }).Count -ne 0 -or
                 $objCandidateRecord.EntryState -cne 'ExpectedAbsent') {
@@ -1288,19 +1347,19 @@ $scriptBlockAssertCandidateInMemoryContext = {
     $hashtableRequiredEntryState = @{
         'CleanupFailed' = 'RetainedUncertain'
     }
-    if (-not $hashtableAdmittedEntryState.ContainsKey($Context.LifecycleState)) {
+    if (-not $hashtableAdmittedEntryState.ContainsKey($objContextCapture.LifecycleState)) {
         throw 'cleanup-context-invalid'
     }
-    $arrAdmittedEntryState = [string[]]$hashtableAdmittedEntryState[$Context.LifecycleState]
-    foreach ($objRecord in $Context.OwnershipJournal) {
+    $arrAdmittedEntryState = [string[]]$hashtableAdmittedEntryState[$objContextCapture.LifecycleState]
+    foreach ($objRecord in $listJournalCapture) {
         if ($objRecord.EntryState -cnotin $arrAdmittedEntryState) {
             throw 'cleanup-context-invalid'
         }
     }
-    if ($hashtableRequiredEntryState.ContainsKey($Context.LifecycleState)) {
-        $strRequiredEntryState = [string]$hashtableRequiredEntryState[$Context.LifecycleState]
+    if ($hashtableRequiredEntryState.ContainsKey($objContextCapture.LifecycleState)) {
+        $strRequiredEntryState = [string]$hashtableRequiredEntryState[$objContextCapture.LifecycleState]
         $boolRequiredPresent = $false
-        foreach ($objRecord in $Context.OwnershipJournal) {
+        foreach ($objRecord in $listJournalCapture) {
             if ($objRecord.EntryState -ceq $strRequiredEntryState) {
                 $boolRequiredPresent = $true
             }
@@ -1343,17 +1402,29 @@ $scriptBlockAssertCandidateInMemoryContext = {
     # issuance while the reference stayed the one on the register. This
     # compares what the context says now against what it said when it was
     # handed out.
+    #
+    # Computed from the CAPTURE, not from the caller's object. Authenticating
+    # one read while the rest of this function acts on another would put the
+    # defect back inside its own fix: the values that were authenticated have
+    # to be the values that get used.
     if (([string]$arrCandidateIssuedSnapshot[$intIssuedIndex]) -cne
-        [string](& $scriptBlockNewCandidateIssuanceSnapshot -Context $Context)) {
+        [string](& $scriptBlockNewCandidateIssuanceSnapshot -Context $objContextCapture)) {
         throw 'cleanup-context-altered'
     }
     # And the lifecycle state against the one this manager last set, for the
     # reason recorded where the register is declared: a terminal state the
     # caller wrote is a claim about work that was never done.
     if (([string]$arrCandidateIssuedState[$intIssuedIndex]) -cne
-        [string]$Context.LifecycleState) {
+        [string]$objContextCapture.LifecycleState) {
         throw 'cleanup-context-altered'
     }
+
+    # The capture is the return value, so a caller of this assertion cannot
+    # act on anything it did not validate. It is built here and never escapes
+    # this manager, its fields are immutable strings, and its Record members
+    # are written to rather than read from.
+    $objContextCapture.Journal = [object[]]$listJournalCapture.ToArray()
+    return $objContextCapture
 }
 
 $scriptBlockGetCandidateRetainedSequence = {
@@ -1362,8 +1433,10 @@ $scriptBlockGetCandidateRetainedSequence = {
         [object]$Context
     )
 
+    # Takes the validated capture, not the caller's context, so the sequences
+    # reported are the ones that were checked.
     $listSequences = New-Object 'System.Collections.Generic.List[uint32]'
-    foreach ($objRecord in $Context.OwnershipJournal) {
+    foreach ($objRecord in $Context.Journal) {
         if ($objRecord.EntryState -eq 'RetainedUncertain') {
             $listSequences.Add([uint32]$objRecord.Sequence)
         }
@@ -1675,7 +1748,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.35
+    # Version: 1.0.20260803.36
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2099,7 +2172,7 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.35
+    # Version: 1.0.20260803.36
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param (
@@ -2177,7 +2250,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.35
+    # Version: 1.0.20260803.36
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2199,10 +2272,16 @@ function Remove-StyleGuideCandidateInvocationContext {
     $guidInvocationId = [System.Guid]::Empty
     $strPreviousState = 'Invalid'
 
+    # Everything below this line reads the PLAN, not the caller's object. The
+    # plan is built inside the assertion, from one read of each field, and it
+    # is what the assertion validated -- so the values that were checked and
+    # the values that get acted on are the same values. Reading the context
+    # again here would reopen exactly the window this closes.
+    $objCleanupPlan = $null
     try {
-        [void](& $scriptBlockAssertCandidateInMemoryContext -Context $Context)
-        $guidInvocationId = $Context.InvocationId
-        $strPreviousState = $Context.LifecycleState
+        $objCleanupPlan = & $scriptBlockAssertCandidateInMemoryContext -Context $Context
+        $guidInvocationId = $objCleanupPlan.InvocationId
+        $strPreviousState = $objCleanupPlan.LifecycleState
     } catch {
         # An unissued context is not a malformed one. The object is well formed
         # by construction -- that is the whole point of the check that refused
@@ -2227,9 +2306,9 @@ function Remove-StyleGuideCandidateInvocationContext {
             -RetainedRecordSequences ([uint32[]]@()))
     }
 
-    if ($Context.LifecycleState -eq 'Disposed') {
+    if ($objCleanupPlan.LifecycleState -eq 'Disposed') {
         return (& $scriptBlockNewCandidateCleanupResult `
-            -InvocationId $Context.InvocationId `
+            -InvocationId $objCleanupPlan.InvocationId `
             -PreviousState 'Disposed' `
             -FinalState 'Disposed' `
             -Success $true `
@@ -2237,10 +2316,10 @@ function Remove-StyleGuideCandidateInvocationContext {
             -ReferenceToFilesystemCallCount ([uint32]0) `
             -RetainedRecordSequences ([uint32[]]@()))
     }
-    if ($Context.LifecycleState -eq 'CleanupFailed') {
-        $arrRetained = & $scriptBlockGetCandidateRetainedSequence -Context $Context
+    if ($objCleanupPlan.LifecycleState -eq 'CleanupFailed') {
+        $arrRetained = & $scriptBlockGetCandidateRetainedSequence -Context $objCleanupPlan
         return (& $scriptBlockNewCandidateCleanupResult `
-            -InvocationId $Context.InvocationId `
+            -InvocationId $objCleanupPlan.InvocationId `
             -PreviousState 'CleanupFailed' `
             -FinalState 'CleanupFailed' `
             -Success $false `
@@ -2258,10 +2337,10 @@ function Remove-StyleGuideCandidateInvocationContext {
         # taxonomy and unreachable; no catalog row asserted it.
 
         [void](& $scriptBlockAssertCandidateOrdinaryDirectoryEnvelope `
-            -LiteralPath $Context.TrustedParentPath `
+            -LiteralPath $objCleanupPlan.TrustedParentPath `
             -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount))
         [void](& $scriptBlockAssertCandidateOrdinaryDirectoryEnvelope `
-            -LiteralPath $Context.InvocationRootPath `
+            -LiteralPath $objCleanupPlan.InvocationRootPath `
             -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount))
 
         # The expected set is derived from the journal alone, so it is known
@@ -2273,15 +2352,15 @@ function Remove-StyleGuideCandidateInvocationContext {
         # correct either way, which is exactly why nothing failed and the site
         # survived a sweep of this class.
         $listExpectedRootEntries = New-Object 'System.Collections.Generic.List[string]'
-        foreach ($objRecord in $Context.OwnershipJournal) {
-            if ($objRecord.ParentPath -eq $Context.InvocationRootPath -and
+        foreach ($objRecord in $objCleanupPlan.Journal) {
+            if ($objRecord.ParentPath -eq $objCleanupPlan.InvocationRootPath -and
                 $objRecord.EntryState -eq 'Created') {
                 $listExpectedRootEntries.Add($objRecord.Path)
             }
         }
         $arrRootEntries = [string[]]@(
             & $scriptBlockGetCandidateImmediateEntry `
-                -LiteralPath $Context.InvocationRootPath `
+                -LiteralPath $objCleanupPlan.InvocationRootPath `
                 -MaximumEntry ($listExpectedRootEntries.Count + 1) `
                 -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
         )
@@ -2298,21 +2377,21 @@ function Remove-StyleGuideCandidateInvocationContext {
             }
         }
 
-        $objDownloadDirectoryRecord = @($Context.OwnershipJournal | Where-Object {
+        $objDownloadDirectoryRecord = @($objCleanupPlan.Journal | Where-Object {
             $_.Kind -eq 'DownloadDirectory'
         })[0]
         if ($objDownloadDirectoryRecord.EntryState -eq 'Created') {
             [void](& $scriptBlockAssertCandidateOrdinaryDirectoryEnvelope `
-                -LiteralPath $Context.DownloadDirectoryPath `
+                -LiteralPath $objCleanupPlan.DownloadDirectoryPath `
                 -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount))
             # As above, the journal supplies the expectation without touching
             # the filesystem, so it can bound the read that checks it.
-            $arrDownloadRecords = @($Context.OwnershipJournal | Where-Object {
+            $arrDownloadRecords = @($objCleanupPlan.Journal | Where-Object {
                 $_.Kind -eq 'DownloadFile' -and $_.EntryState -eq 'Created'
             })
             $arrDownloadEntries = [string[]]@(
                 & $scriptBlockGetCandidateImmediateEntry `
-                    -LiteralPath $Context.DownloadDirectoryPath `
+                    -LiteralPath $objCleanupPlan.DownloadDirectoryPath `
                     -MaximumEntry ($arrDownloadRecords.Count + 1) `
                     -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
             )
@@ -2348,22 +2427,22 @@ function Remove-StyleGuideCandidateInvocationContext {
         # The answer was not a better check but a smaller surface: the entity
         # that authenticates is now the entity that deletes, so there is no
         # verifier left to substitute.
-        $objCandidateDirectoryRecord = @($Context.OwnershipJournal | Where-Object {
+        $objCandidateDirectoryRecord = @($objCleanupPlan.Journal | Where-Object {
             $_.Kind -eq 'CandidateDirectory'
         })[0]
-        $arrCandidateFileRecords = @($Context.OwnershipJournal | Where-Object {
+        $arrCandidateFileRecords = @($objCleanupPlan.Journal | Where-Object {
             $_.Kind -eq 'CandidateFile'
         })
         if ($objCandidateDirectoryRecord.EntryState -eq 'Created') {
             [void](& $scriptBlockAssertCandidateOrdinaryDirectoryEnvelope `
-                -LiteralPath $Context.CandidatePath `
+                -LiteralPath $objCleanupPlan.CandidatePath `
                 -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount))
             $arrOwnedCandidateFiles = @($arrCandidateFileRecords | Where-Object {
                 $_.EntryState -eq 'Created'
             })
             $arrCandidateEntries = [string[]]@(
                 & $scriptBlockGetCandidateImmediateEntry `
-                    -LiteralPath $Context.CandidatePath `
+                    -LiteralPath $objCleanupPlan.CandidatePath `
                     -MaximumEntry ($arrOwnedCandidateFiles.Count + 1) `
                     -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
             )
@@ -2395,16 +2474,18 @@ function Remove-StyleGuideCandidateInvocationContext {
                 -Message 'PSStyleGuide.Context.v1|phase=cleanup|reason=candidate-journal'
         }
 
-        $arrFilesToDelete = @($Context.OwnershipJournal | Where-Object {
+        $arrFilesToDelete = @($objCleanupPlan.Journal | Where-Object {
             $_.ExpectedEntryType -eq 'File' -and $_.EntryState -eq 'Created'
         } | Sort-Object -Property Sequence -Descending)
         foreach ($objRecord in $arrFilesToDelete) {
-            # Read once, into values this manager owns. The record is a
-            # property bag on a caller-held object, and a caller can replace
-            # Path with a script property whose getter answers differently on
-            # each read -- so checking one read and deleting on the next
-            # deletes something no check ever saw. Every use below is of the
-            # captured string, which nothing outside this scope can change.
+            # These come off the plan, so they are the same strings the
+            # evidence loop above proved and the same strings the validator
+            # checked. Round 32 captured them here and only here, which left
+            # the evidence phase and this phase reading the caller's record
+            # independently: measured, a second runspace flipping Path between
+            # the two deleted a file OUTSIDE the invocation root while the
+            # authenticated file survived. Capturing at the point of use is not
+            # enough when the check and the use are different points.
             $strDeletePath = [string]$objRecord.Path
             $strDeleteParent = [string]$objRecord.ParentPath
             $uintFilesystemCallCount = [uint32]($uintFilesystemCallCount + 1)
@@ -2421,13 +2502,17 @@ function Remove-StyleGuideCandidateInvocationContext {
                 & $scriptBlockStopCandidateOperation -Code 'cleanup-delete-failed' `
                     -Message 'PSStyleGuide.Context.v1|phase=cleanup|reason=file-present'
             }
+            # Written through the plan's reference to the live record. This is
+            # the only direction the caller's object is touched from here: a
+            # write, never a read.
+            $objRecord.Record.EntryState = 'Deleted'
             $objRecord.EntryState = 'Deleted'
         }
 
         # Descending sequence puts the candidate directory before the download
         # directory and the root, which is the order the filesystem requires:
         # each must be empty when its turn comes.
-        $arrDirectoriesToDelete = @($Context.OwnershipJournal | Where-Object {
+        $arrDirectoriesToDelete = @($objCleanupPlan.Journal | Where-Object {
             $_.Kind -in @(
                 'CandidateDirectory', 'DownloadDirectory', 'InvocationRootDirectory'
             ) -and
@@ -2451,6 +2536,8 @@ function Remove-StyleGuideCandidateInvocationContext {
                 & $scriptBlockStopCandidateOperation -Code 'cleanup-delete-failed' `
                     -Message 'PSStyleGuide.Context.v1|phase=cleanup|reason=directory-present'
             }
+            # Written through the plan, for the reason at the file loop above.
+            $objRecord.Record.EntryState = 'Deleted'
             $objRecord.EntryState = 'Deleted'
         }
 
@@ -2470,7 +2557,7 @@ function Remove-StyleGuideCandidateInvocationContext {
         }
         [void](& $scriptBlockAssertCandidateInMemoryContext -Context $Context)
         return (& $scriptBlockNewCandidateCleanupResult `
-            -InvocationId $Context.InvocationId `
+            -InvocationId $objCleanupPlan.InvocationId `
             -PreviousState $strPreviousState `
             -FinalState 'Disposed' `
             -Success $true `
@@ -2483,8 +2570,9 @@ function Remove-StyleGuideCandidateInvocationContext {
         # ExpectedAbsent; retyping it would contradict the record schema, which
         # binds every non-ExpectedAbsent candidate-directory record to the
         # destination phase, and would invalidate the terminal context.
-        foreach ($objRecord in $Context.OwnershipJournal) {
+        foreach ($objRecord in $objCleanupPlan.Journal) {
             if ($objRecord.EntryState -eq 'Created') {
+                $objRecord.Record.EntryState = 'RetainedUncertain'
                 $objRecord.EntryState = 'RetainedUncertain'
             }
         }
@@ -2492,12 +2580,12 @@ function Remove-StyleGuideCandidateInvocationContext {
         # what this function promises, and a caller-controlled setter that
         # throws must not turn a reported failure into an unhandled one.
         [void](& $scriptBlockSetCandidateIssuedState -Context $Context -State 'CleanupFailed')
-        $arrRetained = & $scriptBlockGetCandidateRetainedSequence -Context $Context
+        $arrRetained = & $scriptBlockGetCandidateRetainedSequence -Context $objCleanupPlan
         $strCode = & $scriptBlockGetCandidateDiagnosticCode `
             -ErrorRecord $_ `
             -Fallback 'cleanup-owned-entry-uncertain'
         return (& $scriptBlockNewCandidateCleanupResult `
-            -InvocationId $Context.InvocationId `
+            -InvocationId $objCleanupPlan.InvocationId `
             -PreviousState $strPreviousState `
             -FinalState 'CleanupFailed' `
             -Success $false `

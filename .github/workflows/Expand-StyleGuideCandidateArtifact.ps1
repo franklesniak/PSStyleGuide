@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.45
+Version: 1.0.20260803.46
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.45'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.35'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.46'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.36'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -2109,7 +2109,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.45
+    # Version: 1.0.20260803.46
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2225,6 +2225,37 @@ function Remove-StyleGuideCandidateInvocationState {
         # decoration that reads like protection.
 
         $objContextResult = Remove-StyleGuideCandidateInvocationContext -Context $Context
+
+        # A reported success is a CLAIM, made by whatever function is currently
+        # bound to that name, and this function has no way to establish that
+        # the genuine manager answered: measured, a fake bound to the name
+        # returned a schema-shaped cleanup-succeeded with FinalState Disposed
+        # while the invocation root and the download directory were still on
+        # disk. The caller is then told the work is done, does not retry, and
+        # the tree leaks for the life of the machine.
+        #
+        # So the CONSEQUENCE is proven instead of the claim. Cleanup succeeding
+        # means the invocation root is gone; no substitute can make a directory
+        # disappear without actually removing it, and if it does remove it then
+        # the work happened. This is the same move as round 32 -- authenticate
+        # a thing rather than a claim about a thing -- and it is the first one
+        # on this surface that does not depend on identifying who answered.
+        #
+        # What it does NOT do, stated rather than left to be discovered: the
+        # path checked comes from the caller's context, so an actor who both
+        # supplies the context AND rebinds the name can name a path that was
+        # never there and pass vacuously. That actor is lying to itself -- it
+        # already knows no cleanup happened. The case this protects is the one
+        # where the harm exists: an honest caller in a session where something
+        # else rebound the name.
+        if ($objContextResult.Success) {
+            $uintFilesystemCallCount = [uint32]($uintFilesystemCallCount + 1)
+            [void](& $script:scriptBlockAssertCandidateHelperEntryAbsent `
+                -ParentPath $Context.TrustedParentPath `
+                -ExpectedPath $Context.InvocationRootPath `
+                -Phase 'cleanup' `
+                -Code 'cleanup-delete-failed')
+        }
         $uintCombinedCalls = [uint32]($uintFilesystemCallCount + $objContextResult.FilesystemCallCount)
         return (& $script:scriptBlockNewCandidateHelperCleanupResult `
             -InvocationId $objContextResult.InvocationId `
@@ -2491,7 +2522,12 @@ $script:scriptBlockAssertCandidateHelperEntryAbsent = {
         [string]$ExpectedPath,
 
         [Parameter(Mandatory = $true)]
-        [string]$Phase
+        [string]$Phase,
+
+        # The cleanup caller needs a code that already exists in the taxonomy
+        # and says what actually happened, rather than a new "<phase>-invalid"
+        # minted for one site. Empty keeps every existing caller unchanged.
+        [string]$Code = ''
     )
 
     $arrEntries = [string[]]@(
@@ -2504,8 +2540,9 @@ $script:scriptBlockAssertCandidateHelperEntryAbsent = {
             $ExpectedPath,
             $script:objCandidateHelperPathComparison
         )) {
+            $strAbsenceCode = if ($Code.Length -eq 0) { "$Phase-invalid" } else { $Code }
             & $script:scriptBlockStopCandidateHelperOperation `
-                -Code "$Phase-invalid" -Phase $Phase -Subreason 'leaf-present'
+                -Code $strAbsenceCode -Phase $Phase -Subreason 'leaf-present'
         }
     }
 }
@@ -2759,14 +2796,40 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'parameter' -Phase 'parameter' -Subreason 'context-manager-not-loaded'
         }
-        # Bound to an origin rather than to a name, for the reason set out at
-        # the cleanup call site: a caller who loaded the real manager can rebind
-        # this public name afterwards, and Get-Command would still report one
-        # function. The cleanup function is resolved here purely to supply the
-        # file both must share.
-        # Challenged rather than inspected, for the reason set out at the
-        # cleanup call site: ScriptBlock.File is an argument to ParseInput and
-        # therefore a claim the caller writes, not a fact about the block.
+        # WHAT THIS CHECK PROVES, AND WHAT IT DOES NOT.
+        #
+        # The two sentences that used to stand here described an origin binding
+        # removed in round 31 and cross-referenced a challenge at the cleanup
+        # call site removed in round 32. Both mechanisms were gone; one of them
+        # had been refuted. A comment claiming a protection that is not there
+        # is worse than no comment, because it is what a reader checks instead
+        # of the code.
+        #
+        # What it proves: a context this manager never issued is refused before
+        # any filesystem work. Measured -- with the real verifier, a forgery
+        # whose context and parameters name the same attacker-owned tree under
+        # the trusted parent is refused at subreason=context-unissued with the
+        # download directory still empty. That is not decorative; without it
+        # the run proceeds to write.
+        #
+        # What it cannot prove: that the answer came from the real manager.
+        # Four checks have now been tried on this surface and four have fallen
+        # -- a function-count check to rebinding, a ScriptBlock.File check to
+        # ParseInput taking the filename as an argument, a behavioural
+        # challenge to a substitute that answers false for the probe and true
+        # for its own context, and this one to the same substitute. The failure
+        # is structural, not tactical: this script runs inside a session the
+        # caller controls, every name in it is rebindable, and the register
+        # that could settle the question lives in the manager instance that
+        # issued the context -- so loading a private copy would answer "never
+        # issued" for every genuine run. There is no fifth check to write.
+        #
+        # The deletion path escaped this by moving the work to the authority
+        # (round 32). The writes cannot follow it: extraction is this script's
+        # entire purpose. So the residual is bounded and stated instead --
+        # containment and separation still decide WHERE a write may land, and
+        # the manager's own evidence pass refuses at cleanup when the candidate
+        # directory holds anything the journal does not describe.
         $objCandidateIssuanceProbe = [pscustomobject]@{
             CandidateNeverIssued = $true
         }

@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.73
+Version: 1.0.20260803.74
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,12 +53,12 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.73'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.74'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.45'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.35'
-$script:strCandidateCatalogVersion = '1.0.20260803.10'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.46'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.36'
+$script:strCandidateCatalogVersion = '1.0.20260803.11'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
 # outstanding read finish.
@@ -1838,16 +1838,22 @@ $script:arrCandidateContextEnumerationSite = @(
     @{ Target = '$strInvocationRoot'; Bound = '1'; Match = $null },
     @{ Target = '$strDownloadDirectory'; Bound = '1'; Match = $null },
     @{ Target = '$strInvocationRoot'; Bound = '2'; Match = $null },
-    @{ Target = '$Context.InvocationRootPath'
+    # Read off the validated plan rather than the caller's context, since round
+    # 33. The context these three used to name is a caller-held object, and
+    # every read of it is a fresh read: the manager validated one and enumerated
+    # another. Pinning the plan spelling here is what stops that being undone.
+    @{ Target = '$objCleanupPlan.InvocationRootPath'
         Bound = '($listExpectedRootEntries.Count + 1)'; Match = $null },
-    @{ Target = '$Context.DownloadDirectoryPath'
+    @{ Target = '$objCleanupPlan.DownloadDirectoryPath'
         Bound = '($arrDownloadRecords.Count + 1)'; Match = $null },
-    @{ Target = '$Context.CandidatePath'
+    @{ Target = '$objCleanupPlan.CandidatePath'
         Bound = '($arrOwnedCandidateFiles.Count + 1)'; Match = $null },
     # Captured strings rather than record properties, since round 32: a record
-    # is a property bag on a caller-held object, and a getter that answers
-    # differently on each read makes a checked path and a deleted path two
-    # different things. The site table follows the code it pins.
+    # is a property bag on a caller-held object, and a concurrent writer between
+    # two reads makes a checked path and a deleted path two different things.
+    # Round 33 carried the same capture up to the evidence phase, so these
+    # strings now come off the plan the validator built. The site table follows
+    # the code it pins.
     @{ Target = '$strDeleteParent'; Bound = $null; Match = '$strDeletePath' },
     @{ Target = '$strDeleteParent'; Bound = $null; Match = '$strDeletePath' }
 )
@@ -3383,7 +3389,10 @@ $script:scriptBlockAssertStaticMembersResolve = {
 $script:scriptBlockAssertLifecycleRecordStatesRejected = {
     param (
         [Parameter(Mandatory = $true)]
-        [string]$RunRoot
+        [string]$RunRoot,
+
+        [Parameter(Mandatory = $true)]
+        [string]$HelperLiteralPath
     )
 
     # Both production validators pair each lifecycle state with the exact set of
@@ -3498,6 +3507,273 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
     if (-not [System.IO.Directory]::Exists([string]$objForgedContext.InvocationRootPath)) {
         & $script:scriptBlockStopHarness -Code 'orchestration-failed' `
             -Detail 'forged-terminal-state-root-removed'
+    }
+
+    # The expansion-side issuance check, which until round 33 had nothing
+    # asserting it at all. Round 30 added it, rounds 31 and 32 rewrote what
+    # stood beside it, and no assertion would have noticed if any of that had
+    # removed it -- so a protection this file argues for in prose was resting
+    # on nobody deleting it by accident.
+    #
+    # Behavioural rather than positional on purpose. An ordering pin over the
+    # source can be satisfied by code that never runs, which round 20 measured:
+    # wrapping a branch in if ($false) left the suite green. This runs the real
+    # entry point against a context this manager never issued and requires the
+    # refusal to arrive in the parameter phase with the caller's download
+    # directory untouched, which is a claim only the executed check can meet.
+    #
+    # The forgery is a structural clone under a trusted parent, naming its own
+    # tree consistently in both the context and the parameters, so nothing
+    # upstream of the issuance check has anything to catch: no path mismatch,
+    # no schema defect, no state defect.
+    $strUnissuedRoot = [System.IO.Path]::Combine($RunRoot, 'unissued-expansion')
+    [void][System.IO.Directory]::CreateDirectory($strUnissuedRoot)
+    $objUnissuedContext = New-StyleGuideCandidateInvocationContext `
+        -TrustedTemporaryRoot $strUnissuedRoot `
+        -DiagnosticLabel 'unissued-expansion'
+    $strUnissuedTree = [System.IO.Path]::Combine($strUnissuedRoot, 'aaaaaaaa.unissued')
+    $strUnissuedDownload = [System.IO.Path]::Combine($strUnissuedTree, 'download')
+    $strUnissuedCandidate = [System.IO.Path]::Combine($strUnissuedTree, 'candidate')
+    [void][System.IO.Directory]::CreateDirectory($strUnissuedDownload)
+    $objUnissuedContext.InvocationRootPath = $strUnissuedTree
+    $objUnissuedContext.DownloadDirectoryPath = $strUnissuedDownload
+    $objUnissuedContext.CandidatePath = $strUnissuedCandidate
+    $objUnissuedContext.OwnershipJournal[0].Path = $strUnissuedTree
+    $objUnissuedContext.OwnershipJournal[0].ParentPath = $strUnissuedRoot
+    $objUnissuedContext.OwnershipJournal[0].LeafName = 'aaaaaaaa.unissued'
+    $objUnissuedContext.OwnershipJournal[1].Path = $strUnissuedDownload
+    $objUnissuedContext.OwnershipJournal[1].ParentPath = $strUnissuedTree
+    $objUnissuedContext.OwnershipJournal[1].EntryState = 'Created'
+    $objUnissuedContext.OwnershipJournal[2].Path = $strUnissuedCandidate
+    $objUnissuedContext.OwnershipJournal[2].ParentPath = $strUnissuedTree
+    # The manager acting on the path it authenticated, under a writer that
+    # moves the path between the authentication and the delete.
+    #
+    # Round 32 captured the path at the delete loop; round 33 found the evidence
+    # loop reading the caller's record separately, so the check and the use were
+    # still two reads. Measured before the fix, 4 runs of 4 across both
+    # runtimes: a file OUTSIDE the invocation root was deleted while the
+    # authenticated file survived, and the manager refused afterwards.
+    #
+    # The mutator is a second runspace in this process holding the same record
+    # object -- not a script property, which the schema check refuses outright,
+    # and the reason round 32's stated mechanism was wrong. It waits on a real
+    # event rather than a timer: the higher-sequence file disappearing means the
+    # evidence phase is over and the delete loop is running.
+    #
+    # ONE-SIDED ON PURPOSE. Both assertions hold whether or not the mutator wins
+    # its race, so a lost race cannot produce a false failure; it can only
+    # produce a weaker pass. A timing-sensitive assertion that fails
+    # occasionally is worse than none, because a suite people learn to re-run is
+    # a suite that stops being read.
+    $strRacedRoot = [System.IO.Path]::Combine($RunRoot, 'raced-delete')
+    [void][System.IO.Directory]::CreateDirectory($strRacedRoot)
+    $objRacedContext = New-StyleGuideCandidateInvocationContext `
+        -TrustedTemporaryRoot $strRacedRoot `
+        -DiagnosticLabel 'raced-delete'
+    [void][System.IO.Directory]::CreateDirectory(
+        [string]$objRacedContext.DownloadDirectoryPath)
+    [void][System.IO.Directory]::CreateDirectory([string]$objRacedContext.CandidatePath)
+    $strRacedVictimParent = [System.IO.Path]::Combine($strRacedRoot, 'victim')
+    [void][System.IO.Directory]::CreateDirectory($strRacedVictimParent)
+    $strRacedVictim = [System.IO.Path]::Combine($strRacedVictimParent, 'victim.txt')
+    [System.IO.File]::WriteAllBytes($strRacedVictim, [byte[]]@(0x76))
+    $objRacedContext.OwnershipJournal[1].EntryState = 'Created'
+    $objRacedContext.OwnershipJournal[2].EntryState = 'Created'
+    $objRacedContext.OwnershipJournal[2].CreationPhase = 'destination'
+    $arrRacedRecord = @()
+    foreach ($hashtableRacedFile in @(
+        @{ Sequence = [uint32]3; Leaf = 'target.txt'; Byte = [byte]0x74 },
+        @{ Sequence = [uint32]4; Leaf = 'trigger.txt'; Byte = [byte]0x67 }
+    )) {
+        $strRacedPath = [System.IO.Path]::Combine(
+            [string]$objRacedContext.CandidatePath, [string]$hashtableRacedFile.Leaf)
+        $arrRacedByte = [byte[]]@([byte]$hashtableRacedFile.Byte)
+        [System.IO.File]::WriteAllBytes($strRacedPath, $arrRacedByte)
+        $objRacedRecord = $objRacedContext.OwnershipJournal[2].PSObject.Copy()
+        $objRacedRecord.Sequence = [uint32]$hashtableRacedFile.Sequence
+        $objRacedRecord.Kind = 'CandidateFile'
+        $objRacedRecord.Path = $strRacedPath
+        $objRacedRecord.ParentPath = [string]$objRacedContext.CandidatePath
+        $objRacedRecord.LeafName = [string]$hashtableRacedFile.Leaf
+        $objRacedRecord.ExpectedEntryType = 'File'
+        $objRacedRecord.CreationPhase = 'extraction'
+        $objRacedRecord.EntryState = 'Created'
+        $objRacedRecord.ContentLength = [uint64]$arrRacedByte.Length
+        $objRacedRecord.ContentSha256 = & $script:scriptBlockGetByteArraySha256 -Bytes $arrRacedByte
+        $arrRacedRecord += $objRacedRecord
+    }
+    $strRacedTarget = [string]$arrRacedRecord[0].Path
+    $strRacedTrigger = [string]$arrRacedRecord[1].Path
+    $objRacedContext.OwnershipJournal = [object[]]@(
+        $objRacedContext.OwnershipJournal[0],
+        $objRacedContext.OwnershipJournal[1],
+        $objRacedContext.OwnershipJournal[2],
+        $arrRacedRecord[0],
+        $arrRacedRecord[1]
+    )
+    $objRacedContext.NextSequence = [uint32]5
+    $objRacedRunspace = [runspacefactory]::CreateRunspace()
+    $objRacedRunspace.Open()
+    # A synchronized flag rather than a sleep. BeginInvoke queues onto the
+    # thread pool, and cleanup is fast enough to finish before a queued thread
+    # is ever scheduled -- measured: the first version of this assertion passed
+    # against a deliberately regressed manager, because the mutator had not
+    # started. Waiting for the mutator to say it is running removes the startup
+    # race without putting a timer anywhere.
+    $hashtableRacedSignal = [hashtable]::Synchronized(@{ Running = $false })
+    $objRacedRunspace.SessionStateProxy.SetVariable('objRecord', $arrRacedRecord[0])
+    $objRacedRunspace.SessionStateProxy.SetVariable('strTrigger', $strRacedTrigger)
+    $objRacedRunspace.SessionStateProxy.SetVariable('strVictim', $strRacedVictim)
+    $objRacedRunspace.SessionStateProxy.SetVariable('strVictimParent', $strRacedVictimParent)
+    $objRacedRunspace.SessionStateProxy.SetVariable('hashtableSignal', $hashtableRacedSignal)
+    $objRacedShell = [powershell]::Create()
+    $objRacedShell.Runspace = $objRacedRunspace
+    [void]$objRacedShell.AddScript({
+        $objWatch = [System.Diagnostics.Stopwatch]::StartNew()
+        $hashtableSignal.Running = $true
+        while ($objWatch.ElapsedMilliseconds -lt 5000) {
+            if (-not [System.IO.File]::Exists($strTrigger)) {
+                $objRecord.ParentPath = $strVictimParent
+                $objRecord.Path = $strVictim
+                return
+            }
+        }
+    })
+    try {
+        $objRacedHandle = $objRacedShell.BeginInvoke()
+        $objRacedStart = [System.Diagnostics.Stopwatch]::StartNew()
+        while (-not $hashtableRacedSignal.Running -and
+            $objRacedStart.ElapsedMilliseconds -lt 5000) {
+        }
+        [void](Remove-StyleGuideCandidateInvocationContext -Context $objRacedContext)
+        [void]$objRacedShell.EndInvoke($objRacedHandle)
+    } finally {
+        $objRacedShell.Dispose()
+        $objRacedRunspace.Close()
+        $objRacedRunspace.Dispose()
+    }
+    if (-not [System.IO.File]::Exists($strRacedVictim)) {
+        & $script:scriptBlockStopHarness -Code 'orchestration-failed' `
+            -Detail 'raced-delete-victim-removed'
+    }
+    if ([System.IO.File]::Exists($strRacedTarget)) {
+        & $script:scriptBlockStopHarness -Code 'orchestration-failed' `
+            -Detail 'raced-delete-target-survived'
+    }
+
+    # And the other half of the same property, on the cleanup side. Round 32
+    # moved the deletions into the manager, which left the helper's cleanup
+    # function delegating everything to whatever answers to the manager's public
+    # name and passing the returned object straight back. Measured before the
+    # fix: a fake bound to that name returned a schema-shaped cleanup-succeeded
+    # with FinalState Disposed while the invocation root was still on disk.
+    #
+    # The fix proves the CONSEQUENCE instead of the claim, so this asserts the
+    # consequence too: with a lying manager installed, the helper must refuse
+    # and the root must still be there. A filesystem-call-count oracle would
+    # only record that a call happened, which round 20 established is not the
+    # same as recording what it decided.
+    #
+    # The substitution is undone in a finally. The saved value is the real
+    # function's ScriptBlock, and rebinding it restores the closure over the
+    # manager's private register -- verified by the cases that run after this.
+    $strFakeManagerRoot = [System.IO.Path]::Combine($RunRoot, 'fake-manager')
+    [void][System.IO.Directory]::CreateDirectory($strFakeManagerRoot)
+    $objFakeManagerContext = New-StyleGuideCandidateInvocationContext `
+        -TrustedTemporaryRoot $strFakeManagerRoot `
+        -DiagnosticLabel 'fake-manager'
+    [void][System.IO.Directory]::CreateDirectory(
+        [string]$objFakeManagerContext.DownloadDirectoryPath)
+    $objFakeManagerContext.OwnershipJournal[1].EntryState = 'Created'
+    $scriptBlockRealContextCleanup = (Get-Command `
+        -Name Remove-StyleGuideCandidateInvocationContext `
+        -CommandType Function).ScriptBlock
+    $objFakeManagerResult = $null
+    try {
+        Set-Item -LiteralPath Function:\Remove-StyleGuideCandidateInvocationContext -Value {
+            param (
+                [Parameter(Mandatory = $true)]
+                [AllowNull()]
+                [object]$Context
+            )
+
+            $objLie = [pscustomobject]@{
+                SchemaVersion = [uint32]1
+                InvocationId = $Context.InvocationId
+                PreviousState = 'Active'
+                FinalState = 'Disposed'
+                Success = $true
+                DiagnosticCode = 'cleanup-succeeded'
+                FilesystemCallCount = [uint32]7
+                RetainedRecordSequences = [uint32[]]@()
+            }
+            $objLie.PSObject.TypeNames.Insert(0, 'PSStyleGuide.CandidateCleanupResult.v1')
+            return $objLie
+        } -Force
+        $objFakeManagerResult = Remove-StyleGuideCandidateInvocationState `
+            -Context $objFakeManagerContext
+    } finally {
+        Set-Item -LiteralPath Function:\Remove-StyleGuideCandidateInvocationContext `
+            -Value $scriptBlockRealContextCleanup -Force
+    }
+    if ($null -eq $objFakeManagerResult -or
+        $objFakeManagerResult.Success -or
+        ([string]$objFakeManagerResult.DiagnosticCode) -cne 'cleanup-delete-failed') {
+        & $script:scriptBlockStopHarness -Code 'orchestration-failed' `
+            -Detail ('fake-manager-' + $(if ($null -eq $objFakeManagerResult) {
+                'no-result'
+            } else {
+                [string]$objFakeManagerResult.DiagnosticCode
+            }))
+    }
+    if (-not [System.IO.Directory]::Exists(
+            [string]$objFakeManagerContext.InvocationRootPath)) {
+        & $script:scriptBlockStopHarness -Code 'orchestration-failed' `
+            -Detail 'fake-manager-root-removed'
+    }
+
+    $strUnissuedCheckout = [System.IO.Path]::Combine($strUnissuedRoot, 'checkout')
+    [void][System.IO.Directory]::CreateDirectory($strUnissuedCheckout)
+    $boolUnissuedSucceeded = $false
+    $strUnissuedPhase = 'none'
+    $strUnissuedSubreason = 'none'
+    try {
+        [void](& $HelperLiteralPath `
+            -Context $objUnissuedContext `
+            -CheckoutRoot $strUnissuedCheckout `
+            -TrustedTemporaryRoot $strUnissuedRoot `
+            -DownloadDirectory $strUnissuedDownload `
+            -CandidateDirectory $strUnissuedCandidate `
+            -ExpectedDigest ('0' * 64))
+        $boolUnissuedSucceeded = $true
+    } catch {
+        $objUnissuedPhase = [regex]::Match(
+            [string]$_.Exception.Message, 'phase=([a-z][a-z0-9-]*)')
+        if ($objUnissuedPhase.Success) {
+            $strUnissuedPhase = $objUnissuedPhase.Groups[1].Value
+        }
+        $objUnissuedSubreason = [regex]::Match(
+            [string]$_.Exception.Message, 'subreason=([a-z][a-zA-Z0-9-]*)')
+        if ($objUnissuedSubreason.Success) {
+            $strUnissuedSubreason = $objUnissuedSubreason.Groups[1].Value
+        }
+    }
+    if ($boolUnissuedSucceeded -or
+        $strUnissuedPhase -cne 'parameter' -or
+        $strUnissuedSubreason -cne 'context-unissued') {
+        & $script:scriptBlockStopHarness -Code 'orchestration-failed' `
+            -Detail ('unissued-expansion-' + $strUnissuedPhase +
+                '-' + $strUnissuedSubreason)
+    }
+    # The refusal alone is not the claim. A check that refuses AFTER writing is
+    # the defect rounds 29 to 32 kept finding, so the download directory must
+    # still be empty and the candidate directory must never have been created.
+    if (@([System.IO.Directory]::EnumerateFileSystemEntries(
+            $strUnissuedDownload)).Count -ne 0 -or
+        [System.IO.Directory]::Exists($strUnissuedCandidate)) {
+        & $script:scriptBlockStopHarness -Code 'orchestration-failed' `
+            -Detail 'unissued-expansion-wrote'
     }
 
     $strScenarioRoot = [System.IO.Path]::Combine($RunRoot, 'lifecycle-record-state')
@@ -7389,7 +7665,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.73
+    # Version: 1.0.20260803.74
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -7632,7 +7908,8 @@ function Invoke-StyleGuideCandidateHarness {
         & $script:scriptBlockAssertDownloadLeafGuardExecutes `
             -HelperLiteralPath $strHelperLiteralPath `
             -RunRoot $strRunRoot
-        & $script:scriptBlockAssertLifecycleRecordStatesRejected -RunRoot $strRunRoot
+        & $script:scriptBlockAssertLifecycleRecordStatesRejected -RunRoot $strRunRoot `
+            -HelperLiteralPath $strHelperLiteralPath
         & $script:scriptBlockAssertResourceGuardsReached `
             -LiteralPath $strHelperLiteralPath `
             -RunRoot $strRunRoot
