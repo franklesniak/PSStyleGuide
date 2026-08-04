@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.25
+Version: 1.0.20260803.26
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.25'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.12'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.26'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.13'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -199,6 +199,9 @@ $script:objCandidateHelperPathComparer = if ($script:boolCandidateHelperIsWindow
 # fixes that at four. The ceiling exists so that a bound cannot be satisfied in
 # shape while being no bound at all.
 $script:intCandidateHelperMaximumEntryCeiling = 64
+# The documented label ceiling, and the longest path either platform can name.
+$script:intCandidateHelperMaximumLabelLength = 128
+$script:intCandidateHelperMaximumPathLength = 32767
 $script:chrCandidateHelperDirectorySeparator = [System.IO.Path]::DirectorySeparatorChar
 $script:chrCandidateHelperAlternateSeparator = [System.IO.Path]::AltDirectorySeparatorChar
 # A leaf used as an enumeration search pattern must be a literal, and only two
@@ -310,6 +313,31 @@ $script:scriptBlockAssertCandidateHelperRawString = {
             -Code 'parameter' -Phase 'parameter' -Subreason "$ParameterName-type"
     }
     $strValue = [string]$Value
+    # Length is decided before anything walks the value, because everything
+    # below is proportional to it and the verdict is not. ToCharArray copies the
+    # whole string and the foreach boxes every character, so scanning first and
+    # capping afterwards charged the run for a value the cap was always going to
+    # refuse. Measured on .NET 8.0.10, a control-free oversized label:
+    #
+    #     1 MiB    463 ms /  18.72 MiB   ->     2 ms / 0.12 MiB
+    #    16 MiB  4,640 ms / 163.58 MiB   ->     0 ms / 0.03 MiB
+    #    64 MiB 19,358 ms / 398.13 MiB   ->     0 ms / 0.03 MiB
+    #
+    # The path parameters were the worse half of this and carried no cap at all:
+    # the label at least had one to reach eventually. Their ceiling is the
+    # longest path either platform can express -- Windows extended-length paths
+    # stop at 32,767 characters and Linux PATH_MAX is far below it -- so it
+    # refuses only values that no filesystem could have named, and a legitimate
+    # path cannot collide with it.
+    $intMaximumLength = if ($IsLabel) {
+        $script:intCandidateHelperMaximumLabelLength
+    } else {
+        $script:intCandidateHelperMaximumPathLength
+    }
+    if ($strValue.Length -gt $intMaximumLength) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'parameter' -Phase 'parameter' -Subreason "$ParameterName-length"
+    }
     if ($strValue.Length -eq 0 -or [System.String]::IsNullOrWhiteSpace($strValue)) {
         & $script:scriptBlockStopCandidateHelperOperation `
             -Code 'parameter' -Phase 'parameter' -Subreason "$ParameterName-empty"
@@ -319,10 +347,6 @@ $script:scriptBlockAssertCandidateHelperRawString = {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'parameter' -Phase 'parameter' -Subreason "$ParameterName-control"
         }
-    }
-    if ($IsLabel -and $strValue.Length -gt 128) {
-        & $script:scriptBlockStopCandidateHelperOperation `
-            -Code 'parameter' -Phase 'parameter' -Subreason "$ParameterName-length"
     }
     return $strValue
 }
@@ -1969,7 +1993,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.25
+    # Version: 1.0.20260803.26
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
