@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.13
+Version: 1.0.20260803.14
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.13'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.6'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.14'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.7'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -197,6 +197,21 @@ $script:objCandidateHelperPathComparer = if ($script:boolCandidateHelperIsWindow
 }
 $script:chrCandidateHelperDirectorySeparator = [System.IO.Path]::DirectorySeparatorChar
 $script:chrCandidateHelperAlternateSeparator = [System.IO.Path]::AltDirectorySeparatorChar
+# A leaf used as an enumeration search pattern must be a literal. The set is
+# spelled out rather than taken from GetInvalidFileNameChars alone, which
+# returns only NUL and '/' on Unix and the full Windows set on Windows: a leaf
+# refused on one runtime and pattern-matched on the other would be exactly the
+# cross-platform divergence these helpers exist to avoid. Wildcards are refused
+# rather than escaped because the two-argument enumeration overload -- the only
+# one available on .NET Framework 4.8 -- offers no escaping, and because no leaf
+# reaching here can legitimately contain one: they are GetRandomFileName output
+# (alphabet '.0-5a-z', 20000 samples), the fixed manifest names, 'download', or
+# 'candidate'.
+$script:arrCandidateHelperRejectedMatchCharacter = [char[]]@(
+    [System.IO.Path]::GetInvalidFileNameChars() +
+    [char[]]@('*', '?', '[', ']', ':', '\', '/') +
+    [char[]]@(0..31 | ForEach-Object { [char]$_ })
+)
 $script:scriptBlockNewCandidateHelperException = {
     param (
         [Parameter(Mandatory = $true)]
@@ -852,6 +867,8 @@ $script:scriptBlockGetCandidateHelperEntry = {
 
         [int]$MaximumEntry,
 
+        [string]$MatchPath,
+
         [ref]$ReferenceToFilesystemCallCount
     )
 
@@ -877,6 +894,27 @@ $script:scriptBlockGetCandidateHelperEntry = {
     # below the bound is still the complete listing, which is what the presence
     # checks downstream rely on. Callers proving a path ABSENT must not pass a
     # bound: absence cannot be concluded from a partial listing.
+    #
+    # That rule is true and was, on its own, read too far: it does not follow
+    # that an absence proof must read EVERYTHING. Every absence proof here names
+    # the one path it is disproving, and asking the filesystem about that one
+    # name is what MatchPath does. The whole-parent read it replaces was work an
+    # unrelated party could inflate simply by keeping files in the same shared
+    # temporary directory -- 50000 unrelated entries measured 660 ms and
+    # 15.87 MiB on .NET 8, 389 ms and 19.96 MiB on .NET 10, against 72 ms and
+    # 0.05 MiB filtered, and the creation loop retries up to 16 times.
+    #
+    # Filtering must not become a weaker test, so it is a filter and nothing
+    # more: the caller's exact full-path comparison is unchanged, and a search
+    # pattern that matches extra names can therefore only be rejected by it. The
+    # dangerous direction is matching too FEW, which a literal pattern cannot do
+    # -- so a leaf carrying a wildcard metacharacter is refused rather than
+    # pattern-matched. Existence APIs are not an option in its place: File.Exists
+    # and Directory.Exists disagree with each other on a dangling symbolic link
+    # (measured True and False on .NET 8 and .NET 10) and both report absent on
+    # Windows, where the link is followed. Enumeration names entries without
+    # following them, which is why it was chosen and why it stays.
+    #
     # MaximumEntry uses an in-band sentinel: omitted means unbounded, and the
     # parameter defaults to zero, so the `-le 0` branch below is what serves the
     # absence proofs. That makes an explicit `-MaximumEntry 0` read as a bound
@@ -884,15 +922,36 @@ $script:scriptBlockGetCandidateHelperEntry = {
     # neutered without looking neutered. Omission stays unbounded; an explicitly
     # supplied non-positive bound is a contradiction and is refused here, above
     # the try, so it is not reported as an enumeration failure and no filesystem
-    # call is counted for a call that never happened.
-    if ($PSBoundParameters.ContainsKey('MaximumEntry') -and $MaximumEntry -le 0) {
+    # call is counted for a call that never happened. A bounded filtered read is
+    # the same contradiction wearing the other hat -- it would reduce a named
+    # absence proof to a partial listing again -- so the two are refused
+    # together.
+    if (($PSBoundParameters.ContainsKey('MaximumEntry') -and $MaximumEntry -le 0) -or
+        ($PSBoundParameters.ContainsKey('MaximumEntry') -and
+            $PSBoundParameters.ContainsKey('MatchPath'))) {
         & $script:scriptBlockStopCandidateHelperOperation `
             -Code $strFailureCode -Phase $Phase -Subreason 'enumeration-bound'
+    }
+    $strMatchLeaf = ''
+    if ($PSBoundParameters.ContainsKey('MatchPath')) {
+        $strMatchLeaf = [System.IO.Path]::GetFileName($MatchPath)
+        if ($strMatchLeaf.Length -eq 0 -or
+            $strMatchLeaf.Length -gt 255 -or
+            $strMatchLeaf -ceq '.' -or
+            $strMatchLeaf -ceq '..' -or
+            $strMatchLeaf.IndexOfAny($script:arrCandidateHelperRejectedMatchCharacter) -ge 0) {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code $strFailureCode -Phase $Phase -Subreason 'enumeration-filter'
+        }
     }
 
     try {
         if ($null -ne $ReferenceToFilesystemCallCount) {
             $ReferenceToFilesystemCallCount.Value = [uint32]($ReferenceToFilesystemCallCount.Value + 1)
+        }
+        if ($strMatchLeaf.Length -ne 0) {
+            return [string[]]@([System.IO.Directory]::EnumerateFileSystemEntries(
+                $LiteralPath, $strMatchLeaf))
         }
         if ($MaximumEntry -le 0) {
             return [string[]]@([System.IO.Directory]::EnumerateFileSystemEntries($LiteralPath))
@@ -1630,7 +1689,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.13
+    # Version: 1.0.20260803.14
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1756,6 +1815,7 @@ function Remove-StyleGuideCandidateInvocationState {
                     & $script:scriptBlockGetCandidateHelperEntry `
                         -LiteralPath $Context.CandidatePath `
                         -Phase 'cleanup' `
+                        -MatchPath $objRecord.Path `
                         -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
                 )
                 if (& $script:scriptBlockTestCandidateHelperEntryPresent `
@@ -1773,6 +1833,7 @@ function Remove-StyleGuideCandidateInvocationState {
                 & $script:scriptBlockGetCandidateHelperEntry `
                     -LiteralPath $Context.InvocationRootPath `
                     -Phase 'cleanup' `
+                    -MatchPath $Context.CandidatePath `
                     -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
             )
             if (& $script:scriptBlockTestCandidateHelperEntryPresent `
@@ -2059,7 +2120,8 @@ $script:scriptBlockAssertCandidateHelperEntryAbsent = {
     )
 
     $arrEntries = [string[]]@(
-        & $script:scriptBlockGetCandidateHelperEntry -LiteralPath $ParentPath -Phase $Phase
+        & $script:scriptBlockGetCandidateHelperEntry -LiteralPath $ParentPath -Phase $Phase `
+            -MatchPath $ExpectedPath
     )
     foreach ($strEntry in $arrEntries) {
         if ([System.String]::Equals(

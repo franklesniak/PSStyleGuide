@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.20
+Version: 1.0.20260803.21
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,12 +53,12 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.20'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.21'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.13'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.6'
-$script:strCandidateCatalogVersion = '1.0.20260803.3'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.14'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.7'
+$script:strCandidateCatalogVersion = '1.0.20260803.4'
 # The physical allocation size, stated once. It was previously two bare literals
 # inside the header check, which is why growing the catalog failed with an
 # unhelpful 'header' detail rather than naming the count.
@@ -1565,24 +1565,35 @@ $script:arrCandidateEnumerationScriptBlockName = [string[]]@(
 # one. Presence alone is satisfied by -MaximumEntry 0, which both helpers
 # document as meaning unbounded, and by an arbitrarily large literal that bounds
 # nothing in practice. $null means the site must pass no bound at all.
+#
+# Match records the same thing for -MatchPath, and the two together carry the
+# rule this table exists to hold: every site is bounded XOR filtered. The sites
+# that pass neither were the mistake -- a full parent listing to answer whether
+# one named path exists, which an unrelated party sharing the directory could
+# inflate at will. Both directions are wrong and both are refused: a site that
+# drops its filter reads the whole parent again, and a site that gains one
+# where a cardinality count is wanted would count only the filtered name.
 $script:arrCandidateContextEnumerationSite = @(
-    @{ Target = '$strTrustedParent'; Bound = $null },
-    @{ Target = '$strInvocationRoot'; Bound = '1' },
-    @{ Target = '$strDownloadDirectory'; Bound = '1' },
-    @{ Target = '$strInvocationRoot'; Bound = '2' },
-    @{ Target = '$Context.InvocationRootPath'; Bound = '($listExpectedRootEntries.Count + 1)' },
-    @{ Target = '$Context.DownloadDirectoryPath'; Bound = '($arrDownloadRecords.Count + 1)' },
-    @{ Target = '$objRecord.ParentPath'; Bound = $null },
-    @{ Target = '$objRecord.ParentPath'; Bound = $null }
+    @{ Target = '$strTrustedParent'; Bound = $null; Match = '$strInvocationRoot' },
+    @{ Target = '$strInvocationRoot'; Bound = '1'; Match = $null },
+    @{ Target = '$strDownloadDirectory'; Bound = '1'; Match = $null },
+    @{ Target = '$strInvocationRoot'; Bound = '2'; Match = $null },
+    @{ Target = '$Context.InvocationRootPath'
+        Bound = '($listExpectedRootEntries.Count + 1)'; Match = $null },
+    @{ Target = '$Context.DownloadDirectoryPath'
+        Bound = '($arrDownloadRecords.Count + 1)'; Match = $null },
+    @{ Target = '$objRecord.ParentPath'; Bound = $null; Match = '$objRecord.Path' },
+    @{ Target = '$objRecord.ParentPath'; Bound = $null; Match = '$objRecord.Path' }
 )
 $script:arrCandidateHelperEnumerationSite = @(
-    @{ Target = '$Context.CandidatePath'; Bound = '($arrOwnedCandidateFiles.Count + 1)' },
-    @{ Target = '$Context.CandidatePath'; Bound = $null },
-    @{ Target = '$Context.InvocationRootPath'; Bound = $null },
-    @{ Target = '$ParentPath'; Bound = $null },
-    @{ Target = '$strDownloadPath'; Bound = '2' },
-    @{ Target = '$strCandidatePath'; Bound = '1' },
-    @{ Target = '$strCandidatePath'; Bound = '5' }
+    @{ Target = '$Context.CandidatePath'
+        Bound = '($arrOwnedCandidateFiles.Count + 1)'; Match = $null },
+    @{ Target = '$Context.CandidatePath'; Bound = $null; Match = '$objRecord.Path' },
+    @{ Target = '$Context.InvocationRootPath'; Bound = $null; Match = '$Context.CandidatePath' },
+    @{ Target = '$ParentPath'; Bound = $null; Match = '$ExpectedPath' },
+    @{ Target = '$strDownloadPath'; Bound = '2'; Match = $null },
+    @{ Target = '$strCandidatePath'; Bound = '1'; Match = $null },
+    @{ Target = '$strCandidatePath'; Bound = '5'; Match = $null }
 )
 
 $script:scriptBlockAssertEnumerationBoundsDeclared = {
@@ -1627,6 +1638,7 @@ $script:scriptBlockAssertEnumerationBoundsDeclared = {
         for ($intSite = 0; $intSite -lt $arrExpectedSite.Count; $intSite++) {
             $objCall = @($arrCall)[$intSite]
             $strBoundText = $null
+            $strMatchText = $null
             $strTargetText = ''
             for ($intIndex = 1; $intIndex -lt @($objCall.CommandElements).Count; $intIndex++) {
                 $objElement = $objCall.CommandElements[$intIndex]
@@ -1637,6 +1649,10 @@ $script:scriptBlockAssertEnumerationBoundsDeclared = {
                 if ($objElement.ParameterName -ceq 'MaximumEntry' -and
                     ($intIndex + 1) -lt @($objCall.CommandElements).Count) {
                     $strBoundText = [string]$objCall.CommandElements[$intIndex + 1].Extent.Text
+                }
+                if ($objElement.ParameterName -ceq 'MatchPath' -and
+                    ($intIndex + 1) -lt @($objCall.CommandElements).Count) {
+                    $strMatchText = [string]$objCall.CommandElements[$intIndex + 1].Extent.Text
                 }
                 if ($objElement.ParameterName -ceq 'LiteralPath' -and
                     ($intIndex + 1) -lt @($objCall.CommandElements).Count) {
@@ -1656,6 +1672,25 @@ $script:scriptBlockAssertEnumerationBoundsDeclared = {
             } elseif ($strBoundText -cne [string]$objExpectedBound) {
                 & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                     -Detail ('enumeration-site-bound-' + $intSite + '-' + $strTargetText)
+            }
+            $objExpectedMatch = $arrExpectedSite[$intSite].Match
+            if ($null -eq $objExpectedMatch) {
+                if ($null -ne $strMatchText) {
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                        -Detail ('enumeration-site-match-' + $intSite + '-' + $strTargetText)
+                }
+            } elseif ($strMatchText -cne [string]$objExpectedMatch) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                    -Detail ('enumeration-site-match-' + $intSite + '-' + $strTargetText)
+            }
+            # The table is only as good as the rule it encodes, so the rule is
+            # asserted against the table as well: a future editor who adds a row
+            # with neither a bound nor a filter has written down the very defect
+            # this check exists to refuse, and one carrying both has written a
+            # named absence proof that reads a partial listing.
+            if (($null -eq $objExpectedBound) -eq ($null -eq $objExpectedMatch)) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                    -Detail ('enumeration-site-exclusive-' + $intSite + '-' + $strTargetText)
             }
         }
     }
@@ -5634,7 +5669,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.20
+    # Version: 1.0.20260803.21
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
