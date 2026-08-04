@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.36
+Version: 1.0.20260803.37
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.36'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.37'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.29'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -2109,7 +2109,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.36
+    # Version: 1.0.20260803.37
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2805,6 +2805,31 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         if ($Context.LifecycleState -cne 'Active') {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'parameter' -Phase 'parameter' -Subreason 'Context-state'
+        }
+        # Everything above reads the context the caller supplied. Issuance is a
+        # question only the manager can answer, and it is asked here, in the
+        # parameter phase, because the first filesystem work on these paths is
+        # not far below: the root-separation probe writes a sentinel into the
+        # download directory, and the destination step creates the candidate
+        # directory. Both act on paths this context names.
+        #
+        # The cleanup path was corrected for this first, and the correction is
+        # only half done if the path that WRITES keeps the older rule. The
+        # exposure here is smaller -- these are creates rather than deletes, and
+        # the containment and separation proofs already bound where they can
+        # land -- but the property is the same one, and a property enforced in
+        # one of two places is the shape of defect this file keeps producing.
+        $arrIssuanceCommands = @(
+            Get-Command -Name Test-StyleGuideCandidateInvocationContextIssued `
+                -CommandType Function -ErrorAction SilentlyContinue
+        )
+        if ($arrIssuanceCommands.Count -ne 1) {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'parameter' -Phase 'parameter' -Subreason 'context-manager-not-loaded'
+        }
+        if (-not (Test-StyleGuideCandidateInvocationContextIssued -Context $Context)) {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'parameter' -Phase 'parameter' -Subreason 'context-unissued'
         }
         $objValidatedContext = $Context
 
