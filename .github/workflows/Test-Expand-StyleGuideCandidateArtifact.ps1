@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.61
+Version: 1.0.20260803.62
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,12 +53,12 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.61'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.62'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.35'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.28'
-$script:strCandidateCatalogVersion = '1.0.20260803.8'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.36'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.29'
+$script:strCandidateCatalogVersion = '1.0.20260803.9'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
 # outstanding read finish.
@@ -2016,6 +2016,7 @@ $script:arrCandidateHelperPermittedCommand = [string[]]@(
     'Remove-StyleGuideCandidateInvocationState',
     'Set-StrictMode',
     'Sort-Object',
+    'Test-StyleGuideCandidateInvocationContextIssued',
     'Where-Object'
 )
 $script:arrCandidateContextPermittedCommand = [string[]]@(
@@ -2035,13 +2036,15 @@ $script:arrCandidateContextPermittedCommand = [string[]]@(
 # performs an unbounded listing.
 $script:arrCandidateContextPermittedSetItemPath = [string[]]@(
     'Function:\New-StyleGuideCandidateInvocationContext',
-    'Function:\Remove-StyleGuideCandidateInvocationContext'
+    'Function:\Remove-StyleGuideCandidateInvocationContext',
+    'Function:\Test-StyleGuideCandidateInvocationContextIssued'
 )
 # And what may be written to them. The destination was pinned a round before
 # the payload was, which left the half that actually runs unexamined.
 $script:arrCandidateContextPermittedSetItemValue = [string[]]@(
     'scriptBlockNewContextFunction',
-    'scriptBlockRemoveContextFunction'
+    'scriptBlockRemoveContextFunction',
+    'scriptBlockTestContextFunction'
 )
 # Every member either script invokes, by name. This is an allow-list because
 # the surface is enumerable and was measured to be: 48 names in the helper and
@@ -6977,7 +6980,7 @@ $script:scriptBlockInvokeScriptIdentityFixture = {
             } else {
                 $script:strCandidateExpectedContextVersion
             }
-            $uintFunctionCount = if ($boolHelperCase) { [uint32]1 } else { [uint32]2 }
+            $uintFunctionCount = if ($boolHelperCase) { [uint32]1 } else { [uint32]3 }
 
             switch -Exact ($strSemantic) {
                 'script.helper.path-missing' {
@@ -7297,7 +7300,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.61
+    # Version: 1.0.20260803.62
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -7420,7 +7423,7 @@ function Invoke-StyleGuideCandidateHarness {
         -LiteralPath $strContextLiteralPath `
         -RelativePath $script:strCandidateContextRelativePath `
         -ExpectedVersion $script:strCandidateExpectedContextVersion `
-        -ExpectedFunctionCount ([uint32]2))
+        -ExpectedFunctionCount ([uint32]3))
 
     # The catalog is the oracle. Authenticate it against HEAD, the index, and the
     # no-filter working object before consuming a single expectation, exactly as
@@ -7444,7 +7447,7 @@ function Invoke-StyleGuideCandidateHarness {
     [void](& $script:scriptBlockAssertVersionMarkersConsistent `
         -LiteralPath $strContextLiteralPath `
         -ExpectedVersion $script:strCandidateExpectedContextVersion `
-        -ExpectedFunctionCount ([uint32]2))
+        -ExpectedFunctionCount ([uint32]3))
     [void](& $script:scriptBlockAssertResourceGuardsWired -LiteralPath $strHelperLiteralPath)
     $arrContextLoadOutput = @(. $strContextLiteralPath)
     if ($arrContextLoadOutput.Count -ne 0) {
@@ -7579,7 +7582,7 @@ function Invoke-StyleGuideCandidateHarness {
                 -LiteralPath $strContextLiteralPath `
                 -RelativePath $script:strCandidateContextRelativePath `
                 -ExpectedVersion $script:strCandidateExpectedContextVersion `
-                -ExpectedFunctionCount ([uint32]2))
+                -ExpectedFunctionCount ([uint32]3))
 
             $objObservation = $null
             $boolApplicable = $objCase.Applicability -ceq 'All' -or
@@ -7687,7 +7690,7 @@ function Invoke-StyleGuideCandidateHarness {
             -LiteralPath $strContextLiteralPath `
             -RelativePath $script:strCandidateContextRelativePath `
             -ExpectedVersion $script:strCandidateExpectedContextVersion `
-            -ExpectedFunctionCount ([uint32]2))
+            -ExpectedFunctionCount ([uint32]3))
         $hashtableHelperEvidenceAfter = & $script:scriptBlockGetFileEvidence `
             -LiteralPath $strHelperLiteralPath
         $hashtableContextEvidenceAfter = & $script:scriptBlockGetFileEvidence `

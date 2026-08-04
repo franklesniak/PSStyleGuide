@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.28
+Version: 1.0.20260803.29
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.28'
+$versionCandidateContext = [System.Version]'1.0.20260803.29'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -1611,7 +1611,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.28
+    # Version: 1.0.20260803.29
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1993,6 +1993,77 @@ function New-StyleGuideCandidateInvocationContext {
     }
 }
 
+function Test-StyleGuideCandidateInvocationContextIssued {
+    # .SYNOPSIS
+    # Reports whether this manager issued the supplied invocation context.
+    #
+    # .DESCRIPTION
+    # Answers one question and changes nothing: was this exact object handed out
+    # by New-StyleGuideCandidateInvocationContext in this process, and does it
+    # still describe what it described then. Touches no filesystem entry, so a
+    # caller can ask before it acts rather than discovering the answer after.
+    #
+    # This exists because a caller that deletes first and validates afterwards
+    # has already deleted. The helper removes candidate entries before handing
+    # the remainder to Remove-StyleGuideCandidateInvocationContext, and that is
+    # where issuance was proven -- too late to protect the entries the helper
+    # had already removed on the strength of paths the caller supplied. Their
+    # recorded lengths and digests do not close that: a supplied context carries
+    # both the paths and the values they are checked against, so the check
+    # proves the context is self-consistent, not that it is authentic.
+    #
+    # .PARAMETER Context
+    # Specifies the raw PSStyleGuide.CandidateInvocationContext.v1 object to
+    # test. Any value is accepted; anything unissued answers false.
+    #
+    # .EXAMPLE
+    # if (-not (Test-StyleGuideCandidateInvocationContextIssued `
+    #         -Context $objContext)) {
+    #     # Refuse before touching the filesystem.
+    # }
+    #
+    # # Returns $true only for an unaltered context this manager issued.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [bool] True when this manager issued the context and it still describes
+    # what it described at issuance; false in every other case.
+    #
+    # .NOTES
+    # This function supports named parameters only.
+    #
+    # Version: 1.0.20260803.29
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([bool])]
+    param (
+        [Parameter(Mandatory = $true)]
+        [AllowNull()]
+        [object]$Context
+    )
+
+    # A question, not an assertion: every failure is an answer of false rather
+    # than a thrown error, because a caller asking "may I act on this?" needs a
+    # value it can branch on. The reasons are already reported by the cleanup
+    # path, which throws them as codes.
+    $intIssuedIndex = -1
+    try {
+        $intIssuedIndex = & $scriptBlockCandidateContextIssuedIndex -Context $Context
+    } catch {
+        return $false
+    }
+    if ($intIssuedIndex -lt 0) {
+        return $false
+    }
+    try {
+        return (([string]$arrCandidateIssuedSnapshot[$intIssuedIndex]) -ceq
+            [string](& $scriptBlockNewCandidateIssuanceSnapshot -Context $Context))
+    } catch {
+        return $false
+    }
+}
+
 function Remove-StyleGuideCandidateInvocationContext {
     # .SYNOPSIS
     # Removes caller-owned entries from one validated invocation context.
@@ -2030,7 +2101,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.28
+    # Version: 1.0.20260803.29
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2273,13 +2344,18 @@ function Remove-StyleGuideCandidateInvocationContext {
     }
 }
 
-# Bind both public functions to this file's private state. The functions are
-# deliberately consumed after this script is dot-sourced and may be invoked
+# Bind all three public functions to this file's private state. The functions
+# are deliberately consumed after this script is dot-sourced and may be invoked
 # from a different script scope; without a closure, PowerShell would resolve
-# unqualified private variables against that caller's dynamic scope.
+# unqualified private variables against that caller's dynamic scope. The test
+# function needs the closure most of all: the register and the snapshots it
+# reads are exactly those private variables.
 $scriptBlockNewContextFunction = ${function:New-StyleGuideCandidateInvocationContext}.GetNewClosure()
 $scriptBlockRemoveContextFunction = ${function:Remove-StyleGuideCandidateInvocationContext}.GetNewClosure()
+$scriptBlockTestContextFunction = ${function:Test-StyleGuideCandidateInvocationContextIssued}.GetNewClosure()
 [void](Set-Item -LiteralPath Function:\New-StyleGuideCandidateInvocationContext `
     -Value $scriptBlockNewContextFunction -Force)
 [void](Set-Item -LiteralPath Function:\Remove-StyleGuideCandidateInvocationContext `
     -Value $scriptBlockRemoveContextFunction -Force)
+[void](Set-Item -LiteralPath Function:\Test-StyleGuideCandidateInvocationContextIssued `
+    -Value $scriptBlockTestContextFunction -Force)

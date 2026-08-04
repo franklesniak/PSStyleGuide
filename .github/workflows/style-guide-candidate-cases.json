@@ -1,6 +1,6 @@
 {
   "SchemaVersion": 1,
-  "CatalogVersion": "1.0.20260803.8",
+  "CatalogVersion": "1.0.20260803.9",
   "CaseCount": 115,
   "CaseIdPattern": "^PS-P1A-[A-Z]+-[0-9]{2}$",
   "SemanticCasePattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$",
@@ -128,6 +128,7 @@
       "context-conflict-stage",
       "context-head-absent",
       "context-invalid",
+      "context-unissued",
       "context-link",
       "context-manager-not-loaded",
       "context-path-missing",

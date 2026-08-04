@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.35
+Version: 1.0.20260803.36
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.35'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.28'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.36'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.29'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -2109,7 +2109,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.35
+    # Version: 1.0.20260803.36
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2185,6 +2185,29 @@ function Remove-StyleGuideCandidateInvocationState {
         if ($arrCommands.Count -ne 1) {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'cleanup-context-invalid' -Phase 'cleanup' -Subreason 'context-manager-not-loaded'
+        }
+        # And the same reasoning one step further: knowing the cleanup function
+        # is loaded is not knowing this context is one it will accept. Every
+        # check above reads the context the CALLER supplied -- including the
+        # recorded lengths and digests, which are supplied by the same caller as
+        # the paths they authenticate, so they prove self-consistency and not
+        # authenticity. Only the manager knows what it issued.
+        #
+        # It is asked here, while the filesystem is still untouched, because the
+        # deletions below run before this function reaches
+        # Remove-StyleGuideCandidateInvocationContext. A refusal that arrives
+        # after the entries are gone is a report, not a protection.
+        $arrIssuanceCommands = @(
+            Get-Command -Name Test-StyleGuideCandidateInvocationContextIssued `
+                -CommandType Function -ErrorAction SilentlyContinue
+        )
+        if ($arrIssuanceCommands.Count -ne 1) {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'cleanup-context-invalid' -Phase 'cleanup' -Subreason 'context-manager-not-loaded'
+        }
+        if (-not (Test-StyleGuideCandidateInvocationContextIssued -Context $Context)) {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'cleanup-context-invalid' -Phase 'cleanup' -Subreason 'context-unissued'
         }
 
         if ($objCandidateDirectoryRecord.EntryState -eq 'Created') {
