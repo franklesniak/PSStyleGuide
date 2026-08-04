@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.16
+Version: 1.0.20260803.17
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.16'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.17'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.9'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -1720,7 +1720,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.16
+    # Version: 1.0.20260803.17
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2839,6 +2839,56 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         }
 
         $strPhase = 'extraction'
+        # Every output is created by PATH, and a path is resolved fresh by the
+        # operating system on each call. The proof that this directory is
+        # ordinary and link-free was made once, above, before any output
+        # existed; four creates then followed it with nothing re-checked in
+        # between. A competing writer that replaces the directory with a link
+        # inside that window redirects all four, and FileMode.CreateNew does not
+        # object -- it asks whether the leaf exists, not where the parent leads.
+        # Reproduced by fault injection on both runtimes: four files created in
+        # an attacker-named directory outside trusted storage, with the only
+        # complaint arriving in the post-extraction phase, after every write.
+        #
+        # Closing this needs the create itself to be relative to a directory
+        # handle opened with no-follow semantics, which portable .NET does not
+        # expose and Windows PowerShell 5.1 cannot reach without P/Invoke. What
+        # is available is to stop trusting one proof for four writes: the
+        # identity of this directory is captured here, re-proven immediately
+        # before each create, and compared immediately after it. The window
+        # shrinks from four creates to one, and the first redirected file is the
+        # last -- detected in the extraction phase, where the journal still
+        # describes what happened, instead of after the fact.
+        #
+        # The identity is the same chain used for root separation: inode per
+        # ancestor on Linux, canonical spelling on Windows. An envelope check
+        # alone would not do, because it answers "is this a link now" and not
+        # "is this the same directory it was" -- renaming the directory away and
+        # creating an ordinary one in its place passes the envelope and fails
+        # this.
+        $arrCandidateIdentity = [string[]]@(
+            & $script:scriptBlockGetCandidateHelperIdentityChain `
+                -LiteralPath $strCandidatePath
+        )
+        $scriptBlockAssertCandidateStillSame = {
+            [void](& $script:scriptBlockAssertCandidateHelperDirectoryEnvelope `
+                -LiteralPath $strCandidatePath `
+                -Phase 'extraction')
+            $arrNowIdentity = [string[]]@(
+                & $script:scriptBlockGetCandidateHelperIdentityChain `
+                    -LiteralPath $strCandidatePath
+            )
+            if ($arrNowIdentity.Count -ne $arrCandidateIdentity.Count) {
+                & $script:scriptBlockStopCandidateHelperOperation `
+                    -Code 'extraction-invalid' -Phase 'extraction' -Subreason 'identity'
+            }
+            for ($intIdentity = 0; $intIdentity -lt $arrCandidateIdentity.Count; $intIdentity++) {
+                if ($arrNowIdentity[$intIdentity] -cne $arrCandidateIdentity[$intIdentity]) {
+                    & $script:scriptBlockStopCandidateHelperOperation `
+                        -Code 'extraction-invalid' -Phase 'extraction' -Subreason 'identity'
+                }
+            }
+        }
         $uintActualTotal = [uint64]0
         foreach ($strExpectedName in $script:arrCandidateHelperExpectedName) {
             $objEntry = $hashtableEntryMap[$strExpectedName]
@@ -2857,6 +2907,12 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
                 -ExpectedPath $strDestinationPath `
                 -Phase 'extraction')
 
+            # Immediately before this create, and again immediately after it.
+            # Neither placement is redundant: the first refuses a redirection
+            # that is already in place, and the second catches one that lands in
+            # the gap this cannot close, before the next output is written.
+            & $scriptBlockAssertCandidateStillSame
+
             $objDestinationStream = $null
             $objEntryStream = $null
             $objEntrySha256 = $null
@@ -2868,6 +2924,7 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
                     [System.IO.FileAccess]::Write,
                     [System.IO.FileShare]::None
                 )
+                & $scriptBlockAssertCandidateStillSame
                 $objFileRecord = & $script:scriptBlockNewCandidateHelperRecord `
                     -Sequence $Context.NextSequence `
                     -Kind 'CandidateFile' `
