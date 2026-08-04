@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.70
+Version: 1.0.20260803.71
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.70'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.71'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.43'
@@ -2008,6 +2008,15 @@ $script:strCandidateReflectionMemberPattern =
 $script:arrCandidateNativePathVariable = [string[]]@(
     'strStatPath'
 )
+# ...and the one scriptblock a value reaching such a variable may come from.
+# Naming the variable was never enough: the script-block targets get a
+# reaching-value check and these did not, so `$strStatPath = 'Get-Item'`
+# followed by `& $strStatPath -Path "$dir/*"` would perform an unbounded
+# listing while the command allow-list saw no named Get-Item. This is the
+# round-26 lesson -- admit by where the value came from, not by what the
+# variable is called -- applied to the list it was never applied to.
+$script:strCandidateHelperNativeResolver = 'scriptBlockResolveCandidateHelperNativePath'
+$script:strCandidateContextNativeResolver = 'scriptBlockResolveCandidateNativePath'
 $script:arrCandidateHelperPermittedCommand = [string[]]@(
     'Add-Type',
     'Get-Command',
@@ -2100,13 +2109,15 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
             Member = $script:arrCandidateHelperPermittedMember
             SetItemPath = [string[]]@()
             SetItemValue = [string[]]@()
-            SingleUseMember = @{ GetResolvedProviderPathFromPSPath = 0 } },
+            SingleUseMember = @{ GetResolvedProviderPathFromPSPath = 0 }
+            NativeResolver = $script:strCandidateHelperNativeResolver },
         @{ Path = $ContextLiteralPath
             Command = $script:arrCandidateContextPermittedCommand
             Member = $script:arrCandidateContextPermittedMember
             SetItemPath = $script:arrCandidateContextPermittedSetItemPath
             SetItemValue = $script:arrCandidateContextPermittedSetItemValue
-            SingleUseMember = @{ GetResolvedProviderPathFromPSPath = 1 } }
+            SingleUseMember = @{ GetResolvedProviderPathFromPSPath = 1 }
+            NativeResolver = $script:strCandidateContextNativeResolver }
     )
     foreach ($hashtableSurface in $arrScriptSurface) {
         $strScriptPath = [string]$hashtableSurface.Path
@@ -2157,6 +2168,41 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                     }).Count -eq 0
                 } | ForEach-Object { [string]$_.Name })
 
+        # The native-path variables whose EVERY assignment came from the
+        # declared resolver, or is $null. A name on the list is a candidate,
+        # not an admission.
+        $arrNativePathVariable = [string[]]@(@($objAst.FindAll(
+                    {
+                        param ($objNode)
+                        return ($objNode -is
+                            [System.Management.Automation.Language.AssignmentStatementAst] -and
+                            $objNode.Left -is
+                            [System.Management.Automation.Language.VariableExpressionAst])
+                    },
+                    $true
+                )) | Where-Object {
+                    $script:arrCandidateNativePathVariable -ccontains
+                        ([string]$_.Left.VariablePath.UserPath -creplace '^script:', '')
+                } | Group-Object -Property {
+                    [string]$_.Left.VariablePath.UserPath -creplace '^script:', ''
+                } | Where-Object {
+                    @($_.Group | Where-Object {
+                        $strResolver = [string]$hashtableSurface.NativeResolver
+                        $boolFromResolver = $null -ne $_.Right.Find(
+                            {
+                                param ($objInner)
+                                return ($objInner -is
+                                    [System.Management.Automation.Language.VariableExpressionAst] -and
+                                    (([string]$objInner.VariablePath.UserPath) -creplace '^script:', '') -ceq
+                                    $strResolver)
+                            },
+                            $true
+                        )
+                        $boolNullLiteral = ([string]$_.Right.Extent.Text) -ceq '$null'
+                        -not ($boolFromResolver -or $boolNullLiteral)
+                    }).Count -eq 0
+                } | ForEach-Object { [string]$_.Name })
+
         # Every named command in the file, against the allow-list. A call
         # through a variable -- `& $script:scriptBlockFoo` -- has no command
         # name and is not one of these; those are the internal script blocks the
@@ -2195,7 +2241,7 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                 }
                 if ($strTarget.Length -eq 0 -or
                     -not ($arrScriptBlockVariable -ccontains $strTarget -or
-                        $script:arrCandidateNativePathVariable -ccontains $strTarget)) {
+                        $arrNativePathVariable -ccontains $strTarget)) {
                     & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                         -Detail ('nameless-command-not-permitted-' +
                             [string]$objCommand.Extent.StartLineNumber)
@@ -7336,7 +7382,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.70
+    # Version: 1.0.20260803.71
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
