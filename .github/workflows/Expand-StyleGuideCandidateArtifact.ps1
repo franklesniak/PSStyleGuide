@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.34
+Version: 1.0.20260803.35
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.34'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.24'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.35'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.25'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -1872,6 +1872,21 @@ $script:scriptBlockGetCandidateHelperFileEvidence = {
             # artifact: measured as an unprivileged user, a 0444 regular file
             # opened read-write threw where read-only succeeded. Trading a hang
             # for a false rejection is the round-19 defect, so it was not taken.
+            #
+            # The window needs a writer able to reach this path, and the
+            # invocation root is created private to this process or not created
+            # at all -- the context manager applies an owner-only mode on Unix
+            # and an owner-only protected DACL on Windows, and refuses when it
+            # can do neither. That excludes a different unprivileged user GIVEN
+            # a parent they cannot write. Measured on Linux, a 0700 root under a
+            # world-writable parent WITHOUT the sticky bit was renamed away by
+            # another unprivileged user, who then put a FIFO at the original
+            # path; the sticky bit refused the same rename. The parent is the
+            # caller's TrustedTemporaryRoot and neither script reads its mode,
+            # so that clause is a warranty rather than a finding. What remains
+            # is the same user or root -- the competing untrusted writer #146
+            # lists as a non-goal, and the same actor the extraction race is
+            # documented against.
             if (-not $objStream.CanRead -or -not $objStream.CanSeek) {
                 throw 'nonordinary'
             }
@@ -2094,7 +2109,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.34
+    # Version: 1.0.20260803.35
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

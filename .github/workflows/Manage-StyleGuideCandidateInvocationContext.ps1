@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.24
+Version: 1.0.20260803.25
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.24'
+$versionCandidateContext = [System.Version]'1.0.20260803.25'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -1326,12 +1326,34 @@ $scriptBlockGetCandidateFileEvidence = {
             # Trading a hang for a false rejection is the round-19 defect, so it
             # was not taken.
             #
-            # The window needs a writer inside the invocation root, which is
-            # created 0755 and owned by this process inside a sticky parent, so
-            # a different unprivileged user cannot create, delete or replace
-            # anything in it. That leaves the same user or root -- the competing
-            # untrusted writer #146 lists as a non-goal, and the same actor the
-            # extraction race is documented against.
+            # The window needs a writer able to reach this path. The invocation
+            # root is created private to this process or not created at all --
+            # see the creation block, which applies an owner-only mode on Unix
+            # and an owner-only protected DACL on Windows and refuses when it
+            # can do neither. No mode is named here on purpose. The earlier
+            # revision of this paragraph named one, the creation path later
+            # changed, and the file then contradicted itself two hundred lines
+            # apart; an invariant cannot drift the way a copied value can.
+            #
+            # A private root excludes a different unprivileged user from
+            # everything inside it, and that is not the whole argument. The
+            # missing half is an assumption rather than a proof. A private root
+            # can still be renamed out of the way by anyone who can write its
+            # PARENT, and the path then resolves inside a directory that actor
+            # owns. Measured on Linux: a 0700 root under a world-writable parent
+            # WITHOUT the sticky bit was renamed away by another unprivileged
+            # user, who then created a FIFO at the original path; with the
+            # sticky bit set the same rename failed with EPERM. The parent is
+            # TrustedTemporaryRoot, supplied by the caller, and this script
+            # reads neither its mode nor its owner. The parameter name is the
+            # contract and the parameter help states it.
+            #
+            # So a different unprivileged user is excluded by the private root
+            # GIVEN a parent they cannot write, and that last clause is the
+            # caller's warranty rather than this script's finding. What remains
+            # is the same user or root -- the competing untrusted writer #146
+            # lists as a non-goal, and the same actor the extraction race is
+            # documented against.
             if (-not $objStream.CanRead -or -not $objStream.CanSeek) {
                 throw 'nonordinary'
             }
@@ -1426,6 +1448,13 @@ function New-StyleGuideCandidateInvocationContext {
     #
     # .PARAMETER TrustedTemporaryRoot
     # Specifies the raw FileSystem directory below which to create the context.
+    # The name is a contract the caller warrants and this script does not check:
+    # it reads neither the mode nor the owner of this directory. Supply one that
+    # no untrusted local user can write. A private invocation root is created
+    # below it, which keeps other users out of that root's contents, but anyone
+    # able to write this directory can rename the root away and put their own in
+    # its place -- measured on Linux against a world-writable parent carrying no
+    # sticky bit.
     #
     # .PARAMETER DiagnosticLabel
     # Specifies an optional opaque diagnostic label of at most 128 UTF-16 code
@@ -1453,7 +1482,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.24
+    # Version: 1.0.20260803.25
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1872,7 +1901,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.24
+    # Version: 1.0.20260803.25
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

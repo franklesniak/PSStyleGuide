@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.54
+Version: 1.0.20260803.55
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.54'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.55'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.34'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.24'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.35'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.25'
 $script:strCandidateCatalogVersion = '1.0.20260803.6'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
@@ -2391,7 +2391,13 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
 $script:scriptBlockAssertRegularFileProofExecutes = {
     param (
         [Parameter(Mandatory = $true)]
-        [string]$RunRoot
+        [string]$RunRoot,
+
+        [Parameter(Mandatory = $true)]
+        [string]$HelperLiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ContextLiteralPath
     )
 
     if ($script:boolCandidateIsWindows) {
@@ -2487,6 +2493,31 @@ $script:scriptBlockAssertRegularFileProofExecutes = {
             -Detail ('invocation-root-mode-' + [string]$arrRootMode[0])
     }
     [void](Remove-StyleGuideCandidateInvocationContext -Context $objModeContext)
+
+    # The mode above is the measured truth, so prose that claims a DIFFERENT one
+    # for what these scripts create is checkable against it. Round 28 found a
+    # comment still asserting the root was "created 0755" long after the
+    # creation path had been changed to refuse anything but a private root --
+    # the file contradicting itself two hundred lines apart, in the paragraph
+    # that justifies an acknowledged TOCTOU window.
+    #
+    # This is narrow on purpose and does not pretend otherwise: it pins the
+    # literal, not the claim. Reworded drift walks straight past it, which is
+    # why the fix was to state the invariant instead of a value -- this only
+    # stops the value coming back. Mentions of a mode this code does NOT create
+    # are untouched, because they carry no "created".
+    foreach ($strModeClaimPath in @($HelperLiteralPath, $ContextLiteralPath)) {
+        $strModeClaimText = [System.IO.File]::ReadAllText($strModeClaimPath)
+        foreach ($objModeClaim in [regex]::Matches(
+                $strModeClaimText,
+                'created\s+0?([0-7]{3})\b',
+                [System.Text.RegularExpressions.RegexOptions]::CultureInvariant)) {
+            if ($objModeClaim.Groups[1].Value -cne [string]$arrRootMode[0]) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                    -Detail ('created-mode-claim-' + $objModeClaim.Groups[1].Value)
+            }
+        }
+    }
 
     foreach ($hashtableCase in @(
             @{ Path = $strEmptyPath; MustPass = $true; Name = 'empty-regular' },
@@ -6956,7 +6987,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.54
+    # Version: 1.0.20260803.55
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -7192,7 +7223,10 @@ function Invoke-StyleGuideCandidateHarness {
             -ContextLiteralPath $strContextLiteralPath
         & $script:scriptBlockAssertDownloadPathProvenance `
             -HelperLiteralPath $strHelperLiteralPath
-        & $script:scriptBlockAssertRegularFileProofExecutes -RunRoot $strRunRoot
+        & $script:scriptBlockAssertRegularFileProofExecutes `
+            -RunRoot $strRunRoot `
+            -HelperLiteralPath $strHelperLiteralPath `
+            -ContextLiteralPath $strContextLiteralPath
         & $script:scriptBlockAssertDownloadLeafGuardExecutes `
             -HelperLiteralPath $strHelperLiteralPath `
             -RunRoot $strRunRoot
