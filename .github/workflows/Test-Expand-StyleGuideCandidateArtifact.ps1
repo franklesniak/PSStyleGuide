@@ -568,7 +568,7 @@ $script:scriptBlockAssertVersionMarkersConsistent = {
         [string]$OwnVersionVariableName,
 
         [Parameter(Mandatory = $true)]
-        [uint32]$PinnedConstantCount
+        [hashtable]$VersionConstantMap
     )
 
     # Each production script states its version in three places: the help
@@ -612,6 +612,7 @@ $script:scriptBlockAssertVersionMarkersConsistent = {
         ))
     $arrOwnConstant = @()
     $arrForeignConstant = @()
+    $hashtableConstantSeen = @{}
     foreach ($objConvert in $arrVersionConvert) {
         # The conversion sits under a command expression under the assignment,
         # so the assignment is reached by a bounded walk rather than by one
@@ -633,11 +634,46 @@ $script:scriptBlockAssertVersionMarkersConsistent = {
             $objAssignment.Left -is [System.Management.Automation.Language.VariableExpressionAst]) {
             $strAssignedName = [string]$objAssignment.Left.VariablePath.UserPath
         }
+        # Round 50 named the file's own constant and left everything else as
+        # "foreign", counted but not named. Round 51 reported what that admits:
+        # move the pin off its literal -- assign the variable from another
+        # version variable -- and leave any unrelated [System.Version] literal
+        # in the file, and the unrelated one is counted as the pin and skipped
+        # by extent, so the check passes while the constant it claims to have
+        # identified is not the one the file uses. Measured: control PASS,
+        # escape PASS. Naming one side of a partition and inferring the other
+        # is not naming; it is the same defect one level in.
+        #
+        # So every conversion in the file must be assigned to a name this
+        # caller declared, exactly once, carrying exactly the version that name
+        # is required to carry. An unknown name, a duplicate, a missing one, or
+        # a right name holding the wrong version all fail. This also settles a
+        # second weakness the round-50 form carried: a foreign constant only
+        # had to match *one of* the two pinned versions, so the helper could
+        # pin its own version instead of the context manager's and pass.
+        if (-not $VersionConstantMap.ContainsKey($strAssignedName)) {
+            & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
+                -Detail 'version-marker-constant-unknown'
+        }
+        if ($hashtableConstantSeen.ContainsKey($strAssignedName)) {
+            & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
+                -Detail 'version-marker-constant-duplicate'
+        }
+        $hashtableConstantSeen[$strAssignedName] = $true
+        if ([string]$objConvert.Child.Extent.Text -cne
+            ("'" + [string]$VersionConstantMap[$strAssignedName] + "'")) {
+            & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
+                -Detail 'version-marker-constant-value'
+        }
         if ($strAssignedName -ceq $OwnVersionVariableName) {
             $arrOwnConstant += $objConvert
         } else {
             $arrForeignConstant += $objConvert
         }
+    }
+    if ($hashtableConstantSeen.Count -ne $VersionConstantMap.Count) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
+            -Detail ('version-marker-constant-missing-' + $hashtableConstantSeen.Count)
     }
     if (@($arrOwnConstant).Count -ne 1) {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
@@ -646,26 +682,6 @@ $script:scriptBlockAssertVersionMarkersConsistent = {
     if ([string]$arrOwnConstant[0].Child.Extent.Text -cne ("'" + $ExpectedVersion + "'")) {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
             -Detail 'version-marker-constant-value'
-    }
-    # Skipping the pinned constants by position means an extra one would be
-    # skipped too, so the file is allowed exactly the number it declares. This
-    # is the count the previous scheme got for free by counting every literal:
-    # dropping it here would let a planted constant sit in the file unnoticed,
-    # which is the kind of quiet permissiveness a fix keeps introducing.
-    if (@($arrForeignConstant).Count -ne [int]$PinnedConstantCount) {
-        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
-            -Detail ('version-marker-pinned-' + @($arrForeignConstant).Count)
-    }
-    # A constant that is not this file's own is only legitimate when it names
-    # the other script this one is pinned to, which the harness verifies
-    # separately. Anything else is a stale or planted constant.
-    foreach ($objForeign in $arrForeignConstant) {
-        $strForeignText = [string]$objForeign.Child.Extent.Text
-        if ($strForeignText -cne ("'" + $script:strCandidateExpectedHelperVersion + "'") -and
-            $strForeignText -cne ("'" + $script:strCandidateExpectedContextVersion + "'")) {
-            & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
-                -Detail 'version-marker-foreign'
-        }
     }
 
     # The text the parser saw, so the offsets below index the same string the
@@ -2472,106 +2488,149 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                 continue
             }
             if ($strCommandName -ceq 'Remove-Variable') {
-                # Only the register names, and only as a literal list. This
-                # command exists in the permitted set for exactly one purpose:
+                # This command is in the permitted set for exactly one purpose:
                 # taking the issuance registers out of a dot-sourced caller's
                 # scope. Anything else it could unbind is an invocation target
-                # some other rule has already admitted by its assignment.
+                # some other rule admitted by its assignment, and unbinding one
+                # makes a later `& $scriptBlockFoo` fall through to whatever the
+                # caller has bound to that name.
+                #
+                # Four revisions of this rule tried to decide, from the parse
+                # tree, which element PowerShell would bind to -Name. Each was
+                # escaped by a spelling the previous one did not model:
+                # `Remove-Variable scriptBlockFoo -Force`, because -Name is
+                # positional; a splatted hashtable, whose contents are assembled
+                # elsewhere; `-Name $name` where $name came from an assignment
+                # rather than the register loop; and -- reported at round 51 --
+                # `Remove-Variable -Force scriptBlockFoo`, where -Force is a
+                # SWITCH and consumes no argument, so the target binds
+                # positionally while a rule that skips "the value of a parameter
+                # that is not -Name" skips straight past it. Measured: the whole
+                # suite green with that call planted in the context manager.
+                # A fifth spelling would have followed the fourth.
+                #
+                # The root cause was the approach, not any one gap in it. Those
+                # rules were re-implementing PowerShell's parameter binder from
+                # source text, and the binder has more spellings than a rule can
+                # enumerate. So this no longer works out what a call means. The
+                # file is allowed exactly ONE shape of call, matched
+                # structurally, and every other spelling fails by not being that
+                # shape -- including spellings nobody has thought of yet, which
+                # is the only property that has held up in this loop.
                 $arrRemovableName = [string[]]@(
                     'arrCandidateIssuedContext',
                     'arrCandidateIssuedSnapshot',
                     'arrCandidateIssuedState'
                 )
-                # Every element that names a variable, however it is spelled.
-                # The first version of this rule checked only what followed an
-                # explicit -Name, and -Name is POSITIONAL: `Remove-Variable
-                # scriptBlockFoo -Force` put the target at index 1 with no
-                # preceding parameter, so the rule never looked at it -- the
-                # escape this rule exists to stop, wearing a different shape.
-                # Self-found before it shipped anywhere. So the rule is
-                # inverted: everything is a target unless it is a parameter, or
-                # the value of a parameter that is not -Name.
+                $strRegisterLoopVariable = 'strCandidateRegisterName'
+                $boolCanonical = $true
                 $arrElement = @($objCommand.CommandElements)
-                for ($intElement = 1; $intElement -lt $arrElement.Count; $intElement++) {
-                    if ($arrElement[$intElement] -is
-                        [System.Management.Automation.Language.CommandParameterAst]) {
-                        continue
+                # Exactly, and only:
+                #   Remove-Variable -Name $strCandidateRegisterName `
+                #       -Force -ErrorAction SilentlyContinue
+                if ($arrElement.Count -ne 6) {
+                    $boolCanonical = $false
+                } else {
+                    $objNameTarget = $arrElement[2]
+                    if (-not ($arrElement[1] -is
+                            [System.Management.Automation.Language.CommandParameterAst] -and
+                            ([string]$arrElement[1].ParameterName) -ceq 'Name')) {
+                        $boolCanonical = $false
+                    } elseif (-not ($objNameTarget -is
+                            [System.Management.Automation.Language.VariableExpressionAst] -and
+                            -not $objNameTarget.Splatted -and
+                            ([string]$objNameTarget.VariablePath.UserPath) -ceq
+                                $strRegisterLoopVariable)) {
+                        $boolCanonical = $false
+                    } elseif (-not ($arrElement[3] -is
+                            [System.Management.Automation.Language.CommandParameterAst] -and
+                            ([string]$arrElement[3].ParameterName) -ceq 'Force')) {
+                        $boolCanonical = $false
+                    } elseif (-not ($arrElement[4] -is
+                            [System.Management.Automation.Language.CommandParameterAst] -and
+                            ([string]$arrElement[4].ParameterName) -ceq 'ErrorAction')) {
+                        $boolCanonical = $false
+                    } elseif (-not ($arrElement[5] -is
+                            [System.Management.Automation.Language.StringConstantExpressionAst] -and
+                            ([string]$arrElement[5].Value) -ceq 'SilentlyContinue')) {
+                        $boolCanonical = $false
                     }
-                    $objPrevious = $arrElement[$intElement - 1]
-                    if ($objPrevious -is
-                        [System.Management.Automation.Language.CommandParameterAst] -and
-                        ([string]$objPrevious.ParameterName) -cne 'Name') {
-                        continue
-                    }
-                    $objTarget = $arrElement[$intElement]
-                    if ($objTarget -is
-                        [System.Management.Automation.Language.StringConstantExpressionAst]) {
-                        if ($arrRemovableName -cnotcontains [string]$objTarget.Value) {
-                            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-                                -Detail ('remove-variable-target-not-permitted-' +
-                                    [string]$objCommand.Extent.StartLineNumber)
+                }
+                # The loop it must sit in, and the exact list that loop walks.
+                # Round 50's rule accepted any foreach over the target name and
+                # then scanned its condition for string literals, so a condition
+                # that was a VARIABLE offered no literals to reject and the call
+                # was admitted having checked nothing -- absence of evidence read
+                # as evidence, again, in the rule written to stop exactly that.
+                # Measured green with a computed list planted. The names are now
+                # read out of the parse tree: anything that is not an array
+                # literal of exactly these three constants, in this order, is
+                # not the permitted shape.
+                if ($boolCanonical) {
+                    $objRegisterLoop = $null
+                    $objWalk = $objCommand.Parent
+                    $intWalk = 0
+                    while ($null -ne $objWalk -and $intWalk -lt 6) {
+                        if ($objWalk -is
+                            [System.Management.Automation.Language.ForEachStatementAst]) {
+                            $objRegisterLoop = $objWalk
+                            break
                         }
-                        continue
+                        $objWalk = $objWalk.Parent
+                        $intWalk++
                     }
-                    # A variable target is admitted only when every literal
-                    # reaching it in this file is a register name -- which is
-                    # how production spells it, looping over the three.
-                    # A SPLAT is refused outright rather than traced. Its
-                    # contents are a hashtable assembled anywhere, so there is
-                    # no literal set to check -- and the variable-target branch
-                    # below would find no loop over it and admit the call having
-                    # checked nothing. Self-found while auditing this rule.
-                    $strTargetName = ''
-                    if ($objTarget -is
-                        [System.Management.Automation.Language.VariableExpressionAst] -and
-                        -not $objTarget.Splatted) {
-                        $strTargetName = [string]$objTarget.VariablePath.UserPath
-                    }
-                    if ($strTargetName.Length -eq 0) {
-                        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-                            -Detail ('remove-variable-target-not-permitted-' +
-                                [string]$objCommand.Extent.StartLineNumber)
-                    }
-                    # A source must actually be FOUND. The first version only
-                    # checked loops that happened to match, and never failed
-                    # when none did -- so `$name = 'scriptBlockFoo';
-                    # Remove-Variable -Name $name` unbound an invocation target
-                    # with nothing checked. Absence of evidence was being read
-                    # as evidence, in a rule whose whole job is to refuse what
-                    # it cannot account for.
-                    $boolSourceFound = $false
-                    foreach ($objLoop in @($objAst.FindAll(
-                                {
-                                    param ($objNode)
-                                    $objNode -is
-                                        [System.Management.Automation.Language.ForEachStatementAst]
-                                },
-                                $true
-                            ))) {
-                        if (([string]$objLoop.Variable.VariablePath.UserPath) -cne $strTargetName) {
-                            continue
-                        }
-                        $boolSourceFound = $true
-                        foreach ($objLiteral in @($objLoop.Condition.FindAll(
-                                    {
-                                        param ($objNode)
-                                        $objNode -is
-                                            [System.Management.Automation.Language.StringConstantExpressionAst]
-                                    },
-                                    $true
-                                ))) {
-                            if ($arrRemovableName -cnotcontains [string]$objLiteral.Value) {
-                                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-                                    -Detail ('remove-variable-source-not-permitted-' +
-                                        [string]$objLoop.Extent.StartLineNumber)
+                    $arrRegisterLiteral = @()
+                    if ($null -eq $objRegisterLoop -or
+                        ([string]$objRegisterLoop.Variable.VariablePath.UserPath) -cne
+                            $strRegisterLoopVariable) {
+                        $boolCanonical = $false
+                    } else {
+                        $objCondition = $objRegisterLoop.Condition
+                        if ($objCondition -is
+                            [System.Management.Automation.Language.PipelineAst] -and
+                            @($objCondition.PipelineElements).Count -eq 1 -and
+                            $objCondition.PipelineElements[0] -is
+                                [System.Management.Automation.Language.CommandExpressionAst]) {
+                            $objArray = $objCondition.PipelineElements[0].Expression
+                            if ($objArray -is
+                                [System.Management.Automation.Language.ArrayExpressionAst]) {
+                                $arrStatement = @($objArray.SubExpression.Statements)
+                                if ($arrStatement.Count -eq 1 -and
+                                    $arrStatement[0] -is
+                                        [System.Management.Automation.Language.PipelineAst] -and
+                                    @($arrStatement[0].PipelineElements).Count -eq 1 -and
+                                    $arrStatement[0].PipelineElements[0] -is
+                                        [System.Management.Automation.Language.CommandExpressionAst]) {
+                                    $objList = $arrStatement[0].PipelineElements[0].Expression
+                                    if ($objList -is
+                                        [System.Management.Automation.Language.ArrayLiteralAst]) {
+                                        $arrRegisterLiteral = @($objList.Elements)
+                                    }
+                                }
                             }
                         }
                     }
-                    if (-not $boolSourceFound) {
-                        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-                            -Detail ('remove-variable-source-not-found-' +
-                                [string]$objCommand.Extent.StartLineNumber)
+                    if ($boolCanonical) {
+                        if ($arrRegisterLiteral.Count -ne $arrRemovableName.Count) {
+                            $boolCanonical = $false
+                        } else {
+                            for ($intName = 0
+                                $intName -lt $arrRegisterLiteral.Count
+                                $intName++) {
+                                if (-not ($arrRegisterLiteral[$intName] -is
+                                        [System.Management.Automation.Language.StringConstantExpressionAst] -and
+                                        ([string]$arrRegisterLiteral[$intName].Value) -ceq
+                                            $arrRemovableName[$intName])) {
+                                    $boolCanonical = $false
+                                }
+                            }
+                        }
                     }
+                }
+                if (-not $boolCanonical) {
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                        -Detail ('remove-variable-not-canonical-' +
+                            [string]$objCommand.Extent.StartLineNumber)
                 }
             }
             if (@($hashtableSurface.Command) -cnotcontains $strCommandName) {
@@ -8188,13 +8247,21 @@ function Invoke-StyleGuideCandidateHarness {
         -ExpectedVersion $script:strCandidateExpectedHelperVersion `
         -ExpectedFunctionCount ([uint32]1) `
         -OwnVersionVariableName 'script:versionCandidateHelper' `
-        -PinnedConstantCount ([uint32]1))
+        -VersionConstantMap @{
+            'script:versionCandidateHelper' =
+                $script:strCandidateExpectedHelperVersion
+            'script:versionCandidateExpectedContext' =
+                $script:strCandidateExpectedContextVersion
+        })
     [void](& $script:scriptBlockAssertVersionMarkersConsistent `
         -LiteralPath $strContextLiteralPath `
         -ExpectedVersion $script:strCandidateExpectedContextVersion `
         -ExpectedFunctionCount ([uint32]3) `
         -OwnVersionVariableName 'versionCandidateContext' `
-        -PinnedConstantCount ([uint32]0))
+        -VersionConstantMap @{
+            'versionCandidateContext' =
+                $script:strCandidateExpectedContextVersion
+        })
     [void](& $script:scriptBlockAssertResourceGuardsWired -LiteralPath $strHelperLiteralPath)
     $arrContextLoadOutput = @(. $strContextLiteralPath)
     if ($arrContextLoadOutput.Count -ne 0) {
