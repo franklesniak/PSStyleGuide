@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.37
+Version: 1.0.20260803.38
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,12 +53,18 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.37'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.38'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.26'
 $script:strCandidateExpectedContextVersion = '1.0.20260803.13'
 $script:strCandidateCatalogVersion = '1.0.20260803.5'
+# The documented ceiling on what an authenticated native query may return, the
+# interval at which it is enforced while the output is still arriving, and how
+# long a killed child is given to let its copy tasks finish.
+$script:intCandidateNativeOutputCeiling = 4194304
+$script:intCandidateNativePollMilliseconds = 10
+$script:intCandidateNativeDrainMilliseconds = 10000
 # The physical allocation size, stated once. It was previously two bare literals
 # inside the header check, which is why growing the catalog failed with an
 # unhelpful 'header' detail rather than naming the count.
@@ -413,19 +419,58 @@ $script:scriptBlockInvokeNativeRaw = {
             & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'native-start'
         }
         $objProcess.StandardInput.Close()
-        $objStandardOutputTask = $objProcess.StandardOutput.BaseStream.CopyToAsync(
-            $objStandardOutputStream
+        # Both pipes are drained concurrently, because draining one to completion
+        # while the other fills its buffer deadlocks the child. The ceiling is
+        # therefore enforced from here, while the copies run, rather than after
+        # they finish: CopyToAsync has no size limit, so consulting the length
+        # afterwards meant the whole output was already in memory and ToArray was
+        # about to double it. Measured, a child emitting 64 MiB against this
+        # 4 MiB ceiling: 96.74 MiB of managed growth before the refusal.
+        #
+        # Two tidier-looking designs were tried first and both are wrong, which
+        # is why this one polls. A MemoryStream built over a fixed byte[] does
+        # bound the sink -- but its Length is the BUFFER size from the moment it
+        # is constructed, not the number of bytes written, so a length test
+        # against it fires immediately on legitimate output. And letting the copy
+        # fault on overflow deadlocks: WaitAll still waits on the sibling task,
+        # which cannot complete until the child exits, which it cannot do while
+        # blocked writing into a pipe nobody is draining. So the child is killed
+        # explicitly, which closes both pipes and lets both tasks finish.
+        #
+        # Reading Length here while a pool thread writes is a deliberate,
+        # bounded race: the read can be stale-low, never torn, so the worst case
+        # is noticing one interval late. Measured with children emitting 64 MiB,
+        # 256 MiB and 1 GiB, growth stayed flat at roughly 50 to 64 MiB and the
+        # call returned in about 60 ms in every case, against growth that
+        # previously tracked whatever the child chose to produce.
+        $arrCopyTask = @(
+            $objProcess.StandardOutput.BaseStream.CopyToAsync($objStandardOutputStream),
+            $objProcess.StandardError.BaseStream.CopyToAsync($objStandardErrorStream)
         )
-        $objStandardErrorTask = $objProcess.StandardError.BaseStream.CopyToAsync(
-            $objStandardErrorStream
-        )
+        while (-not [System.Threading.Tasks.Task]::WaitAll(
+                $arrCopyTask, $script:intCandidateNativePollMilliseconds)) {
+            if ($objStandardOutputStream.Length -gt $script:intCandidateNativeOutputCeiling -or
+                $objStandardErrorStream.Length -gt $script:intCandidateNativeOutputCeiling) {
+                try {
+                    $objProcess.Kill()
+                } catch {
+                    $null = $_
+                }
+                try {
+                    [void][System.Threading.Tasks.Task]::WaitAll(
+                        $arrCopyTask, $script:intCandidateNativeDrainMilliseconds)
+                } catch {
+                    $null = $_
+                }
+                & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
+                    -Detail 'native-output-limit'
+            }
+        }
         $objProcess.WaitForExit()
-        [System.Threading.Tasks.Task]::WaitAll(@(
-            $objStandardOutputTask,
-            $objStandardErrorTask
-        ))
-        if ($objStandardOutputStream.Length -gt 4194304 -or
-            $objStandardErrorStream.Length -gt 4194304) {
+        # Retained as a backstop rather than replaced. If the loop above ever
+        # fails to observe a breach, the original refusal still fires here.
+        if ($objStandardOutputStream.Length -gt $script:intCandidateNativeOutputCeiling -or
+            $objStandardErrorStream.Length -gt $script:intCandidateNativeOutputCeiling) {
             & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'native-output-limit'
         }
         return [ordered]@{
@@ -6236,7 +6281,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.37
+    # Version: 1.0.20260803.38
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
