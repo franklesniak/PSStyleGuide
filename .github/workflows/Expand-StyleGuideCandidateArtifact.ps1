@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.21
+Version: 1.0.20260803.22
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.21'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.22'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.10'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -1596,10 +1596,39 @@ $script:scriptBlockGetCandidateHelperEntryIdentity = {
         [string]$Phase
     )
 
+    # Link-ness first, and on both platforms, because on Windows the identity
+    # below cannot express it. EnumerateDirectories lists a reparse point as an
+    # ordinary directory entry and answers with the same stored path whether or
+    # not the name is a link, so a canonical-spelling comparison returns an
+    # identical string before and after a competing writer swaps the directory
+    # for a symlink or junction -- and every path-based create then follows it.
+    # An earlier revision replaced the per-write envelope check with that
+    # comparison alone in the name of cost, which detected the swap on Linux,
+    # where stat -L reports the target's inode, and detected nothing at all on
+    # Windows. Measuring one platform and inferring the other is what made that
+    # look finished.
+    #
+    # A candidate directory is never legitimately a link, so this refuses rather
+    # than describes, and the attributes join the identity as well: a swap that
+    # somehow preserved the spelling still changes the value being compared.
+    try {
+        $objIdentityAttributes = [System.IO.File]::GetAttributes($LiteralPath)
+    } catch {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code "$Phase-invalid" -Phase $Phase -Subreason 'identity'
+    }
+    if (($objIdentityAttributes -band [System.IO.FileAttributes]::Directory) -eq 0 -or
+        ($objIdentityAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code "$Phase-invalid" -Phase $Phase -Subreason 'nonordinary-directory'
+    }
+    $strIdentityAttributes = '|' + ([int]$objIdentityAttributes).ToString(
+        [System.Globalization.CultureInfo]::InvariantCulture)
+
     if ($script:boolCandidateHelperIsWindows) {
         $objEntry = New-Object System.IO.DirectoryInfo($LiteralPath)
         if ($null -eq $objEntry.Parent) {
-            return [string]$objEntry.FullName
+            return ([string]$objEntry.FullName + $strIdentityAttributes)
         }
         $arrMatch = @()
         try {
@@ -1615,7 +1644,7 @@ $script:scriptBlockGetCandidateHelperEntryIdentity = {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code "$Phase-invalid" -Phase $Phase -Subreason 'identity'
         }
-        return [string]$arrMatch[0]
+        return ([string]$arrMatch[0] + $strIdentityAttributes)
     }
     $strStatPath = [string](& $script:scriptBlockResolveCandidateHelperNativePath `
         -CandidatePath $script:arrCandidateHelperStatPath)
@@ -1629,7 +1658,7 @@ $script:scriptBlockGetCandidateHelperEntryIdentity = {
         & $script:scriptBlockStopCandidateHelperOperation `
             -Code "$Phase-invalid" -Phase $Phase -Subreason 'identity'
     }
-    return [string]$arrStatus[0]
+    return ([string]$arrStatus[0] + $strIdentityAttributes)
 }
 
 $script:scriptBlockAssertCandidateHelperDirectoryEnvelope = {
@@ -1861,7 +1890,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.21
+    # Version: 1.0.20260803.22
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
