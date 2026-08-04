@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.51
+Version: 1.0.20260803.52
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.51'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.52'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.33'
@@ -2128,6 +2128,32 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                 & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                     -Detail ('command-not-permitted-' + $strCommandName + '-' +
                         [string]$objCommand.Extent.StartLineNumber)
+            }
+            # Add-Type is the one permitted command that can introduce member
+            # names no rule above has heard of. Every other entry on the list
+            # either takes a script block, whose contents these same checks walk,
+            # or returns an object whose methods are ordinary member calls.
+            # Measured: -TypeDefinition compiling a C# lister, then calling it as
+            # [ShadowLister]::Walk(...), performed an unbounded directory read
+            # and left the suite green at 113 passes.
+            #
+            # Requiring -AssemblyName is enough on its own, because the
+            # code-bearing parameters belong to other parameter sets and cannot
+            # be combined with it. Both real uses load an assembly by name.
+            if ($strCommandName -ceq 'Add-Type') {
+                $boolAssemblyName = $false
+                foreach ($objElement in $objCommand.CommandElements) {
+                    if ($objElement -is
+                        [System.Management.Automation.Language.CommandParameterAst] -and
+                        $objElement.ParameterName -ceq 'AssemblyName') {
+                        $boolAssemblyName = $true
+                    }
+                }
+                if (-not $boolAssemblyName) {
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                        -Detail ('add-type-without-assemblyname-' +
+                            [string]$objCommand.Extent.StartLineNumber)
+                }
             }
         }
         # A member name that is not a literal is refused across the whole file,
@@ -6678,7 +6704,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.51
+    # Version: 1.0.20260803.52
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
