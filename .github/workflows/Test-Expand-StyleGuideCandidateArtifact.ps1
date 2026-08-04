@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.24
+Version: 1.0.20260803.25
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.24'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.25'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.16'
@@ -1858,6 +1858,7 @@ $script:scriptBlockAssertDownloadLeafGuardExecutes = {
         }
 
         $boolSucceeded = $false
+        $strObservedSubreason = 'none'
         try {
             [void](& $HelperLiteralPath `
                 -Context $objProbeContext `
@@ -1868,7 +1869,11 @@ $script:scriptBlockAssertDownloadLeafGuardExecutes = {
                 -ExpectedDigest $strExpectedDigest)
             $boolSucceeded = $true
         } catch {
-            $boolSucceeded = $false
+            $objSubreason = [regex]::Match(
+                [string]$_.Exception.Message, 'subreason=([a-z][a-z0-9-]*)')
+            if ($objSubreason.Success) {
+                $strObservedSubreason = $objSubreason.Groups[1].Value
+            }
         }
         if ($boolSucceeded -ne [bool]$hashtableCase.MustSucceed) {
             & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
@@ -1877,6 +1882,18 @@ $script:scriptBlockAssertDownloadLeafGuardExecutes = {
                 } else {
                     'refused'
                 }))
+        }
+        # Which refusal, not merely that one happened. A leaf carrying '*' is
+        # refused twice over: once where it is adopted, and again by the context
+        # validator when the record reaches it. Asserting only that expansion
+        # failed cannot tell those apart, so bypassing the adoption check left
+        # this green -- measured, with the archive journaled unvalidated first,
+        # which is the whole defect. The subreason is closed-taxonomy contract
+        # rather than incidental message text, so pinning it does not make this
+        # a source-shaped assertion again.
+        if (-not $hashtableCase.MustSucceed -and $strObservedSubreason -cne 'entry-name') {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('download-leaf-guard-late-' + $strObservedSubreason)
         }
     }
 }
@@ -5899,7 +5916,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.24
+    # Version: 1.0.20260803.25
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
