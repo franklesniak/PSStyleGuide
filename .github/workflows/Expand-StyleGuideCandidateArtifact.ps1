@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.31
+Version: 1.0.20260803.32
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.31'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.17'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.32'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.18'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -202,6 +202,9 @@ $script:intCandidateHelperMaximumEntryCeiling = 64
 # The documented label ceiling, and the longest path either platform can name.
 $script:intCandidateHelperMaximumLabelLength = 128
 $script:intCandidateHelperMaximumPathLength = 32767
+# The longest single path component either platform can name, which is what
+# a journaled leaf and an enumeration search leaf both are.
+$script:intCandidateHelperMaximumLeafLength = 255
 # Fixed buffer for bounded hashing, so the read never sizes itself from a file.
 $script:intCandidateHelperHashBuffer = 65536
 $script:chrCandidateHelperDirectorySeparator = [System.IO.Path]::DirectorySeparatorChar
@@ -599,6 +602,7 @@ $script:scriptBlockAssertCandidateHelperContext = {
             $objRecord.Path.GetType() -ne [System.String] -or $objRecord.Path.Length -eq 0 -or
             $objRecord.ParentPath.GetType() -ne [System.String] -or $objRecord.ParentPath.Length -eq 0 -or
             $objRecord.LeafName.GetType() -ne [System.String] -or $objRecord.LeafName.Length -eq 0 -or
+            $objRecord.LeafName.Length -gt $script:intCandidateHelperMaximumLeafLength -or
             $objRecord.LeafName -in @('.', '..') -or
             $objRecord.LeafName.IndexOf($script:chrCandidateHelperDirectorySeparator) -ge 0 -or
             $objRecord.LeafName.IndexOf($script:chrCandidateHelperAlternateSeparator) -ge 0 -or
@@ -1051,7 +1055,7 @@ $script:scriptBlockGetCandidateHelperEntry = {
     if ($PSBoundParameters.ContainsKey('MatchPath')) {
         $strMatchLeaf = [System.IO.Path]::GetFileName($MatchPath)
         if ($strMatchLeaf.Length -eq 0 -or
-            $strMatchLeaf.Length -gt 255 -or
+            $strMatchLeaf.Length -gt $script:intCandidateHelperMaximumLeafLength -or
             $strMatchLeaf -ceq '.' -or
             $strMatchLeaf -ceq '..' -or
             $strMatchLeaf.IndexOfAny($script:arrCandidateHelperRejectedMatchCharacter) -ge 0) {
@@ -2090,7 +2094,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.31
+    # Version: 1.0.20260803.32
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.17
+Version: 1.0.20260803.18
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.17'
+$versionCandidateContext = [System.Version]'1.0.20260803.18'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -98,6 +98,9 @@ $intCandidateMaximumEntryCeiling = 64
 # The documented label ceiling, and the longest path either platform can name.
 $intCandidateMaximumLabelLength = 128
 $intCandidateMaximumPathLength = 32767
+# The longest single path component either platform can name, which is what
+# a journaled leaf and an enumeration search leaf both are.
+$intCandidateMaximumLeafLength = 255
 # Fixed buffer for bounded hashing, so the read never sizes itself from a file.
 $intCandidateHashBuffer = 65536
 $intCandidateCreationAttemptMaximum = 16
@@ -494,7 +497,7 @@ $scriptBlockGetCandidateImmediateEntry = {
     if ($PSBoundParameters.ContainsKey('MatchPath')) {
         $strMatchLeaf = [System.IO.Path]::GetFileName($MatchPath)
         if ($strMatchLeaf.Length -eq 0 -or
-            $strMatchLeaf.Length -gt 255 -or
+            $strMatchLeaf.Length -gt $intCandidateMaximumLeafLength -or
             $strMatchLeaf -ceq '.' -or
             $strMatchLeaf -ceq '..' -or
             $strMatchLeaf.IndexOfAny($arrCandidateRejectedMatchCharacter) -ge 0) {
@@ -918,6 +921,7 @@ $scriptBlockAssertCandidateInMemoryContext = {
             $objRecord.Path.GetType() -ne [System.String] -or $objRecord.Path.Length -eq 0 -or
             $objRecord.ParentPath.GetType() -ne [System.String] -or $objRecord.ParentPath.Length -eq 0 -or
             $objRecord.LeafName.GetType() -ne [System.String] -or $objRecord.LeafName.Length -eq 0 -or
+            $objRecord.LeafName.Length -gt $intCandidateMaximumLeafLength -or
             $objRecord.LeafName -in @('.', '..') -or
             $objRecord.LeafName.IndexOf($chrCandidateDirectorySeparator) -ge 0 -or
             $objRecord.LeafName.IndexOf($chrCandidateAlternateSeparator) -ge 0 -or
@@ -1449,7 +1453,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.17
+    # Version: 1.0.20260803.18
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1724,7 +1728,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.17
+    # Version: 1.0.20260803.18
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
