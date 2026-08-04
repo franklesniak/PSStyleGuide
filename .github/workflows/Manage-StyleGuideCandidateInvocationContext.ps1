@@ -27,14 +27,14 @@ a caller that deletes first and validates afterwards has already
 deleted, so it needs a way to ask about issuance that changes nothing.
 
 .NOTES
-Version: 1.0.20260803.41
+Version: 1.0.20260803.42
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.41'
+$versionCandidateContext = [System.Version]'1.0.20260803.42'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -1116,6 +1116,7 @@ $scriptBlockAssertCandidateInMemoryContext = {
             ContentLength = $objLiveRecord.ContentLength
             ContentSha256 = $objLiveRecord.ContentSha256
             Record = $objLiveRecord
+            RecordWriteRefused = $false
         }
         [void]$listJournalCapture.Add($objRecord)
 
@@ -1748,7 +1749,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.41
+    # Version: 1.0.20260803.42
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2210,7 +2211,7 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.41
+    # Version: 1.0.20260803.42
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param (
@@ -2320,7 +2321,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.41
+    # Version: 1.0.20260803.42
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2572,11 +2573,18 @@ function Remove-StyleGuideCandidateInvocationContext {
                 & $scriptBlockStopCandidateOperation -Code 'cleanup-delete-failed' `
                     -Message 'PSStyleGuide.Context.v1|phase=cleanup|reason=file-present'
             }
-            # Written through the plan's reference to the live record. This is
-            # the only direction the caller's object is touched from here: a
-            # write, never a read.
-            $objRecord.Record.EntryState = 'Deleted'
+            # The PLAN is the record of what happened; the write onto the
+            # caller's object is a courtesy and is best-effort. A note property
+            # the caller replaced can throw on assignment, and a throw here
+            # would escape into the catch below over state already deleted --
+            # turning a completed deletion into an unhandled failure. The plan
+            # write cannot throw: this manager owns that object.
             $objRecord.EntryState = 'Deleted'
+            try {
+                $objRecord.Record.EntryState = 'Deleted'
+            } catch {
+                $objRecord.RecordWriteRefused = $true
+            }
         }
 
         # Descending sequence puts the candidate directory before the download
@@ -2606,9 +2614,14 @@ function Remove-StyleGuideCandidateInvocationContext {
                 & $scriptBlockStopCandidateOperation -Code 'cleanup-delete-failed' `
                     -Message 'PSStyleGuide.Context.v1|phase=cleanup|reason=directory-present'
             }
-            # Written through the plan, for the reason at the file loop above.
-            $objRecord.Record.EntryState = 'Deleted'
+            # Plan first, live write best-effort, for the reason at the file
+            # loop above.
             $objRecord.EntryState = 'Deleted'
+            try {
+                $objRecord.Record.EntryState = 'Deleted'
+            } catch {
+                $objRecord.RecordWriteRefused = $true
+            }
         }
 
         if (-not (& $scriptBlockSetCandidateIssuedState -Context $Context -State 'Disposed')) {
@@ -2642,8 +2655,16 @@ function Remove-StyleGuideCandidateInvocationContext {
         # destination phase, and would invalidate the terminal context.
         foreach ($objRecord in $objCleanupPlan.Journal) {
             if ($objRecord.EntryState -eq 'Created') {
-                $objRecord.Record.EntryState = 'RetainedUncertain'
+                # Inside the catch, so this is the last place that may throw.
+                # It is the same courtesy write as the delete loops and gets
+                # the same treatment: the plan carries the truth that the
+                # bounded failure result below is built from.
                 $objRecord.EntryState = 'RetainedUncertain'
+                try {
+                    $objRecord.Record.EntryState = 'RetainedUncertain'
+                } catch {
+                    $objRecord.RecordWriteRefused = $true
+                }
             }
         }
         # Deliberately not conditional: the bounded failure result below is
