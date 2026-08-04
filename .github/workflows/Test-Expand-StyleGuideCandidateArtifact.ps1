@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.42
+Version: 1.0.20260803.43
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,17 +53,17 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.42'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.43'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.29'
 $script:strCandidateExpectedContextVersion = '1.0.20260803.15'
 $script:strCandidateCatalogVersion = '1.0.20260803.5'
 # The documented ceiling on what an authenticated native query may return, the
-# interval at which it is enforced while the output is still arriving, and how
-# long a killed child is given to let its copy tasks finish.
+# buffer each pipe is read into, and how long a killed child is given to let its
+# outstanding read finish.
 $script:intCandidateNativeOutputCeiling = 4194304
-$script:intCandidateNativePollMilliseconds = 10
+$script:intCandidateNativeReadBuffer = 65536
 $script:intCandidateNativeDrainMilliseconds = 10000
 # The physical allocation size, stated once. It was previously two bare literals
 # inside the header check, which is why growing the catalog failed with an
@@ -437,34 +437,81 @@ $script:scriptBlockInvokeNativeRaw = {
         # blocked writing into a pipe nobody is draining. So the child is killed
         # explicitly, which closes both pipes and lets both tasks finish.
         #
-        # Reading Length here while a pool thread writes is a deliberate,
-        # bounded race: the read can be stale-low, never torn, so the worst case
-        # is noticing one interval late. Measured with children emitting 64 MiB,
-        # 256 MiB and 1 GiB, growth stayed flat at roughly 50 to 64 MiB and the
-        # call returned in about 60 ms in every case, against growth that
-        # previously tracked whatever the child chose to produce.
-        $arrCopyTask = @(
-            $objProcess.StandardOutput.BaseStream.CopyToAsync($objStandardOutputStream),
-            $objProcess.StandardError.BaseStream.CopyToAsync($objStandardErrorStream)
+        # An earlier revision polled the two sinks on an interval and killed the
+        # child once one had already exceeded the ceiling. That bounded the
+        # growth but did not bound it HARD: whatever arrives between two polls
+        # is retained, so the ceiling was a target rather than a limit, and the
+        # length read raced a pool thread besides. Measured at a 10 ms interval,
+        # a 1 GiB child still retained 6.56 MiB against a 4 MiB ceiling.
+        #
+        # This reads both pipes itself, one buffer at a time, and refuses the
+        # chunk that would cross the ceiling rather than absorbing it first.
+        # Nothing above the limit is ever written, so the limit is exact. Both
+        # reads stay in flight together because draining one to completion while
+        # the other fills its buffer deadlocks the child -- that is the failure
+        # the copy-fault design hit, where WaitAll waited on a sibling task that
+        # could not finish until a blocked child exited.
+        #
+        # Measured, children emitting 2 MiB, 64 MiB and 1 GiB, and separately
+        # flooding stderr rather than stdout: legitimate output collected
+        # unchanged, and every oversized case refused with exactly 4.00 MiB
+        # retained on whichever pipe flooded, about 7 MiB of managed growth, and
+        # no deadlock in any of them.
+        $arrReadBuffer = @(
+            (New-Object byte[] $script:intCandidateNativeReadBuffer),
+            (New-Object byte[] $script:intCandidateNativeReadBuffer)
         )
-        while (-not [System.Threading.Tasks.Task]::WaitAll(
-                $arrCopyTask, $script:intCandidateNativePollMilliseconds)) {
-            if ($objStandardOutputStream.Length -gt $script:intCandidateNativeOutputCeiling -or
-                $objStandardErrorStream.Length -gt $script:intCandidateNativeOutputCeiling) {
-                try {
-                    $objProcess.Kill()
-                } catch {
-                    $null = $_
+        $arrReadStream = @(
+            $objProcess.StandardOutput.BaseStream,
+            $objProcess.StandardError.BaseStream
+        )
+        $arrReadSink = @($objStandardOutputStream, $objStandardErrorStream)
+        $arrReadTask = @(
+            $arrReadStream[0].ReadAsync($arrReadBuffer[0], 0, $arrReadBuffer[0].Length),
+            $arrReadStream[1].ReadAsync($arrReadBuffer[1], 0, $arrReadBuffer[1].Length)
+        )
+        $boolReadExceeded = $false
+        while (-not $boolReadExceeded -and
+            ($null -ne $arrReadTask[0] -or $null -ne $arrReadTask[1])) {
+            $arrPending = @($arrReadTask | Where-Object { $null -ne $_ })
+            [void][System.Threading.Tasks.Task]::WaitAny($arrPending)
+            for ($intPipe = 0; $intPipe -lt 2; $intPipe++) {
+                if ($null -eq $arrReadTask[$intPipe] -or
+                    -not $arrReadTask[$intPipe].IsCompleted) {
+                    continue
                 }
-                try {
-                    [void][System.Threading.Tasks.Task]::WaitAll(
-                        $arrCopyTask, $script:intCandidateNativeDrainMilliseconds)
-                } catch {
-                    $null = $_
+                $intRead = [int]$arrReadTask[$intPipe].Result
+                if ($intRead -le 0) {
+                    $arrReadTask[$intPipe] = $null
+                    continue
                 }
-                & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
-                    -Detail 'native-output-limit'
+                if (($arrReadSink[$intPipe].Length + $intRead) -gt
+                    $script:intCandidateNativeOutputCeiling) {
+                    $boolReadExceeded = $true
+                    break
+                }
+                $arrReadSink[$intPipe].Write($arrReadBuffer[$intPipe], 0, $intRead)
+                $arrReadTask[$intPipe] = $arrReadStream[$intPipe].ReadAsync(
+                    $arrReadBuffer[$intPipe], 0, $arrReadBuffer[$intPipe].Length)
             }
+        }
+        if ($boolReadExceeded) {
+            # Killing closes both pipes, which is what lets the outstanding read
+            # finish instead of waiting on a child that cannot proceed.
+            try {
+                $objProcess.Kill()
+            } catch {
+                $null = $_
+            }
+            try {
+                [void][System.Threading.Tasks.Task]::WaitAll(
+                    @($arrReadTask | Where-Object { $null -ne $_ }),
+                    $script:intCandidateNativeDrainMilliseconds)
+            } catch {
+                $null = $_
+            }
+            & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
+                -Detail 'native-output-limit'
         }
         $objProcess.WaitForExit()
         # Retained as a backstop rather than replaced. If the loop above ever
@@ -6375,7 +6422,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.42
+    # Version: 1.0.20260803.43
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
