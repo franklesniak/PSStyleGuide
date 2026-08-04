@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.33
+Version: 1.0.20260803.34
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.33'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.21'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.34'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.23'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -2094,7 +2094,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.33
+    # Version: 1.0.20260803.34
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2563,14 +2563,34 @@ $script:scriptBlockReadCandidateHelperValidatedFile = {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'post-extraction-invalid' -Phase 'post-extraction' -Subreason 'length'
         }
+        # Exactly the validated count, and not to wherever the file now ends.
+        # The length above is compared against the journal and then the read ran
+        # to EOF, which is not the same number once a competing writer appends:
+        # the ceiling bounded the check and not the work, and a writer that
+        # stays ahead of the reader moves the end indefinitely.
+        #
+        # This is the third place this class appeared, after the archive
+        # allocation and the cleanup hash. The sweep that followed those missed
+        # it, because it searched for ComputeHash -- the mechanism of the
+        # previous fix -- rather than for a filesystem read that ends where the
+        # file ends. The idiom here was already the bounded one; only the bound
+        # was absent.
         $objSha256 = [System.Security.Cryptography.SHA256]::Create()
         $arrBuffer = New-Object byte[] $script:intCandidateHelperBufferSize
         $listPrefix = New-Object 'System.Collections.Generic.List[byte]'
         try {
-            while ($true) {
-                $intRead = $objStream.Read($arrBuffer, 0, $arrBuffer.Length)
-                if ($intRead -eq 0) {
-                    break
+            $uintRemaining = $ExpectedLength
+            while ($uintRemaining -gt 0) {
+                $intWanted = if ($uintRemaining -lt [uint64]$arrBuffer.Length) {
+                    [int]$uintRemaining
+                } else {
+                    $arrBuffer.Length
+                }
+                $intRead = $objStream.Read($arrBuffer, 0, $intWanted)
+                if ($intRead -le 0) {
+                    & $script:scriptBlockStopCandidateHelperOperation `
+                        -Code 'post-extraction-invalid' -Phase 'post-extraction' `
+                        -Subreason 'length'
                 }
                 for ($intIndex = 0; $intIndex -lt $intRead; $intIndex++) {
                     if ($listPrefix.Count -lt 3) {
@@ -2582,6 +2602,13 @@ $script:scriptBlockReadCandidateHelperValidatedFile = {
                     }
                 }
                 [void]$objSha256.TransformBlock($arrBuffer, 0, $intRead, $null, 0)
+                $uintRemaining -= [uint64]$intRead
+            }
+            # One byte past the validated end: a file with more to give is not
+            # the file that was extracted.
+            if ($objStream.Read($arrBuffer, 0, 1) -gt 0) {
+                & $script:scriptBlockStopCandidateHelperOperation `
+                    -Code 'post-extraction-invalid' -Phase 'post-extraction' -Subreason 'length'
             }
             [void]$objSha256.TransformFinalBlock((New-Object byte[] 0), 0, 0)
             $strActualSha256 = (

@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.52
+Version: 1.0.20260803.53
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,12 +53,12 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.52'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.53'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.33'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.21'
-$script:strCandidateCatalogVersion = '1.0.20260803.5'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.34'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.23'
+$script:strCandidateCatalogVersion = '1.0.20260803.6'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
 # outstanding read finish.
@@ -2065,7 +2065,22 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                             [System.Management.Automation.Language.AssignmentStatementAst] -and
                         $objNode.Left -is
                             [System.Management.Automation.Language.VariableExpressionAst] -and
-                        $null -ne $objNode.Right.Find(
+                        $true
+                    },
+                    $true
+                )) | Group-Object -Property {
+                    [string]$_.Left.VariablePath.UserPath -creplace '^script:', ''
+                } | Where-Object {
+                    # EVERY assignment, not merely one. Recording that a script
+                    # block was assigned somewhere admitted a variable that was
+                    # later overwritten with a command name -- measured,
+                    # `$x = {}` then `$x = 'Get-Item'` then `& $x` performed an
+                    # unbounded listing and left the suite green at 113 passes.
+                    # Which assignment reaches the call is not decidable here, so
+                    # the admissible set is narrowed to variables that can only
+                    # ever hold a script block.
+                    @($_.Group | Where-Object {
+                        $null -eq $_.Right.Find(
                             {
                                 param ($objInner)
                                 $objInner -is
@@ -2073,11 +2088,8 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                             },
                             $false
                         )
-                    },
-                    $true
-                )) | ForEach-Object {
-                    [string]$_.Left.VariablePath.UserPath -creplace '^script:', ''
-                })
+                    }).Count -eq 0
+                } | ForEach-Object { [string]$_.Name })
 
         # Every named command in the file, against the allow-list. A call
         # through a variable -- `& $script:scriptBlockFoo` -- has no command
@@ -2413,7 +2425,11 @@ $script:scriptBlockAssertRegularFileProofExecutes = {
                         continue
                     }
                     $strSid = [string]$objRule.IdentityReference.Value
-                    if ($strSid -ceq 'S-1-1-0' -or $strSid -ceq 'S-1-5-32-545') {
+                    # Everyone, the built-in Users group, and Authenticated
+                    # Users. The last was missing and is the one most likely to
+                    # be inherited from a shared parent on a domain-joined host.
+                    if ($strSid -ceq 'S-1-1-0' -or $strSid -ceq 'S-1-5-32-545' -or
+                        $strSid -ceq 'S-1-5-11') {
                         & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                             -Detail ('invocation-root-acl-' + $strSid)
                     }
@@ -6704,7 +6720,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.52
+    # Version: 1.0.20260803.53
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()

@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.21
+Version: 1.0.20260803.23
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.21'
+$versionCandidateContext = [System.Version]'1.0.20260803.23'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -1453,7 +1453,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.21
+    # Version: 1.0.20260803.23
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1580,21 +1580,71 @@ function New-StyleGuideCandidateInvocationContext {
             # branch and throw a binding error instead of the fallback this code
             # documents. Only a missing overload is caught -- a real creation
             # failure, such as a permission error, still propagates.
-            $typeCandidateUnixFileMode = 'System.IO.UnixFileMode' -as [type]
+            # Private at creation on both platforms, or not created at all.
+            #
+            # An earlier revision fell back to the single-argument form whenever
+            # the private one was unavailable, and described that as "no worse
+            # than before". Before was the exposure: 0755 under the usual 022
+            # umask, measured, which lets any local user traverse the root once
+            # its unpredictable name is known and read the archive and the
+            # extracted files. A fallback that restores the thing being fixed is
+            # not a fallback, so this refuses instead.
+            #
+            # Windows inherits the parent's DACL unless told otherwise, and a
+            # comment here once claimed the envelope check covered that. It does
+            # not -- that check reads GetAttributes and tests only Directory and
+            # ReparsePoint. An owner-only protected ACL is applied at creation
+            # instead, and a failure to apply it refuses rather than proceeding
+            # with whatever was inherited.
             $boolCandidateRootPrivate = $false
-            if (-not $boolCandidateIsWindows -and $null -ne $typeCandidateUnixFileMode) {
+            if ($boolCandidateIsWindows) {
                 try {
-                    $null = [System.IO.Directory]::CreateDirectory(
-                        $strInvocationRoot,
-                        [System.Enum]::ToObject($typeCandidateUnixFileMode, 448)
-                    )
+                    $objRootSecurity = New-Object System.Security.AccessControl.DirectorySecurity
+                    $objRootSecurity.SetAccessRuleProtection($true, $false)
+                    $objRootSecurity.AddAccessRule(
+                        (New-Object System.Security.AccessControl.FileSystemAccessRule(
+                            [System.Security.Principal.WindowsIdentity]::GetCurrent().User,
+                            [System.Security.AccessControl.FileSystemRights]::FullControl,
+                            ([System.Security.AccessControl.InheritanceFlags]::ContainerInherit -bor
+                                [System.Security.AccessControl.InheritanceFlags]::ObjectInherit),
+                            [System.Security.AccessControl.PropagationFlags]::None,
+                            [System.Security.AccessControl.AccessControlType]::Allow)))
+                    $objRootInfo = New-Object System.IO.DirectoryInfo($strInvocationRoot)
+                    # 5.1 carries the security overload on DirectoryInfo itself;
+                    # PowerShell 7 moved it to the ACL extension type.
+                    $typeCandidateAclExtension =
+                        'System.IO.FileSystemAclExtensions' -as [type]
+                    # Both forms emit the created directory on some runtimes,
+                    # and an unsuppressed object here would join this function's
+                    # output and corrupt the context it returns.
+                    if ($null -ne $typeCandidateAclExtension) {
+                        $null = [System.IO.FileSystemAclExtensions]::CreateDirectory(
+                            $objRootInfo, $objRootSecurity)
+                    } else {
+                        $null = $objRootInfo.Create($objRootSecurity)
+                    }
                     $boolCandidateRootPrivate = $true
-                } catch [System.Management.Automation.MethodException] {
+                } catch {
                     $boolCandidateRootPrivate = $false
+                }
+            } else {
+                $typeCandidateUnixFileMode = 'System.IO.UnixFileMode' -as [type]
+                if ($null -ne $typeCandidateUnixFileMode) {
+                    try {
+                        $null = [System.IO.Directory]::CreateDirectory(
+                            $strInvocationRoot,
+                            [System.Enum]::ToObject($typeCandidateUnixFileMode, 448)
+                        )
+                        $boolCandidateRootPrivate = $true
+                    } catch [System.Management.Automation.MethodException] {
+                        $boolCandidateRootPrivate = $false
+                    }
                 }
             }
             if (-not $boolCandidateRootPrivate) {
-                $null = [System.IO.Directory]::CreateDirectory($strInvocationRoot)
+                & $scriptBlockStopCandidateOperation -Code 'context-create-verification' `
+                    -Message ('PSStyleGuide.Context.v1|phase=root' +
+                        '|reason=private-root-unavailable')
             }
             # Ownership is claimed here, on the call that may have created the
             # directory, and not after the checks below have approved of it.
@@ -1784,7 +1834,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.21
+    # Version: 1.0.20260803.23
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
