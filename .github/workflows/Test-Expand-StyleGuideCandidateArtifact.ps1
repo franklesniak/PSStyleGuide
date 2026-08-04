@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.30
+Version: 1.0.20260803.31
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.30'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.31'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.21'
@@ -517,6 +517,76 @@ $script:scriptBlockAssertVersionMarkersConsistent = {
     if ($intExpectedMarker -ne $intRequiredMarker) {
         & $script:scriptBlockStopHarness `
             -Code 'script-identity-invalid' -Detail 'version-marker'
+    }
+
+    # The count above treats every literal as interchangeable, and they are not.
+    # Deleting a public function's marker and adding one matching literal to any
+    # unrelated comment preserves the total exactly, so the assertion passes
+    # while the contract it states -- one marker in the help block, one on the
+    # constant, one inside every public function -- is broken. Measured: the
+    # whole suite green with a function's marker gone.
+    #
+    # So each declared location is checked as a location. The literals are no
+    # longer counted in the abstract; they are found where they are supposed to
+    # be, and a literal anywhere else is a stray rather than a substitute.
+    $objMarkerTokens = $null
+    $objMarkerErrors = $null
+    $objMarkerAst = [System.Management.Automation.Language.Parser]::ParseFile(
+        $LiteralPath, [ref]$objMarkerTokens, [ref]$objMarkerErrors)
+    if ($null -eq $objMarkerAst -or @($objMarkerErrors).Count -ne 0) {
+        & $script:scriptBlockStopHarness `
+            -Code 'script-identity-invalid' -Detail 'version-marker-parse'
+    }
+
+    # One [System.Version] constant carrying exactly this version.
+    $arrVersionConstant = @($objMarkerAst.FindAll(
+            {
+                param ($objNode)
+                $objNode -is [System.Management.Automation.Language.ConvertExpressionAst] -and
+                $objNode.Type.TypeName.FullName -match '^(System\.)?Version$'
+            },
+            $true
+        ) | Where-Object { [string]$_.Child.Extent.Text -ceq ("'" + $ExpectedVersion + "'") })
+    if ($arrVersionConstant.Count -ne 1) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
+            -Detail ('version-marker-constant-' + $arrVersionConstant.Count)
+    }
+
+    # One '# Version: <expected>' comment inside each public function, and none
+    # anywhere else. Comments are tokens rather than syntax, so they are matched
+    # against each function's extent by position.
+    $arrMarkerComment = @(@($objMarkerTokens) | Where-Object {
+            $_.Kind -eq [System.Management.Automation.Language.TokenKind]::Comment -and
+            [string]$_.Text -cmatch ('^#\s*Version:\s*' +
+                [System.Text.RegularExpressions.Regex]::Escape($ExpectedVersion) + '\s*$')
+        })
+    $arrPublicFunction = @($objMarkerAst.FindAll(
+            {
+                param ($objNode)
+                $objNode -is [System.Management.Automation.Language.FunctionDefinitionAst]
+            },
+            $true
+        ))
+    if ($arrPublicFunction.Count -ne [int]$ExpectedFunctionCount) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
+            -Detail ('version-marker-function-count-' + $arrPublicFunction.Count)
+    }
+    if ($arrMarkerComment.Count -ne [int]$ExpectedFunctionCount) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
+            -Detail ('version-marker-comment-count-' + $arrMarkerComment.Count)
+    }
+    foreach ($objFunction in $arrPublicFunction) {
+        $intInside = 0
+        foreach ($objComment in $arrMarkerComment) {
+            if ($objComment.Extent.StartOffset -ge $objFunction.Extent.StartOffset -and
+                $objComment.Extent.EndOffset -le $objFunction.Extent.EndOffset) {
+                $intInside++
+            }
+        }
+        if ($intInside -ne 1) {
+            & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
+                -Detail ('version-marker-in-' + $objFunction.Name + '-' + $intInside)
+        }
     }
 }
 
@@ -5969,7 +6039,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.30
+    # Version: 1.0.20260803.31
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
