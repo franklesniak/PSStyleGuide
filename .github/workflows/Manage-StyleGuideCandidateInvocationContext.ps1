@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.13
+Version: 1.0.20260803.14
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.13'
+$versionCandidateContext = [System.Version]'1.0.20260803.14'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -1263,6 +1263,36 @@ $scriptBlockGetCandidateFileEvidence = {
             [System.IO.FileShare]::Read
         )
         try {
+            # The proof above is about a NAME; this is about the object that was
+            # actually opened. A regular file is seekable and a pipe, socket or
+            # device is not, so this refuses a non-regular object explicitly
+            # rather than leaving it to be noticed when Length happens to throw.
+            # An incidental stop is not a stop -- that lesson is already written
+            # into the archive trailer guard, and it applies here too.
+            #
+            # What this does NOT do is close the window between the proof and
+            # the open. A name proven regular can be replaced before the open
+            # runs, and if the replacement is a FIFO the open blocks before any
+            # check reaches it. Closing that needs a non-blocking or no-follow
+            # open, which portable .NET does not expose: FileOptions offers
+            # WriteThrough, Asynchronous, RandomAccess, DeleteOnClose,
+            # SequentialScan and Encrypted, and none of them is O_NONBLOCK.
+            # Opening read-write does avoid the block -- measured, a FIFO opens
+            # in 5 ms that way -- but it refuses a legitimate read-only artifact:
+            # measured as an unprivileged user, a 0444 regular file opened
+            # read-write threw while the same file opened read-only succeeded.
+            # Trading a hang for a false rejection is the round-19 defect, so it
+            # was not taken.
+            #
+            # The window needs a writer inside the invocation root, which is
+            # created 0755 and owned by this process inside a sticky parent, so
+            # a different unprivileged user cannot create, delete or replace
+            # anything in it. That leaves the same user or root -- the competing
+            # untrusted writer #146 lists as a non-goal, and the same actor the
+            # extraction race is documented against.
+            if (-not $objStream.CanRead -or -not $objStream.CanSeek) {
+                throw 'nonordinary'
+            }
             $uintLength = [uint64]$objStream.Length
             # The caller compares this length against the journal before it
             # looks at the digest, so a file whose length already disagrees is
@@ -1340,7 +1370,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.13
+    # Version: 1.0.20260803.14
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1615,7 +1645,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.13
+    # Version: 1.0.20260803.14
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.27
+Version: 1.0.20260803.28
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.27'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.13'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.28'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.14'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -1816,7 +1816,7 @@ $script:scriptBlockGetCandidateHelperFileEvidence = {
             $ReferenceToFilesystemCallCount.Value = [uint32]($ReferenceToFilesystemCallCount.Value + 1)
         }
         & $script:scriptBlockAssertCandidateHelperOrdinaryRegularFile `
-            -LiteralPath $LiteralPath -Phase $Phase
+            -LiteralPath $LiteralPath
         if ($null -ne $ReferenceToFilesystemCallCount) {
             $ReferenceToFilesystemCallCount.Value = [uint32]($ReferenceToFilesystemCallCount.Value + 1)
         }
@@ -1827,6 +1827,27 @@ $script:scriptBlockGetCandidateHelperFileEvidence = {
             [System.IO.FileShare]::Read
         )
         try {
+            # The proof above is about a NAME; this is about the object that was
+            # actually opened. A regular file is seekable and a pipe, socket or
+            # device is not, so a non-regular object is refused explicitly here
+            # rather than being noticed when Length happens to throw. An
+            # incidental stop is not a stop -- the same lesson the archive
+            # trailer guard already carries.
+            #
+            # This does not close the window between the proof and the open. A
+            # name proven regular can be replaced first, and a FIFO put in its
+            # place blocks the open before any check reaches it. Closing that
+            # needs a non-blocking or no-follow open, which portable .NET does
+            # not expose -- FileOptions offers WriteThrough, Asynchronous,
+            # RandomAccess, DeleteOnClose, SequentialScan and Encrypted, none of
+            # them O_NONBLOCK. Opening read-write does avoid the block, measured
+            # at 5 ms against a FIFO, but it refuses a legitimate read-only
+            # artifact: measured as an unprivileged user, a 0444 regular file
+            # opened read-write threw where read-only succeeded. Trading a hang
+            # for a false rejection is the round-19 defect, so it was not taken.
+            if (-not $objStream.CanRead -or -not $objStream.CanSeek) {
+                throw 'nonordinary'
+            }
             $uintLength = [uint64]$objStream.Length
             # The caller compares this length against the journal before it
             # looks at the digest, so a file whose length already disagrees is
@@ -1895,10 +1916,7 @@ $script:scriptBlockGetCandidateHelperFileEvidence = {
 $script:scriptBlockAssertCandidateHelperOrdinaryRegularFile = {
     param (
         [Parameter(Mandatory = $true)]
-        [string]$LiteralPath,
-
-        [Parameter(Mandatory = $true)]
-        [string]$Phase
+        [string]$LiteralPath
     )
 
     $objAttributes = [System.IO.File]::GetAttributes($LiteralPath)
@@ -1932,7 +1950,7 @@ $script:scriptBlockAssertCandidateHelperOrdinaryFileMetadata = {
 
     try {
         & $script:scriptBlockAssertCandidateHelperOrdinaryRegularFile `
-            -LiteralPath $LiteralPath -Phase $Phase
+            -LiteralPath $LiteralPath
         $objFile = New-Object System.IO.FileInfo($LiteralPath)
         # A named pipe carries no Directory or ReparsePoint attribute and
         # reports a length of zero, so the checks above accept it as an
@@ -1993,7 +2011,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.27
+    # Version: 1.0.20260803.28
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
