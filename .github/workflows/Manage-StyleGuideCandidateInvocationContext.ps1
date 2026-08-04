@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.5
+Version: 1.0.20260803.6
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.5'
+$versionCandidateContext = [System.Version]'1.0.20260803.6'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -379,6 +379,19 @@ $scriptBlockGetCandidateImmediateEntry = {
     # below the bound is still the complete listing, which is what the presence
     # checks downstream rely on. Callers proving a path ABSENT must not pass a
     # bound: absence cannot be concluded from a partial listing.
+    # MaximumEntry uses an in-band sentinel: omitted means unbounded, and the
+    # parameter defaults to zero, so the `-le 0` branch below is what serves the
+    # absence proofs. That makes an explicit `-MaximumEntry 0` read as a bound
+    # while meaning the opposite, which is how a cardinality check can be
+    # neutered without looking neutered. Omission stays unbounded; an explicitly
+    # supplied non-positive bound is a contradiction and is refused here, above
+    # the try, so it is not reported as an enumeration failure and no filesystem
+    # call is counted for a call that never happened.
+    if ($PSBoundParameters.ContainsKey('MaximumEntry') -and $MaximumEntry -le 0) {
+        & $scriptBlockStopCandidateOperation -Code $strFailureCode `
+            -Message "PSStyleGuide.Context.v1|phase=$strFailurePhase|reason=enumeration-bound"
+    }
+
     try {
         if ($null -ne $ReferenceToFilesystemCallCount) {
             $ReferenceToFilesystemCallCount.Value = [uint32]($ReferenceToFilesystemCallCount.Value + 1)
@@ -1139,7 +1152,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.5
+    # Version: 1.0.20260803.6
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1413,7 +1426,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.5
+    # Version: 1.0.20260803.6
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.12
+Version: 1.0.20260803.13
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.12'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.5'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.13'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.6'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -877,6 +877,19 @@ $script:scriptBlockGetCandidateHelperEntry = {
     # below the bound is still the complete listing, which is what the presence
     # checks downstream rely on. Callers proving a path ABSENT must not pass a
     # bound: absence cannot be concluded from a partial listing.
+    # MaximumEntry uses an in-band sentinel: omitted means unbounded, and the
+    # parameter defaults to zero, so the `-le 0` branch below is what serves the
+    # absence proofs. That makes an explicit `-MaximumEntry 0` read as a bound
+    # while meaning the opposite, which is how a cardinality check can be
+    # neutered without looking neutered. Omission stays unbounded; an explicitly
+    # supplied non-positive bound is a contradiction and is refused here, above
+    # the try, so it is not reported as an enumeration failure and no filesystem
+    # call is counted for a call that never happened.
+    if ($PSBoundParameters.ContainsKey('MaximumEntry') -and $MaximumEntry -le 0) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code $strFailureCode -Phase $Phase -Subreason 'enumeration-bound'
+    }
+
     try {
         if ($null -ne $ReferenceToFilesystemCallCount) {
             $ReferenceToFilesystemCallCount.Value = [uint32]($ReferenceToFilesystemCallCount.Value + 1)
@@ -1617,7 +1630,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.12
+    # Version: 1.0.20260803.13
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

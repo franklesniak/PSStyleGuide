@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.19
+Version: 1.0.20260803.20
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,12 +53,12 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.19'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.20'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.12'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.5'
-$script:strCandidateCatalogVersion = '1.0.20260803.2'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.13'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.6'
+$script:strCandidateCatalogVersion = '1.0.20260803.3'
 # The physical allocation size, stated once. It was previously two bare literals
 # inside the header check, which is why growing the catalog failed with an
 # unhelpful 'header' detail rather than naming the count.
@@ -1561,24 +1561,28 @@ $script:arrCandidateEnumerationScriptBlockName = [string[]]@(
     'scriptBlockGetCandidateImmediateEntry',
     'scriptBlockGetCandidateHelperEntry'
 )
+# Bound records the exact expression each site passes, not merely that it passes
+# one. Presence alone is satisfied by -MaximumEntry 0, which both helpers
+# document as meaning unbounded, and by an arbitrarily large literal that bounds
+# nothing in practice. $null means the site must pass no bound at all.
 $script:arrCandidateContextEnumerationSite = @(
-    @{ Target = '$strTrustedParent'; Bounded = $false },
-    @{ Target = '$strInvocationRoot'; Bounded = $true },
-    @{ Target = '$strDownloadDirectory'; Bounded = $true },
-    @{ Target = '$strInvocationRoot'; Bounded = $true },
-    @{ Target = '$Context.InvocationRootPath'; Bounded = $true },
-    @{ Target = '$Context.DownloadDirectoryPath'; Bounded = $true },
-    @{ Target = '$objRecord.ParentPath'; Bounded = $false },
-    @{ Target = '$objRecord.ParentPath'; Bounded = $false }
+    @{ Target = '$strTrustedParent'; Bound = $null },
+    @{ Target = '$strInvocationRoot'; Bound = '1' },
+    @{ Target = '$strDownloadDirectory'; Bound = '1' },
+    @{ Target = '$strInvocationRoot'; Bound = '2' },
+    @{ Target = '$Context.InvocationRootPath'; Bound = '($listExpectedRootEntries.Count + 1)' },
+    @{ Target = '$Context.DownloadDirectoryPath'; Bound = '($arrDownloadRecords.Count + 1)' },
+    @{ Target = '$objRecord.ParentPath'; Bound = $null },
+    @{ Target = '$objRecord.ParentPath'; Bound = $null }
 )
 $script:arrCandidateHelperEnumerationSite = @(
-    @{ Target = '$Context.CandidatePath'; Bounded = $true },
-    @{ Target = '$Context.CandidatePath'; Bounded = $false },
-    @{ Target = '$Context.InvocationRootPath'; Bounded = $false },
-    @{ Target = '$ParentPath'; Bounded = $false },
-    @{ Target = '$strDownloadPath'; Bounded = $true },
-    @{ Target = '$strCandidatePath'; Bounded = $true },
-    @{ Target = '$strCandidatePath'; Bounded = $true }
+    @{ Target = '$Context.CandidatePath'; Bound = '($arrOwnedCandidateFiles.Count + 1)' },
+    @{ Target = '$Context.CandidatePath'; Bound = $null },
+    @{ Target = '$Context.InvocationRootPath'; Bound = $null },
+    @{ Target = '$ParentPath'; Bound = $null },
+    @{ Target = '$strDownloadPath'; Bound = '2' },
+    @{ Target = '$strCandidatePath'; Bound = '1' },
+    @{ Target = '$strCandidatePath'; Bound = '5' }
 )
 
 $script:scriptBlockAssertEnumerationBoundsDeclared = {
@@ -1622,7 +1626,7 @@ $script:scriptBlockAssertEnumerationBoundsDeclared = {
         }
         for ($intSite = 0; $intSite -lt $arrExpectedSite.Count; $intSite++) {
             $objCall = @($arrCall)[$intSite]
-            $boolBounded = $false
+            $strBoundText = $null
             $strTargetText = ''
             for ($intIndex = 1; $intIndex -lt @($objCall.CommandElements).Count; $intIndex++) {
                 $objElement = $objCall.CommandElements[$intIndex]
@@ -1630,8 +1634,9 @@ $script:scriptBlockAssertEnumerationBoundsDeclared = {
                     [System.Management.Automation.Language.CommandParameterAst]) {
                     continue
                 }
-                if ($objElement.ParameterName -ceq 'MaximumEntry') {
-                    $boolBounded = $true
+                if ($objElement.ParameterName -ceq 'MaximumEntry' -and
+                    ($intIndex + 1) -lt @($objCall.CommandElements).Count) {
+                    $strBoundText = [string]$objCall.CommandElements[$intIndex + 1].Extent.Text
                 }
                 if ($objElement.ParameterName -ceq 'LiteralPath' -and
                     ($intIndex + 1) -lt @($objCall.CommandElements).Count) {
@@ -1642,7 +1647,13 @@ $script:scriptBlockAssertEnumerationBoundsDeclared = {
                 & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                     -Detail ('enumeration-site-target-' + $intSite + '-' + $strTargetText)
             }
-            if ($boolBounded -ne [bool]$arrExpectedSite[$intSite].Bounded) {
+            $objExpectedBound = $arrExpectedSite[$intSite].Bound
+            if ($null -eq $objExpectedBound) {
+                if ($null -ne $strBoundText) {
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                        -Detail ('enumeration-site-bound-' + $intSite + '-' + $strTargetText)
+                }
+            } elseif ($strBoundText -cne [string]$objExpectedBound) {
                 & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                     -Detail ('enumeration-site-bound-' + $intSite + '-' + $strTargetText)
             }
@@ -5623,7 +5634,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.19
+    # Version: 1.0.20260803.20
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()

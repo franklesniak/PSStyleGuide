@@ -1,6 +1,6 @@
 {
   "SchemaVersion": 1,
-  "CatalogVersion": "1.0.20260803.2",
+  "CatalogVersion": "1.0.20260803.3",
   "CaseCount": 115,
   "CaseIdPattern": "^PS-P1A-[A-Z]+-[0-9]{2}$",
   "SemanticCasePattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$",
@@ -142,6 +142,7 @@
       "entry-name",
       "entry-read",
       "enumeration",
+      "enumeration-bound",
       "failure",
       "file-evidence",
       "file-metadata",
