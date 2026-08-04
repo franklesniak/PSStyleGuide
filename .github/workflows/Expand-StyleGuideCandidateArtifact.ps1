@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.29
+Version: 1.0.20260803.30
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.29'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.15'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.30'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.16'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -1953,9 +1953,24 @@ $script:scriptBlockAssertCandidateHelperOrdinaryRegularFile = {
     if ($strStatPath.Length -eq 0) {
         throw 'nonordinary'
     }
-    $arrFileType = @(& $strStatPath '-c' '%F' '--' $LiteralPath 2>$null)
-    if ($LASTEXITCODE -ne 0 -or $arrFileType.Count -ne 1 -or
-        [string]$arrFileType[0] -cnotin @('regular file', 'regular empty file')) {
+    # %f is the raw mode in hex and %F is the file type as PROSE. GNU coreutils
+    # translates its messages, so on a runner whose LC_MESSAGES selects an
+    # installed translation %F stops equalling any English literal and every
+    # valid cleanup is refused as uncertain. That is a false rejection of
+    # legitimate input, which is the defect this code has shipped twice before.
+    # The numeric form carries no message catalogue at all.
+    #
+    # Masking with S_IFMT also states the question better than a literal list
+    # did: one test covers a regular file whether or not it is empty, where the
+    # prose needed both 'regular file' and 'regular empty file' spelled out.
+    # Measured on this image -- regular 0x81a4, empty 0x81a4, fifo 0x11a4,
+    # symbolic link 0xa1ff, so 0x8000 after masking is exactly the regular case.
+    $arrFileMode = @(& $strStatPath '-c' '%f' '--' $LiteralPath 2>$null)
+    if ($LASTEXITCODE -ne 0 -or $arrFileMode.Count -ne 1 -or
+        [string]$arrFileMode[0] -notmatch '^[0-9A-Fa-f]{1,8}$') {
+        throw 'nonordinary'
+    }
+    if (([System.Convert]::ToInt32([string]$arrFileMode[0], 16) -band 0xF000) -ne 0x8000) {
         throw 'nonordinary'
     }
 }
@@ -2032,7 +2047,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.29
+    # Version: 1.0.20260803.30
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

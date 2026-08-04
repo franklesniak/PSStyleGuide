@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.43
+Version: 1.0.20260803.45
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.43'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.45'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.29'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.15'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.30'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.16'
 $script:strCandidateCatalogVersion = '1.0.20260803.5'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
@@ -2101,6 +2101,26 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                 -Detail ('dynamic-member-not-permitted-' +
                     [string]$objDynamic.Extent.StartLineNumber)
         }
+        # A prose format string for stat is refused outright. The behavioural
+        # probe elsewhere in this harness proves the regular-file proof decides
+        # correctly, but it can only prove it under the locale the suite runs
+        # in: reverting to %F would keep that probe green on an English runner
+        # and refuse every valid cleanup on a translated one. The property at
+        # stake is that no message catalogue is consulted at all, and that is a
+        # property of the source rather than of one run.
+        foreach ($objProse in @($objAst.FindAll(
+                    {
+                        param ($objNode)
+                        $objNode -is
+                            [System.Management.Automation.Language.StringConstantExpressionAst] -and
+                        [string]$objNode.Value -cmatch '%F'
+                    },
+                    $true
+                ))) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('translatable-stat-format-' +
+                    [string]$objProse.Extent.StartLineNumber)
+        }
         # Reflection is refused across the whole file, helper definition
         # included: it reaches a listing without spelling one, and neither
         # script has any use for it.
@@ -2208,6 +2228,70 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
 # through the production entry point, with the outcome required to differ by
 # leaf. The two checks answer different questions and neither subsumes the
 # other -- this one cannot see ordering, and the AST one cannot see execution.
+# The regular-file proof asks an external tool what a path is, and the first
+# version asked in PROSE: it compared stat's %F against 'regular file' and
+# 'regular empty file'. GNU coreutils translates its messages, so a runner whose
+# LC_MESSAGES selected an installed translation would have refused every valid
+# cleanup -- a false rejection of legitimate input, which this code has now
+# shipped twice before and flagged as a risk once without fixing it.
+#
+# The fix reads the numeric mode instead, and this probe is behavioural rather
+# than another source rule on purpose. Five separate holes have been found in
+# the AST-shaped rules this suite carries, every one of them a spelling the rule
+# did not anticipate. A probe that plants a real FIFO and a real empty file and
+# checks what the loaded helper actually decides cannot be defeated by
+# respelling the format string, and it fails if either verdict ever inverts.
+$script:scriptBlockAssertRegularFileProofExecutes = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$RunRoot
+    )
+
+    # Windows has no mkfifo and no filesystem pipes under the invocation root,
+    # so the refusal is unobservable there rather than expected to fail.
+    if ($script:boolCandidateIsWindows) {
+        return
+    }
+    $strFifoPath = [string](& $script:scriptBlockResolveHarnessNativePath `
+        -CandidatePath ([string[]]@('/usr/bin/mkfifo', '/bin/mkfifo')))
+    if ($strFifoPath.Length -eq 0) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'regular-file-proof-mkfifo-absent'
+    }
+    $strProbeRoot = [System.IO.Path]::Combine($RunRoot, 'regular-file-proof')
+    [void][System.IO.Directory]::CreateDirectory($strProbeRoot)
+
+    $strEmptyPath = [System.IO.Path]::Combine($strProbeRoot, 'empty.bin')
+    [System.IO.File]::WriteAllBytes($strEmptyPath, [byte[]]@())
+    $strPipePath = [System.IO.Path]::Combine($strProbeRoot, 'pipe.bin')
+    [void](& $strFifoPath $strPipePath 2>$null)
+    if ($LASTEXITCODE -ne 0) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'regular-file-proof-mkfifo-failed'
+    }
+
+    # An empty regular file must be ADMITTED. That direction matters as much as
+    # the refusal: a journaled file may legitimately be empty, and the earlier
+    # download-path rule that refused a zero length could not be reused here for
+    # exactly that reason.
+    foreach ($hashtableCase in @(
+            @{ Path = $strEmptyPath; MustPass = $true; Name = 'empty-regular' },
+            @{ Path = $strPipePath; MustPass = $false; Name = 'named-pipe' })) {
+        $boolPassed = $true
+        try {
+            & $scriptBlockAssertCandidateOrdinaryRegularFile `
+                -LiteralPath ([string]$hashtableCase.Path)
+        } catch {
+            $boolPassed = $false
+        }
+        if ($boolPassed -ne [bool]$hashtableCase.MustPass) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('regular-file-proof-' + [string]$hashtableCase.Name + '-' +
+                    $(if ($boolPassed) { 'admitted' } else { 'refused' }))
+        }
+    }
+}
+
 $script:scriptBlockAssertDownloadLeafGuardExecutes = {
     param (
         [Parameter(Mandatory = $true)]
@@ -6422,7 +6506,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.43
+    # Version: 1.0.20260803.45
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -6655,6 +6739,7 @@ function Invoke-StyleGuideCandidateHarness {
             -HelperLiteralPath $strHelperLiteralPath
         & $script:scriptBlockAssertDownloadPathProvenance `
             -HelperLiteralPath $strHelperLiteralPath
+        & $script:scriptBlockAssertRegularFileProofExecutes -RunRoot $strRunRoot
         & $script:scriptBlockAssertDownloadLeafGuardExecutes `
             -HelperLiteralPath $strHelperLiteralPath `
             -RunRoot $strRunRoot
