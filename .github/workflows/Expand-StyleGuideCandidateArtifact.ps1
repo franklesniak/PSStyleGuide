@@ -122,7 +122,7 @@ param (
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
 $script:versionCandidateHelper = [System.Version]'1.0.20260803.35'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.25'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.27'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'

@@ -21,15 +21,43 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.25
+Version: 1.0.20260803.27
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.25'
+$versionCandidateContext = [System.Version]'1.0.20260803.27'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
+# The exact context objects this manager has issued. Membership is decided by
+# reference, so a structurally identical clone is not a member.
+#
+# Entries are never removed, and that is deliberate rather than an oversight.
+# Dropping a context on successful cleanup was tried first and is wrong: the
+# identity check runs during parameter validation, ahead of the already-disposed
+# branch, so a deregistered context would make a second Remove call throw
+# instead of returning cleanup-already-disposed with Success true. Idempotent
+# cleanup is a documented part of this contract and outranks the tidier set.
+#
+# The cost of keeping them is one object reference per context this process
+# creates, and a context is created once per invocation. It is proportional to
+# calls rather than to anything an input controls.
+#
+# The name is unqualified, like every other private in this file, because both
+# public functions are closures and are invoked from the script scope of
+# whatever dot-sourced them. A $script: reference resolves against THAT scope
+# at run time, so New- would have registered into the caller's scope and
+# Remove- would have looked in it and found nothing -- measured, 42 of 116
+# cases failed with a context still Active. The closure captures this reference
+# instead, and both functions mutate the one list.
+#
+# ReferenceEquals is written out rather than left to a comparer.
+# System.Collections.Generic.ReferenceEqualityComparer arrived in .NET 5 and is
+# absent from the .NET Framework 4.8 that Windows PowerShell 5.1 runs on, and
+# the default comparer decides equality by asking the objects -- which is the
+# question this register exists to stop asking.
+$arrCandidateIssuedContext = New-Object System.Collections.ArrayList
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
 # The same ceilings the expansion helper enforces. They are restated rather
@@ -674,7 +702,29 @@ $scriptBlockNewCandidateContext = {
         )
     }
     $objContext.PSObject.TypeNames.Insert(0, $strCandidateContextTypeName)
+    # Recorded before it is returned, so no caller can hold a context this
+    # manager does not know it issued. Reference equality is the comparer, and
+    # it is stated rather than defaulted: the default for PSCustomObject would
+    # compare by value and readmit the clone this register exists to exclude.
+    [void]$arrCandidateIssuedContext.Add($objContext)
     return $objContext
+}
+
+$scriptBlockCandidateContextIssuedIndex = {
+    param (
+        [AllowNull()]
+        [object]$Context
+    )
+
+    for ($intIssued = 0
+        $intIssued -lt $arrCandidateIssuedContext.Count
+        $intIssued++) {
+        if ([System.Object]::ReferenceEquals(
+                $arrCandidateIssuedContext[$intIssued], $Context)) {
+            return $intIssued
+        }
+    }
+    return -1
 }
 
 $scriptBlockAssertCandidateExactPropertySchema = {
@@ -1161,6 +1211,32 @@ $scriptBlockAssertCandidateInMemoryContext = {
             throw 'cleanup-context-invalid'
         }
     }
+
+    # Everything above describes a SHAPE, and a shape can be reproduced. A
+    # caller that builds a PSCustomObject carrying this type name, this schema
+    # version, this property set and an Active journal satisfies every check
+    # here without this manager ever having issued it -- and can then name any
+    # empty directory as the Created invocation root and have cleanup remove
+    # it. Ownership was being inferred from a structural clone.
+    #
+    # Reference identity cannot be forged. The register holds the exact objects
+    # this manager returned, compared by reference, so a copy with identical
+    # contents is not a member however faithfully it was reconstructed.
+    #
+    # This is checked LAST on purpose. Every forged context the suite already
+    # exercises is structurally wrong in some specific way, and each of those
+    # cases asserts the specific diagnostic it earns; putting identity first
+    # would collapse all of them onto this one code and lose what they test.
+    # A structurally perfect forgery is the only thing that reaches here.
+    #
+    # What this does NOT do is create a privilege boundary. Constructing that
+    # forgery takes arbitrary code in this process, and that actor can call
+    # [System.IO.Directory]::Delete without involving this script at all. The
+    # claim being repaired is the function's own contract -- it removes what
+    # this manager created -- which was approximate and is now exact.
+    if ((& $scriptBlockCandidateContextIssuedIndex -Context $Context) -lt 0) {
+        throw 'cleanup-context-unissued'
+    }
 }
 
 $scriptBlockGetCandidateRetainedSequence = {
@@ -1482,7 +1558,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.25
+    # Version: 1.0.20260803.27
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1901,7 +1977,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.25
+    # Version: 1.0.20260803.27
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1928,12 +2004,23 @@ function Remove-StyleGuideCandidateInvocationContext {
         $guidInvocationId = $Context.InvocationId
         $strPreviousState = $Context.LifecycleState
     } catch {
+        # An unissued context is not a malformed one. The object is well formed
+        # by construction -- that is the whole point of the check that refused
+        # it -- and reporting a structural defect that does not exist would
+        # send a caller looking for a field to fix. It would also leave the
+        # taxonomy declaring a code production could never emit, which is worse
+        # than not declaring it: the catalogue would describe a refusal nothing
+        # can produce.
+        $strContextFailureCode = 'cleanup-context-invalid'
+        if (([string]$_.Exception.Message) -ceq 'cleanup-context-unissued') {
+            $strContextFailureCode = 'cleanup-context-unissued'
+        }
         return (& $scriptBlockNewCandidateCleanupResult `
             -InvocationId $guidInvocationId `
             -PreviousState $strPreviousState `
             -FinalState $strPreviousState `
             -Success $false `
-            -DiagnosticCode 'cleanup-context-invalid' `
+            -DiagnosticCode $strContextFailureCode `
             -ReferenceToFilesystemCallCount ([uint32]0) `
             -RetainedRecordSequences ([uint32[]]@()))
     }
