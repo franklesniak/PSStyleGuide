@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.18
+Version: 1.0.20260803.19
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.18'
+$versionCandidateContext = [System.Version]'1.0.20260803.19'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -1453,7 +1453,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.18
+    # Version: 1.0.20260803.19
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1539,7 +1539,33 @@ function New-StyleGuideCandidateInvocationContext {
                 -DownloadDirectoryPath $strDownloadDirectory `
                 -CandidatePath $strCandidatePath
 
-            $null = [System.IO.Directory]::CreateDirectory($strInvocationRoot)
+            # Private at creation on Unix, not private a moment afterwards.
+            # The default is 0755 under the usual 022 umask -- measured -- which
+            # lets any local user traverse the root once its unpredictable name
+            # is known and read the downloaded archive and the extracted files.
+            # Everything below inherits the protection: POSIX traversal needs
+            # execute on every component, so a 0700 root makes the download and
+            # candidate directories unreachable whatever their own modes are.
+            #
+            # The mode goes to the creating call rather than a chmod afterwards,
+            # because create-then-protect is a window, and this project has
+            # already had to close one of those. 448 is 0700 -- UserRead,
+            # UserWrite and UserExecute -- written numerically so the enum type
+            # is not referenced on a runtime that lacks it.
+            #
+            # Windows keeps the single-argument form: it has no Unix mode, and
+            # the inherited ACL is what the envelope check already reasons
+            # about. PowerShell 7 releases older than the UnixFileMode overload
+            # fall back to the same form and are no worse than before.
+            $typeCandidateUnixFileMode = 'System.IO.UnixFileMode' -as [type]
+            if (-not $boolCandidateIsWindows -and $null -ne $typeCandidateUnixFileMode) {
+                $null = [System.IO.Directory]::CreateDirectory(
+                    $strInvocationRoot,
+                    [System.Enum]::ToObject($typeCandidateUnixFileMode, 448)
+                )
+            } else {
+                $null = [System.IO.Directory]::CreateDirectory($strInvocationRoot)
+            }
             # Ownership is claimed here, on the call that may have created the
             # directory, and not after the checks below have approved of it.
             # CreateDirectory cannot say whether it made the directory or found
@@ -1728,7 +1754,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.18
+    # Version: 1.0.20260803.19
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

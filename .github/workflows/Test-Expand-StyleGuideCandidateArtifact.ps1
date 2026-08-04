@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.48
+Version: 1.0.20260803.49
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.48'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.49'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.32'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.18'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.19'
 $script:strCandidateCatalogVersion = '1.0.20260803.5'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
@@ -2349,6 +2349,32 @@ $script:scriptBlockAssertRegularFileProofExecutes = {
     # the refusal: a journaled file may legitimately be empty, and the earlier
     # download-path rule that refused a zero length could not be reused here for
     # exactly that reason.
+    # The invocation root must be private at creation. The default under the
+    # usual 022 umask is 0755 -- measured -- which lets any local user traverse
+    # the root once its unpredictable name is known and read the downloaded
+    # archive and the extracted files. Checked here rather than in source
+    # because the property is what the filesystem ended up with, and a source
+    # change that quietly reverted the mode would still parse.
+    $strModeProbeParent = [System.IO.Path]::Combine($strProbeRoot, 'mode')
+    [void][System.IO.Directory]::CreateDirectory($strModeProbeParent)
+    $objModeContext = New-StyleGuideCandidateInvocationContext `
+        -TrustedTemporaryRoot $strModeProbeParent `
+        -DiagnosticLabel 'invocation-root-mode'
+    $strStatPathForMode = [string](& $script:scriptBlockResolveHarnessNativePath `
+        -CandidatePath ([string[]]@('/usr/bin/stat', '/bin/stat')))
+    if ($strStatPathForMode.Length -eq 0) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'invocation-root-mode-stat-absent'
+    }
+    $arrRootMode = @(& $strStatPathForMode '-c' '%a' '--' `
+        ([string]$objModeContext.InvocationRootPath) 2>$null)
+    if ($LASTEXITCODE -ne 0 -or $arrRootMode.Count -ne 1 -or
+        [string]$arrRootMode[0] -cne '700') {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+            -Detail ('invocation-root-mode-' + [string]$arrRootMode[0])
+    }
+    [void](Remove-StyleGuideCandidateInvocationContext -Context $objModeContext)
+
     foreach ($hashtableCase in @(
             @{ Path = $strEmptyPath; MustPass = $true; Name = 'empty-regular' },
             @{ Path = $strPipePath; MustPass = $false; Name = 'named-pipe' })) {
@@ -6581,7 +6607,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.48
+    # Version: 1.0.20260803.49
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
