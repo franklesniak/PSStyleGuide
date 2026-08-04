@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.46
+Version: 1.0.20260803.47
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.46'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.47'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.31'
@@ -2002,6 +2002,12 @@ $script:strCandidateListingMemberPattern =
     '^(Enumerate|Get)(Directories|Files|FileSystemEntries|FileSystemInfos)$'
 $script:strCandidateReflectionMemberPattern =
     '^(GetMethods?|GetPropert(y|ies)|GetFields?|GetMembers?|InvokeMember|GetConstructors?|CreateInstance)$'
+# The only variables a nameless command may invoke besides the internal script
+# blocks: absolute native paths this code resolved itself. Measured, that is one
+# name per script today.
+$script:arrCandidateNativePathVariable = [string[]]@(
+    'strStatPath'
+)
 $script:arrCandidateHelperPermittedCommand = [string[]]@(
     'Add-Type',
     'Get-Command',
@@ -2058,6 +2064,36 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                 ))) {
             $strCommandName = [string]$objCommand.GetCommandName()
             if ([string]::IsNullOrEmpty($strCommandName)) {
+                # A command with no name is an invocation through something.
+                # Skipping those outright is what let `& ('Get-' + 'Item')` do
+                # an unbounded wildcard listing while naming no forbidden
+                # command, member or dynamic member -- green at 113 passes. An
+                # earlier round called this class unclosable because the
+                # indirection is unbounded in form. That was wrong: the target
+                # cannot be traced, but it can be CONSTRAINED, and constraining
+                # it is enough.
+                #
+                # Measured, all 297 nameless invocations across both scripts
+                # invoke a variable, and of the 56 distinct variables, 54 are
+                # the internal script blocks and the other is the resolved
+                # absolute path of stat in each file. So the rule is that a
+                # nameless command must invoke one of those two things.
+                # `& ('Get-' + 'Item')` fails because its target is not a
+                # variable at all, and `$x = 'Get-Item'; & $x` fails because the
+                # variable is neither a script block nor a declared native path.
+                $objTarget = $objCommand.CommandElements[0]
+                $strTarget = ''
+                if ($objTarget -is
+                    [System.Management.Automation.Language.VariableExpressionAst]) {
+                    $strTarget = [string]$objTarget.VariablePath.UserPath -creplace '^script:', ''
+                }
+                if ($strTarget.Length -eq 0 -or
+                    -not ($strTarget -cmatch '^scriptBlock' -or
+                        $script:arrCandidateNativePathVariable -ccontains $strTarget)) {
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                        -Detail ('nameless-command-not-permitted-' +
+                            [string]$objCommand.Extent.StartLineNumber)
+                }
                 continue
             }
             if (@($hashtableSurface.Command) -cnotcontains $strCommandName) {
@@ -6545,7 +6581,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.46
+    # Version: 1.0.20260803.47
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
