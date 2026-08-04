@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.49
+Version: 1.0.20260803.50
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.49'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.50'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.32'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.19'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.33'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.20'
 $script:strCandidateCatalogVersion = '1.0.20260803.5'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
@@ -2051,6 +2051,34 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
             & $script:scriptBlockStopHarness `
                 -Code 'catalog-invalid' -Detail 'enumeration-primitive-parse'
         }
+        # The variables this file actually defines as script blocks. An earlier
+        # revision matched the NAME instead -- anything starting 'scriptBlock' --
+        # which is a convention rather than a property: measured, assigning a
+        # command name to a variable called $scriptBlockListing and invoking it
+        # performed an unbounded directory read and left the suite green at 113
+        # passes. What the rule means is "invokes an internal script block", so
+        # that is what is checked.
+        $arrScriptBlockVariable = [string[]]@(@($objAst.FindAll(
+                    {
+                        param ($objNode)
+                        $objNode -is
+                            [System.Management.Automation.Language.AssignmentStatementAst] -and
+                        $objNode.Left -is
+                            [System.Management.Automation.Language.VariableExpressionAst] -and
+                        $null -ne $objNode.Right.Find(
+                            {
+                                param ($objInner)
+                                $objInner -is
+                                    [System.Management.Automation.Language.ScriptBlockExpressionAst]
+                            },
+                            $false
+                        )
+                    },
+                    $true
+                )) | ForEach-Object {
+                    [string]$_.Left.VariablePath.UserPath -creplace '^script:', ''
+                })
+
         # Every named command in the file, against the allow-list. A call
         # through a variable -- `& $script:scriptBlockFoo` -- has no command
         # name and is not one of these; those are the internal script blocks the
@@ -2088,7 +2116,7 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                     $strTarget = [string]$objTarget.VariablePath.UserPath -creplace '^script:', ''
                 }
                 if ($strTarget.Length -eq 0 -or
-                    -not ($strTarget -cmatch '^scriptBlock' -or
+                    -not ($arrScriptBlockVariable -ccontains $strTarget -or
                         $script:arrCandidateNativePathVariable -ccontains $strTarget)) {
                     & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                         -Detail ('nameless-command-not-permitted-' +
@@ -2165,10 +2193,16 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                         if ($strMember -cne 'ComputeHash') {
                             return $false
                         }
-                        # One argument whose name says stream: the array form
-                        # takes an array, and the offset form takes three.
-                        return (@($objNode.Arguments).Count -eq 1 -and
-                            [string]$objNode.Arguments[0].Extent.Text -imatch 'stream')
+                        # Every one-argument form, with no inference from how
+                        # the argument is spelled. The earlier rule asked
+                        # whether the argument's text contained 'stream', which
+                        # is a guess about a name rather than a fact about a
+                        # call: measured, a stream hash under a variable called
+                        # $objSource restored the unbounded read and left the
+                        # suite green at 113 passes. The legitimate byte-array
+                        # call takes the three-argument form instead, where the
+                        # count is explicit and no guess is needed.
+                        return (@($objNode.Arguments).Count -eq 1)
                     },
                     $true
                 ))) {
@@ -6607,7 +6641,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.49
+    # Version: 1.0.20260803.50
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()

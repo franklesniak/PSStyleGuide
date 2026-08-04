@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.32
+Version: 1.0.20260803.33
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.32'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.19'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.33'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.20'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -2094,7 +2094,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.32
+    # Version: 1.0.20260803.33
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2986,7 +2986,7 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         $objArchiveSha256 = [System.Security.Cryptography.SHA256]::Create()
         try {
             $strActualDigest = ([System.BitConverter]::ToString(
-                $objArchiveSha256.ComputeHash($arrArchiveByte)
+                $objArchiveSha256.ComputeHash($arrArchiveByte, 0, $arrArchiveByte.Length)
             ) -replace '-', '').ToLowerInvariant()
         } finally {
             $objArchiveSha256.Dispose()

@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.19
+Version: 1.0.20260803.20
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.19'
+$versionCandidateContext = [System.Version]'1.0.20260803.20'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -1453,7 +1453,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.19
+    # Version: 1.0.20260803.20
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1557,13 +1557,28 @@ function New-StyleGuideCandidateInvocationContext {
             # the inherited ACL is what the envelope check already reasons
             # about. PowerShell 7 releases older than the UnixFileMode overload
             # fall back to the same form and are no worse than before.
+            # The overload is attempted rather than predicted. An earlier
+            # revision tested whether the UnixFileMode TYPE resolved and treated
+            # that as proof the two-argument CreateDirectory existed, which is a
+            # proxy for the thing actually invoked rather than the thing itself:
+            # a runtime carrying the enum without the overload would take the
+            # branch and throw a binding error instead of the fallback this code
+            # documents. Only a missing overload is caught -- a real creation
+            # failure, such as a permission error, still propagates.
             $typeCandidateUnixFileMode = 'System.IO.UnixFileMode' -as [type]
+            $boolCandidateRootPrivate = $false
             if (-not $boolCandidateIsWindows -and $null -ne $typeCandidateUnixFileMode) {
-                $null = [System.IO.Directory]::CreateDirectory(
-                    $strInvocationRoot,
-                    [System.Enum]::ToObject($typeCandidateUnixFileMode, 448)
-                )
-            } else {
+                try {
+                    $null = [System.IO.Directory]::CreateDirectory(
+                        $strInvocationRoot,
+                        [System.Enum]::ToObject($typeCandidateUnixFileMode, 448)
+                    )
+                    $boolCandidateRootPrivate = $true
+                } catch [System.Management.Automation.MethodException] {
+                    $boolCandidateRootPrivate = $false
+                }
+            }
+            if (-not $boolCandidateRootPrivate) {
                 $null = [System.IO.Directory]::CreateDirectory($strInvocationRoot)
             }
             # Ownership is claimed here, on the call that may have created the
@@ -1754,7 +1769,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.19
+    # Version: 1.0.20260803.20
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
