@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.65
+Version: 1.0.20260803.67
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.65'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.67'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.39'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.30'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.40'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.31'
 $script:strCandidateCatalogVersion = '1.0.20260803.9'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
@@ -3419,6 +3419,34 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
         }
     )
 
+    # A terminal state the CALLER wrote, not the manager. Round 31 found this
+    # returning cleanup-already-disposed with Success true and zero filesystem
+    # calls while the invocation directory was still on disk -- a false success,
+    # which is worse than a missed refusal, because a caller told the work
+    # succeeded does not retry and the directory leaks. Pinned here so the
+    # register that closed it cannot quietly stop being consulted.
+    $strForgedStateRoot = [System.IO.Path]::Combine($RunRoot, 'forged-terminal-state')
+    [void][System.IO.Directory]::CreateDirectory($strForgedStateRoot)
+    $objForgedContext = New-StyleGuideCandidateInvocationContext `
+        -TrustedTemporaryRoot $strForgedStateRoot `
+        -DiagnosticLabel 'forged-terminal-state'
+    $objForgedContext.LifecycleState = 'Disposed'
+    foreach ($objForgedRecord in $objForgedContext.OwnershipJournal) {
+        if ($objForgedRecord.EntryState -ceq 'Created') {
+            $objForgedRecord.EntryState = 'Deleted'
+        }
+    }
+    $objForgedResult = Remove-StyleGuideCandidateInvocationContext -Context $objForgedContext
+    if ($objForgedResult.Success -or
+        ([string]$objForgedResult.DiagnosticCode) -cne 'cleanup-context-altered') {
+        & $script:scriptBlockStopHarness -Code 'orchestration-failed' `
+            -Detail ('forged-terminal-state-' + [string]$objForgedResult.DiagnosticCode)
+    }
+    if (-not [System.IO.Directory]::Exists([string]$objForgedContext.InvocationRootPath)) {
+        & $script:scriptBlockStopHarness -Code 'orchestration-failed' `
+            -Detail 'forged-terminal-state-root-removed'
+    }
+
     $strScenarioRoot = [System.IO.Path]::Combine($RunRoot, 'lifecycle-record-state')
     [void][System.IO.Directory]::CreateDirectory($strScenarioRoot)
     foreach ($hashtableScenario in $arrScenario) {
@@ -3444,7 +3472,15 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
                 $objContext.OwnershipJournal[$hashtableMutation.Index].EntryState =
                     [string]$hashtableMutation.EntryState
             }
-            $objContext.LifecycleState = [string]$hashtableScenario.LifecycleState
+            # Transitioned through the manager's own recorder rather than by
+            # writing the field. A caller cannot write a terminal state onto a
+            # context any more -- that was round 31's false-success defect --
+            # so a test that did would be exercising a path production no
+            # longer has. What these scenarios are for is the record-state
+            # table, which is reached the same way either way.
+            [void](& $scriptBlockSetCandidateIssuedState `
+                -Context $objContext `
+                -State ([string]$hashtableScenario.LifecycleState))
 
             $objResult = & $strEntryPoint -Context $objContext
             if ($objResult.DiagnosticCode -cne $hashtableScenario.ExpectedDiagnosticCode -or
@@ -7300,7 +7336,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.65
+    # Version: 1.0.20260803.67
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()

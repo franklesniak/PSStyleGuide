@@ -27,14 +27,14 @@ a caller that deletes first and validates afterwards has already
 deleted, so it needs a way to ask about issuance that changes nothing.
 
 .NOTES
-Version: 1.0.20260803.30
+Version: 1.0.20260803.31
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.30'
+$versionCandidateContext = [System.Version]'1.0.20260803.31'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -79,6 +79,21 @@ $arrCandidateIssuedContext = New-Object System.Collections.ArrayList
 # Parallel to the register by index, and held as strings, which .NET does not
 # allow anyone to mutate in place.
 $arrCandidateIssuedSnapshot = New-Object System.Collections.ArrayList
+# The lifecycle state THIS MANAGER last set, parallel to the register by index.
+# It cannot go in the snapshot above, because unlike the paths it is meant to
+# change: Active at issuance, then Disposed or CleanupFailed when cleanup ends.
+# That is exactly what made it forgeable. A caller holding a genuine Active
+# context could write 'Disposed' onto it and flip its Created records to
+# Deleted, producing a structurally valid terminal context -- and cleanup then
+# reported cleanup-already-disposed with Success true and zero filesystem calls
+# while the invocation directory was still on disk. Measured on both runtimes.
+#
+# That is worse than a missed refusal. A caller told the work succeeded does
+# not retry, so the directory leaks for the life of the machine.
+#
+# So the state is not read from the caller's copy and trusted; it is compared
+# against what the manager itself last recorded.
+$arrCandidateIssuedState = New-Object System.Collections.ArrayList
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
 # The same ceilings the expansion helper enforces. They are restated rather
@@ -730,7 +745,28 @@ $scriptBlockNewCandidateContext = {
     [void]$arrCandidateIssuedContext.Add($objContext)
     [void]$arrCandidateIssuedSnapshot.Add(
         (& $scriptBlockNewCandidateIssuanceSnapshot -Context $objContext))
+    [void]$arrCandidateIssuedState.Add('Active')
     return $objContext
+}
+
+$scriptBlockSetCandidateIssuedState = {
+    param (
+        [AllowNull()]
+        [object]$Context,
+
+        [Parameter(Mandatory = $true)]
+        [string]$State
+    )
+
+    # The manager's own record moves with the object's. Written through one
+    # place so the two cannot drift: the assertion compares them, so a state
+    # set on the context without being recorded here would refuse the very
+    # context this manager just transitioned.
+    $intIndex = & $scriptBlockCandidateContextIssuedIndex -Context $Context
+    if ($intIndex -ge 0) {
+        $arrCandidateIssuedState[$intIndex] = $State
+    }
+    $Context.LifecycleState = $State
 }
 
 $scriptBlockNewCandidateIssuanceSnapshot = {
@@ -1296,6 +1332,13 @@ $scriptBlockAssertCandidateInMemoryContext = {
         [string](& $scriptBlockNewCandidateIssuanceSnapshot -Context $Context)) {
         throw 'cleanup-context-altered'
     }
+    # And the lifecycle state against the one this manager last set, for the
+    # reason recorded where the register is declared: a terminal state the
+    # caller wrote is a claim about work that was never done.
+    if (([string]$arrCandidateIssuedState[$intIssuedIndex]) -cne
+        [string]$Context.LifecycleState) {
+        throw 'cleanup-context-altered'
+    }
 }
 
 $scriptBlockGetCandidateRetainedSequence = {
@@ -1617,7 +1660,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.30
+    # Version: 1.0.20260803.31
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2040,7 +2083,7 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.30
+    # Version: 1.0.20260803.31
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param (
@@ -2107,7 +2150,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.30
+    # Version: 1.0.20260803.31
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2313,7 +2356,7 @@ function Remove-StyleGuideCandidateInvocationContext {
             $objRecord.EntryState = 'Deleted'
         }
 
-        $Context.LifecycleState = 'Disposed'
+        [void](& $scriptBlockSetCandidateIssuedState -Context $Context -State 'Disposed')
         [void](& $scriptBlockAssertCandidateInMemoryContext -Context $Context)
         return (& $scriptBlockNewCandidateCleanupResult `
             -InvocationId $Context.InvocationId `
@@ -2334,7 +2377,7 @@ function Remove-StyleGuideCandidateInvocationContext {
                 $objRecord.EntryState = 'RetainedUncertain'
             }
         }
-        $Context.LifecycleState = 'CleanupFailed'
+        [void](& $scriptBlockSetCandidateIssuedState -Context $Context -State 'CleanupFailed')
         $arrRetained = & $scriptBlockGetCandidateRetainedSequence -Context $Context
         $strCode = & $scriptBlockGetCandidateDiagnosticCode `
             -ErrorRecord $_ `
