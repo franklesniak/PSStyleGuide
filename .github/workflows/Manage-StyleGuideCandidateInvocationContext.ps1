@@ -27,14 +27,14 @@ a caller that deletes first and validates afterwards has already
 deleted, so it needs a way to ask about issuance that changes nothing.
 
 .NOTES
-Version: 1.0.20260803.42
+Version: 1.0.20260803.43
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.42'
+$versionCandidateContext = [System.Version]'1.0.20260803.43'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -1377,9 +1377,29 @@ $scriptBlockAssertCandidateInMemoryContext = {
     # empty directory as the Created invocation root and have cleanup remove
     # it. Ownership was being inferred from a structural clone.
     #
-    # Reference identity cannot be forged. The register holds the exact objects
-    # this manager returned, compared by reference, so a copy with identical
-    # contents is not a member however faithfully it was reconstructed.
+    # WHAT THE REGISTER IS AND IS NOT. It raises the cost of a forgery. It is
+    # not a boundary, and rounds 29 to 41 of this file's comments said it was.
+    #
+    # Measured: a caller in this process reaches the register through
+    # (Get-Command <public name>).ScriptBlock.Module.SessionState.PSVariable
+    # and writes it, then gets cleanup-already-disposed with Success true over
+    # an intact root. Removing the dot-sourced variable names closes the
+    # cheapest route and nothing more; putting the state in New-Module session
+    # state or in a nested closure was measured and reaches the same way. There
+    # is no arrangement of PowerShell scope that hides state from code running
+    # in the same process.
+    #
+    # That is not a gap this file can close, and it is not one that matters as
+    # much as it first appears: the actor who can do it can call
+    # [System.IO.Directory]::Delete directly without involving these scripts at
+    # all. The register still earns its place -- it defeats every structural
+    # clone and every replayed context, which is what the catalog exercises --
+    # but the honest claim is cost, not impossibility.
+    #
+    # Reference identity is not forgeable by construction: the register holds
+    # the exact objects this manager returned, compared by reference, so a copy
+    # with identical contents is not a member however faithfully it was
+    # reconstructed.
     #
     # This is checked LAST on purpose. Every forged context the suite already
     # exercises is structurally wrong in some specific way, and each of those
@@ -1749,7 +1769,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.42
+    # Version: 1.0.20260803.43
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2211,7 +2231,7 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.42
+    # Version: 1.0.20260803.43
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param (
@@ -2321,7 +2341,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.42
+    # Version: 1.0.20260803.43
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

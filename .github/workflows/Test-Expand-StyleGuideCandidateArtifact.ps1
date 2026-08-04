@@ -57,7 +57,7 @@ $script:versionCandidateHarness = [System.Version]'1.0.20260803.80'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.53'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.42'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.43'
 $script:strCandidateCatalogVersion = '1.0.20260803.12'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
