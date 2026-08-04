@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.20
+Version: 1.0.20260803.21
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.20'
+$versionCandidateContext = [System.Version]'1.0.20260803.21'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -1453,7 +1453,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.20
+    # Version: 1.0.20260803.21
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1553,10 +1553,25 @@ function New-StyleGuideCandidateInvocationContext {
             # UserWrite and UserExecute -- written numerically so the enum type
             # is not referenced on a runtime that lacks it.
             #
-            # Windows keeps the single-argument form: it has no Unix mode, and
-            # the inherited ACL is what the envelope check already reasons
-            # about. PowerShell 7 releases older than the UnixFileMode overload
-            # fall back to the same form and are no worse than before.
+            # Windows keeps the single-argument form and therefore inherits
+            # whatever the trusted parent's ACL grants. An earlier revision
+            # claimed the envelope check reasoned about that ACL. It does not:
+            # that check reads GetAttributes and tests only for Directory and
+            # ReparsePoint, so the claim was false and made a real gap look
+            # covered. If the caller supplies a shared trusted root whose
+            # inheritable ACL grants other local users read access, the archive
+            # and the extracted files stay readable to them.
+            #
+            # No ACL is written here, deliberately. This code cannot be executed
+            # on Windows from where it is being changed, and a wrong DACL would
+            # break every Windows run rather than announce itself -- two Windows
+            # defects have already reached this branch that way. The harness
+            # instead refuses a created root that grants Everyone or Users, so
+            # the single Windows run this PR owes reports the condition
+            # precisely rather than leaving it to be reasoned about.
+            #
+            # PowerShell 7 releases older than the UnixFileMode overload fall
+            # back to the same form and are no worse than before.
             # The overload is attempted rather than predicted. An earlier
             # revision tested whether the UnixFileMode TYPE resolved and treated
             # that as proof the two-argument CreateDirectory existed, which is a
@@ -1769,7 +1784,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.20
+    # Version: 1.0.20260803.21
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

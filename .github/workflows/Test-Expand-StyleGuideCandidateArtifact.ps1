@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.50
+Version: 1.0.20260803.51
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.50'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.51'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.33'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.20'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.21'
 $script:strCandidateCatalogVersion = '1.0.20260803.5'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
@@ -2356,9 +2356,46 @@ $script:scriptBlockAssertRegularFileProofExecutes = {
         [string]$RunRoot
     )
 
-    # Windows has no mkfifo and no filesystem pipes under the invocation root,
-    # so the refusal is unobservable there rather than expected to fail.
     if ($script:boolCandidateIsWindows) {
+        # Windows has no mkfifo and no filesystem pipes under the invocation
+        # root, so the pipe refusal is unobservable there. What IS observable is
+        # whether the created root is private, and on Windows it is created with
+        # the inherited ACL: a shared trusted parent leaves the archive and the
+        # extracted files readable to other local users.
+        #
+        # Only the unambiguous case is judged -- an allow entry for Everyone or
+        # for the built-in Users group -- because what else belongs on a runner
+        # cannot be settled from a machine that has none. An ACL that cannot be
+        # read at all is skipped rather than failed, so a mis-guess here cannot
+        # block the Windows run that exists to answer this.
+        $objRootContext = New-StyleGuideCandidateInvocationContext `
+            -TrustedTemporaryRoot $RunRoot `
+            -DiagnosticLabel 'invocation-root-acl'
+        try {
+            $objRootAcl = $null
+            try {
+                $objRootAcl = (New-Object System.IO.DirectoryInfo(
+                    [string]$objRootContext.InvocationRootPath)).GetAccessControl()
+            } catch {
+                $objRootAcl = $null
+            }
+            if ($null -ne $objRootAcl) {
+                foreach ($objRule in @($objRootAcl.GetAccessRules(
+                            $true, $true, [System.Security.Principal.SecurityIdentifier]))) {
+                    if ($objRule.AccessControlType -ne
+                        [System.Security.AccessControl.AccessControlType]::Allow) {
+                        continue
+                    }
+                    $strSid = [string]$objRule.IdentityReference.Value
+                    if ($strSid -ceq 'S-1-1-0' -or $strSid -ceq 'S-1-5-32-545') {
+                        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                            -Detail ('invocation-root-acl-' + $strSid)
+                    }
+                }
+            }
+        } finally {
+            [void](Remove-StyleGuideCandidateInvocationContext -Context $objRootContext)
+        }
         return
     }
     $strFifoPath = [string](& $script:scriptBlockResolveHarnessNativePath `
@@ -6641,7 +6678,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.50
+    # Version: 1.0.20260803.51
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
