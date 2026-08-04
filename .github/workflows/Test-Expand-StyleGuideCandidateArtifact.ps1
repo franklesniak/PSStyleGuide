@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.34
+Version: 1.0.20260803.35
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.34'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.35'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.24'
@@ -1884,12 +1884,50 @@ $script:scriptBlockAssertEnumerationBoundsDeclared = {
 # Matching is by member NAME rather than by receiver type, because the receiver
 # is what varies: Directory::EnumerateFiles and a DirectoryInfo instance's
 # EnumerateFiles list the same directory and only one of them names a type the
-# parser can resolve. Get-ChildItem is included with its shipped aliases for the
-# same reason -- the escape from a rule about one spelling is another spelling.
+# parser can resolve.
+#
+# The command dimension is handled the other way round, and the first attempt at
+# it is why. That attempt named the commands a script may NOT call -- Get-ChildItem
+# and its aliases -- and a deny-list is only ever as complete as the imagination
+# behind it. Measured: `Get-Item -Path (Join-Path $dir '*')` lists the whole
+# directory, is named by none of those, and left the suite green at 113 passes
+# with a shadow whole-parent read in place. Resolve-Path does the same.
+#
+# So the commands are allow-listed instead, per script and in full. Anything not
+# on the list fails, which closes Get-Item, Resolve-Path, and every spelling
+# nobody has thought of yet in one rule rather than one row per name. That is
+# affordable here only because the surface is genuinely small -- measured at
+# eight distinct commands in the helper and seven in the context manager, in
+# scripts that reach for .NET rather than cmdlets -- and it is deliberately NOT
+# extended to member names, where the surface is 48 and 37 and a pin would fail
+# the suite the first time somebody wrote .Trim(). Refusing legitimate work is
+# the round-19 defect, and it does not become acceptable by being a test.
+#
+# Reflection is denied everywhere rather than outside the helper, because it is
+# the generic escape from any rule that matches a name: GetMethod('...').Invoke()
+# reaches a listing without ever spelling one. Neither script uses it.
 $script:strCandidateListingMemberPattern =
     '^(Enumerate|Get)(Directories|Files|FileSystemEntries|FileSystemInfos)$'
-$script:arrCandidateListingCommandName = [string[]]@(
-    'Get-ChildItem', 'gci', 'dir', 'ls'
+$script:strCandidateReflectionMemberPattern =
+    '^(GetMethods?|GetPropert(y|ies)|GetFields?|GetMembers?|InvokeMember|GetConstructors?|CreateInstance)$'
+$script:arrCandidateHelperPermittedCommand = [string[]]@(
+    'Add-Type',
+    'Get-Command',
+    'New-Object',
+    'Remove-StyleGuideCandidateInvocationContext',
+    'Remove-StyleGuideCandidateInvocationState',
+    'Set-StrictMode',
+    'Sort-Object',
+    'Where-Object'
+)
+$script:arrCandidateContextPermittedCommand = [string[]]@(
+    'ForEach-Object',
+    'New-Object',
+    'Remove-StyleGuideCandidateInvocationContext',
+    'Set-Item',
+    'Set-StrictMode',
+    'Sort-Object',
+    'Where-Object'
 )
 $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
     param (
@@ -1900,13 +1938,66 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
         [string]$ContextLiteralPath
     )
 
-    foreach ($strScriptPath in @($HelperLiteralPath, $ContextLiteralPath)) {
+    $arrScriptSurface = @(
+        @{ Path = $HelperLiteralPath
+            Command = $script:arrCandidateHelperPermittedCommand },
+        @{ Path = $ContextLiteralPath
+            Command = $script:arrCandidateContextPermittedCommand }
+    )
+    foreach ($hashtableSurface in $arrScriptSurface) {
+        $strScriptPath = [string]$hashtableSurface.Path
         $objErrors = $null
         $objAst = [System.Management.Automation.Language.Parser]::ParseFile(
             $strScriptPath, [ref]$null, [ref]$objErrors)
         if ($null -eq $objAst -or @($objErrors).Count -ne 0) {
             & $script:scriptBlockStopHarness `
                 -Code 'catalog-invalid' -Detail 'enumeration-primitive-parse'
+        }
+        # Every named command in the file, against the allow-list. A call
+        # through a variable -- `& $script:scriptBlockFoo` -- has no command
+        # name and is not one of these; those are the internal script blocks the
+        # site table already governs.
+        foreach ($objCommand in @($objAst.FindAll(
+                    {
+                        param ($objNode)
+                        $objNode -is [System.Management.Automation.Language.CommandAst]
+                    },
+                    $true
+                ))) {
+            $strCommandName = [string]$objCommand.GetCommandName()
+            if ([string]::IsNullOrEmpty($strCommandName)) {
+                continue
+            }
+            if (@($hashtableSurface.Command) -cnotcontains $strCommandName) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                    -Detail ('command-not-permitted-' + $strCommandName + '-' +
+                        [string]$objCommand.Extent.StartLineNumber)
+            }
+        }
+        # Reflection is refused across the whole file, helper definition
+        # included: it reaches a listing without spelling one, and neither
+        # script has any use for it.
+        foreach ($objReflection in @($objAst.FindAll(
+                    {
+                        param ($objNode)
+                        if ($objNode -isnot
+                            [System.Management.Automation.Language.InvokeMemberExpressionAst]) {
+                            return $false
+                        }
+                        $strMember = if ($objNode.Member -is
+                            [System.Management.Automation.Language.StringConstantExpressionAst]) {
+                            [string]$objNode.Member.Value
+                        } else {
+                            [string]$objNode.Member.Extent.Text
+                        }
+                        return ($strMember -match
+                            $script:strCandidateReflectionMemberPattern)
+                    },
+                    $true
+                ))) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('reflection-not-permitted-' +
+                    [string]$objReflection.Extent.StartLineNumber)
         }
         # The helper's own definition is the one region a listing may occupy.
         # Finding it by the same name list the site table uses keeps the two
@@ -1944,12 +2035,10 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                         }
                         return ($strMember -match $script:strCandidateListingMemberPattern)
                     }
-                    if ($objNode -is
-                        [System.Management.Automation.Language.CommandAst]) {
-                        $strCommand = [string]$objNode.GetCommandName()
-                        return ($null -ne $strCommand -and
-                            $script:arrCandidateListingCommandName -icontains $strCommand)
-                    }
+                    # No command branch here: a listing cmdlet cannot reach this
+                    # file at all, because the allow-list above admits only
+                    # commands that do not list. Naming Get-ChildItem here as
+                    # well would be a second, weaker statement of that.
                     return $false
                 },
                 $true
@@ -6147,7 +6236,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.34
+    # Version: 1.0.20260803.35
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
