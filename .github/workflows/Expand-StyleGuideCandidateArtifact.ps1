@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.37
+Version: 1.0.20260803.38
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.37'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.29'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.38'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.30'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -2109,7 +2109,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.37
+    # Version: 1.0.20260803.38
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2202,6 +2202,31 @@ function Remove-StyleGuideCandidateInvocationState {
                 -CommandType Function -ErrorAction SilentlyContinue
         )
         if ($arrIssuanceCommands.Count -ne 1) {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'cleanup-context-invalid' -Phase 'cleanup' -Subreason 'context-manager-not-loaded'
+        }
+        # Resolving by NAME asks the session what currently answers to it, and
+        # a caller who loaded the real manager can rebind that name afterwards:
+        # measured, replacing this function with `{ param($Context) $true }`
+        # leaves Get-Command reporting exactly one function and returns true for
+        # the string 'anything'. A verifier that any caller can substitute is
+        # not an authority, and the check would have waved through the forged
+        # context it exists to stop.
+        #
+        # So the verifier is bound to an ORIGIN rather than to a name: it must
+        # come from the same file as the cleanup function resolved above, and
+        # that file must be a real one -- a scriptblock built by
+        # [scriptblock]::Create carries no File at all.
+        #
+        # What this does not do, stated rather than implied: an actor who
+        # replaces BOTH functions defeats it. That actor has replaced cleanup
+        # itself and no longer needs to fool the verifier, which is the same
+        # boundary every other check here sits behind.
+        $strCandidateVerifierFile = [string]$arrIssuanceCommands[0].ScriptBlock.File
+        $strCandidateCleanupFile = [string]$arrCommands[0].ScriptBlock.File
+        if ($strCandidateVerifierFile.Length -eq 0 -or
+            $strCandidateCleanupFile.Length -eq 0 -or
+            $strCandidateVerifierFile -cne $strCandidateCleanupFile) {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'cleanup-context-invalid' -Phase 'cleanup' -Subreason 'context-manager-not-loaded'
         }
@@ -2824,6 +2849,29 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
                 -CommandType Function -ErrorAction SilentlyContinue
         )
         if ($arrIssuanceCommands.Count -ne 1) {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'parameter' -Phase 'parameter' -Subreason 'context-manager-not-loaded'
+        }
+        # Bound to an origin rather than to a name, for the reason set out at
+        # the cleanup call site: a caller who loaded the real manager can rebind
+        # this public name afterwards, and Get-Command would still report one
+        # function. The cleanup function is resolved here purely to supply the
+        # file both must share.
+        $arrCleanupCommands = @(
+            Get-Command -Name Remove-StyleGuideCandidateInvocationContext `
+                -CommandType Function -ErrorAction SilentlyContinue
+        )
+        $strCandidateVerifierOrigin = ''
+        $strCandidateCleanupOrigin = ''
+        if ($arrIssuanceCommands.Count -eq 1) {
+            $strCandidateVerifierOrigin = [string]$arrIssuanceCommands[0].ScriptBlock.File
+        }
+        if ($arrCleanupCommands.Count -eq 1) {
+            $strCandidateCleanupOrigin = [string]$arrCleanupCommands[0].ScriptBlock.File
+        }
+        if ($strCandidateVerifierOrigin.Length -eq 0 -or
+            $strCandidateCleanupOrigin.Length -eq 0 -or
+            $strCandidateVerifierOrigin -cne $strCandidateCleanupOrigin) {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'parameter' -Phase 'parameter' -Subreason 'context-manager-not-loaded'
         }

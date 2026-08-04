@@ -18,17 +18,23 @@ Loads the context-management functions into the current scope.
 None. You can't pipe objects to this script.
 
 .OUTPUTS
-None. Dot-sourcing the script defines its two public functions.
+None. Dot-sourcing the script defines its three public functions:
+New-StyleGuideCandidateInvocationContext,
+Remove-StyleGuideCandidateInvocationContext and
+Test-StyleGuideCandidateInvocationContextIssued. The third is a
+deliberate addition beyond the two-function surface issue #146 states:
+a caller that deletes first and validates afterwards has already
+deleted, so it needs a way to ask about issuance that changes nothing.
 
 .NOTES
-Version: 1.0.20260803.29
+Version: 1.0.20260803.30
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.29'
+$versionCandidateContext = [System.Version]'1.0.20260803.30'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -1611,7 +1617,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.29
+    # Version: 1.0.20260803.30
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2034,7 +2040,7 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.29
+    # Version: 1.0.20260803.30
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param (
@@ -2101,7 +2107,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.29
+    # Version: 1.0.20260803.30
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
