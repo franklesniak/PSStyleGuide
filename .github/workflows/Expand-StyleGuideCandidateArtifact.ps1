@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.24
+Version: 1.0.20260803.25
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.24'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.11'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.25'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.12'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -1791,11 +1791,8 @@ $script:scriptBlockGetCandidateHelperFileEvidence = {
         if ($null -ne $ReferenceToFilesystemCallCount) {
             $ReferenceToFilesystemCallCount.Value = [uint32]($ReferenceToFilesystemCallCount.Value + 1)
         }
-        $objAttributes = [System.IO.File]::GetAttributes($LiteralPath)
-        if (($objAttributes -band [System.IO.FileAttributes]::Directory) -ne 0 -or
-            ($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
-            throw 'nonordinary'
-        }
+        & $script:scriptBlockAssertCandidateHelperOrdinaryRegularFile `
+            -LiteralPath $LiteralPath -Phase $Phase
         if ($null -ne $ReferenceToFilesystemCallCount) {
             $ReferenceToFilesystemCallCount.Value = [uint32]($ReferenceToFilesystemCallCount.Value + 1)
         }
@@ -1845,6 +1842,61 @@ $script:scriptBlockGetCandidateHelperFileEvidence = {
     }
 }
 
+# Every path this script opens for reading must first be proven an ordinary
+# regular file, and this is the single place that decides it.
+#
+# The attribute test alone does not: measured on .NET 8.0.10 and .NET 10.0.10, a
+# FIFO created with mkfifo reports GetAttributes = Normal (128), carrying
+# neither Directory nor ReparsePoint, and the FileStream constructor then blocks
+# until a writer appears. An untrusted caller who hands back a schema-valid
+# context naming one hangs the run indefinitely.
+#
+# Length does not decide it either, and that is why the download path's rule
+# could not simply be reused here. That rule refuses a length of zero, which is
+# sound there because the ZIP end-of-central-directory record alone is
+# twenty-two bytes -- but an extracted candidate file may legitimately be empty.
+# Measured, both runtimes: a FIFO and a legitimate empty file both report
+# Length 0 without blocking, so length cannot separate them at the evidence
+# sites. Refusing zero there would reject valid input, which is the round-19
+# defect, and it left the invocation root on disk the last time it shipped.
+#
+# GetUnixFileMode looks like the portable answer and is not: measured, it
+# returns permissions only -- OtherRead, GroupRead, UserWrite, UserRead for the
+# FIFO and for the empty file alike -- and it does not exist on 5.1 at all.
+#
+# So the file TYPE is asked for directly, from the same stat this script already
+# resolves for identity. Windows needs no equivalent: named pipes live in the
+# \\.\pipe\ namespace rather than the filesystem, so a journaled path under the
+# invocation root cannot name one, and the attribute test carries that platform.
+$script:scriptBlockAssertCandidateHelperOrdinaryRegularFile = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Phase
+    )
+
+    $objAttributes = [System.IO.File]::GetAttributes($LiteralPath)
+    if (($objAttributes -band [System.IO.FileAttributes]::Directory) -ne 0 -or
+        ($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+        throw 'nonordinary'
+    }
+    if ($script:boolCandidateHelperIsWindows) {
+        return
+    }
+    $strStatPath = [string](& $script:scriptBlockResolveCandidateHelperNativePath `
+        -CandidatePath $script:arrCandidateHelperStatPath)
+    if ($strStatPath.Length -eq 0) {
+        throw 'nonordinary'
+    }
+    $arrFileType = @(& $strStatPath '-c' '%F' '--' $LiteralPath 2>$null)
+    if ($LASTEXITCODE -ne 0 -or $arrFileType.Count -ne 1 -or
+        [string]$arrFileType[0] -cnotin @('regular file', 'regular empty file')) {
+        throw 'nonordinary'
+    }
+}
+
 $script:scriptBlockAssertCandidateHelperOrdinaryFileMetadata = {
     param (
         [Parameter(Mandatory = $true)]
@@ -1855,11 +1907,8 @@ $script:scriptBlockAssertCandidateHelperOrdinaryFileMetadata = {
     )
 
     try {
-        $objAttributes = [System.IO.File]::GetAttributes($LiteralPath)
-        if (($objAttributes -band [System.IO.FileAttributes]::Directory) -ne 0 -or
-            ($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
-            throw 'nonordinary'
-        }
+        & $script:scriptBlockAssertCandidateHelperOrdinaryRegularFile `
+            -LiteralPath $LiteralPath -Phase $Phase
         $objFile = New-Object System.IO.FileInfo($LiteralPath)
         # A named pipe carries no Directory or ReparsePoint attribute and
         # reports a length of zero, so the checks above accept it as an
@@ -1920,7 +1969,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.24
+    # Version: 1.0.20260803.25
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

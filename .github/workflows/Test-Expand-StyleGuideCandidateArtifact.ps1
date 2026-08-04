@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.35
+Version: 1.0.20260803.36
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.35'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.36'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.24'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.11'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.25'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.12'
 $script:strCandidateCatalogVersion = '1.0.20260803.4'
 # The physical allocation size, stated once. It was previously two bare literals
 # inside the header check, which is why growing the catalog failed with an
@@ -6236,7 +6236,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.35
+    # Version: 1.0.20260803.36
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()

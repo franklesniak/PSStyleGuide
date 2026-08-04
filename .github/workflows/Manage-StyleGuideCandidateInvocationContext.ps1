@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.11
+Version: 1.0.20260803.12
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.11'
+$versionCandidateContext = [System.Version]'1.0.20260803.12'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -1176,6 +1176,53 @@ $scriptBlockNewCandidateCleanupResult = {
     return $objResult
 }
 
+# Every path this script opens for reading must first be proven an ordinary
+# regular file, and this is the single place that decides it.
+#
+# The attribute test alone does not: measured on .NET 8.0.10 and .NET 10.0.10, a
+# FIFO created with mkfifo reports GetAttributes = Normal (128), carrying
+# neither Directory nor ReparsePoint, and the FileStream constructor then blocks
+# until a writer appears. An untrusted caller who hands back a schema-valid
+# context naming one hangs cleanup indefinitely, before any length or digest is
+# ever consulted.
+#
+# Length cannot decide it: measured, both runtimes, a FIFO and a legitimate
+# empty file both report Length 0 without blocking. A journaled file may
+# legitimately be empty, so refusing zero here would reject valid input -- the
+# round-19 defect, which left the invocation root on disk when it shipped.
+# GetUnixFileMode does not decide it either: it returns permissions only,
+# identical for both, and does not exist on 5.1.
+#
+# So the file TYPE is asked for directly, from the same stat this script already
+# resolves. Windows needs no equivalent: named pipes live in the \\.\pipe\
+# namespace rather than the filesystem, so a journaled path under the invocation
+# root cannot name one, and the attribute test carries that platform.
+$scriptBlockAssertCandidateOrdinaryRegularFile = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath
+    )
+
+    $objAttributes = [System.IO.File]::GetAttributes($LiteralPath)
+    if (($objAttributes -band [System.IO.FileAttributes]::Directory) -ne 0 -or
+        ($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+        throw 'nonordinary'
+    }
+    if ($boolCandidateIsWindows) {
+        return
+    }
+    $strStatPath = [string](& $scriptBlockResolveCandidateNativePath `
+        -CandidatePath $arrCandidateStatPath)
+    if ($strStatPath.Length -eq 0) {
+        throw 'nonordinary'
+    }
+    $arrFileType = @(& $strStatPath '-c' '%F' '--' $LiteralPath 2>$null)
+    if ($LASTEXITCODE -ne 0 -or $arrFileType.Count -ne 1 -or
+        [string]$arrFileType[0] -cnotin @('regular file', 'regular empty file')) {
+        throw 'nonordinary'
+    }
+}
+
 $scriptBlockGetCandidateFileEvidence = {
     param (
         [Parameter(Mandatory = $true)]
@@ -1190,11 +1237,7 @@ $scriptBlockGetCandidateFileEvidence = {
 
     try {
         $ReferenceToFilesystemCallCount.Value = [uint32]($ReferenceToFilesystemCallCount.Value + 1)
-        $objAttributes = [System.IO.File]::GetAttributes($LiteralPath)
-        if (($objAttributes -band [System.IO.FileAttributes]::Directory) -ne 0 -or
-            ($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
-            throw 'nonordinary'
-        }
+        & $scriptBlockAssertCandidateOrdinaryRegularFile -LiteralPath $LiteralPath
         $ReferenceToFilesystemCallCount.Value = [uint32]($ReferenceToFilesystemCallCount.Value + 1)
         $objStream = New-Object System.IO.FileStream(
             $LiteralPath,
@@ -1280,7 +1323,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.11
+    # Version: 1.0.20260803.12
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1555,7 +1598,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.11
+    # Version: 1.0.20260803.12
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
