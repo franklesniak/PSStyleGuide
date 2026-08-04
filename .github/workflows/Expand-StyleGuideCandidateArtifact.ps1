@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.50
+Version: 1.0.20260803.52
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.50'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.52'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.40'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -2113,7 +2113,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.50
+    # Version: 1.0.20260803.52
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2335,13 +2335,26 @@ function Remove-StyleGuideCandidateInvocationState {
         # the matching transition produces a context the manager's own
         # validator refuses. The failure is reported in the RESULT, which is
         # what a caller acts on, rather than by editing the caller's object.
-        $arrRetained = & $script:scriptBlockGetCandidateHelperRetainedSequence -ContextValue $Context
+        # NOTHING here reads the caller's object. This block exists to turn any
+        # failure into the bounded result this function documents, so a read
+        # that can itself throw defeats the only thing it is for: a rebound
+        # manager handed the same object can write a non-Guid onto InvocationId
+        # immediately before throwing, and result construction would then throw
+        # from inside the catch. The identity captured at entry is used, and the
+        # retained sequences come from the journal reference captured with it.
+        $arrRetained = @()
+        try {
+            $arrRetained = & $script:scriptBlockGetCandidateHelperRetainedSequence `
+                -ContextValue $Context
+        } catch {
+            $arrRetained = @()
+        }
         $strCode = & $script:scriptBlockGetCandidateHelperFailureField `
             -ErrorRecord $_ `
             -Key 'PSStyleGuideDiagnosticCode' `
             -Fallback 'cleanup-owned-entry-uncertain'
         return (& $script:scriptBlockNewCandidateHelperCleanupResult `
-            -InvocationId $Context.InvocationId `
+            -InvocationId $guidInvocationId `
             -PreviousState $strPreviousState `
             -FinalState 'CleanupFailed' `
             -Success $false `
@@ -2891,13 +2904,17 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'parameter' -Phase 'parameter' -Subreason 'context-manager-not-loaded'
         }
-        if (-not (Test-StyleGuideCandidateInvocationContextIssued -Context $Context)) {
-            & $script:scriptBlockStopCandidateHelperOperation `
-                -Code 'parameter' -Phase 'parameter' -Subreason 'context-unissued'
-        }
+        # ONE issuance check, below, not two. Round 30 asked the question here
+        # against the live object; round 36 asked it again a few lines down
+        # against the captured set. The second strictly subsumes the first --
+        # same issuance, plus the four paths this run will actually act on --
+        # so the first proved nothing the second does not, while looking like
+        # it proved the paths. That is the shape this file has been bitten by
+        # more than once: a check that reads as protection for something it
+        # never covered. Deleted rather than kept for symmetry.
         # The authenticated values, captured. Everything from here on reads
         # these strings rather than the caller's object, because the verifier
-        # above authenticates the values present at that instant and every
+        # below authenticates the values present at that instant and every
         # later read is a different read: a same-session runspace can repoint
         # the context immediately afterwards, and the containment probes, the
         # sentinel write, the journaling parents and the candidate creation
