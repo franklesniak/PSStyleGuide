@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.38
+Version: 1.0.20260803.39
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,10 +53,10 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.38'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.39'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.26'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.27'
 $script:strCandidateExpectedContextVersion = '1.0.20260803.13'
 $script:strCandidateCatalogVersion = '1.0.20260803.5'
 # The documented ceiling on what an authenticated native query may return, the
@@ -2305,6 +2305,65 @@ $script:scriptBlockAssertDownloadPathProvenance = {
     if ($strProducer -cne 'scriptBlockGetCandidateHelperValidatedDownloadPath') {
         & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
             -Detail ('download-path-producer-' + $strProducer)
+    }
+}
+
+# The archive ceiling is a bound on a number the stream can change underneath
+# it. On Unix a held handle observes in-place growth -- the helper's own comment
+# has said so since the single-retained-stream amendment -- so a ceiling checked
+# against one read of Length and an allocation sized by a second read are not
+# bounded by each other. Measured: a file admitted at 1,024 bytes and grown by
+# another writer reported 268,436,480 bytes at the allocation.
+#
+# What is pinned is the SOURCE of the danger rather than the shape of the
+# allocation. Pinning the allocation expression would be satisfied by any
+# editor who spelled it differently -- `[byte[]]::new(...)` instead of
+# `New-Object byte[]` -- which is the same escape a reviewer found in the
+# enumeration rule this suite already carries. A second read of Length is the
+# thing that reintroduces the defect, whatever is done with it, so a second read
+# is what fails here.
+$script:scriptBlockAssertArchiveLengthReadOnce = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$HelperLiteralPath
+    )
+
+    $objErrors = $null
+    $objAst = [System.Management.Automation.Language.Parser]::ParseFile(
+        $HelperLiteralPath, [ref]$null, [ref]$objErrors)
+    if ($null -eq $objAst -or @($objErrors).Count -ne 0) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'archive-length-parse'
+    }
+    # Any member access named Length whose target is the archive stream
+    # variable, however the access is spelled.
+    $arrLengthRead = @($objAst.FindAll(
+            {
+                param ($objNode)
+                if ($objNode -isnot
+                    [System.Management.Automation.Language.MemberExpressionAst]) {
+                    return $false
+                }
+                if ($objNode.Expression -isnot
+                    [System.Management.Automation.Language.VariableExpressionAst]) {
+                    return $false
+                }
+                if ($objNode.Expression.VariablePath.UserPath -cne 'objArchiveStream') {
+                    return $false
+                }
+                $strMember = if ($objNode.Member -is
+                    [System.Management.Automation.Language.StringConstantExpressionAst]) {
+                    [string]$objNode.Member.Value
+                } else {
+                    [string]$objNode.Member.Extent.Text
+                }
+                return ($strMember -ceq 'Length')
+            },
+            $true
+        ))
+    if (@($arrLengthRead).Count -ne 1) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+            -Detail ('archive-length-read-' + @($arrLengthRead).Count)
     }
 }
 
@@ -6281,7 +6340,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.38
+    # Version: 1.0.20260803.39
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -6510,6 +6569,8 @@ function Invoke-StyleGuideCandidateHarness {
         & $script:scriptBlockAssertEnumerationPrimitiveExclusive `
             -HelperLiteralPath $strHelperLiteralPath `
             -ContextLiteralPath $strContextLiteralPath
+        & $script:scriptBlockAssertArchiveLengthReadOnce `
+            -HelperLiteralPath $strHelperLiteralPath
         & $script:scriptBlockAssertDownloadPathProvenance `
             -HelperLiteralPath $strHelperLiteralPath
         & $script:scriptBlockAssertDownloadLeafGuardExecutes `

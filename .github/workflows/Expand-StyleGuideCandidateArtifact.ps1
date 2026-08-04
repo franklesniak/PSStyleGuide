@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.26
+Version: 1.0.20260803.27
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.26'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.27'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.13'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -1993,7 +1993,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.26
+    # Version: 1.0.20260803.27
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2830,9 +2830,18 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
                 -Code 'download-invalid' -Phase 'download' -Subreason 'archive-open'
         }
         $strPhase = 'digest'
+        # One read of Length, held. The ceiling below is worth nothing if the
+        # allocation asks the stream again: on Unix the handle observes in-place
+        # growth -- this file says so twenty lines down, and the code did not
+        # honour it. Measured: a file admitted at 1,024 bytes, grown by another
+        # writer through a second handle, reported 268,436,480 bytes at the
+        # allocation and would have taken 256 MiB from a candidate that passed a
+        # 32 MiB ceiling. Every later use is this variable, and the harness
+        # refuses a second read of the stream's Length in this function.
+        $uintArchiveByteCount = [uint64]$objArchiveStream.Length
         if (-not $objArchiveStream.CanRead -or -not $objArchiveStream.CanSeek -or
-            [uint64]$objArchiveStream.Length -ne $uintArchiveMetadataLength -or
-            [uint64]$objArchiveStream.Length -gt $script:uintCandidateHelperMaximumArchiveByte) {
+            $uintArchiveByteCount -ne $uintArchiveMetadataLength -or
+            $uintArchiveByteCount -gt $script:uintCandidateHelperMaximumArchiveByte) {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'archive-invalid' -Phase 'archive' -Subreason 'stream'
         }
@@ -2853,7 +2862,7 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         # below and the bytes parsed afterwards are the same bytes by
         # construction rather than by assumption. The 32 MiB ceiling already
         # checked above is what makes this affordable.
-        $arrArchiveByte = New-Object byte[] ([int]$objArchiveStream.Length)
+        $arrArchiveByte = New-Object byte[] ([int]$uintArchiveByteCount)
         $intArchiveFilled = 0
         while ($intArchiveFilled -lt $arrArchiveByte.Length) {
             $intArchiveRead = $objArchiveStream.Read(
