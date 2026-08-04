@@ -27,14 +27,14 @@ a caller that deletes first and validates afterwards has already
 deleted, so it needs a way to ask about issuance that changes nothing.
 
 .NOTES
-Version: 1.0.20260803.33
+Version: 1.0.20260803.34
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.33'
+$versionCandidateContext = [System.Version]'1.0.20260803.34'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -1675,7 +1675,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.33
+    # Version: 1.0.20260803.34
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2099,7 +2099,7 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.33
+    # Version: 1.0.20260803.34
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param (
@@ -2177,7 +2177,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.33
+    # Version: 1.0.20260803.34
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2344,17 +2344,25 @@ function Remove-StyleGuideCandidateInvocationContext {
             $_.ExpectedEntryType -eq 'File' -and $_.EntryState -eq 'Created'
         } | Sort-Object -Property Sequence -Descending)
         foreach ($objRecord in $arrFilesToDelete) {
+            # Read once, into values this manager owns. The record is a
+            # property bag on a caller-held object, and a caller can replace
+            # Path with a script property whose getter answers differently on
+            # each read -- so checking one read and deleting on the next
+            # deletes something no check ever saw. Every use below is of the
+            # captured string, which nothing outside this scope can change.
+            $strDeletePath = [string]$objRecord.Path
+            $strDeleteParent = [string]$objRecord.ParentPath
             $uintFilesystemCallCount = [uint32]($uintFilesystemCallCount + 1)
-            [System.IO.File]::Delete($objRecord.Path)
+            [System.IO.File]::Delete($strDeletePath)
             $arrParentEntries = [string[]]@(
                 & $scriptBlockGetCandidateImmediateEntry `
-                    -LiteralPath $objRecord.ParentPath `
-                    -MatchPath $objRecord.Path `
+                    -LiteralPath $strDeleteParent `
+                    -MatchPath $strDeletePath `
                     -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
             )
             if (& $scriptBlockTestCandidateEntryPresent `
                 -EntryList $arrParentEntries `
-                -ExpectedPath $objRecord.Path) {
+                -ExpectedPath $strDeletePath) {
                 & $scriptBlockStopCandidateOperation -Code 'cleanup-delete-failed' `
                     -Message 'PSStyleGuide.Context.v1|phase=cleanup|reason=file-present'
             }
@@ -2366,17 +2374,20 @@ function Remove-StyleGuideCandidateInvocationContext {
             $_.EntryState -eq 'Created'
         } | Sort-Object -Property Sequence -Descending)
         foreach ($objRecord in $arrDirectoriesToDelete) {
+            # Captured once, for the reason given at the file loop above.
+            $strDeletePath = [string]$objRecord.Path
+            $strDeleteParent = [string]$objRecord.ParentPath
             $uintFilesystemCallCount = [uint32]($uintFilesystemCallCount + 1)
-            [System.IO.Directory]::Delete($objRecord.Path, $false)
+            [System.IO.Directory]::Delete($strDeletePath, $false)
             $arrParentEntries = [string[]]@(
                 & $scriptBlockGetCandidateImmediateEntry `
-                    -LiteralPath $objRecord.ParentPath `
-                    -MatchPath $objRecord.Path `
+                    -LiteralPath $strDeleteParent `
+                    -MatchPath $strDeletePath `
                     -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
             )
             if (& $scriptBlockTestCandidateEntryPresent `
                 -EntryList $arrParentEntries `
-                -ExpectedPath $objRecord.Path) {
+                -ExpectedPath $strDeletePath) {
                 & $scriptBlockStopCandidateOperation -Code 'cleanup-delete-failed' `
                     -Message 'PSStyleGuide.Context.v1|phase=cleanup|reason=directory-present'
             }

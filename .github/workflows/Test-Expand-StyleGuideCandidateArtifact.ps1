@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.71
+Version: 1.0.20260803.72
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.71'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.72'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.43'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.33'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.44'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.34'
 $script:strCandidateCatalogVersion = '1.0.20260803.9'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
@@ -1839,8 +1839,12 @@ $script:arrCandidateContextEnumerationSite = @(
         Bound = '($listExpectedRootEntries.Count + 1)'; Match = $null },
     @{ Target = '$Context.DownloadDirectoryPath'
         Bound = '($arrDownloadRecords.Count + 1)'; Match = $null },
-    @{ Target = '$objRecord.ParentPath'; Bound = $null; Match = '$objRecord.Path' },
-    @{ Target = '$objRecord.ParentPath'; Bound = $null; Match = '$objRecord.Path' }
+    # Captured strings rather than record properties, since round 32: a record
+    # is a property bag on a caller-held object, and a getter that answers
+    # differently on each read makes a checked path and a deleted path two
+    # different things. The site table follows the code it pins.
+    @{ Target = '$strDeleteParent'; Bound = $null; Match = '$strDeletePath' },
+    @{ Target = '$strDeleteParent'; Bound = $null; Match = '$strDeletePath' }
 )
 $script:arrCandidateHelperEnumerationSite = @(
     @{ Target = '$strCanonical'; Bound = $null; Match = '$strComponentName' },
@@ -7382,7 +7386,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.71
+    # Version: 1.0.20260803.72
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
