@@ -2041,6 +2041,51 @@ $script:arrCandidateHelperPermittedCommand = [string[]]@(
     'Test-StyleGuideCandidateInvocationContextIssued',
     'Where-Object'
 )
+# True when every self-closure assignment to a variable has a script-block
+# literal assignment to that same variable EARLIER in the file. Written as a
+# helper because the check needs statement space that a filter expression
+# cannot give it -- the first attempt at this reached for $_.Group from inside
+# a nested filter, where $_ is one assignment rather than the group, and was
+# discarded rather than shipped.
+$script:scriptBlockTestSelfClosureSourced = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [object[]]$Assignment
+    )
+
+    $scriptBlockHasLiteral = {
+        param ($objNode)
+        return ($null -ne $objNode.Right.Find(
+            {
+                param ($objInner)
+                $objInner -is
+                    [System.Management.Automation.Language.ScriptBlockExpressionAst]
+            },
+            $false
+        ))
+    }
+    foreach ($objSelf in $Assignment) {
+        $strSelfName = [string]$objSelf.Left.VariablePath.UserPath
+        if (([string]$objSelf.Right.Extent.Text) -cne ('$' + $strSelfName + '.GetNewClosure()')) {
+            continue
+        }
+        $boolPrecededByLiteral = $false
+        foreach ($objOther in $Assignment) {
+            if ([int]$objOther.Extent.StartOffset -ge [int]$objSelf.Extent.StartOffset) {
+                continue
+            }
+            if (& $scriptBlockHasLiteral $objOther) {
+                $boolPrecededByLiteral = $true
+            }
+        }
+        if (-not $boolPrecededByLiteral) {
+            return $false
+        }
+    }
+    return $true
+}
+
 $script:arrCandidateContextPermittedCommand = [string[]]@(
     'ForEach-Object',
     'New-Object',
@@ -2201,24 +2246,21 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                         )
                         -not ($boolLiteral -or $boolSelfClosure)
                     }).Count -eq 0 -and
-                    # ...and at least one of them must be an actual literal.
-                    # A variable whose ONLY assignment is `$x = $x.GetNewClosure()`
-                    # has no source in this file at all: in a dot-sourced script
-                    # the value it closes over comes from the CALLER's scope, so
+                    # ...and a literal must PRECEDE every self-closure of it.
+                    # A variable whose only assignment is `$x = $x.GetNewClosure()`
+                    # has no source in this file: in a dot-sourced script the
+                    # value it closes over comes from the CALLER's scope, so
                     # admitting it would let `& $x` invoke caller-supplied code
                     # while the rule reported an internal script block. The
                     # self-closure form preserves what a variable holds; it
                     # cannot establish it.
-                    @($_.Group | Where-Object {
-                        $null -ne $_.Right.Find(
-                            {
-                                param ($objInner)
-                                $objInner -is
-                                    [System.Management.Automation.Language.ScriptBlockExpressionAst]
-                            },
-                            $false
-                        )
-                    }).Count -ge 1
+                    #
+                    # Counting literals anywhere in the file is not enough: one
+                    # appearing LATER, or in a branch that never runs, would
+                    # satisfy the count while the self-closure and the
+                    # invocation both used the caller's value. Position is what
+                    # makes a capture meaningful, so position is what is checked.
+                    (& $script:scriptBlockTestSelfClosureSourced -Assignment @($_.Group))
                 } | ForEach-Object { [string]$_.Name })
 
         # The native-path variables whose EVERY assignment came from the
