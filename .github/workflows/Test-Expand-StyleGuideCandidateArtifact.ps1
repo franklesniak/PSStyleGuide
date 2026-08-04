@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.41
+Version: 1.0.20260803.42
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.41'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.42'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.29'
@@ -2018,6 +2018,41 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                     -Detail ('command-not-permitted-' + $strCommandName + '-' +
                         [string]$objCommand.Extent.StartLineNumber)
             }
+        }
+        # A member name that is not a literal is refused across the whole file,
+        # invocation and plain access alike. Every rule above compares a NAME,
+        # and a dynamic member has none to compare: the AST node holds the
+        # variable expression, so the comparison sees the text `$strMethod`
+        # rather than the EnumerateFileSystemInfos it carries. Measured, that
+        # left an unbounded whole-directory listing green at 113 passes -- the
+        # fourth hole found in this one rule, after Get-Item, Resolve-Path and
+        # the module-qualified spelling.
+        #
+        # Refusing the dynamic name rather than chasing what it might resolve to
+        # is what makes this the last of them: resolving assignments would still
+        # miss a name built from an expression, and a deny-list of resolved
+        # values is the shape that has now failed four times. Plain access is
+        # included because it is the first link of a chain that reaches a
+        # listing without ever naming one -- `$obj.$name` yields a method
+        # reference, and invoking that is an ordinary literal call. Breaking the
+        # first link costs nothing here and needs no second rule.
+        #
+        # Measured: both production scripts contain zero dynamic member
+        # invocations and zero dynamic member accesses, so this refuses nothing
+        # they do today.
+        foreach ($objDynamic in @($objAst.FindAll(
+                    {
+                        param ($objNode)
+                        $objNode -is
+                            [System.Management.Automation.Language.MemberExpressionAst] -and
+                        $objNode.Member -isnot
+                            [System.Management.Automation.Language.StringConstantExpressionAst]
+                    },
+                    $true
+                ))) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('dynamic-member-not-permitted-' +
+                    [string]$objDynamic.Extent.StartLineNumber)
         }
         # Reflection is refused across the whole file, helper definition
         # included: it reaches a listing without spelling one, and neither
@@ -6340,7 +6375,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.41
+    # Version: 1.0.20260803.42
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
