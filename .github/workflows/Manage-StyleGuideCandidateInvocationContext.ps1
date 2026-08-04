@@ -27,14 +27,14 @@ a caller that deletes first and validates afterwards has already
 deleted, so it needs a way to ask about issuance that changes nothing.
 
 .NOTES
-Version: 1.0.20260803.31
+Version: 1.0.20260803.33
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.31'
+$versionCandidateContext = [System.Version]'1.0.20260803.33'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -762,11 +762,26 @@ $scriptBlockSetCandidateIssuedState = {
     # place so the two cannot drift: the assertion compares them, so a state
     # set on the context without being recorded here would refuse the very
     # context this manager just transitioned.
+    #
+    # The EXPOSED property is written first and the register only if that
+    # succeeds. LifecycleState is a note property on a caller-held object, and
+    # a caller can replace it with a schema-compatible script property whose
+    # getter returns Active and whose setter throws -- validation still passes.
+    # Committing the register first would record a transition that never
+    # happened on the object, and the cleanup catch path would then call this
+    # again, record again, and throw again, losing the bounded failure result
+    # this manager documents it returns. So the order is: change the thing,
+    # then record that it changed.
+    try {
+        $Context.LifecycleState = $State
+    } catch {
+        return $false
+    }
     $intIndex = & $scriptBlockCandidateContextIssuedIndex -Context $Context
     if ($intIndex -ge 0) {
         $arrCandidateIssuedState[$intIndex] = $State
     }
-    $Context.LifecycleState = $State
+    return $true
 }
 
 $scriptBlockNewCandidateIssuanceSnapshot = {
@@ -1660,7 +1675,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.31
+    # Version: 1.0.20260803.33
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2048,8 +2063,9 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     #
     # .DESCRIPTION
     # Answers one question and changes nothing: was this exact object handed out
-    # by New-StyleGuideCandidateInvocationContext in this process, and does it
-    # still describe what it described then. Touches no filesystem entry, so a
+    # by New-StyleGuideCandidateInvocationContext in this process, does it still
+    # describe what it described then, and does its lifecycle state still match
+    # the one this manager last set. Touches no filesystem entry, so a
     # caller can ask before it acts rather than discovering the answer after.
     #
     # This exists because a caller that deletes first and validates afterwards
@@ -2083,7 +2099,7 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.31
+    # Version: 1.0.20260803.33
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param (
@@ -2106,8 +2122,19 @@ function Test-StyleGuideCandidateInvocationContextIssued {
         return $false
     }
     try {
-        return (([string]$arrCandidateIssuedSnapshot[$intIssuedIndex]) -ceq
-            [string](& $scriptBlockNewCandidateIssuanceSnapshot -Context $Context))
+        if (([string]$arrCandidateIssuedSnapshot[$intIssuedIndex]) -cne
+            [string](& $scriptBlockNewCandidateIssuanceSnapshot -Context $Context)) {
+            return $false
+        }
+        # The lifecycle state as well, not only the paths. Asking whether this
+        # manager issued the object is the wrong question on its own: a genuine
+        # issued context with a terminal state the caller wrote is still issued,
+        # and answering true let the helper's already-disposed return report
+        # success over a tree that was never removed. What a caller needs before
+        # it acts is whether the context is what this manager issued AND still
+        # says what the manager last recorded, so that is what this answers.
+        return (([string]$arrCandidateIssuedState[$intIssuedIndex]) -ceq
+            [string]$Context.LifecycleState)
     } catch {
         return $false
     }
@@ -2150,7 +2177,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.31
+    # Version: 1.0.20260803.33
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2356,7 +2383,20 @@ function Remove-StyleGuideCandidateInvocationContext {
             $objRecord.EntryState = 'Deleted'
         }
 
-        [void](& $scriptBlockSetCandidateIssuedState -Context $Context -State 'Disposed')
+        if (-not (& $scriptBlockSetCandidateIssuedState -Context $Context -State 'Disposed')) {
+            # The filesystem work is done and the object refused the
+            # transition, so the truth is reported rather than thrown: a
+            # context whose own state cannot be written is not the context
+            # this manager issued.
+            return (& $scriptBlockNewCandidateCleanupResult `
+                -InvocationId $guidInvocationId `
+                -PreviousState $strPreviousState `
+                -FinalState $strPreviousState `
+                -Success $false `
+                -DiagnosticCode 'cleanup-context-altered' `
+                -ReferenceToFilesystemCallCount $uintFilesystemCallCount `
+                -RetainedRecordSequences ([uint32[]]@()))
+        }
         [void](& $scriptBlockAssertCandidateInMemoryContext -Context $Context)
         return (& $scriptBlockNewCandidateCleanupResult `
             -InvocationId $Context.InvocationId `
@@ -2377,6 +2417,9 @@ function Remove-StyleGuideCandidateInvocationContext {
                 $objRecord.EntryState = 'RetainedUncertain'
             }
         }
+        # Deliberately not conditional: the bounded failure result below is
+        # what this function promises, and a caller-controlled setter that
+        # throws must not turn a reported failure into an unhandled one.
         [void](& $scriptBlockSetCandidateIssuedState -Context $Context -State 'CleanupFailed')
         $arrRetained = & $scriptBlockGetCandidateRetainedSequence -Context $Context
         $strCode = & $scriptBlockGetCandidateDiagnosticCode `

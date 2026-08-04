@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.41
+Version: 1.0.20260803.43
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.41'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.31'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.43'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.33'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -2109,7 +2109,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.41
+    # Version: 1.0.20260803.43
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2135,6 +2135,36 @@ function Remove-StyleGuideCandidateInvocationState {
         $guidInvocationId = $Context.InvocationId
         $strPreviousState = $Context.LifecycleState
     } catch {
+        return (& $script:scriptBlockNewCandidateHelperCleanupResult `
+            -InvocationId $guidInvocationId `
+            -PreviousState $strPreviousState `
+            -FinalState $strPreviousState `
+            -Success $false `
+            -DiagnosticCode 'cleanup-context-invalid' `
+            -ReferenceToFilesystemCallCount ([uint32]0) `
+            -RetainedRecordSequences ([uint32[]]@()))
+    }
+
+    # Authenticated before either terminal-state return, not after. A terminal
+    # state is a CLAIM the caller can write, and the returns below answer it
+    # with Success true and zero filesystem calls -- so reaching them on an
+    # unauthenticated context reports that cleanup happened when nothing was
+    # removed. The manager was corrected for exactly this a commit ago; the
+    # helper has its own early returns and kept the old behaviour, which is the
+    # sibling that correction did not sweep to.
+    $arrEarlyIssuanceCommands = @(
+        Get-Command -Name Test-StyleGuideCandidateInvocationContextIssued `
+            -CommandType Function -ErrorAction SilentlyContinue
+    )
+    $boolEarlyIssued = $false
+    if ($arrEarlyIssuanceCommands.Count -eq 1) {
+        $objEarlyProbe = [pscustomobject]@{ CandidateNeverIssued = $true }
+        if (-not (Test-StyleGuideCandidateInvocationContextIssued -Context $objEarlyProbe)) {
+            $boolEarlyIssued = [bool](
+                Test-StyleGuideCandidateInvocationContextIssued -Context $Context)
+        }
+    }
+    if (-not $boolEarlyIssued) {
         return (& $script:scriptBlockNewCandidateHelperCleanupResult `
             -InvocationId $guidInvocationId `
             -PreviousState $strPreviousState `
