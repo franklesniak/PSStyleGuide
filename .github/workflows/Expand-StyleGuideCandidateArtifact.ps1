@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.19
+Version: 1.0.20260803.20
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.19'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.20'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.9'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -1027,6 +1027,27 @@ $script:scriptBlockTestCandidateHelperEntryPresent = {
     return $intMatches -eq 1
 }
 
+# The only way production obtains the download path. The rule it applies is the
+# same canonical stored-path rule the journal uses -- restating it here is what
+# went wrong once already -- but it is applied where the name is adopted, and it
+# is applied by producing the value rather than by inspecting one that already
+# exists. A caller cannot hold an unvalidated download path, because there is
+# nowhere else for one to come from.
+$script:scriptBlockGetCandidateHelperValidatedDownloadPath = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$Candidate
+    )
+
+    try {
+        [void](& $script:scriptBlockAssertCandidateHelperCanonicalStoredPath -Value $Candidate)
+    } catch {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'download-invalid' -Phase 'download' -Subreason 'entry-name'
+    }
+    return [string]$Candidate
+}
+
 # The only way production obtains a ZipArchive. The bound and the construction
 # used to be adjacent statements, and their order was the whole protection: the
 # End of Central Directory record carries the entry count, so an oversized
@@ -1823,7 +1844,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.19
+    # Version: 1.0.20260803.20
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2610,7 +2631,6 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'download-invalid' -Phase 'download' -Subreason 'entry-count'
         }
-        $strArchivePath = $arrDownloadEntries[0]
         # This is the only path that ends up journaled without this code having
         # chosen its name: every other one is a fixed leaf or GetRandomFileName
         # output, and every caller-supplied root is checked at parameter
@@ -2620,17 +2640,18 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         # journal holding a path it refuses. Measured on 'build[1].zip': refused
         # at journaling, correctly, and then cleanup unable to remove what it
         # had already created, reporting Invalid with retained=0 while the
-        # invocation root stayed on disk. The rule is not restated here; it is
-        # the same check, moved to the moment the name is adopted and ahead of
-        # any further I/O on it, so a name that cannot be journaled is refused
-        # while every journaled entry is still one this code named itself.
-        try {
-            [void](& $script:scriptBlockAssertCandidateHelperCanonicalStoredPath `
-                -Value $strArchivePath)
-        } catch {
-            & $script:scriptBlockStopCandidateHelperOperation `
-                -Code 'download-invalid' -Phase 'download' -Subreason 'entry-name'
-        }
+        # invocation root stayed on disk.
+        #
+        # The validation is not a step that happens to come first. An earlier
+        # revision made it one, and leaving an unreachable copy at the old
+        # location while moving the real call after the metadata read satisfied
+        # both the source-order pin and the behavioural probe -- 115 records,
+        # zero failures, with the leaf touched before it was checked. So the
+        # validated value is the only value: $strArchivePath is produced by the
+        # validator and by nothing else, and every use below is therefore of a
+        # path that has been through it.
+        $strArchivePath = [string](& $script:scriptBlockGetCandidateHelperValidatedDownloadPath `
+            -Candidate $arrDownloadEntries[0])
         $uintArchiveMetadataLength = & $script:scriptBlockAssertCandidateHelperOrdinaryFileMetadata `
             -LiteralPath $strArchivePath `
             -Phase 'download'

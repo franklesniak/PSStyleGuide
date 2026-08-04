@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.28
+Version: 1.0.20260803.29
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,10 +53,10 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.28'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.29'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.19'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.20'
 $script:strCandidateExpectedContextVersion = '1.0.20260803.9'
 $script:strCandidateCatalogVersion = '1.0.20260803.4'
 # The physical allocation size, stated once. It was previously two bare literals
@@ -1898,7 +1898,19 @@ $script:scriptBlockAssertDownloadLeafGuardExecutes = {
     }
 }
 
-$script:scriptBlockAssertDownloadLeafValidatedFirst = {
+# This used to assert that the validator was the first command naming
+# $strArchivePath, which is a statement about source ORDER, and source order is
+# satisfied by code that never runs. Leaving an unreachable copy at the original
+# location while moving the real call after the metadata read passed both this
+# and the behavioural probe above: 115 records, zero failures, with the leaf
+# touched before it was checked.
+#
+# Order is the wrong property to pin. Production no longer validates a value it
+# already holds -- the validator PRODUCES the value -- so what is pinned now is
+# provenance: $strArchivePath is assigned exactly once, and that assignment is
+# the validator call. A dormant copy cannot satisfy this, because a dead copy is
+# either a second assignment or not the assignment at all, and both fail.
+$script:scriptBlockAssertDownloadPathProvenance = {
     param (
         [Parameter(Mandatory = $true)]
         [string]$HelperLiteralPath
@@ -1909,11 +1921,24 @@ $script:scriptBlockAssertDownloadLeafValidatedFirst = {
         $HelperLiteralPath, [ref]$null, [ref]$objErrors)
     if ($null -eq $objAst -or @($objErrors).Count -ne 0) {
         & $script:scriptBlockStopHarness `
-            -Code 'catalog-invalid' -Detail 'download-leaf-parse'
+            -Code 'catalog-invalid' -Detail 'download-path-parse'
     }
-    # Every call naming $strArchivePath, in source order, paired with the
-    # scriptblock it invokes.
-    $arrCall = @($objAst.FindAll(
+    $arrAssignment = @($objAst.FindAll(
+            {
+                param ($objNode)
+                $objNode -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                $objNode.Left.Extent.Text -ceq '$strArchivePath'
+            },
+            $true
+        ))
+    if ($arrAssignment.Count -ne 1) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+            -Detail ('download-path-assignment-' + $arrAssignment.Count)
+    }
+    # The producing call, wherever it sits inside casts or parentheses on the
+    # right-hand side. Naming the scriptblock is what matters, not the shape of
+    # the expression wrapped around it.
+    $arrProducer = @($arrAssignment[0].Right.FindAll(
             {
                 param ($objNode)
                 $objNode -is [System.Management.Automation.Language.CommandAst] -and
@@ -1922,24 +1947,15 @@ $script:scriptBlockAssertDownloadLeafValidatedFirst = {
                     [System.Management.Automation.Language.VariableExpressionAst]
             },
             $true
-        )) | Sort-Object -Property { $_.Extent.StartOffset }
-    $strFirstNamingArchivePath = ''
-    foreach ($objCall in $arrCall) {
-        $boolNamesArchivePath = $false
-        for ($intIndex = 1; $intIndex -lt @($objCall.CommandElements).Count; $intIndex++) {
-            if ([string]$objCall.CommandElements[$intIndex].Extent.Text -ceq '$strArchivePath') {
-                $boolNamesArchivePath = $true
-            }
-        }
-        if ($boolNamesArchivePath) {
-            $strFirstNamingArchivePath = [string]$objCall.CommandElements[0].VariablePath.UserPath `
-                -creplace '^script:', ''
-            break
-        }
+        ))
+    $strProducer = if ($arrProducer.Count -eq 1) {
+        [string]$arrProducer[0].CommandElements[0].VariablePath.UserPath -creplace '^script:', ''
+    } else {
+        ''
     }
-    if ($strFirstNamingArchivePath -cne 'scriptBlockAssertCandidateHelperCanonicalStoredPath') {
+    if ($strProducer -cne 'scriptBlockGetCandidateHelperValidatedDownloadPath') {
         & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-            -Detail ('download-leaf-unvalidated-' + $strFirstNamingArchivePath)
+            -Detail ('download-path-producer-' + $strProducer)
     }
 }
 
@@ -5916,7 +5932,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.28
+    # Version: 1.0.20260803.29
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -6142,7 +6158,7 @@ function Invoke-StyleGuideCandidateHarness {
         & $script:scriptBlockAssertEnumerationBoundsDeclared `
             -HelperLiteralPath $strHelperLiteralPath `
             -ContextLiteralPath $strContextLiteralPath
-        & $script:scriptBlockAssertDownloadLeafValidatedFirst `
+        & $script:scriptBlockAssertDownloadPathProvenance `
             -HelperLiteralPath $strHelperLiteralPath
         & $script:scriptBlockAssertDownloadLeafGuardExecutes `
             -HelperLiteralPath $strHelperLiteralPath `
