@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.38
+Version: 1.0.20260803.39
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.38'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.39'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.30'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -2109,7 +2109,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.38
+    # Version: 1.0.20260803.39
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2205,28 +2205,36 @@ function Remove-StyleGuideCandidateInvocationState {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'cleanup-context-invalid' -Phase 'cleanup' -Subreason 'context-manager-not-loaded'
         }
-        # Resolving by NAME asks the session what currently answers to it, and
-        # a caller who loaded the real manager can rebind that name afterwards:
-        # measured, replacing this function with `{ param($Context) $true }`
-        # leaves Get-Command reporting exactly one function and returns true for
-        # the string 'anything'. A verifier that any caller can substitute is
-        # not an authority, and the check would have waved through the forged
-        # context it exists to stop.
+        # The verifier is challenged, not inspected. Round 30 compared its
+        # ScriptBlock.File against the cleanup function's, and that comparison
+        # is worthless: ParseInput TAKES the filename as an argument, so
+        # `Parser::ParseInput($code, <the manager's path>, ...)` followed by
+        # GetScriptBlock produces a block that reports the genuine path and
+        # returns whatever the caller wants -- measured on .NET 8 and .NET 10,
+        # the round-30 binding passed while the substitute answered true for
+        # the string 'anything'. Authenticating reported metadata authenticates
+        # a claim rather than a thing.
         #
-        # So the verifier is bound to an ORIGIN rather than to a name: it must
-        # come from the same file as the cleanup function resolved above, and
-        # that file must be a real one -- a scriptblock built by
-        # [scriptblock]::Create carries no File at all.
+        # What a substitute cannot copy is the genuine verifier's ANSWERS,
+        # because those come from a register it cannot read. A context this
+        # manager cannot have issued must be refused, so asking about one
+        # separates a real verifier from a blanket yes.
         #
-        # What this does not do, stated rather than implied: an actor who
-        # replaces BOTH functions defeats it. That actor has replaced cleanup
-        # itself and no longer needs to fool the verifier, which is the same
-        # boundary every other check here sits behind.
-        $strCandidateVerifierFile = [string]$arrIssuanceCommands[0].ScriptBlock.File
-        $strCandidateCleanupFile = [string]$arrCommands[0].ScriptBlock.File
-        if ($strCandidateVerifierFile.Length -eq 0 -or
-            $strCandidateCleanupFile.Length -eq 0 -or
-            $strCandidateVerifierFile -cne $strCandidateCleanupFile) {
+        # This is a sanity check and not an authentication boundary, and the
+        # difference is written down rather than left to be discovered: a
+        # substitute that answers false for anything unfamiliar and true for
+        # its own context passes this. It cannot be closed from here. The
+        # helper runs inside a session the caller controls, where every name is
+        # rebindable, so nothing it resolves can be trusted to be what it says.
+        # The guarantee that holds is in the manager, which authenticates
+        # against its own register and consults no verifier at all -- see the
+        # Known gaps entry, and the note there on moving deletion into the
+        # manager so that no verifier need exist.
+        $objCandidateIssuanceProbe = [pscustomobject]@{
+            CandidateNeverIssued = $true
+        }
+        if (Test-StyleGuideCandidateInvocationContextIssued `
+                -Context $objCandidateIssuanceProbe) {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'cleanup-context-invalid' -Phase 'cleanup' -Subreason 'context-manager-not-loaded'
         }
@@ -2857,21 +2865,14 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         # this public name afterwards, and Get-Command would still report one
         # function. The cleanup function is resolved here purely to supply the
         # file both must share.
-        $arrCleanupCommands = @(
-            Get-Command -Name Remove-StyleGuideCandidateInvocationContext `
-                -CommandType Function -ErrorAction SilentlyContinue
-        )
-        $strCandidateVerifierOrigin = ''
-        $strCandidateCleanupOrigin = ''
-        if ($arrIssuanceCommands.Count -eq 1) {
-            $strCandidateVerifierOrigin = [string]$arrIssuanceCommands[0].ScriptBlock.File
+        # Challenged rather than inspected, for the reason set out at the
+        # cleanup call site: ScriptBlock.File is an argument to ParseInput and
+        # therefore a claim the caller writes, not a fact about the block.
+        $objCandidateIssuanceProbe = [pscustomobject]@{
+            CandidateNeverIssued = $true
         }
-        if ($arrCleanupCommands.Count -eq 1) {
-            $strCandidateCleanupOrigin = [string]$arrCleanupCommands[0].ScriptBlock.File
-        }
-        if ($strCandidateVerifierOrigin.Length -eq 0 -or
-            $strCandidateCleanupOrigin.Length -eq 0 -or
-            $strCandidateVerifierOrigin -cne $strCandidateCleanupOrigin) {
+        if (Test-StyleGuideCandidateInvocationContextIssued `
+                -Context $objCandidateIssuanceProbe) {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'parameter' -Phase 'parameter' -Subreason 'context-manager-not-loaded'
         }
