@@ -2360,14 +2360,25 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                     'arrCandidateIssuedSnapshot',
                     'arrCandidateIssuedState'
                 )
-                # Only what -Name receives. Other literals in the call are
-                # parameter values like SilentlyContinue and are not targets.
+                # Every element that names a variable, however it is spelled.
+                # The first version of this rule checked only what followed an
+                # explicit -Name, and -Name is POSITIONAL: `Remove-Variable
+                # scriptBlockFoo -Force` put the target at index 1 with no
+                # preceding parameter, so the rule never looked at it -- the
+                # escape this rule exists to stop, wearing a different shape.
+                # Self-found before it shipped anywhere. So the rule is
+                # inverted: everything is a target unless it is a parameter, or
+                # the value of a parameter that is not -Name.
                 $arrElement = @($objCommand.CommandElements)
                 for ($intElement = 1; $intElement -lt $arrElement.Count; $intElement++) {
+                    if ($arrElement[$intElement] -is
+                        [System.Management.Automation.Language.CommandParameterAst]) {
+                        continue
+                    }
                     $objPrevious = $arrElement[$intElement - 1]
-                    if (-not ($objPrevious -is
-                            [System.Management.Automation.Language.CommandParameterAst] -and
-                            ([string]$objPrevious.ParameterName) -ceq 'Name')) {
+                    if ($objPrevious -is
+                        [System.Management.Automation.Language.CommandParameterAst] -and
+                        ([string]$objPrevious.ParameterName) -cne 'Name') {
                         continue
                     }
                     $objTarget = $arrElement[$intElement]
