@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.14
+Version: 1.0.20260803.15
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.14'
+$versionCandidateContext = [System.Version]'1.0.20260803.15'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -699,6 +699,22 @@ $scriptBlockAssertCandidateCanonicalStoredPath = {
         [string]$Value
     )
 
+    # Length first, because everything below is proportional to it and the
+    # verdict is not. Round 23 capped the raw entry-point parameters and left
+    # this validator uncapped, though it governs strings that are just as
+    # untrusted: the four paths a caller-supplied context carries, and every
+    # journaled path inside it. Measured on .NET 8.0.10, one 32 MiB path took
+    # 7,940 ms and 135.11 MiB here -- and was ACCEPTED, so the cost bought the
+    # caller a valid verdict rather than a refusal. A forged context carries
+    # four of those plus a journal.
+    #
+    # The ceiling is the same one the parameter rule uses: the longest path
+    # either platform can express, so it refuses only what no filesystem could
+    # have named.
+    if ($Value.Length -gt $intCandidateMaximumPathLength) {
+        throw 'cleanup-context-invalid'
+    }
+
     # This rule governs a path that is STORED, and a stored path is consumed
     # only by literal .NET APIs -- File.Delete, Directory.Delete, GetAttributes,
     # and ordinal comparison -- plus one enumeration search pattern. It used to
@@ -829,6 +845,11 @@ $scriptBlockAssertCandidateInMemoryContext = {
         [void](& $scriptBlockAssertCandidateCanonicalStoredPath -Value $strContextPath)
     }
 
+    # The label is scanned character by character, so its length is decided
+    # first for the same reason the paths above are.
+    if ($Context.DiagnosticLabel.Length -gt $intCandidateMaximumLabelLength) {
+        throw 'cleanup-context-invalid'
+    }
     foreach ($chrLabel in $Context.DiagnosticLabel.ToCharArray()) {
         if ([System.Char]::IsControl($chrLabel)) {
             throw 'cleanup-context-invalid'
@@ -1370,7 +1391,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.14
+    # Version: 1.0.20260803.15
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1645,7 +1666,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.14
+    # Version: 1.0.20260803.15
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

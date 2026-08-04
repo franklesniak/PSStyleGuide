@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.28
+Version: 1.0.20260803.29
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.28'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.14'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.29'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.15'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -378,6 +378,22 @@ $script:scriptBlockAssertCandidateHelperCanonicalStoredPath = {
         [string]$Value
     )
 
+    # Length first, because everything below is proportional to it and the
+    # verdict is not. Round 23 capped the raw entry-point parameters and left
+    # this validator uncapped, though it governs strings that are just as
+    # untrusted: the four paths a caller-supplied context carries, and every
+    # journaled path inside it. Measured on .NET 8.0.10, one 32 MiB path took
+    # 7,940 ms and 135.11 MiB here -- and was ACCEPTED, so the cost bought the
+    # caller a valid verdict rather than a refusal. A forged context carries
+    # four of those plus a journal.
+    #
+    # The ceiling is the same one the parameter rule uses: the longest path
+    # either platform can express, so it refuses only what no filesystem could
+    # have named.
+    if ($Value.Length -gt $script:intCandidateHelperMaximumPathLength) {
+        throw 'context-invalid'
+    }
+
     # This rule governs a path that is STORED, and a stored path is consumed
     # only by literal .NET APIs -- File.Delete, Directory.Delete, GetAttributes,
     # and ordinal comparison -- plus one enumeration search pattern. It used to
@@ -510,6 +526,11 @@ $script:scriptBlockAssertCandidateHelperContext = {
         [void](& $script:scriptBlockAssertCandidateHelperCanonicalStoredPath -Value $strContextPath)
     }
 
+    # The label is scanned character by character, so its length is decided
+    # first for the same reason the paths above are.
+    if ($ContextValue.DiagnosticLabel.Length -gt $script:intCandidateHelperMaximumLabelLength) {
+        throw 'context-invalid'
+    }
     foreach ($chrLabel in $ContextValue.DiagnosticLabel.ToCharArray()) {
         if ([System.Char]::IsControl($chrLabel)) {
             throw 'context-invalid'
@@ -2011,7 +2032,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.28
+    # Version: 1.0.20260803.29
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

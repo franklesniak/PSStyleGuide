@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.40
+Version: 1.0.20260803.41
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.40'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.41'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.28'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.14'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.29'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.15'
 $script:strCandidateCatalogVersion = '1.0.20260803.5'
 # The documented ceiling on what an authenticated native query may return, the
 # interval at which it is enforced while the output is still arriving, and how
@@ -6340,7 +6340,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.40
+    # Version: 1.0.20260803.41
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
