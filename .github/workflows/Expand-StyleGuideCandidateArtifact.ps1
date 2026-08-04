@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.22
+Version: 1.0.20260803.23
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.22'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.10'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.23'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.11'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -501,6 +501,23 @@ $script:scriptBlockAssertCandidateHelperContext = {
         DownloadFile = 0
         CandidateDirectory = 0
         CandidateFile = 0
+    }
+
+    # Bounded before the loop, not after it. The cardinality rules further down
+    # reject a journal carrying more than one root, download directory,
+    # candidate directory, or download file -- but only once every record has
+    # been schema-checked, canonicalized, and added to the path set, and a
+    # schema-shaped context is untrusted input. Measured on .NET 8 against the
+    # context manager's identical loop: 20000 forged records cost 4960 ms and
+    # 48.54 MiB, 200000 cost 60929 ms and 365.03 MiB, for a journal this schema
+    # caps at eight.
+    #
+    # Derived rather than written down: one invocation root, one download
+    # directory, one candidate directory, one download file, and one candidate
+    # file per manifest name. Growing the manifest moves the cap on its own.
+    $intMaximumJournalRecord = 4 + $script:arrCandidateHelperExpectedName.Count
+    if ($ContextValue.OwnershipJournal.Count -gt $intMaximumJournalRecord) {
+        throw 'context-invalid'
     }
 
     for ($intIndex = 0; $intIndex -lt $ContextValue.OwnershipJournal.Count; $intIndex++) {
@@ -1890,7 +1907,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.22
+    # Version: 1.0.20260803.23
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

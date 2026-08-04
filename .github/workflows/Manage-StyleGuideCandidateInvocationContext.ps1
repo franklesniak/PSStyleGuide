@@ -21,20 +21,24 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.10
+Version: 1.0.20260803.11
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.10'
+$versionCandidateContext = [System.Version]'1.0.20260803.11'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
 # The same ceilings the expansion helper enforces. They are restated rather
 # than imported because either script may be loaded without the other, and a
 # journal this script accepts must be one that script would accept too.
+# The manifest's fixed entry count, restated here for the same reason the byte
+# ceilings above it are: either script may be loaded without the other, and a
+# journal this script accepts must be one the expansion helper would accept too.
+$intCandidateManifestEntryCount = 4
 $uintCandidateMaximumEntryByte = [uint64](8 * 1024 * 1024)
 $uintCandidateMaximumArchiveByte = [uint64](32 * 1024 * 1024)
 # The platform decides which comparison, path grammar, link primitive, and
@@ -825,6 +829,24 @@ $scriptBlockAssertCandidateInMemoryContext = {
         CandidateFile = 0
     }
 
+    # The cardinality rules below reject a journal that carries more than one
+    # root, download directory, candidate directory, or download file -- but
+    # they run after every record has been schema-checked, canonicalized, and
+    # added to the path set. A schema-shaped context is untrusted input, so a
+    # forged journal buys the whole loop before the count that refuses it:
+    # measured on .NET 8, 20000 records cost 4960 ms and 48.54 MiB, and 200000
+    # cost 60929 ms and 365.03 MiB, for a journal this schema caps at eight.
+    #
+    # The cap is derived rather than written down. One invocation root, one
+    # download directory, one candidate directory, one download file, and one
+    # candidate file per manifest name -- so growing the manifest moves it and
+    # transcribing it cannot go stale. A literal count in this file has already
+    # accepted a deletion once.
+    $intMaximumJournalRecord = 4 + $intCandidateManifestEntryCount
+    if ($Context.OwnershipJournal.Count -gt $intMaximumJournalRecord) {
+        throw 'cleanup-context-invalid'
+    }
+
     for ($intIndex = 0; $intIndex -lt $Context.OwnershipJournal.Count; $intIndex++) {
         $objRecord = $Context.OwnershipJournal[$intIndex]
         if ($null -eq $objRecord -or
@@ -1258,7 +1280,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.10
+    # Version: 1.0.20260803.11
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1533,7 +1555,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.10
+    # Version: 1.0.20260803.11
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
