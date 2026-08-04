@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.53
+Version: 1.0.20260803.54
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.53'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.54'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.34'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.23'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.24'
 $script:strCandidateCatalogVersion = '1.0.20260803.6'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
@@ -2744,6 +2744,242 @@ $script:scriptBlockAssertArchiveLengthReadOnce = {
     if (@($arrLengthRead).Count -ne 1) {
         & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
             -Detail ('archive-length-read-' + @($arrLengthRead).Count)
+    }
+}
+
+$script:scriptBlockAssertStaticMembersResolve = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$HelperLiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ContextLiteralPath
+    )
+
+    # Round 28 shipped a call to
+    # [System.IO.FileSystemAclExtensions]::CreateDirectory(DirectoryInfo,
+    # DirectorySecurity). That member does not exist -- the type carries
+    # Create(DirectoryInfo, DirectorySecurity) and
+    # CreateDirectory(DirectorySecurity, String) -- so the call threw
+    # MethodException at bind time and every Windows PowerShell 7 context
+    # creation refused. Nothing caught it, because the only place it could fail
+    # was a platform this suite cannot run.
+    #
+    # It does not need that platform. Binding is decided by the reflection
+    # surface of the type, and System.IO.FileSystem.AccessControl ships on
+    # Linux even though its methods throw PlatformNotSupportedException there --
+    # measured, the type resolves on .NET 8 and .NET 10 here. So the member can
+    # be proven present, with an overload that accepts the argument types, on
+    # the runtimes this suite actually runs.
+    #
+    # Arity alone would not have caught it: the call passes two arguments and
+    # CreateDirectory takes two. The parameter types are what disagree, so the
+    # types are what this checks. Where an argument's type cannot be determined
+    # it is skipped rather than guessed, and the skipped count is reported so
+    # the coverage claim stays honest.
+    $arrTarget = @(
+        @{ Label = 'helper'; Path = $HelperLiteralPath },
+        @{ Label = 'context'; Path = $ContextLiteralPath }
+    )
+    foreach ($hashTarget in $arrTarget) {
+        $objErrors = $null
+        $objAst = [System.Management.Automation.Language.Parser]::ParseFile(
+            [string]$hashTarget.Path, [ref]$null, [ref]$objErrors)
+        if ($null -eq $objAst -or @($objErrors).Count -ne 0) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('static-member-parse-' + [string]$hashTarget.Label)
+        }
+
+        # Every New-Object with a literal type name, and every [T]::new(),
+        # assigned to a plain variable. One variable assigned two different
+        # types is recorded as indeterminate rather than as either of them.
+        $hashVariableType = @{}
+        $arrAssignment = @($objAst.FindAll(
+                {
+                    param ($objNode)
+                    return ($objNode -is
+                        [System.Management.Automation.Language.AssignmentStatementAst])
+                },
+                $true
+            ))
+        foreach ($objAssignment in $arrAssignment) {
+            if ($objAssignment.Left -isnot
+                [System.Management.Automation.Language.VariableExpressionAst]) {
+                continue
+            }
+            $strVariable = [string]$objAssignment.Left.VariablePath.UserPath
+            $strTypeName = ''
+            $objRight = $objAssignment.Right
+            if ($objRight -is
+                [System.Management.Automation.Language.CommandExpressionAst]) {
+                $objRight = $objRight.Expression
+            }
+            if ($objRight -is
+                [System.Management.Automation.Language.InvokeMemberExpressionAst] -and
+                $objRight.Static -and
+                $objRight.Expression -is
+                [System.Management.Automation.Language.TypeExpressionAst] -and
+                $objRight.Member -is
+                [System.Management.Automation.Language.StringConstantExpressionAst] -and
+                ([string]$objRight.Member.Value) -ceq 'new') {
+                $strTypeName = [string]$objRight.Expression.TypeName.FullName
+            } elseif ($objRight -is
+                [System.Management.Automation.Language.PipelineAst]) {
+                $arrElement = @($objRight.PipelineElements)
+                if ($arrElement.Count -eq 1 -and $arrElement[0] -is
+                    [System.Management.Automation.Language.CommandAst]) {
+                    $objCommand = $arrElement[0]
+                    if (([string]$objCommand.GetCommandName()) -ceq 'New-Object') {
+                        $arrElements = @($objCommand.CommandElements)
+                        for ($intIndex = 1; $intIndex -lt $arrElements.Count; $intIndex++) {
+                            if ($arrElements[$intIndex] -is
+                                [System.Management.Automation.Language.StringConstantExpressionAst]) {
+                                $strTypeName = [string]$arrElements[$intIndex].Value
+                                break
+                            }
+                        }
+                    }
+                }
+            }
+            if ($strTypeName.Length -eq 0) {
+                $hashVariableType[$strVariable] = ''
+                continue
+            }
+            if ($hashVariableType.ContainsKey($strVariable) -and
+                ([string]$hashVariableType[$strVariable]) -cne $strTypeName) {
+                $hashVariableType[$strVariable] = ''
+                continue
+            }
+            $hashVariableType[$strVariable] = $strTypeName
+        }
+
+        # Every [T]::Member(...) whose type and member name are both literal.
+        $arrStaticCall = @($objAst.FindAll(
+                {
+                    param ($objNode)
+                    if ($objNode -isnot
+                        [System.Management.Automation.Language.InvokeMemberExpressionAst]) {
+                        return $false
+                    }
+                    if (-not $objNode.Static) {
+                        return $false
+                    }
+                    if ($objNode.Expression -isnot
+                        [System.Management.Automation.Language.TypeExpressionAst]) {
+                        return $false
+                    }
+                    return ($objNode.Member -is
+                        [System.Management.Automation.Language.StringConstantExpressionAst])
+                },
+                $true
+            ))
+        $intSkippedType = 0
+        $intSkippedArgument = 0
+        $intProvenName = 0
+        $intProvenSignature = 0
+        foreach ($objCall in $arrStaticCall) {
+            $strTypeName = [string]$objCall.Expression.TypeName.FullName
+            $strMember = [string]$objCall.Member.Value
+            $typeTarget = $strTypeName -as [type]
+            if ($null -eq $typeTarget) {
+                # Absent on this runtime, so nothing here can be decided. The
+                # production branch that reaches it must resolve the type first.
+                $intSkippedType++
+                continue
+            }
+            if (($strMember -ceq 'new')) {
+                $intProvenName++
+                continue
+            }
+            $arrOverload = @($typeTarget.GetMethods(
+                    [System.Reflection.BindingFlags]::Public -bor
+                    [System.Reflection.BindingFlags]::Static
+                ) | Where-Object { ([string]$_.Name) -ceq $strMember })
+            if ($arrOverload.Count -eq 0) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                    -Detail ('static-member-absent-' + $strMember + '-' +
+                        [string]$objCall.Extent.StartLineNumber)
+            }
+            $intProvenName++
+            # Arguments is null rather than empty for a no-argument call, and
+            # @($null) counts one, which would read as arity 1. The empty array
+            # is assigned directly rather than returned from an if, because an
+            # empty array emitted as the value of a statement block unwraps to
+            # nothing and would leave this null.
+            $arrArgument = @()
+            if ($null -ne $objCall.Arguments) {
+                $arrArgument = @($objCall.Arguments)
+            }
+            $arrByArity = @($arrOverload | Where-Object {
+                    @($_.GetParameters()).Count -eq $arrArgument.Count
+                })
+            if ($arrByArity.Count -eq 0) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                    -Detail ('static-member-arity-' + $strMember + '-' +
+                        [string]$objCall.Extent.StartLineNumber)
+            }
+
+            # Argument types, where the AST alone settles them. A variable is
+            # usable only when every assignment to it named the same literal
+            # type; anything else leaves the call proven by name and arity only.
+            $arrArgumentType = New-Object System.Collections.ArrayList
+            $boolTyped = $true
+            foreach ($objArgument in $arrArgument) {
+                $strArgumentType = ''
+                if ($objArgument -is
+                    [System.Management.Automation.Language.VariableExpressionAst]) {
+                    $strVariable = [string]$objArgument.VariablePath.UserPath
+                    if ($hashVariableType.ContainsKey($strVariable)) {
+                        $strArgumentType = [string]$hashVariableType[$strVariable]
+                    }
+                }
+                if ($strArgumentType.Length -eq 0) {
+                    $boolTyped = $false
+                    break
+                }
+                $typeArgument = $strArgumentType -as [type]
+                if ($null -eq $typeArgument) {
+                    $boolTyped = $false
+                    break
+                }
+                $null = $arrArgumentType.Add($typeArgument)
+            }
+            if (-not $boolTyped) {
+                $intSkippedArgument++
+                continue
+            }
+            $boolAccepts = $false
+            foreach ($objOverload in $arrByArity) {
+                $arrParameter = @($objOverload.GetParameters())
+                $boolMatch = $true
+                for ($intIndex = 0; $intIndex -lt $arrParameter.Count; $intIndex++) {
+                    if (-not $arrParameter[$intIndex].ParameterType.IsAssignableFrom(
+                            $arrArgumentType[$intIndex])) {
+                        $boolMatch = $false
+                        break
+                    }
+                }
+                if ($boolMatch) {
+                    $boolAccepts = $true
+                    break
+                }
+            }
+            if (-not $boolAccepts) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                    -Detail ('static-member-signature-' + $strMember + '-' +
+                        [string]$objCall.Extent.StartLineNumber)
+            }
+            $intProvenSignature++
+        }
+        if ($intProvenName -eq 0) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('static-member-none-' + [string]$hashTarget.Label)
+        }
+        Write-Verbose ('static members in ' + [string]$hashTarget.Label +
+            ': name-proven ' + [string]$intProvenName +
+            ', signature-proven ' + [string]$intProvenSignature +
+            ', type absent here ' + [string]$intSkippedType +
+            ', argument type undetermined ' + [string]$intSkippedArgument)
     }
 }
 
@@ -6720,7 +6956,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.53
+    # Version: 1.0.20260803.54
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -6951,6 +7187,9 @@ function Invoke-StyleGuideCandidateHarness {
             -ContextLiteralPath $strContextLiteralPath
         & $script:scriptBlockAssertArchiveLengthReadOnce `
             -HelperLiteralPath $strHelperLiteralPath
+        & $script:scriptBlockAssertStaticMembersResolve `
+            -HelperLiteralPath $strHelperLiteralPath `
+            -ContextLiteralPath $strContextLiteralPath
         & $script:scriptBlockAssertDownloadPathProvenance `
             -HelperLiteralPath $strHelperLiteralPath
         & $script:scriptBlockAssertRegularFileProofExecutes -RunRoot $strRunRoot

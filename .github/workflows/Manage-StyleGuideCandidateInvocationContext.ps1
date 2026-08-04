@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.23
+Version: 1.0.20260803.24
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.23'
+$versionCandidateContext = [System.Version]'1.0.20260803.24'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -1453,7 +1453,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.23
+    # Version: 1.0.20260803.24
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1597,6 +1597,7 @@ function New-StyleGuideCandidateInvocationContext {
             # instead, and a failure to apply it refuses rather than proceeding
             # with whatever was inherited.
             $boolCandidateRootPrivate = $false
+            $strCandidateRootFailure = 'private-root-unavailable'
             if ($boolCandidateIsWindows) {
                 try {
                     $objRootSecurity = New-Object System.Security.AccessControl.DirectorySecurity
@@ -1610,20 +1611,56 @@ function New-StyleGuideCandidateInvocationContext {
                             [System.Security.AccessControl.PropagationFlags]::None,
                             [System.Security.AccessControl.AccessControlType]::Allow)))
                     $objRootInfo = New-Object System.IO.DirectoryInfo($strInvocationRoot)
-                    # 5.1 carries the security overload on DirectoryInfo itself;
-                    # PowerShell 7 moved it to the ACL extension type.
+                    # The member is attempted, not predicted -- and an earlier
+                    # revision of THIS branch got that wrong in the exact way the
+                    # Unix branch below had already been corrected for. It
+                    # resolved System.IO.FileSystemAclExtensions and treated the
+                    # TYPE existing as proof of the member it went on to call.
+                    # Measured on .NET 8 and .NET 10, that type exposes
+                    # Create(DirectoryInfo, DirectorySecurity) and
+                    # CreateDirectory(DirectorySecurity, String). The
+                    # CreateDirectory(DirectoryInfo, DirectorySecurity) it called
+                    # exists on neither, so the call threw MethodException at
+                    # BIND time -- before any platform check -- on every Windows
+                    # PowerShell 7 run, and the catch below reported that as an
+                    # unavailable private root. Windows 7.x could not create a
+                    # context at all. Resolving the type still decides which
+                    # branch to take, because that is a real question about the
+                    # host; what it may not do is answer a question about a
+                    # member. The harness now proves every static member these
+                    # scripts invoke against the live reflection surface, which
+                    # catches this class on a runtime that has the type.
+                    #
+                    # The extension form emits nothing; the instance form emits
+                    # the created directory, and an unsuppressed object here
+                    # would join this function's output and corrupt the context
+                    # it returns.
                     $typeCandidateAclExtension =
                         'System.IO.FileSystemAclExtensions' -as [type]
-                    # Both forms emit the created directory on some runtimes,
-                    # and an unsuppressed object here would join this function's
-                    # output and corrupt the context it returns.
                     if ($null -ne $typeCandidateAclExtension) {
-                        $null = [System.IO.FileSystemAclExtensions]::CreateDirectory(
-                            $objRootInfo, $objRootSecurity)
-                    } else {
-                        $null = $objRootInfo.Create($objRootSecurity)
+                        try {
+                            [System.IO.FileSystemAclExtensions]::Create(
+                                $objRootInfo, $objRootSecurity)
+                            $boolCandidateRootPrivate = $true
+                        } catch [System.Management.Automation.MethodException] {
+                            $boolCandidateRootPrivate = $false
+                        }
                     }
-                    $boolCandidateRootPrivate = $true
+                    if (-not $boolCandidateRootPrivate) {
+                        # .NET Framework ships no extension type and keeps the
+                        # security overload on DirectoryInfo itself. Reached
+                        # either because the type is absent or because it did not
+                        # carry the member, and a failure here is not swallowed.
+                        $null = $objRootInfo.Create($objRootSecurity)
+                        $boolCandidateRootPrivate = $true
+                    }
+                } catch [System.Management.Automation.MethodException] {
+                    # No form bound. That is a defect in this script rather than
+                    # a fact about the host, so it is reported as itself. Folding
+                    # it into the environmental refusal is what let a total
+                    # Windows breakage look like a graceful degradation.
+                    $boolCandidateRootPrivate = $false
+                    $strCandidateRootFailure = 'private-root-binding'
                 } catch {
                     $boolCandidateRootPrivate = $false
                 }
@@ -1638,13 +1675,14 @@ function New-StyleGuideCandidateInvocationContext {
                         $boolCandidateRootPrivate = $true
                     } catch [System.Management.Automation.MethodException] {
                         $boolCandidateRootPrivate = $false
+                        $strCandidateRootFailure = 'private-root-binding'
                     }
                 }
             }
             if (-not $boolCandidateRootPrivate) {
                 & $scriptBlockStopCandidateOperation -Code 'context-create-verification' `
                     -Message ('PSStyleGuide.Context.v1|phase=root' +
-                        '|reason=private-root-unavailable')
+                        "|reason=$strCandidateRootFailure")
             }
             # Ownership is claimed here, on the call that may have created the
             # directory, and not after the checks below have approved of it.
@@ -1834,7 +1872,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.23
+    # Version: 1.0.20260803.24
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

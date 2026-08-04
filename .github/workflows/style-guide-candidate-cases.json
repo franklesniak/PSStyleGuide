@@ -180,6 +180,7 @@
       "nonordinary-directory",
       "overlap",
       "primary-and-cleanup",
+      "private-root-binding",
       "private-root-unavailable",
       "provider",
       "relationship",
