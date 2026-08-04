@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.40
+Version: 1.0.20260803.41
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.40'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.41'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.31'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -2109,7 +2109,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.40
+    # Version: 1.0.20260803.41
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -3432,7 +3432,21 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
                     [System.IO.FileAccess]::Write,
                     [System.IO.FileShare]::None
                 )
-                & $scriptBlockAssertCandidateStillSame
+                # Journaled on the call that created it, before the check that
+                # can reject it. This file already exists by the time the
+                # identity re-proof runs, so a record written afterwards is
+                # written only when that proof passes -- and when it fails,
+                # which is exactly the case the proof exists for, the file is
+                # on disk with nothing describing it. Cleanup then meets an
+                # unexpected candidate entry it cannot account for, and a
+                # redirected file can be left outside the trusted tree while
+                # the comment above claims the journal describes what happened.
+                #
+                # This is the directory rule, applied to the file case it was
+                # never carried to: ownership is claimed on the call that may
+                # have created the entry, not after later checks approve of it.
+                # The reasoning is written out at the invocation-root creation
+                # in the context manager and was true here all along.
                 $objFileRecord = & $script:scriptBlockNewCandidateHelperRecord `
                     -Sequence $Context.NextSequence `
                     -Kind 'CandidateFile' `
@@ -3445,6 +3459,7 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
                 [void](& $script:scriptBlockAddCandidateHelperRecord `
                     -ContextValue $Context `
                     -Record $objFileRecord)
+                & $scriptBlockAssertCandidateStillSame
 
                 $objEntryStream = $objEntry.Open()
                 $objEntrySha256 = [System.Security.Cryptography.SHA256]::Create()
