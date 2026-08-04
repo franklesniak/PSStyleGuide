@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.52
+Version: 1.0.20260803.53
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.52'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.53'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.42'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -2113,7 +2113,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.52
+    # Version: 1.0.20260803.53
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2926,6 +2926,17 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         # the sweep-by-mechanism mistake this PR keeps paying for.
         $objValidatedContext = $Context
         $strAuthenticatedRoot = [string]$Context.InvocationRootPath
+        # The journal identity and the next sequence, captured with the paths
+        # and authenticated with them. Round 38 found expansion still reading
+        # both back off the caller's context AFTER the issuance checks, so a
+        # same-session runspace could swap OwnershipJournal or move
+        # NextSequence between the check and a record being built. The helper
+        # would then append a record describing a tree nobody authenticated,
+        # fail the assertion after it, and hand rollback a context the manager
+        # refuses as invalid -- leaving the issued tree on disk. A refusal
+        # that leaks is worse than the write it refused.
+        $objAuthenticatedJournal = $Context.OwnershipJournal
+        $uintAuthenticatedSequence = [uint32]$Context.NextSequence
         $strAuthenticatedTrustedParent = [string]$Context.TrustedParentPath
         $strAuthenticatedDownload = [string]$Context.DownloadDirectoryPath
         $strAuthenticatedCandidate = [string]$Context.CandidatePath
@@ -3120,7 +3131,7 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
             -ExpectedPath $strCandidatePath `
             -Phase 'destination')
 
-        if (@($Context.OwnershipJournal | Where-Object { $_.Kind -eq 'DownloadFile' }).Count -ne 0) {
+        if (@($objAuthenticatedJournal | Where-Object { $_.Kind -eq 'DownloadFile' }).Count -ne 0) {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'parameter' -Phase 'parameter' -Subreason 'download-already-journaled'
         }
@@ -3203,7 +3214,7 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         }
 
         $objDownloadRecord = & $script:scriptBlockNewCandidateHelperRecord `
-            -Sequence $Context.NextSequence `
+            -Sequence $uintAuthenticatedSequence `
             -Kind 'DownloadFile' `
             -Path $strArchivePath `
             -ParentPath $strDownloadPath `
@@ -3214,6 +3225,10 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         [void](& $script:scriptBlockAddCandidateHelperRecord `
             -ContextValue $Context `
             -Record $objDownloadRecord)
+        # The captured counter advances with the journal it describes, so the
+        # second record is numbered from the first rather than from a field
+        # the caller could have moved in between.
+        $uintAuthenticatedSequence = [uint32]($uintAuthenticatedSequence + 1)
         [void](& $script:scriptBlockAssertCandidateHelperContext -ContextValue $Context)
 
         if (-not [System.String]::Equals(
@@ -3515,7 +3530,7 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
                 # The reasoning is written out at the invocation-root creation
                 # in the context manager and was true here all along.
                 $objFileRecord = & $script:scriptBlockNewCandidateHelperRecord `
-                    -Sequence $Context.NextSequence `
+                    -Sequence $uintAuthenticatedSequence `
                     -Kind 'CandidateFile' `
                     -Path $strDestinationPath `
                     -ParentPath $strCandidatePath `
@@ -3526,6 +3541,10 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
                 [void](& $script:scriptBlockAddCandidateHelperRecord `
                     -ContextValue $Context `
                     -Record $objFileRecord)
+                # The captured counter advances with the journal it describes, so the
+                # second record is numbered from the first rather than from a field
+                # the caller could have moved in between.
+                $uintAuthenticatedSequence = [uint32]($uintAuthenticatedSequence + 1)
                 & $scriptBlockAssertCandidateStillSame
 
                 $objEntryStream = $objEntry.Open()

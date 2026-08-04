@@ -56,7 +56,7 @@ $ErrorActionPreference = 'Stop'
 $script:versionCandidateHarness = [System.Version]'1.0.20260803.80'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.52'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.53'
 $script:strCandidateExpectedContextVersion = '1.0.20260803.42'
 $script:strCandidateCatalogVersion = '1.0.20260803.12'
 # The documented ceiling on what an authenticated native query may return, the
