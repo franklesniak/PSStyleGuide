@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.18
+Version: 1.0.20260803.19
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.18'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.19'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.9'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -1027,6 +1027,51 @@ $script:scriptBlockTestCandidateHelperEntryPresent = {
     return $intMatches -eq 1
 }
 
+# The only way production obtains a ZipArchive. The bound and the construction
+# used to be adjacent statements, and their order was the whole protection: the
+# End of Central Directory record carries the entry count, so an oversized
+# archive can be refused before ZipArchive parses anything, and ZipArchive.Entries
+# builds one object per central-directory record the moment it is touched --
+# measured at 150000 objects and 50.00 MiB of managed heap on .NET 8 and
+# 52.61 MiB on .NET 10, from an archive of 12.66 MiB, well inside the 32 MiB
+# ceiling.
+#
+# Adjacency is not a guarantee. Moving the bound to just after the first Entries
+# access left every assertion in the harness satisfied -- honest archive
+# accepted, poisoned copy rejected, hostile fixtures still refused by the guard
+# -- while the resource bound it exists to provide was gone, and the Zip64
+# trailer bypass it stops is live on .NET 10 today. So the two are folded: an
+# archive cannot be returned from here without having been bounded, and there is
+# no other constructor for callers to reach.
+$script:scriptBlockOpenCandidateHelperValidatedArchive = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [System.IO.Stream]$Buffer
+    )
+
+    [void](& $script:scriptBlockAssertCandidateHelperArchiveEntryCount -Stream $Buffer)
+
+    $Buffer.Position = 0
+    Add-Type -AssemblyName System.IO.Compression -ErrorAction Stop
+    try {
+        Add-Type -AssemblyName System.IO.Compression.FileSystem -ErrorAction Stop
+    } catch {
+        if (-not ('System.IO.Compression.ZipArchive' -as [type])) {
+            throw
+        }
+    }
+    try {
+        return (New-Object System.IO.Compression.ZipArchive(
+            $Buffer,
+            [System.IO.Compression.ZipArchiveMode]::Read,
+            $true
+        ))
+    } catch {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'archive-invalid' -Phase 'archive' -Subreason 'zip-open'
+    }
+}
+
 $script:scriptBlockAssertCandidateHelperArchiveEntryCount = {
     param (
         [Parameter(Mandatory = $true)]
@@ -1778,7 +1823,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.18
+    # Version: 1.0.20260803.19
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2694,41 +2739,31 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
                 -Code 'digest-mismatch' -Phase 'digest' -Subreason 'mismatch'
         }
 
-        # The End of Central Directory record carries the entry count, so the
-        # archive can be refused before ZipArchive materializes anything. That
-        # matters because accessing Entries builds one object per central
-        # directory record: a 12 MiB archive of empty entries, well inside the
-        # 32 MiB ceiling, measured 150000 objects and 54 MiB of managed heap.
-        # The cardinality check on the next lines runs far too late to stop it.
+        # The archive is obtained from a helper that cannot hand one back
+        # without having bounded the central directory first, so the ordering
+        # below is a data dependency rather than a convention someone has to
+        # remember. It used to be three statements in a row, and the order was
+        # load-bearing with nothing enforcing it.
         $strPhase = 'archive'
-        [void](& $script:scriptBlockAssertCandidateHelperArchiveEntryCount `
-            -Stream $objArchiveBuffer)
-
-        $objArchiveBuffer.Position = 0
-        Add-Type -AssemblyName System.IO.Compression -ErrorAction Stop
-        try {
-            Add-Type -AssemblyName System.IO.Compression.FileSystem -ErrorAction Stop
-        } catch {
-            if (-not ('System.IO.Compression.ZipArchive' -as [type])) {
-                throw
-            }
-        }
-        try {
-            $objZipArchive = New-Object System.IO.Compression.ZipArchive(
-                $objArchiveBuffer,
-                [System.IO.Compression.ZipArchiveMode]::Read,
-                $true
-            )
-        } catch {
-            & $script:scriptBlockStopCandidateHelperOperation `
-                -Code 'archive-invalid' -Phase 'archive' -Subreason 'zip-open'
-        }
+        $objZipArchive = & $script:scriptBlockOpenCandidateHelperValidatedArchive `
+            -Buffer $objArchiveBuffer
 
         $strPhase = 'manifest'
-        # Enumerated rather than materialized: the enumerator yields entries one
-        # at a time, so a fifth entry stops the walk instead of building the
-        # whole collection first. The declared count was already bounded above;
-        # this is the second, independent stop.
+        # This loop bounds nothing, and an earlier revision of this comment
+        # claimed it did -- "the enumerator yields entries one at a time, so a
+        # fifth entry stops the walk", called a second independent stop.
+        # ZipArchive.Entries is a ReadOnlyCollection whose getter reads the
+        # entire central directory before the first iteration runs, so breaking
+        # at five saves nothing. Measured on a 150000-entry archive of 12.66 MiB,
+        # comfortably inside the 32 MiB ceiling: 150000 objects and 50.00 MiB of
+        # managed heap on .NET 8, 52.61 MiB on .NET 10, with the break in place.
+        #
+        # The bound that actually holds is the central-directory count read from
+        # the trailer, which is why the archive can only be obtained from a
+        # helper that applies it first. The break stays because taking five
+        # references instead of 150000 is still worth having once the bytes are
+        # already parsed; it is not a second line of defence, and calling it one
+        # is what made the ordering above look optional.
         $listZipEntries = New-Object 'System.Collections.Generic.List[object]'
         foreach ($objZipEntry in $objZipArchive.Entries) {
             $listZipEntries.Add($objZipEntry)
