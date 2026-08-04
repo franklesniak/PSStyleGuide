@@ -57,7 +57,7 @@ $script:versionCandidateHarness = [System.Version]'1.0.20260803.80'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.52'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.40'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.41'
 $script:strCandidateCatalogVersion = '1.0.20260803.12'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
@@ -2045,6 +2045,9 @@ $script:arrCandidateContextPermittedCommand = [string[]]@(
     'ForEach-Object',
     'New-Object',
     'Remove-StyleGuideCandidateInvocationContext',
+    # Round 41: this file severs the names its private registers were reachable
+    # through, because a dot-sourced script creates them in the CALLER's scope.
+    'Remove-Variable',
     'Set-Item',
     'Set-StrictMode',
     'Sort-Object',
@@ -2170,7 +2173,20 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                     # the admissible set is narrowed to variables that can only
                     # ever hold a script block.
                     @($_.Group | Where-Object {
-                        $null -eq $_.Right.Find(
+                        # A script-block literal, or the variable closing over
+                        # itself. The second shape was added in round 41: a
+                        # helper that reads this file's private registers has to
+                        # carry them in a closure, or `&` resolves them at call
+                        # time against a DOT-SOURCED scope the caller shares.
+                        # `$x = $x.GetNewClosure()` cannot change what $x holds
+                        # from a script block into anything else -- the source is
+                        # the variable itself -- so it is admitted by that exact
+                        # shape rather than by naming the variable.
+                        $strRight = [string]$_.Right.Extent.Text
+                        $strSelf = [string]$_.Left.VariablePath.UserPath
+                        $boolSelfClosure = $strRight -ceq
+                            ('$' + $strSelf + '.GetNewClosure()')
+                        $boolLiteral = $null -ne $_.Right.Find(
                             {
                                 param ($objInner)
                                 $objInner -is
@@ -2178,6 +2194,7 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                             },
                             $false
                         )
+                        -not ($boolLiteral -or $boolSelfClosure)
                     }).Count -eq 0
                 } | ForEach-Object { [string]$_.Name })
 

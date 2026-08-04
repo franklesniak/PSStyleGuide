@@ -27,14 +27,14 @@ a caller that deletes first and validates afterwards has already
 deleted, so it needs a way to ask about issuance that changes nothing.
 
 .NOTES
-Version: 1.0.20260803.40
+Version: 1.0.20260803.41
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.40'
+$versionCandidateContext = [System.Version]'1.0.20260803.41'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -1748,7 +1748,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.40
+    # Version: 1.0.20260803.41
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2210,7 +2210,7 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.40
+    # Version: 1.0.20260803.41
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param (
@@ -2320,7 +2320,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.40
+    # Version: 1.0.20260803.41
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2671,6 +2671,29 @@ function Remove-StyleGuideCandidateInvocationContext {
 # unqualified private variables against that caller's dynamic scope. The test
 # function needs the closure most of all: the register and the snapshots it
 # reads are exactly those private variables.
+# Close the register-consuming helpers over the registers, LEAF FIRST, before
+# the public functions capture them.
+#
+# These four are the only scriptblocks that touch the issuance registers. They
+# are ordinary script-scoped scriptblocks, so `& $scriptBlockX` resolves the
+# registers at call time against this script's scope -- which, because this
+# file is DOT-SOURCED, is the caller's scope. Giving each one a closure makes
+# it carry the register references itself, so the names can go afterwards.
+#
+# The order is a dependency order and is not cosmetic: a closure copies the
+# variables as they stand, so a converted helper must be converted before any
+# helper that calls it, or the caller keeps the unconverted copy. Index is a
+# leaf; state and the in-memory assertion call index; context creation calls
+# all of them.
+$scriptBlockCandidateContextIssuedIndex = `
+    $scriptBlockCandidateContextIssuedIndex.GetNewClosure()
+$scriptBlockSetCandidateIssuedState = `
+    $scriptBlockSetCandidateIssuedState.GetNewClosure()
+$scriptBlockAssertCandidateInMemoryContext = `
+    $scriptBlockAssertCandidateInMemoryContext.GetNewClosure()
+$scriptBlockNewCandidateContext = `
+    $scriptBlockNewCandidateContext.GetNewClosure()
+
 $scriptBlockNewContextFunction = ${function:New-StyleGuideCandidateInvocationContext}.GetNewClosure()
 $scriptBlockRemoveContextFunction = ${function:Remove-StyleGuideCandidateInvocationContext}.GetNewClosure()
 $scriptBlockTestContextFunction = ${function:Test-StyleGuideCandidateInvocationContextIssued}.GetNewClosure()
@@ -2680,3 +2703,24 @@ $scriptBlockTestContextFunction = ${function:Test-StyleGuideCandidateInvocationC
     -Value $scriptBlockRemoveContextFunction -Force)
 [void](Set-Item -LiteralPath Function:\Test-StyleGuideCandidateInvocationContextIssued `
     -Value $scriptBlockTestContextFunction -Force)
+
+# Now take the registers out of the caller's reach.
+#
+# Measured before this change: the register variable was reachable from the
+# dot-sourcing caller's scope, and `$arrCandidateIssuedState[0] = 'Disposed'`
+# produced `cleanup-already-disposed success=True calls=0` with the invocation
+# root still on disk. No rebinding, no substitute, no concurrency -- every
+# authentication in this file rests on these three objects, so a caller that
+# can write them can forge any answer they produce.
+#
+# Removing the names leaves each closure's copy of the reference intact, so
+# one register is still shared by everything that needs it, while the caller
+# has nothing to reach it through. Done last: the closures above must already
+# hold the references, and nothing below may name them again.
+foreach ($strCandidateRegisterName in @(
+        'arrCandidateIssuedContext',
+        'arrCandidateIssuedSnapshot',
+        'arrCandidateIssuedState'
+    )) {
+    Remove-Variable -Name $strCandidateRegisterName -Force -ErrorAction SilentlyContinue
+}
