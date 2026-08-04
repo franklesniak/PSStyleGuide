@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.14
+Version: 1.0.20260803.15
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.14'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.7'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.15'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.8'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -197,20 +197,34 @@ $script:objCandidateHelperPathComparer = if ($script:boolCandidateHelperIsWindow
 }
 $script:chrCandidateHelperDirectorySeparator = [System.IO.Path]::DirectorySeparatorChar
 $script:chrCandidateHelperAlternateSeparator = [System.IO.Path]::AltDirectorySeparatorChar
-# A leaf used as an enumeration search pattern must be a literal. The set is
-# spelled out rather than taken from GetInvalidFileNameChars alone, which
-# returns only NUL and '/' on Unix and the full Windows set on Windows: a leaf
-# refused on one runtime and pattern-matched on the other would be exactly the
-# cross-platform divergence these helpers exist to avoid. Wildcards are refused
-# rather than escaped because the two-argument enumeration overload -- the only
-# one available on .NET Framework 4.8 -- offers no escaping, and because no leaf
-# reaching here can legitimately contain one: they are GetRandomFileName output
-# (alphabet '.0-5a-z', 20000 samples), the fixed manifest names, 'download', or
-# 'candidate'.
+# A leaf used as an enumeration search pattern must be a literal, and only two
+# characters are not: '*' and '?' are the sole expanding forms in the
+# two-argument overload -- the only one available on .NET Framework 4.8 -- which
+# offers no escaping, so they are refused rather than quoted. The separators are
+# refused because they would move the search off the directory being read.
+#
+# Everything else is matched literally, measured on both runtimes: ':', '\',
+# '[', ']', '"', '<' and '>' each match their own file and nothing else. An
+# earlier revision refused those too, on the theory that one character set for
+# both platforms avoided divergence. It produced divergence instead: they are
+# legal in a Unix filename, the download leaf is the one journaled name this
+# code does not choose, and an ordinary artifact called 'release:linux.zip'
+# therefore expanded successfully and then failed cleanup, leaving the
+# invocation root on disk. The rule is per-platform because what a platform can
+# name is per-platform -- GetInvalidFileNameChars is the statement of that, and
+# a leaf obtained from an enumeration cannot contain any of it.
+#
+# What a journaled path may contain is a stricter and separate question,
+# answered once by the canonical stored-path check and applied where such a path
+# is adopted. Answering it a second time here, in a differently shaped guard,
+# is what went wrong.
 $script:arrCandidateHelperRejectedMatchCharacter = [char[]]@(
     [System.IO.Path]::GetInvalidFileNameChars() +
-    [char[]]@('*', '?', '[', ']', ':', '\', '/') +
-    [char[]]@(0..31 | ForEach-Object { [char]$_ })
+    [char[]]@(
+        '*', '?',
+        [System.IO.Path]::DirectorySeparatorChar,
+        [System.IO.Path]::AltDirectorySeparatorChar
+    )
 )
 $script:scriptBlockNewCandidateHelperException = {
     param (
@@ -1689,7 +1703,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.14
+    # Version: 1.0.20260803.15
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2477,6 +2491,26 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
                 -Code 'download-invalid' -Phase 'download' -Subreason 'entry-count'
         }
         $strArchivePath = $arrDownloadEntries[0]
+        # This is the only path that ends up journaled without this code having
+        # chosen its name: every other one is a fixed leaf or GetRandomFileName
+        # output, and every caller-supplied root is checked at parameter
+        # validation. It was adopted unchecked, and the journal's own rule about
+        # what a stored path may contain was therefore first applied to it after
+        # it had been recorded -- by which point cleanup had to consult a
+        # journal holding a path it refuses. Measured on 'build[1].zip': refused
+        # at journaling, correctly, and then cleanup unable to remove what it
+        # had already created, reporting Invalid with retained=0 while the
+        # invocation root stayed on disk. The rule is not restated here; it is
+        # the same check, moved to the moment the name is adopted and ahead of
+        # any further I/O on it, so a name that cannot be journaled is refused
+        # while every journaled entry is still one this code named itself.
+        try {
+            [void](& $script:scriptBlockAssertCandidateHelperCanonicalStoredPath `
+                -Value $strArchivePath)
+        } catch {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'download-invalid' -Phase 'download' -Subreason 'entry-name'
+        }
         $uintArchiveMetadataLength = & $script:scriptBlockAssertCandidateHelperOrdinaryFileMetadata `
             -LiteralPath $strArchivePath `
             -Phase 'download'

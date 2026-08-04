@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.7
+Version: 1.0.20260803.8
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.7'
+$versionCandidateContext = [System.Version]'1.0.20260803.8'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -56,19 +56,34 @@ $objCandidatePathComparer = if ($boolCandidateIsWindows) {
 } else {
     [System.StringComparer]::Ordinal
 }
-# A leaf used as an enumeration search pattern must be a literal. The set is
-# spelled out rather than taken from GetInvalidFileNameChars alone, which
-# returns only NUL and '/' on Unix and the full Windows set on Windows: a leaf
-# refused on one runtime and pattern-matched on the other would be exactly the
-# cross-platform divergence this script exists to avoid. Wildcards are refused
-# rather than escaped because the two-argument enumeration overload -- the only
-# one available on .NET Framework 4.8 -- offers no escaping, and because no leaf
-# reaching here can legitimately contain one: they are GetRandomFileName output
-# (alphabet '.0-5a-z', 20000 samples), 'download', or 'candidate'.
+# A leaf used as an enumeration search pattern must be a literal, and only two
+# characters are not: '*' and '?' are the sole expanding forms in the
+# two-argument overload -- the only one available on .NET Framework 4.8 -- which
+# offers no escaping, so they are refused rather than quoted. The separators are
+# refused because they would move the search off the directory being read.
+#
+# Everything else is matched literally, measured on both runtimes: ':', '\',
+# '[', ']', '"', '<' and '>' each match their own file and nothing else. An
+# earlier revision refused those too, on the theory that one character set for
+# both platforms avoided divergence. It produced divergence instead: they are
+# legal in a Unix filename, the download leaf is the one journaled name this
+# code does not choose, and an ordinary artifact called 'release:linux.zip'
+# therefore expanded successfully and then failed cleanup here, leaving the
+# invocation root on disk. The rule is per-platform because what a platform can
+# name is per-platform -- GetInvalidFileNameChars is the statement of that, and
+# a leaf obtained from an enumeration cannot contain any of it.
+#
+# What a journaled path may contain is a stricter and separate question,
+# answered once by the canonical stored-path check and applied where such a path
+# is adopted. Answering it a second time here, in a differently shaped guard,
+# is what went wrong.
 $arrCandidateRejectedMatchCharacter = [char[]]@(
     [System.IO.Path]::GetInvalidFileNameChars() +
-    [char[]]@('*', '?', '[', ']', ':', '\', '/') +
-    [char[]]@(0..31 | ForEach-Object { [char]$_ })
+    [char[]]@(
+        '*', '?',
+        [System.IO.Path]::DirectorySeparatorChar,
+        [System.IO.Path]::AltDirectorySeparatorChar
+    )
 )
 $chrCandidateDirectorySeparator = [System.IO.Path]::DirectorySeparatorChar
 $chrCandidateAlternateSeparator = [System.IO.Path]::AltDirectorySeparatorChar
@@ -1210,7 +1225,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.7
+    # Version: 1.0.20260803.8
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1485,7 +1500,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.7
+    # Version: 1.0.20260803.8
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

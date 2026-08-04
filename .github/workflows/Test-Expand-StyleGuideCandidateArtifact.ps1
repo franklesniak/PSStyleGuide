@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.21
+Version: 1.0.20260803.22
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.21'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.22'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.14'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.7'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.15'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.8'
 $script:strCandidateCatalogVersion = '1.0.20260803.4'
 # The physical allocation size, stated once. It was previously two bare literals
 # inside the header check, which is why growing the catalog failed with an
@@ -1693,6 +1693,59 @@ $script:scriptBlockAssertEnumerationBoundsDeclared = {
                     -Detail ('enumeration-site-exclusive-' + $intSite + '-' + $strTargetText)
             }
         }
+    }
+}
+
+# The download entry's leaf is the only journaled name production does not
+# choose, and the filtered absence proofs made that matter: a name legal on the
+# filesystem but not legal in the journal was adopted, recorded, and only tested
+# once cleanup had to consult the record. Ordering is the whole property, so
+# ordering is what is pinned -- the stored-path rule must be applied to
+# $strArchivePath before the first call that touches it. A check that runs after
+# the metadata read, or after journaling, is the defect this asserts against,
+# and it would be invisible to a check that only asked whether the call exists.
+$script:scriptBlockAssertDownloadLeafValidatedFirst = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$HelperLiteralPath
+    )
+
+    $objErrors = $null
+    $objAst = [System.Management.Automation.Language.Parser]::ParseFile(
+        $HelperLiteralPath, [ref]$null, [ref]$objErrors)
+    if ($null -eq $objAst -or @($objErrors).Count -ne 0) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'download-leaf-parse'
+    }
+    # Every call naming $strArchivePath, in source order, paired with the
+    # scriptblock it invokes.
+    $arrCall = @($objAst.FindAll(
+            {
+                param ($objNode)
+                $objNode -is [System.Management.Automation.Language.CommandAst] -and
+                @($objNode.CommandElements).Count -gt 0 -and
+                $objNode.CommandElements[0] -is
+                    [System.Management.Automation.Language.VariableExpressionAst]
+            },
+            $true
+        )) | Sort-Object -Property { $_.Extent.StartOffset }
+    $strFirstNamingArchivePath = ''
+    foreach ($objCall in $arrCall) {
+        $boolNamesArchivePath = $false
+        for ($intIndex = 1; $intIndex -lt @($objCall.CommandElements).Count; $intIndex++) {
+            if ([string]$objCall.CommandElements[$intIndex].Extent.Text -ceq '$strArchivePath') {
+                $boolNamesArchivePath = $true
+            }
+        }
+        if ($boolNamesArchivePath) {
+            $strFirstNamingArchivePath = [string]$objCall.CommandElements[0].VariablePath.UserPath `
+                -creplace '^script:', ''
+            break
+        }
+    }
+    if ($strFirstNamingArchivePath -cne 'scriptBlockAssertCandidateHelperCanonicalStoredPath') {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+            -Detail ('download-leaf-unvalidated-' + $strFirstNamingArchivePath)
     }
 }
 
@@ -5669,7 +5722,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.21
+    # Version: 1.0.20260803.22
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -5895,6 +5948,8 @@ function Invoke-StyleGuideCandidateHarness {
         & $script:scriptBlockAssertEnumerationBoundsDeclared `
             -HelperLiteralPath $strHelperLiteralPath `
             -ContextLiteralPath $strContextLiteralPath
+        & $script:scriptBlockAssertDownloadLeafValidatedFirst `
+            -HelperLiteralPath $strHelperLiteralPath
         & $script:scriptBlockAssertLifecycleRecordStatesRejected -RunRoot $strRunRoot
         & $script:scriptBlockAssertResourceGuardsReached `
             -LiteralPath $strHelperLiteralPath `
