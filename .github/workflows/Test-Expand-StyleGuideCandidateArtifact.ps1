@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.77
+Version: 1.0.20260803.78
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,12 +53,12 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.77'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.78'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.49'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.39'
-$script:strCandidateCatalogVersion = '1.0.20260803.11'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.50'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.40'
+$script:strCandidateCatalogVersion = '1.0.20260803.12'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
 # outstanding read finish.
@@ -3858,10 +3858,39 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
             [void](& $scriptBlockSetCandidateIssuedState `
                 -Context $objContext `
                 -State ([string]$hashtableScenario.LifecycleState))
+            # A context that says Disposed while its tree is still on disk is
+            # not a disposed context, it is the forgery round 37 closed -- and
+            # the helper now refuses it, correctly. This scenario is about the
+            # record-state table, not about that forgery, so its disposed rows
+            # are made genuinely disposed: the entries the records call Deleted
+            # are actually deleted. The forgery itself is asserted separately.
+            if (([string]$hashtableScenario.LifecycleState) -ceq 'Disposed') {
+                foreach ($strDisposedPath in @(
+                    [string]$objContext.DownloadDirectoryPath,
+                    [string]$objContext.InvocationRootPath
+                )) {
+                    if ([System.IO.Directory]::Exists($strDisposedPath)) {
+                        [System.IO.Directory]::Delete($strDisposedPath, $false)
+                    }
+                }
+            }
 
+            # A terminal REFUSAL still costs nothing. A terminal SUCCESS
+            # through the helper now costs exactly one call, because round 37
+            # made every success it reports prove the invocation root is gone
+            # -- it no longer answers already-disposed from a property it read
+            # and a verifier it resolved by name. The manager's own entry point
+            # still costs nothing, because it authenticates against a register
+            # rather than against the filesystem. Stated as an exact expected
+            # count per entry point rather than relaxed to "0 or 1", so a call
+            # appearing where none belongs is still a failure.
+            $uintExpectedCalls = if (
+                $strEntryPoint -ceq 'Remove-StyleGuideCandidateInvocationState' -and
+                ([string]$hashtableScenario.ExpectedDiagnosticCode) -ceq 'cleanup-already-disposed'
+            ) { [uint32]1 } else { [uint32]0 }
             $objResult = & $strEntryPoint -Context $objContext
             if ($objResult.DiagnosticCode -cne $hashtableScenario.ExpectedDiagnosticCode -or
-                $objResult.FilesystemCallCount -ne [uint32]0) {
+                $objResult.FilesystemCallCount -ne $uintExpectedCalls) {
                 & $script:scriptBlockStopHarness `
                     -Code 'orchestration-failed' -Detail 'lifecycle-record-state'
             }
@@ -7713,7 +7742,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.77
+    # Version: 1.0.20260803.78
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()

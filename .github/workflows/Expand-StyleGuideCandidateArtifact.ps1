@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.49
+Version: 1.0.20260803.50
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.49'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.39'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.50'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.40'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -2097,7 +2097,11 @@ function Remove-StyleGuideCandidateInvocationState {
     # $objRepeatResult = Remove-StyleGuideCandidateInvocationState `
     #     -Context $objContext
     #
-    # # A valid disposed repeat succeeds with FilesystemCallCount equal to zero.
+    # # A valid disposed repeat succeeds with FilesystemCallCount equal to one:
+    # # the call that proves the invocation root really is gone. It used to
+    # # cost zero, answered from a property read and a verifier resolved by
+    # # name -- which a substitute could answer, so the cheap answer was also
+    # # an unprovable one.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
@@ -2109,7 +2113,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.49
+    # Version: 1.0.20260803.50
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2207,27 +2211,25 @@ function Remove-StyleGuideCandidateInvocationState {
             -RetainedRecordSequences ([uint32[]]@()))
     }
 
-    if ($strPreviousState -eq 'Disposed') {
-        return (& $script:scriptBlockNewCandidateHelperCleanupResult `
-            -InvocationId $guidInvocationId `
-            -PreviousState 'Disposed' `
-            -FinalState 'Disposed' `
-            -Success $true `
-            -DiagnosticCode 'cleanup-already-disposed' `
-            -ReferenceToFilesystemCallCount ([uint32]0) `
-            -RetainedRecordSequences ([uint32[]]@()))
-    }
-    if ($strPreviousState -eq 'CleanupFailed') {
-        $arrRetained = & $script:scriptBlockGetCandidateHelperRetainedSequence -ContextValue $Context
-        return (& $script:scriptBlockNewCandidateHelperCleanupResult `
-            -InvocationId $guidInvocationId `
-            -PreviousState 'CleanupFailed' `
-            -FinalState 'CleanupFailed' `
-            -Success $false `
-            -DiagnosticCode 'cleanup-terminal-failure' `
-            -ReferenceToFilesystemCallCount ([uint32]0) `
-            -RetainedRecordSequences $arrRetained)
-    }
+    # NO TERMINAL BRANCH HERE. This function used to answer already-disposed
+    # and terminal-failure itself, from a property it read and a verifier it
+    # resolved by name. Measured: with a substitute answering true for a
+    # caller-mutated terminal context, that returned
+    #
+    #   cleanup-already-disposed success=True calls=0
+    #   ROOT STILL ON DISK: True
+    #
+    # A terminal success is the most valuable answer an attacker can get --
+    # it costs nothing, does nothing, and stops the caller retrying -- so it
+    # must not be produced by anything that can be replaced. The manager
+    # answers both cases from the plan it validated and the register only it
+    # can read, and the retained sequences come from that plan rather than
+    # from a rescan of a journal nothing authenticates.
+    #
+    # The cost is real and is called out rather than absorbed: a disposed
+    # repeat no longer costs zero filesystem calls, because the consequence
+    # proof below runs on every reported success. The old contract traded a
+    # provable answer for a cheap one.
 
     try {
         # Prove the trusted context-manager cleanup function is loaded before any
@@ -2287,6 +2289,8 @@ function Remove-StyleGuideCandidateInvocationState {
         # proof pass over a tree that is still there -- the check would confirm
         # the absence of a path nobody ever created. The captured value is the
         # one that was validated at entry, and a string cannot be repointed.
+        # Every reported success, including a disposed repeat. Success means
+        # the invocation root is gone, whoever says so and whenever it went.
         if ($objContextResult.Success) {
             $uintFilesystemCallCount = [uint32]($uintFilesystemCallCount + 1)
             [void](& $script:scriptBlockAssertCandidateHelperEntryAbsent `
