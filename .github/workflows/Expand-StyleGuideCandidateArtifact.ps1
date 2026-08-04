@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.23
+Version: 1.0.20260803.24
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.23'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.24'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.11'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -1535,8 +1535,25 @@ $script:scriptBlockGetCandidateHelperIdentityChain = {
         # the alternative where GetLongPathName is unavailable, and it needs no
         # P/Invoke, no compiler, and no elevation.
         #
-        # Wildcards would otherwise be read as a pattern here, and are already
-        # refused for every path parameter that reaches this function.
+        # The component read goes through the shared enumeration helper rather
+        # than calling the framework directly. An earlier revision called
+        # Directory.EnumerateDirectories here, which put the read outside every
+        # bound this script maintains: the pinned site table matches calls to
+        # the helper, so a static framework call is not merely unpinned but
+        # invisible to it. Measured -- rewriting this read to list the whole
+        # parent and post-filter in the pipeline left the suite green at 113
+        # passes and zero failures, reinstating the unbounded per-ancestor read
+        # that rounds 15 through 17 removed everywhere else.
+        #
+        # Routing it here buys the run-time guard as well as the static one. The
+        # component is a search pattern, and only '*' and '?' expand in the
+        # two-argument overload; a parent holding exactly one subdirectory
+        # answers a '*' component with Count 1, so the check below passes and
+        # the canonical spelling names a DIFFERENT directory than the one asked
+        # about -- a wrong identity rather than a refusal. Every path parameter
+        # reaching this function is wildcard-checked on the way in, so that is
+        # unreachable today, but it was true only by a claim about callers. The
+        # helper refuses the leaf itself, which is a property of this read.
         $listWindowsComponent = New-Object 'System.Collections.Generic.List[string]'
         $objWalk = New-Object System.IO.DirectoryInfo($LiteralPath)
         while ($null -ne $objWalk.Parent) {
@@ -1545,16 +1562,10 @@ $script:scriptBlockGetCandidateHelperIdentityChain = {
         }
         $strCanonical = [string]$objWalk.FullName
         for ($intComponent = $listWindowsComponent.Count - 1; $intComponent -ge 0; $intComponent--) {
-            $arrMatch = @()
-            try {
-                $arrMatch = @([System.IO.Directory]::EnumerateDirectories(
-                    $strCanonical,
-                    $listWindowsComponent[$intComponent]
-                ))
-            } catch {
-                & $script:scriptBlockStopCandidateHelperOperation `
-                    -Code 'root-invalid' -Phase 'root' -Subreason 'identity'
-            }
+            $strComponentName = [string]$listWindowsComponent[$intComponent]
+            $arrMatch = @(& $script:scriptBlockGetCandidateHelperEntry `
+                    -LiteralPath $strCanonical -Phase 'root' `
+                    -MatchPath $strComponentName)
             if ($arrMatch.Count -ne 1) {
                 & $script:scriptBlockStopCandidateHelperOperation `
                     -Code 'root-invalid' -Phase 'root' -Subreason 'identity'
@@ -1647,16 +1658,18 @@ $script:scriptBlockGetCandidateHelperEntryIdentity = {
         if ($null -eq $objEntry.Parent) {
             return ([string]$objEntry.FullName + $strIdentityAttributes)
         }
-        $arrMatch = @()
-        try {
-            $arrMatch = @([System.IO.Directory]::EnumerateDirectories(
-                [string]$objEntry.Parent.FullName,
-                [string]$objEntry.Name
-            ))
-        } catch {
-            & $script:scriptBlockStopCandidateHelperOperation `
-                -Code "$Phase-invalid" -Phase $Phase -Subreason 'identity'
-        }
+        # Through the shared helper for the same reason the chain walk above is:
+        # a direct framework call is outside the pinned site table and outside
+        # the bounded-or-filtered rule the table encodes. The attribute read
+        # above has already established that this leaf is an ordinary directory,
+        # so listing entries rather than directories cannot widen what matches
+        # -- a file and a directory of one name cannot share a parent -- and the
+        # exact-count check below is unchanged.
+        $strEntryParent = [string]$objEntry.Parent.FullName
+        $strEntryName = [string]$objEntry.Name
+        $arrMatch = @(& $script:scriptBlockGetCandidateHelperEntry `
+                -LiteralPath $strEntryParent -Phase $Phase `
+                -MatchPath $strEntryName)
         if ($arrMatch.Count -ne 1) {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code "$Phase-invalid" -Phase $Phase -Subreason 'identity'
@@ -1907,7 +1920,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.23
+    # Version: 1.0.20260803.24
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

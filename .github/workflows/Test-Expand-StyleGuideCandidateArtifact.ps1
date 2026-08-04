@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.33
+Version: 1.0.20260803.34
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,10 +53,10 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.33'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.34'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.23'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.24'
 $script:strCandidateExpectedContextVersion = '1.0.20260803.11'
 $script:strCandidateCatalogVersion = '1.0.20260803.4'
 # The physical allocation size, stated once. It was previously two bare literals
@@ -1751,6 +1751,8 @@ $script:arrCandidateContextEnumerationSite = @(
     @{ Target = '$objRecord.ParentPath'; Bound = $null; Match = '$objRecord.Path' }
 )
 $script:arrCandidateHelperEnumerationSite = @(
+    @{ Target = '$strCanonical'; Bound = $null; Match = '$strComponentName' },
+    @{ Target = '$strEntryParent'; Bound = $null; Match = '$strEntryName' },
     @{ Target = '$Context.CandidatePath'
         Bound = '($arrOwnedCandidateFiles.Count + 1)'; Match = $null },
     @{ Target = '$Context.CandidatePath'; Bound = $null; Match = '$objRecord.Path' },
@@ -1856,6 +1858,112 @@ $script:scriptBlockAssertEnumerationBoundsDeclared = {
             if (($null -eq $objExpectedBound) -eq ($null -eq $objExpectedMatch)) {
                 & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                     -Detail ('enumeration-site-exclusive-' + $intSite + '-' + $strTargetText)
+            }
+        }
+    }
+}
+
+# The table above governs calls to the enumeration helpers. It says nothing
+# about a directory listing that does not go through one, and for two rounds it
+# could not have: the check matches CommandAst nodes naming a helper, so a
+# static [System.IO.Directory]::EnumerateDirectories call is not an unpinned
+# site but an invisible one. Two of those sat in the Windows identity
+# resolution. Measured -- rewriting one of them to list the whole parent and
+# post-filter in the pipeline left the suite at 113 passes and zero failures,
+# reinstating the unbounded read the table exists to refuse, one file away from
+# the table itself.
+#
+# Adding a second table for direct calls would have pinned the two that exist
+# and nothing about the third someone writes later, so the rule here is
+# exclusivity instead: a directory listing may appear ONLY inside an enumeration
+# helper's own definition. That makes the site table complete by construction --
+# every remaining listing is a helper call, and every helper call is a row --
+# and it is the difference between detecting this defect and being unable to
+# spell it.
+#
+# Matching is by member NAME rather than by receiver type, because the receiver
+# is what varies: Directory::EnumerateFiles and a DirectoryInfo instance's
+# EnumerateFiles list the same directory and only one of them names a type the
+# parser can resolve. Get-ChildItem is included with its shipped aliases for the
+# same reason -- the escape from a rule about one spelling is another spelling.
+$script:strCandidateListingMemberPattern =
+    '^(Enumerate|Get)(Directories|Files|FileSystemEntries|FileSystemInfos)$'
+$script:arrCandidateListingCommandName = [string[]]@(
+    'Get-ChildItem', 'gci', 'dir', 'ls'
+)
+$script:scriptBlockAssertEnumerationPrimitiveExclusive = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$HelperLiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ContextLiteralPath
+    )
+
+    foreach ($strScriptPath in @($HelperLiteralPath, $ContextLiteralPath)) {
+        $objErrors = $null
+        $objAst = [System.Management.Automation.Language.Parser]::ParseFile(
+            $strScriptPath, [ref]$null, [ref]$objErrors)
+        if ($null -eq $objAst -or @($objErrors).Count -ne 0) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' -Detail 'enumeration-primitive-parse'
+        }
+        # The helper's own definition is the one region a listing may occupy.
+        # Finding it by the same name list the site table uses keeps the two
+        # checks from disagreeing about what a helper is.
+        $arrDefinition = @($objAst.FindAll(
+                {
+                    param ($objNode)
+                    $objNode -is
+                        [System.Management.Automation.Language.AssignmentStatementAst] -and
+                    $objNode.Left -is
+                        [System.Management.Automation.Language.VariableExpressionAst] -and
+                    $script:arrCandidateEnumerationScriptBlockName -ccontains
+                        ($objNode.Left.VariablePath.UserPath -creplace '^script:', '')
+                },
+                $true
+            ))
+        if (@($arrDefinition).Count -ne 1) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('enumeration-primitive-definition-' + @($arrDefinition).Count)
+        }
+        $intDefinitionStart = [int]@($arrDefinition)[0].Extent.StartOffset
+        $intDefinitionEnd = [int]@($arrDefinition)[0].Extent.EndOffset
+
+        $arrListing = @($objAst.FindAll(
+                {
+                    param ($objNode)
+                    if ($objNode -is
+                        [System.Management.Automation.Language.InvokeMemberExpressionAst]) {
+                        $strMember = ''
+                        if ($objNode.Member -is
+                            [System.Management.Automation.Language.StringConstantExpressionAst]) {
+                            $strMember = [string]$objNode.Member.Value
+                        } else {
+                            $strMember = [string]$objNode.Member.Extent.Text
+                        }
+                        return ($strMember -match $script:strCandidateListingMemberPattern)
+                    }
+                    if ($objNode -is
+                        [System.Management.Automation.Language.CommandAst]) {
+                        $strCommand = [string]$objNode.GetCommandName()
+                        return ($null -ne $strCommand -and
+                            $script:arrCandidateListingCommandName -icontains $strCommand)
+                    }
+                    return $false
+                },
+                $true
+            ))
+        if (@($arrListing).Count -eq 0) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' -Detail 'enumeration-primitive-absent'
+        }
+        foreach ($objListing in @($arrListing)) {
+            if ([int]$objListing.Extent.StartOffset -lt $intDefinitionStart -or
+                [int]$objListing.Extent.EndOffset -gt $intDefinitionEnd) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                    -Detail ('enumeration-primitive-escaped-' +
+                        [string]$objListing.Extent.StartLineNumber)
             }
         }
     }
@@ -6039,7 +6147,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.33
+    # Version: 1.0.20260803.34
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -6263,6 +6371,9 @@ function Invoke-StyleGuideCandidateHarness {
             -Catalog $objCatalog `
             -RunRoot $strRunRoot
         & $script:scriptBlockAssertEnumerationBoundsDeclared `
+            -HelperLiteralPath $strHelperLiteralPath `
+            -ContextLiteralPath $strContextLiteralPath
+        & $script:scriptBlockAssertEnumerationPrimitiveExclusive `
             -HelperLiteralPath $strHelperLiteralPath `
             -ContextLiteralPath $strContextLiteralPath
         & $script:scriptBlockAssertDownloadPathProvenance `
