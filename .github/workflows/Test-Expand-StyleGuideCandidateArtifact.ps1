@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.60
+Version: 1.0.20260803.61
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.60'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.61'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.35'
@@ -2037,6 +2037,12 @@ $script:arrCandidateContextPermittedSetItemPath = [string[]]@(
     'Function:\New-StyleGuideCandidateInvocationContext',
     'Function:\Remove-StyleGuideCandidateInvocationContext'
 )
+# And what may be written to them. The destination was pinned a round before
+# the payload was, which left the half that actually runs unexamined.
+$script:arrCandidateContextPermittedSetItemValue = [string[]]@(
+    'scriptBlockNewContextFunction',
+    'scriptBlockRemoveContextFunction'
+)
 # Every member either script invokes, by name. This is an allow-list because
 # the surface is enumerable and was measured to be: 48 names in the helper and
 # 44 in the context manager, none of them computed. The deny-lists above match
@@ -2089,11 +2095,15 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
         @{ Path = $HelperLiteralPath
             Command = $script:arrCandidateHelperPermittedCommand
             Member = $script:arrCandidateHelperPermittedMember
-            SetItemPath = [string[]]@() },
+            SetItemPath = [string[]]@()
+            SetItemValue = [string[]]@()
+            SingleUseMember = @{ GetResolvedProviderPathFromPSPath = 0 } },
         @{ Path = $ContextLiteralPath
             Command = $script:arrCandidateContextPermittedCommand
             Member = $script:arrCandidateContextPermittedMember
-            SetItemPath = $script:arrCandidateContextPermittedSetItemPath }
+            SetItemPath = $script:arrCandidateContextPermittedSetItemPath
+            SetItemValue = $script:arrCandidateContextPermittedSetItemValue
+            SingleUseMember = @{ GetResolvedProviderPathFromPSPath = 1 } }
     )
     foreach ($hashtableSurface in $arrScriptSurface) {
         $strScriptPath = [string]$hashtableSurface.Path
@@ -2230,6 +2240,68 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                     & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                         -Detail ('set-item-target-not-permitted-' +
                             [string]$objCommand.Extent.StartLineNumber)
+                }
+                # Pinning only the destination left the payload unexamined, and
+                # the payload is the half that runs. `-Value ([scriptblock]::
+                # Create('Get-Item -Path "$dir/*"'))` spends only the permitted
+                # Set-Item and the permitted Create, and the command inside the
+                # string is not in the parsed tree for any rule here to see. So
+                # the value must be one of the closure variables production
+                # actually assigns -- a literal, traceable target, not an
+                # expression that can build one.
+                $strSetItemValue = ''
+                for ($intElement = 1
+                    $intElement -lt $arrSetItemElement.Count
+                    $intElement++) {
+                    $objElement = $arrSetItemElement[$intElement]
+                    if ($objElement -isnot
+                        [System.Management.Automation.Language.CommandParameterAst]) {
+                        continue
+                    }
+                    if (([string]$objElement.ParameterName) -cne 'Value') {
+                        continue
+                    }
+                    $objValue = $objElement.Argument
+                    if ($null -eq $objValue -and
+                        ($intElement + 1) -lt $arrSetItemElement.Count) {
+                        $objValue = $arrSetItemElement[$intElement + 1]
+                    }
+                    if ($objValue -is
+                        [System.Management.Automation.Language.VariableExpressionAst]) {
+                        $strSetItemValue =
+                            [string]$objValue.VariablePath.UserPath -creplace '^script:', ''
+                    }
+                    break
+                }
+                if ($strSetItemValue.Length -eq 0 -or
+                    @($hashtableSurface.SetItemValue) -cnotcontains $strSetItemValue) {
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                        -Detail ('set-item-value-not-permitted-' +
+                            [string]$objCommand.Extent.StartLineNumber)
+                }
+            }
+            if ($strCommandName -ceq 'ForEach-Object') {
+                # ForEach-Object names a member as DATA. Piping a DirectoryInfo
+                # to `-MemberName EnumerateFileSystemInfos` invokes that member
+                # and emits the whole directory, and the parse tree holds no
+                # InvokeMemberExpressionAst and no listing name outside a string
+                # -- so the member allow-list, the listing pattern and the
+                # helper-region rule all see nothing. Production uses only the
+                # bare script-block form, whose contents these same checks walk,
+                # so that is the whole permitted shape: any parameter at all is
+                # refused rather than -MemberName being named and blocked, which
+                # is the deny-list mistake this file has already made twice.
+                #
+                # Sort-Object and Where-Object were checked for the same
+                # property and do not have it: -Property reads a value, it does
+                # not invoke a member, and production passes it a literal name.
+                foreach ($objElement in @($objCommand.CommandElements)) {
+                    if ($objElement -is
+                        [System.Management.Automation.Language.CommandParameterAst]) {
+                        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                            -Detail ('foreach-object-parameter-not-permitted-' +
+                                [string]$objCommand.Extent.StartLineNumber)
+                    }
                 }
             }
             # Add-Type is the one permitted command that can introduce member
@@ -2383,6 +2455,36 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
             & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                 -Detail ('reflection-not-permitted-' +
                     [string]$objReflection.Extent.StartLineNumber)
+        }
+        # Members that are on the allow-list and still read a directory. Being
+        # known is not the same as being safe: GetResolvedProviderPathFromPSPath
+        # expands a wildcard into the entries it matches, so a second call
+        # anywhere is an unbounded directory read that spells no listing name
+        # and matches no listing pattern. Production needs exactly one, behind
+        # the wildcard guard, so the count is what is pinned -- a rule about
+        # where it may appear would have to name a region, and a name is what
+        # keeps getting respelled around here.
+        foreach ($strBoundedMember in @($hashtableSurface.SingleUseMember.Keys)) {
+            $intUse = @($objAst.FindAll(
+                    {
+                        param ($objNode)
+                        if ($objNode -isnot
+                            [System.Management.Automation.Language.InvokeMemberExpressionAst]) {
+                            return $false
+                        }
+                        if ($objNode.Member -isnot
+                            [System.Management.Automation.Language.StringConstantExpressionAst]) {
+                            return $false
+                        }
+                        return (([string]$objNode.Member.Value) -ceq $strBoundedMember)
+                    },
+                    $true
+                )).Count
+            if ($intUse -ne [int]$hashtableSurface.SingleUseMember[$strBoundedMember]) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                    -Detail ('bounded-member-count-' + $strBoundedMember + '-' +
+                        [string]$intUse)
+            }
         }
         # Every invoked member, against the allow-list. The two patterns above
         # are deny-lists: they name mechanisms, and a deny-list can only refuse
@@ -2903,6 +3005,94 @@ $script:scriptBlockAssertArchiveLengthReadOnce = {
     }
 }
 
+$script:scriptBlockResolveCandidateArgumentType = {
+    param (
+        [AllowNull()]
+        [object]$Argument,
+
+        [Parameter(Mandatory = $true)]
+        [hashtable]$VariableType
+    )
+
+    # Round 28's rule read argument types only from variables, which made the
+    # signature check indeterminate the moment an argument was written inline --
+    # and indeterminate means "proven by name and arity only". Name and arity
+    # are exactly what the round-28 ACL defect satisfied, so inlining
+    # `New-Object DirectoryInfo(...)` at that call would have re-admitted it.
+    # The AST settles these forms as surely as it settles an assignment, so
+    # they are read rather than skipped.
+    if ($null -eq $Argument) {
+        return ''
+    }
+    # ([T]::new(...)) and (New-Object T) arrive wrapped in parentheses when
+    # written as an argument, so the wrapper is stepped through first.
+    $objInner = $Argument
+    while ($objInner -is
+        [System.Management.Automation.Language.ParenExpressionAst]) {
+        $objInner = $objInner.Pipeline
+        if ($objInner -is [System.Management.Automation.Language.PipelineAst]) {
+            $arrElement = @($objInner.PipelineElements)
+            if ($arrElement.Count -ne 1) {
+                return ''
+            }
+            $objInner = $arrElement[0]
+        }
+        if ($objInner -is
+            [System.Management.Automation.Language.CommandExpressionAst]) {
+            $objInner = $objInner.Expression
+        }
+    }
+    if ($objInner -is
+        [System.Management.Automation.Language.VariableExpressionAst]) {
+        $strVariable = [string]$objInner.VariablePath.UserPath
+        if ($VariableType.ContainsKey($strVariable)) {
+            return [string]$VariableType[$strVariable]
+        }
+        return ''
+    }
+    if ($objInner -is
+        [System.Management.Automation.Language.ConvertExpressionAst]) {
+        # A cast states the type outright.
+        return [string]$objInner.Type.TypeName.FullName
+    }
+    if ($objInner -is
+        [System.Management.Automation.Language.InvokeMemberExpressionAst] -and
+        $objInner.Static -and
+        $objInner.Expression -is
+        [System.Management.Automation.Language.TypeExpressionAst] -and
+        $objInner.Member -is
+        [System.Management.Automation.Language.StringConstantExpressionAst] -and
+        ([string]$objInner.Member.Value) -ceq 'new') {
+        return [string]$objInner.Expression.TypeName.FullName
+    }
+    if ($objInner -is
+        [System.Management.Automation.Language.CommandAst] -and
+        ([string]$objInner.GetCommandName()) -ceq 'New-Object') {
+        $arrElements = @($objInner.CommandElements)
+        for ($intIndex = 1; $intIndex -lt $arrElements.Count; $intIndex++) {
+            if ($arrElements[$intIndex] -is
+                [System.Management.Automation.Language.StringConstantExpressionAst]) {
+                return [string]$arrElements[$intIndex].Value
+            }
+        }
+        return ''
+    }
+    if ($objInner -is
+        [System.Management.Automation.Language.StringConstantExpressionAst] -or
+        $objInner -is
+        [System.Management.Automation.Language.ExpandableStringExpressionAst]) {
+        return 'System.String'
+    }
+    if ($objInner -is
+        [System.Management.Automation.Language.ConstantExpressionAst]) {
+        if ($null -eq $objInner.Value) {
+            return ''
+        }
+        return [string]$objInner.StaticType.FullName
+    }
+    return ''
+}
+
 $script:scriptBlockAssertStaticMembersResolve = {
     param (
         [Parameter(Mandatory = $true)]
@@ -3081,14 +3271,9 @@ $script:scriptBlockAssertStaticMembersResolve = {
             $arrArgumentType = New-Object System.Collections.ArrayList
             $boolTyped = $true
             foreach ($objArgument in $arrArgument) {
-                $strArgumentType = ''
-                if ($objArgument -is
-                    [System.Management.Automation.Language.VariableExpressionAst]) {
-                    $strVariable = [string]$objArgument.VariablePath.UserPath
-                    if ($hashVariableType.ContainsKey($strVariable)) {
-                        $strArgumentType = [string]$hashVariableType[$strVariable]
-                    }
-                }
+                $strArgumentType = & $script:scriptBlockResolveCandidateArgumentType `
+                    -Argument $objArgument `
+                    -VariableType $hashVariableType
                 if ($strArgumentType.Length -eq 0) {
                     $boolTyped = $false
                     break
@@ -7112,7 +7297,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.60
+    # Version: 1.0.20260803.61
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
