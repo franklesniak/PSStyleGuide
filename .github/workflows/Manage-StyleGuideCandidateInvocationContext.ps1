@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.16
+Version: 1.0.20260803.17
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.16'
+$versionCandidateContext = [System.Version]'1.0.20260803.17'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -98,6 +98,8 @@ $intCandidateMaximumEntryCeiling = 64
 # The documented label ceiling, and the longest path either platform can name.
 $intCandidateMaximumLabelLength = 128
 $intCandidateMaximumPathLength = 32767
+# Fixed buffer for bounded hashing, so the read never sizes itself from a file.
+$intCandidateHashBuffer = 65536
 $intCandidateCreationAttemptMaximum = 16
 $arrCandidateStatPath = [string[]]@(
     '/usr/bin/stat',
@@ -1346,12 +1348,53 @@ $scriptBlockGetCandidateFileEvidence = {
                     Sha256 = ''
                 }
             }
+            # Exactly the validated number of bytes, and not one more.
+            # ComputeHash reads a stream to EOF, and EOF is not where the
+            # journal said the file ended -- it is wherever the file happens to
+            # end when the read gets there. Measured: a file validated at 1,024
+            # bytes, appended to by another writer, had ComputeHash consume
+            # 201,327,616 bytes. Worse than the volume, a writer that keeps
+            # ahead of the reader moves EOF for as long as it likes, so the read
+            # need never finish at all.
+            #
+            # Hashing the validated prefix is also the more correct answer: the
+            # journal describes that many bytes, so that is what the digest
+            # should attest. This is the same defect the archive allocation had
+            # a round earlier, in a second place, which is what comes of fixing
+            # one instance of a class without sweeping for its siblings. The
+            # bounded loop below is the idiom this file already uses in three
+            # other places.
             $objSha256 = [System.Security.Cryptography.SHA256]::Create()
             try {
-                $strHash = (
-                    [System.BitConverter]::ToString($objSha256.ComputeHash($objStream)) -replace
-                        '-', ''
-                ).ToLowerInvariant()
+                $arrHashBuffer = New-Object byte[] $intCandidateHashBuffer
+                $uintHashRemaining = $uintLength
+                while ($uintHashRemaining -gt 0) {
+                    $intHashWanted = if ($uintHashRemaining -lt [uint64]$arrHashBuffer.Length) {
+                        [int]$uintHashRemaining
+                    } else {
+                        $arrHashBuffer.Length
+                    }
+                    $intHashRead = $objStream.Read($arrHashBuffer, 0, $intHashWanted)
+                    if ($intHashRead -le 0) {
+                        throw 'truncated'
+                    }
+                    [void]$objSha256.TransformBlock($arrHashBuffer, 0, $intHashRead, $null, 0)
+                    $uintHashRemaining -= [uint64]$intHashRead
+                }
+                [void]$objSha256.TransformFinalBlock((New-Object byte[] 0), 0, 0)
+                # One byte past the validated end. A file that still has more to
+                # give is no longer the file the journal describes, and the
+                # empty digest is the shape the caller already treats as a
+                # mismatch, so no new failure path is needed.
+                if ($objStream.Read($arrHashBuffer, 0, 1) -gt 0) {
+                    return [ordered]@{
+                        Length = $uintLength
+                        Sha256 = ''
+                    }
+                }
+                $strHash = ([System.BitConverter]::ToString(
+                    $objSha256.Hash
+                ) -replace '-', '').ToLowerInvariant()
             } finally {
                 $objSha256.Dispose()
             }
@@ -1406,7 +1449,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.16
+    # Version: 1.0.20260803.17
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1681,7 +1724,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.16
+    # Version: 1.0.20260803.17
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

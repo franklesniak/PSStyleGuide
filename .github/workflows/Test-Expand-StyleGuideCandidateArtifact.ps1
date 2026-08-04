@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.45
+Version: 1.0.20260803.46
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.45'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.46'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.30'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.16'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.31'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.17'
 $script:strCandidateCatalogVersion = '1.0.20260803.5'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
@@ -2100,6 +2100,45 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
             & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                 -Detail ('dynamic-member-not-permitted-' +
                     [string]$objDynamic.Extent.StartLineNumber)
+        }
+        # ComputeHash handed a stream is refused. It reads to EOF, and EOF is
+        # wherever the file happens to end when the read arrives rather than
+        # where the journal said it ended -- measured, a file validated at 1,024
+        # bytes had 201,327,616 consumed, and a writer that keeps ahead of the
+        # reader moves the end for as long as it likes. Both evidence helpers
+        # now hash exactly the validated count through the bounded TransformBlock
+        # idiom this file already used in three other places.
+        #
+        # The single-argument form is what does this; ComputeHash over a byte
+        # array is bounded by the array and stays permitted. That distinction is
+        # the rule, so it is what gets compared -- pinning the loop's shape
+        # instead would be satisfied by any editor who rewrote the loop.
+        foreach ($objHashCall in @($objAst.FindAll(
+                    {
+                        param ($objNode)
+                        if ($objNode -isnot
+                            [System.Management.Automation.Language.InvokeMemberExpressionAst]) {
+                            return $false
+                        }
+                        $strMember = if ($objNode.Member -is
+                            [System.Management.Automation.Language.StringConstantExpressionAst]) {
+                            [string]$objNode.Member.Value
+                        } else {
+                            ''
+                        }
+                        if ($strMember -cne 'ComputeHash') {
+                            return $false
+                        }
+                        # One argument whose name says stream: the array form
+                        # takes an array, and the offset form takes three.
+                        return (@($objNode.Arguments).Count -eq 1 -and
+                            [string]$objNode.Arguments[0].Extent.Text -imatch 'stream')
+                    },
+                    $true
+                ))) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('stream-hash-not-permitted-' +
+                    [string]$objHashCall.Extent.StartLineNumber)
         }
         # A prose format string for stat is refused outright. The behavioural
         # probe elsewhere in this harness proves the regular-file proof decides
@@ -6506,7 +6545,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.45
+    # Version: 1.0.20260803.46
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()

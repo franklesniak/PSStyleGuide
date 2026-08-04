@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.30
+Version: 1.0.20260803.31
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.30'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.16'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.31'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.17'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -202,6 +202,8 @@ $script:intCandidateHelperMaximumEntryCeiling = 64
 # The documented label ceiling, and the longest path either platform can name.
 $script:intCandidateHelperMaximumLabelLength = 128
 $script:intCandidateHelperMaximumPathLength = 32767
+# Fixed buffer for bounded hashing, so the read never sizes itself from a file.
+$script:intCandidateHelperHashBuffer = 65536
 $script:chrCandidateHelperDirectorySeparator = [System.IO.Path]::DirectorySeparatorChar
 $script:chrCandidateHelperAlternateSeparator = [System.IO.Path]::AltDirectorySeparatorChar
 # A leaf used as an enumeration search pattern must be a literal, and only two
@@ -1886,12 +1888,53 @@ $script:scriptBlockGetCandidateHelperFileEvidence = {
                     Sha256 = ''
                 }
             }
+            # Exactly the validated number of bytes, and not one more.
+            # ComputeHash reads a stream to EOF, and EOF is not where the
+            # journal said the file ended -- it is wherever the file happens to
+            # end when the read gets there. Measured: a file validated at 1,024
+            # bytes, appended to by another writer, had ComputeHash consume
+            # 201,327,616 bytes. Worse than the volume, a writer that keeps
+            # ahead of the reader moves EOF for as long as it likes, so the read
+            # need never finish at all.
+            #
+            # Hashing the validated prefix is also the more correct answer: the
+            # journal describes that many bytes, so that is what the digest
+            # should attest. This is the same defect the archive allocation had
+            # a round earlier, in a second place, which is what comes of fixing
+            # one instance of a class without sweeping for its siblings. The
+            # bounded loop below is the idiom this file already uses in three
+            # other places.
             $objSha256 = [System.Security.Cryptography.SHA256]::Create()
             try {
-                $strSha256 = (
-                    [System.BitConverter]::ToString($objSha256.ComputeHash($objStream)) -replace
-                        '-', ''
-                ).ToLowerInvariant()
+                $arrHashBuffer = New-Object byte[] $script:intCandidateHelperHashBuffer
+                $uintHashRemaining = $uintLength
+                while ($uintHashRemaining -gt 0) {
+                    $intHashWanted = if ($uintHashRemaining -lt [uint64]$arrHashBuffer.Length) {
+                        [int]$uintHashRemaining
+                    } else {
+                        $arrHashBuffer.Length
+                    }
+                    $intHashRead = $objStream.Read($arrHashBuffer, 0, $intHashWanted)
+                    if ($intHashRead -le 0) {
+                        throw 'truncated'
+                    }
+                    [void]$objSha256.TransformBlock($arrHashBuffer, 0, $intHashRead, $null, 0)
+                    $uintHashRemaining -= [uint64]$intHashRead
+                }
+                [void]$objSha256.TransformFinalBlock((New-Object byte[] 0), 0, 0)
+                # One byte past the validated end. A file that still has more to
+                # give is no longer the file the journal describes, and the
+                # empty digest is the shape the caller already treats as a
+                # mismatch, so no new failure path is needed.
+                if ($objStream.Read($arrHashBuffer, 0, 1) -gt 0) {
+                    return [ordered]@{
+                        Length = $uintLength
+                        Sha256 = ''
+                    }
+                }
+                $strSha256 = ([System.BitConverter]::ToString(
+                    $objSha256.Hash
+                ) -replace '-', '').ToLowerInvariant()
             } finally {
                 $objSha256.Dispose()
             }
@@ -2047,7 +2090,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.30
+    # Version: 1.0.20260803.31
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
