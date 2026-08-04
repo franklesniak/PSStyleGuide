@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.55
+Version: 1.0.20260803.56
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.55'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.56'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.35'
@@ -2027,6 +2027,54 @@ $script:arrCandidateContextPermittedCommand = [string[]]@(
     'Sort-Object',
     'Where-Object'
 )
+# Set-Item can rebind a NAME. Production uses it for exactly two Function:
+# paths, so those two are the whole permitted surface. Without this,
+# `Set-Item Variable:x 'Get-Item'` mutates an admitted script-block variable
+# through the provider without producing an assignment for the reaching-value
+# rule to see, and `& $x -Path "$dir/*"` is then a permitted nameless call that
+# performs an unbounded listing.
+$script:arrCandidateContextPermittedSetItemPath = [string[]]@(
+    'Function:\New-StyleGuideCandidateInvocationContext',
+    'Function:\Remove-StyleGuideCandidateInvocationContext'
+)
+# Every member either script invokes, by name. This is an allow-list because
+# the surface is enumerable and was measured to be: 48 names in the helper and
+# 44 in the context manager, none of them computed. The deny-lists above match
+# what a listing or a reflection call is CALLED, which can only ever enumerate
+# mechanisms someone thought of -- and two were missed. Commands supplied as
+# data to [System.Management.Automation.PowerShell] reach a listing without
+# naming one: Create, AddCommand('Get-Item'), AddParameter('Path', "$dir/*"),
+# Invoke. Of those, only Create appears below, so the chain cannot be written.
+# The same closes $ExecutionContext.InvokeCommand.InvokeScript(...), which no
+# deny-list here mentioned either.
+#
+# Adding a member to production means adding it here. That is the cost of an
+# allow-list and it is the point: a new name is a deliberate act, reviewed,
+# rather than something that arrives with a refactor.
+$script:arrCandidateHelperPermittedMember = [string[]]@(
+    'Add', 'Append', 'Combine', 'ComputeHash', 'Contains', 'ContainsKey',
+    'ContainsWildcardCharacters', 'Copy', 'Create', 'CreateDirectory',
+    'Delete', 'Dispose', 'EnumerateFileSystemEntries', 'Equals', 'Exists',
+    'Flush', 'GetAttributes', 'GetEnumerator', 'GetFileName', 'GetFullPath',
+    'GetInvalidFileNameChars', 'GetType', 'IndexOf', 'IndexOfAny', 'Insert',
+    'IsControl', 'IsLetter', 'IsNullOrWhiteSpace', 'IsPathRooted', 'Min',
+    'MoveNext', 'NewGuid', 'Open', 'Read', 'ReadAllLines', 'Split',
+    'StartsWith', 'Substring', 'ToArray', 'ToCharArray', 'ToInt32',
+    'ToLowerInvariant', 'ToString', 'TransformBlock', 'TransformFinalBlock',
+    'TrimEnd', 'Write', 'WriteAllBytes'
+)
+$script:arrCandidateContextPermittedMember = [string[]]@(
+    'Add', 'AddAccessRule', 'Combine', 'Contains', 'ContainsKey',
+    'ContainsWildcardCharacters', 'Create', 'CreateDirectory', 'Delete',
+    'Dispose', 'EnumerateFileSystemEntries', 'Equals', 'GetAttributes',
+    'GetCurrent', 'GetEnumerator', 'GetFileName', 'GetFullPath',
+    'GetInvalidFileNameChars', 'GetNewClosure', 'GetRandomFileName',
+    'GetResolvedProviderPathFromPSPath', 'GetType', 'IndexOf', 'IndexOfAny',
+    'Insert', 'IsControl', 'IsLetter', 'IsNullOrWhiteSpace', 'IsPathRooted',
+    'MoveNext', 'NewGuid', 'Read', 'SetAccessRuleProtection', 'Split',
+    'Substring', 'ToArray', 'ToCharArray', 'ToInt32', 'ToLowerInvariant',
+    'ToObject', 'ToString', 'TransformBlock', 'TransformFinalBlock', 'TrimEnd'
+)
 $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
     param (
         [Parameter(Mandatory = $true)]
@@ -2038,9 +2086,13 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
 
     $arrScriptSurface = @(
         @{ Path = $HelperLiteralPath
-            Command = $script:arrCandidateHelperPermittedCommand },
+            Command = $script:arrCandidateHelperPermittedCommand
+            Member = $script:arrCandidateHelperPermittedMember
+            SetItemPath = [string[]]@() },
         @{ Path = $ContextLiteralPath
-            Command = $script:arrCandidateContextPermittedCommand }
+            Command = $script:arrCandidateContextPermittedCommand
+            Member = $script:arrCandidateContextPermittedMember
+            SetItemPath = $script:arrCandidateContextPermittedSetItemPath }
     )
     foreach ($hashtableSurface in $arrScriptSurface) {
         $strScriptPath = [string]$hashtableSurface.Path
@@ -2140,6 +2192,44 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                 & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                     -Detail ('command-not-permitted-' + $strCommandName + '-' +
                         [string]$objCommand.Extent.StartLineNumber)
+            }
+            if ($strCommandName -ceq 'Set-Item') {
+                # Set-Item is the one permitted command that rebinds a name, and
+                # a rebound name is invisible to every rule that reads source.
+                # Its target must therefore be a literal from the permitted set:
+                # a non-literal path, or any path outside that set, is refused
+                # whatever provider it names.
+                $strSetItemPath = ''
+                $arrSetItemElement = @($objCommand.CommandElements)
+                for ($intElement = 1
+                    $intElement -lt $arrSetItemElement.Count
+                    $intElement++) {
+                    $objElement = $arrSetItemElement[$intElement]
+                    if ($objElement -isnot
+                        [System.Management.Automation.Language.CommandParameterAst]) {
+                        continue
+                    }
+                    if (([string]$objElement.ParameterName) -cne 'LiteralPath' -and
+                        ([string]$objElement.ParameterName) -cne 'Path') {
+                        continue
+                    }
+                    $objValue = $objElement.Argument
+                    if ($null -eq $objValue -and
+                        ($intElement + 1) -lt $arrSetItemElement.Count) {
+                        $objValue = $arrSetItemElement[$intElement + 1]
+                    }
+                    if ($objValue -is
+                        [System.Management.Automation.Language.StringConstantExpressionAst]) {
+                        $strSetItemPath = [string]$objValue.Value
+                    }
+                    break
+                }
+                if ($strSetItemPath.Length -eq 0 -or
+                    @($hashtableSurface.SetItemPath) -cnotcontains $strSetItemPath) {
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                        -Detail ('set-item-target-not-permitted-' +
+                            [string]$objCommand.Extent.StartLineNumber)
+                }
             }
             # Add-Type is the one permitted command that can introduce member
             # names no rule above has heard of. Every other entry on the list
@@ -2292,6 +2382,40 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
             & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                 -Detail ('reflection-not-permitted-' +
                     [string]$objReflection.Extent.StartLineNumber)
+        }
+        # Every invoked member, against the allow-list. The two patterns above
+        # are deny-lists: they name mechanisms, and a deny-list can only refuse
+        # the mechanisms someone thought of. Two got past them -- an embedded
+        # [System.Management.Automation.PowerShell] taking its command as data,
+        # and $ExecutionContext.InvokeCommand.InvokeScript -- and neither
+        # spells a listing or a reflection name anywhere. This asks the
+        # opposite question, which the deny-lists cannot: is this member one
+        # the production scripts are known to use?
+        #
+        # They are kept alongside rather than replaced. Both still fire first
+        # and say precisely what was wrong, which an allow-list rejection
+        # cannot; this one only reports that a name was not on the list.
+        foreach ($objMember in @($objAst.FindAll(
+                    {
+                        param ($objNode)
+                        return ($objNode -is
+                            [System.Management.Automation.Language.InvokeMemberExpressionAst])
+                    },
+                    $true
+                ))) {
+            # A computed member name is already refused elsewhere, and it has no
+            # name to test here, so it is left to that rule rather than reported
+            # twice under a less specific one.
+            if ($objMember.Member -isnot
+                [System.Management.Automation.Language.StringConstantExpressionAst]) {
+                continue
+            }
+            $strMemberName = [string]$objMember.Member.Value
+            if (@($hashtableSurface.Member) -cnotcontains $strMemberName) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                    -Detail ('member-not-permitted-' + $strMemberName + '-' +
+                        [string]$objMember.Extent.StartLineNumber)
+            }
         }
         # The helper's own definition is the one region a listing may occupy.
         # Finding it by the same name list the site table uses keeps the two
@@ -6987,7 +7111,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.55
+    # Version: 1.0.20260803.56
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
