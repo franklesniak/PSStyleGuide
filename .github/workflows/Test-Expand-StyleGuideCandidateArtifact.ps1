@@ -2394,9 +2394,15 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                     # A variable target is admitted only when every literal
                     # reaching it in this file is a register name -- which is
                     # how production spells it, looping over the three.
+                    # A SPLAT is refused outright rather than traced. Its
+                    # contents are a hashtable assembled anywhere, so there is
+                    # no literal set to check -- and the variable-target branch
+                    # below would find no loop over it and admit the call having
+                    # checked nothing. Self-found while auditing this rule.
                     $strTargetName = ''
                     if ($objTarget -is
-                        [System.Management.Automation.Language.VariableExpressionAst]) {
+                        [System.Management.Automation.Language.VariableExpressionAst] -and
+                        -not $objTarget.Splatted) {
                         $strTargetName = [string]$objTarget.VariablePath.UserPath
                     }
                     if ($strTargetName.Length -eq 0) {
@@ -2404,6 +2410,14 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                             -Detail ('remove-variable-target-not-permitted-' +
                                 [string]$objCommand.Extent.StartLineNumber)
                     }
+                    # A source must actually be FOUND. The first version only
+                    # checked loops that happened to match, and never failed
+                    # when none did -- so `$name = 'scriptBlockFoo';
+                    # Remove-Variable -Name $name` unbound an invocation target
+                    # with nothing checked. Absence of evidence was being read
+                    # as evidence, in a rule whose whole job is to refuse what
+                    # it cannot account for.
+                    $boolSourceFound = $false
                     foreach ($objLoop in @($objAst.FindAll(
                                 {
                                     param ($objNode)
@@ -2415,6 +2429,7 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                         if (([string]$objLoop.Variable.VariablePath.UserPath) -cne $strTargetName) {
                             continue
                         }
+                        $boolSourceFound = $true
                         foreach ($objLiteral in @($objLoop.Condition.FindAll(
                                     {
                                         param ($objNode)
@@ -2429,6 +2444,11 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                                         [string]$objLoop.Extent.StartLineNumber)
                             }
                         }
+                    }
+                    if (-not $boolSourceFound) {
+                        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                            -Detail ('remove-variable-source-not-found-' +
+                                [string]$objCommand.Extent.StartLineNumber)
                     }
                 }
             }
@@ -2528,9 +2548,22 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                 # Sort-Object and Where-Object were checked for the same
                 # property and do not have it: -Property reads a value, it does
                 # not invoke a member, and production passes it a literal name.
-                foreach ($objElement in @($objCommand.CommandElements)) {
+                # Every element after the command name, not just parameters.
+                # ForEach-Object's simplified syntax binds a POSITIONAL string
+                # to -MemberName -- `ForEach-Object EnumerateFileSystemInfos`
+                # has no parameter node at all, so a rule that rejected only
+                # CommandParameterAst would let it through and invoke the very
+                # listing member the member allow-list exists to exclude.
+                # Production passes exactly one argument here, a script block,
+                # so anything else is refused.
+                $arrForEachElement = @($objCommand.CommandElements)
+                for ($intForEach = 1; $intForEach -lt $arrForEachElement.Count; $intForEach++) {
+                    $objElement = $arrForEachElement[$intForEach]
                     if ($objElement -is
-                        [System.Management.Automation.Language.CommandParameterAst]) {
+                        [System.Management.Automation.Language.ScriptBlockExpressionAst]) {
+                        continue
+                    }
+                    if ($true) {
                         & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                             -Detail ('foreach-object-parameter-not-permitted-' +
                                 [string]$objCommand.Extent.StartLineNumber)
@@ -2545,16 +2578,39 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
             # [ShadowLister]::Walk(...), performed an unbounded directory read
             # and left the suite green at 113 passes.
             #
-            # Requiring -AssemblyName is enough on its own, because the
-            # code-bearing parameters belong to other parameter sets and cannot
-            # be combined with it. Both real uses load an assembly by name.
+            # Requiring -AssemblyName keeps the code-bearing parameter sets out,
+            # but it does not bound WHICH assembly is loaded, and -AssemblyName
+            # accepts wildcards and falls back to the current location. A loaded
+            # type can then expose a member the allow-list already permits by
+            # name -- Create, say -- and do work no rule can tell from a
+            # framework call, with no -TypeDefinition anywhere. So the two
+            # literal names production uses are pinned, and a variable or a
+            # wildcard in their place is refused.
             if ($strCommandName -ceq 'Add-Type') {
+                $arrPermittedAssembly = [string[]]@(
+                    'System.IO.Compression',
+                    'System.IO.Compression.FileSystem'
+                )
                 $boolAssemblyName = $false
-                foreach ($objElement in $objCommand.CommandElements) {
-                    if ($objElement -is
-                        [System.Management.Automation.Language.CommandParameterAst] -and
-                        $objElement.ParameterName -ceq 'AssemblyName') {
-                        $boolAssemblyName = $true
+                $arrAddTypeElement = @($objCommand.CommandElements)
+                for ($intAdd = 1; $intAdd -lt $arrAddTypeElement.Count; $intAdd++) {
+                    $objPreviousAdd = $arrAddTypeElement[$intAdd - 1]
+                    if (-not ($objPreviousAdd -is
+                            [System.Management.Automation.Language.CommandParameterAst] -and
+                            ([string]$objPreviousAdd.ParameterName) -ceq 'AssemblyName')) {
+                        continue
+                    }
+                    $boolAssemblyName = $true
+                    $objAssembly = $arrAddTypeElement[$intAdd]
+                    $strAssembly = ''
+                    if ($objAssembly -is
+                        [System.Management.Automation.Language.StringConstantExpressionAst]) {
+                        $strAssembly = [string]$objAssembly.Value
+                    }
+                    if ($arrPermittedAssembly -cnotcontains $strAssembly) {
+                        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                            -Detail ('add-type-assembly-not-permitted-' +
+                                [string]$objCommand.Extent.StartLineNumber)
                     }
                 }
                 if (-not $boolAssemblyName) {
