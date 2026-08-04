@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.27
+Version: 1.0.20260803.28
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.27'
+$versionCandidateContext = [System.Version]'1.0.20260803.28'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -58,6 +58,21 @@ $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # the default comparer decides equality by asking the objects -- which is the
 # question this register exists to stop asking.
 $arrCandidateIssuedContext = New-Object System.Collections.ArrayList
+# What was issued, beside WHICH object was issued. The reference alone answers
+# the wrong question. A context is a mutable PSCustomObject held by its caller,
+# so registering the reference authenticated the container while every field
+# that decides what cleanup deletes stayed writable through it. Measured: after
+# New- returned, rewriting the four paths and the journal record paths on that
+# same object made cleanup delete a tree this manager never created, and report
+# cleanup-succeeded with Success true.
+#
+# These are the fields that may never legitimately change after issuance. The
+# journal's states, lengths, digests, count and next sequence all move during a
+# normal run and are governed by the schema checks instead.
+#
+# Parallel to the register by index, and held as strings, which .NET does not
+# allow anyone to mutate in place.
+$arrCandidateIssuedSnapshot = New-Object System.Collections.ArrayList
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
 # The same ceilings the expansion helper enforces. They are restated rather
@@ -707,7 +722,33 @@ $scriptBlockNewCandidateContext = {
     # it is stated rather than defaulted: the default for PSCustomObject would
     # compare by value and readmit the clone this register exists to exclude.
     [void]$arrCandidateIssuedContext.Add($objContext)
+    [void]$arrCandidateIssuedSnapshot.Add(
+        (& $scriptBlockNewCandidateIssuanceSnapshot -Context $objContext))
     return $objContext
+}
+
+$scriptBlockNewCandidateIssuanceSnapshot = {
+    param (
+        [AllowNull()]
+        [object]$Context
+    )
+
+    # Length-prefixed rather than delimiter-joined. A path may legitimately
+    # contain any byte but NUL, a newline included, so any separator could be
+    # written inside one field to impersonate two -- a caller who controls the
+    # paths controls the encoding, and an encoding a caller controls proves
+    # nothing. With the length in front there is exactly one way to read it.
+    $strSnapshot = ''
+    foreach ($strField in @(
+            [string]$Context.InvocationId,
+            [string]$Context.TrustedParentPath,
+            [string]$Context.InvocationRootPath,
+            [string]$Context.DownloadDirectoryPath,
+            [string]$Context.CandidatePath
+        )) {
+        $strSnapshot += [string]$strField.Length + ':' + $strField
+    }
+    return $strSnapshot
 }
 
 $scriptBlockCandidateContextIssuedIndex = {
@@ -1234,8 +1275,20 @@ $scriptBlockAssertCandidateInMemoryContext = {
     # [System.IO.Directory]::Delete without involving this script at all. The
     # claim being repaired is the function's own contract -- it removes what
     # this manager created -- which was approximate and is now exact.
-    if ((& $scriptBlockCandidateContextIssuedIndex -Context $Context) -lt 0) {
+    $intIssuedIndex = & $scriptBlockCandidateContextIssuedIndex -Context $Context
+    if ($intIssuedIndex -lt 0) {
         throw 'cleanup-context-unissued'
+    }
+    # Being the issued object is not the same as still describing what was
+    # issued. Round 28 registered the reference and stopped there, which
+    # authenticated the container and left its contents writable by the caller
+    # holding it -- so the paths cleanup acts on could be repointed after
+    # issuance while the reference stayed the one on the register. This
+    # compares what the context says now against what it said when it was
+    # handed out.
+    if (([string]$arrCandidateIssuedSnapshot[$intIssuedIndex]) -cne
+        [string](& $scriptBlockNewCandidateIssuanceSnapshot -Context $Context)) {
+        throw 'cleanup-context-altered'
     }
 }
 
@@ -1558,7 +1611,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.27
+    # Version: 1.0.20260803.28
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1977,7 +2030,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.27
+    # Version: 1.0.20260803.28
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2012,8 +2065,10 @@ function Remove-StyleGuideCandidateInvocationContext {
         # than not declaring it: the catalogue would describe a refusal nothing
         # can produce.
         $strContextFailureCode = 'cleanup-context-invalid'
-        if (([string]$_.Exception.Message) -ceq 'cleanup-context-unissued') {
-            $strContextFailureCode = 'cleanup-context-unissued'
+        foreach ($strOwnCode in @('cleanup-context-unissued', 'cleanup-context-altered')) {
+            if (([string]$_.Exception.Message) -ceq $strOwnCode) {
+                $strContextFailureCode = $strOwnCode
+            }
         }
         return (& $scriptBlockNewCandidateCleanupResult `
             -InvocationId $guidInvocationId `
