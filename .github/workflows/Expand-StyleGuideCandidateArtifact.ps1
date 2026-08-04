@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.44
+Version: 1.0.20260803.45
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.44'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.34'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.45'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.35'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -2109,7 +2109,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.44
+    # Version: 1.0.20260803.45
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2198,13 +2198,6 @@ function Remove-StyleGuideCandidateInvocationState {
     }
 
     try {
-        $objCandidateDirectoryRecord = @($Context.OwnershipJournal | Where-Object {
-            $_.Kind -eq 'CandidateDirectory'
-        })[0]
-        $arrCandidateFileRecords = @($Context.OwnershipJournal | Where-Object {
-            $_.Kind -eq 'CandidateFile'
-        })
-
         # Prove the trusted context-manager cleanup function is loaded before any
         # filesystem work. Deleting candidate entries first and only then finding
         # the caller cleanup missing would destroy owned state that this function
@@ -2216,144 +2209,20 @@ function Remove-StyleGuideCandidateInvocationState {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'cleanup-context-invalid' -Phase 'cleanup' -Subreason 'context-manager-not-loaded'
         }
-        # And the same reasoning one step further: knowing the cleanup function
-        # is loaded is not knowing this context is one it will accept. Every
-        # check above reads the context the CALLER supplied -- including the
-        # recorded lengths and digests, which are supplied by the same caller as
-        # the paths they authenticate, so they prove self-consistency and not
-        # authenticity. Only the manager knows what it issued.
+        # The candidate directory and its files are removed by the context
+        # manager now, not here. This function used to enumerate, prove
+        # evidence, delete, and only then hand the remainder over -- which put
+        # every one of those deletions ahead of the only place issuance is
+        # proven. Three rounds were spent trying to let this side authenticate
+        # first: a name check, then a reported-file check, then a behavioural
+        # challenge. Each was defeated, because everything this script resolves
+        # lives in a session the caller controls.
         #
-        # It is asked here, while the filesystem is still untouched, because the
-        # deletions below run before this function reaches
-        # Remove-StyleGuideCandidateInvocationContext. A refusal that arrives
-        # after the entries are gone is a report, not a protection.
-        $arrIssuanceCommands = @(
-            Get-Command -Name Test-StyleGuideCandidateInvocationContextIssued `
-                -CommandType Function -ErrorAction SilentlyContinue
-        )
-        if ($arrIssuanceCommands.Count -ne 1) {
-            & $script:scriptBlockStopCandidateHelperOperation `
-                -Code 'cleanup-context-invalid' -Phase 'cleanup' -Subreason 'context-manager-not-loaded'
-        }
-        # The verifier is challenged, not inspected. Round 30 compared its
-        # ScriptBlock.File against the cleanup function's, and that comparison
-        # is worthless: ParseInput TAKES the filename as an argument, so
-        # `Parser::ParseInput($code, <the manager's path>, ...)` followed by
-        # GetScriptBlock produces a block that reports the genuine path and
-        # returns whatever the caller wants -- measured on .NET 8 and .NET 10,
-        # the round-30 binding passed while the substitute answered true for
-        # the string 'anything'. Authenticating reported metadata authenticates
-        # a claim rather than a thing.
-        #
-        # What a substitute cannot copy is the genuine verifier's ANSWERS,
-        # because those come from a register it cannot read. A context this
-        # manager cannot have issued must be refused, so asking about one
-        # separates a real verifier from a blanket yes.
-        #
-        # This is a sanity check and not an authentication boundary, and the
-        # difference is written down rather than left to be discovered: a
-        # substitute that answers false for anything unfamiliar and true for
-        # its own context passes this. It cannot be closed from here. The
-        # helper runs inside a session the caller controls, where every name is
-        # rebindable, so nothing it resolves can be trusted to be what it says.
-        # The guarantee that holds is in the manager, which authenticates
-        # against its own register and consults no verifier at all -- see the
-        # Known gaps entry, and the note there on moving deletion into the
-        # manager so that no verifier need exist.
-        $objCandidateIssuanceProbe = [pscustomobject]@{
-            CandidateNeverIssued = $true
-        }
-        if (Test-StyleGuideCandidateInvocationContextIssued `
-                -Context $objCandidateIssuanceProbe) {
-            & $script:scriptBlockStopCandidateHelperOperation `
-                -Code 'cleanup-context-invalid' -Phase 'cleanup' -Subreason 'context-manager-not-loaded'
-        }
-        if (-not (Test-StyleGuideCandidateInvocationContextIssued -Context $Context)) {
-            & $script:scriptBlockStopCandidateHelperOperation `
-                -Code 'cleanup-context-invalid' -Phase 'cleanup' -Subreason 'context-unissued'
-        }
-
-        if ($objCandidateDirectoryRecord.EntryState -eq 'Created') {
-            [void](& $script:scriptBlockAssertCandidateHelperDirectoryEnvelope `
-                -LiteralPath $Context.CandidatePath `
-                -Phase 'cleanup' `
-                -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount))
-            # The expectation comes from the journal, which costs no I/O, so it
-            # is available before the directory is read and can bound the read.
-            $arrOwnedCandidateFiles = @($arrCandidateFileRecords | Where-Object {
-                $_.EntryState -eq 'Created'
-            })
-            $arrCandidateEntries = [string[]]@(
-                & $script:scriptBlockGetCandidateHelperEntry `
-                    -LiteralPath $Context.CandidatePath `
-                    -Phase 'cleanup' `
-                    -MaximumEntry ($arrOwnedCandidateFiles.Count + 1) `
-                    -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
-            )
-            if ($arrCandidateEntries.Count -ne $arrOwnedCandidateFiles.Count) {
-                & $script:scriptBlockStopCandidateHelperOperation `
-                    -Code 'cleanup-owned-entry-uncertain' -Phase 'cleanup' -Subreason 'candidate-cardinality'
-            }
-            foreach ($objRecord in $arrOwnedCandidateFiles) {
-                if (-not (& $script:scriptBlockTestCandidateHelperEntryPresent `
-                    -EntryList $arrCandidateEntries `
-                    -ExpectedPath $objRecord.Path)) {
-                    & $script:scriptBlockStopCandidateHelperOperation `
-                        -Code 'cleanup-owned-entry-uncertain' -Phase 'cleanup' -Subreason 'candidate-entry'
-                }
-                $hashtableEvidence = & $script:scriptBlockGetCandidateHelperFileEvidence `
-                    -LiteralPath $objRecord.Path `
-                    -Phase 'cleanup' `
-                    -ExpectedLength ([uint64]$objRecord.ContentLength) `
-                    -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
-                if ($hashtableEvidence.Length -ne $objRecord.ContentLength -or
-                    $hashtableEvidence.Sha256 -cne $objRecord.ContentSha256) {
-                    & $script:scriptBlockStopCandidateHelperOperation `
-                        -Code 'cleanup-owned-entry-uncertain' -Phase 'cleanup' -Subreason 'candidate-identity'
-                }
-            }
-
-            $arrToDelete = @($arrOwnedCandidateFiles | Sort-Object -Property Sequence -Descending)
-            foreach ($objRecord in $arrToDelete) {
-                $uintFilesystemCallCount = [uint32]($uintFilesystemCallCount + 1)
-                [System.IO.File]::Delete($objRecord.Path)
-                $arrRemaining = [string[]]@(
-                    & $script:scriptBlockGetCandidateHelperEntry `
-                        -LiteralPath $Context.CandidatePath `
-                        -Phase 'cleanup' `
-                        -MatchPath $objRecord.Path `
-                        -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
-                )
-                if (& $script:scriptBlockTestCandidateHelperEntryPresent `
-                    -EntryList $arrRemaining `
-                    -ExpectedPath $objRecord.Path) {
-                    & $script:scriptBlockStopCandidateHelperOperation `
-                        -Code 'cleanup-delete-failed' -Phase 'cleanup' -Subreason 'candidate-file-present'
-                }
-                $objRecord.EntryState = 'Deleted'
-            }
-
-            $uintFilesystemCallCount = [uint32]($uintFilesystemCallCount + 1)
-            [System.IO.Directory]::Delete($Context.CandidatePath, $false)
-            $arrRootEntries = [string[]]@(
-                & $script:scriptBlockGetCandidateHelperEntry `
-                    -LiteralPath $Context.InvocationRootPath `
-                    -Phase 'cleanup' `
-                    -MatchPath $Context.CandidatePath `
-                    -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
-            )
-            if (& $script:scriptBlockTestCandidateHelperEntryPresent `
-                -EntryList $arrRootEntries `
-                -ExpectedPath $Context.CandidatePath) {
-                & $script:scriptBlockStopCandidateHelperOperation `
-                    -Code 'cleanup-delete-failed' -Phase 'cleanup' -Subreason 'candidate-directory-present'
-            }
-            $objCandidateDirectoryRecord.EntryState = 'Deleted'
-        } elseif ($objCandidateDirectoryRecord.EntryState -eq 'ExpectedAbsent' -and
-            $arrCandidateFileRecords.Count -ne 0) {
-            & $script:scriptBlockStopCandidateHelperOperation `
-                -Code 'cleanup-context-invalid' -Phase 'cleanup' -Subreason 'candidate-journal'
-        }
+        # So the deletions moved to the authority instead of the authority
+        # being re-checked here. The issuance challenge that used to stand in
+        # front of them is gone with them: it guarded work this function no
+        # longer performs, and a check whose subject has been removed is
+        # decoration that reads like protection.
 
         $objContextResult = Remove-StyleGuideCandidateInvocationContext -Context $Context
         $uintCombinedCalls = [uint32]($uintFilesystemCallCount + $objContextResult.FilesystemCallCount)

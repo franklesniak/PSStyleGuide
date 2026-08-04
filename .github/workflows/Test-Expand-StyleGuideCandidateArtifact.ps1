@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.72
+Version: 1.0.20260803.73
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,12 +53,12 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.72'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.73'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.44'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.34'
-$script:strCandidateCatalogVersion = '1.0.20260803.9'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.45'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.35'
+$script:strCandidateCatalogVersion = '1.0.20260803.10'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
 # outstanding read finish.
@@ -1279,9 +1279,12 @@ $script:scriptBlockAssertDirectoryReadsBounded = {
     # caught one addition that would otherwise have slipped past unrecorded.
     # Context gained a fifth bounded site when round 16 found its invocation-root
     # cleanup read deriving its expected set after the read instead of before it.
+    # Round 32 moved the candidate-cleanup read from the helper to the context
+    # manager along with the deletions it bounded, so the helper is one lower
+    # and the context one higher than before.
     $hashtableBoundedSite = [ordered]@{
-        $LiteralPath = [int]4
-        $ContextLiteralPath = [int]5
+        $LiteralPath = [int]3
+        $ContextLiteralPath = [int]6
     }
     foreach ($strScriptPath in $hashtableBoundedSite.Keys) {
         $objSiteTokens = $null
@@ -1839,6 +1842,8 @@ $script:arrCandidateContextEnumerationSite = @(
         Bound = '($listExpectedRootEntries.Count + 1)'; Match = $null },
     @{ Target = '$Context.DownloadDirectoryPath'
         Bound = '($arrDownloadRecords.Count + 1)'; Match = $null },
+    @{ Target = '$Context.CandidatePath'
+        Bound = '($arrOwnedCandidateFiles.Count + 1)'; Match = $null },
     # Captured strings rather than record properties, since round 32: a record
     # is a property bag on a caller-held object, and a getter that answers
     # differently on each read makes a checked path and a deleted path two
@@ -1849,10 +1854,8 @@ $script:arrCandidateContextEnumerationSite = @(
 $script:arrCandidateHelperEnumerationSite = @(
     @{ Target = '$strCanonical'; Bound = $null; Match = '$strComponentName' },
     @{ Target = '$strEntryParent'; Bound = $null; Match = '$strEntryName' },
-    @{ Target = '$Context.CandidatePath'
-        Bound = '($arrOwnedCandidateFiles.Count + 1)'; Match = $null },
-    @{ Target = '$Context.CandidatePath'; Bound = $null; Match = '$objRecord.Path' },
-    @{ Target = '$Context.InvocationRootPath'; Bound = $null; Match = '$Context.CandidatePath' },
+    # The three candidate-cleanup sites moved to the context manager in round
+    # 32, with the deletions they served.
     @{ Target = '$ParentPath'; Bound = $null; Match = '$ExpectedPath' },
     @{ Target = '$strDownloadPath'; Bound = '2'; Match = $null },
     @{ Target = '$strCandidatePath'; Bound = '1'; Match = $null },
@@ -7386,7 +7389,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.72
+    # Version: 1.0.20260803.73
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()

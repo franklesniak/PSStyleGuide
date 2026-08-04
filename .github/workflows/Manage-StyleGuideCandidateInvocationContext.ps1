@@ -27,14 +27,14 @@ a caller that deletes first and validates afterwards has already
 deleted, so it needs a way to ask about issuance that changes nothing.
 
 .NOTES
-Version: 1.0.20260803.34
+Version: 1.0.20260803.35
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.34'
+$versionCandidateContext = [System.Version]'1.0.20260803.35'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -1675,7 +1675,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.34
+    # Version: 1.0.20260803.35
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2099,7 +2099,7 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.34
+    # Version: 1.0.20260803.35
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param (
@@ -2177,7 +2177,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.34
+    # Version: 1.0.20260803.35
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2250,13 +2250,12 @@ function Remove-StyleGuideCandidateInvocationContext {
     }
 
     try {
-        foreach ($objRecord in $Context.OwnershipJournal) {
-            if ($objRecord.Kind -in @('CandidateDirectory', 'CandidateFile') -and
-                $objRecord.EntryState -eq 'Created') {
-                & $scriptBlockStopCandidateOperation -Code 'cleanup-candidate-owned' `
-                    -Message 'PSStyleGuide.Context.v1|phase=cleanup|reason=candidate-owned'
-            }
-        }
+        # This used to refuse a context whose candidate entries were still
+        # Created, because clearing them was the caller's job and arriving here
+        # with them present meant the caller had skipped a step. Round 32 made
+        # them this function's job, so their presence is now the ordinary case
+        # rather than an error. cleanup-candidate-owned stays declared in the
+        # taxonomy and unreachable; no catalog row asserted it.
 
         [void](& $scriptBlockAssertCandidateOrdinaryDirectoryEnvelope `
             -LiteralPath $Context.TrustedParentPath `
@@ -2340,6 +2339,62 @@ function Remove-StyleGuideCandidateInvocationContext {
             }
         }
 
+        # The candidate directory and its files, checked here rather than by the
+        # caller. They used to be the helper's: it enumerated, proved evidence,
+        # deleted, and only afterwards handed the rest to this function -- which
+        # is where issuance is proven. Three rounds were spent trying to let the
+        # helper authenticate first, and each attempt was defeated, because the
+        # helper resolves this manager by name in a session the caller controls.
+        # The answer was not a better check but a smaller surface: the entity
+        # that authenticates is now the entity that deletes, so there is no
+        # verifier left to substitute.
+        $objCandidateDirectoryRecord = @($Context.OwnershipJournal | Where-Object {
+            $_.Kind -eq 'CandidateDirectory'
+        })[0]
+        $arrCandidateFileRecords = @($Context.OwnershipJournal | Where-Object {
+            $_.Kind -eq 'CandidateFile'
+        })
+        if ($objCandidateDirectoryRecord.EntryState -eq 'Created') {
+            [void](& $scriptBlockAssertCandidateOrdinaryDirectoryEnvelope `
+                -LiteralPath $Context.CandidatePath `
+                -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount))
+            $arrOwnedCandidateFiles = @($arrCandidateFileRecords | Where-Object {
+                $_.EntryState -eq 'Created'
+            })
+            $arrCandidateEntries = [string[]]@(
+                & $scriptBlockGetCandidateImmediateEntry `
+                    -LiteralPath $Context.CandidatePath `
+                    -MaximumEntry ($arrOwnedCandidateFiles.Count + 1) `
+                    -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
+            )
+            if ($arrCandidateEntries.Count -ne $arrOwnedCandidateFiles.Count) {
+                & $scriptBlockStopCandidateOperation -Code 'cleanup-owned-entry-uncertain' `
+                    -Message 'PSStyleGuide.Context.v1|phase=cleanup|reason=candidate-cardinality'
+            }
+            foreach ($objRecord in $arrOwnedCandidateFiles) {
+                $strCandidateEntryPath = [string]$objRecord.Path
+                if (-not (& $scriptBlockTestCandidateEntryPresent `
+                    -EntryList $arrCandidateEntries `
+                    -ExpectedPath $strCandidateEntryPath)) {
+                    & $scriptBlockStopCandidateOperation -Code 'cleanup-owned-entry-uncertain' `
+                        -Message 'PSStyleGuide.Context.v1|phase=cleanup|reason=candidate-entry'
+                }
+                $hashtableEvidence = & $scriptBlockGetCandidateFileEvidence `
+                    -LiteralPath $strCandidateEntryPath `
+                    -ExpectedLength ([uint64]$objRecord.ContentLength) `
+                    -ReferenceToFilesystemCallCount ([ref]$uintFilesystemCallCount)
+                if ($hashtableEvidence.Length -ne $objRecord.ContentLength -or
+                    $hashtableEvidence.Sha256 -cne $objRecord.ContentSha256) {
+                    & $scriptBlockStopCandidateOperation -Code 'cleanup-owned-entry-uncertain' `
+                        -Message 'PSStyleGuide.Context.v1|phase=cleanup|reason=candidate-identity'
+                }
+            }
+        } elseif ($objCandidateDirectoryRecord.EntryState -eq 'ExpectedAbsent' -and
+            $arrCandidateFileRecords.Count -ne 0) {
+            & $scriptBlockStopCandidateOperation -Code 'cleanup-context-invalid' `
+                -Message 'PSStyleGuide.Context.v1|phase=cleanup|reason=candidate-journal'
+        }
+
         $arrFilesToDelete = @($Context.OwnershipJournal | Where-Object {
             $_.ExpectedEntryType -eq 'File' -and $_.EntryState -eq 'Created'
         } | Sort-Object -Property Sequence -Descending)
@@ -2369,8 +2424,13 @@ function Remove-StyleGuideCandidateInvocationContext {
             $objRecord.EntryState = 'Deleted'
         }
 
+        # Descending sequence puts the candidate directory before the download
+        # directory and the root, which is the order the filesystem requires:
+        # each must be empty when its turn comes.
         $arrDirectoriesToDelete = @($Context.OwnershipJournal | Where-Object {
-            $_.Kind -in @('DownloadDirectory', 'InvocationRootDirectory') -and
+            $_.Kind -in @(
+                'CandidateDirectory', 'DownloadDirectory', 'InvocationRootDirectory'
+            ) -and
             $_.EntryState -eq 'Created'
         } | Sort-Object -Property Sequence -Descending)
         foreach ($objRecord in $arrDirectoriesToDelete) {
