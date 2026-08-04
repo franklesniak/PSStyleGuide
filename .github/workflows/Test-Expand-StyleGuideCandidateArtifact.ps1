@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.22
+Version: 1.0.20260803.23
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.22'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.23'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260803.15'
@@ -1013,6 +1013,64 @@ $script:scriptBlockAssertDirectoryReadsBounded = {
                 -LiteralPath $strSparse -Phase 'download' -MaximumEntry 2).Count -ne 1) {
         & $script:scriptBlockStopHarness `
             -Code 'catalog-invalid' -Detail 'bounded-directory-read'
+    }
+
+    # A filtered read turns a leaf into a search pattern, so the guard on it has
+    # to refuse what expands and nothing else. It once refused a set spelled
+    # identically on both platforms, which is how an ordinary Unix artifact name
+    # -- 'release:linux.zip' -- expanded successfully and then failed cleanup,
+    # retaining records and leaving the invocation root on disk. No catalog case
+    # can see that, because none of them names a download file; re-widening the
+    # set passed 115 of 115 silently. So the property is asserted directly:
+    # every name the platform can produce must be found by its own filter.
+    $strLeafProbe = [System.IO.Path]::Combine($strProbeRoot, 'leaf')
+    [void][System.IO.Directory]::CreateDirectory($strLeafProbe)
+    $objInvalidLeafChar = New-Object 'System.Collections.Generic.HashSet[char]' (
+        ,[char[]][System.IO.Path]::GetInvalidFileNameChars()
+    )
+    foreach ($strLeaf in [string[]]@(
+            'plain.zip', 'release:linux.zip', 'back\slash.zip', 'brack[et].zip',
+            'quote".zip', 'less<than.zip', 'more>than.zip')) {
+        # What a platform cannot name it cannot enumerate, so those rows are not
+        # applicable rather than expected to fail.
+        $boolNameable = $true
+        foreach ($chrLeaf in $strLeaf.ToCharArray()) {
+            if ($objInvalidLeafChar.Contains($chrLeaf)) {
+                $boolNameable = $false
+            }
+        }
+        if (-not $boolNameable) {
+            continue
+        }
+        $strLeafPath = [System.IO.Path]::Combine($strLeafProbe, $strLeaf)
+        [System.IO.File]::WriteAllBytes($strLeafPath, [byte[]]@())
+        if ([string[]]@(& $script:scriptBlockGetCandidateHelperEntry `
+                    -LiteralPath $strLeafProbe -Phase 'download' `
+                    -MatchPath $strLeafPath) -cnotcontains $strLeafPath -or
+            [string[]]@(& $scriptBlockGetCandidateImmediateEntry `
+                    -LiteralPath $strLeafProbe -FailureCode 'root-invalid' `
+                    -FailurePhase 'root' -MatchPath $strLeafPath) -cnotcontains $strLeafPath) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' -Detail 'match-leaf-refused'
+        }
+    }
+    # The other direction, so the guard cannot be relaxed into uselessness: the
+    # two characters that do expand stay refused, because a pattern matching
+    # more than its one name reopens the whole-directory read the filter
+    # replaced.
+    foreach ($strExpanding in [string[]]@('star*.zip', 'quest?.zip')) {
+        $boolRefused = $false
+        try {
+            [void](& $script:scriptBlockGetCandidateHelperEntry `
+                -LiteralPath $strLeafProbe -Phase 'download' `
+                -MatchPath ([System.IO.Path]::Combine($strLeafProbe, $strExpanding)))
+        } catch {
+            $boolRefused = $true
+        }
+        if (-not $boolRefused) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' -Detail 'match-leaf-admitted'
+        }
     }
 
     # Exact counts, not minimums. A minimum would let one bound be dropped as
@@ -5722,7 +5780,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.22
+    # Version: 1.0.20260803.23
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
