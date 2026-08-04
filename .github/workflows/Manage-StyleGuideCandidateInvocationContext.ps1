@@ -21,14 +21,14 @@ None. You can't pipe objects to this script.
 None. Dot-sourcing the script defines its two public functions.
 
 .NOTES
-Version: 1.0.20260803.8
+Version: 1.0.20260803.9
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.8'
+$versionCandidateContext = [System.Version]'1.0.20260803.9'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -662,8 +662,25 @@ $scriptBlockAssertCandidateCanonicalStoredPath = {
         [string]$Value
     )
 
+    # This rule governs a path that is STORED, and a stored path is consumed
+    # only by literal .NET APIs -- File.Delete, Directory.Delete, GetAttributes,
+    # and ordinal comparison -- plus one enumeration search pattern. It used to
+    # ask WildcardPattern.ContainsWildcardCharacters, which answers a different
+    # question: that method reports '*', '?', '[' and ']', because those are
+    # PowerShell wildcard syntax, and nothing downstream of a journaled path
+    # parses PowerShell wildcards. Only the parameter rule does, and it calls
+    # that method itself, before provider path resolution, where it belongs.
+    #
+    # The consequence of asking the wrong question was refusing 'build[1].zip',
+    # an ordinary artifact name that both platforms can produce and that every
+    # downstream operation would have handled literally. What must still be
+    # refused is '*' and '?', and for a reason specific to this code rather than
+    # to PowerShell: every journaled leaf is used as a literal search pattern
+    # when cleanup proves that entry gone, and those two are the only characters
+    # that expand there. Refusing them at the point a name is adopted is what
+    # keeps a name that cannot be cleaned up from ever being recorded.
     if ($Value.Length -eq 0 -or
-        [System.Management.Automation.WildcardPattern]::ContainsWildcardCharacters($Value) -or
+        $Value.IndexOfAny([char[]]@('*', '?')) -ge 0 -or
         $Value.IndexOf('::', [System.StringComparison]::Ordinal) -ge 0) {
         throw 'cleanup-context-invalid'
     }
@@ -1225,7 +1242,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.8
+    # Version: 1.0.20260803.9
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1500,7 +1517,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.8
+    # Version: 1.0.20260803.9
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260803.23
+Version: 1.0.20260803.24
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260803.23'
+$script:versionCandidateHarness = [System.Version]'1.0.20260803.24'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260803.15'
-$script:strCandidateExpectedContextVersion = '1.0.20260803.8'
+$script:strCandidateExpectedHelperVersion = '1.0.20260803.16'
+$script:strCandidateExpectedContextVersion = '1.0.20260803.9'
 $script:strCandidateCatalogVersion = '1.0.20260803.4'
 # The physical allocation size, stated once. It was previously two bare literals
 # inside the header check, which is why growing the catalog failed with an
@@ -1762,6 +1762,125 @@ $script:scriptBlockAssertEnumerationBoundsDeclared = {
 # $strArchivePath before the first call that touches it. A check that runs after
 # the metadata read, or after journaling, is the defect this asserts against,
 # and it would be invisible to a check that only asked whether the call exists.
+# Source order is not execution. The check above proves the stored-path rule is
+# applied to the download leaf before the first call that touches it, and that
+# is a real property -- but a call parked inside `if ($false)` is still the
+# first command naming $strArchivePath, so the ordering pin stays satisfied
+# while the rule never runs, and nothing in the catalog supplies a download
+# leaf that would notice. Measured: the whole suite green, 115 records, zero
+# failures, with the validation bypassed and the archive journaled unvalidated.
+#
+# The file already knew this. The resource-guard prober above says so in as many
+# words, and drives real expansions rather than reading trees, precisely because
+# parseable is not reachable. The pin below was written without applying that
+# lesson. So execution is observed here the same way: one expansion per leaf
+# through the production entry point, with the outcome required to differ by
+# leaf. The two checks answer different questions and neither subsumes the
+# other -- this one cannot see ordering, and the AST one cannot see execution.
+$script:scriptBlockAssertDownloadLeafGuardExecutes = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$HelperLiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RunRoot
+    )
+
+    $strProbeRoot = [System.IO.Path]::Combine($RunRoot, 'download-leaf-guard')
+    [void][System.IO.Directory]::CreateDirectory($strProbeRoot)
+    $strCheckoutRoot = [System.IO.Path]::Combine($strProbeRoot, 'checkout')
+    [void][System.IO.Directory]::CreateDirectory($strCheckoutRoot)
+    $strTrustedRoot = [System.IO.Path]::Combine($strProbeRoot, 'trusted')
+    [void][System.IO.Directory]::CreateDirectory($strTrustedRoot)
+
+    $objInvalidLeafChar = New-Object 'System.Collections.Generic.HashSet[char]' (
+        ,[char[]][System.IO.Path]::GetInvalidFileNameChars()
+    )
+    # A valid archive under each leaf, so the only thing that can differ between
+    # the two runs is the leaf rule itself. 'build[1].zip' must be processed --
+    # brackets are PowerShell wildcard syntax but every operation downstream of
+    # a journaled path is literal. 'star*.zip' must be refused, because its leaf
+    # cannot serve as the literal search pattern cleanup will need.
+    foreach ($hashtableCase in @(
+            @{ Leaf = 'build[1].zip'; MustSucceed = $true },
+            @{ Leaf = 'star*.zip'; MustSucceed = $false })) {
+        $strLeaf = [string]$hashtableCase.Leaf
+        $boolNameable = $true
+        foreach ($chrLeaf in $strLeaf.ToCharArray()) {
+            if ($objInvalidLeafChar.Contains($chrLeaf)) {
+                $boolNameable = $false
+            }
+        }
+        # Windows cannot name '*', so the refusal is unobservable there rather
+        # than expected to fail.
+        if (-not $boolNameable) {
+            continue
+        }
+
+        $objProbeContext = New-StyleGuideCandidateInvocationContext `
+            -TrustedTemporaryRoot $strTrustedRoot
+        $strArchivePath = [System.IO.Path]::Combine(
+            $objProbeContext.DownloadDirectoryPath, $strLeaf)
+        $objArchive = [System.IO.Compression.ZipFile]::Open(
+            $strArchivePath, [System.IO.Compression.ZipArchiveMode]::Create)
+        try {
+            foreach ($strEntryName in @(
+                'copilot-instructions.md',
+                'powershell.instructions.md',
+                'STYLE_GUIDE_CHAT.md',
+                'STYLE_GUIDE_FULL.md'
+            )) {
+                $objEntry = $objArchive.CreateEntry($strEntryName)
+                $objEntryWriter = New-Object System.IO.StreamWriter($objEntry.Open())
+                try {
+                    $objEntryWriter.Write('# ' + $strEntryName)
+                } finally {
+                    $objEntryWriter.Dispose()
+                }
+            }
+        } finally {
+            $objArchive.Dispose()
+        }
+        $objSha256 = [System.Security.Cryptography.SHA256]::Create()
+        try {
+            $objArchiveStream = [System.IO.File]::OpenRead($strArchivePath)
+            try {
+                $strExpectedDigest = (
+                    [System.BitConverter]::ToString(
+                        $objSha256.ComputeHash($objArchiveStream)
+                    ) -replace '-', ''
+                ).ToLowerInvariant()
+            } finally {
+                $objArchiveStream.Dispose()
+            }
+        } finally {
+            $objSha256.Dispose()
+        }
+
+        $boolSucceeded = $false
+        try {
+            [void](& $HelperLiteralPath `
+                -Context $objProbeContext `
+                -CheckoutRoot $strCheckoutRoot `
+                -TrustedTemporaryRoot $strTrustedRoot `
+                -DownloadDirectory $objProbeContext.DownloadDirectoryPath `
+                -CandidateDirectory $objProbeContext.CandidatePath `
+                -ExpectedDigest $strExpectedDigest)
+            $boolSucceeded = $true
+        } catch {
+            $boolSucceeded = $false
+        }
+        if ($boolSucceeded -ne [bool]$hashtableCase.MustSucceed) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('download-leaf-guard-' + $(if ($boolSucceeded) {
+                    'admitted'
+                } else {
+                    'refused'
+                }))
+        }
+    }
+}
+
 $script:scriptBlockAssertDownloadLeafValidatedFirst = {
     param (
         [Parameter(Mandatory = $true)]
@@ -5780,7 +5899,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260803.23
+    # Version: 1.0.20260803.24
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -6008,6 +6127,9 @@ function Invoke-StyleGuideCandidateHarness {
             -ContextLiteralPath $strContextLiteralPath
         & $script:scriptBlockAssertDownloadLeafValidatedFirst `
             -HelperLiteralPath $strHelperLiteralPath
+        & $script:scriptBlockAssertDownloadLeafGuardExecutes `
+            -HelperLiteralPath $strHelperLiteralPath `
+            -RunRoot $strRunRoot
         & $script:scriptBlockAssertLifecycleRecordStatesRejected -RunRoot $strRunRoot
         & $script:scriptBlockAssertResourceGuardsReached `
             -LiteralPath $strHelperLiteralPath `
