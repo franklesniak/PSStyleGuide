@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260803.48
+Version: 1.0.20260803.49
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260803.48'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.38'
+$script:versionCandidateHelper = [System.Version]'1.0.20260803.49'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260803.39'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -2109,7 +2109,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.48
+    # Version: 1.0.20260803.49
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2145,6 +2145,17 @@ function Remove-StyleGuideCandidateInvocationState {
         $strPreviousState = $Context.LifecycleState
         $strCapturedTrustedParent = [string]$Context.TrustedParentPath
         $strCapturedInvocationRoot = [string]$Context.InvocationRootPath
+        # The whole set, captured together and authenticated together below.
+        # Capturing paths and then authenticating only the STATE proves nothing
+        # about the paths: they can be moved to whatever the caller wants
+        # captured and moved back before the verifier looks.
+        $objCapturedValues = [pscustomobject]@{
+            InvocationId = $Context.InvocationId
+            TrustedParentPath = $strCapturedTrustedParent
+            InvocationRootPath = $strCapturedInvocationRoot
+            DownloadDirectoryPath = [string]$Context.DownloadDirectoryPath
+            CandidatePath = [string]$Context.CandidatePath
+        }
     } catch {
         return (& $script:scriptBlockNewCandidateHelperCleanupResult `
             -InvocationId $guidInvocationId `
@@ -2181,7 +2192,8 @@ function Remove-StyleGuideCandidateInvocationState {
         if (-not (Test-StyleGuideCandidateInvocationContextIssued -Context $objEarlyProbe)) {
             $boolEarlyIssued = [bool](
                 Test-StyleGuideCandidateInvocationContextIssued `
-                    -Context $Context -ExpectedState $strPreviousState)
+                    -Context $Context -ExpectedState $strPreviousState `
+                    -ExpectedValues $objCapturedValues)
         }
     }
     if (-not $boolEarlyIssued) {
@@ -2893,6 +2905,28 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         # the sweep-by-mechanism mistake this PR keeps paying for.
         $objValidatedContext = $Context
         $strAuthenticatedRoot = [string]$Context.InvocationRootPath
+        $strAuthenticatedTrustedParent = [string]$Context.TrustedParentPath
+        $strAuthenticatedDownload = [string]$Context.DownloadDirectoryPath
+        $strAuthenticatedCandidate = [string]$Context.CandidatePath
+        # Round 35 froze only the root here and left the three paths the
+        # comparisons below consult reading live. A same-session runspace could
+        # move those to match the caller's parameters for the length of the
+        # comparison and move them back, so the comparison proved the caller
+        # and the object agreed at one instant rather than that the manager
+        # issued this tree. All four are captured together and authenticated as
+        # a set, and every comparison and write below uses the capture.
+        $objAuthenticatedValues = [pscustomobject]@{
+            InvocationId = $Context.InvocationId
+            TrustedParentPath = $strAuthenticatedTrustedParent
+            InvocationRootPath = $strAuthenticatedRoot
+            DownloadDirectoryPath = $strAuthenticatedDownload
+            CandidatePath = $strAuthenticatedCandidate
+        }
+        if (-not (Test-StyleGuideCandidateInvocationContextIssued `
+                -Context $Context -ExpectedValues $objAuthenticatedValues)) {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'parameter' -Phase 'parameter' -Subreason 'context-unissued'
+        }
 
         $strCheckoutPath = & $script:scriptBlockConvertToCandidateHelperNormalizedPath `
             -Value $strCheckoutRoot -ParameterName 'CheckoutRoot'
@@ -2905,17 +2939,17 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
 
         $boolTrustedPathMatchesContext = [System.String]::Equals(
             $strTrustedPath,
-            $Context.TrustedParentPath,
+            $strAuthenticatedTrustedParent,
             $script:objCandidateHelperPathComparison
         )
         $boolDownloadPathMatchesContext = [System.String]::Equals(
             $strDownloadPath,
-            $Context.DownloadDirectoryPath,
+            $strAuthenticatedDownload,
             $script:objCandidateHelperPathComparison
         )
         $boolCandidatePathMatchesContext = [System.String]::Equals(
             $strCandidatePath,
-            $Context.CandidatePath,
+            $strAuthenticatedCandidate,
             $script:objCandidateHelperPathComparison
         )
         if (-not $boolTrustedPathMatchesContext -or

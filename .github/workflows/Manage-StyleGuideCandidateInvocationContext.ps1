@@ -27,14 +27,14 @@ a caller that deletes first and validates afterwards has already
 deleted, so it needs a way to ask about issuance that changes nothing.
 
 .NOTES
-Version: 1.0.20260803.38
+Version: 1.0.20260803.39
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260803.38'
+$versionCandidateContext = [System.Version]'1.0.20260803.39'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -1748,7 +1748,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.38
+    # Version: 1.0.20260803.39
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2210,7 +2210,7 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.38
+    # Version: 1.0.20260803.39
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param (
@@ -2218,7 +2218,10 @@ function Test-StyleGuideCandidateInvocationContextIssued {
         [AllowNull()]
         [object]$Context,
 
-        [string]$ExpectedState = ''
+        [string]$ExpectedState = '',
+
+        [AllowNull()]
+        [object]$ExpectedValues = $null
     )
 
     # A question, not an assertion: every failure is an answer of false rather
@@ -2235,8 +2238,20 @@ function Test-StyleGuideCandidateInvocationContextIssued {
         return $false
     }
     try {
+        # Built from the caller's CAPTURED values when it supplies them, and
+        # from the live object otherwise. A caller that captures five fields,
+        # asks whether the object is issued, and then acts on its captures has
+        # authenticated a different read from the one it will use -- the paths
+        # can be moved to match at this instant and moved back. Handing the
+        # captured set here authenticates exactly what the caller will act on,
+        # as a set, against the values this manager recorded at issuance.
+        $objSnapshotSource = if ($null -eq $ExpectedValues) {
+            $Context
+        } else {
+            $ExpectedValues
+        }
         if (([string]$arrCandidateIssuedSnapshot[$intIssuedIndex]) -cne
-            [string](& $scriptBlockNewCandidateIssuanceSnapshot -Context $Context)) {
+            [string](& $scriptBlockNewCandidateIssuanceSnapshot -Context $objSnapshotSource)) {
             return $false
         }
         # The lifecycle state as well, not only the paths. Asking whether this
@@ -2304,7 +2319,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260803.38
+    # Version: 1.0.20260803.39
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
