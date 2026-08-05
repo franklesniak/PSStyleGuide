@@ -919,11 +919,11 @@ $script:scriptBlockAddCandidateHelperRecord = {
     if (-not [System.Object]::ReferenceEquals(
             $ContextValue.OwnershipJournal, $JournalValue)) {
         & $script:scriptBlockStopCandidateHelperOperation `
-            -Code 'context-invalid' -Phase $PhaseValue -Subreason 'journal-swapped'
+            -Code 'parameter' -Phase $PhaseValue -Subreason 'journal-swapped'
     }
     if ([uint32]$ContextValue.NextSequence -ne $NextSequenceValue) {
         & $script:scriptBlockStopCandidateHelperOperation `
-            -Code 'context-invalid' -Phase $PhaseValue -Subreason 'journal-swapped'
+            -Code 'parameter' -Phase $PhaseValue -Subreason 'journal-swapped'
     }
 
     $arrJournal = New-Object object[] ($JournalValue.Count + 1)
