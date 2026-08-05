@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260805.2
+Version: 1.0.20260805.3
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260805.2'
+$script:versionCandidateHarness = [System.Version]'1.0.20260805.3'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260805.2'
@@ -1619,6 +1619,53 @@ $script:scriptBlockAssertDirectoryReadsBounded = {
         if (-not $boolRefused) {
             & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                 -Detail ('unbounded-read-admitted-' + $hashtableRefused.Name)
+        }
+    }
+
+    # The FILTERED read's own refusal -- the sibling of the absurd-bound probes
+    # above, which cover 'enumeration-bound' while this half went unexercised in
+    # both enumerators. A MatchPath leaf carrying a wildcard cannot serve as a
+    # literal filter: it would match many names and reduce a named absence proof
+    # to a pattern listing, so both the helper and the context enumerator refuse
+    # it with 'enumeration-filter'. Neither refusal is reachable from the public
+    # entry point -- every production call site passes an internal name already
+    # cleared of wildcards by the parameter boundary check that E-10/S-03/S-04
+    # cover -- so this is a direct behavioural probe rather than a catalog row,
+    # the same shape the round-59 wiring pins take. Measured: deleting the
+    # rejected-character check let an 'e*.bin' filter pattern-match all 512
+    # crowded entries with no refusal. The message is checked for the subreason,
+    # not merely that it threw, and both '*' and '?' are exercised. The helper
+    # reports subreason=, the context manager reason=, and the latter is a
+    # substring of the former.
+    $arrFilterProbe = @(
+        @{ Name = 'helper-star'
+            Probe = { & $script:scriptBlockGetCandidateHelperEntry `
+                    -LiteralPath $strCrowded -Phase 'download' -MatchPath 'e*.bin' } }
+        @{ Name = 'helper-question'
+            Probe = { & $script:scriptBlockGetCandidateHelperEntry `
+                    -LiteralPath $strCrowded -Phase 'download' -MatchPath 'e?.bin' } }
+        @{ Name = 'context-star'
+            Probe = { & $scriptBlockGetCandidateImmediateEntry `
+                    -LiteralPath $strCrowded -FailureCode 'root-invalid' `
+                    -FailurePhase 'root' -MatchPath 'e*.bin' } }
+        @{ Name = 'context-question'
+            Probe = { & $scriptBlockGetCandidateImmediateEntry `
+                    -LiteralPath $strCrowded -FailureCode 'root-invalid' `
+                    -FailurePhase 'root' -MatchPath 'e?.bin' } }
+    )
+    foreach ($hashtableFilter in $arrFilterProbe) {
+        $boolFilterRefused = $false
+        $strFilterMessage = ''
+        try {
+            [void]([string[]]@(& ([scriptblock]$hashtableFilter.Probe)))
+        } catch {
+            $boolFilterRefused = $true
+            $strFilterMessage = [string]$_.Exception.Message
+        }
+        if (-not $boolFilterRefused -or
+            -not $strFilterMessage.Contains('reason=enumeration-filter')) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('enumeration-filter-not-refused-' + $hashtableFilter.Name)
         }
     }
 
@@ -9093,7 +9140,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260805.2
+    # Version: 1.0.20260805.3
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
