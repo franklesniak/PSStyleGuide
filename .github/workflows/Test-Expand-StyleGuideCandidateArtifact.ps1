@@ -790,6 +790,35 @@ $script:scriptBlockAssertVersionMarkersConsistent = {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
             -Detail ('version-marker-comment-count-' + $arrMarkerComment.Count)
     }
+
+    # The file's own .NOTES marker had no location check of its own. Every
+    # other declared marker was verified where it stands; this one was only
+    # ever counted, and a count is satisfied by any literal anywhere. Delete
+    # the help block's Version line, add the same literal to an unrelated
+    # comment, and the total is unchanged while the published help goes stale.
+    # Reported at round 57 as JJ3.
+    #
+    # This marker lives in the file-level `<# ... #>` help block rather than in
+    # a `#` line comment, so the token match above -- anchored to `^#` -- never
+    # saw it and never could. It is matched here as a line within a block
+    # comment token, and required to stand before the first public function,
+    # which is what makes it the FILE's version rather than some function's.
+    $intFirstFunctionOffset = [int]::MaxValue
+    foreach ($objFunction in $arrPublicFunction) {
+        if ([int]$objFunction.Extent.StartOffset -lt $intFirstFunctionOffset) {
+            $intFirstFunctionOffset = [int]$objFunction.Extent.StartOffset
+        }
+    }
+    $arrHelpMarker = @(@($objMarkerTokens) | Where-Object {
+            $_.Kind -eq [System.Management.Automation.Language.TokenKind]::Comment -and
+            [string]$_.Text -cmatch ('(?m)^\s*Version:\s*' +
+                [System.Text.RegularExpressions.Regex]::Escape($ExpectedVersion) + '\s*$') -and
+            [int]$_.Extent.StartOffset -lt $intFirstFunctionOffset
+        })
+    if (@($arrHelpMarker).Count -ne 1) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
+            -Detail ('version-marker-help-' + @($arrHelpMarker).Count)
+    }
     foreach ($objFunction in $arrPublicFunction) {
         $intInside = 0
         foreach ($objComment in $arrMarkerComment) {
