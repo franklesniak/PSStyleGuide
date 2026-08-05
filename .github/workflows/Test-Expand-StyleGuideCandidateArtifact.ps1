@@ -4470,6 +4470,42 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
     }
 }
 
+# Round 52, EE5. The taxonomy closure below reads the two production scripts
+# with regular expressions, and a regular expression sees one spelling. It
+# validates -Code 'literal' and is blind to -Code ('literal'), to a variable,
+# and to anything else an editor might write -- so an undeclared diagnostic
+# could ship while the catalog still reported a closed set. That is the one
+# check #146 requires to "reject unknown values", so a hole in it is worse
+# than a hole anywhere else here.
+#
+# The reported remedy -- refuse non-literal arguments -- cannot be applied as
+# stated: production deliberately emits computed codes, measured at 24 -Code
+# variables, 6 "$Phase-invalid" interpolations, and one propagated
+# $objContextResult.DiagnosticCode. Refusing non-literals would refuse the
+# shipped code at three dozen sites.
+#
+# So the SHAPES are closed instead, and the shape set was measured rather than
+# imagined -- every argument to every diagnostic parameter in both scripts is
+# one of exactly four AST kinds. A literal is validated by the pass below; an
+# interpolation is validated against the declared family table; a variable or
+# a propagated member must be named here. Any fifth shape, and any name not on
+# these lists, is refused. That is what makes the regex pass sound: it is no
+# longer the only thing standing between an undeclared value and the catalog,
+# because nothing can reach that pass in a shape the pass cannot read.
+$script:hashtableCandidateDiagnosticPassThrough = @{
+    'Code' = [string[]]@(
+        'Code', 'DiagnosticCode', 'strAbsenceCode', 'strCreationCategory',
+        'strFailureCode', 'strPrimaryCode'
+    )
+    'DiagnosticCode' = [string[]]@('strCode', 'strContextFailureCode')
+    'Phase' = [string[]]@('Phase', 'PhaseValue', 'strPrimaryPhase')
+    'Subreason' = [string[]]@('Subreason', 'strPrimarySubreason')
+    'Fallback' = [string[]]@('strPhase')
+}
+$script:arrCandidateDiagnosticPropagated = [string[]]@(
+    '$objContextResult.DiagnosticCode'
+)
+
 $script:scriptBlockAssertProductionTaxonomyClosed = {
     param (
         [Parameter(Mandatory = $true)]
@@ -4501,6 +4537,73 @@ $script:scriptBlockAssertProductionTaxonomyClosed = {
     foreach ($strLiteralPath in $LiteralPath) {
         $strText = & $script:scriptBlockConvertFromStrictUtf8 `
             -Bytes ([System.IO.File]::ReadAllBytes($strLiteralPath))
+
+        # Close the shape set before the text passes read it. See the note above
+        # the pass-through table: a spelling these regular expressions cannot
+        # see is a value they cannot check.
+        $objShapeErrors = $null
+        $objShapeAst = [System.Management.Automation.Language.Parser]::ParseFile(
+            $strLiteralPath, [ref]$null, [ref]$objShapeErrors)
+        if ($null -eq $objShapeAst -or @($objShapeErrors).Count -ne 0) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' -Detail 'production-diagnostic-parse'
+        }
+        foreach ($objShapeCommand in @($objShapeAst.FindAll(
+                    {
+                        param ($objNode)
+                        return ($objNode -is
+                            [System.Management.Automation.Language.CommandAst])
+                    },
+                    $true
+                ))) {
+            $arrShapeElement = @($objShapeCommand.CommandElements)
+            for ($intShape = 0; $intShape -lt $arrShapeElement.Count; $intShape++) {
+                $objShapeElement = $arrShapeElement[$intShape]
+                if ($objShapeElement -isnot
+                    [System.Management.Automation.Language.CommandParameterAst]) {
+                    continue
+                }
+                $strShapeParameter = [string]$objShapeElement.ParameterName
+                if (-not $script:hashtableCandidateDiagnosticPassThrough.ContainsKey(
+                        $strShapeParameter)) {
+                    continue
+                }
+                $objShapeArgument = $objShapeElement.Argument
+                if ($null -eq $objShapeArgument -and
+                    ($intShape + 1) -lt $arrShapeElement.Count) {
+                    $objShapeArgument = $arrShapeElement[$intShape + 1]
+                }
+                if ($objShapeArgument -is
+                    [System.Management.Automation.Language.StringConstantExpressionAst]) {
+                    continue
+                }
+                if ($objShapeArgument -is
+                    [System.Management.Automation.Language.ExpandableStringExpressionAst]) {
+                    # Validated by the family pass below, which resolves the
+                    # suffix against the declared table.
+                    continue
+                }
+                if ($objShapeArgument -is
+                    [System.Management.Automation.Language.VariableExpressionAst]) {
+                    $strShapeName = [string]$objShapeArgument.VariablePath.UserPath
+                    if (@($script:hashtableCandidateDiagnosticPassThrough[
+                            $strShapeParameter]) -ccontains $strShapeName) {
+                        continue
+                    }
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                        -Detail ('production-diagnostic-passthrough-' +
+                            [string]$objShapeCommand.Extent.StartLineNumber)
+                }
+                if ($null -ne $objShapeArgument -and
+                    $script:arrCandidateDiagnosticPropagated -ccontains
+                    ([string]$objShapeArgument.Extent.Text)) {
+                    continue
+                }
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                    -Detail ('production-diagnostic-shape-' +
+                        [string]$objShapeCommand.Extent.StartLineNumber)
+            }
+        }
 
         foreach ($objMatch in [regex]::Matches($strText, "-Subreason\s+'([^']*)'")) {
             if (-not $objSubreason.Contains($objMatch.Groups[1].Value)) {
