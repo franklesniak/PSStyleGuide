@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260805.3
+Version: 1.0.20260805.4
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260805.3'
+$script:versionCandidateHelper = [System.Version]'1.0.20260805.4'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260805.0'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -931,6 +931,60 @@ $script:scriptBlockAssertCandidateHelperJournalCurrent = {
     if ([uint32]$ContextValue.NextSequence -ne $NextSequenceValue) {
         & $script:scriptBlockStopCandidateHelperOperation `
             -Code 'parameter' -Phase $PhaseValue -Subreason 'journal-swapped'
+    }
+}
+
+$script:scriptBlockAssertCandidateHelperRecordUnchanged = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [AllowNull()]
+        [object]$Record,
+
+        [Parameter(Mandatory = $true)]
+        [object]$Snapshot,
+
+        [Parameter(Mandatory = $true)]
+        [string]$PhaseValue
+    )
+
+    # Round 64 (Codex): reference identity of the journal array says nothing
+    # about a record's mutable fields, and the destination create marks this
+    # record and hands it to the final context assertion. Every field that
+    # assertion re-validates for a pre-create ExpectedAbsent CandidateDirectory
+    # record is re-proven here -- the caller-variable paths against the snapshot
+    # captured at authentication, the fixed fields against their only admitted
+    # value and type -- so a same-session flip of any of them is refused before
+    # the irreversible create rather than surfacing as a rollback the manager
+    # rejects, which retains the issued tree. Round 63 re-proved Kind, Sequence
+    # and Path only. Type as well as value: a field retyped to something that
+    # stringises the same still fails the assertion that reads its type.
+    if ($null -eq $Record -or
+        $Record.SchemaVersion -isnot [System.UInt32] -or
+        $Record.SchemaVersion -ne [uint32]1 -or
+        $Record.Sequence -isnot [System.UInt32] -or
+        $Record.Sequence -ne [uint32]$Snapshot.Sequence -or
+        $Record.Kind -isnot [System.String] -or
+        $Record.Kind -cne 'CandidateDirectory' -or
+        $Record.ExpectedEntryType -isnot [System.String] -or
+        $Record.ExpectedEntryType -cne 'Directory' -or
+        $Record.CreationPhase -isnot [System.String] -or
+        $Record.CreationPhase -cne 'context' -or
+        $null -ne $Record.ContentLength -or
+        $null -ne $Record.ContentSha256 -or
+        $Record.Path -isnot [System.String] -or
+        $Record.ParentPath -isnot [System.String] -or
+        $Record.LeafName -isnot [System.String] -or
+        -not [System.String]::Equals(
+            [string]$Record.Path, [string]$Snapshot.Path,
+            $script:objCandidateHelperPathComparison) -or
+        -not [System.String]::Equals(
+            [string]$Record.ParentPath, [string]$Snapshot.ParentPath,
+            $script:objCandidateHelperPathComparison) -or
+        -not [System.String]::Equals(
+            [string]$Record.LeafName, [string]$Snapshot.LeafName,
+            $script:objCandidateHelperPathComparison)) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'destination-invalid' -Phase $PhaseValue -Subreason 'candidate-record'
     }
 }
 
@@ -2214,7 +2268,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260805.3
+    # Version: 1.0.20260805.4
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -3112,21 +3166,23 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         })[0]
         $strAuthenticatedCandidateEntryState =
             [string]$objCapturedCandidateRecord.EntryState
-        # Round 63 (Codex): the candidate record's identity, captured as
-        # immutable values alongside its state. Reference identity of the journal
-        # array (the journal-current guard) says nothing about a record's mutable
-        # fields, and the destination block below both re-selects the record by
-        # live Kind and marks it after the create. A same-session writer that
-        # flips this record's Kind or Path after authentication would move that
-        # selection to another record -- or off it -- so the create runs, the
-        # real record stays ExpectedAbsent, and cleanup meets a directory no
-        # journal describes. The sequence is the record's authenticated index;
-        # the destination block re-selects by it and re-proves these fields
-        # before the create.
-        $uintAuthenticatedCandidateSequence =
-            [uint32]$objCapturedCandidateRecord.Sequence
-        $strAuthenticatedCandidatePath =
-            [string]$objCapturedCandidateRecord.Path
+        # Round 63/64 (Codex): the candidate record's full identity, captured as
+        # an immutable snapshot alongside its state. Reference identity of the
+        # journal array (the journal-current guard) says nothing about a record's
+        # mutable fields, and the destination block below re-selects the record
+        # by its authenticated sequence, marks it after the create, and hands it
+        # to the final context assertion. A same-session writer that flips any
+        # field the assertion re-validates -- round 63 caught Kind, Sequence and
+        # Path; round 64 adds ParentPath, LeafName, and every remaining schema
+        # field -- would otherwise let the create run against a record cleanup
+        # then rejects, retaining the issued tree. The snapshot cannot be
+        # repointed.
+        $objAuthenticatedCandidateSnapshot = [pscustomobject]@{
+            Sequence   = [uint32]$objCapturedCandidateRecord.Sequence
+            Path       = [string]$objCapturedCandidateRecord.Path
+            ParentPath = [string]$objCapturedCandidateRecord.ParentPath
+            LeafName   = [string]$objCapturedCandidateRecord.LeafName
+        }
         # Round 54: the state belongs in the capture too. The verifier's
         # -ExpectedState exists precisely so the manager compares its register
         # against a value the caller cannot move afterwards, and this call was
@@ -3289,6 +3345,20 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
             -Phase 'containment')
 
         $strPhase = 'download'
+        # Round 64 (Codex): re-prove the authenticated journal is still installed
+        # before any download work. The archive open and hash below can reach
+        # cleanup, and until the download record append there is no journal-
+        # current check -- a same-session swap in that window would let the
+        # append refuse 'journal-swapped' with the archive already read and
+        # unjournaled in the decoy, then rollback would validate the decoy, meet
+        # the archive as an unexpected download-directory entry, and retain the
+        # issued tree. The same guard the destination create, each file create,
+        # and the append already run, at this phase boundary too.
+        & $script:scriptBlockAssertCandidateHelperJournalCurrent `
+            -ContextValue $Context `
+            -JournalValue $objAuthenticatedJournal `
+            -NextSequenceValue $uintAuthenticatedSequence `
+            -PhaseValue $strPhase
         # Two is all this needs: one says conforming, two says refuse, and any
         # further path costs memory to reach the same verdict.
         $arrDownloadEntries = [string[]]@(
@@ -3626,26 +3696,21 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         # gates the create is the string captured at authentication (round 61
         # F1 above), not this record's live field -- which a same-session writer
         # can flip after authentication to force the retention described there.
-        # Round 63 (Codex): select the record by its authenticated sequence and
-        # re-prove its Kind and Path against the values captured at
-        # authentication before the create, rather than re-matching the live
-        # Kind. A same-session writer that flips this record's Kind or Path
-        # (fields the journal-current reference guard above does not cover) would
-        # otherwise move this selection to a different record or off it, leaving
-        # the create to run while the real record is never marked Created and
-        # cleanup meets a directory no journal describes.
+        # Round 63/64 (Codex): select the record by its authenticated sequence
+        # and re-prove EVERY invariant field against the snapshot captured at
+        # authentication before the create. Round 63 re-proved Kind, Sequence and
+        # Path; a same-session writer that instead flipped ParentPath, LeafName,
+        # ExpectedEntryType, CreationPhase, SchemaVersion or the content fields
+        # slipped past that guard, so the create ran and the final context
+        # assertion rejected the record, retaining the issued tree. The check is
+        # factored into scriptBlockAssertCandidateHelperRecordUnchanged so its
+        # field coverage is exercised in isolation by the harness.
         $objCandidateDirectoryRecord =
-            $objAuthenticatedJournal[$uintAuthenticatedCandidateSequence]
-        if ($null -eq $objCandidateDirectoryRecord -or
-            $objCandidateDirectoryRecord.Kind -cne 'CandidateDirectory' -or
-            [uint32]$objCandidateDirectoryRecord.Sequence -ne $uintAuthenticatedCandidateSequence -or
-            -not [System.String]::Equals(
-                $objCandidateDirectoryRecord.Path,
-                $strAuthenticatedCandidatePath,
-                $script:objCandidateHelperPathComparison)) {
-            & $script:scriptBlockStopCandidateHelperOperation `
-                -Code 'destination-invalid' -Phase 'destination' -Subreason 'candidate-record'
-        }
+            $objAuthenticatedJournal[$objAuthenticatedCandidateSnapshot.Sequence]
+        & $script:scriptBlockAssertCandidateHelperRecordUnchanged `
+            -Record $objCandidateDirectoryRecord `
+            -Snapshot $objAuthenticatedCandidateSnapshot `
+            -PhaseValue 'destination'
         if ($strAuthenticatedCandidateEntryState -cne 'ExpectedAbsent') {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'destination-invalid' -Phase 'destination' -Subreason 'candidate-state'

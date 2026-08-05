@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260805.4
+Version: 1.0.20260805.5
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,12 +53,12 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260805.4'
+$script:versionCandidateHarness = [System.Version]'1.0.20260805.5'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260805.3'
+$script:strCandidateExpectedHelperVersion = '1.0.20260805.4'
 $script:strCandidateExpectedContextVersion = '1.0.20260805.0'
-$script:strCandidateCatalogVersion = '1.0.20260805.0'
+$script:strCandidateCatalogVersion = '1.0.20260805.1'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
 # outstanding read finish.
@@ -4041,6 +4041,84 @@ $script:scriptBlockAssertRetainedSequenceFromCapture = {
     }
 }
 
+$script:scriptBlockAssertCandidateRecordUnchangedRefused = {
+    # Round 64 (Codex): the pre-create candidate-record guard must refuse a
+    # same-session flip of EVERY invariant field, not just the Kind/Sequence/Path
+    # round 63 covered. The production check is factored into
+    # scriptBlockAssertCandidateHelperRecordUnchanged so it can be exercised in
+    # isolation here: an unmutated record passes, and a flip of any one field is
+    # refused with subreason candidate-record. Removing any field's check from
+    # the production guard reddens exactly this probe. Same-process direct call,
+    # the journal-swap probe's mechanism.
+    $scriptBlockFreshRecord = {
+        [pscustomobject]@{
+            SchemaVersion     = [uint32]1
+            Sequence          = [uint32]3
+            Kind              = 'CandidateDirectory'
+            Path              = 'candidate-root/candidate'
+            ParentPath        = 'candidate-root'
+            LeafName          = 'candidate'
+            ExpectedEntryType = 'Directory'
+            CreationPhase     = 'context'
+            EntryState        = 'ExpectedAbsent'
+            ContentLength     = $null
+            ContentSha256     = $null
+        }
+    }
+    $objSnapshot = [pscustomobject]@{
+        Sequence   = [uint32]3
+        Path       = 'candidate-root/candidate'
+        ParentPath = 'candidate-root'
+        LeafName   = 'candidate'
+    }
+
+    $boolControlPassed = $true
+    try {
+        & $script:scriptBlockAssertCandidateHelperRecordUnchanged `
+            -Record (& $scriptBlockFreshRecord) -Snapshot $objSnapshot `
+            -PhaseValue 'destination'
+    } catch {
+        $boolControlPassed = $false
+    }
+    if (-not $boolControlPassed) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+            -Detail 'candidate-record-unchanged-control-refused'
+    }
+
+    foreach ($hashtableMutation in @(
+            @{ Name = 'SchemaVersion'; Apply = { param ($r) $r.SchemaVersion = [uint32]2 } },
+            @{ Name = 'Sequence'; Apply = { param ($r) $r.Sequence = [uint32]5 } },
+            @{ Name = 'Kind'; Apply = { param ($r) $r.Kind = 'DownloadFile' } },
+            @{ Name = 'ExpectedEntryType'; Apply = { param ($r) $r.ExpectedEntryType = 'File' } },
+            @{ Name = 'CreationPhase'; Apply = { param ($r) $r.CreationPhase = 'destination' } },
+            @{ Name = 'ContentLength'; Apply = { param ($r) $r.ContentLength = [uint64]1 } },
+            @{ Name = 'ContentSha256'; Apply = { param ($r) $r.ContentSha256 = ('0' * 64) } },
+            @{ Name = 'Path'; Apply = { param ($r) $r.Path = 'candidate-root/other' } },
+            @{ Name = 'ParentPath'; Apply = { param ($r) $r.ParentPath = 'evil-root' } },
+            @{ Name = 'LeafName'; Apply = { param ($r) $r.LeafName = 'other' } })) {
+        $objRecord = & $scriptBlockFreshRecord
+        & $hashtableMutation.Apply $objRecord
+        $boolRefused = $false
+        $strSubreason = 'none'
+        try {
+            [void](& $script:scriptBlockAssertCandidateHelperRecordUnchanged `
+                -Record $objRecord -Snapshot $objSnapshot -PhaseValue 'destination')
+        } catch {
+            $boolRefused = $true
+            $objMatch = [regex]::Match(
+                [string]$_.Exception.Message, 'subreason=([a-z][a-z0-9-]*)')
+            if ($objMatch.Success) {
+                $strSubreason = $objMatch.Groups[1].Value
+            }
+        }
+        if (-not $boolRefused -or $strSubreason -cne 'candidate-record') {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('candidate-record-unchanged-' + [string]$hashtableMutation.Name +
+                    '-' + $strSubreason)
+        }
+    }
+}
+
 $script:scriptBlockAssertRound63JournalPlanWired = {
     param (
         [Parameter(Mandatory = $true)]
@@ -4175,17 +4253,25 @@ $script:scriptBlockAssertOrdinaryFileProofWired = {
             # the irreversible CreateDirectory rather than after, at the next
             # append, when rollback has already been handed the decoy.
             # Round 63 (Codex) carried the same guard to the extraction FILE
-            # create, which ran its FileStream CreateNew with no journal-current
-            # check before it -- the append's own check refused only afterward,
-            # leaving the file on disk for rollback to meet against a decoy. So
-            # production now calls scriptBlockAssertCandidateHelperJournalCurrent
-            # at exactly three sites -- the append helper, the destination
-            # create, and each file create -- and fewer than three means one of
-            # them lost its guard. Measured: deleting the file-create call left
-            # all 115 cases green, the same invisibility the round-59 wiring pins
-            # were added for.
+            # create, and round 64 (Codex) to the DOWNLOAD phase entry, which
+            # opened and hashed the archive with no journal-current check before
+            # the download append. So production now calls
+            # scriptBlockAssertCandidateHelperJournalCurrent at exactly four
+            # sites -- the append helper, the download-phase entry, the
+            # destination create, and each file create -- and fewer than four
+            # means one lost its guard. Measured: deleting any one left all 115
+            # cases green, the same invisibility the round-59 wiring pins were
+            # added for.
+            #
+            # Round 64 (Codex) also factored the candidate-directory record's
+            # pre-create field re-proof into
+            # scriptBlockAssertCandidateHelperRecordUnchanged, called once before
+            # the create; its per-field coverage is exercised in isolation by
+            # scriptBlockAssertCandidateRecordUnchangedRefused.
             @{ Name = 'scriptBlockAssertCandidateHelperJournalCurrent'
-                Minimum = 3; Detail = 'production-journal-current-guard' })) {
+                Minimum = 4; Detail = 'production-journal-current-guard' },
+            @{ Name = 'scriptBlockAssertCandidateHelperRecordUnchanged'
+                Minimum = 1; Detail = 'production-candidate-record-unchanged' })) {
         $intCalls = @($arrCommandAst | Where-Object {
                 ([string]$_.CommandElements[0].VariablePath.UserPath) -ceq
                     ('script:' + [string]$hashtableRequirement.Name)
@@ -9215,7 +9301,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260805.4
+    # Version: 1.0.20260805.5
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -9475,6 +9561,7 @@ function Invoke-StyleGuideCandidateHarness {
             -LiteralPath $strHelperLiteralPath
         & $script:scriptBlockAssertRound63JournalPlanWired `
             -LiteralPath $strHelperLiteralPath
+        & $script:scriptBlockAssertCandidateRecordUnchangedRefused
         & $script:scriptBlockAssertDownloadLeafGuardExecutes `
             -HelperLiteralPath $strHelperLiteralPath `
             -RunRoot $strRunRoot
