@@ -2290,9 +2290,14 @@ $script:arrCandidateContextPermittedSetItemValue = [string[]]@(
 #
 # A name on a permitted list but absent from this table is refused: adding a
 # member now means declaring how it is called, not just that it is.
-$script:hashtableCandidateMemberReceiver = @{
+# Self-audit after the fix above: the first version of this table was ONE
+# map shared by both scripts, built from their union. That quietly widened
+# each file by the other's usage -- measured, Expand gained an instance
+# `Create` because Manage makes one, and Manage gained an instance
+# `ToString` because Expand makes one. A permitted-member list is already
+# per-file for exactly this reason, and the receiver table has to be too.
+$script:hashtableCandidateHelperMemberReceiver = @{
     'Add' = @{ Static = [string[]]@(); Instance = $true }
-    'AddAccessRule' = @{ Static = [string[]]@(); Instance = $true }
     'Append' = @{ Static = [string[]]@(); Instance = $true }
     'Combine' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
     'ComputeHash' = @{ Static = [string[]]@(); Instance = $true }
@@ -2305,6 +2310,61 @@ $script:hashtableCandidateMemberReceiver = @{
         Instance = $false
     }
     'Copy' = @{ Static = [string[]]@('System.Array'); Instance = $false }
+    'Create' = @{ Static = [string[]]@('System.Security.Cryptography.SHA256'); Instance = $false }
+    'CreateDirectory' = @{ Static = [string[]]@('System.IO.Directory'); Instance = $false }
+    'Delete' = @{ Static = [string[]]@('System.IO.File'); Instance = $false }
+    'Dispose' = @{ Static = [string[]]@(); Instance = $true }
+    'EnumerateFileSystemEntries' = @{ Static = [string[]]@('System.IO.Directory'); Instance = $false }
+    'Equals' = @{ Static = [string[]]@('System.String'); Instance = $false }
+    'Exists' = @{ Static = [string[]]@('System.IO.File'); Instance = $false }
+    'Flush' = @{ Static = [string[]]@(); Instance = $true }
+    'GetAttributes' = @{ Static = [string[]]@('System.IO.File'); Instance = $false }
+    'GetEnumerator' = @{ Static = [string[]]@(); Instance = $true }
+    'GetFileName' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
+    'GetFullPath' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
+    'GetInvalidFileNameChars' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
+    'GetType' = @{ Static = [string[]]@(); Instance = $true }
+    'IndexOf' = @{ Static = [string[]]@(); Instance = $true }
+    'IndexOfAny' = @{ Static = [string[]]@(); Instance = $true }
+    'Insert' = @{ Static = [string[]]@(); Instance = $true }
+    'IsControl' = @{ Static = [string[]]@('System.Char'); Instance = $false }
+    'IsLetter' = @{ Static = [string[]]@('System.Char'); Instance = $false }
+    'IsNullOrWhiteSpace' = @{ Static = [string[]]@('System.String'); Instance = $false }
+    'IsPathRooted' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
+    'Min' = @{ Static = [string[]]@('System.Math'); Instance = $false }
+    'MoveNext' = @{ Static = [string[]]@(); Instance = $true }
+    'NewGuid' = @{ Static = [string[]]@('System.Guid'); Instance = $false }
+    'Open' = @{ Static = [string[]]@(); Instance = $true }
+    'Read' = @{ Static = [string[]]@(); Instance = $true }
+    'ReadAllLines' = @{ Static = [string[]]@('System.IO.File'); Instance = $false }
+    'ReferenceEquals' = @{ Static = [string[]]@('System.Object'); Instance = $false }
+    'Split' = @{ Static = [string[]]@(); Instance = $true }
+    'StartsWith' = @{ Static = [string[]]@(); Instance = $true }
+    'Substring' = @{ Static = [string[]]@(); Instance = $true }
+    'ToArray' = @{ Static = [string[]]@(); Instance = $true }
+    'ToCharArray' = @{ Static = [string[]]@(); Instance = $true }
+    'ToInt32' = @{ Static = [string[]]@('System.Convert'); Instance = $false }
+    'ToLowerInvariant' = @{ Static = [string[]]@(); Instance = $true }
+    'ToString' = @{ Static = [string[]]@('System.BitConverter'); Instance = $true }
+    'TransformBlock' = @{ Static = [string[]]@(); Instance = $true }
+    'TransformFinalBlock' = @{ Static = [string[]]@(); Instance = $true }
+    'TrimEnd' = @{ Static = [string[]]@(); Instance = $true }
+    'Write' = @{ Static = [string[]]@(); Instance = $true }
+    'WriteAllBytes' = @{ Static = [string[]]@('System.IO.File'); Instance = $false }
+}
+
+$script:hashtableCandidateContextMemberReceiver = @{
+    'Add' = @{ Static = [string[]]@(); Instance = $true }
+    'AddAccessRule' = @{ Static = [string[]]@(); Instance = $true }
+    'Combine' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
+    'Contains' = @{ Static = [string[]]@(); Instance = $true }
+    'ContainsKey' = @{ Static = [string[]]@(); Instance = $true }
+    'ContainsWildcardCharacters' = @{
+        Static = [string[]]@(
+            'System.Management.Automation.WildcardPattern'
+        )
+        Instance = $false
+    }
     'Create' = @{
         Static = [string[]]@(
             'System.IO.FileSystemAclExtensions',
@@ -2317,8 +2377,6 @@ $script:hashtableCandidateMemberReceiver = @{
     'Dispose' = @{ Static = [string[]]@(); Instance = $true }
     'EnumerateFileSystemEntries' = @{ Static = [string[]]@('System.IO.Directory'); Instance = $false }
     'Equals' = @{ Static = [string[]]@('System.String'); Instance = $false }
-    'Exists' = @{ Static = [string[]]@('System.IO.File'); Instance = $false }
-    'Flush' = @{ Static = [string[]]@(); Instance = $true }
     'GetAttributes' = @{ Static = [string[]]@('System.IO.File'); Instance = $false }
     'GetCurrent' = @{ Static = [string[]]@('System.Security.Principal.WindowsIdentity'); Instance = $false }
     'GetEnumerator' = @{ Static = [string[]]@(); Instance = $true }
@@ -2336,28 +2394,22 @@ $script:hashtableCandidateMemberReceiver = @{
     'IsLetter' = @{ Static = [string[]]@('System.Char'); Instance = $false }
     'IsNullOrWhiteSpace' = @{ Static = [string[]]@('System.String'); Instance = $false }
     'IsPathRooted' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
-    'Min' = @{ Static = [string[]]@('System.Math'); Instance = $false }
     'MoveNext' = @{ Static = [string[]]@(); Instance = $true }
     'NewGuid' = @{ Static = [string[]]@('System.Guid'); Instance = $false }
-    'Open' = @{ Static = [string[]]@(); Instance = $true }
     'Read' = @{ Static = [string[]]@(); Instance = $true }
-    'ReadAllLines' = @{ Static = [string[]]@('System.IO.File'); Instance = $false }
     'ReferenceEquals' = @{ Static = [string[]]@('System.Object'); Instance = $false }
     'SetAccessRuleProtection' = @{ Static = [string[]]@(); Instance = $true }
     'Split' = @{ Static = [string[]]@(); Instance = $true }
-    'StartsWith' = @{ Static = [string[]]@(); Instance = $true }
     'Substring' = @{ Static = [string[]]@(); Instance = $true }
     'ToArray' = @{ Static = [string[]]@(); Instance = $true }
     'ToCharArray' = @{ Static = [string[]]@(); Instance = $true }
     'ToInt32' = @{ Static = [string[]]@('System.Convert'); Instance = $false }
     'ToLowerInvariant' = @{ Static = [string[]]@(); Instance = $true }
     'ToObject' = @{ Static = [string[]]@('System.Enum'); Instance = $false }
-    'ToString' = @{ Static = [string[]]@('System.BitConverter'); Instance = $true }
+    'ToString' = @{ Static = [string[]]@('System.BitConverter'); Instance = $false }
     'TransformBlock' = @{ Static = [string[]]@(); Instance = $true }
     'TransformFinalBlock' = @{ Static = [string[]]@(); Instance = $true }
     'TrimEnd' = @{ Static = [string[]]@(); Instance = $true }
-    'Write' = @{ Static = [string[]]@(); Instance = $true }
-    'WriteAllBytes' = @{ Static = [string[]]@('System.IO.File'); Instance = $false }
 }
 
 $script:arrCandidateHelperPermittedMember = [string[]]@(
@@ -2402,14 +2454,16 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
             SetItemPath = [string[]]@()
             SetItemValue = [string[]]@()
             SingleUseMember = @{ GetResolvedProviderPathFromPSPath = 0 }
-            NativeResolver = $script:strCandidateHelperNativeResolver },
+            NativeResolver = $script:strCandidateHelperNativeResolver
+            MemberReceiver = $script:hashtableCandidateHelperMemberReceiver },
         @{ Path = $ContextLiteralPath
             Command = $script:arrCandidateContextPermittedCommand
             Member = $script:arrCandidateContextPermittedMember
             SetItemPath = $script:arrCandidateContextPermittedSetItemPath
             SetItemValue = $script:arrCandidateContextPermittedSetItemValue
             SingleUseMember = @{ GetResolvedProviderPathFromPSPath = 1 }
-            NativeResolver = $script:strCandidateContextNativeResolver }
+            NativeResolver = $script:strCandidateContextNativeResolver
+            MemberReceiver = $script:hashtableCandidateContextMemberReceiver }
     )
     foreach ($hashtableSurface in $arrScriptSurface) {
         $strScriptPath = [string]$hashtableSurface.Path
@@ -3154,12 +3208,12 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
             # The name is permitted; now the receiver has to be one production
             # uses it on. Without this, a permitted name is permitted on
             # anything -- see the note above the table.
-            if (-not $script:hashtableCandidateMemberReceiver.ContainsKey($strMemberName)) {
+            if (-not $hashtableSurface.MemberReceiver.ContainsKey($strMemberName)) {
                 & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                     -Detail ('member-receiver-undeclared-' + $strMemberName + '-' +
                         [string]$objMember.Extent.StartLineNumber)
             }
-            $hashtableReceiver = $script:hashtableCandidateMemberReceiver[$strMemberName]
+            $hashtableReceiver = $hashtableSurface.MemberReceiver[$strMemberName]
             if ($objMember.Static) {
                 $strReceiverType = ''
                 if ($objMember.Expression -is
@@ -4572,6 +4626,20 @@ $script:scriptBlockAssertProductionTaxonomyClosed = {
                 if ($null -eq $objShapeArgument -and
                     ($intShape + 1) -lt $arrShapeElement.Count) {
                     $objShapeArgument = $arrShapeElement[$intShape + 1]
+                }
+                # A splat carries its arguments in a hashtable this pass cannot
+                # read, and neither can the text passes below, so a diagnostic
+                # assembled that way would reach the catalog unchecked. Measured
+                # at zero splatted arguments anywhere in either script, so
+                # refusing keeps it that way by construction rather than by
+                # anyone remembering. This is the shape that escaped the
+                # Remove-Variable rule at round 51.
+                if ($objShapeArgument -is
+                    [System.Management.Automation.Language.VariableExpressionAst] -and
+                    $objShapeArgument.Splatted) {
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                        -Detail ('production-diagnostic-splat-' +
+                            [string]$objShapeCommand.Extent.StartLineNumber)
                 }
                 if ($objShapeArgument -is
                     [System.Management.Automation.Language.StringConstantExpressionAst]) {
