@@ -2275,6 +2275,91 @@ $script:arrCandidateContextPermittedSetItemValue = [string[]]@(
 # Adding a member to production means adding it here. That is the cost of an
 # allow-list and it is the point: a new name is a deliberate act, reviewed,
 # rather than something that arrives with a refactor.
+# Round 52, EE3. The allow-lists below name a MEMBER, and a name says nothing
+# about what it is called on. `Delete` is on the helper's list because
+# production calls [System.IO.File]::Delete and [System.IO.Directory]::Delete;
+# the same entry admitted `$objDirectoryInfo.Delete($true)`, which is a
+# RECURSIVE INSTANCE delete of a caller-controlled path. Same name, opposite
+# behaviour, and the list could not tell them apart.
+#
+# So each name is additionally pinned to the receiver forms production actually
+# uses. This table is generated from the two scripts rather than written by
+# hand -- every static receiver type and whether the name is ever used as an
+# instance call was read out of their parse trees, so it records what the code
+# does rather than what someone remembered it doing.
+#
+# A name on a permitted list but absent from this table is refused: adding a
+# member now means declaring how it is called, not just that it is.
+$script:hashtableCandidateMemberReceiver = @{
+    'Add' = @{ Static = [string[]]@(); Instance = $true }
+    'AddAccessRule' = @{ Static = [string[]]@(); Instance = $true }
+    'Append' = @{ Static = [string[]]@(); Instance = $true }
+    'Combine' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
+    'ComputeHash' = @{ Static = [string[]]@(); Instance = $true }
+    'Contains' = @{ Static = [string[]]@(); Instance = $true }
+    'ContainsKey' = @{ Static = [string[]]@(); Instance = $true }
+    'ContainsWildcardCharacters' = @{
+        Static = [string[]]@(
+            'System.Management.Automation.WildcardPattern'
+        )
+        Instance = $false
+    }
+    'Copy' = @{ Static = [string[]]@('System.Array'); Instance = $false }
+    'Create' = @{
+        Static = [string[]]@(
+            'System.IO.FileSystemAclExtensions',
+            'System.Security.Cryptography.SHA256'
+        )
+        Instance = $true
+    }
+    'CreateDirectory' = @{ Static = [string[]]@('System.IO.Directory'); Instance = $false }
+    'Delete' = @{ Static = [string[]]@('System.IO.Directory', 'System.IO.File'); Instance = $false }
+    'Dispose' = @{ Static = [string[]]@(); Instance = $true }
+    'EnumerateFileSystemEntries' = @{ Static = [string[]]@('System.IO.Directory'); Instance = $false }
+    'Equals' = @{ Static = [string[]]@('System.String'); Instance = $false }
+    'Exists' = @{ Static = [string[]]@('System.IO.File'); Instance = $false }
+    'Flush' = @{ Static = [string[]]@(); Instance = $true }
+    'GetAttributes' = @{ Static = [string[]]@('System.IO.File'); Instance = $false }
+    'GetCurrent' = @{ Static = [string[]]@('System.Security.Principal.WindowsIdentity'); Instance = $false }
+    'GetEnumerator' = @{ Static = [string[]]@(); Instance = $true }
+    'GetFileName' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
+    'GetFullPath' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
+    'GetInvalidFileNameChars' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
+    'GetNewClosure' = @{ Static = [string[]]@(); Instance = $true }
+    'GetRandomFileName' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
+    'GetResolvedProviderPathFromPSPath' = @{ Static = [string[]]@(); Instance = $true }
+    'GetType' = @{ Static = [string[]]@(); Instance = $true }
+    'IndexOf' = @{ Static = [string[]]@(); Instance = $true }
+    'IndexOfAny' = @{ Static = [string[]]@(); Instance = $true }
+    'Insert' = @{ Static = [string[]]@(); Instance = $true }
+    'IsControl' = @{ Static = [string[]]@('System.Char'); Instance = $false }
+    'IsLetter' = @{ Static = [string[]]@('System.Char'); Instance = $false }
+    'IsNullOrWhiteSpace' = @{ Static = [string[]]@('System.String'); Instance = $false }
+    'IsPathRooted' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
+    'Min' = @{ Static = [string[]]@('System.Math'); Instance = $false }
+    'MoveNext' = @{ Static = [string[]]@(); Instance = $true }
+    'NewGuid' = @{ Static = [string[]]@('System.Guid'); Instance = $false }
+    'Open' = @{ Static = [string[]]@(); Instance = $true }
+    'Read' = @{ Static = [string[]]@(); Instance = $true }
+    'ReadAllLines' = @{ Static = [string[]]@('System.IO.File'); Instance = $false }
+    'ReferenceEquals' = @{ Static = [string[]]@('System.Object'); Instance = $false }
+    'SetAccessRuleProtection' = @{ Static = [string[]]@(); Instance = $true }
+    'Split' = @{ Static = [string[]]@(); Instance = $true }
+    'StartsWith' = @{ Static = [string[]]@(); Instance = $true }
+    'Substring' = @{ Static = [string[]]@(); Instance = $true }
+    'ToArray' = @{ Static = [string[]]@(); Instance = $true }
+    'ToCharArray' = @{ Static = [string[]]@(); Instance = $true }
+    'ToInt32' = @{ Static = [string[]]@('System.Convert'); Instance = $false }
+    'ToLowerInvariant' = @{ Static = [string[]]@(); Instance = $true }
+    'ToObject' = @{ Static = [string[]]@('System.Enum'); Instance = $false }
+    'ToString' = @{ Static = [string[]]@('System.BitConverter'); Instance = $true }
+    'TransformBlock' = @{ Static = [string[]]@(); Instance = $true }
+    'TransformFinalBlock' = @{ Static = [string[]]@(); Instance = $true }
+    'TrimEnd' = @{ Static = [string[]]@(); Instance = $true }
+    'Write' = @{ Static = [string[]]@(); Instance = $true }
+    'WriteAllBytes' = @{ Static = [string[]]@('System.IO.File'); Instance = $false }
+}
+
 $script:arrCandidateHelperPermittedMember = [string[]]@(
     'Add', 'Append', 'Combine', 'ComputeHash', 'Contains', 'ContainsKey',
     'ContainsWildcardCharacters', 'Copy', 'Create', 'CreateDirectory',
@@ -3064,6 +3149,31 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
             if (@($hashtableSurface.Member) -cnotcontains $strMemberName) {
                 & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                     -Detail ('member-not-permitted-' + $strMemberName + '-' +
+                        [string]$objMember.Extent.StartLineNumber)
+            }
+            # The name is permitted; now the receiver has to be one production
+            # uses it on. Without this, a permitted name is permitted on
+            # anything -- see the note above the table.
+            if (-not $script:hashtableCandidateMemberReceiver.ContainsKey($strMemberName)) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                    -Detail ('member-receiver-undeclared-' + $strMemberName + '-' +
+                        [string]$objMember.Extent.StartLineNumber)
+            }
+            $hashtableReceiver = $script:hashtableCandidateMemberReceiver[$strMemberName]
+            if ($objMember.Static) {
+                $strReceiverType = ''
+                if ($objMember.Expression -is
+                    [System.Management.Automation.Language.TypeExpressionAst]) {
+                    $strReceiverType = [string]$objMember.Expression.TypeName.FullName
+                }
+                if (@($hashtableReceiver.Static) -cnotcontains $strReceiverType) {
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                        -Detail ('member-receiver-not-permitted-' + $strMemberName + '-' +
+                            [string]$objMember.Extent.StartLineNumber)
+                }
+            } elseif (-not $hashtableReceiver.Instance) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                    -Detail ('member-instance-not-permitted-' + $strMemberName + '-' +
                         [string]$objMember.Extent.StartLineNumber)
             }
         }
