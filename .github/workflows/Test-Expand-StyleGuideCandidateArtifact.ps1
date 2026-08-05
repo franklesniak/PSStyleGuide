@@ -947,8 +947,26 @@ $script:scriptBlockAssertContextReadsAreCaptured = {
             $hashtableAlias.ContainsKey([string]$objValue.VariablePath.UserPath)) {
             $boolIsCapture = $true
         }
+        # A literal counts only when it is built from a context read. The first
+        # revision accepted every HashtableAst, which made the earliest
+        # `$x = @{...}` anywhere in the file the capture point and refused the
+        # entry point's own pre-authentication guard. Measured:
+        # context-read-not-captured-2879 again, from a different cause than the
+        # two before it.
         if ($objValue -is [System.Management.Automation.Language.HashtableAst]) {
-            $boolIsCapture = $true
+            $boolIsCapture = @($objValue.FindAll(
+                    {
+                        param ($objNode)
+                        return ($objNode -is
+                            [System.Management.Automation.Language.MemberExpressionAst] -and
+                            $objNode.Expression -is
+                            [System.Management.Automation.Language.VariableExpressionAst])
+                    },
+                    $true
+                ) | Where-Object {
+                    $hashtableAlias.ContainsKey(
+                        [string]$_.Expression.VariablePath.UserPath)
+                }).Count -gt 0
         }
         if ($boolIsCapture) {
             $arrCapture += $objAssignment
