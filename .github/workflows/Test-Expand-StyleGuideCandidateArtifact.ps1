@@ -803,6 +803,35 @@ $script:scriptBlockAssertVersionMarkersConsistent = {
                 -Detail ('version-marker-in-' + $objFunction.Name + '-' + $intInside)
         }
     }
+
+    # The count above proves 2 + N non-foreign markers exist and every one of
+    # them equals the expected version; the own-constant check binds one of
+    # those markers to the constant, and the per-function loop binds N of them
+    # to the functions. That leaves exactly one -- the help block's -- accounted
+    # for by the total alone. Deleting the help block's marker and adding a
+    # stray version literal to any unrelated comment preserves the total, the
+    # own-constant, the function count, and the per-function locations, so the
+    # help block can carry no marker while this assertion passes. That is the
+    # same substitution the per-function check just above closes for a
+    # function's marker, left open for the help block's. Bind the last marker
+    # too: the help block is the file's leading '<# #>' token and states the
+    # version exactly once.
+    $arrHelpBlockToken = @(@($objMarkerTokens) | Where-Object {
+            $_.Kind -eq [System.Management.Automation.Language.TokenKind]::Comment -and
+            ([string]$_.Text).StartsWith('<#')
+        } | Sort-Object { $_.Extent.StartOffset })
+    if (@($arrHelpBlockToken).Count -lt 1) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
+            -Detail 'version-marker-help-block-absent'
+    }
+    $intHelpBlockMarker = @([System.Text.RegularExpressions.Regex]::Matches(
+            [string]$arrHelpBlockToken[0].Text,
+            '\b\d+\.\d+\.\d{8}\.\d+\b'
+        ) | Where-Object { $_.Value -ceq $ExpectedVersion }).Count
+    if ($intHelpBlockMarker -ne 1) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
+            -Detail ('version-marker-help-block-' + $intHelpBlockMarker)
+    }
 }
 
 # Rounds 52 and 54 produced three findings of one shape: a live
@@ -5488,7 +5517,19 @@ $script:scriptBlockAssertProductionTaxonomyClosed = {
                     # the pass-through table AND the closed-set regexes, which
                     # is the same hole one layer along. Only the form those
                     # passes can actually read is admitted here.
-                    if (([string]$objShapeArgument.Extent.Text) -cmatch
+                    #
+                    # "A pass can read it" is per field, not global. The family
+                    # pass below reads -Subreason "$name-suffix"; the computed
+                    # pass reads -Code and -Fallback "$name-invalid". Nothing
+                    # downstream reads an interpolated -Phase or -DiagnosticCode,
+                    # so admitting one of those here would carry its value to the
+                    # catalog unchecked -- the same hole one field over from the
+                    # round-54 report. Production interpolates only Code,
+                    # Fallback and Subreason (measured); an expandable argument
+                    # to any other diagnostic parameter is refused rather than
+                    # admitted into a form no pass validates.
+                    if (@('Code', 'Fallback', 'Subreason') -ccontains $strShapeParameter -and
+                        ([string]$objShapeArgument.Extent.Text) -cmatch
                         '^"\$[A-Za-z0-9_]+-[A-Za-z]+"$') {
                         continue
                     }
@@ -5515,6 +5556,128 @@ $script:scriptBlockAssertProductionTaxonomyClosed = {
                 & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                     -Detail ('production-diagnostic-shape-' +
                         [string]$objShapeCommand.Extent.StartLineNumber)
+            }
+        }
+
+        # The shape pass above admits `-Code $strFailureCode` on the strength of
+        # the variable's NAME being on the pass-through table; nothing there
+        # reads the VALUE the variable carries. The call-site passes below read
+        # only values written AT a call site, so a diagnostic written to a
+        # variable and then forwarded is invisible to every check -- which is
+        # the one thing #146 asks this closure to prevent. Close it where the
+        # value is written: every literal assigned, in value position, to a
+        # pass-through variable must belong to that variable's field.
+        #
+        # Only literals in value position are collected -- a direct assignment,
+        # or the tail of an if/ternary branch -- never a literal that is an
+        # argument to a call in the right-hand side, so a helper's -Key and
+        # -Fallback strings are not mistaken for the variable's value. Three
+        # right-hand-side shapes are deliberately not literals here and are left
+        # to their existing coverage: an interpolation ("$Phase-invalid") is
+        # proven whole by the computed pass below; a value returned by a
+        # diagnostic-field helper is bounded by that helper's validated
+        # -Fallback and by the validated annotations at the throw sites it
+        # reads; a propagated variable was itself validated where it was written.
+        $hashtablePassThroughField = @{}
+        foreach ($strPassKey in $script:hashtableCandidateDiagnosticPassThrough.Keys) {
+            foreach ($strPassVar in
+                $script:hashtableCandidateDiagnosticPassThrough[$strPassKey]) {
+                $hashtablePassThroughField[[string]$strPassVar] = [string]$strPassKey
+            }
+        }
+        foreach ($objAssign in @($objShapeAst.FindAll(
+                    {
+                        param ($SyntaxNode)
+                        $SyntaxNode -is
+                            [System.Management.Automation.Language.AssignmentStatementAst] -and
+                        $SyntaxNode.Left -is
+                            [System.Management.Automation.Language.VariableExpressionAst]
+                    },
+                    $true
+                ) | Where-Object {
+                    $hashtablePassThroughField.ContainsKey(
+                        [string]$_.Left.VariablePath.UserPath)
+                })) {
+            $strAssignField = $hashtablePassThroughField[
+                [string]$objAssign.Left.VariablePath.UserPath]
+            # A Fallback variable's destination is chosen at the call by -Key, so
+            # its literal is allowed in any of the three sets; the other fields
+            # resolve to one exact set.
+            $objAssignSet = $null
+            if ($strAssignField -ceq 'Phase') { $objAssignSet = $objPhase }
+            elseif ($strAssignField -ceq 'Subreason') { $objAssignSet = $objSubreason }
+            elseif ($strAssignField -ceq 'Fallback') { $objAssignSet = $null }
+            else { $objAssignSet = $objDiagnostic }
+            $queueValueNode = New-Object 'System.Collections.Generic.Queue[object]'
+            $queueValueNode.Enqueue($objAssign.Right)
+            while ($queueValueNode.Count -gt 0) {
+                $objValueNode = $queueValueNode.Dequeue()
+                if ($null -eq $objValueNode) { continue }
+                if ($objValueNode -is
+                    [System.Management.Automation.Language.PipelineAst]) {
+                    # A pipeline of a single expression is that expression's
+                    # value; a pipeline that invokes a command yields the
+                    # command's return -- the documented helper boundary -- and
+                    # is not descended into.
+                    if (@($objValueNode.PipelineElements).Count -eq 1 -and
+                        $objValueNode.PipelineElements[0] -is
+                            [System.Management.Automation.Language.CommandExpressionAst]) {
+                        $queueValueNode.Enqueue(
+                            $objValueNode.PipelineElements[0].Expression)
+                    }
+                    continue
+                }
+                if ($objValueNode -is
+                    [System.Management.Automation.Language.ParenExpressionAst]) {
+                    $queueValueNode.Enqueue($objValueNode.Pipeline)
+                    continue
+                }
+                if ($objValueNode -is
+                    [System.Management.Automation.Language.IfStatementAst]) {
+                    foreach ($objIfClause in $objValueNode.Clauses) {
+                        $queueValueNode.Enqueue($objIfClause.Item2)
+                    }
+                    if ($null -ne $objValueNode.ElseClause) {
+                        $queueValueNode.Enqueue($objValueNode.ElseClause)
+                    }
+                    continue
+                }
+                if ($objValueNode -is
+                    [System.Management.Automation.Language.StatementBlockAst]) {
+                    $arrBlockStatement = @($objValueNode.Statements)
+                    if ($arrBlockStatement.Count -gt 0) {
+                        $queueValueNode.Enqueue(
+                            $arrBlockStatement[$arrBlockStatement.Count - 1])
+                    }
+                    continue
+                }
+                if ($objValueNode -is
+                    [System.Management.Automation.Language.TernaryExpressionAst]) {
+                    $queueValueNode.Enqueue($objValueNode.IfTrue)
+                    $queueValueNode.Enqueue($objValueNode.IfFalse)
+                    continue
+                }
+                if ($objValueNode -is
+                    [System.Management.Automation.Language.StringConstantExpressionAst]) {
+                    $strAssignLiteral = [string]$objValueNode.Value
+                    $boolAssignMember = $false
+                    if ($null -eq $objAssignSet) {
+                        $boolAssignMember = $objDiagnostic.Contains($strAssignLiteral) -or
+                            $objPhase.Contains($strAssignLiteral) -or
+                            $objSubreason.Contains($strAssignLiteral)
+                    } else {
+                        $boolAssignMember = $objAssignSet.Contains($strAssignLiteral)
+                    }
+                    if (-not $boolAssignMember) {
+                        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                            -Detail ('production-passthrough-literal-' +
+                                [string]$objAssign.Extent.StartLineNumber)
+                    }
+                    continue
+                }
+                # An expandable string, a bare variable, or any command/member
+                # value is not a literal in value position and is covered by the
+                # passes named above rather than validated here.
             }
         }
 
