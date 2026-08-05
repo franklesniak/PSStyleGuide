@@ -805,6 +805,119 @@ $script:scriptBlockAssertVersionMarkersConsistent = {
     }
 }
 
+# Rounds 52 and 54 produced three findings of one shape: a live
+# `$Context.<field>` read AFTER that field had been captured and
+# authenticated. EE6 was the ownership append; GG-A was the
+# candidate-directory record; GG-A-prime was the candidate-file record, which
+# supplies the expected length and digest the extracted bytes are checked
+# against. Each was fixed where it was found, and the third was found only
+# because the second prompted a sweep.
+#
+# Measured, and this is the part that made a rule worth writing: reverting any
+# of those three reads leaves the whole suite green -- 113 pass, 2 skip, 0
+# fail, empty stderr. No catalog case swaps a journal mid-expansion, so
+# nothing observes the difference between reading a capture and reading the
+# field it was captured from. Three findings, and the tests could not see any
+# of them.
+#
+# So the shape is refused statically instead. After the capture point, the
+# only `$Context.<member>` access production may make is the capture itself:
+# the whole right-hand side of an assignment, or a field in a capture literal.
+# `@($Context.OwnershipJournal | Where-Object {...})[0]` is neither, and that
+# is exactly GG-A-prime.
+#
+# The capture point is found rather than written down -- the first assignment
+# to a variable whose name carries `Authenticated`. Reads BEFORE it are
+# untouched, which is deliberate: the entry guard at the top of expansion
+# (`if ($Context.LifecycleState -cne 'Active')`) is a legitimate pre-capture
+# rejection of a caller-supplied context, and a rule that refused it would be
+# refusing the check that makes the capture worth having.
+$script:scriptBlockAssertContextReadsAreCaptured = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath
+    )
+
+    $objErrors = $null
+    $objAst = [System.Management.Automation.Language.Parser]::ParseFile(
+        $LiteralPath, [ref]$null, [ref]$objErrors)
+    if ($null -eq $objAst -or @($objErrors).Count -ne 0) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'context-read-parse'
+    }
+
+    $arrCapture = @($objAst.FindAll(
+            {
+                param ($objNode)
+                return ($objNode -is
+                    [System.Management.Automation.Language.AssignmentStatementAst] -and
+                    $objNode.Left -is
+                    [System.Management.Automation.Language.VariableExpressionAst] -and
+                    ([string]$objNode.Left.VariablePath.UserPath) -cmatch 'Authenticated')
+            },
+            $true
+        ))
+    if (@($arrCapture).Count -eq 0) {
+        # The capture is what this rule exists to protect. If it is gone, the
+        # rule cannot be evaluated, and a rule that passes when it finds no
+        # subject admits everything -- which is round 49's BB1.
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'context-read-capture-absent'
+    }
+    $intCapturePoint = [int]::MaxValue
+    foreach ($objCapture in $arrCapture) {
+        if ([int]$objCapture.Extent.StartOffset -lt $intCapturePoint) {
+            $intCapturePoint = [int]$objCapture.Extent.StartOffset
+        }
+    }
+
+    foreach ($objRead in @($objAst.FindAll(
+                {
+                    param ($objNode)
+                    return ($objNode -is
+                        [System.Management.Automation.Language.MemberExpressionAst] -and
+                        $objNode.Expression -is
+                        [System.Management.Automation.Language.VariableExpressionAst] -and
+                        ([string]$objNode.Expression.VariablePath.UserPath) -ceq 'Context')
+                },
+                $true
+            ))) {
+        if ([int]$objRead.Extent.StartOffset -lt $intCapturePoint) {
+            continue
+        }
+        # Walk out through at most one cast and one command expression. A
+        # capture reaches an assignment or a literal within that; anything
+        # embedded in a pipeline, an index or a call does not.
+        $boolCaptured = $false
+        $objWalk = $objRead.Parent
+        $intHop = 0
+        while ($null -ne $objWalk -and $intHop -lt 4) {
+            if ($objWalk -is
+                [System.Management.Automation.Language.AssignmentStatementAst] -or
+                $objWalk -is
+                [System.Management.Automation.Language.HashtableAst]) {
+                $boolCaptured = $true
+                break
+            }
+            if ($objWalk -isnot
+                [System.Management.Automation.Language.ConvertExpressionAst] -and
+                $objWalk -isnot
+                [System.Management.Automation.Language.CommandExpressionAst] -and
+                $objWalk -isnot
+                [System.Management.Automation.Language.PipelineAst]) {
+                break
+            }
+            $objWalk = $objWalk.Parent
+            $intHop++
+        }
+        if (-not $boolCaptured) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('context-read-not-captured-' +
+                    [string]$objRead.Extent.StartLineNumber)
+        }
+    }
+}
+
 $script:scriptBlockAssertResourceGuardsWired = {
     param (
         [Parameter(Mandatory = $true)]
@@ -8654,6 +8767,8 @@ function Invoke-StyleGuideCandidateHarness {
                 $script:strCandidateExpectedContextVersion
         })
     [void](& $script:scriptBlockAssertResourceGuardsWired -LiteralPath $strHelperLiteralPath)
+    [void](& $script:scriptBlockAssertContextReadsAreCaptured `
+        -LiteralPath $strHelperLiteralPath)
     $arrContextLoadOutput = @(. $strContextLiteralPath)
     if ($arrContextLoadOutput.Count -ne 0) {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'context-load-output'
