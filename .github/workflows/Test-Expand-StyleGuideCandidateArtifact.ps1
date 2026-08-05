@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260805.0
+Version: 1.0.20260805.1
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,10 +53,10 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260805.0'
+$script:versionCandidateHarness = [System.Version]'1.0.20260805.1'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260805.0'
+$script:strCandidateExpectedHelperVersion = '1.0.20260805.1'
 $script:strCandidateExpectedContextVersion = '1.0.20260805.0'
 $script:strCandidateCatalogVersion = '1.0.20260805.0'
 # The documented ceiling on what an authenticated native query may return, the
@@ -604,9 +604,9 @@ $script:scriptBlockAssertVersionMarkersConsistent = {
 
     $arrVersionConvert = @($objMarkerAst.FindAll(
             {
-                param ($objNode)
-                $objNode -is [System.Management.Automation.Language.ConvertExpressionAst] -and
-                $objNode.Type.TypeName.FullName -match '^(System\.)?Version$'
+                param ($SyntaxNode)
+                $SyntaxNode -is [System.Management.Automation.Language.ConvertExpressionAst] -and
+                $SyntaxNode.Type.TypeName.FullName -match '^(System\.)?Version$'
             },
             $true
         ))
@@ -689,9 +689,9 @@ $script:scriptBlockAssertVersionMarkersConsistent = {
     foreach ($strDeclaredName in $VersionConstantMap.Keys) {
         $arrAssignment = @($objMarkerAst.FindAll(
                 {
-                    param ($objNode)
-                    $objNode -is [System.Management.Automation.Language.AssignmentStatementAst] -and
-                    $objNode.Left -is [System.Management.Automation.Language.VariableExpressionAst]
+                    param ($SyntaxNode)
+                    $SyntaxNode -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                    $SyntaxNode.Left -is [System.Management.Automation.Language.VariableExpressionAst]
                 },
                 $true
             ) | Where-Object {
@@ -777,8 +777,8 @@ $script:scriptBlockAssertVersionMarkersConsistent = {
         })
     $arrPublicFunction = @($objMarkerAst.FindAll(
             {
-                param ($objNode)
-                $objNode -is [System.Management.Automation.Language.FunctionDefinitionAst]
+                param ($SyntaxNode)
+                $SyntaxNode -is [System.Management.Automation.Language.FunctionDefinitionAst]
             },
             $true
         ))
@@ -868,10 +868,10 @@ $script:scriptBlockAssertContextReadsAreCaptured = {
 
     $arrAllAssignment = @($objAst.FindAll(
             {
-                param ($objNode)
-                return ($objNode -is
+                param ($SyntaxNode)
+                return ($SyntaxNode -is
                     [System.Management.Automation.Language.AssignmentStatementAst] -and
-                    $objNode.Left -is
+                    $SyntaxNode.Left -is
                     [System.Management.Automation.Language.VariableExpressionAst])
             },
             $true
@@ -882,8 +882,8 @@ $script:scriptBlockAssertContextReadsAreCaptured = {
     # element -- returns nothing, because whatever a command did to the value
     # is not a capture of it.
     $scriptBlockUnwrapAssignedValue = {
-        param ($objAssignment)
-        $objValue = $objAssignment.Right
+        param ($AssignmentStatement)
+        $objValue = $AssignmentStatement.Right
         if ($objValue -is [System.Management.Automation.Language.PipelineAst]) {
             if (@($objValue.PipelineElements).Count -ne 1) {
                 return $null
@@ -941,18 +941,18 @@ $script:scriptBlockAssertContextReadsAreCaptured = {
     # evaluated, which is refused rather than passed -- round 49's BB1.
     $arrAuthentication = @($objAst.FindAll(
             {
-                param ($objNode)
-                return ($objNode -is
+                param ($SyntaxNode)
+                return ($SyntaxNode -is
                     [System.Management.Automation.Language.CommandAst] -and
-                    ([string]$objNode.GetCommandName()) -ceq
+                    ([string]$SyntaxNode.GetCommandName()) -ceq
                     'Test-StyleGuideCandidateInvocationContextIssued')
             },
             $true
         ))
 
     $scriptBlockResolveScopeStart = {
-        param ($objNode)
-        $objScope = $objNode
+        param ($SyntaxNode)
+        $objScope = $SyntaxNode
         while ($null -ne $objScope) {
             if ($objScope -is
                 [System.Management.Automation.Language.FunctionDefinitionAst] -or
@@ -971,8 +971,8 @@ $script:scriptBlockAssertContextReadsAreCaptured = {
     # as JJ1, and it is HH2's property inside the fix for HH2: a rule that names
     # one spelling of a thing is escaped by another spelling of the same thing.
     $scriptBlockUnwrapReceiver = {
-        param ($objNode)
-        $objInner = $objNode
+        param ($SyntaxNode)
+        $objInner = $SyntaxNode
         while ($true) {
             if ($objInner -is
                 [System.Management.Automation.Language.ParenExpressionAst]) {
@@ -1007,10 +1007,10 @@ $script:scriptBlockAssertContextReadsAreCaptured = {
     # anywhere, so the permitted shape is "not at all". Reported as JJ2.
     foreach ($objPipeline in @($objAst.FindAll(
                 {
-                    param ($objNode)
-                    return ($objNode -is
+                    param ($SyntaxNode)
+                    return ($SyntaxNode -is
                         [System.Management.Automation.Language.PipelineAst] -and
-                        @($objNode.PipelineElements).Count -gt 1)
+                        @($SyntaxNode.PipelineElements).Count -gt 1)
                 },
                 $true
             ))) {
@@ -1027,8 +1027,8 @@ $script:scriptBlockAssertContextReadsAreCaptured = {
 
     foreach ($objRead in @($objAst.FindAll(
                 {
-                    param ($objNode)
-                    return ($objNode -is
+                    param ($SyntaxNode)
+                    return ($SyntaxNode -is
                         [System.Management.Automation.Language.MemberExpressionAst])
                 },
                 $true
@@ -1154,8 +1154,8 @@ $script:scriptBlockAssertResourceGuardsWired = {
     }
     $arrCommandAst = @($objScriptAst.FindAll(
         {
-            param ($objNode)
-            $objNode -is [System.Management.Automation.Language.CommandAst]
+            param ($SyntaxNode)
+            $SyntaxNode -is [System.Management.Automation.Language.CommandAst]
         },
         $true
     ))
@@ -1352,11 +1352,11 @@ $script:scriptBlockAssertResourceGuardsReached = {
     foreach ($strGuardName in $arrGuardName) {
         $arrAssignment = @($objScriptAst.FindAll(
             {
-                param ($objNode)
-                $objNode -is [System.Management.Automation.Language.AssignmentStatementAst] -and
-                    $objNode.Left -is
+                param ($SyntaxNode)
+                $SyntaxNode -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                    $SyntaxNode.Left -is
                         [System.Management.Automation.Language.VariableExpressionAst] -and
-                    $objNode.Left.VariablePath.UserPath -ceq ('script:' + $strGuardName)
+                    $SyntaxNode.Left.VariablePath.UserPath -ceq ('script:' + $strGuardName)
             },
             $true
         ))
@@ -1449,11 +1449,11 @@ $script:scriptBlockAssertResourceGuardsReached = {
     foreach ($strGuardName in $arrGuardName) {
         $arrAssignment = @($objScriptAst.FindAll(
             {
-                param ($objNode)
-                $objNode -is [System.Management.Automation.Language.AssignmentStatementAst] -and
-                    $objNode.Left -is
+                param ($SyntaxNode)
+                $SyntaxNode -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                    $SyntaxNode.Left -is
                         [System.Management.Automation.Language.VariableExpressionAst] -and
-                    $objNode.Left.VariablePath.UserPath -ceq ('script:' + $strGuardName)
+                    $SyntaxNode.Left.VariablePath.UserPath -ceq ('script:' + $strGuardName)
             },
             $true
         ))
@@ -1720,13 +1720,13 @@ $script:scriptBlockAssertDirectoryReadsBounded = {
         }
         $intBoundedCall = @($objSiteAst.FindAll(
                 {
-                    param ($objNode)
-                    if ($objNode -isnot
+                    param ($SyntaxNode)
+                    if ($SyntaxNode -isnot
                         [System.Management.Automation.Language.CommandAst]) {
                         return $false
                     }
                     $boolNamed = $false
-                    foreach ($objElement in $objNode.CommandElements) {
+                    foreach ($objElement in $SyntaxNode.CommandElements) {
                         if ($objElement -is
                             [System.Management.Automation.Language.CommandParameterAst] -and
                             $objElement.ParameterName -ceq 'MaximumEntry') {
@@ -2167,12 +2167,12 @@ $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
     }
     $arrGuardAssignment = @($objGuardAst.FindAll(
             {
-                param ($objNode)
-                $objNode -is [System.Management.Automation.Language.AssignmentStatementAst] -and
-                $objNode.Left.Extent.Text -ceq ('$script:' + $strGuardName) -and
-                $objNode.Right -is
+                param ($SyntaxNode)
+                $SyntaxNode -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                $SyntaxNode.Left.Extent.Text -ceq ('$script:' + $strGuardName) -and
+                $SyntaxNode.Right -is
                     [System.Management.Automation.Language.CommandExpressionAst] -and
-                $objNode.Right.Expression -is
+                $SyntaxNode.Right.Expression -is
                     [System.Management.Automation.Language.ScriptBlockExpressionAst]
             },
             $true
@@ -2311,13 +2311,13 @@ $script:scriptBlockAssertEnumerationBoundsDeclared = {
         }
         $arrCall = @($objAst.FindAll(
                 {
-                    param ($objNode)
-                    $objNode -is [System.Management.Automation.Language.CommandAst] -and
-                    @($objNode.CommandElements).Count -gt 0 -and
-                    $objNode.CommandElements[0] -is
+                    param ($SyntaxNode)
+                    $SyntaxNode -is [System.Management.Automation.Language.CommandAst] -and
+                    @($SyntaxNode.CommandElements).Count -gt 0 -and
+                    $SyntaxNode.CommandElements[0] -is
                         [System.Management.Automation.Language.VariableExpressionAst] -and
                     $script:arrCandidateEnumerationScriptBlockName -ccontains
-                        ($objNode.CommandElements[0].VariablePath.UserPath -creplace
+                        ($SyntaxNode.CommandElements[0].VariablePath.UserPath -creplace
                             '^script:', '')
                 },
                 $true
@@ -2475,11 +2475,11 @@ $script:scriptBlockTestSelfClosureSourced = {
     )
 
     $scriptBlockHasLiteral = {
-        param ($objNode)
-        return ($null -ne $objNode.Right.Find(
+        param ($SyntaxNode)
+        return ($null -ne $SyntaxNode.Right.Find(
             {
-                param ($objInner)
-                $objInner -is
+                param ($InnerSyntaxNode)
+                $InnerSyntaxNode -is
                     [System.Management.Automation.Language.ScriptBlockExpressionAst]
             },
             $false
@@ -2780,10 +2780,10 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
         # that is what is checked.
         $arrScriptBlockVariable = [string[]]@(@($objAst.FindAll(
                     {
-                        param ($objNode)
-                        $objNode -is
+                        param ($SyntaxNode)
+                        $SyntaxNode -is
                             [System.Management.Automation.Language.AssignmentStatementAst] -and
-                        $objNode.Left -is
+                        $SyntaxNode.Left -is
                             [System.Management.Automation.Language.VariableExpressionAst] -and
                         $true
                     },
@@ -2815,8 +2815,8 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                             ('$' + $strSelf + '.GetNewClosure()')
                         $boolLiteral = $null -ne $_.Right.Find(
                             {
-                                param ($objInner)
-                                $objInner -is
+                                param ($InnerSyntaxNode)
+                                $InnerSyntaxNode -is
                                     [System.Management.Automation.Language.ScriptBlockExpressionAst]
                             },
                             $false
@@ -2845,10 +2845,10 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
         # not an admission.
         $arrNativePathVariable = [string[]]@(@($objAst.FindAll(
                     {
-                        param ($objNode)
-                        return ($objNode -is
+                        param ($SyntaxNode)
+                        return ($SyntaxNode -is
                             [System.Management.Automation.Language.AssignmentStatementAst] -and
-                            $objNode.Left -is
+                            $SyntaxNode.Left -is
                             [System.Management.Automation.Language.VariableExpressionAst])
                     },
                     $true
@@ -2923,18 +2923,18 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
         # ${function:...} without the closure, is not on the list.
         $arrOwnFunctionName = [string[]]@(@($objAst.FindAll(
                     {
-                        param ($objNode)
-                        $objNode -is
+                        param ($SyntaxNode)
+                        $SyntaxNode -is
                             [System.Management.Automation.Language.FunctionDefinitionAst]
                     },
                     $true
                 )) | ForEach-Object { [string]$_.Name })
         $arrOwnClosureVariable = [string[]]@(@($objAst.FindAll(
                     {
-                        param ($objNode)
-                        return ($objNode -is
+                        param ($SyntaxNode)
+                        return ($SyntaxNode -is
                             [System.Management.Automation.Language.AssignmentStatementAst] -and
-                            $objNode.Left -is
+                            $SyntaxNode.Left -is
                             [System.Management.Automation.Language.VariableExpressionAst])
                     },
                     $true
@@ -2960,8 +2960,8 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
         # site table already governs.
         foreach ($objCommand in @($objAst.FindAll(
                     {
-                        param ($objNode)
-                        $objNode -is [System.Management.Automation.Language.CommandAst]
+                        param ($SyntaxNode)
+                        $SyntaxNode -is [System.Management.Automation.Language.CommandAst]
                     },
                     $true
                 ))) {
@@ -3337,10 +3337,10 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
         # they do today.
         foreach ($objDynamic in @($objAst.FindAll(
                     {
-                        param ($objNode)
-                        $objNode -is
+                        param ($SyntaxNode)
+                        $SyntaxNode -is
                             [System.Management.Automation.Language.MemberExpressionAst] -and
-                        $objNode.Member -isnot
+                        $SyntaxNode.Member -isnot
                             [System.Management.Automation.Language.StringConstantExpressionAst]
                     },
                     $true
@@ -3363,14 +3363,14 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
         # instead would be satisfied by any editor who rewrote the loop.
         foreach ($objHashCall in @($objAst.FindAll(
                     {
-                        param ($objNode)
-                        if ($objNode -isnot
+                        param ($SyntaxNode)
+                        if ($SyntaxNode -isnot
                             [System.Management.Automation.Language.InvokeMemberExpressionAst]) {
                             return $false
                         }
-                        $strMember = if ($objNode.Member -is
+                        $strMember = if ($SyntaxNode.Member -is
                             [System.Management.Automation.Language.StringConstantExpressionAst]) {
-                            [string]$objNode.Member.Value
+                            [string]$SyntaxNode.Member.Value
                         } else {
                             ''
                         }
@@ -3386,7 +3386,7 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                         # suite green at 113 passes. The legitimate byte-array
                         # call takes the three-argument form instead, where the
                         # count is explicit and no guess is needed.
-                        return (@($objNode.Arguments).Count -eq 1)
+                        return (@($SyntaxNode.Arguments).Count -eq 1)
                     },
                     $true
                 ))) {
@@ -3403,10 +3403,10 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
         # property of the source rather than of one run.
         foreach ($objProse in @($objAst.FindAll(
                     {
-                        param ($objNode)
-                        $objNode -is
+                        param ($SyntaxNode)
+                        $SyntaxNode -is
                             [System.Management.Automation.Language.StringConstantExpressionAst] -and
-                        [string]$objNode.Value -cmatch '%F'
+                        [string]$SyntaxNode.Value -cmatch '%F'
                     },
                     $true
                 ))) {
@@ -3419,16 +3419,16 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
         # script has any use for it.
         foreach ($objReflection in @($objAst.FindAll(
                     {
-                        param ($objNode)
-                        if ($objNode -isnot
+                        param ($SyntaxNode)
+                        if ($SyntaxNode -isnot
                             [System.Management.Automation.Language.InvokeMemberExpressionAst]) {
                             return $false
                         }
-                        $strMember = if ($objNode.Member -is
+                        $strMember = if ($SyntaxNode.Member -is
                             [System.Management.Automation.Language.StringConstantExpressionAst]) {
-                            [string]$objNode.Member.Value
+                            [string]$SyntaxNode.Member.Value
                         } else {
-                            [string]$objNode.Member.Extent.Text
+                            [string]$SyntaxNode.Member.Extent.Text
                         }
                         return ($strMember -match
                             $script:strCandidateReflectionMemberPattern)
@@ -3450,16 +3450,16 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
         foreach ($strBoundedMember in @($hashtableSurface.SingleUseMember.Keys)) {
             $intUse = @($objAst.FindAll(
                     {
-                        param ($objNode)
-                        if ($objNode -isnot
+                        param ($SyntaxNode)
+                        if ($SyntaxNode -isnot
                             [System.Management.Automation.Language.InvokeMemberExpressionAst]) {
                             return $false
                         }
-                        if ($objNode.Member -isnot
+                        if ($SyntaxNode.Member -isnot
                             [System.Management.Automation.Language.StringConstantExpressionAst]) {
                             return $false
                         }
-                        return (([string]$objNode.Member.Value) -ceq $strBoundedMember)
+                        return (([string]$SyntaxNode.Member.Value) -ceq $strBoundedMember)
                     },
                     $true
                 )).Count
@@ -3483,8 +3483,8 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
         # cannot; this one only reports that a name was not on the list.
         foreach ($objMember in @($objAst.FindAll(
                     {
-                        param ($objNode)
-                        return ($objNode -is
+                        param ($SyntaxNode)
+                        return ($SyntaxNode -is
                             [System.Management.Automation.Language.InvokeMemberExpressionAst])
                     },
                     $true
@@ -3533,13 +3533,13 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
         # checks from disagreeing about what a helper is.
         $arrDefinition = @($objAst.FindAll(
                 {
-                    param ($objNode)
-                    $objNode -is
+                    param ($SyntaxNode)
+                    $SyntaxNode -is
                         [System.Management.Automation.Language.AssignmentStatementAst] -and
-                    $objNode.Left -is
+                    $SyntaxNode.Left -is
                         [System.Management.Automation.Language.VariableExpressionAst] -and
                     $script:arrCandidateEnumerationScriptBlockName -ccontains
-                        ($objNode.Left.VariablePath.UserPath -creplace '^script:', '')
+                        ($SyntaxNode.Left.VariablePath.UserPath -creplace '^script:', '')
                 },
                 $true
             ))
@@ -3552,15 +3552,15 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
 
         $arrListing = @($objAst.FindAll(
                 {
-                    param ($objNode)
-                    if ($objNode -is
+                    param ($SyntaxNode)
+                    if ($SyntaxNode -is
                         [System.Management.Automation.Language.InvokeMemberExpressionAst]) {
                         $strMember = ''
-                        if ($objNode.Member -is
+                        if ($SyntaxNode.Member -is
                             [System.Management.Automation.Language.StringConstantExpressionAst]) {
-                            $strMember = [string]$objNode.Member.Value
+                            $strMember = [string]$SyntaxNode.Member.Value
                         } else {
-                            $strMember = [string]$objNode.Member.Extent.Text
+                            $strMember = [string]$SyntaxNode.Member.Extent.Text
                         }
                         return ($strMember -match $script:strCandidateListingMemberPattern)
                     }
@@ -3945,11 +3945,11 @@ $script:scriptBlockAssertOrdinaryFileProofWired = {
     }
     $arrCommandAst = @($objAst.FindAll(
             {
-                param ($objNode)
-                return ($objNode -is
+                param ($SyntaxNode)
+                return ($SyntaxNode -is
                     [System.Management.Automation.Language.CommandAst] -and
-                    @($objNode.CommandElements).Count -ge 1 -and
-                    $objNode.CommandElements[0] -is
+                    @($SyntaxNode.CommandElements).Count -ge 1 -and
+                    $SyntaxNode.CommandElements[0] -is
                     [System.Management.Automation.Language.VariableExpressionAst])
             },
             $true
@@ -4118,9 +4118,9 @@ $script:scriptBlockAssertDownloadPathProvenance = {
     }
     $arrAssignment = @($objAst.FindAll(
             {
-                param ($objNode)
-                $objNode -is [System.Management.Automation.Language.AssignmentStatementAst] -and
-                $objNode.Left.Extent.Text -ceq '$strArchivePath'
+                param ($SyntaxNode)
+                $SyntaxNode -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                $SyntaxNode.Left.Extent.Text -ceq '$strArchivePath'
             },
             $true
         ))
@@ -4133,10 +4133,10 @@ $script:scriptBlockAssertDownloadPathProvenance = {
     # the expression wrapped around it.
     $arrProducer = @($arrAssignment[0].Right.FindAll(
             {
-                param ($objNode)
-                $objNode -is [System.Management.Automation.Language.CommandAst] -and
-                @($objNode.CommandElements).Count -gt 0 -and
-                $objNode.CommandElements[0] -is
+                param ($SyntaxNode)
+                $SyntaxNode -is [System.Management.Automation.Language.CommandAst] -and
+                @($SyntaxNode.CommandElements).Count -gt 0 -and
+                $SyntaxNode.CommandElements[0] -is
                     [System.Management.Automation.Language.VariableExpressionAst]
             },
             $true
@@ -4183,23 +4183,23 @@ $script:scriptBlockAssertArchiveLengthReadOnce = {
     # variable, however the access is spelled.
     $arrLengthRead = @($objAst.FindAll(
             {
-                param ($objNode)
-                if ($objNode -isnot
+                param ($SyntaxNode)
+                if ($SyntaxNode -isnot
                     [System.Management.Automation.Language.MemberExpressionAst]) {
                     return $false
                 }
-                if ($objNode.Expression -isnot
+                if ($SyntaxNode.Expression -isnot
                     [System.Management.Automation.Language.VariableExpressionAst]) {
                     return $false
                 }
-                if ($objNode.Expression.VariablePath.UserPath -cne 'objArchiveStream') {
+                if ($SyntaxNode.Expression.VariablePath.UserPath -cne 'objArchiveStream') {
                     return $false
                 }
-                $strMember = if ($objNode.Member -is
+                $strMember = if ($SyntaxNode.Member -is
                     [System.Management.Automation.Language.StringConstantExpressionAst]) {
-                    [string]$objNode.Member.Value
+                    [string]$SyntaxNode.Member.Value
                 } else {
-                    [string]$objNode.Member.Extent.Text
+                    [string]$SyntaxNode.Member.Extent.Text
                 }
                 return ($strMember -ceq 'Length')
             },
@@ -4333,23 +4333,23 @@ $script:scriptBlockAssertStaticMembersResolve = {
         @{ Label = 'helper'; Path = $HelperLiteralPath },
         @{ Label = 'context'; Path = $ContextLiteralPath }
     )
-    foreach ($hashTarget in $arrTarget) {
+    foreach ($hashtableTarget in $arrTarget) {
         $objErrors = $null
         $objAst = [System.Management.Automation.Language.Parser]::ParseFile(
-            [string]$hashTarget.Path, [ref]$null, [ref]$objErrors)
+            [string]$hashtableTarget.Path, [ref]$null, [ref]$objErrors)
         if ($null -eq $objAst -or @($objErrors).Count -ne 0) {
             & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-                -Detail ('static-member-parse-' + [string]$hashTarget.Label)
+                -Detail ('static-member-parse-' + [string]$hashtableTarget.Label)
         }
 
         # Every New-Object with a literal type name, and every [T]::new(),
         # assigned to a plain variable. One variable assigned two different
         # types is recorded as indeterminate rather than as either of them.
-        $hashVariableType = @{}
+        $hashtableVariableType = @{}
         $arrAssignment = @($objAst.FindAll(
                 {
-                    param ($objNode)
-                    return ($objNode -is
+                    param ($SyntaxNode)
+                    return ($SyntaxNode -is
                         [System.Management.Automation.Language.AssignmentStatementAst])
                 },
                 $true
@@ -4394,33 +4394,33 @@ $script:scriptBlockAssertStaticMembersResolve = {
                 }
             }
             if ($strTypeName.Length -eq 0) {
-                $hashVariableType[$strVariable] = ''
+                $hashtableVariableType[$strVariable] = ''
                 continue
             }
-            if ($hashVariableType.ContainsKey($strVariable) -and
-                ([string]$hashVariableType[$strVariable]) -cne $strTypeName) {
-                $hashVariableType[$strVariable] = ''
+            if ($hashtableVariableType.ContainsKey($strVariable) -and
+                ([string]$hashtableVariableType[$strVariable]) -cne $strTypeName) {
+                $hashtableVariableType[$strVariable] = ''
                 continue
             }
-            $hashVariableType[$strVariable] = $strTypeName
+            $hashtableVariableType[$strVariable] = $strTypeName
         }
 
         # Every [T]::Member(...) whose type and member name are both literal.
         $arrStaticCall = @($objAst.FindAll(
                 {
-                    param ($objNode)
-                    if ($objNode -isnot
+                    param ($SyntaxNode)
+                    if ($SyntaxNode -isnot
                         [System.Management.Automation.Language.InvokeMemberExpressionAst]) {
                         return $false
                     }
-                    if (-not $objNode.Static) {
+                    if (-not $SyntaxNode.Static) {
                         return $false
                     }
-                    if ($objNode.Expression -isnot
+                    if ($SyntaxNode.Expression -isnot
                         [System.Management.Automation.Language.TypeExpressionAst]) {
                         return $false
                     }
-                    return ($objNode.Member -is
+                    return ($SyntaxNode.Member -is
                         [System.Management.Automation.Language.StringConstantExpressionAst])
                 },
                 $true
@@ -4492,7 +4492,7 @@ $script:scriptBlockAssertStaticMembersResolve = {
             foreach ($objArgument in $arrArgument) {
                 $strArgumentType = & $script:scriptBlockResolveCandidateArgumentType `
                     -Argument $objArgument `
-                    -VariableType $hashVariableType
+                    -VariableType $hashtableVariableType
                 if ($strArgumentType.Length -eq 0) {
                     $boolTyped = $false
                     break
@@ -4533,9 +4533,9 @@ $script:scriptBlockAssertStaticMembersResolve = {
         }
         if ($intProvenName -eq 0) {
             & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-                -Detail ('static-member-none-' + [string]$hashTarget.Label)
+                -Detail ('static-member-none-' + [string]$hashtableTarget.Label)
         }
-        Write-Verbose ('static members in ' + [string]$hashTarget.Label +
+        Write-Verbose ('static members in ' + [string]$hashtableTarget.Label +
             ': name-proven ' + [string]$intProvenName +
             ', signature-proven ' + [string]$intProvenSignature +
             ', type absent here ' + [string]$intSkippedType +
@@ -5099,8 +5099,8 @@ $script:scriptBlockAssertProductionTaxonomyClosed = {
         }
         foreach ($objShapeCommand in @($objShapeAst.FindAll(
                     {
-                        param ($objNode)
-                        return ($objNode -is
+                        param ($SyntaxNode)
+                        return ($SyntaxNode -is
                             [System.Management.Automation.Language.CommandAst])
                     },
                     $true
@@ -5758,8 +5758,8 @@ $script:scriptBlockAssertTrackedScriptIdentity = {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'parser'
     }
     $arrFunctions = @($objAbstractSyntaxTree.FindAll({
-        param ($objNode)
-        $objNode -is [System.Management.Automation.Language.FunctionDefinitionAst]
+        param ($SyntaxNode)
+        $SyntaxNode -is [System.Management.Automation.Language.FunctionDefinitionAst]
     }, $true))
     if ($arrFunctions.Count -ne $ExpectedFunctionCount) {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'function-count'
@@ -8988,7 +8988,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260805.0
+    # Version: 1.0.20260805.1
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()

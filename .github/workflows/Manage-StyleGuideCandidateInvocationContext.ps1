@@ -2204,6 +2204,11 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # that omits it and then re-reads the property to branch has authenticated
     # one read and acted on another.
     #
+    # .PARAMETER ExpectedValues
+    # Specifies the captured context values the caller intends to use after
+    # this check. When supplied, the manager authenticates that exact set
+    # against its issuance snapshot rather than rereading the live context.
+    #
     # .EXAMPLE
     # if (-not (Test-StyleGuideCandidateInvocationContextIssued `
     #         -Context $objContext)) {
@@ -2244,6 +2249,8 @@ function Test-StyleGuideCandidateInvocationContextIssued {
         [AllowNull()]
         [object]$ExpectedValues = $null
     )
+
+    Set-StrictMode -Version Latest
 
     # A question, not an assertion: every failure is an answer of false rather
     # than a thrown error, because a caller asking "may I act on this?" needs a
