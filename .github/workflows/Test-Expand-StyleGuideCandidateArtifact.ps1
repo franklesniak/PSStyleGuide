@@ -955,6 +955,31 @@ $script:scriptBlockAssertContextReadsAreCaptured = {
         }
     }
 
+    # A capture belongs to the nearest function that encloses it, or to the file
+    # when nothing does -- the same resolution applied to reads below. Selecting
+    # a scope's captures by extent containment instead would give the file every
+    # capture nested inside a function, and the earliest of those would sit
+    # before the entry point's own pre-authentication reads and refuse them.
+    # Measured: context-read-not-captured-2879 against the state guard.
+    $scriptBlockResolveScopeStart = {
+        param ($objNode)
+        $objScope = $objNode
+        while ($null -ne $objScope) {
+            if ($objScope -is
+                [System.Management.Automation.Language.FunctionDefinitionAst] -or
+                $null -eq $objScope.Parent) {
+                return [int]$objScope.Extent.StartOffset
+            }
+            $objScope = $objScope.Parent
+        }
+        return -1
+    }
+    $hashtableCaptureScope = @{}
+    foreach ($objCapture in $arrCapture) {
+        $hashtableCaptureScope[[int]$objCapture.Extent.StartOffset] =
+            (& $scriptBlockResolveScopeStart $objCapture.Parent)
+    }
+
     foreach ($objRead in @($objAst.FindAll(
                 {
                     param ($objNode)
@@ -980,23 +1005,15 @@ $script:scriptBlockAssertContextReadsAreCaptured = {
         # file. Measured: the first revision of this walk refused
         # context-read-unscoped-2879, the pre-authentication state guard on the
         # expansion path, which is top-level rather than inside a function.
-        $objScope = $objRead.Parent
-        while ($null -ne $objScope -and $objScope -isnot
-            [System.Management.Automation.Language.FunctionDefinitionAst]) {
-            if ($null -eq $objScope.Parent) {
-                break
-            }
-            $objScope = $objScope.Parent
-        }
-        if ($null -eq $objScope) {
+        $intScopeStart = & $scriptBlockResolveScopeStart $objRead.Parent
+        if ($intScopeStart -lt 0) {
             & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                 -Detail ('context-read-unscoped-' +
                     [string]$objRead.Extent.StartLineNumber)
         }
 
         $arrScopeCapture = @($arrCapture | Where-Object {
-                [int]$_.Extent.StartOffset -ge [int]$objScope.Extent.StartOffset -and
-                [int]$_.Extent.EndOffset -le [int]$objScope.Extent.EndOffset
+                $hashtableCaptureScope[[int]$_.Extent.StartOffset] -eq $intScopeStart
             })
         if (@($arrScopeCapture).Count -eq 0) {
             # A function that reads the context and never captures it cannot be
