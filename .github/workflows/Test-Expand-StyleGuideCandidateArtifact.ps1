@@ -3772,6 +3772,145 @@ $script:scriptBlockAssertRegularFileProofExecutes = {
     }
 }
 
+$script:scriptBlockAssertJournalSwapRefused = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$RunRoot
+    )
+
+    # Round 52's reference-identity check in scriptBlockAddCandidateHelperRecord
+    # refuses to append when the caller's context no longer holds the exact
+    # journal array the expansion authenticated -- the fix for EE6/II1. Nothing
+    # in the committed suite exercised it. Measured directly: deleting the check
+    # left all 115 cases green, so a revert would have been invisible. The
+    # normal expansion cases never swap the journal between authentication and
+    # append, so only a direct invocation with a swapped array reaches it.
+    #
+    # Behavioural, with a positive control. The un-swapped append must SUCCEED
+    # and the swapped append must be REFUSED with 'journal-swapped'. Requiring
+    # the control to succeed is what gives the assertion teeth: an assertion
+    # that only checked the refusal would also pass against a guard that always
+    # throws, and against a guard deleted entirely the swapped append would
+    # wrongly succeed -- which this fails on. Round 33's one-sided-race lesson,
+    # applied to a deterministic guard.
+    $strSwapRoot = [System.IO.Path]::Combine($RunRoot, 'journal-swap')
+    [void][System.IO.Directory]::CreateDirectory($strSwapRoot)
+    $objContext = New-StyleGuideCandidateInvocationContext `
+        -TrustedTemporaryRoot $strSwapRoot -DiagnosticLabel 'journal-swap'
+    try {
+        $objAuthenticatedJournal = $objContext.OwnershipJournal
+        $uintAuthenticatedSequence = [uint32]$objContext.NextSequence
+        $objRecord = & $script:scriptBlockNewCandidateHelperRecord `
+            -Sequence $uintAuthenticatedSequence `
+            -Kind 'DownloadFile' `
+            -Path ([System.IO.Path]::Combine(
+                [string]$objContext.DownloadDirectoryPath, 'probe.zip')) `
+            -ParentPath ([string]$objContext.DownloadDirectoryPath) `
+            -LeafName 'probe.zip' `
+            -CreationPhase 'download' `
+            -ContentLength ([uint64]1) `
+            -ContentSha256 ('0' * 64)
+
+        # Control: an append whose context still holds the authenticated journal
+        # must succeed.
+        $boolControlSucceeded = $true
+        try {
+            [void](& $script:scriptBlockAddCandidateHelperRecord `
+                -ContextValue $objContext -Record $objRecord `
+                -JournalValue $objAuthenticatedJournal `
+                -NextSequenceValue $uintAuthenticatedSequence -PhaseValue 'download')
+        } catch {
+            $boolControlSucceeded = $false
+        }
+        if (-not $boolControlSucceeded) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail 'journal-swap-control-refused'
+        }
+
+        # Attack: swap the context's journal to a decoy after authentication,
+        # then append with the authenticated capture. The guard must refuse,
+        # naming journal-swapped, rather than let the record land in the decoy.
+        $objContext.OwnershipJournal = [object[]]@()
+        $boolSwapRefused = $false
+        $strSwapSubreason = 'none'
+        try {
+            [void](& $script:scriptBlockAddCandidateHelperRecord `
+                -ContextValue $objContext -Record $objRecord `
+                -JournalValue $objAuthenticatedJournal `
+                -NextSequenceValue $uintAuthenticatedSequence -PhaseValue 'download')
+        } catch {
+            $boolSwapRefused = $true
+            $objSubreasonMatch = [regex]::Match(
+                [string]$_.Exception.Message, 'subreason=([a-z][a-z0-9-]*)')
+            if ($objSubreasonMatch.Success) {
+                $strSwapSubreason = $objSubreasonMatch.Groups[1].Value
+            }
+        }
+        if (-not $boolSwapRefused -or $strSwapSubreason -cne 'journal-swapped') {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('journal-swap-not-refused-' + $strSwapSubreason)
+        }
+    } finally {
+        # The context was deliberately corrupted, so its own cleanup is not
+        # trusted to dispose the tree; remove the probe root directly.
+        [System.IO.Directory]::Delete($strSwapRoot, $true)
+    }
+}
+
+$script:scriptBlockAssertOrdinaryFileProofWired = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath
+    )
+
+    # Round 57's JJ4: the post-extraction reader must prove the path is an
+    # ordinary regular file immediately before opening it. W-06 already
+    # exercises the proof's BEHAVIOUR on the download open (a FIFO as the sole
+    # download entry is refused), so a broken proof is caught. What no committed
+    # case caught was the proof's CALL going missing at the post-extraction
+    # open: measured, deleting that one call left all 115 cases green, because
+    # every real extracted file is an ordinary file that the FileStream open
+    # accepts whether or not the proof ran.
+    #
+    # Production invokes scriptBlockAssertCandidateHelperOrdinaryRegularFile at
+    # three sites, and fewer than three means a reader lost its ordinariness
+    # proof. AST rather than source text, for the reasons the resource-guard
+    # wiring assertion states: a commented-out or literal-decoy line is not an
+    # executable invocation and does not appear here.
+    #
+    # This pins the COUNT, not the POSITION. A decoy invocation elsewhere could
+    # hold the count at three while the post-extraction call was removed; the
+    # stronger form pins each open to a preceding proof of the same path, and is
+    # recorded as recommended rather than taken -- a dataflow rule over
+    # FileStream opens is exactly the wide-surface AST rule this loop has been
+    # burned writing, and the realistic regression is a dropped call, which a
+    # count catches.
+    $objErrors = $null
+    $objAst = [System.Management.Automation.Language.Parser]::ParseFile(
+        $LiteralPath, [ref]$null, [ref]$objErrors)
+    if ($null -eq $objAst -or @($objErrors).Count -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+            -Detail 'production-ordinary-file-proof-parse'
+    }
+    $intCalls = @($objAst.FindAll(
+            {
+                param ($objNode)
+                return ($objNode -is
+                    [System.Management.Automation.Language.CommandAst] -and
+                    @($objNode.CommandElements).Count -ge 1 -and
+                    $objNode.CommandElements[0] -is
+                    [System.Management.Automation.Language.VariableExpressionAst] -and
+                    ([string]$objNode.CommandElements[0].VariablePath.UserPath) -ceq
+                    'script:scriptBlockAssertCandidateHelperOrdinaryRegularFile')
+            },
+            $true
+        )).Count
+    if ($intCalls -lt 3) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+            -Detail ('production-ordinary-file-proof-' + $intCalls)
+    }
+}
+
 $script:scriptBlockAssertDownloadLeafGuardExecutes = {
     param (
         [Parameter(Mandatory = $true)]
@@ -9044,6 +9183,9 @@ function Invoke-StyleGuideCandidateHarness {
             -RunRoot $strRunRoot `
             -HelperLiteralPath $strHelperLiteralPath `
             -ContextLiteralPath $strContextLiteralPath
+        & $script:scriptBlockAssertJournalSwapRefused -RunRoot $strRunRoot
+        & $script:scriptBlockAssertOrdinaryFileProofWired `
+            -LiteralPath $strHelperLiteralPath
         & $script:scriptBlockAssertDownloadLeafGuardExecutes `
             -HelperLiteralPath $strHelperLiteralPath `
             -RunRoot $strRunRoot
