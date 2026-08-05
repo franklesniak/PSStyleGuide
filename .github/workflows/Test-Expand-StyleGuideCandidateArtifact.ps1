@@ -924,61 +924,32 @@ $script:scriptBlockAssertContextReadsAreCaptured = {
         }
     }
 
-    # HH1. A capture is an assignment that stores a context read, an alias, or
-    # a literal built from them -- decided by the shape of what it stores, not
-    # by what the variable is called.
-    $arrCapture = @()
-    foreach ($objAssignment in $arrAllAssignment) {
-        $objValue = & $scriptBlockUnwrapAssignedValue $objAssignment
-        if ($null -eq $objValue) {
-            continue
-        }
-        $boolIsCapture = $false
-        if ($objValue -is
-            [System.Management.Automation.Language.MemberExpressionAst] -and
-            $objValue.Expression -is
-            [System.Management.Automation.Language.VariableExpressionAst] -and
-            $hashtableAlias.ContainsKey(
-                [string]$objValue.Expression.VariablePath.UserPath)) {
-            $boolIsCapture = $true
-        }
-        if ($objValue -is
-            [System.Management.Automation.Language.VariableExpressionAst] -and
-            $hashtableAlias.ContainsKey([string]$objValue.VariablePath.UserPath)) {
-            $boolIsCapture = $true
-        }
-        # A literal counts only when it is built from a context read. The first
-        # revision accepted every HashtableAst, which made the earliest
-        # `$x = @{...}` anywhere in the file the capture point and refused the
-        # entry point's own pre-authentication guard. Measured:
-        # context-read-not-captured-2879 again, from a different cause than the
-        # two before it.
-        if ($objValue -is [System.Management.Automation.Language.HashtableAst]) {
-            $boolIsCapture = @($objValue.FindAll(
-                    {
-                        param ($objNode)
-                        return ($objNode -is
-                            [System.Management.Automation.Language.MemberExpressionAst] -and
-                            $objNode.Expression -is
-                            [System.Management.Automation.Language.VariableExpressionAst])
-                    },
-                    $true
-                ) | Where-Object {
-                    $hashtableAlias.ContainsKey(
-                        [string]$_.Expression.VariablePath.UserPath)
-                }).Count -gt 0
-        }
-        if ($boolIsCapture) {
-            $arrCapture += $objAssignment
-        }
-    }
+    # The anchor is the authentication itself, not an inferred capture point.
+    #
+    # The first attempt at this fix classified assignments as "captures" and
+    # allowed a read inside one. Mutation testing refuted it: a post-
+    # authentication `$objSneak = $objValidatedContext.OwnershipJournal` is
+    # itself an assignment storing a context read, so it was classified as a
+    # capture and admitted. The rule would have shipped admitting the exact
+    # read it exists to ban. That is HH3's complaint one level up, and it is
+    # why the classification machinery is gone rather than narrowed.
+    #
+    # The property is simply stated: once a scope has authenticated the context,
+    # it must not read the mutable object again. So the last authentication call
+    # in a scope is the boundary, and every context read must precede it. A
+    # scope that reads the context and never authenticates it cannot be
+    # evaluated, which is refused rather than passed -- round 49's BB1.
+    $arrAuthentication = @($objAst.FindAll(
+            {
+                param ($objNode)
+                return ($objNode -is
+                    [System.Management.Automation.Language.CommandAst] -and
+                    ([string]$objNode.GetCommandName()) -ceq
+                    'Test-StyleGuideCandidateInvocationContextIssued')
+            },
+            $true
+        ))
 
-    # A capture belongs to the nearest function that encloses it, or to the file
-    # when nothing does -- the same resolution applied to reads below. Selecting
-    # a scope's captures by extent containment instead would give the file every
-    # capture nested inside a function, and the earliest of those would sit
-    # before the entry point's own pre-authentication reads and refuse them.
-    # Measured: context-read-not-captured-2879 against the state guard.
     $scriptBlockResolveScopeStart = {
         param ($objNode)
         $objScope = $objNode
@@ -991,11 +962,6 @@ $script:scriptBlockAssertContextReadsAreCaptured = {
             $objScope = $objScope.Parent
         }
         return -1
-    }
-    $hashtableCaptureScope = @{}
-    foreach ($objCapture in $arrCapture) {
-        $hashtableCaptureScope[[int]$objCapture.Extent.StartOffset] =
-            (& $scriptBlockResolveScopeStart $objCapture.Parent)
     }
 
     foreach ($objRead in @($objAst.FindAll(
@@ -1013,16 +979,10 @@ $script:scriptBlockAssertContextReadsAreCaptured = {
             continue
         }
 
-        # Each function carries its own capture block, so the point a read is
-        # measured against is its own function's. A file-wide minimum would put
-        # one function's pre-authentication guard after another function's
-        # capture and refuse it.
-        #
-        # The entry point is not a function, and its capture block is the one
-        # that matters most here, so code outside any function is scoped to the
-        # file. Measured: the first revision of this walk refused
-        # context-read-unscoped-2879, the pre-authentication state guard on the
-        # expansion path, which is top-level rather than inside a function.
+        # Each function authenticates for itself, and the entry point is not a
+        # function, so code outside any function is scoped to the file. A
+        # file-wide boundary would otherwise place one function's
+        # authentication against another function's reads.
         $intScopeStart = & $scriptBlockResolveScopeStart $objRead.Parent
         if ($intScopeStart -lt 0) {
             & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
@@ -1030,40 +990,21 @@ $script:scriptBlockAssertContextReadsAreCaptured = {
                     [string]$objRead.Extent.StartLineNumber)
         }
 
-        $arrScopeCapture = @($arrCapture | Where-Object {
-                $hashtableCaptureScope[[int]$_.Extent.StartOffset] -eq $intScopeStart
-            })
-        if (@($arrScopeCapture).Count -eq 0) {
-            # A function that reads the context and never captures it cannot be
-            # evaluated by this rule, and a rule that passes when it finds no
-            # subject admits everything -- round 49's BB1.
+        $intBoundary = -1
+        foreach ($objAuthentication in $arrAuthentication) {
+            if ((& $scriptBlockResolveScopeStart $objAuthentication.Parent) -ne
+                $intScopeStart) {
+                continue
+            }
+            if ([int]$objAuthentication.Extent.EndOffset -gt $intBoundary) {
+                $intBoundary = [int]$objAuthentication.Extent.EndOffset
+            }
+        }
+        if ($intBoundary -lt 0) {
             & $script:scriptBlockStopHarness `
                 -Code 'catalog-invalid' -Detail 'context-read-capture-absent'
         }
-        $intCapturePoint = [int]::MaxValue
-        foreach ($objScopeCapture in $arrScopeCapture) {
-            if ([int]$objScopeCapture.Extent.StartOffset -lt $intCapturePoint) {
-                $intCapturePoint = [int]$objScopeCapture.Extent.StartOffset
-            }
-        }
-        if ([int]$objRead.Extent.StartOffset -lt $intCapturePoint) {
-            continue
-        }
-
-        # HH3. The read must sit inside one of the capture assignments this
-        # scope actually has -- identity, not an ancestor that happens to be an
-        # assignment.
-        $boolCaptured = $false
-        foreach ($objScopeCapture in $arrScopeCapture) {
-            if ([int]$objRead.Extent.StartOffset -ge
-                [int]$objScopeCapture.Extent.StartOffset -and
-                [int]$objRead.Extent.EndOffset -le
-                [int]$objScopeCapture.Extent.EndOffset) {
-                $boolCaptured = $true
-                break
-            }
-        }
-        if (-not $boolCaptured) {
+        if ([int]$objRead.Extent.StartOffset -gt $intBoundary) {
             & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                 -Detail ('context-read-not-captured-' +
                     [string]$objRead.Extent.StartLineNumber)
