@@ -974,9 +974,18 @@ $script:scriptBlockAssertContextReadsAreCaptured = {
         # measured against is its own function's. A file-wide minimum would put
         # one function's pre-authentication guard after another function's
         # capture and refuse it.
+        #
+        # The entry point is not a function, and its capture block is the one
+        # that matters most here, so code outside any function is scoped to the
+        # file. Measured: the first revision of this walk refused
+        # context-read-unscoped-2879, the pre-authentication state guard on the
+        # expansion path, which is top-level rather than inside a function.
         $objScope = $objRead.Parent
         while ($null -ne $objScope -and $objScope -isnot
             [System.Management.Automation.Language.FunctionDefinitionAst]) {
+            if ($null -eq $objScope.Parent) {
+                break
+            }
             $objScope = $objScope.Parent
         }
         if ($null -eq $objScope) {
