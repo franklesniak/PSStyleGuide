@@ -964,18 +964,82 @@ $script:scriptBlockAssertContextReadsAreCaptured = {
         return -1
     }
 
+    # A receiver may be wrapped in things that do not change which object it is.
+    # Round 56 required the receiver to BE a VariableExpressionAst, so
+    # `($objValidatedContext).OwnershipJournal` -- a ParenExpressionAst -- was
+    # skipped before the alias table was ever consulted. Reported at round 57
+    # as JJ1, and it is HH2's property inside the fix for HH2: a rule that names
+    # one spelling of a thing is escaped by another spelling of the same thing.
+    $scriptBlockUnwrapReceiver = {
+        param ($objNode)
+        $objInner = $objNode
+        while ($true) {
+            if ($objInner -is
+                [System.Management.Automation.Language.ParenExpressionAst]) {
+                $objInner = $objInner.Pipeline
+                continue
+            }
+            if ($objInner -is
+                [System.Management.Automation.Language.PipelineAst] -and
+                @($objInner.PipelineElements).Count -eq 1) {
+                $objInner = $objInner.PipelineElements[0]
+                continue
+            }
+            if ($objInner -is
+                [System.Management.Automation.Language.CommandExpressionAst]) {
+                $objInner = $objInner.Expression
+                continue
+            }
+            if ($objInner -is
+                [System.Management.Automation.Language.ConvertExpressionAst]) {
+                $objInner = $objInner.Child
+                continue
+            }
+            break
+        }
+        return $objInner
+    }
+
+    # A context piped into a script block arrives as $_ or $PSItem, which is the
+    # same object under a name the alias table cannot know. Rather than model
+    # what each command does with its input, any pipeline whose source is a
+    # context alias is refused outright -- production never pipes the context
+    # anywhere, so the permitted shape is "not at all". Reported as JJ2.
+    foreach ($objPipeline in @($objAst.FindAll(
+                {
+                    param ($objNode)
+                    return ($objNode -is
+                        [System.Management.Automation.Language.PipelineAst] -and
+                        @($objNode.PipelineElements).Count -gt 1)
+                },
+                $true
+            ))) {
+        $objSource = & $scriptBlockUnwrapReceiver $objPipeline.PipelineElements[0]
+        if ($objSource -is
+            [System.Management.Automation.Language.VariableExpressionAst] -and
+            $hashtableAlias.ContainsKey(
+                [string]$objSource.VariablePath.UserPath)) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('context-read-piped-' +
+                    [string]$objPipeline.Extent.StartLineNumber)
+        }
+    }
+
     foreach ($objRead in @($objAst.FindAll(
                 {
                     param ($objNode)
                     return ($objNode -is
-                        [System.Management.Automation.Language.MemberExpressionAst] -and
-                        $objNode.Expression -is
-                        [System.Management.Automation.Language.VariableExpressionAst])
+                        [System.Management.Automation.Language.MemberExpressionAst])
                 },
                 $true
             ))) {
+        $objReceiver = & $scriptBlockUnwrapReceiver $objRead.Expression
+        if ($objReceiver -isnot
+            [System.Management.Automation.Language.VariableExpressionAst]) {
+            continue
+        }
         if (-not $hashtableAlias.ContainsKey(
-                [string]$objRead.Expression.VariablePath.UserPath)) {
+                [string]$objReceiver.VariablePath.UserPath)) {
             continue
         }
 
