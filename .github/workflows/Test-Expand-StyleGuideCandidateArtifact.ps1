@@ -2193,9 +2193,26 @@ $script:scriptBlockTestSelfClosureSourced = {
         if (([string]$objSelf.Right.Extent.Text) -cne ('$' + $strSelfName + '.GetNewClosure()')) {
             continue
         }
+        # Round 52, EE1: an earlier offset was the whole test, so a literal
+        # inside `if ($false) { $x = {} }` counted as the source while the
+        # closure at runtime captured whatever a caller had put in $x. Source
+        # order is not reachability, and this routine was treating them as the
+        # same thing.
+        #
+        # Sharing a parent statement block is the property that was actually
+        # meant: the literal and the closure that preserves it run under the
+        # same condition, which for production is no condition at all. A
+        # literal nested in any branch has a different parent and no longer
+        # counts. This is an exact-shape test rather than a reachability
+        # analysis, which is deliberate -- the file already knows what shape
+        # it writes, and inferring reachability is how the last four rules
+        # here were escaped.
         $boolPrecededByLiteral = $false
         foreach ($objOther in $Assignment) {
             if ([int]$objOther.Extent.StartOffset -ge [int]$objSelf.Extent.StartOffset) {
+                continue
+            }
+            if (-not [System.Object]::ReferenceEquals($objOther.Parent, $objSelf.Parent)) {
                 continue
             }
             if (& $scriptBlockHasLiteral $objOther) {
@@ -2407,16 +2424,48 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                 } | Where-Object {
                     @($_.Group | Where-Object {
                         $strResolver = [string]$hashtableSurface.NativeResolver
-                        $boolFromResolver = $null -ne $_.Right.Find(
-                            {
-                                param ($objInner)
-                                return ($objInner -is
-                                    [System.Management.Automation.Language.VariableExpressionAst] -and
-                                    (([string]$objInner.VariablePath.UserPath) -creplace '^script:', '') -ceq
-                                    $strResolver)
-                            },
-                            $true
-                        )
+                        # Round 52, EE4: a recursive Find meant the right-hand
+                        # side only had to MENTION the resolver somewhere, so
+                        #   $strStatPath = if ($false) { & $resolver ... }
+                        #                  else { 'Get-Item' }
+                        # was classified as resolver-sourced and the nameless
+                        # `& $strStatPath -Path "$dir/*"` that followed was
+                        # admitted. A mention is not a source.
+                        #
+                        # Production writes exactly one shape:
+                        #   [string](& $resolver -CandidatePath ...)
+                        # so that shape is what is accepted, cast optional, and
+                        # every other right-hand side fails by not being it.
+                        $objRight = $_.Right
+                        if ($objRight -is
+                            [System.Management.Automation.Language.CommandExpressionAst]) {
+                            $objRight = $objRight.Expression
+                        }
+                        if ($objRight -is
+                            [System.Management.Automation.Language.ConvertExpressionAst]) {
+                            $objRight = $objRight.Child
+                        }
+                        $boolFromResolver = $false
+                        if ($objRight -is
+                            [System.Management.Automation.Language.ParenExpressionAst]) {
+                            $objPipeline = $objRight.Pipeline
+                            if ($objPipeline -is
+                                [System.Management.Automation.Language.PipelineAst] -and
+                                @($objPipeline.PipelineElements).Count -eq 1) {
+                                $objCommand = @($objPipeline.PipelineElements)[0]
+                                if ($objCommand -is
+                                    [System.Management.Automation.Language.CommandAst]) {
+                                    $arrResolverElement = @($objCommand.CommandElements)
+                                    if ($arrResolverElement.Count -ge 1 -and
+                                        $arrResolverElement[0] -is
+                                        [System.Management.Automation.Language.VariableExpressionAst] -and
+                                        (([string]$arrResolverElement[0].VariablePath.UserPath) `
+                                            -creplace '^script:', '') -ceq $strResolver) {
+                                        $boolFromResolver = $true
+                                    }
+                                }
+                            }
+                        }
                         $boolNullLiteral = ([string]$_.Right.Extent.Text) -ceq '$null'
                         -not ($boolFromResolver -or $boolNullLiteral)
                     }).Count -eq 0
