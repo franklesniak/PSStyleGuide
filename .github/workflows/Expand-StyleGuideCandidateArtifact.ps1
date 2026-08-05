@@ -2979,6 +2979,19 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         $strAuthenticatedTrustedParent = [string]$Context.TrustedParentPath
         $strAuthenticatedDownload = [string]$Context.DownloadDirectoryPath
         $strAuthenticatedCandidate = [string]$Context.CandidatePath
+        # Round 54: the state belongs in the capture too. The verifier's
+        # -ExpectedState exists precisely so the manager compares its register
+        # against a value the caller cannot move afterwards, and this call was
+        # omitting it -- so the manager re-read $Context.LifecycleState itself.
+        # A state that is Active for this check and CleanupFailed by the final
+        # assertion leaves expansion having written and journaled files while
+        # rollback sees a terminal-shaped context and refuses it, stranding the
+        # issued tree. Reported at round 54.
+        $strAuthenticatedState = [string]$Context.LifecycleState
+        if ($strAuthenticatedState -cne 'Active') {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'parameter' -Phase 'parameter' -Subreason 'Context-state'
+        }
         # Round 35 froze only the root here and left the three paths the
         # comparisons below consult reading live. A same-session runspace could
         # move those to match the caller's parameters for the length of the
@@ -2994,7 +3007,8 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
             CandidatePath = $strAuthenticatedCandidate
         }
         if (-not (Test-StyleGuideCandidateInvocationContextIssued `
-                -Context $Context -ExpectedValues $objAuthenticatedValues)) {
+                -Context $Context -ExpectedValues $objAuthenticatedValues `
+                -ExpectedState $strAuthenticatedState)) {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'parameter' -Phase 'parameter' -Subreason 'context-unissued'
         }
@@ -3444,7 +3458,14 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
             -ExpectedPath $strCandidatePath `
             -Phase 'destination')
 
-        $objCandidateDirectoryRecord = @($Context.OwnershipJournal | Where-Object {
+        # Round 54: the authenticated journal, not the caller's current one.
+        # Fixing EE6 moved the ownership APPEND onto the capture and stopped
+        # there; these two reads were left on $Context and are the same defect
+        # in the same file. A swapped journal here supplies the record whose
+        # state is checked and then marked Created, so the authenticated
+        # journal never learns the candidate directory exists and cleanup
+        # never deletes it.
+        $objCandidateDirectoryRecord = @($objAuthenticatedJournal | Where-Object {
             $_.Kind -eq 'CandidateDirectory'
         })[0]
         if ($objCandidateDirectoryRecord.EntryState -cne 'ExpectedAbsent') {
@@ -3673,7 +3694,13 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
                 & $script:scriptBlockStopCandidateHelperOperation `
                     -Code 'post-extraction-invalid' -Phase 'post-extraction' -Subreason 'missing-entry'
             }
-            $objRecord = @($Context.OwnershipJournal | Where-Object {
+            # Same correction, and this site is the worse of the two: the
+            # record supplies the EXPECTED length and digest that the extracted
+            # bytes are then validated against. Read from the caller's journal,
+            # a swap lets the caller choose what the output is compared to,
+            # which defeats the post-extraction check rather than merely
+            # confusing cleanup.
+            $objRecord = @($objAuthenticatedJournal | Where-Object {
                 $_.Kind -eq 'CandidateFile' -and $_.LeafName -ceq $strExpectedName
             })[0]
             [void](& $script:scriptBlockReadCandidateHelperValidatedFile `

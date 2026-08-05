@@ -4611,6 +4611,23 @@ $script:scriptBlockAssertProductionTaxonomyClosed = {
                     $true
                 ))) {
             $arrShapeElement = @($objShapeCommand.CommandElements)
+            # Round 54: the first version of this guard sat inside the loop
+            # body, after a recognised -Code/-Phase/-Subreason switch had been
+            # found, so a whole-call splat -- `& $stop @fields` -- carried no
+            # CommandParameterAst for the loop to find and was never examined.
+            # A guard against splats that only runs once a non-splatted call
+            # has been recognised is not a guard against splats. Measured at
+            # zero splatted elements anywhere in either script, so every
+            # command is refused one, not merely the diagnostic helpers.
+            foreach ($objSplatElement in $arrShapeElement) {
+                if ($objSplatElement -is
+                    [System.Management.Automation.Language.VariableExpressionAst] -and
+                    $objSplatElement.Splatted) {
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                        -Detail ('production-diagnostic-splat-' +
+                            [string]$objShapeCommand.Extent.StartLineNumber)
+                }
+            }
             for ($intShape = 0; $intShape -lt $arrShapeElement.Count; $intShape++) {
                 $objShapeElement = $arrShapeElement[$intShape]
                 if ($objShapeElement -isnot
@@ -4635,21 +4652,24 @@ $script:scriptBlockAssertProductionTaxonomyClosed = {
                 # anyone remembering. This is the shape that escaped the
                 # Remove-Variable rule at round 51.
                 if ($objShapeArgument -is
-                    [System.Management.Automation.Language.VariableExpressionAst] -and
-                    $objShapeArgument.Splatted) {
-                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-                        -Detail ('production-diagnostic-splat-' +
-                            [string]$objShapeCommand.Extent.StartLineNumber)
-                }
-                if ($objShapeArgument -is
                     [System.Management.Automation.Language.StringConstantExpressionAst]) {
                     continue
                 }
                 if ($objShapeArgument -is
                     [System.Management.Automation.Language.ExpandableStringExpressionAst]) {
-                    # Validated by the family pass below, which resolves the
-                    # suffix against the declared table.
-                    continue
+                    # Round 54: this used to admit EVERY expandable string,
+                    # while the text passes below validate only the computed
+                    # form "$name-suffix". So `-Code "$strCode"` slipped past
+                    # the pass-through table AND the closed-set regexes, which
+                    # is the same hole one layer along. Only the form those
+                    # passes can actually read is admitted here.
+                    if (([string]$objShapeArgument.Extent.Text) -cmatch
+                        '^"\$[A-Za-z0-9_]+-[A-Za-z]+"$') {
+                        continue
+                    }
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                        -Detail ('production-diagnostic-expandable-' +
+                            [string]$objShapeCommand.Extent.StartLineNumber)
                 }
                 if ($objShapeArgument -is
                     [System.Management.Automation.Language.VariableExpressionAst]) {
