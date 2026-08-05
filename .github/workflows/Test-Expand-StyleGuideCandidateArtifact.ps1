@@ -2265,7 +2265,8 @@ $script:arrCandidateHelperPermittedMember = [string[]]@(
     'Flush', 'GetAttributes', 'GetEnumerator', 'GetFileName', 'GetFullPath',
     'GetInvalidFileNameChars', 'GetType', 'IndexOf', 'IndexOfAny', 'Insert',
     'IsControl', 'IsLetter', 'IsNullOrWhiteSpace', 'IsPathRooted', 'Min',
-    'MoveNext', 'NewGuid', 'Open', 'Read', 'ReadAllLines', 'Split',
+    'MoveNext', 'NewGuid', 'Open', 'Read', 'ReadAllLines', 'ReferenceEquals',
+    'Split',
     'StartsWith', 'Substring', 'ToArray', 'ToCharArray', 'ToInt32',
     'ToLowerInvariant', 'ToString', 'TransformBlock', 'TransformFinalBlock',
     'TrimEnd', 'Write', 'WriteAllBytes'
