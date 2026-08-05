@@ -846,28 +846,112 @@ $script:scriptBlockAssertContextReadsAreCaptured = {
             -Code 'catalog-invalid' -Detail 'context-read-parse'
     }
 
-    $arrCapture = @($objAst.FindAll(
+    # Round 56 replaced three proxies in this rule with the things themselves.
+    # Each was reported separately and all three were the same mistake:
+    #
+    #   HH1 the capture point came from any assignment whose variable NAME
+    #       matched 'Authenticated'. Rename or delete the real captures, leave
+    #       one late `$boolAuthenticated = $true`, and the point moves past the
+    #       live reads while the absent-capture branch stays satisfied.
+    #   HH2 a read counted only when its receiver was spelled exactly $Context,
+    #       so `$objValidatedContext.OwnershipJournal` was invisible. That alias
+    #       is not hypothetical -- production assigns it one line above the
+    #       capture block, so the read this rule exists to ban was already
+    #       spellable when the rule was written.
+    #   HH3 a read counted as captured when ANY ancestor within four hops was an
+    #       assignment or a hashtable, and the walk permitted PipelineAst hops,
+    #       so `$x = $Context.OwnershipJournal | Select-Object -First 1` reached
+    #       an assignment and passed.
+    #
+    # A name, an ancestor node type, and one spelling of a receiver. None of
+    # them is the property being checked.
+
+    $arrAllAssignment = @($objAst.FindAll(
             {
                 param ($objNode)
                 return ($objNode -is
                     [System.Management.Automation.Language.AssignmentStatementAst] -and
                     $objNode.Left -is
-                    [System.Management.Automation.Language.VariableExpressionAst] -and
-                    ([string]$objNode.Left.VariablePath.UserPath) -cmatch 'Authenticated')
+                    [System.Management.Automation.Language.VariableExpressionAst])
             },
             $true
         ))
-    if (@($arrCapture).Count -eq 0) {
-        # The capture is what this rule exists to protect. If it is gone, the
-        # rule cannot be evaluated, and a rule that passes when it finds no
-        # subject admits everything -- which is round 49's BB1.
-        & $script:scriptBlockStopHarness `
-            -Code 'catalog-invalid' -Detail 'context-read-capture-absent'
+
+    # The value an assignment actually stores, unwrapped through the wrappers
+    # that do not change it. A Right holding a real pipeline -- more than one
+    # element -- returns nothing, because whatever a command did to the value
+    # is not a capture of it.
+    $scriptBlockUnwrapAssignedValue = {
+        param ($objAssignment)
+        $objValue = $objAssignment.Right
+        if ($objValue -is [System.Management.Automation.Language.PipelineAst]) {
+            if (@($objValue.PipelineElements).Count -ne 1) {
+                return $null
+            }
+            $objValue = $objValue.PipelineElements[0]
+        }
+        if ($objValue -is
+            [System.Management.Automation.Language.CommandExpressionAst]) {
+            $objValue = $objValue.Expression
+        }
+        while ($objValue -is
+            [System.Management.Automation.Language.ConvertExpressionAst]) {
+            $objValue = $objValue.Child
+        }
+        return $objValue
     }
-    $intCapturePoint = [int]::MaxValue
-    foreach ($objCapture in $arrCapture) {
-        if ([int]$objCapture.Extent.StartOffset -lt $intCapturePoint) {
-            $intCapturePoint = [int]$objCapture.Extent.StartOffset
+
+    # HH2. Every variable that holds the caller's context object, not just the
+    # parameter's own name. Iterated to a fixed point so an alias of an alias
+    # is one too.
+    $hashtableAlias = @{ 'Context' = $true }
+    $boolAliasGrew = $true
+    while ($boolAliasGrew) {
+        $boolAliasGrew = $false
+        foreach ($objAssignment in $arrAllAssignment) {
+            $strTarget = [string]$objAssignment.Left.VariablePath.UserPath
+            if ($hashtableAlias.ContainsKey($strTarget)) {
+                continue
+            }
+            $objValue = & $scriptBlockUnwrapAssignedValue $objAssignment
+            if ($objValue -is
+                [System.Management.Automation.Language.VariableExpressionAst] -and
+                $hashtableAlias.ContainsKey(
+                    [string]$objValue.VariablePath.UserPath)) {
+                $hashtableAlias[$strTarget] = $true
+                $boolAliasGrew = $true
+            }
+        }
+    }
+
+    # HH1. A capture is an assignment that stores a context read, an alias, or
+    # a literal built from them -- decided by the shape of what it stores, not
+    # by what the variable is called.
+    $arrCapture = @()
+    foreach ($objAssignment in $arrAllAssignment) {
+        $objValue = & $scriptBlockUnwrapAssignedValue $objAssignment
+        if ($null -eq $objValue) {
+            continue
+        }
+        $boolIsCapture = $false
+        if ($objValue -is
+            [System.Management.Automation.Language.MemberExpressionAst] -and
+            $objValue.Expression -is
+            [System.Management.Automation.Language.VariableExpressionAst] -and
+            $hashtableAlias.ContainsKey(
+                [string]$objValue.Expression.VariablePath.UserPath)) {
+            $boolIsCapture = $true
+        }
+        if ($objValue -is
+            [System.Management.Automation.Language.VariableExpressionAst] -and
+            $hashtableAlias.ContainsKey([string]$objValue.VariablePath.UserPath)) {
+            $boolIsCapture = $true
+        }
+        if ($objValue -is [System.Management.Automation.Language.HashtableAst]) {
+            $boolIsCapture = $true
+        }
+        if ($boolIsCapture) {
+            $arrCapture += $objAssignment
         }
     }
 
@@ -877,38 +961,63 @@ $script:scriptBlockAssertContextReadsAreCaptured = {
                     return ($objNode -is
                         [System.Management.Automation.Language.MemberExpressionAst] -and
                         $objNode.Expression -is
-                        [System.Management.Automation.Language.VariableExpressionAst] -and
-                        ([string]$objNode.Expression.VariablePath.UserPath) -ceq 'Context')
+                        [System.Management.Automation.Language.VariableExpressionAst])
                 },
                 $true
             ))) {
+        if (-not $hashtableAlias.ContainsKey(
+                [string]$objRead.Expression.VariablePath.UserPath)) {
+            continue
+        }
+
+        # Each function carries its own capture block, so the point a read is
+        # measured against is its own function's. A file-wide minimum would put
+        # one function's pre-authentication guard after another function's
+        # capture and refuse it.
+        $objScope = $objRead.Parent
+        while ($null -ne $objScope -and $objScope -isnot
+            [System.Management.Automation.Language.FunctionDefinitionAst]) {
+            $objScope = $objScope.Parent
+        }
+        if ($null -eq $objScope) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('context-read-unscoped-' +
+                    [string]$objRead.Extent.StartLineNumber)
+        }
+
+        $arrScopeCapture = @($arrCapture | Where-Object {
+                [int]$_.Extent.StartOffset -ge [int]$objScope.Extent.StartOffset -and
+                [int]$_.Extent.EndOffset -le [int]$objScope.Extent.EndOffset
+            })
+        if (@($arrScopeCapture).Count -eq 0) {
+            # A function that reads the context and never captures it cannot be
+            # evaluated by this rule, and a rule that passes when it finds no
+            # subject admits everything -- round 49's BB1.
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' -Detail 'context-read-capture-absent'
+        }
+        $intCapturePoint = [int]::MaxValue
+        foreach ($objScopeCapture in $arrScopeCapture) {
+            if ([int]$objScopeCapture.Extent.StartOffset -lt $intCapturePoint) {
+                $intCapturePoint = [int]$objScopeCapture.Extent.StartOffset
+            }
+        }
         if ([int]$objRead.Extent.StartOffset -lt $intCapturePoint) {
             continue
         }
-        # Walk out through at most one cast and one command expression. A
-        # capture reaches an assignment or a literal within that; anything
-        # embedded in a pipeline, an index or a call does not.
+
+        # HH3. The read must sit inside one of the capture assignments this
+        # scope actually has -- identity, not an ancestor that happens to be an
+        # assignment.
         $boolCaptured = $false
-        $objWalk = $objRead.Parent
-        $intHop = 0
-        while ($null -ne $objWalk -and $intHop -lt 4) {
-            if ($objWalk -is
-                [System.Management.Automation.Language.AssignmentStatementAst] -or
-                $objWalk -is
-                [System.Management.Automation.Language.HashtableAst]) {
+        foreach ($objScopeCapture in $arrScopeCapture) {
+            if ([int]$objRead.Extent.StartOffset -ge
+                [int]$objScopeCapture.Extent.StartOffset -and
+                [int]$objRead.Extent.EndOffset -le
+                [int]$objScopeCapture.Extent.EndOffset) {
                 $boolCaptured = $true
                 break
             }
-            if ($objWalk -isnot
-                [System.Management.Automation.Language.ConvertExpressionAst] -and
-                $objWalk -isnot
-                [System.Management.Automation.Language.CommandExpressionAst] -and
-                $objWalk -isnot
-                [System.Management.Automation.Language.PipelineAst]) {
-                break
-            }
-            $objWalk = $objWalk.Parent
-            $intHop++
         }
         if (-not $boolCaptured) {
             & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
