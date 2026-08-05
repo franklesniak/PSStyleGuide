@@ -2664,6 +2664,27 @@ $script:scriptBlockReadCandidateHelperValidatedFile = {
         [string]$ExpectedSha256
     )
 
+    # Prove the path is an ordinary regular file before opening it. A named
+    # pipe carries neither the Directory nor the ReparsePoint attribute, so
+    # nothing above this line would refuse one, and opening a FIFO for reading
+    # blocks until a writer appears -- which is an indefinite hang of the
+    # runner, not a failed check.
+    #
+    # This is the THIRD site where this class has appeared. Round 23 closed it
+    # at the download entry, round 25 centralised the proof, and this site was
+    # missed both times because the sweeps looked for the shape of the previous
+    # fix rather than for the property: a path opened for reading whose
+    # ordinariness has not been proven immediately beforehand. The listing that
+    # precedes this call establishes the entry existed then, not that it is
+    # still an ordinary file now. Reported at round 57.
+    try {
+        & $script:scriptBlockAssertCandidateHelperOrdinaryRegularFile `
+            -LiteralPath $LiteralPath
+    } catch {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'post-extraction-invalid' -Phase 'post-extraction' -Subreason 'nonordinary'
+    }
+
     $objStream = New-Object System.IO.FileStream(
         $LiteralPath,
         [System.IO.FileMode]::Open,
