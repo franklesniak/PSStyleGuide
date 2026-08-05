@@ -27,14 +27,14 @@ a caller that deletes first and validates afterwards has already
 deleted, so it needs a way to ask about issuance that changes nothing.
 
 .NOTES
-Version: 1.0.20260804.0
+Version: 1.0.20260805.0
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260804.0'
+$versionCandidateContext = [System.Version]'1.0.20260805.0'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -1769,7 +1769,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260804.0
+    # Version: 1.0.20260805.0
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2231,7 +2231,7 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260804.0
+    # Version: 1.0.20260805.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param (
@@ -2341,7 +2341,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260804.0
+    # Version: 1.0.20260805.0
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2439,12 +2439,24 @@ function Remove-StyleGuideCandidateInvocationContext {
         # afterwards made this the one cardinality check in either script that
         # materialized its directory first: a root polluted with unexpected
         # children cost 17.00 MiB of managed heap and 210 ms at 50,000 entries
-        # to reach a verdict that only ever needed to see two. The verdict was
-        # correct either way, which is exactly why nothing failed and the site
-        # survived a sweep of this class.
+        # to reach a verdict that only ever needed to see two.
+        #
+        # The path comparison uses this file's own comparison discipline --
+        # Ordinal on Linux, OrdinalIgnoreCase on Windows -- rather than the bare
+        # -eq it used through round 59. Copilot flagged that -eq twice: it is
+        # PowerShell's default case-insensitive string equality even on a
+        # case-sensitive filesystem, and every other path comparison in this
+        # file already routes through $objCandidatePathComparison. An earlier
+        # comment here argued the verdict was "correct either way" and left it;
+        # that is exactly the reasoned-safe assertion this loop keeps being
+        # burned by, so the site now matches the filesystem's own semantics
+        # instead of arguing that the discrepancy does not matter.
         $listExpectedRootEntries = New-Object 'System.Collections.Generic.List[string]'
         foreach ($objRecord in $objCleanupPlan.Journal) {
-            if ($objRecord.ParentPath -eq $objCleanupPlan.InvocationRootPath -and
+            if ([System.String]::Equals(
+                    [string]$objRecord.ParentPath,
+                    [string]$objCleanupPlan.InvocationRootPath,
+                    $objCandidatePathComparison) -and
                 $objRecord.EntryState -eq 'Created') {
                 $listExpectedRootEntries.Add($objRecord.Path)
             }

@@ -57,7 +57,7 @@ $script:versionCandidateHarness = [System.Version]'1.0.20260805.0'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260805.0'
-$script:strCandidateExpectedContextVersion = '1.0.20260804.0'
+$script:strCandidateExpectedContextVersion = '1.0.20260805.0'
 $script:strCandidateCatalogVersion = '1.0.20260805.0'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
@@ -3754,20 +3754,37 @@ $script:scriptBlockAssertRegularFileProofExecutes = {
         }
     }
 
-    foreach ($hashtableCase in @(
-            @{ Path = $strEmptyPath; MustPass = $true; Name = 'empty-regular' },
-            @{ Path = $strPipePath; MustPass = $false; Name = 'named-pipe' })) {
-        $boolPassed = $true
-        try {
-            & $scriptBlockAssertCandidateOrdinaryRegularFile `
-                -LiteralPath ([string]$hashtableCase.Path)
-        } catch {
-            $boolPassed = $false
-        }
-        if ($boolPassed -ne [bool]$hashtableCase.MustPass) {
-            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-                -Detail ('regular-file-proof-' + [string]$hashtableCase.Name + '-' +
-                    $(if ($boolPassed) { 'admitted' } else { 'refused' }))
+    # The context manager's predicate and the helper's predicate are DIFFERENT
+    # scriptblocks (scriptBlockAssertCandidateOrdinaryRegularFile vs
+    # scriptBlockAssertCandidateHelperOrdinaryRegularFile), and the
+    # post-extraction reader opens through the HELPER's. Round 59 exercised only
+    # the manager's here and pinned the helper's by call count, which -- Codex
+    # observed at round 60 -- leaves the helper predicate's behaviour uncovered:
+    # if its Unix stat mode check regresses to accept a pipe, the count stays
+    # three and W-06 still refuses its FIFO on a later metadata check, so the
+    # suite stays green while a post-extraction open would accept a FIFO. Both
+    # predicates are now exercised against the same two fixtures.
+    foreach ($hashtableProof in @(
+            @{ Block = $scriptBlockAssertCandidateOrdinaryRegularFile
+                Label = 'regular-file-proof' },
+            @{ Block = $script:scriptBlockAssertCandidateHelperOrdinaryRegularFile
+                Label = 'helper-regular-file-proof' })) {
+        foreach ($hashtableCase in @(
+                @{ Path = $strEmptyPath; MustPass = $true; Name = 'empty-regular' },
+                @{ Path = $strPipePath; MustPass = $false; Name = 'named-pipe' })) {
+            $boolPassed = $true
+            try {
+                & $hashtableProof.Block `
+                    -LiteralPath ([string]$hashtableCase.Path)
+            } catch {
+                $boolPassed = $false
+            }
+            if ($boolPassed -ne [bool]$hashtableCase.MustPass) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                    -Detail ([string]$hashtableProof.Label + '-' +
+                        [string]$hashtableCase.Name + '-' +
+                        $(if ($boolPassed) { 'admitted' } else { 'refused' }))
+            }
         }
     }
 }
@@ -3812,13 +3829,23 @@ $script:scriptBlockAssertJournalSwapRefused = {
             -ContentSha256 ('0' * 64)
 
         # Control: an append whose context still holds the authenticated journal
-        # must succeed.
+        # must succeed -- and it ADVANCES the capture. The guard has two
+        # branches, a journal reference-identity check and a NextSequence check,
+        # and the control append moves both the context's journal (to a new
+        # array) and its NextSequence forward. Round 59's first version left the
+        # capture at the pre-control values, so each attack below tripped BOTH
+        # branches at once and neither branch was isolated: deleting only the
+        # reference check still left the swap caught by the stale sequence
+        # mismatch, with the same subreason, so the assertion proved nothing
+        # specific. Reported by Codex at round 60. The capture is advanced with
+        # the append -- the returned journal, and the context's own advanced
+        # NextSequence -- so each attack now targets exactly one branch.
         $boolControlSucceeded = $true
         try {
-            [void](& $script:scriptBlockAddCandidateHelperRecord `
+            $objAuthenticatedJournal = & $script:scriptBlockAddCandidateHelperRecord `
                 -ContextValue $objContext -Record $objRecord `
                 -JournalValue $objAuthenticatedJournal `
-                -NextSequenceValue $uintAuthenticatedSequence -PhaseValue 'download')
+                -NextSequenceValue $uintAuthenticatedSequence -PhaseValue 'download'
         } catch {
             $boolControlSucceeded = $false
         }
@@ -3826,29 +3853,46 @@ $script:scriptBlockAssertJournalSwapRefused = {
             & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                 -Detail 'journal-swap-control-refused'
         }
+        $uintAuthenticatedSequence = [uint32]$objContext.NextSequence
 
-        # Attack: swap the context's journal to a decoy after authentication,
-        # then append with the authenticated capture. The guard must refuse,
-        # naming journal-swapped, rather than let the record land in the decoy.
-        $objContext.OwnershipJournal = [object[]]@()
-        $boolSwapRefused = $false
-        $strSwapSubreason = 'none'
-        try {
-            [void](& $script:scriptBlockAddCandidateHelperRecord `
-                -ContextValue $objContext -Record $objRecord `
-                -JournalValue $objAuthenticatedJournal `
-                -NextSequenceValue $uintAuthenticatedSequence -PhaseValue 'download')
-        } catch {
-            $boolSwapRefused = $true
-            $objSubreasonMatch = [regex]::Match(
-                [string]$_.Exception.Message, 'subreason=([a-z][a-z0-9-]*)')
-            if ($objSubreasonMatch.Success) {
-                $strSwapSubreason = $objSubreasonMatch.Groups[1].Value
+        # Attack A -- swap the journal to a decoy while leaving the sequence
+        # matched, so ONLY the reference-identity check can catch it.
+        # Attack B -- keep the journal matched while passing a mismatched
+        # sequence, so ONLY the NextSequence check can catch it.
+        # Each must be refused, naming journal-swapped. Deleting either guard
+        # branch now fails exactly one of these.
+        foreach ($hashtableAttack in @(
+                @{ Name = 'journal'
+                    Journal = ([object[]]@())
+                    Sequence = $uintAuthenticatedSequence },
+                @{ Name = 'sequence'
+                    Journal = $objAuthenticatedJournal
+                    Sequence = ([uint32]($uintAuthenticatedSequence + 1)) })) {
+            $objContext.OwnershipJournal = [object[]]$hashtableAttack.Journal
+            $boolSwapRefused = $false
+            $strSwapSubreason = 'none'
+            try {
+                [void](& $script:scriptBlockAddCandidateHelperRecord `
+                    -ContextValue $objContext -Record $objRecord `
+                    -JournalValue $objAuthenticatedJournal `
+                    -NextSequenceValue ([uint32]$hashtableAttack.Sequence) `
+                    -PhaseValue 'download')
+            } catch {
+                $boolSwapRefused = $true
+                $objSubreasonMatch = [regex]::Match(
+                    [string]$_.Exception.Message, 'subreason=([a-z][a-z0-9-]*)')
+                if ($objSubreasonMatch.Success) {
+                    $strSwapSubreason = $objSubreasonMatch.Groups[1].Value
+                }
             }
-        }
-        if (-not $boolSwapRefused -or $strSwapSubreason -cne 'journal-swapped') {
-            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-                -Detail ('journal-swap-not-refused-' + $strSwapSubreason)
+            if (-not $boolSwapRefused -or $strSwapSubreason -cne 'journal-swapped') {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                    -Detail ('journal-swap-' + [string]$hashtableAttack.Name +
+                        '-not-refused-' + $strSwapSubreason)
+            }
+            # Restore the authenticated journal so the next attack targets its
+            # own branch from a clean matched state.
+            $objContext.OwnershipJournal = $objAuthenticatedJournal
         }
     } finally {
         # The context was deliberately corrupted, so its own cleanup is not
@@ -3874,17 +3918,24 @@ $script:scriptBlockAssertOrdinaryFileProofWired = {
     #
     # Production invokes scriptBlockAssertCandidateHelperOrdinaryRegularFile at
     # three sites, and fewer than three means a reader lost its ordinariness
-    # proof. AST rather than source text, for the reasons the resource-guard
-    # wiring assertion states: a commented-out or literal-decoy line is not an
+    # proof. Round 60 adds a second requirement in the same shape: every
+    # ownership record must be published through scriptBlockAddCandidateHelperRecord,
+    # whose reference-identity guard is what the journal-swap probe exercises --
+    # Codex observed that the probe invokes that helper directly, so an
+    # expansion edit that appended records inline, bypassing the helper, would
+    # not be caught. Production appends at two sites; fewer than two means a
+    # publication went inline, around the guard.
+    #
+    # AST rather than source text, for the reasons the resource-guard wiring
+    # assertion states: a commented-out or literal-decoy line is not an
     # executable invocation and does not appear here.
     #
     # This pins the COUNT, not the POSITION. A decoy invocation elsewhere could
-    # hold the count at three while the post-extraction call was removed; the
-    # stronger form pins each open to a preceding proof of the same path, and is
-    # recorded as recommended rather than taken -- a dataflow rule over
-    # FileStream opens is exactly the wide-surface AST rule this loop has been
-    # burned writing, and the realistic regression is a dropped call, which a
-    # count catches.
+    # hold a count at its floor while a real call was removed; the stronger form
+    # pins each open (or each publication) to its guard by dataflow, and is
+    # recorded as recommended rather than taken -- a wide-surface AST rule is
+    # exactly what this loop has been burned writing, and the realistic
+    # regression is a dropped call, which a count catches.
     $objErrors = $null
     $objAst = [System.Management.Automation.Language.Parser]::ParseFile(
         $LiteralPath, [ref]$null, [ref]$objErrors)
@@ -3892,22 +3943,30 @@ $script:scriptBlockAssertOrdinaryFileProofWired = {
         & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
             -Detail 'production-ordinary-file-proof-parse'
     }
-    $intCalls = @($objAst.FindAll(
+    $arrCommandAst = @($objAst.FindAll(
             {
                 param ($objNode)
                 return ($objNode -is
                     [System.Management.Automation.Language.CommandAst] -and
                     @($objNode.CommandElements).Count -ge 1 -and
                     $objNode.CommandElements[0] -is
-                    [System.Management.Automation.Language.VariableExpressionAst] -and
-                    ([string]$objNode.CommandElements[0].VariablePath.UserPath) -ceq
-                    'script:scriptBlockAssertCandidateHelperOrdinaryRegularFile')
+                    [System.Management.Automation.Language.VariableExpressionAst])
             },
             $true
-        )).Count
-    if ($intCalls -lt 3) {
-        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-            -Detail ('production-ordinary-file-proof-' + $intCalls)
+        ))
+    foreach ($hashtableRequirement in @(
+            @{ Name = 'scriptBlockAssertCandidateHelperOrdinaryRegularFile'
+                Minimum = 3; Detail = 'production-ordinary-file-proof' },
+            @{ Name = 'scriptBlockAddCandidateHelperRecord'
+                Minimum = 2; Detail = 'production-journal-append' })) {
+        $intCalls = @($arrCommandAst | Where-Object {
+                ([string]$_.CommandElements[0].VariablePath.UserPath) -ceq
+                    ('script:' + [string]$hashtableRequirement.Name)
+            }).Count
+        if ($intCalls -lt [int]$hashtableRequirement.Minimum) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ([string]$hashtableRequirement.Detail + '-' + $intCalls)
+        }
     }
 }
 
