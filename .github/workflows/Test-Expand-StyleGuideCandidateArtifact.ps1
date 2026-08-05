@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260805.3
+Version: 1.0.20260805.4
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,10 +53,10 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260805.3'
+$script:versionCandidateHarness = [System.Version]'1.0.20260805.4'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260805.2'
+$script:strCandidateExpectedHelperVersion = '1.0.20260805.3'
 $script:strCandidateExpectedContextVersion = '1.0.20260805.0'
 $script:strCandidateCatalogVersion = '1.0.20260805.0'
 # The documented ceiling on what an authenticated native query may return, the
@@ -4041,6 +4041,76 @@ $script:scriptBlockAssertRetainedSequenceFromCapture = {
     }
 }
 
+$script:scriptBlockAssertRound63JournalPlanWired = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath
+    )
+
+    # Round 63 (Codex): the journal-plan fixes pinned as structural regressions,
+    # in the count/existence shape the wiring assertion below documents and for
+    # the same reason -- a same-session journal swap is not expressible as a
+    # catalog fixture (this file says so at line 818), so reverting any one of
+    # these left all 115 cases green. Each pin fails closed on revert:
+    #
+    #   * The context assertion READS the OwnershipJournal member off the
+    #     caller's object at exactly two sites -- where it captures and validates
+    #     the journal it returns, and the journal-current reference guard. Every
+    #     other read this PR removed was a post-assertion re-read that could
+    #     observe a decoy the assertion never validated; reverting the cleanup or
+    #     primary capture to a live $Context.OwnershipJournal read adds a third,
+    #     whatever receiver name it is spelled with (the HH2 lesson: count the
+    #     member, not the receiver).
+    #   * The assertion returns that captured array as the plan; without the
+    #     return the two captures above bind $null.
+    #   * The destination create carries the candidate-record identity guard that
+    #     re-proves Kind and Path before the create.
+    $objErrors = $null
+    $objAst = [System.Management.Automation.Language.Parser]::ParseFile(
+        $LiteralPath, [ref]$null, [ref]$objErrors)
+    if ($null -eq $objAst -or @($objErrors).Count -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+            -Detail 'round63-plan-parse'
+    }
+
+    $arrJournalMember = @($objAst.FindAll(
+            {
+                param ($SyntaxNode)
+                return ($SyntaxNode -is
+                    [System.Management.Automation.Language.MemberExpressionAst] -and
+                    $SyntaxNode.Member -is
+                    [System.Management.Automation.Language.StringConstantExpressionAst] -and
+                    ([string]$SyntaxNode.Member.Value) -ceq 'OwnershipJournal')
+            },
+            $true
+        ))
+    # Every OwnershipJournal member expression that is NOT the left side of an
+    # assignment is a read; the sole write is the append's re-publication.
+    $arrJournalRead = @($arrJournalMember | Where-Object {
+            -not ($_.Parent -is
+                [System.Management.Automation.Language.AssignmentStatementAst] -and
+                [System.Object]::ReferenceEquals($_.Parent.Left, $_))
+        })
+    if (@($arrJournalRead).Count -ne 2) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+            -Detail ('round63-journal-read-count-' + [string]@($arrJournalRead).Count)
+    }
+
+    $strText = [System.IO.File]::ReadAllText($LiteralPath)
+    $intReturn = @([regex]::Matches(
+        $strText, '(?m)^\s*return ,\$objJournal\s*$')).Count
+    if ($intReturn -ne 1) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+            -Detail ('round63-plan-return-' + [string]$intReturn)
+    }
+    $intIdentityGuard = @([regex]::Matches(
+        $strText, "-Subreason 'candidate-record'")).Count
+    if ($intIdentityGuard -ne 1) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+            -Detail ('round63-candidate-record-guard-' + [string]$intIdentityGuard)
+    }
+}
+
 $script:scriptBlockAssertOrdinaryFileProofWired = {
     param (
         [Parameter(Mandatory = $true)]
@@ -4103,14 +4173,19 @@ $script:scriptBlockAssertOrdinaryFileProofWired = {
             # destination create as well as inside the append helper, so a
             # same-session swap in the pre-destination window is caught before
             # the irreversible CreateDirectory rather than after, at the next
-            # append, when rollback has already been handed the decoy. Production
-            # calls scriptBlockAssertCandidateHelperJournalCurrent at exactly two
-            # sites -- the append helper and the destination create -- so fewer
-            # than two means one of them lost its guard. Measured: deleting the
-            # destination call left all 115 cases green, the same invisibility
-            # the round-59 wiring pins were added for.
+            # append, when rollback has already been handed the decoy.
+            # Round 63 (Codex) carried the same guard to the extraction FILE
+            # create, which ran its FileStream CreateNew with no journal-current
+            # check before it -- the append's own check refused only afterward,
+            # leaving the file on disk for rollback to meet against a decoy. So
+            # production now calls scriptBlockAssertCandidateHelperJournalCurrent
+            # at exactly three sites -- the append helper, the destination
+            # create, and each file create -- and fewer than three means one of
+            # them lost its guard. Measured: deleting the file-create call left
+            # all 115 cases green, the same invisibility the round-59 wiring pins
+            # were added for.
             @{ Name = 'scriptBlockAssertCandidateHelperJournalCurrent'
-                Minimum = 2; Detail = 'production-journal-current-guard' })) {
+                Minimum = 3; Detail = 'production-journal-current-guard' })) {
         $intCalls = @($arrCommandAst | Where-Object {
                 ([string]$_.CommandElements[0].VariablePath.UserPath) -ceq
                     ('script:' + [string]$hashtableRequirement.Name)
@@ -9140,7 +9215,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260805.3
+    # Version: 1.0.20260805.4
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -9397,6 +9472,8 @@ function Invoke-StyleGuideCandidateHarness {
         & $script:scriptBlockAssertJournalSwapRefused -RunRoot $strRunRoot
         & $script:scriptBlockAssertRetainedSequenceFromCapture -RunRoot $strRunRoot
         & $script:scriptBlockAssertOrdinaryFileProofWired `
+            -LiteralPath $strHelperLiteralPath
+        & $script:scriptBlockAssertRound63JournalPlanWired `
             -LiteralPath $strHelperLiteralPath
         & $script:scriptBlockAssertDownloadLeafGuardExecutes `
             -HelperLiteralPath $strHelperLiteralPath `

@@ -123,6 +123,7 @@
       "candidate-file-present",
       "candidate-identity",
       "candidate-journal",
+      "candidate-record",
       "candidate-state",
       "content-changed",
       "context-conflict-stage",

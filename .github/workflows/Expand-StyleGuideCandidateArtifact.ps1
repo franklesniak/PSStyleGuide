@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260805.2
+Version: 1.0.20260805.3
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260805.2'
+$script:versionCandidateHelper = [System.Version]'1.0.20260805.3'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260805.0'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -497,6 +497,16 @@ $script:scriptBlockAssertCandidateHelperContext = {
             'OwnershipJournal'
         ))
 
+    # Round 63 (Codex): bind the journal to a single read here. Every check
+    # below, and the plan this assertion returns to its callers, reads THIS
+    # captured reference rather than $ContextValue.OwnershipJournal again -- a
+    # property a same-session holder can repoint between reads, so validating
+    # one array and letting a later read (here, or in a caller that re-reads the
+    # property after this returns) act on another is the exact swap the
+    # journal-current guard exists to refuse. One read, one validated array,
+    # returned so no caller has to read the property a second time.
+    $objJournal = $ContextValue.OwnershipJournal
+
     if ($ContextValue.SchemaVersion.GetType() -ne [System.UInt32] -or
         $ContextValue.SchemaVersion -ne [uint32]1 -or
         $ContextValue.ContextScriptVersion.GetType() -ne [System.Version] -or
@@ -517,8 +527,8 @@ $script:scriptBlockAssertCandidateHelperContext = {
         $ContextValue.LifecycleState.GetType() -ne [System.String] -or
         $ContextValue.LifecycleState -cnotin @('Active', 'CleanupFailed', 'Disposed') -or
         $ContextValue.NextSequence.GetType() -ne [System.UInt32] -or
-        $ContextValue.OwnershipJournal.GetType() -ne [System.Object[]] -or
-        $ContextValue.NextSequence -ne [uint32]$ContextValue.OwnershipJournal.Count) {
+        $objJournal.GetType() -ne [System.Object[]] -or
+        $ContextValue.NextSequence -ne [uint32]$objJournal.Count) {
         throw 'context-invalid'
     }
 
@@ -566,12 +576,12 @@ $script:scriptBlockAssertCandidateHelperContext = {
     # directory, one candidate directory, one download file, and one candidate
     # file per manifest name. Growing the manifest moves the cap on its own.
     $intMaximumJournalRecord = 4 + $script:arrCandidateHelperExpectedName.Count
-    if ($ContextValue.OwnershipJournal.Count -gt $intMaximumJournalRecord) {
+    if ($objJournal.Count -gt $intMaximumJournalRecord) {
         throw 'context-invalid'
     }
 
-    for ($intIndex = 0; $intIndex -lt $ContextValue.OwnershipJournal.Count; $intIndex++) {
-        $objRecord = $ContextValue.OwnershipJournal[$intIndex]
+    for ($intIndex = 0; $intIndex -lt $objJournal.Count; $intIndex++) {
+        $objRecord = $objJournal[$intIndex]
         if ($null -eq $objRecord -or
             $objRecord.GetType() -ne [System.Management.Automation.PSCustomObject] -or
             $objRecord.PSObject.TypeNames.Count -eq 0 -or
@@ -752,10 +762,10 @@ $script:scriptBlockAssertCandidateHelperContext = {
         $hashtableCounts.DownloadFile -gt 1) {
         throw 'context-invalid'
     }
-    $objCandidateDirectoryRecord = @($ContextValue.OwnershipJournal | Where-Object {
+    $objCandidateDirectoryRecord = @($objJournal | Where-Object {
         $_.Kind -eq 'CandidateDirectory'
     })[0]
-    $arrCandidateFileRecords = @($ContextValue.OwnershipJournal | Where-Object {
+    $arrCandidateFileRecords = @($objJournal | Where-Object {
         $_.Kind -eq 'CandidateFile'
     })
     if ($arrCandidateFileRecords.Count -gt 4 -or
@@ -766,10 +776,10 @@ $script:scriptBlockAssertCandidateHelperContext = {
         throw 'context-invalid'
     }
     if ($ContextValue.LifecycleState -eq 'Active') {
-        $objRootRecord = @($ContextValue.OwnershipJournal | Where-Object {
+        $objRootRecord = @($objJournal | Where-Object {
             $_.Kind -eq 'InvocationRootDirectory'
         })[0]
-        $objDownloadDirectoryRecord = @($ContextValue.OwnershipJournal | Where-Object {
+        $objDownloadDirectoryRecord = @($objJournal | Where-Object {
             $_.Kind -eq 'DownloadDirectory'
         })[0]
         # An ExpectedAbsent download directory is only ever produced by the
@@ -818,7 +828,7 @@ $script:scriptBlockAssertCandidateHelperContext = {
         throw 'context-invalid'
     }
     $arrAdmittedEntryState = [string[]]$hashtableAdmittedEntryState[$ContextValue.LifecycleState]
-    foreach ($objRecord in $ContextValue.OwnershipJournal) {
+    foreach ($objRecord in $objJournal) {
         if ($objRecord.EntryState -cnotin $arrAdmittedEntryState) {
             throw 'context-invalid'
         }
@@ -826,7 +836,7 @@ $script:scriptBlockAssertCandidateHelperContext = {
     if ($hashtableRequiredEntryState.ContainsKey($ContextValue.LifecycleState)) {
         $strRequiredEntryState = [string]$hashtableRequiredEntryState[$ContextValue.LifecycleState]
         $boolRequiredPresent = $false
-        foreach ($objRecord in $ContextValue.OwnershipJournal) {
+        foreach ($objRecord in $objJournal) {
             if ($objRecord.EntryState -ceq $strRequiredEntryState) {
                 $boolRequiredPresent = $true
             }
@@ -835,6 +845,11 @@ $script:scriptBlockAssertCandidateHelperContext = {
             throw 'context-invalid'
         }
     }
+
+    # Round 63 (Codex): the validated journal, returned as the plan its callers
+    # authenticate against. The unary comma keeps a single-element journal an
+    # array rather than unrolling it to the bare record.
+    return ,$objJournal
 }
 
 $script:scriptBlockNewCandidateHelperRecord = {
@@ -2199,7 +2214,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260805.2
+    # Version: 1.0.20260805.3
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2236,12 +2251,18 @@ function Remove-StyleGuideCandidateInvocationState {
     # cannot make the catch iterate it.
     $objCapturedJournal = @()
     try {
-        [void](& $script:scriptBlockAssertCandidateHelperContext -ContextValue $Context)
+        # Round 63 (Codex): the journal captured here is the array the assertion
+        # just validated and returned, not a fresh read of the live property
+        # after it. The round-61 capture re-read $Context.OwnershipJournal on a
+        # separate line below, so a same-session swap between the assertion and
+        # that read handed the failure catch an unbounded decoy the assertion
+        # never bounded. Checked and captured are now one array.
+        $objCapturedJournal = & $script:scriptBlockAssertCandidateHelperContext `
+            -ContextValue $Context
         $guidInvocationId = $Context.InvocationId
         $strPreviousState = $Context.LifecycleState
         $strCapturedTrustedParent = [string]$Context.TrustedParentPath
         $strCapturedInvocationRoot = [string]$Context.InvocationRootPath
-        $objCapturedJournal = $Context.OwnershipJournal
         # The whole set, captured together and authenticated together below.
         # Capturing paths and then authenticating only the STATE proves nothing
         # about the paths: they can be moved to whatever the caller wants
@@ -2949,8 +2970,13 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
                 -Value $RunAttempt -ParameterName 'RunAttempt' -IsLabel $true
         }
 
+        # Round 63 (Codex): capture the journal the assertion validated and
+        # returned, so the authenticated-journal read further down is not a
+        # second read of the live property after the issuance checks.
+        $objAssertedJournal = $null
         try {
-            [void](& $script:scriptBlockAssertCandidateHelperContext -ContextValue $Context)
+            $objAssertedJournal = & $script:scriptBlockAssertCandidateHelperContext `
+                -ContextValue $Context
         } catch {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'parameter' -Phase 'parameter' -Subreason 'Context-schema'
@@ -3053,8 +3079,19 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         # fail the assertion after it, and hand rollback a context the manager
         # refuses as invalid -- leaving the issued tree on disk. A refusal
         # that leaks is worse than the write it refused.
-        $objAuthenticatedJournal = $Context.OwnershipJournal
-        $uintAuthenticatedSequence = [uint32]$Context.NextSequence
+        # Round 63 (Codex): the authenticated journal is the array the context
+        # assertion validated and returned at entry, NOT a re-read of the live
+        # property here. Round 38 froze this read after the issuance checks, but
+        # the issuance verifier authenticates paths and state only -- so a
+        # same-session swap between the assertion and this line installed a decoy
+        # journal (with a matching NextSequence) that every later journal-current
+        # check then measured against itself, and an attacker-shaped preallocated
+        # record in it failed the post-append assertion and left rollback
+        # validating the decoy. The sequence comes from the validated array's
+        # length, which the assertion has already proved equal to NextSequence,
+        # so a moved counter changes nothing.
+        $objAuthenticatedJournal = $objAssertedJournal
+        $uintAuthenticatedSequence = [uint32]$objAuthenticatedJournal.Count
         $strAuthenticatedTrustedParent = [string]$Context.TrustedParentPath
         $strAuthenticatedDownload = [string]$Context.DownloadDirectoryPath
         $strAuthenticatedCandidate = [string]$Context.CandidatePath
@@ -3075,6 +3112,21 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         })[0]
         $strAuthenticatedCandidateEntryState =
             [string]$objCapturedCandidateRecord.EntryState
+        # Round 63 (Codex): the candidate record's identity, captured as
+        # immutable values alongside its state. Reference identity of the journal
+        # array (the journal-current guard) says nothing about a record's mutable
+        # fields, and the destination block below both re-selects the record by
+        # live Kind and marks it after the create. A same-session writer that
+        # flips this record's Kind or Path after authentication would move that
+        # selection to another record -- or off it -- so the create runs, the
+        # real record stays ExpectedAbsent, and cleanup meets a directory no
+        # journal describes. The sequence is the record's authenticated index;
+        # the destination block re-selects by it and re-proves these fields
+        # before the create.
+        $uintAuthenticatedCandidateSequence =
+            [uint32]$objCapturedCandidateRecord.Sequence
+        $strAuthenticatedCandidatePath =
+            [string]$objCapturedCandidateRecord.Path
         # Round 54: the state belongs in the capture too. The verifier's
         # -ExpectedState exists precisely so the manager compares its register
         # against a value the caller cannot move afterwards, and this call was
@@ -3574,9 +3626,26 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         # gates the create is the string captured at authentication (round 61
         # F1 above), not this record's live field -- which a same-session writer
         # can flip after authentication to force the retention described there.
-        $objCandidateDirectoryRecord = @($objAuthenticatedJournal | Where-Object {
-            $_.Kind -eq 'CandidateDirectory'
-        })[0]
+        # Round 63 (Codex): select the record by its authenticated sequence and
+        # re-prove its Kind and Path against the values captured at
+        # authentication before the create, rather than re-matching the live
+        # Kind. A same-session writer that flips this record's Kind or Path
+        # (fields the journal-current reference guard above does not cover) would
+        # otherwise move this selection to a different record or off it, leaving
+        # the create to run while the real record is never marked Created and
+        # cleanup meets a directory no journal describes.
+        $objCandidateDirectoryRecord =
+            $objAuthenticatedJournal[$uintAuthenticatedCandidateSequence]
+        if ($null -eq $objCandidateDirectoryRecord -or
+            $objCandidateDirectoryRecord.Kind -cne 'CandidateDirectory' -or
+            [uint32]$objCandidateDirectoryRecord.Sequence -ne $uintAuthenticatedCandidateSequence -or
+            -not [System.String]::Equals(
+                $objCandidateDirectoryRecord.Path,
+                $strAuthenticatedCandidatePath,
+                $script:objCandidateHelperPathComparison)) {
+            & $script:scriptBlockStopCandidateHelperOperation `
+                -Code 'destination-invalid' -Phase 'destination' -Subreason 'candidate-record'
+        }
         if ($strAuthenticatedCandidateEntryState -cne 'ExpectedAbsent') {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'destination-invalid' -Phase 'destination' -Subreason 'candidate-state'
@@ -3674,6 +3743,21 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
             # that is already in place, and the second catches one that lands in
             # the gap this cannot close, before the next output is written.
             & $scriptBlockAssertCandidateStillSame
+
+            # Round 63 (Codex): re-prove the caller's context still holds the
+            # authenticated journal at the authenticated sequence immediately
+            # before the irreversible create -- the same guard the directory
+            # create and the record append already run. Without it the file was
+            # created first and the append's journal-current check refused only
+            # afterward, so a same-session swap in this window left the file on
+            # disk while the append refused 'journal-swapped' and rollback
+            # validated the decoy: the directory case this file already fixed,
+            # carried to the file create it was never applied to.
+            & $script:scriptBlockAssertCandidateHelperJournalCurrent `
+                -ContextValue $Context `
+                -JournalValue $objAuthenticatedJournal `
+                -NextSequenceValue $uintAuthenticatedSequence `
+                -PhaseValue $strPhase
 
             $objDestinationStream = $null
             $objEntryStream = $null
