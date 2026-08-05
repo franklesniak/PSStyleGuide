@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260804.0
+Version: 1.0.20260805.0
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,12 +53,12 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260804.0'
+$script:versionCandidateHarness = [System.Version]'1.0.20260805.0'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260804.0'
+$script:strCandidateExpectedHelperVersion = '1.0.20260805.0'
 $script:strCandidateExpectedContextVersion = '1.0.20260804.0'
-$script:strCandidateCatalogVersion = '1.0.20260804.0'
+$script:strCandidateCatalogVersion = '1.0.20260805.0'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
 # outstanding read finish.
@@ -674,6 +674,33 @@ $script:scriptBlockAssertVersionMarkersConsistent = {
     if ($hashtableConstantSeen.Count -ne $VersionConstantMap.Count) {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
             -Detail ('version-marker-constant-missing-' + $hashtableConstantSeen.Count)
+    }
+    # Auditing only the [System.Version] conversions leaves the variable open
+    # to being written again by something that is not a conversion. Keep the
+    # required literal assignment so the map above is satisfied, then add
+    # `$script:versionCandidateHelper = $PSVersionTable.PSVersion` further
+    # down, and every check here still passes while the constant the file
+    # actually runs with carries a different version. Reported at round 52.
+    #
+    # The conversions are what this routine can read a version out of; they
+    # are not what decides the variable's value. So the declared names must
+    # be written exactly once each, by any spelling, and the one write is the
+    # conversion already checked above.
+    foreach ($strDeclaredName in $VersionConstantMap.Keys) {
+        $arrAssignment = @($objMarkerAst.FindAll(
+                {
+                    param ($objNode)
+                    $objNode -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                    $objNode.Left -is [System.Management.Automation.Language.VariableExpressionAst]
+                },
+                $true
+            ) | Where-Object {
+                ([string]$_.Left.VariablePath.UserPath) -ceq [string]$strDeclaredName
+            })
+        if (@($arrAssignment).Count -ne 1) {
+            & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
+                -Detail ('version-marker-constant-writes-' + @($arrAssignment).Count)
+        }
     }
     if (@($arrOwnConstant).Count -ne 1) {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
@@ -8102,7 +8129,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260804.0
+    # Version: 1.0.20260805.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()

@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260804.0
+Version: 1.0.20260805.0
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260804.0'
+$script:versionCandidateHelper = [System.Version]'1.0.20260805.0'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260804.0'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -887,20 +887,59 @@ $script:scriptBlockAddCandidateHelperRecord = {
         [object]$ContextValue,
 
         [Parameter(Mandatory = $true)]
-        [object]$Record
+        [object]$Record,
+
+        [Parameter(Mandatory = $true)]
+        [object]$JournalValue,
+
+        [Parameter(Mandatory = $true)]
+        [uint32]$NextSequenceValue,
+
+        [Parameter(Mandatory = $true)]
+        [string]$PhaseValue
     )
 
-    $arrJournal = New-Object object[] ($ContextValue.OwnershipJournal.Count + 1)
+    # Round 43 captured the journal and the sequence this expansion had
+    # authenticated, and then numbered records from the captured sequence
+    # while still appending to whatever `$ContextValue.OwnershipJournal`
+    # happened to be at the moment of the call. Half the capture was used.
+    # Measured deterministically: with the journal swapped after
+    # authentication, the download record lands in the swapped array and the
+    # authenticated one is never touched --
+    #
+    #   authenticated journal length : 3
+    #   context journal length       : 1
+    #   record landed in the DECOY journal : True
+    #
+    # -- after which the context assertion fails and rollback is handed a
+    # context the manager refuses, leaving the issued tree on disk. So the
+    # append reads the journal it was given, and refuses outright if the
+    # caller's context no longer holds that exact array. Reference identity
+    # is the check, not equality: a structural clone is a different journal.
+    if (-not [System.Object]::ReferenceEquals(
+            $ContextValue.OwnershipJournal, $JournalValue)) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'context-invalid' -Phase $PhaseValue -Subreason 'journal-swapped'
+    }
+    if ([uint32]$ContextValue.NextSequence -ne $NextSequenceValue) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'context-invalid' -Phase $PhaseValue -Subreason 'journal-swapped'
+    }
+
+    $arrJournal = New-Object object[] ($JournalValue.Count + 1)
     [System.Array]::Copy(
-        $ContextValue.OwnershipJournal,
+        $JournalValue,
         0,
         $arrJournal,
         0,
-        $ContextValue.OwnershipJournal.Count
+        $JournalValue.Count
     )
     $arrJournal[$arrJournal.Length - 1] = $Record
     $ContextValue.OwnershipJournal = [object[]]$arrJournal
-    $ContextValue.NextSequence = [uint32]($ContextValue.NextSequence + 1)
+    $ContextValue.NextSequence = [uint32]($NextSequenceValue + 1)
+    # Returned so the caller's capture advances with the journal it just
+    # committed, rather than re-reading the context to find out what happened.
+    return ,[object[]]$arrJournal
 }
 
 $script:scriptBlockGetCandidateHelperRetainedSequence = {
@@ -2113,7 +2152,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260804.0
+    # Version: 1.0.20260805.0
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -3222,9 +3261,12 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
             -CreationPhase 'download' `
             -ContentLength ([uint64]$arrArchiveByte.Length) `
             -ContentSha256 $strActualDigest
-        [void](& $script:scriptBlockAddCandidateHelperRecord `
+        $objAuthenticatedJournal = & $script:scriptBlockAddCandidateHelperRecord `
             -ContextValue $Context `
-            -Record $objDownloadRecord)
+            -Record $objDownloadRecord `
+            -JournalValue $objAuthenticatedJournal `
+            -NextSequenceValue $uintAuthenticatedSequence `
+            -PhaseValue $strPhase
         # The captured counter advances with the journal it describes, so the
         # second record is numbered from the first rather than from a field
         # the caller could have moved in between.
@@ -3538,9 +3580,12 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
                     -CreationPhase 'extraction' `
                     -ContentLength ([uint64]$hashtableExpectedEvidence.Length) `
                     -ContentSha256 ([string]$hashtableExpectedEvidence.Sha256)
-                [void](& $script:scriptBlockAddCandidateHelperRecord `
+                $objAuthenticatedJournal = & $script:scriptBlockAddCandidateHelperRecord `
                     -ContextValue $Context `
-                    -Record $objFileRecord)
+                    -Record $objFileRecord `
+                    -JournalValue $objAuthenticatedJournal `
+                    -NextSequenceValue $uintAuthenticatedSequence `
+                    -PhaseValue $strPhase
                 # The captured counter advances with the journal it describes, so the
                 # second record is numbered from the first rather than from a field
                 # the caller could have moved in between.
