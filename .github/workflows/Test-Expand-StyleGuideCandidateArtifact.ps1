@@ -3731,14 +3731,27 @@ $script:scriptBlockAssertStaticMembersResolve = {
                 $intSkippedType++
                 continue
             }
-            if (($strMember -ceq 'new')) {
-                $intProvenName++
-                continue
+            # `[T]::new(...)` used to be counted proven the moment the type
+            # resolved: no constructor was ever looked up, so a call with the
+            # wrong arguments passed the very guard that exists to catch a
+            # binding failure on a branch no test executes. That is the defect
+            # this whole routine was written for, left open in the one syntax
+            # that names no method. Reported at round 52.
+            #
+            # ConstructorInfo and MethodInfo both expose GetParameters(), so
+            # the arity and argument-type checks below need no special case --
+            # only the overload set is chosen differently.
+            if ($strMember -ceq 'new') {
+                $arrOverload = @($typeTarget.GetConstructors(
+                        [System.Reflection.BindingFlags]::Public -bor
+                        [System.Reflection.BindingFlags]::Instance
+                    ))
+            } else {
+                $arrOverload = @($typeTarget.GetMethods(
+                        [System.Reflection.BindingFlags]::Public -bor
+                        [System.Reflection.BindingFlags]::Static
+                    ) | Where-Object { ([string]$_.Name) -ceq $strMember })
             }
-            $arrOverload = @($typeTarget.GetMethods(
-                    [System.Reflection.BindingFlags]::Public -bor
-                    [System.Reflection.BindingFlags]::Static
-                ) | Where-Object { ([string]$_.Name) -ceq $strMember })
             if ($arrOverload.Count -eq 0) {
                 & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                     -Detail ('static-member-absent-' + $strMember + '-' +
