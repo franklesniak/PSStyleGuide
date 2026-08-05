@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260805.1
+Version: 1.0.20260805.2
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,10 +53,10 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260805.1'
+$script:versionCandidateHarness = [System.Version]'1.0.20260805.2'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260805.1'
+$script:strCandidateExpectedHelperVersion = '1.0.20260805.2'
 $script:strCandidateExpectedContextVersion = '1.0.20260805.0'
 $script:strCandidateCatalogVersion = '1.0.20260805.0'
 # The documented ceiling on what an authenticated native query may return, the
@@ -3901,6 +3901,99 @@ $script:scriptBlockAssertJournalSwapRefused = {
     }
 }
 
+$script:scriptBlockAssertRetainedSequenceFromCapture = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$RunRoot
+    )
+
+    # Round 61 (Codex F3): the cleanup failure catch computes retained sequences
+    # from the journal it captured and bounded at entry, not from the live
+    # $Context a thrown manager may have swapped. Measured before the fix: a
+    # rebound manager that replaced $Context.OwnershipJournal with 2,000,000
+    # records and threw made the catch iterate all of them (5.5 s on .NET 8) and
+    # return attacker-chosen sequences, defeating the bounded result the catch
+    # documents. Nothing committed exercised that path.
+    #
+    # Two parts, so the assertion has teeth in both directions. The CONTROL
+    # proves the catch reads the captured journal's contents: a manager that
+    # marks one real record RetainedUncertain in place and throws must have that
+    # record's sequence reported, so a catch hardcoded to empty fails here. The
+    # ATTACK proves it reads the CAPTURE and not the live property: a manager
+    # that swaps the journal for a decoy full of RetainedUncertain records and
+    # throws must still report the captured journal's own set -- empty, for a
+    # fresh context -- so a catch that reads $Context reports the decoy and fails.
+    $scriptBlockRealCleanup = (Get-Command `
+        -Name Remove-StyleGuideCandidateInvocationContext `
+        -CommandType Function).ScriptBlock
+
+    $strControlRoot = [System.IO.Path]::Combine($RunRoot, 'retained-control')
+    [void][System.IO.Directory]::CreateDirectory($strControlRoot)
+    $objControlContext = New-StyleGuideCandidateInvocationContext `
+        -TrustedTemporaryRoot $strControlRoot -DiagnosticLabel 'retained-control'
+    $uintControlSequence = [uint32]$objControlContext.OwnershipJournal[1].Sequence
+    $objControlResult = $null
+    try {
+        Set-Item -LiteralPath Function:\Remove-StyleGuideCandidateInvocationContext -Value {
+            param (
+                [Parameter(Mandatory = $true)]
+                [AllowNull()]
+                [object]$Context
+            )
+            $Context.OwnershipJournal[1].EntryState = 'RetainedUncertain'
+            throw 'retained-control-throw'
+        } -Force
+        $objControlResult = Remove-StyleGuideCandidateInvocationState `
+            -Context $objControlContext
+    } finally {
+        Set-Item -LiteralPath Function:\Remove-StyleGuideCandidateInvocationContext `
+            -Value $scriptBlockRealCleanup -Force
+        [System.IO.Directory]::Delete($strControlRoot, $true)
+    }
+    $arrControlRetained = [uint32[]]@($objControlResult.RetainedRecordSequences)
+    if ($arrControlRetained.Count -ne 1 -or
+        $arrControlRetained[0] -ne $uintControlSequence) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+            -Detail ('retained-capture-control-' + [string]$arrControlRetained.Count)
+    }
+
+    $strAttackRoot = [System.IO.Path]::Combine($RunRoot, 'retained-attack')
+    [void][System.IO.Directory]::CreateDirectory($strAttackRoot)
+    $objAttackContext = New-StyleGuideCandidateInvocationContext `
+        -TrustedTemporaryRoot $strAttackRoot -DiagnosticLabel 'retained-attack'
+    $objAttackResult = $null
+    try {
+        Set-Item -LiteralPath Function:\Remove-StyleGuideCandidateInvocationContext -Value {
+            param (
+                [Parameter(Mandatory = $true)]
+                [AllowNull()]
+                [object]$Context
+            )
+            $intDecoy = 4096
+            $arrDecoy = New-Object object[] $intDecoy
+            for ($intIndex = 0; $intIndex -lt $intDecoy; $intIndex++) {
+                $arrDecoy[$intIndex] = [pscustomobject]@{
+                    EntryState = 'RetainedUncertain'
+                    Sequence = [uint32]$intIndex
+                }
+            }
+            $Context.OwnershipJournal = [object[]]$arrDecoy
+            throw 'retained-attack-throw'
+        } -Force
+        $objAttackResult = Remove-StyleGuideCandidateInvocationState `
+            -Context $objAttackContext
+    } finally {
+        Set-Item -LiteralPath Function:\Remove-StyleGuideCandidateInvocationContext `
+            -Value $scriptBlockRealCleanup -Force
+        [System.IO.Directory]::Delete($strAttackRoot, $true)
+    }
+    $intAttackRetained = @($objAttackResult.RetainedRecordSequences).Count
+    if ($intAttackRetained -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+            -Detail ('retained-capture-live-' + $intAttackRetained)
+    }
+}
+
 $script:scriptBlockAssertOrdinaryFileProofWired = {
     param (
         [Parameter(Mandatory = $true)]
@@ -3958,7 +4051,19 @@ $script:scriptBlockAssertOrdinaryFileProofWired = {
             @{ Name = 'scriptBlockAssertCandidateHelperOrdinaryRegularFile'
                 Minimum = 3; Detail = 'production-ordinary-file-proof' },
             @{ Name = 'scriptBlockAddCandidateHelperRecord'
-                Minimum = 2; Detail = 'production-journal-append' })) {
+                Minimum = 2; Detail = 'production-journal-append' },
+            # Round 61 (Codex F2): the journal-current guard must run before the
+            # destination create as well as inside the append helper, so a
+            # same-session swap in the pre-destination window is caught before
+            # the irreversible CreateDirectory rather than after, at the next
+            # append, when rollback has already been handed the decoy. Production
+            # calls scriptBlockAssertCandidateHelperJournalCurrent at exactly two
+            # sites -- the append helper and the destination create -- so fewer
+            # than two means one of them lost its guard. Measured: deleting the
+            # destination call left all 115 cases green, the same invisibility
+            # the round-59 wiring pins were added for.
+            @{ Name = 'scriptBlockAssertCandidateHelperJournalCurrent'
+                Minimum = 2; Detail = 'production-journal-current-guard' })) {
         $intCalls = @($arrCommandAst | Where-Object {
                 ([string]$_.CommandElements[0].VariablePath.UserPath) -ceq
                     ('script:' + [string]$hashtableRequirement.Name)
@@ -8988,7 +9093,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260805.1
+    # Version: 1.0.20260805.2
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -9243,6 +9348,7 @@ function Invoke-StyleGuideCandidateHarness {
             -HelperLiteralPath $strHelperLiteralPath `
             -ContextLiteralPath $strContextLiteralPath
         & $script:scriptBlockAssertJournalSwapRefused -RunRoot $strRunRoot
+        & $script:scriptBlockAssertRetainedSequenceFromCapture -RunRoot $strRunRoot
         & $script:scriptBlockAssertOrdinaryFileProofWired `
             -LiteralPath $strHelperLiteralPath
         & $script:scriptBlockAssertDownloadLeafGuardExecutes `
