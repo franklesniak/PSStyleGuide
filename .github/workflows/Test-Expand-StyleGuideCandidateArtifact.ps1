@@ -990,15 +990,41 @@ $script:scriptBlockAssertContextReadsAreCaptured = {
                     [string]$objRead.Extent.StartLineNumber)
         }
 
-        $intBoundary = -1
+        # The boundary is the FIRST call that actually authenticates, and only
+        # a call carrying -ExpectedValues does that: a bare
+        # Test-...Issued is a probe, and production uses one against a
+        # throwaway object purely to prove the manager is loaded.
+        #
+        # Round 56 took the maximum end offset over every call of any shape.
+        # Reported immediately: with a real authentication, then a live read,
+        # then any later verifier call, the maximum picks the later call and the
+        # intervening read looks pre-authentication. Taking the first
+        # authenticating call instead means a later one cannot move the
+        # boundary at all, which is the property that was wanted.
+        $intBoundary = [int]::MaxValue
         foreach ($objAuthentication in $arrAuthentication) {
             if ((& $scriptBlockResolveScopeStart $objAuthentication.Parent) -ne
                 $intScopeStart) {
                 continue
             }
-            if ([int]$objAuthentication.Extent.EndOffset -gt $intBoundary) {
+            $boolAuthenticates = $false
+            foreach ($objElement in @($objAuthentication.CommandElements)) {
+                if ($objElement -is
+                    [System.Management.Automation.Language.CommandParameterAst] -and
+                    ([string]$objElement.ParameterName) -ceq 'ExpectedValues') {
+                    $boolAuthenticates = $true
+                    break
+                }
+            }
+            if (-not $boolAuthenticates) {
+                continue
+            }
+            if ([int]$objAuthentication.Extent.EndOffset -lt $intBoundary) {
                 $intBoundary = [int]$objAuthentication.Extent.EndOffset
             }
+        }
+        if ($intBoundary -eq [int]::MaxValue) {
+            $intBoundary = -1
         }
         if ($intBoundary -lt 0) {
             & $script:scriptBlockStopHarness `

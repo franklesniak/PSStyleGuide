@@ -3694,19 +3694,35 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
                 & $script:scriptBlockStopCandidateHelperOperation `
                     -Code 'post-extraction-invalid' -Phase 'post-extraction' -Subreason 'missing-entry'
             }
-            # Same correction, and this site is the worse of the two: the
-            # record supplies the EXPECTED length and digest that the extracted
-            # bytes are then validated against. Read from the caller's journal,
-            # a swap lets the caller choose what the output is compared to,
-            # which defeats the post-extraction check rather than merely
-            # confusing cleanup.
-            $objRecord = @($objAuthenticatedJournal | Where-Object {
-                $_.Kind -eq 'CandidateFile' -and $_.LeafName -ceq $strExpectedName
-            })[0]
+            # This site supplies the EXPECTED length and digest that the
+            # extracted bytes are validated against, so whoever chooses those
+            # two values decides what the check means.
+            #
+            # An earlier round moved this read off $Context.OwnershipJournal and
+            # onto the authenticated array, and the comment here claimed the
+            # swap was thereby closed. It was not. Authenticating the array
+            # fixed WHICH ARRAY is read and left WHAT IS IN IT alone -- measured:
+            #
+            #   array reference authenticated        : True
+            #   record[0] same object via both paths : True
+            #   after a caller-side write, the field read through the
+            #   AUTHENTICATED array shows the caller's value
+            #   array reference check still passes    : True
+            #
+            # The records inside the authenticated array are the same objects
+            # the caller still holds, so a write to ContentSha256 still chooses
+            # what the output is compared against, and the reference-identity
+            # check passes throughout because the array itself never changed.
+            # Reference identity of a container says nothing about its contents.
+            #
+            # The expected values now come from the evidence this code built
+            # from the archive it had already authenticated, which the caller
+            # never holds a reference to.
+            $hashtablePostEvidence = $hashtableEntryEvidence[$strExpectedName]
             [void](& $script:scriptBlockReadCandidateHelperValidatedFile `
                 -LiteralPath $strDestinationPath `
-                -ExpectedLength $objRecord.ContentLength `
-                -ExpectedSha256 $objRecord.ContentSha256)
+                -ExpectedLength ([uint64]$hashtablePostEvidence.Length) `
+                -ExpectedSha256 ([string]$hashtablePostEvidence.Sha256))
         }
 
         [void](& $script:scriptBlockAssertCandidateHelperContext -ContextValue $Context)
