@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260805.4
+Version: 1.0.20260805.5
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,7 +121,7 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260805.4'
+$script:versionCandidateHelper = [System.Version]'1.0.20260805.5'
 $script:versionCandidateExpectedContext = [System.Version]'1.0.20260805.0'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
@@ -958,6 +958,38 @@ $script:scriptBlockAssertCandidateHelperRecordUnchanged = {
     # rejects, which retains the issued tree. Round 63 re-proved Kind, Sequence
     # and Path only. Type as well as value: a field retyped to something that
     # stringises the same still fails the assertion that reads its type.
+    #
+    # Round 65 (Codex): the record's SHAPE as well, before its field values --
+    # the type name and the exact NoteProperty set scriptBlockAssertCandidate-
+    # HelperContext checks per record. A same-session holder that adds or removes
+    # a property, retypes one off NoteProperty, or repoints PSObject.TypeNames
+    # after authentication passes a value-only re-proof, so the create runs and
+    # only the post-append assertion rejects the record, handing cleanup a
+    # journal it refuses and retaining the issued tree. The same two proofs run
+    # here so the pre-create guard and that assertion cannot drift.
+    if ($null -eq $Record -or
+        $Record.GetType() -ne [System.Management.Automation.PSCustomObject] -or
+        $Record.PSObject.TypeNames.Count -eq 0 -or
+        $Record.PSObject.TypeNames[0] -cne $script:strCandidateHelperRecordTypeName) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'destination-invalid' -Phase $PhaseValue -Subreason 'candidate-record'
+    }
+    $boolCandidateRecordPropertiesExact = $true
+    try {
+        [void](& $script:scriptBlockAssertCandidateHelperExactProperty `
+            -Value $Record `
+            -ExpectedNames @(
+                'SchemaVersion', 'Sequence', 'Kind', 'Path', 'ParentPath',
+                'LeafName', 'ExpectedEntryType', 'CreationPhase', 'EntryState',
+                'ContentLength', 'ContentSha256'
+            ))
+    } catch {
+        $boolCandidateRecordPropertiesExact = $false
+    }
+    if (-not $boolCandidateRecordPropertiesExact) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'destination-invalid' -Phase $PhaseValue -Subreason 'candidate-record'
+    }
     if ($null -eq $Record -or
         $Record.SchemaVersion -isnot [System.UInt32] -or
         $Record.SchemaVersion -ne [uint32]1 -or
@@ -2268,7 +2300,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260805.4
+    # Version: 1.0.20260805.5
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

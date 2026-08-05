@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260805.5
+Version: 1.0.20260805.6
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,10 +53,10 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260805.5'
+$script:versionCandidateHarness = [System.Version]'1.0.20260805.6'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260805.4'
+$script:strCandidateExpectedHelperVersion = '1.0.20260805.5'
 $script:strCandidateExpectedContextVersion = '1.0.20260805.0'
 $script:strCandidateCatalogVersion = '1.0.20260805.1'
 # The documented ceiling on what an authenticated native query may return, the
@@ -4051,7 +4051,7 @@ $script:scriptBlockAssertCandidateRecordUnchangedRefused = {
     # the production guard reddens exactly this probe. Same-process direct call,
     # the journal-swap probe's mechanism.
     $scriptBlockFreshRecord = {
-        [pscustomobject]@{
+        $objRecord = [pscustomobject][ordered]@{
             SchemaVersion     = [uint32]1
             Sequence          = [uint32]3
             Kind              = 'CandidateDirectory'
@@ -4064,6 +4064,9 @@ $script:scriptBlockAssertCandidateRecordUnchangedRefused = {
             ContentLength     = $null
             ContentSha256     = $null
         }
+        $objRecord.PSObject.TypeNames.Insert(
+            0, $script:strCandidateHelperRecordTypeName)
+        $objRecord
     }
     $objSnapshot = [pscustomobject]@{
         Sequence   = [uint32]3
@@ -4095,7 +4098,15 @@ $script:scriptBlockAssertCandidateRecordUnchangedRefused = {
             @{ Name = 'ContentSha256'; Apply = { param ($r) $r.ContentSha256 = ('0' * 64) } },
             @{ Name = 'Path'; Apply = { param ($r) $r.Path = 'candidate-root/other' } },
             @{ Name = 'ParentPath'; Apply = { param ($r) $r.ParentPath = 'evil-root' } },
-            @{ Name = 'LeafName'; Apply = { param ($r) $r.LeafName = 'other' } })) {
+            @{ Name = 'LeafName'; Apply = { param ($r) $r.LeafName = 'other' } },
+            @{ Name = 'AddedProperty'; Apply = { param ($r)
+                    $r.PSObject.Properties.Add(
+                        [System.Management.Automation.PSNoteProperty]::new(
+                            'Injected', [uint32]1)) } },
+            @{ Name = 'RemovedProperty'; Apply = { param ($r)
+                    $r.PSObject.Properties.Remove('ContentSha256') } },
+            @{ Name = 'TypeName'; Apply = { param ($r)
+                    $r.PSObject.TypeNames.Insert(0, 'Evil.Injected.Type') } })) {
         $objRecord = & $scriptBlockFreshRecord
         & $hashtableMutation.Apply $objRecord
         $boolRefused = $false
@@ -4181,9 +4192,15 @@ $script:scriptBlockAssertRound63JournalPlanWired = {
         & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
             -Detail ('round63-plan-return-' + [string]$intReturn)
     }
+    # At least one candidate-record refusal must exist -- the guard is present.
+    # Round 63 pinned this at exactly one inline stop; round 64 moved it into
+    # scriptBlockAssertCandidateHelperRecordUnchanged and round 65 added the
+    # shape and type-name proofs, so the stop count is no longer fixed. Total
+    # removal (zero) still trips here; which individual field or shape proof is
+    # present is pinned by scriptBlockAssertCandidateRecordUnchangedRefused.
     $intIdentityGuard = @([regex]::Matches(
         $strText, "-Subreason 'candidate-record'")).Count
-    if ($intIdentityGuard -ne 1) {
+    if ($intIdentityGuard -lt 1) {
         & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
             -Detail ('round63-candidate-record-guard-' + [string]$intIdentityGuard)
     }
@@ -9301,7 +9318,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260805.5
+    # Version: 1.0.20260805.6
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
