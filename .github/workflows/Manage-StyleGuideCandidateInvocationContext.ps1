@@ -27,14 +27,14 @@ a caller that deletes first and validates afterwards has already
 deleted, so it needs a way to ask about issuance that changes nothing.
 
 .NOTES
-Version: 1.0.20260805.0
+Version: 1.0.20260806.0
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260805.0'
+$versionCandidateContext = [System.Version]'1.0.20260806.0'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -1785,7 +1785,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260805.0
+    # Version: 1.0.20260806.0
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2252,7 +2252,7 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260805.0
+    # Version: 1.0.20260806.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param (
@@ -2364,7 +2364,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260805.0
+    # Version: 1.0.20260806.0
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2703,33 +2703,40 @@ function Remove-StyleGuideCandidateInvocationContext {
             -ReferenceToFilesystemCallCount $uintFilesystemCallCount `
             -RetainedRecordSequences ([uint32[]]@()))
     } catch {
-        # Only entries this invocation actually created can be uncertain. An
-        # ExpectedAbsent record names a path that was never created, so it stays
-        # ExpectedAbsent; retyping it would contradict the record schema, which
-        # binds every non-ExpectedAbsent candidate-directory record to the
-        # destination phase, and would invalidate the terminal context.
-        foreach ($objRecord in $objCleanupPlan.Journal) {
-            if ($objRecord.EntryState -eq 'Created') {
-                # Inside the catch, so this is the last place that may throw.
-                # It is the same courtesy write as the delete loops and gets
-                # the same treatment: the plan carries the truth that the
-                # bounded failure result below is built from.
-                $objRecord.EntryState = 'RetainedUncertain'
-                try {
-                    $objRecord.Record.EntryState = 'RetainedUncertain'
-                } catch {
-                    $objRecord.RecordWriteRefused = $true
-                }
-            }
-        }
         # The setter cannot throw: it converts a caller-controlled LifecycleState
         # setter that throws into a $false return and leaves both the object and
         # the register at the prior state (see its definition). So its result is
         # captured, not discarded -- a transition the register refused must not
-        # be reported as one that happened. The retained sequences are the same
-        # either way, so they are computed once.
-        $arrRetained = & $scriptBlockGetCandidateRetainedSequence -Context $objCleanupPlan
+        # be reported as one that happened, and the record states must match
+        # whichever state actually persists. The retype is therefore gated on the
+        # transition rather than run ahead of it: a journal is validated against
+        # the state it carries, and only the state that admits RetainedUncertain
+        # may hold a RetainedUncertain record.
         if (& $scriptBlockSetCandidateIssuedState -Context $Context -State 'CleanupFailed') {
+            # The transition persisted, so the reported state is terminal
+            # CleanupFailed -- whose admitted-record-state set is
+            # {ExpectedAbsent, Deleted, RetainedUncertain} and which REQUIRES at
+            # least one RetainedUncertain. Only now, with that state committed, is
+            # each still-Created owned entry retyped, so the journal admits the
+            # state it carries. An ExpectedAbsent record names a path that was
+            # never created and stays ExpectedAbsent; a Deleted record was already
+            # removed and stays Deleted; retyping either would contradict the
+            # record schema and invalidate the terminal context. The live write is
+            # the same courtesy write as the delete loops and gets the same
+            # treatment: the plan carries the truth the bounded result is built
+            # from, and a live write the caller has rigged to throw is recorded as
+            # refused rather than allowed to escape.
+            foreach ($objRecord in $objCleanupPlan.Journal) {
+                if ($objRecord.EntryState -eq 'Created') {
+                    $objRecord.EntryState = 'RetainedUncertain'
+                    try {
+                        $objRecord.Record.EntryState = 'RetainedUncertain'
+                    } catch {
+                        $objRecord.RecordWriteRefused = $true
+                    }
+                }
+            }
+            $arrRetained = & $scriptBlockGetCandidateRetainedSequence -Context $objCleanupPlan
             $strCode = & $scriptBlockGetCandidateDiagnosticCode `
                 -ErrorRecord $_ `
                 -Fallback 'cleanup-owned-entry-uncertain'
@@ -2743,9 +2750,17 @@ function Remove-StyleGuideCandidateInvocationContext {
                 -RetainedRecordSequences $arrRetained)
         }
         # The register refused the CleanupFailed transition, so it still holds the
-        # prior state. Report that truth -- not a terminal state that was never
-        # recorded -- exactly as the disposed path above does, so a caller does
-        # not stop retrying on a transition that did not happen.
+        # prior state and the context stays there (for example Active). That
+        # state's admitted-record-state set does NOT include RetainedUncertain, so
+        # the owned entries are LEFT at their prior Created state: the journal then
+        # admits the state actually reported, and a caller can retry -- every entry
+        # still on disk is named by a Created record the retry will act on, so
+        # nothing is dropped. Retyping before this point (the order this catch
+        # shipped with) produced an Active context carrying RetainedUncertain
+        # records, which the next cleanup's validator refuses before any
+        # filesystem work, stranding the very entries the retry would remove.
+        # Reported truthfully, exactly as the disposed refusal above does, so a
+        # caller does not stop retrying on a transition that did not happen.
         return (& $scriptBlockNewCandidateCleanupResult `
             -InvocationId $objCleanupPlan.InvocationId `
             -PreviousState $strPreviousState `
@@ -2753,7 +2768,7 @@ function Remove-StyleGuideCandidateInvocationContext {
             -Success $false `
             -DiagnosticCode 'cleanup-context-altered' `
             -ReferenceToFilesystemCallCount $uintFilesystemCallCount `
-            -RetainedRecordSequences $arrRetained)
+            -RetainedRecordSequences ([uint32[]]@()))
     }
 }
 

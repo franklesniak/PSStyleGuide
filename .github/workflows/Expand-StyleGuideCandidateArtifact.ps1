@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260805.5
+Version: 1.0.20260806.0
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260805.5'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260805.0'
+$script:versionCandidateHelper = [System.Version]'1.0.20260806.0'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260806.0'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -2380,7 +2380,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260805.5
+    # Version: 1.0.20260806.0
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2578,13 +2578,87 @@ function Remove-StyleGuideCandidateInvocationState {
                 -ExpectedPath $strCapturedInvocationRoot `
                 -Phase 'cleanup' `
                 -Code 'cleanup-delete-failed')
+            $uintCombinedCalls = [uint32]($uintFilesystemCallCount + $objContextResult.FilesystemCallCount)
+            return (& $script:scriptBlockNewCandidateHelperCleanupResult `
+                -InvocationId $objContextResult.InvocationId `
+                -PreviousState $strPreviousState `
+                -FinalState $objContextResult.FinalState `
+                -Success $objContextResult.Success `
+                -DiagnosticCode $objContextResult.DiagnosticCode `
+                -ReferenceToFilesystemCallCount $uintCombinedCalls `
+                -RetainedRecordSequences $objContextResult.RetainedRecordSequences)
         }
+        # A reported FAILURE is a CLAIM too, and a terminal one -- CleanupFailed
+        # (entries permanently retained) or Disposed -- tells the caller to STOP.
+        # A success is authenticated above by a filesystem CONSEQUENCE, because a
+        # substitute cannot make the invocation root disappear without removing
+        # it; a terminal FAILURE has no such consequence, since a genuine
+        # CleanupFailed and a forged one leave the same tree on disk. Measured on
+        # this surface: a substitute bound to the manager's name can return a
+        # schema-shaped {Success=$false, FinalState='CleanupFailed'} while the
+        # register stays Active and the owned tree stays present, so the caller is
+        # told terminal, stops retrying, and the tree leaks.
+        #
+        # So the register is authenticated instead, exactly as the entry issuance
+        # gate does: the manager's own record is asked whether it actually holds
+        # the claimed terminal state, with the negative-control probe rejecting a
+        # binding that answers true for everything. A genuine manager reaches
+        # CleanupFailed only by moving its own register there, and never reports
+        # Disposed with failure at all -- so an authenticated claim is genuine and
+        # is relayed as terminal, while an unauthenticated one is reported as the
+        # captured previous state (which the entry gate DID authenticate) with a
+        # retryable code. That preserves a genuine unrecoverable CleanupFailed as
+        # terminal -- the register confirms it -- without letting a forged one
+        # strand the tree, and without turning either into an infinite retry.
+        $strClaimedFinalState = [string]$objContextResult.FinalState
+        if ($strClaimedFinalState -ceq 'CleanupFailed' -or $strClaimedFinalState -ceq 'Disposed') {
+            $boolTerminalAuthenticated = $false
+            $arrTerminalIssuanceCommands = @(
+                Get-Command -Name Test-StyleGuideCandidateInvocationContextIssued `
+                    -CommandType Function -ErrorAction SilentlyContinue
+            )
+            if ($arrTerminalIssuanceCommands.Count -eq 1) {
+                $objTerminalProbe = [pscustomobject]@{ CandidateNeverIssued = $true }
+                if (-not (Test-StyleGuideCandidateInvocationContextIssued -Context $objTerminalProbe)) {
+                    # The CAPTURED values and state, for the reason the entry gate
+                    # gives: the paths and the state authenticated must be the ones
+                    # acted on, not a fresh read a concurrent writer can move.
+                    $boolTerminalAuthenticated = [bool](
+                        Test-StyleGuideCandidateInvocationContextIssued `
+                            -Context $Context -ExpectedState $strClaimedFinalState `
+                            -ExpectedValues $objCapturedValues)
+                }
+            }
+            if (-not $boolTerminalAuthenticated) {
+                # Unauthenticated terminal claim. Report the captured previous
+                # state as a retryable failure, and take the retained sequences
+                # from the journal captured and bounded at entry -- not from the
+                # untrusted result -- exactly as the fallback catch does.
+                $arrDowngradeRetained = @()
+                try {
+                    $arrDowngradeRetained = & $script:scriptBlockGetCandidateHelperRetainedSequence `
+                        -JournalValue $objCapturedJournal
+                } catch {
+                    $arrDowngradeRetained = @()
+                }
+                return (& $script:scriptBlockNewCandidateHelperCleanupResult `
+                    -InvocationId $guidInvocationId `
+                    -PreviousState $strPreviousState `
+                    -FinalState $strPreviousState `
+                    -Success $false `
+                    -DiagnosticCode 'cleanup-context-altered' `
+                    -ReferenceToFilesystemCallCount $uintFilesystemCallCount `
+                    -RetainedRecordSequences $arrDowngradeRetained)
+            }
+        }
+        # A non-terminal failure (retryable, relayed unchanged) or a terminal
+        # failure the register confirmed. Relay the manager's result.
         $uintCombinedCalls = [uint32]($uintFilesystemCallCount + $objContextResult.FilesystemCallCount)
         return (& $script:scriptBlockNewCandidateHelperCleanupResult `
             -InvocationId $objContextResult.InvocationId `
             -PreviousState $strPreviousState `
             -FinalState $objContextResult.FinalState `
-            -Success $objContextResult.Success `
+            -Success $false `
             -DiagnosticCode $objContextResult.DiagnosticCode `
             -ReferenceToFilesystemCallCount $uintCombinedCalls `
             -RetainedRecordSequences $objContextResult.RetainedRecordSequences)
@@ -2637,10 +2711,19 @@ function Remove-StyleGuideCandidateInvocationState {
             -ErrorRecord $_ `
             -Key 'PSStyleGuideDiagnosticCode' `
             -Fallback 'cleanup-owned-entry-uncertain'
+        # FinalState is the captured previous state, not a terminal CleanupFailed.
+        # This catch runs only where the manager never ran or never agreed -- a
+        # throw, a not-loaded manager, or the consequence proof above catching a
+        # false success -- so no authenticated terminal transition exists to
+        # report. Writing an unauthenticated CleanupFailed here would tell the
+        # caller the tree is permanently retained and stop it retrying over a tree
+        # still on disk, the very leak this block's comment above warns of. The
+        # captured previous state (which the entry issuance gate DID authenticate)
+        # is retryable, and $strCode carries the specific reason.
         return (& $script:scriptBlockNewCandidateHelperCleanupResult `
             -InvocationId $guidInvocationId `
             -PreviousState $strPreviousState `
-            -FinalState 'CleanupFailed' `
+            -FinalState $strPreviousState `
             -Success $false `
             -DiagnosticCode $strCode `
             -ReferenceToFilesystemCallCount $uintFilesystemCallCount `
