@@ -1,6 +1,6 @@
 # Agent Instructions for Claude Code
 
-**Version:** 1.0.20260806.1
+**Version:** 1.0.20260806.2
 
 ## Metadata
 
@@ -74,6 +74,16 @@ time**.
 "Handled" means the thread is both **answered and resolved** — treat *address
 and resolve* as one unit of work, not two optional halves.
 
+Steps 2 through 5 are **mandatory for every finding that survives step 1 as
+real**, whatever becomes of it. A fix you implement now, a deferral, and a
+recommendation the owner must act on (a protected-file change, a scope decision)
+all get the same options, rubric, scoring table, and selection. **The rigor is
+independent of who implements the fix, or whether you can implement it at all.**
+A recommendation the owner reads deserves *more* care than a change you make
+yourself, not less: the owner relies on your rubric and table to decide. A
+finding's outcome never shrinks its analysis — and neither do your context,
+budget, or turns remaining (see **Deferring work**, rule 2).
+
 **1. Validate the feedback.** Determine whether the comment represents a material
 opportunity for improvement, and/or confirm that any bug it points out is real —
 reproduce it where it can be reproduced. A finding that turns out to be false is
@@ -134,7 +144,10 @@ too.
 rubric, the scoring table, the selected option, the `References` section (when
 research informed the decision), and either a note that implementation follows or
 the commit SHA that implements it. End every reply with the Claude Code
-attribution footer.
+attribution footer. Before posting, verify the reply actually contains all four
+artifacts — **options, rubric, scoring table, and selected option** — for any
+finding that survived step 1; a reply missing any of them is incomplete whatever
+the finding's outcome, so complete it before posting.
 
 **7. Implement the solution.** Apply the selected option, commit, and make the
 change visible on the PR (reachable from the PR's head ref). If implementation
@@ -157,10 +170,13 @@ addressed-but-unresolved thread hides real state — a reader cannot tell a hand
 comment from an open one. The one exception: a finding that genuinely needs a
 maintainer's decision you should not make on their behalf (or a step-8
 style-guide recommendation the owner must see first) — in that case, say so
-explicitly on the thread and leave it open. When the selected option is to
-**defer** the work, that is not one of those cases: follow **Deferring work**
-below — open the tracking issue, reference it in the reply, and resolve the
-thread.
+explicitly on the thread and leave it open. That exception governs **resolution
+only** — whether the thread stays open — and never exempts steps 2-5: the
+options, rubric, and scoring table are exactly what make a maintainer-facing
+recommendation decision-grade, so produce them in full before leaving the thread
+open. When the selected option is to **defer** the work, that is not one of
+those cases: follow **Deferring work** below — open the tracking issue, reference
+it in the reply, and resolve the thread.
 
 When asked to take a PR to a clean review state, apply this to **every**
 unresolved thread on the PR, not only the most recent ones.
@@ -258,8 +274,12 @@ not "clean" on the strength of a reviewer that never actually reviewed.
 2. Wait for the reviews by **active polling** — do not rely on webhook delivery
    alone. Poll at least every 60 seconds using authenticated structured tooling
    (`get_reviews` and `get_review_comments`, or equivalent), paginating so you
-   actually observe the newest records. A new round has arrived when either bot
-   posts a review or comment newer than its baseline.
+   actually observe the newest records. A new round has arrived for a reviewer
+   only when that reviewer posts a review or comment that is both newer than its
+   baseline **and carries a `commit_id` equal to the recorded head SHA**. A
+   verdict whose `commit_id` is an earlier head is stale — it reviewed code the
+   head has moved past; do not count it toward round-arrival or the clean state,
+   and never misattribute it to the current head.
 3. Process every actionable comment from **both** reviewers via **Handling code
    review comments** above (validate → options → rubric → score → select → post →
    implement → style-guide → resolve). Track processed comment IDs and skip any
@@ -270,10 +290,13 @@ not "clean" on the strength of a reviewer that never actually reviewed.
 ### Exit condition and round cap
 
 - **Clean only when BOTH reviewers agree.** The loop is clean only when **both
-  Copilot and Codex return a review with no actionable comments** on the same
-  head. A clean result from one reviewer while the other still has open comments
-  is **not** clean — keep going. When both are clean, stop and report the
-  terminal-clean state.
+  Copilot and Codex return a review whose `commit_id` equals the current head
+  SHA with no actionable comments**. A clean result from one reviewer while the
+  other still has open comments is **not** clean — keep going. A *stale* verdict,
+  one whose `commit_id` is an earlier head, never counts as a reviewer being
+  clean at the current head; a reviewer that genuinely cannot read the diff (per
+  **Reviewers**) is recorded non-functional and excepted. When both are clean,
+  stop and report the terminal-clean state.
 - **Round cap: 80.** Run up to **80 rounds** per invocation. If 80 rounds are
   reached before both reviewers are clean, pause and report where things stand
   rather than continuing silently.
