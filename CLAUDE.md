@@ -1,6 +1,6 @@
 # Agent Instructions for Claude Code
 
-**Version:** 1.0.20260806.0
+**Version:** 1.0.20260806.1
 
 ## Metadata
 
@@ -9,8 +9,9 @@
 - **Last Updated:** 2026-08-06
 - **Scope:** Agent-specific entry point for Claude Code and compatible AI coding
   agents operating in this repository. It captures the pull-request review-loop
-  workflow the maintainer runs, and the per-finding decision process to apply to
-  every code-review comment.
+  workflow the maintainer runs, the per-finding decision process to apply to
+  every code-review comment, and the discipline governing when and how work may
+  be deferred.
 
 This file is adapted from the `franklesniak/copilot-repo-template` agent
 instructions and tailored to this GitHub-hosted PowerShell and Markdown
@@ -156,10 +157,77 @@ addressed-but-unresolved thread hides real state — a reader cannot tell a hand
 comment from an open one. The one exception: a finding that genuinely needs a
 maintainer's decision you should not make on their behalf (or a step-8
 style-guide recommendation the owner must see first) — in that case, say so
-explicitly on the thread and leave it open.
+explicitly on the thread and leave it open. When the selected option is to
+**defer** the work, that is not one of those cases: follow **Deferring work**
+below — open the tracking issue, reference it in the reply, and resolve the
+thread.
 
 When asked to take a PR to a clean review state, apply this to **every**
 unresolved thread on the PR, not only the most recent ones.
+
+## Deferring work
+
+When the analysis of a finding, a self-found gap, or a task concludes that the
+work should not be done now, that is a **deferral**. A deferral is a deliberate
+decision with a high bar — never a fallback for work that is simply unfinished.
+Apply this whichever way the item arose: a reviewer's comment, something you
+found yourself, or a "known gap" you are tempted to write into a PR description.
+
+**1. Deferral must be earned, not assumed.** A deferral is legitimate only when
+the full decision process — validate the finding, list the options exhaustively,
+build a fresh rubric, score, and select — has been run and has **concluded, on
+the merits, that deferring is the best option**. Deferral is a conclusion of that
+analysis, never its starting point.
+
+**2. These are never reasons to defer.** Do not defer because you (the agent) are
+low on context, budget, or turns; because the change is large or tedious; because
+a reviewer or another agent might catch it later; or because a review round or
+the loop is ending. None of these bear on whether the work should be done — they
+are facts about the worker, not the work. If one of them is the real reason, the
+honest move is to do the work, or to state plainly that it is unfinished and why
+— not to relabel it "deferred."
+
+**3. Genuinely deferred work is tracked in a GitHub issue.** A PR description, a
+review-thread reply, or a "Known gaps" list is not a tracker: it disappears from
+view the moment the PR merges. Any work the analysis genuinely defers **must** be
+captured in a GitHub issue before the thread or PR that raised it is resolved or
+merged. The issue states the problem, why it was deferred (the analysis
+conclusion, in brief), the condition that should reopen or trigger it, the scope
+it touches, and a link back to the originating PR or thread. Issue #154 is the
+model — a self-contained, reopen-conditioned record that outlives the PR. The
+originating PR text links the issue, so a reader of the merged history can always
+find the open work.
+
+**4. Distinguish a deferral from a residual or a deviation.** Not everything left
+unfinished is deferred work, and calling all three "deferred" hides the items
+that genuinely are:
+
+- **Deferred work** — a real future task the analysis chose not to do now.
+  Track it in a GitHub issue, per rule 3.
+- **Accepted residual / accepted risk** — a limitation that is understood,
+  bounded, and knowingly accepted, often because no portable mechanism can close
+  it. Document it at the code and in the PR as an accepted residual with its
+  bound; it is not a perpetually open thread, and not "deferred."
+- **Intentional deviation / fail-closed choice** — behavior deliberately chosen
+  (for example, refusing rather than degrading). Record it as a flagged
+  deviation; it is not a gap at all.
+
+Say which of the three a thing is, in those terms. Do not write "deferred" or
+"deliberately left open" over a residual or a deviation — that language asserts
+pending work exists when it does not.
+
+**5. Do not leave a review thread open as a stand-in for a tracker.** Per
+**Handling code review comments** step 9, resolve the thread. If the finding is
+genuinely deferred, open the issue (rule 3), reference it in the reply, and
+resolve the thread — the issue, not the thread, carries the work forward. Leaving
+a thread open is only for the case step 9 names: a decision that is genuinely the
+maintainer's to make.
+
+**6. A scope-reducing deferral needs owner authorization.** If deferring would
+drop something the governing issue or contract required — for example, narrowing
+a scope that issue #146 fixed — that is a scope change. Raise it explicitly and
+get the owner's decision, exactly as a protected-file or scope change would. Do
+not absorb a required item into a "Known gaps" list on your own authority.
 
 ## Automated review loop
 
