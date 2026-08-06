@@ -212,6 +212,22 @@ $scriptBlockResolveCandidateNativePath = {
 $scriptBlockNewCandidateException = {
     param (
         [Parameter(Mandatory = $true)]
+        # Round 66: production self-enforces the closed DiagnosticCode set so an
+        # out-of-set value is refused at binding regardless of source (Codex
+        # "refuse unresolved sources").
+        [ValidateSet(
+            'archive-invalid', 'cleanup-already-disposed', 'cleanup-candidate-owned',
+            'cleanup-context-altered', 'cleanup-context-invalid',
+            'cleanup-context-unissued', 'cleanup-delete-failed',
+            'cleanup-owned-entry-uncertain', 'cleanup-succeeded',
+            'cleanup-terminal-failure', 'containment-invalid',
+            'context-create-collision-limit', 'context-create-composite-failure',
+            'context-create-failed', 'context-create-verification',
+            'destination-invalid', 'digest-invalid', 'digest-mismatch',
+            'download-invalid', 'extraction-invalid', 'manifest-invalid', 'none',
+            'parameter', 'parameter-invalid', 'post-extraction-invalid', 'root-invalid',
+            'script-identity-invalid'
+        )]
         [string]$Code,
 
         [Parameter(Mandatory = $true)]

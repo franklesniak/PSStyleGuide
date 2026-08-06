@@ -5891,6 +5891,184 @@ $script:scriptBlockAssertProductionTaxonomyClosed = {
     }
 }
 
+# Round 66 (Codex "refuse unresolved sources"): the taxonomy check above proves
+# every diagnostic value a text or AST pass can SEE is in the closed set, but by
+# construction it cannot resolve a value whose source is a parameter or a
+# computed string -- the exact gap Codex named. The production builders now carry
+# that proof themselves: each diagnostic parameter declares a [ValidateSet(...)],
+# so PowerShell refuses an out-of-set value at binding whatever its source. This
+# asserts the declared sets are EXACTLY the catalog's closed sets -- neither
+# narrowed, which would refuse a legitimate diagnostic at runtime, nor widened,
+# which would readmit the drift the gate exists to stop -- so the runtime gate
+# and the oracle cannot disagree about what the taxonomy is. Manage encodes phase
+# and subreason in its message string, so only its -Code is a taxonomy field and
+# only -Code is gated; Expand emits all three through typed parameters.
+$script:scriptBlockAssertProductionValidateSetsClosed = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [object]$Catalog,
+
+        [Parameter(Mandatory = $true)]
+        [string]$HelperLiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ContextLiteralPath
+    )
+
+    $objDiagnostic = New-Object 'System.Collections.Generic.HashSet[string]' (
+        [System.StringComparer]::Ordinal
+    )
+    foreach ($strValue in $Catalog.ClosedSets.DiagnosticCode) {
+        [void]$objDiagnostic.Add([string]$strValue)
+    }
+    $objPhase = New-Object 'System.Collections.Generic.HashSet[string]' (
+        [System.StringComparer]::Ordinal
+    )
+    foreach ($strValue in $Catalog.ClosedSets.Phase) {
+        [void]$objPhase.Add([string]$strValue)
+    }
+    $objSubreason = New-Object 'System.Collections.Generic.HashSet[string]' (
+        [System.StringComparer]::Ordinal
+    )
+    foreach ($strValue in $Catalog.ClosedSets.Subreason) {
+        [void]$objSubreason.Add([string]$strValue)
+    }
+
+    # Each expectation names a production file, the builder scriptblock inside it
+    # (by variable name, scope prefix stripped), and the closed set every gated
+    # parameter's [ValidateSet(...)] must equal.
+    $arrExpectation = @(
+        [ordered]@{
+            Path    = $HelperLiteralPath
+            Builder = 'scriptBlockNewCandidateHelperException'
+            Fields  = [ordered]@{
+                Code      = $objDiagnostic
+                Phase     = $objPhase
+                Subreason = $objSubreason
+            }
+        },
+        [ordered]@{
+            Path    = $ContextLiteralPath
+            Builder = 'scriptBlockNewCandidateException'
+            Fields  = [ordered]@{
+                Code = $objDiagnostic
+            }
+        }
+    )
+
+    foreach ($hashtableExpectation in $arrExpectation) {
+        $strBuilder = [string]$hashtableExpectation.Builder
+        $objErrors = $null
+        $objAst = [System.Management.Automation.Language.Parser]::ParseFile(
+            [string]$hashtableExpectation.Path, [ref]$null, [ref]$objErrors)
+        if ($null -eq $objAst -or @($objErrors).Count -ne 0) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('validateset-parse-' + $strBuilder)
+        }
+
+        # Find the builder's assignment by its variable name (scope stripped),
+        # then the scriptblock literal it is assigned. A builder this cannot find
+        # is a structural change to fail on, not to skip.
+        $objBuilderScriptBlock = $null
+        foreach ($objAssign in @($objAst.FindAll(
+                    {
+                        param ($SyntaxNode)
+                        $SyntaxNode -is
+                            [System.Management.Automation.Language.AssignmentStatementAst] -and
+                        $SyntaxNode.Left -is
+                            [System.Management.Automation.Language.VariableExpressionAst]
+                    },
+                    $true
+                ))) {
+            $strName = ([string]$objAssign.Left.VariablePath.UserPath) -replace '^[A-Za-z]+:', ''
+            if ($strName -cne $strBuilder) { continue }
+            $objBuilderScriptBlock = $objAssign.Right.Find(
+                {
+                    param ($SyntaxNode)
+                    $SyntaxNode -is
+                        [System.Management.Automation.Language.ScriptBlockExpressionAst]
+                },
+                $true
+            )
+            break
+        }
+        if ($null -eq $objBuilderScriptBlock -or
+            $null -eq $objBuilderScriptBlock.ScriptBlock.ParamBlock) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('validateset-builder-' + $strBuilder)
+        }
+
+        foreach ($strField in $hashtableExpectation.Fields.Keys) {
+            $objExpectedSet = $hashtableExpectation.Fields[$strField]
+            $objParameter = $null
+            foreach ($objCandidate in $objBuilderScriptBlock.ScriptBlock.ParamBlock.Parameters) {
+                if (([string]$objCandidate.Name.VariablePath.UserPath) -ceq $strField) {
+                    $objParameter = $objCandidate
+                    break
+                }
+            }
+            if ($null -eq $objParameter) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                    -Detail ('validateset-param-' + $strBuilder + '-' + $strField)
+            }
+
+            # Collect the ValidateSet's declared literals. More than one
+            # ValidateSet on the parameter, or a non-literal member, is a shape
+            # this equality cannot read and is refused rather than guessed.
+            $objValidateSet = $null
+            foreach ($objAttribute in $objParameter.Attributes) {
+                if ($objAttribute -is
+                        [System.Management.Automation.Language.AttributeAst] -and
+                    ([string]$objAttribute.TypeName.Name) -ceq 'ValidateSet') {
+                    if ($null -ne $objValidateSet) {
+                        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                            -Detail ('validateset-attr-count-' + $strBuilder + '-' + $strField)
+                    }
+                    $objValidateSet = $objAttribute
+                }
+            }
+            if ($null -eq $objValidateSet) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                    -Detail ('validateset-absent-' + $strBuilder + '-' + $strField)
+            }
+            $objDeclared = New-Object 'System.Collections.Generic.HashSet[string]' (
+                [System.StringComparer]::Ordinal
+            )
+            foreach ($objArgument in $objValidateSet.PositionalArguments) {
+                if ($objArgument -isnot
+                    [System.Management.Automation.Language.StringConstantExpressionAst]) {
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                        -Detail ('validateset-nonliteral-' + $strBuilder + '-' + $strField)
+                }
+                $strDeclared = [string]$objArgument.Value
+                if (-not $objDeclared.Add($strDeclared)) {
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                        -Detail ('validateset-duplicate-' + $strBuilder + '-' + $strField +
+                            '-' + $strDeclared)
+                }
+            }
+
+            # Ordinal set equality, reported per offending value so a drift names
+            # itself. A missing value narrows the gate below the taxonomy; an
+            # extra value widens it above the taxonomy; both break the invariant.
+            foreach ($strWanted in $objExpectedSet) {
+                if (-not $objDeclared.Contains($strWanted)) {
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                        -Detail ('validateset-missing-' + $strBuilder + '-' + $strField +
+                            '-' + $strWanted)
+                }
+            }
+            foreach ($strDeclared in $objDeclared) {
+                if (-not $objExpectedSet.Contains($strDeclared)) {
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                        -Detail ('validateset-extra-' + $strBuilder + '-' + $strField +
+                            '-' + $strDeclared)
+                }
+            }
+        }
+    }
+}
+
 $script:scriptBlockGetScriptVersionRecord = {
     param (
         [Parameter(Mandatory = $true)]
@@ -9734,6 +9912,10 @@ function Invoke-StyleGuideCandidateHarness {
     [void](& $script:scriptBlockAssertProductionTaxonomyClosed `
         -Catalog $objCatalog `
         -LiteralPath ([string[]]@($strHelperLiteralPath, $strContextLiteralPath)))
+    [void](& $script:scriptBlockAssertProductionValidateSetsClosed `
+        -Catalog $objCatalog `
+        -HelperLiteralPath $strHelperLiteralPath `
+        -ContextLiteralPath $strContextLiteralPath)
     [void](& $script:scriptBlockAssertVersionMarkersConsistent `
         -LiteralPath $strHelperLiteralPath `
         -ExpectedVersion $script:strCandidateExpectedHelperVersion `

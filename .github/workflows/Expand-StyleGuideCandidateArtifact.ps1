@@ -241,12 +241,92 @@ $script:arrCandidateHelperRejectedMatchCharacter = [char[]]@(
 $script:scriptBlockNewCandidateHelperException = {
     param (
         [Parameter(Mandatory = $true)]
+        # Round 66: production self-enforces the closed DiagnosticCode set so an
+        # out-of-set value is refused at binding regardless of source (Codex
+        # "refuse unresolved sources").
+        [ValidateSet(
+            'archive-invalid', 'cleanup-already-disposed', 'cleanup-candidate-owned',
+            'cleanup-context-altered', 'cleanup-context-invalid',
+            'cleanup-context-unissued', 'cleanup-delete-failed',
+            'cleanup-owned-entry-uncertain', 'cleanup-succeeded',
+            'cleanup-terminal-failure', 'containment-invalid',
+            'context-create-collision-limit', 'context-create-composite-failure',
+            'context-create-failed', 'context-create-verification',
+            'destination-invalid', 'digest-invalid', 'digest-mismatch',
+            'download-invalid', 'extraction-invalid', 'manifest-invalid', 'none',
+            'parameter', 'parameter-invalid', 'post-extraction-invalid', 'root-invalid',
+            'script-identity-invalid'
+        )]
         [string]$Code,
 
         [Parameter(Mandatory = $true)]
+        # Round 66: production self-enforces the closed Phase set so an
+        # out-of-set value is refused at binding regardless of source (Codex
+        # "refuse unresolved sources").
+        [ValidateSet(
+            'none', 'parameter', 'root', 'containment',
+            'download', 'digest', 'archive', 'manifest',
+            'destination', 'extraction', 'post-extraction', 'cleanup',
+            'identity'
+        )]
         [string]$Phase,
 
         [Parameter(Mandatory = $true)]
+        # Round 66: production self-enforces the closed Subreason set so an
+        # out-of-set value is refused at binding regardless of source (Codex
+        # "refuse unresolved sources").
+        [ValidateSet(
+            'ArtifactId-control', 'ArtifactId-empty', 'ArtifactId-length',
+            'ArtifactId-type', 'CandidateDirectory-control', 'CandidateDirectory-empty',
+            'CandidateDirectory-length', 'CandidateDirectory-missing',
+            'CandidateDirectory-normalization', 'CandidateDirectory-provider',
+            'CandidateDirectory-relative', 'CandidateDirectory-type',
+            'CandidateDirectory-wildcard', 'CheckoutRoot-control', 'CheckoutRoot-empty',
+            'CheckoutRoot-length', 'CheckoutRoot-missing', 'CheckoutRoot-normalization',
+            'CheckoutRoot-provider', 'CheckoutRoot-relative', 'CheckoutRoot-type',
+            'CheckoutRoot-wildcard', 'Context-missing', 'Context-path-mismatch',
+            'Context-schema', 'Context-state', 'DownloadDirectory-control',
+            'DownloadDirectory-empty', 'DownloadDirectory-length',
+            'DownloadDirectory-missing', 'DownloadDirectory-normalization',
+            'DownloadDirectory-provider', 'DownloadDirectory-relative',
+            'DownloadDirectory-type', 'DownloadDirectory-wildcard',
+            'ExpectedDigest-control', 'ExpectedDigest-empty', 'ExpectedDigest-grammar',
+            'ExpectedDigest-length', 'ExpectedDigest-missing', 'ExpectedDigest-type',
+            'RunAttempt-control', 'RunAttempt-empty', 'RunAttempt-length',
+            'RunAttempt-type', 'RunId-control', 'RunId-empty', 'RunId-length',
+            'RunId-type', 'TrustedTemporaryRoot-control', 'TrustedTemporaryRoot-empty',
+            'TrustedTemporaryRoot-length', 'TrustedTemporaryRoot-missing',
+            'TrustedTemporaryRoot-normalization', 'TrustedTemporaryRoot-provider',
+            'TrustedTemporaryRoot-relative', 'TrustedTemporaryRoot-type',
+            'TrustedTemporaryRoot-wildcard', 'actual-declared-mismatch', 'actual-limit',
+            'actual-overflow', 'already-disposed', 'archive-limit', 'archive-open',
+            'attribute', 'bom', 'candidate-before-context', 'candidate-cardinality',
+            'candidate-directory-present', 'candidate-entry', 'candidate-file-present',
+            'candidate-identity', 'candidate-journal', 'candidate-record',
+            'candidate-state', 'content-changed', 'context-conflict-stage',
+            'context-head-absent', 'context-invalid', 'context-unissued',
+            'context-link', 'context-manager-not-loaded', 'context-path-missing',
+            'context-path-wildcard', 'context-provider-qualified-valid',
+            'context-raw-object', 'context-unstaged-replacement',
+            'context-wrong-tree-type', 'cr', 'declared-length',
+            'destination-containment', 'download-already-journaled', 'duplicate-case',
+            'duplicate-exact', 'entry-count', 'entry-limit', 'entry-name',
+            'entry-read', 'enumeration', 'enumeration-bound', 'enumeration-filter',
+            'failure', 'file-evidence', 'file-metadata',
+            'git-hostile-literal-substitution', 'git-ls-files-malformed',
+            'git-ls-tree-malformed', 'git-native-status-failure',
+            'git-object-id-abbreviated', 'git-object-id-wrong-format', 'hash-shape',
+            'helper-index-absent', 'helper-link', 'helper-nonfilesystem-provider',
+            'helper-path-missing', 'helper-path-wildcard',
+            'helper-provider-qualified-valid', 'helper-raw-array',
+            'helper-staged-replacement', 'helper-untracked', 'helper-wrong-mode',
+            'identity', 'journal-swapped', 'leaf-present', 'length',
+            'mismatch', 'missing-entry', 'mount', 'none',
+            'nonordinary', 'nonordinary-directory', 'overlap', 'primary-and-cleanup',
+            'private-root-binding', 'private-root-unavailable', 'provider',
+            'relationship', 'root-cardinality', 'sha256', 'stream',
+            'succeeded', 'total-limit', 'zip-open', 'zip64-locator'
+        )]
         [string]$Subreason
     )
 
