@@ -2722,20 +2722,36 @@ function Remove-StyleGuideCandidateInvocationContext {
                 }
             }
         }
-        # Deliberately not conditional: the bounded failure result below is
-        # what this function promises, and a caller-controlled setter that
-        # throws must not turn a reported failure into an unhandled one.
-        [void](& $scriptBlockSetCandidateIssuedState -Context $Context -State 'CleanupFailed')
+        # The setter cannot throw: it converts a caller-controlled LifecycleState
+        # setter that throws into a $false return and leaves both the object and
+        # the register at the prior state (see its definition). So its result is
+        # captured, not discarded -- a transition the register refused must not
+        # be reported as one that happened. The retained sequences are the same
+        # either way, so they are computed once.
         $arrRetained = & $scriptBlockGetCandidateRetainedSequence -Context $objCleanupPlan
-        $strCode = & $scriptBlockGetCandidateDiagnosticCode `
-            -ErrorRecord $_ `
-            -Fallback 'cleanup-owned-entry-uncertain'
+        if (& $scriptBlockSetCandidateIssuedState -Context $Context -State 'CleanupFailed') {
+            $strCode = & $scriptBlockGetCandidateDiagnosticCode `
+                -ErrorRecord $_ `
+                -Fallback 'cleanup-owned-entry-uncertain'
+            return (& $scriptBlockNewCandidateCleanupResult `
+                -InvocationId $objCleanupPlan.InvocationId `
+                -PreviousState $strPreviousState `
+                -FinalState 'CleanupFailed' `
+                -Success $false `
+                -DiagnosticCode $strCode `
+                -ReferenceToFilesystemCallCount $uintFilesystemCallCount `
+                -RetainedRecordSequences $arrRetained)
+        }
+        # The register refused the CleanupFailed transition, so it still holds the
+        # prior state. Report that truth -- not a terminal state that was never
+        # recorded -- exactly as the disposed path above does, so a caller does
+        # not stop retrying on a transition that did not happen.
         return (& $scriptBlockNewCandidateCleanupResult `
             -InvocationId $objCleanupPlan.InvocationId `
             -PreviousState $strPreviousState `
-            -FinalState 'CleanupFailed' `
+            -FinalState $strPreviousState `
             -Success $false `
-            -DiagnosticCode $strCode `
+            -DiagnosticCode 'cleanup-context-altered' `
             -ReferenceToFilesystemCallCount $uintFilesystemCallCount `
             -RetainedRecordSequences $arrRetained)
     }
