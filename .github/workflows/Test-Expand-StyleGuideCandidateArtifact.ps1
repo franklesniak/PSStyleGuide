@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260806.0
+Version: 1.0.20260806.1
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260806.0'
+$script:versionCandidateHarness = [System.Version]'1.0.20260806.1'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260806.0'
@@ -5306,6 +5306,252 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
             -Detail 'unissued-expansion-wrote'
     }
 
+    # The expansion helper must not RELAY an unauthenticated terminal FAILURE.
+    # The fake-manager probe above pins the reported-SUCCESS half: a success is
+    # authenticated by its filesystem consequence, because no substitute can make
+    # the invocation root disappear without removing it. A reported terminal
+    # FAILURE has no such consequence -- a genuine CleanupFailed and a forged one
+    # leave the same tree on disk -- so a substitute bound to the manager's name
+    # can return a schema-shaped {Success=$false, FinalState='CleanupFailed'} for a
+    # context the register only ever recorded Active, and a helper that relayed it
+    # would tell the caller the tree is permanently retained and stop it retrying
+    # over a tree still present. The fix (commit c99d6a9) authenticates the claim
+    # against the register exactly as the entry gate does -- the negative-control
+    # probe rejecting a binding that answers true for everything, then the CAPTURED
+    # values and the claimed state -- and, when it cannot, DOWNGRADES to the
+    # captured previous state with the retryable 'cleanup-context-altered', taking
+    # the retained sequences from the journal bounded at entry rather than the
+    # untrusted result.
+    #
+    # Behavioural, not positional: this drives the real helper against a lying
+    # substitute and asserts the DOWNGRADE ({Success=$false, FinalState='Active',
+    # 'cleanup-context-altered', no retained sequences}), not a relayed terminal
+    # CleanupFailed. Before the fix this returned the substitute's FinalState
+    # unchanged. The binding is restored in a finally, as the fake-manager probe
+    # does; the cases that run after this verify the restored closure.
+    $strAlteredTerminalRoot = [System.IO.Path]::Combine($RunRoot, 'altered-terminal-relay')
+    [void][System.IO.Directory]::CreateDirectory($strAlteredTerminalRoot)
+    $objAlteredTerminalContext = New-StyleGuideCandidateInvocationContext `
+        -TrustedTemporaryRoot $strAlteredTerminalRoot `
+        -DiagnosticLabel 'altered-terminal-relay'
+    [void][System.IO.Directory]::CreateDirectory(
+        [string]$objAlteredTerminalContext.DownloadDirectoryPath)
+    $objAlteredTerminalContext.OwnershipJournal[1].EntryState = 'Created'
+    $scriptBlockRealContextCleanupTerminal = (Get-Command `
+        -Name Remove-StyleGuideCandidateInvocationContext `
+        -CommandType Function).ScriptBlock
+    $objAlteredTerminalResult = $null
+    try {
+        Set-Item -LiteralPath Function:\Remove-StyleGuideCandidateInvocationContext -Value {
+            param (
+                [Parameter(Mandatory = $true)]
+                [AllowNull()]
+                [object]$Context
+            )
+
+            $objForgedTerminal = [pscustomobject]@{
+                SchemaVersion = [uint32]1
+                InvocationId = $Context.InvocationId
+                PreviousState = 'Active'
+                FinalState = 'CleanupFailed'
+                Success = $false
+                DiagnosticCode = 'cleanup-owned-entry-uncertain'
+                FilesystemCallCount = [uint32]4
+                RetainedRecordSequences = [uint32[]]@([uint32]0)
+            }
+            $objForgedTerminal.PSObject.TypeNames.Insert(0,
+                'PSStyleGuide.CandidateCleanupResult.v1')
+            return $objForgedTerminal
+        } -Force
+        Write-Verbose 'lifecycle-record-state: altered-terminal-relay probe executing'
+        $objAlteredTerminalResult = Remove-StyleGuideCandidateInvocationState `
+            -Context $objAlteredTerminalContext
+    } finally {
+        Set-Item -LiteralPath Function:\Remove-StyleGuideCandidateInvocationContext `
+            -Value $scriptBlockRealContextCleanupTerminal -Force
+    }
+    if ($null -eq $objAlteredTerminalResult -or
+        $objAlteredTerminalResult.Success -or
+        ([string]$objAlteredTerminalResult.FinalState) -cne 'Active' -or
+        ([string]$objAlteredTerminalResult.DiagnosticCode) -cne 'cleanup-context-altered' -or
+        @([uint32[]]@($objAlteredTerminalResult.RetainedRecordSequences)).Count -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'orchestration-failed' `
+            -Detail ('altered-terminal-relay-' + $(if ($null -eq $objAlteredTerminalResult) {
+                'no-result'
+            } else {
+                [string]$objAlteredTerminalResult.FinalState + '-' +
+                    [string]$objAlteredTerminalResult.DiagnosticCode
+            }))
+    }
+
+    # The context manager's cleanup CATCH must not over-claim when the terminal
+    # transition it attempts is REFUSED. A cleanup that has begun deleting can
+    # throw; the catch then tries to record CleanupFailed through the object's own
+    # LifecycleState setter, and a same-session holder can make that setter throw
+    # -- so the setter returns false and the register stays at the prior state. On
+    # that refused transition the manager must report the CAPTURED PREVIOUS state
+    # with a retryable code and leave the owned records where they are: NOT a
+    # terminal CleanupFailed (round 68 / issue #157), and NOT records retyped to
+    # RetainedUncertain, which an Active context's own validator would refuse and
+    # which would strand the very entries a retry would remove (commit c99d6a9,
+    # which gated the retype on the transition persisting). Both fixes live on this
+    # one branch, so this one probe covers both.
+    #
+    # (ii) reaching the branch needs a LifecycleState whose setter throws yet
+    # passed the entry schema. That schema requires note properties and refuses a
+    # script property before any loop runs -- the manager records this at its own
+    # capture -- so the setter is made to throw the only way that survives it: the
+    # holder REPLACES the note property with a throwing script property AFTER entry
+    # validation, from a second runspace holding the same object. (i) the same
+    # holder causes the throw, polluting the candidate directory so the manager's
+    # non-recursive Directory.Delete of it fails. The swap is written BEFORE the
+    # pollution, so a thrown cleanup proves the swap already landed and the setter
+    # is certain to refuse; the candidate directory is the first directory deleted,
+    # so the download and root records stay Created and the left journal is a valid,
+    # retryable Active journal.
+    #
+    # ONE-SIDED, like the raced-delete probe. The assertions are invariants that
+    # clean production holds whatever the race does: it never reports a terminal
+    # CleanupFailed the register does not hold, never leaves a RetainedUncertain
+    # record while the register is non-terminal, and never reports retained
+    # sequences while the register is non-terminal. A lost race merely disposes, or
+    # refuses over an Active register, and passes all three. Only the reverted
+    # branch violates them, on every run the holder wins the deletion race
+    # (measured reliable across dozens of runs on this runtime). The register is
+    # read back through the manager's own issuance gate on the CAPTURED paths, so
+    # the swapped LifecycleState property is never consulted.
+    $strRefusedTransitionRoot = [System.IO.Path]::Combine($RunRoot, 'refused-transition')
+    [void][System.IO.Directory]::CreateDirectory($strRefusedTransitionRoot)
+    $objRefusedContext = New-StyleGuideCandidateInvocationContext `
+        -TrustedTemporaryRoot $strRefusedTransitionRoot `
+        -DiagnosticLabel 'refused-transition'
+    [void][System.IO.Directory]::CreateDirectory(
+        [string]$objRefusedContext.DownloadDirectoryPath)
+    [void][System.IO.Directory]::CreateDirectory(
+        [string]$objRefusedContext.CandidatePath)
+    $objRefusedContext.OwnershipJournal[1].EntryState = 'Created'
+    $objRefusedContext.OwnershipJournal[2].EntryState = 'Created'
+    $objRefusedContext.OwnershipJournal[2].CreationPhase = 'destination'
+    $arrRefusedFileRecord = @()
+    $uintRefusedSequence = [uint32]3
+    foreach ($strRefusedLeaf in @('aaaa.txt', 'bbbb.txt', 'cccc.txt', 'dddd.txt')) {
+        $strRefusedFilePath = [System.IO.Path]::Combine(
+            [string]$objRefusedContext.CandidatePath, $strRefusedLeaf)
+        $arrRefusedByte = [System.Text.Encoding]::ASCII.GetBytes('refused-' + $strRefusedLeaf)
+        [System.IO.File]::WriteAllBytes($strRefusedFilePath, $arrRefusedByte)
+        $objRefusedRecord = $objRefusedContext.OwnershipJournal[2].PSObject.Copy()
+        $objRefusedRecord.Sequence = [uint32]$uintRefusedSequence
+        $objRefusedRecord.Kind = 'CandidateFile'
+        $objRefusedRecord.Path = $strRefusedFilePath
+        $objRefusedRecord.ParentPath = [string]$objRefusedContext.CandidatePath
+        $objRefusedRecord.LeafName = $strRefusedLeaf
+        $objRefusedRecord.ExpectedEntryType = 'File'
+        $objRefusedRecord.CreationPhase = 'extraction'
+        $objRefusedRecord.EntryState = 'Created'
+        $objRefusedRecord.ContentLength = [uint64]$arrRefusedByte.Length
+        $objRefusedRecord.ContentSha256 = & $script:scriptBlockGetByteArraySha256 -Bytes $arrRefusedByte
+        $arrRefusedFileRecord += $objRefusedRecord
+        $uintRefusedSequence = [uint32]($uintRefusedSequence + 1)
+    }
+    $objRefusedContext.OwnershipJournal = [object[]]@(
+        $objRefusedContext.OwnershipJournal[0],
+        $objRefusedContext.OwnershipJournal[1],
+        $objRefusedContext.OwnershipJournal[2],
+        $arrRefusedFileRecord[0],
+        $arrRefusedFileRecord[1],
+        $arrRefusedFileRecord[2],
+        $arrRefusedFileRecord[3]
+    )
+    $objRefusedContext.NextSequence = [uint32]7
+    # Captured before the call: the register is re-authenticated afterward from
+    # these paths, never from the LifecycleState the holder is about to swap.
+    $objRefusedCaptured = [pscustomobject]@{
+        InvocationId = $objRefusedContext.InvocationId
+        TrustedParentPath = [string]$objRefusedContext.TrustedParentPath
+        InvocationRootPath = [string]$objRefusedContext.InvocationRootPath
+        DownloadDirectoryPath = [string]$objRefusedContext.DownloadDirectoryPath
+        CandidatePath = [string]$objRefusedContext.CandidatePath
+    }
+    # The highest-sequence candidate file is deleted first, so watching it vanish
+    # fires the holder early, a wide window before the candidate directory delete.
+    $strRefusedTrigger = [string]$arrRefusedFileRecord[3].Path
+    $strRefusedPollute = [System.IO.Path]::Combine(
+        [string]$objRefusedContext.CandidatePath, 'refused.marker')
+    $hashtableRefusedSignal = [hashtable]::Synchronized(@{ Running = $false })
+    $objRefusedRunspace = [runspacefactory]::CreateRunspace()
+    $objRefusedRunspace.Open()
+    $objRefusedRunspace.SessionStateProxy.SetVariable('objContext', $objRefusedContext)
+    $objRefusedRunspace.SessionStateProxy.SetVariable('strTrigger', $strRefusedTrigger)
+    $objRefusedRunspace.SessionStateProxy.SetVariable('strPollutePath', $strRefusedPollute)
+    $objRefusedRunspace.SessionStateProxy.SetVariable('hashtableSignal', $hashtableRefusedSignal)
+    $objRefusedShell = [powershell]::Create()
+    $objRefusedShell.Runspace = $objRefusedRunspace
+    [void]$objRefusedShell.AddScript({
+        $objWatch = [System.Diagnostics.Stopwatch]::StartNew()
+        $hashtableSignal.Running = $true
+        while ($objWatch.ElapsedMilliseconds -lt 5000) {
+            if (-not [System.IO.File]::Exists($strTrigger)) {
+                # First the swap the manager's setter will refuse, THEN the
+                # pollution that makes cleanup throw. This order makes a thrown
+                # cleanup proof that the swap already landed.
+                Add-Member -InputObject $objContext -MemberType ScriptProperty `
+                    -Name LifecycleState -Force `
+                    -Value { 'Active' } `
+                    -SecondValue { throw 'refused-by-same-session-holder' }
+                [System.IO.File]::WriteAllBytes($strPollutePath, [byte[]]@(0x50))
+                return
+            }
+        }
+    })
+    $objRefusedResult = $null
+    try {
+        Write-Verbose 'lifecycle-record-state: refused-transition probe executing'
+        $objRefusedHandle = $objRefusedShell.BeginInvoke()
+        $objRefusedStart = [System.Diagnostics.Stopwatch]::StartNew()
+        while (-not $hashtableRefusedSignal.Running -and
+            $objRefusedStart.ElapsedMilliseconds -lt 5000) {
+        }
+        $objRefusedResult = Remove-StyleGuideCandidateInvocationContext -Context $objRefusedContext
+        [void]$objRefusedShell.EndInvoke($objRefusedHandle)
+    } finally {
+        $objRefusedShell.Dispose()
+        $objRefusedRunspace.Close()
+        $objRefusedRunspace.Dispose()
+    }
+    # Does the manager's register actually hold a terminal CleanupFailed for this
+    # context? Asked through the issuance gate on the captured paths, so the
+    # swapped LifecycleState is not read.
+    $boolRefusedRegisterTerminal = [bool](
+        Test-StyleGuideCandidateInvocationContextIssued `
+            -Context $objRefusedContext -ExpectedState 'CleanupFailed' `
+            -ExpectedValues $objRefusedCaptured)
+    $boolRefusedAnyRetainedUncertain = $false
+    foreach ($objRefusedJournalRecord in $objRefusedContext.OwnershipJournal) {
+        if (([string]$objRefusedJournalRecord.EntryState) -ceq 'RetainedUncertain') {
+            $boolRefusedAnyRetainedUncertain = $true
+        }
+    }
+    # Assigned directly, not from an if-block: an empty array emitted as a
+    # block's value unwraps to $null, and $null.Count throws under strict mode.
+    $arrRefusedResultRetained = [uint32[]]@()
+    if ($null -ne $objRefusedResult) {
+        $arrRefusedResultRetained = [uint32[]]@($objRefusedResult.RetainedRecordSequences)
+    }
+    if (($null -eq $objRefusedResult) -or
+        (([string]$objRefusedResult.FinalState) -ceq 'CleanupFailed' -and
+            -not $boolRefusedRegisterTerminal) -or
+        ($boolRefusedAnyRetainedUncertain -and -not $boolRefusedRegisterTerminal) -or
+        ($arrRefusedResultRetained.Count -ne 0 -and -not $boolRefusedRegisterTerminal)) {
+        & $script:scriptBlockStopHarness -Code 'orchestration-failed' `
+            -Detail ('refused-transition-' + $(if ($null -eq $objRefusedResult) {
+                'no-result'
+            } else {
+                [string]$objRefusedResult.FinalState +
+                    '-ru' + [string]$boolRefusedAnyRetainedUncertain +
+                    '-rt' + [string]$boolRefusedRegisterTerminal
+            }))
+    }
+
     $strScenarioRoot = [System.IO.Path]::Combine($RunRoot, 'lifecycle-record-state')
     [void][System.IO.Directory]::CreateDirectory($strScenarioRoot)
     foreach ($hashtableScenario in $arrScenario) {
@@ -9772,7 +10018,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260806.0
+    # Version: 1.0.20260806.1
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
