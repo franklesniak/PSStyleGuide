@@ -816,13 +816,27 @@ $script:scriptBlockAssertVersionMarkersConsistent = {
     # function's marker, left open for the help block's. Bind the last marker
     # too: the help block is the file's leading '<# #>' token and states the
     # version exactly once.
+    # Round 66 (Codex P3): the help block was identified by POSITION -- the
+    # earliest '<#' token -- not by being the help block. A block comment
+    # inserted ahead of the real help (a licence banner, say) becomes the
+    # earliest, so moving the marker into that banner and deleting it from the
+    # real .SYNOPSIS block preserves the total, the own-constant, the function
+    # count, and the per-function locations while the actual help carries no
+    # version. Identify the help block by what makes it one: the comment-based
+    # help keyword .SYNOPSIS, which the parser itself keys on. Matching the
+    # keyword case-insensitively tracks how PowerShell recognises help; the
+    # version equality below stays case-sensitive because that is a style rule.
+    # Requiring exactly one such block file-wide also refuses a decoy help block
+    # that duplicates the keyword to hide an unversioned original. This is the
+    # round-56 lesson once more -- key on the thing, not a proxy for it.
     $arrHelpBlockToken = @(@($objMarkerTokens) | Where-Object {
             $_.Kind -eq [System.Management.Automation.Language.TokenKind]::Comment -and
-            ([string]$_.Text).StartsWith('<#')
+            ([string]$_.Text).StartsWith('<#') -and
+            ([string]$_.Text) -imatch '(?m)^\s*\.SYNOPSIS\s*$'
         } | Sort-Object { $_.Extent.StartOffset })
-    if (@($arrHelpBlockToken).Count -lt 1) {
+    if (@($arrHelpBlockToken).Count -ne 1) {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
-            -Detail 'version-marker-help-block-absent'
+            -Detail ('version-marker-help-block-count-' + @($arrHelpBlockToken).Count)
     }
     $intHelpBlockMarker = @([System.Text.RegularExpressions.Regex]::Matches(
             [string]$arrHelpBlockToken[0].Text,
@@ -5585,6 +5599,90 @@ $script:scriptBlockAssertProductionTaxonomyClosed = {
                 $hashtablePassThroughField[[string]$strPassVar] = [string]$strPassKey
             }
         }
+
+        # Round 66 (Codex P2): a fallback variable's destination is the field its
+        # -Key selects at the call, not the union of all three taxonomies. The
+        # one fallback variable, $strPhase, is used as `-Key 'PSStyleGuidePhase'
+        # -Fallback $strPhase`, so `$strPhase = 'candidate-record'` -- a valid
+        # Subreason but not a Phase -- passed the union test below while
+        # production would have emitted it as an undeclared phase. The -Key is a
+        # literal at the call, so it is readable; correlate each fallback
+        # variable with the set(s) its -Key names and validate its writes
+        # against that. A variable used under more than one key must satisfy
+        # every one, so the destination is the intersection; a use whose -Key is
+        # not a readable literal collapses the destination to empty, refusing
+        # every literal rather than guessing -- the round-51 fail-closed shape.
+        $hashtableFallbackKeySet = @{
+            'PSStyleGuideDiagnosticCode' = $objDiagnostic
+            'PSStyleGuidePhase'          = $objPhase
+            'PSStyleGuideSubreason'      = $objSubreason
+        }
+        $hashtableFallbackDestination = @{}
+        foreach ($objFallbackCommand in @($objShapeAst.FindAll(
+                    {
+                        param ($SyntaxNode)
+                        $SyntaxNode -is [System.Management.Automation.Language.CommandAst]
+                    },
+                    $true))) {
+            $arrFallbackElement = @($objFallbackCommand.CommandElements)
+            for ($intFallback = 0; $intFallback -lt $arrFallbackElement.Count; $intFallback++) {
+                $objFallbackParam = $arrFallbackElement[$intFallback]
+                if ($objFallbackParam -isnot
+                    [System.Management.Automation.Language.CommandParameterAst] -or
+                    ([string]$objFallbackParam.ParameterName) -cne 'Fallback') {
+                    continue
+                }
+                $objFallbackArg = $objFallbackParam.Argument
+                if ($null -eq $objFallbackArg -and
+                    ($intFallback + 1) -lt $arrFallbackElement.Count) {
+                    $objFallbackArg = $arrFallbackElement[$intFallback + 1]
+                }
+                if ($objFallbackArg -isnot
+                    [System.Management.Automation.Language.VariableExpressionAst]) {
+                    continue
+                }
+                $strFallbackVar = [string]$objFallbackArg.VariablePath.UserPath
+                if (-not ($hashtablePassThroughField.ContainsKey($strFallbackVar) -and
+                        $hashtablePassThroughField[$strFallbackVar] -ceq 'Fallback')) {
+                    continue
+                }
+                # Resolve this use's -Key to a recognised set, else leave it null
+                # (unresolved) so the intersection below collapses to empty.
+                $objUseSet = $null
+                for ($intKey = 0; $intKey -lt $arrFallbackElement.Count; $intKey++) {
+                    $objKeyParam = $arrFallbackElement[$intKey]
+                    if ($objKeyParam -isnot
+                        [System.Management.Automation.Language.CommandParameterAst] -or
+                        ([string]$objKeyParam.ParameterName) -cne 'Key') {
+                        continue
+                    }
+                    $objKeyArg = $objKeyParam.Argument
+                    if ($null -eq $objKeyArg -and
+                        ($intKey + 1) -lt $arrFallbackElement.Count) {
+                        $objKeyArg = $arrFallbackElement[$intKey + 1]
+                    }
+                    if ($objKeyArg -is
+                        [System.Management.Automation.Language.StringConstantExpressionAst] -and
+                        $hashtableFallbackKeySet.ContainsKey([string]$objKeyArg.Value)) {
+                        $objUseSet = $hashtableFallbackKeySet[[string]$objKeyArg.Value]
+                    }
+                    break
+                }
+                if (-not $hashtableFallbackDestination.ContainsKey($strFallbackVar)) {
+                    $objSeed = New-Object 'System.Collections.Generic.HashSet[string]' (
+                        [System.StringComparer]::Ordinal)
+                    if ($null -ne $objUseSet) {
+                        foreach ($strSeed in $objUseSet) { [void]$objSeed.Add($strSeed) }
+                    }
+                    $hashtableFallbackDestination[$strFallbackVar] = $objSeed
+                } elseif ($null -eq $objUseSet) {
+                    $hashtableFallbackDestination[$strFallbackVar].Clear()
+                } else {
+                    $hashtableFallbackDestination[$strFallbackVar].IntersectWith($objUseSet)
+                }
+            }
+        }
+
         foreach ($objAssign in @($objShapeAst.FindAll(
                     {
                         param ($SyntaxNode)
@@ -5600,13 +5698,24 @@ $script:scriptBlockAssertProductionTaxonomyClosed = {
                 })) {
             $strAssignField = $hashtablePassThroughField[
                 [string]$objAssign.Left.VariablePath.UserPath]
-            # A Fallback variable's destination is chosen at the call by -Key, so
-            # its literal is allowed in any of the three sets; the other fields
-            # resolve to one exact set.
+            # A Fallback variable's destination is the field its -Key selects,
+            # resolved above into $hashtableFallbackDestination; a fallback
+            # variable never used as `-Fallback $var` has no readable
+            # destination and its literals are refused rather than admitted by
+            # union. The other fields resolve to one exact set.
             $objAssignSet = $null
             if ($strAssignField -ceq 'Phase') { $objAssignSet = $objPhase }
             elseif ($strAssignField -ceq 'Subreason') { $objAssignSet = $objSubreason }
-            elseif ($strAssignField -ceq 'Fallback') { $objAssignSet = $null }
+            elseif ($strAssignField -ceq 'Fallback') {
+                $objAssignSet = if ($hashtableFallbackDestination.ContainsKey(
+                        [string]$objAssign.Left.VariablePath.UserPath)) {
+                    $hashtableFallbackDestination[
+                        [string]$objAssign.Left.VariablePath.UserPath]
+                } else {
+                    New-Object 'System.Collections.Generic.HashSet[string]' (
+                        [System.StringComparer]::Ordinal)
+                }
+            }
             else { $objAssignSet = $objDiagnostic }
             $queueValueNode = New-Object 'System.Collections.Generic.Queue[object]'
             $queueValueNode.Enqueue($objAssign.Right)
@@ -5625,6 +5734,18 @@ $script:scriptBlockAssertProductionTaxonomyClosed = {
                         $queueValueNode.Enqueue(
                             $objValueNode.PipelineElements[0].Expression)
                     }
+                    continue
+                }
+                if ($objValueNode -is
+                    [System.Management.Automation.Language.CommandExpressionAst]) {
+                    # Round 66 (self-found while mutation-testing the fallback fix
+                    # above): a direct `$var = 'literal'` assignment has a
+                    # CommandExpressionAst on its right, not a PipelineAst, so
+                    # without this the walk descended if/ternary branch tails but
+                    # silently skipped every plain assignment -- the ten
+                    # `$strPhase = '<phase>'` writes among them. The literal is
+                    # this node's Expression.
+                    $queueValueNode.Enqueue($objValueNode.Expression)
                     continue
                 }
                 if ($objValueNode -is
@@ -5660,15 +5781,7 @@ $script:scriptBlockAssertProductionTaxonomyClosed = {
                 if ($objValueNode -is
                     [System.Management.Automation.Language.StringConstantExpressionAst]) {
                     $strAssignLiteral = [string]$objValueNode.Value
-                    $boolAssignMember = $false
-                    if ($null -eq $objAssignSet) {
-                        $boolAssignMember = $objDiagnostic.Contains($strAssignLiteral) -or
-                            $objPhase.Contains($strAssignLiteral) -or
-                            $objSubreason.Contains($strAssignLiteral)
-                    } else {
-                        $boolAssignMember = $objAssignSet.Contains($strAssignLiteral)
-                    }
-                    if (-not $boolAssignMember) {
+                    if (-not $objAssignSet.Contains($strAssignLiteral)) {
                         & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                             -Detail ('production-passthrough-literal-' +
                                 [string]$objAssign.Extent.StartLineNumber)
