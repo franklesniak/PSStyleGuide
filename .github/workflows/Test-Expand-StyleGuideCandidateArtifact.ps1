@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260806.1
+Version: 1.0.20260806.2
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260806.1'
+$script:versionCandidateHarness = [System.Version]'1.0.20260806.2'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260806.0'
-$script:strCandidateExpectedContextVersion = '1.0.20260806.0'
+$script:strCandidateExpectedHelperVersion = '1.0.20260806.1'
+$script:strCandidateExpectedContextVersion = '1.0.20260806.1'
 $script:strCandidateCatalogVersion = '1.0.20260805.1'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
@@ -4173,6 +4173,159 @@ $script:scriptBlockAssertCandidateRecordUnchangedRefused = {
     }
 }
 
+$script:scriptBlockAssertPreexistingRecordReproofRefused = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$RunRoot
+    )
+
+    # Round 71 (Codex P2): before the irreversible destination create, expansion
+    # re-proves the two PRE-EXISTING records the context manager issued -- the
+    # seq-0 root and seq-1 download directories -- against snapshots captured at
+    # authentication, with the guard generalised from the candidate re-proof.
+    # Round 64 re-proved the candidate record only, so a same-session writer that
+    # flipped a pre-existing record after authentication slipped past every
+    # pre-create guard: the create ran, and only the post-append context assertion
+    # rejected the record -- handing rollback a journal the manager refuses and
+    # leaving the issued tree on disk. Reproduced end-to-end by flipping the seq-0
+    # root record's EntryState from Created to Deleted in the auth-to-create window.
+    # A same-session swap is not expressible as a catalog fixture (this file says so
+    # at the journal-swap probe), so the guard sequence is replayed here on the real
+    # production scriptblocks, in production's order.
+    #
+    # Behavioural, with a positive control, like the journal-swap probe. The HONEST
+    # guard sequence must PASS; the sequence run after the seq-0 EntryState flip
+    # must be REFUSED with subreason candidate-record BEFORE any create. Requiring
+    # the control to pass gives it teeth: a guard that always threw would fail the
+    # control. And if the attack is NOT refused -- the state a reverted fix returns
+    # to -- the probe replays the create, the marking, the post-create context
+    # assertion, and the real rollback exactly as expansion does, and fails on the
+    # leak the manager then retains: rollback validates the corrupted journal,
+    # refuses with FilesystemCallCount 0, and leaves the issued root on disk.
+    # Removing the pre-existing EntryState re-proof reddens this probe on that leak;
+    # removing the re-proof calls is pinned by scriptBlockAssertRound63JournalPlanWired.
+    $strReproofRoot = [System.IO.Path]::Combine($RunRoot, 'preexisting-reproof')
+    [void][System.IO.Directory]::CreateDirectory($strReproofRoot)
+    $objReproofContext = New-StyleGuideCandidateInvocationContext `
+        -TrustedTemporaryRoot $strReproofRoot -DiagnosticLabel 'preexisting-reproof'
+    try {
+        $objReproofJournal = & $script:scriptBlockAssertCandidateHelperContext `
+            -ContextValue $objReproofContext
+        $uintReproofSequence = [uint32]$objReproofJournal.Count
+        $scriptBlockReproofSnapshot = {
+            param ($ObjRecord)
+            [pscustomobject]@{
+                Sequence   = [uint32]$ObjRecord.Sequence
+                Path       = [string]$ObjRecord.Path
+                ParentPath = [string]$ObjRecord.ParentPath
+                LeafName   = [string]$ObjRecord.LeafName
+            }
+        }
+        $objCandidateSnapshot = & $scriptBlockReproofSnapshot (@($objReproofJournal |
+            Where-Object { $_.Kind -eq 'CandidateDirectory' })[0])
+        $objRootSnapshot = & $scriptBlockReproofSnapshot (@($objReproofJournal |
+            Where-Object { $_.Kind -eq 'InvocationRootDirectory' })[0])
+        $objDownloadSnapshot = & $scriptBlockReproofSnapshot (@($objReproofJournal |
+            Where-Object { $_.Kind -eq 'DownloadDirectory' })[0])
+        $strReproofCandidateDir = [string]$objReproofContext.CandidatePath
+        $strReproofRootDir = [string]$objReproofContext.InvocationRootPath
+        $strReproofDownloadDir = [string]$objReproofContext.DownloadDirectoryPath
+
+        # The pre-create guard sequence expansion runs, on the real scriptblocks
+        # and in the real order: the journal-current reference guard, then the
+        # candidate re-proof, then the two pre-existing-record re-proofs.
+        $scriptBlockReproofGuards = {
+            param ($Ctx, $Journal, $Seq, $CandSnap, $RootSnap, $DlSnap)
+            & $script:scriptBlockAssertCandidateHelperJournalCurrent `
+                -ContextValue $Ctx -JournalValue $Journal `
+                -NextSequenceValue $Seq -PhaseValue 'destination'
+            & $script:scriptBlockAssertCandidateHelperRecordUnchanged `
+                -Record $Journal[$CandSnap.Sequence] -Snapshot $CandSnap `
+                -PhaseValue 'destination'
+            & $script:scriptBlockAssertCandidateHelperRecordUnchanged `
+                -Record $Journal[$RootSnap.Sequence] -Snapshot $RootSnap `
+                -ExpectedKind 'InvocationRootDirectory' -ExpectedEntryState 'Created' `
+                -PhaseValue 'destination'
+            & $script:scriptBlockAssertCandidateHelperRecordUnchanged `
+                -Record $Journal[$DlSnap.Sequence] -Snapshot $DlSnap `
+                -ExpectedKind 'DownloadDirectory' -ExpectedEntryState 'Created' `
+                -PhaseValue 'destination'
+        }
+
+        # Control: the honest guard sequence must pass.
+        $boolReproofControlPassed = $true
+        try {
+            & $scriptBlockReproofGuards $objReproofContext $objReproofJournal `
+                $uintReproofSequence $objCandidateSnapshot $objRootSnapshot `
+                $objDownloadSnapshot
+        } catch {
+            $boolReproofControlPassed = $false
+        }
+        if (-not $boolReproofControlPassed) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail 'preexisting-reproof-control-refused'
+        }
+
+        # Attack: flip the seq-0 root record's EntryState after authentication, in
+        # place -- the journal array reference and NextSequence are unchanged, so
+        # the journal-current guard cannot see it. Only the pre-existing-record
+        # re-proof can.
+        $objReproofJournal[$objRootSnapshot.Sequence].EntryState = 'Deleted'
+        $boolReproofRefused = $false
+        $strReproofSubreason = 'none'
+        try {
+            & $scriptBlockReproofGuards $objReproofContext $objReproofJournal `
+                $uintReproofSequence $objCandidateSnapshot $objRootSnapshot `
+                $objDownloadSnapshot
+        } catch {
+            $boolReproofRefused = $true
+            $objReproofMatch = [regex]::Match(
+                [string]$_.Exception.Message, 'subreason=([a-z][a-z0-9-]*)')
+            if ($objReproofMatch.Success) {
+                $strReproofSubreason = $objReproofMatch.Groups[1].Value
+            }
+        }
+
+        if ($boolReproofRefused) {
+            # Refused before the create, as clean production does. The subreason
+            # must name the record guard, and nothing may have been created.
+            if ($strReproofSubreason -cne 'candidate-record') {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                    -Detail ('preexisting-reproof-subreason-' + $strReproofSubreason)
+            }
+            if ([System.IO.Directory]::Exists($strReproofCandidateDir)) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                    -Detail 'preexisting-reproof-created-despite-refusal'
+            }
+        } else {
+            # NOT refused: the state a reverted pre-existing-record re-proof returns
+            # to. Replay the create, the marking, the post-create context assertion
+            # and the real rollback exactly as expansion does, then fail on the leak
+            # the manager retains.
+            $null = [System.IO.Directory]::CreateDirectory($strReproofCandidateDir)
+            $objReproofCandidateLive =
+                $objReproofContext.OwnershipJournal[$objCandidateSnapshot.Sequence]
+            $objReproofCandidateLive.CreationPhase = 'destination'
+            $objReproofCandidateLive.EntryState = 'Created'
+            try {
+                [void](& $script:scriptBlockAssertCandidateHelperContext `
+                    -ContextValue $objReproofContext)
+            } catch {
+            }
+            [void](Remove-StyleGuideCandidateInvocationState -Context $objReproofContext)
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('preexisting-reproof-attack-not-refused-rootleak-' +
+                    [string]([System.IO.Directory]::Exists($strReproofRootDir)))
+        }
+    } finally {
+        # The context was deliberately corrupted, so its own cleanup is not trusted
+        # to dispose the tree; remove the probe root directly.
+        if ([System.IO.Directory]::Exists($strReproofRoot)) {
+            [System.IO.Directory]::Delete($strReproofRoot, $true)
+        }
+    }
+}
+
 $script:scriptBlockAssertRound63JournalPlanWired = {
     param (
         [Parameter(Mandatory = $true)]
@@ -4246,6 +4399,23 @@ $script:scriptBlockAssertRound63JournalPlanWired = {
     if ($intIdentityGuard -lt 1) {
         & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
             -Detail ('round63-candidate-record-guard-' + [string]$intIdentityGuard)
+    }
+    # Round 71 (Codex P2): the destination create additionally re-proves the two
+    # PRE-EXISTING records -- the seq-0 root and seq-1 download directories -- each
+    # by its own ExpectedKind, before the irreversible create. Removing either call
+    # is a same-session-swap regression not expressible as a catalog fixture, so
+    # exactly one re-proof call per pre-existing kind is pinned here; total removal
+    # reddens this. The generalised guard's refusal BEHAVIOUR -- that a flipped
+    # pre-existing record is refused before the create -- is exercised by
+    # scriptBlockAssertPreexistingRecordReproofRefused.
+    foreach ($strReproofKind in @('InvocationRootDirectory', 'DownloadDirectory')) {
+        $intReproofCall = @([regex]::Matches(
+            $strText, "-ExpectedKind '" + $strReproofKind + "'")).Count
+        if ($intReproofCall -ne 1) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('round71-preexisting-reproof-' + $strReproofKind +
+                    '-' + [string]$intReproofCall)
+        }
     }
 }
 
@@ -5549,6 +5719,171 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
                 [string]$objRefusedResult.FinalState +
                     '-ru' + [string]$boolRefusedAnyRetainedUncertain +
                     '-rt' + [string]$boolRefusedRegisterTerminal
+            }))
+    }
+
+    # Round 71 (Codex P2): the sibling of the refused-transition probe above, on
+    # the RECORD side. When a same-session holder rigs a live RECORD's EntryState
+    # to throw -- not the context's LifecycleState -- the best-effort courtesy write
+    # in the delete loops throws and is recorded (RecordWriteRefused), the whole
+    # tree is deleted and each delete verified, the register transitions to Disposed,
+    # and then the final live-context re-assertion re-reads the tampered record and
+    # throws: the manager reported a false terminal CleanupFailed with EMPTY retained
+    # sequences over a succeeded, verified disposal (round 68's failure mode, entered
+    # from the record side). The fix consults RecordWriteRefused -- set at three
+    # sites and previously never read -- before that re-assertion, and returns the
+    # manager's authenticated terminal disposal directly.
+    #
+    # ONE-SIDED and reliable, like the raced-delete probe. The rig targets the seq-0
+    # ROOT record, whose courtesy write is the LAST of the whole cleanup, and is
+    # triggered by the FIRST file deletion -- so the holder has the entire file and
+    # directory deletion to land the swap before that courtesy write; measured
+    # reliable across dozens of runs. The invariant clean production holds whatever
+    # the race does: once the tree is fully deleted, cleanup is Disposed and
+    # successful with no retained sequences, never a terminal CleanupFailed. The
+    # register is read back through the manager's own issuance gate on the CAPTURED
+    # paths, so the swapped record field is never consulted. Reverting the consult
+    # violates the invariant on every run the holder wins the race.
+    $strRecordRefusedRoot = [System.IO.Path]::Combine($RunRoot, 'record-write-refused')
+    [void][System.IO.Directory]::CreateDirectory($strRecordRefusedRoot)
+    $objRecordRefusedContext = New-StyleGuideCandidateInvocationContext `
+        -TrustedTemporaryRoot $strRecordRefusedRoot -DiagnosticLabel 'record-write-refused'
+    [void][System.IO.Directory]::CreateDirectory(
+        [string]$objRecordRefusedContext.DownloadDirectoryPath)
+    [void][System.IO.Directory]::CreateDirectory(
+        [string]$objRecordRefusedContext.CandidatePath)
+    $objRecordRefusedContext.OwnershipJournal[1].EntryState = 'Created'
+    $objRecordRefusedContext.OwnershipJournal[2].EntryState = 'Created'
+    $objRecordRefusedContext.OwnershipJournal[2].CreationPhase = 'destination'
+    $arrRecordRefusedFile = @()
+    $uintRecordRefusedSequence = [uint32]3
+    foreach ($strRecordRefusedLeaf in @('aaaa.txt', 'bbbb.txt', 'cccc.txt', 'dddd.txt')) {
+        $strRecordRefusedFilePath = [System.IO.Path]::Combine(
+            [string]$objRecordRefusedContext.CandidatePath, $strRecordRefusedLeaf)
+        $arrRecordRefusedByte = [System.Text.Encoding]::ASCII.GetBytes(
+            'record-refused-' + $strRecordRefusedLeaf)
+        [System.IO.File]::WriteAllBytes($strRecordRefusedFilePath, $arrRecordRefusedByte)
+        $objRecordRefusedRecord = $objRecordRefusedContext.OwnershipJournal[2].PSObject.Copy()
+        $objRecordRefusedRecord.Sequence = [uint32]$uintRecordRefusedSequence
+        $objRecordRefusedRecord.Kind = 'CandidateFile'
+        $objRecordRefusedRecord.Path = $strRecordRefusedFilePath
+        $objRecordRefusedRecord.ParentPath = [string]$objRecordRefusedContext.CandidatePath
+        $objRecordRefusedRecord.LeafName = $strRecordRefusedLeaf
+        $objRecordRefusedRecord.ExpectedEntryType = 'File'
+        $objRecordRefusedRecord.CreationPhase = 'extraction'
+        $objRecordRefusedRecord.EntryState = 'Created'
+        $objRecordRefusedRecord.ContentLength = [uint64]$arrRecordRefusedByte.Length
+        $objRecordRefusedRecord.ContentSha256 = & $script:scriptBlockGetByteArraySha256 `
+            -Bytes $arrRecordRefusedByte
+        $arrRecordRefusedFile += $objRecordRefusedRecord
+        $uintRecordRefusedSequence = [uint32]($uintRecordRefusedSequence + 1)
+    }
+    $objRecordRefusedContext.OwnershipJournal = [object[]]@(
+        $objRecordRefusedContext.OwnershipJournal[0],
+        $objRecordRefusedContext.OwnershipJournal[1],
+        $objRecordRefusedContext.OwnershipJournal[2],
+        $arrRecordRefusedFile[0],
+        $arrRecordRefusedFile[1],
+        $arrRecordRefusedFile[2],
+        $arrRecordRefusedFile[3]
+    )
+    $objRecordRefusedContext.NextSequence = [uint32]7
+    # Captured before the call: the register is re-authenticated afterward from
+    # these paths, never from the record field the holder is about to swap.
+    $objRecordRefusedCaptured = [pscustomobject]@{
+        InvocationId = $objRecordRefusedContext.InvocationId
+        TrustedParentPath = [string]$objRecordRefusedContext.TrustedParentPath
+        InvocationRootPath = [string]$objRecordRefusedContext.InvocationRootPath
+        DownloadDirectoryPath = [string]$objRecordRefusedContext.DownloadDirectoryPath
+        CandidatePath = [string]$objRecordRefusedContext.CandidatePath
+    }
+    $strRecordRefusedRootDir = [string]$objRecordRefusedContext.InvocationRootPath
+    # Target: the seq-0 ROOT record, deleted last, so its courtesy write is the last
+    # in the whole cleanup. Trigger: the highest-sequence file, deleted first.
+    $objRecordRefusedTarget = $objRecordRefusedContext.OwnershipJournal[0]
+    $strRecordRefusedTrigger = [string]$arrRecordRefusedFile[3].Path
+    $hashtableRecordRefusedSignal = [hashtable]::Synchronized(@{ Running = $false })
+    $objRecordRefusedRunspace = [runspacefactory]::CreateRunspace()
+    $objRecordRefusedRunspace.Open()
+    $objRecordRefusedRunspace.SessionStateProxy.SetVariable(
+        'objTarget', $objRecordRefusedTarget)
+    $objRecordRefusedRunspace.SessionStateProxy.SetVariable(
+        'strTrigger', $strRecordRefusedTrigger)
+    $objRecordRefusedRunspace.SessionStateProxy.SetVariable(
+        'hashtableSignal', $hashtableRecordRefusedSignal)
+    $objRecordRefusedShell = [powershell]::Create()
+    $objRecordRefusedShell.Runspace = $objRecordRefusedRunspace
+    [void]$objRecordRefusedShell.AddScript({
+        $objWatch = [System.Diagnostics.Stopwatch]::StartNew()
+        $hashtableSignal.Running = $true
+        while ($objWatch.ElapsedMilliseconds -lt 5000) {
+            if (-not [System.IO.File]::Exists($strTrigger)) {
+                # Replace the live record's EntryState note property with a throwing
+                # script property AFTER the plan capture read its valid value and
+                # BEFORE the root record's best-effort courtesy write. The getter
+                # answers Created so a read does not throw; the setter throws so the
+                # courtesy write is refused and RecordWriteRefused is set.
+                Add-Member -InputObject $objTarget -MemberType ScriptProperty `
+                    -Name EntryState -Force `
+                    -Value { 'Created' } `
+                    -SecondValue { throw 'entrystate-refused-by-same-session-holder' }
+                return
+            }
+        }
+    })
+    $objRecordRefusedResult = $null
+    try {
+        Write-Verbose 'lifecycle-record-state: record-write-refused probe executing'
+        $objRecordRefusedHandle = $objRecordRefusedShell.BeginInvoke()
+        $objRecordRefusedStart = [System.Diagnostics.Stopwatch]::StartNew()
+        while (-not $hashtableRecordRefusedSignal.Running -and
+            $objRecordRefusedStart.ElapsedMilliseconds -lt 5000) {
+        }
+        $objRecordRefusedResult = Remove-StyleGuideCandidateInvocationContext `
+            -Context $objRecordRefusedContext
+        [void]$objRecordRefusedShell.EndInvoke($objRecordRefusedHandle)
+    } finally {
+        $objRecordRefusedShell.Dispose()
+        $objRecordRefusedRunspace.Close()
+        $objRecordRefusedRunspace.Dispose()
+    }
+    $boolRecordRefusedTreeGone =
+        (-not [System.IO.Directory]::Exists($strRecordRefusedRootDir))
+    # Does the register hold a terminal Disposed for this context? Asked through the
+    # issuance gate on the captured paths, so the swapped record field is not read.
+    $boolRecordRefusedRegisterDisposed = [bool](
+        Test-StyleGuideCandidateInvocationContextIssued `
+            -Context $objRecordRefusedContext -ExpectedState 'Disposed' `
+            -ExpectedValues $objRecordRefusedCaptured)
+    # Assigned directly, not from an if-block: an empty array emitted as a block's
+    # value unwraps to $null, and $null.Count throws under strict mode.
+    $arrRecordRefusedRetained = [uint32[]]@()
+    if ($null -ne $objRecordRefusedResult) {
+        $arrRecordRefusedRetained = [uint32[]]@(
+            $objRecordRefusedResult.RetainedRecordSequences)
+    }
+    # Invariant: once the tree is fully deleted, a completed, verified disposal is
+    # reported as terminal Disposed and successful, with no retained sequences and a
+    # register that holds Disposed -- never a false CleanupFailed. Reverting the
+    # RecordWriteRefused consult violates this on every run the holder wins the race
+    # (measured: the tree is gone, yet FinalState is CleanupFailed and the register
+    # holds CleanupFailed).
+    if (($null -eq $objRecordRefusedResult) -or
+        (-not $boolRecordRefusedTreeGone) -or
+        (([string]$objRecordRefusedResult.FinalState) -cne 'Disposed') -or
+        (-not [bool]$objRecordRefusedResult.Success) -or
+        (([string]$objRecordRefusedResult.DiagnosticCode) -cne 'cleanup-succeeded') -or
+        ($arrRecordRefusedRetained.Count -ne 0) -or
+        (-not $boolRecordRefusedRegisterDisposed)) {
+        & $script:scriptBlockStopHarness -Code 'orchestration-failed' `
+            -Detail ('record-write-refused-' + $(if ($null -eq $objRecordRefusedResult) {
+                'no-result'
+            } else {
+                [string]$objRecordRefusedResult.FinalState +
+                    '-s' + [string]$objRecordRefusedResult.Success +
+                    '-tg' + [string]$boolRecordRefusedTreeGone +
+                    '-rd' + [string]$boolRecordRefusedRegisterDisposed +
+                    '-rc' + [string]$arrRecordRefusedRetained.Count
             }))
     }
 
@@ -10018,7 +10353,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260806.1
+    # Version: 1.0.20260806.2
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -10283,6 +10618,7 @@ function Invoke-StyleGuideCandidateHarness {
         & $script:scriptBlockAssertRound63JournalPlanWired `
             -LiteralPath $strHelperLiteralPath
         & $script:scriptBlockAssertCandidateRecordUnchangedRefused
+        & $script:scriptBlockAssertPreexistingRecordReproofRefused -RunRoot $strRunRoot
         & $script:scriptBlockAssertDownloadLeafGuardExecutes `
             -HelperLiteralPath $strHelperLiteralPath `
             -RunRoot $strRunRoot

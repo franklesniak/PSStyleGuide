@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260806.0
+Version: 1.0.20260806.1
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260806.0'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260806.0'
+$script:versionCandidateHelper = [System.Version]'1.0.20260806.1'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260806.1'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -1024,7 +1024,27 @@ $script:scriptBlockAssertCandidateHelperRecordUnchanged = {
         [object]$Snapshot,
 
         [Parameter(Mandatory = $true)]
-        [string]$PhaseValue
+        [string]$PhaseValue,
+
+        # Round 71 (Codex P2): this guard was written for the candidate record
+        # alone and hardcoded its Kind and fixed fields. It is generalised here so
+        # the seq-0 root and seq-1 download records the context manager issued can
+        # be re-proven with the same shape/fixed-field/caller-variable-path
+        # discipline before the irreversible create. ExpectedKind replaces the
+        # hardcoded 'CandidateDirectory'. ExpectedEntryState, when non-null,
+        # additionally pins the record's EntryState against its only admitted
+        # value -- 'Created' for the two pre-existing directories, which are on
+        # disk before this expansion runs; the candidate record passes $null and
+        # is exempt, because its EntryState is ExpectedAbsent here, proven
+        # separately by the caller, and flipped to Created by the create itself.
+        # The two parameters default to the candidate's prior behaviour so the
+        # candidate call site and the round-64/65 harness unit probe are unchanged.
+        [Parameter(Mandatory = $false)]
+        [string]$ExpectedKind = 'CandidateDirectory',
+
+        [Parameter(Mandatory = $false)]
+        [AllowNull()]
+        [object]$ExpectedEntryState = $null
     )
 
     # Round 64 (Codex): reference identity of the journal array says nothing
@@ -1076,7 +1096,7 @@ $script:scriptBlockAssertCandidateHelperRecordUnchanged = {
         $Record.Sequence -isnot [System.UInt32] -or
         $Record.Sequence -ne [uint32]$Snapshot.Sequence -or
         $Record.Kind -isnot [System.String] -or
-        $Record.Kind -cne 'CandidateDirectory' -or
+        $Record.Kind -cne $ExpectedKind -or
         $Record.ExpectedEntryType -isnot [System.String] -or
         $Record.ExpectedEntryType -cne 'Directory' -or
         $Record.CreationPhase -isnot [System.String] -or
@@ -1095,6 +1115,22 @@ $script:scriptBlockAssertCandidateHelperRecordUnchanged = {
         -not [System.String]::Equals(
             [string]$Record.LeafName, [string]$Snapshot.LeafName,
             $script:objCandidateHelperPathComparison)) {
+        & $script:scriptBlockStopCandidateHelperOperation `
+            -Code 'destination-invalid' -Phase $PhaseValue -Subreason 'candidate-record'
+    }
+    # Round 71 (Codex P2): when EntryState is a fixed field of this record kind --
+    # the pre-existing root and download directories, on disk as 'Created' before
+    # this expansion runs -- pin it against that value and its type. Type as well
+    # as value, like the fixed fields above: a field retyped off [string] fails.
+    # A same-session flip of a pre-existing record's EntryState (the reproduced
+    # 'Created' -> 'Deleted' swap) is refused here, before the irreversible create,
+    # instead of surfacing as the post-create context assertion's rejection, which
+    # hands cleanup a journal it refuses and retains the issued tree. The candidate
+    # record passes $null here and is exempt: its ExpectedAbsent state is proven by
+    # the caller and flipped to Created by the create itself.
+    if ($null -ne $ExpectedEntryState -and (
+            $Record.EntryState -isnot [System.String] -or
+            $Record.EntryState -cne [string]$ExpectedEntryState)) {
         & $script:scriptBlockStopCandidateHelperOperation `
             -Code 'destination-invalid' -Phase $PhaseValue -Subreason 'candidate-record'
     }
@@ -2380,7 +2416,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260806.0
+    # Version: 1.0.20260806.1
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -3378,6 +3414,37 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
             ParentPath = [string]$objCapturedCandidateRecord.ParentPath
             LeafName   = [string]$objCapturedCandidateRecord.LeafName
         }
+        # Round 71 (Codex P2): the seq-0 root and seq-1 download records the
+        # context manager issued -- already Created on disk before this expansion
+        # runs -- captured as immutable snapshots alongside the candidate's, for
+        # the same reason. Round 64 proved only the candidate record before the
+        # create, so a same-session writer that instead flipped a PRE-EXISTING
+        # record (root or download) after authentication slipped past every
+        # pre-create guard: the irreversible create ran, and only the post-append
+        # context assertion rejected the corrupted record, handing rollback a
+        # journal the manager refuses and leaving the issued tree on disk.
+        # Reproduced end-to-end by flipping the seq-0 root record's EntryState
+        # from Created to Deleted in the authentication-to-create window. These
+        # snapshots cannot be repointed, and each record is re-proven against its
+        # snapshot immediately before the create below.
+        $objCapturedRootRecord = @($objAuthenticatedJournal | Where-Object {
+            $_.Kind -eq 'InvocationRootDirectory'
+        })[0]
+        $objAuthenticatedRootSnapshot = [pscustomobject]@{
+            Sequence   = [uint32]$objCapturedRootRecord.Sequence
+            Path       = [string]$objCapturedRootRecord.Path
+            ParentPath = [string]$objCapturedRootRecord.ParentPath
+            LeafName   = [string]$objCapturedRootRecord.LeafName
+        }
+        $objCapturedDownloadRecord = @($objAuthenticatedJournal | Where-Object {
+            $_.Kind -eq 'DownloadDirectory'
+        })[0]
+        $objAuthenticatedDownloadSnapshot = [pscustomobject]@{
+            Sequence   = [uint32]$objCapturedDownloadRecord.Sequence
+            Path       = [string]$objCapturedDownloadRecord.Path
+            ParentPath = [string]$objCapturedDownloadRecord.ParentPath
+            LeafName   = [string]$objCapturedDownloadRecord.LeafName
+        }
         # Round 54: the state belongs in the capture too. The verifier's
         # -ExpectedState exists precisely so the manager compares its register
         # against a value the caller cannot move afterwards, and this call was
@@ -3910,6 +3977,36 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'destination-invalid' -Phase 'destination' -Subreason 'candidate-state'
         }
+        # Round 71 (Codex P2): re-prove the two PRE-EXISTING records the manager
+        # issued -- the seq-0 root and seq-1 download directories -- against the
+        # snapshots captured at authentication, immediately before the create,
+        # with the guard the candidate record uses (generalised above). Each is
+        # selected by its authenticated sequence, its Kind pinned to its own value,
+        # and its EntryState pinned to 'Created' -- both are on disk before this
+        # expansion runs. Round 64 re-proved the candidate record only; a
+        # same-session writer that instead flipped a pre-existing record after
+        # authentication (EntryState 'Created' -> 'Deleted' is the reproduced
+        # attack) slipped past every pre-create guard, the create ran, and only the
+        # post-append context assertion rejected the record -- handing rollback a
+        # journal the manager refuses and retaining the issued tree. Refused here,
+        # before the irreversible create, in the same code/subreason class the
+        # candidate record uses.
+        $objRootDirectoryRecord =
+            $objAuthenticatedJournal[$objAuthenticatedRootSnapshot.Sequence]
+        & $script:scriptBlockAssertCandidateHelperRecordUnchanged `
+            -Record $objRootDirectoryRecord `
+            -Snapshot $objAuthenticatedRootSnapshot `
+            -ExpectedKind 'InvocationRootDirectory' `
+            -ExpectedEntryState 'Created' `
+            -PhaseValue 'destination'
+        $objDownloadDirectoryRecord =
+            $objAuthenticatedJournal[$objAuthenticatedDownloadSnapshot.Sequence]
+        & $script:scriptBlockAssertCandidateHelperRecordUnchanged `
+            -Record $objDownloadDirectoryRecord `
+            -Snapshot $objAuthenticatedDownloadSnapshot `
+            -ExpectedKind 'DownloadDirectory' `
+            -ExpectedEntryState 'Created' `
+            -PhaseValue 'destination'
         $null = [System.IO.Directory]::CreateDirectory($strCandidatePath)
         $objCandidateDirectoryRecord.CreationPhase = 'destination'
         $objCandidateDirectoryRecord.EntryState = 'Created'

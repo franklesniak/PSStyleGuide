@@ -27,14 +27,14 @@ a caller that deletes first and validates afterwards has already
 deleted, so it needs a way to ask about issuance that changes nothing.
 
 .NOTES
-Version: 1.0.20260806.0
+Version: 1.0.20260806.1
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260806.0'
+$versionCandidateContext = [System.Version]'1.0.20260806.1'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -1785,7 +1785,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260806.0
+    # Version: 1.0.20260806.1
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2252,7 +2252,7 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260806.0
+    # Version: 1.0.20260806.1
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param (
@@ -2364,7 +2364,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260806.0
+    # Version: 1.0.20260806.1
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2690,6 +2690,42 @@ function Remove-StyleGuideCandidateInvocationContext {
                 -FinalState $strPreviousState `
                 -Success $false `
                 -DiagnosticCode 'cleanup-context-altered' `
+                -ReferenceToFilesystemCallCount $uintFilesystemCallCount `
+                -RetainedRecordSequences ([uint32[]]@()))
+        }
+        # Round 71 (Codex P2): the delete loops above recorded, per record, whether
+        # the best-effort courtesy write onto the caller's LIVE record threw
+        # (RecordWriteRefused). That flag was set at three sites and never read.
+        # The register is already Disposed here -- the transition above succeeded,
+        # or this line is unreachable -- and the manager's register, plan, and
+        # per-delete filesystem verification have authenticated the disposal: every
+        # owned entry was deleted and its parent re-read to prove it gone. If any
+        # courtesy write was refused, the caller replaced a live record's EntryState
+        # with a throwing member AFTER the plan captured its valid value, so the
+        # ONLY thing the final live-context re-assertion below could fail on is that
+        # same caller-tampered record -- turning a completed, verified disposal into
+        # a false terminal CleanupFailed with EMPTY retained sequences (round 68's
+        # failure mode re-entered from the record side rather than the LifecycleState
+        # side). The delete loops' own contract already says a throw on the courtesy
+        # write must not turn a completed deletion into a failure, so the manager
+        # returns its authenticated terminal disposal directly, skipping the
+        # re-assertion whose only failure here is the caller's own tamper. The
+        # no-refusal path is unchanged: it runs the re-assertion, then reports
+        # Disposed/success exactly as before.
+        $boolCourtesyRecordWriteRefused = $false
+        foreach ($objCourtesyRecord in $objCleanupPlan.Journal) {
+            if ($objCourtesyRecord.RecordWriteRefused -eq $true) {
+                $boolCourtesyRecordWriteRefused = $true
+                break
+            }
+        }
+        if ($boolCourtesyRecordWriteRefused) {
+            return (& $scriptBlockNewCandidateCleanupResult `
+                -InvocationId $objCleanupPlan.InvocationId `
+                -PreviousState $strPreviousState `
+                -FinalState 'Disposed' `
+                -Success $true `
+                -DiagnosticCode 'cleanup-succeeded' `
                 -ReferenceToFilesystemCallCount $uintFilesystemCallCount `
                 -RetainedRecordSequences ([uint32[]]@()))
         }
