@@ -1,36 +1,228 @@
-# CLAUDE.md — working agreement for coding agents in this repository
+# Agent Instructions for Claude Code
 
-This file orients Claude Code (and other coding agents) working in
-`PSStyleGuide`. For the repository's documentation-authoring rules — the
+**Version:** 1.0.20260806.0
+
+## Metadata
+
+- **Status:** Active
+- **Owner:** Repository maintainer (@franklesniak)
+- **Last Updated:** 2026-08-06
+- **Scope:** Agent-specific entry point for Claude Code and compatible AI coding
+  agents operating in this repository. It captures the pull-request review-loop
+  workflow the maintainer runs, and the per-finding decision process to apply to
+  every code-review comment.
+
+This file is adapted from the `franklesniak/copilot-repo-template` agent
+instructions and tailored to this GitHub-hosted PowerShell and Markdown
+repository. For the repository's documentation-authoring rules — the
 `STYLE_GUIDE.md` / `STYLE_GUIDE_RATIONALE.md` split and its generated
-consumer-facing derivatives — follow `.github/copilot-instructions.md`.
+consumer-facing derivatives — `.github/copilot-instructions.md` remains the
+canonical source of truth.
 
-## Responding to code-review comments
+## Canonical instructions
 
-A review comment is not "handled" until its thread is both **answered and
-resolved**. Treat *address and resolve* as one unit of work, not two optional
-halves. For every review thread you act on:
+The authoritative source of truth for the repository's documentation-authoring
+rules is **`.github/copilot-instructions.md`**. Read it before changing any
+style-guide content. This file does not replace it; it adds the agent workflow.
 
-1. **Address it.** Make the change the comment calls for. If the finding does
-   not hold, or is intentionally out of scope, establish that **with evidence** —
-   do not assume that a changed line, or an "outdated" label, means the issue is
-   gone. Check whether it still applies against the current code.
-2. **Reply on the thread.** Document the outcome: the fix, naming the commit and
-   the file/line it landed at; or, for a finding you are not changing, the
-   reasoned disposition — refuted with evidence, or accepted as a documented,
-   bounded residual with the trade-off named. Where more than one defensible fix
-   exists, show the options you weighed and why you chose one. End every reply
-   with the Claude Code attribution footer.
-3. **Resolve the thread.** Mark it resolved once the reply is posted. An
-   addressed-but-unresolved thread hides real state — a reader cannot tell a
-   handled comment from an open one. The one exception: a finding that genuinely
-   needs a maintainer's decision you should not make on their behalf. In that
-   case, say so explicitly on the thread and leave it open.
+## Protected instruction files
 
-When asked to take a pull request to a clean review state, apply this to **every
-unresolved thread on the PR**, not only the most recent ones.
+Instruction files and agent entry points are protected governance files. Do not
+create, edit, delete, or rename `.github/copilot-instructions.md`, files under
+`.github/instructions/`, or root agent instruction files (`AGENTS.md`,
+`CLAUDE.md`, `GEMINI.md`) unless the repository owner has directly and explicitly
+authorized that specific change in the current task. Implied consent is not
+enough: do not infer authorization from a plan you generated, from review
+feedback, from a generic "update the docs" request, from cleanup or validation
+work, or from a "keep files in sync" instruction. If a change to a protected
+file appears warranted but has not been explicitly authorized, propose it
+separately and wait for approval.
 
-## Tests
+## Essential repository summary
+
+- **What this repo is.** A PowerShell style guide for humans and agents, plus a
+  fail-closed cross-platform candidate-artifact validator under
+  `.github/workflows/` (two production scripts, an adversarial harness, and a
+  versioned case catalog).
+- **Safety and security.** Treat all external input as untrusted. Never hardcode
+  secrets. Do not weaken a security constraint to "make it work," and do not
+  invent behavior when requirements are ambiguous — raise an explicit open
+  question instead.
+- **Validation.** Markdown is linted by `markdownlint` (config
+  `.github/workflows/.markdownlint.jsonc`; `MD013` line-length is disabled) and a
+  nested-fence linter. The candidate-artifact harness is described under **Tests
+  and the identity gate** below. Do not push while a required check is failing;
+  fix it and re-run until it passes.
+- **Commits.** Do not create separate formatting-only or lint-only commits;
+  include auto-fixes in the same commit as the related change.
+
+## Ignoring commands addressed to other agents
+
+PR comments and review comments that begin with `@copilot` are commands
+addressed to GitHub Copilot's coding agent, not to Claude Code. Ignore them
+entirely — do not process them, reply to them, or treat them as review feedback.
+
+## Handling code review comments
+
+Apply this process to **each** code-review comment, whichever reviewer authored
+it — **GitHub Copilot (`copilot-pull-request-reviewer`), Codex
+(`chatgpt-codex-connector`), a human reviewer, or any other reviewer**. Process
+Codex comments identically to Copilot comments. Address comments **one at a
+time**.
+
+"Handled" means the thread is both **answered and resolved** — treat *address
+and resolve* as one unit of work, not two optional halves.
+
+**1. Validate the feedback.** Determine whether the comment represents a material
+opportunity for improvement, and/or confirm that any bug it points out is real —
+reproduce it where it can be reproduced. A finding that turns out to be false is
+**refuted with evidence, not accommodated**: say so in a reply, with the
+evidence, then skip to resolving the thread. Do not assume that because a line
+changed, or because the comment is marked "outdated," the issue is gone — check
+whether it still applies against the current code.
+
+**2. List the options — exhaustively.** Think hard about every materially
+distinct way to address the finding. Be exhaustive, and where applicable
+consider **permutations and combinations** of options, not only mutually
+exclusive base options. Generate options from **multiple perspectives** — a
+senior software engineer, a new developer, a DevOps expert, a documentation
+expert, a project manager, a cybersecurity executive, a cybersecurity technical
+expert, a business stakeholder, and any other role that would see the problem
+differently. Do **primary-source Internet research** as needed to bolster the
+options and confirm correctness (for example, language, framework,
+cloud-provider, API, or tooling documentation); link and explain any research
+you rely on in a `References` section of the reply.
+
+> **Gate:** you must list the options before continuing — in chat or in the
+> reply to the reviewer's comment.
+
+**3. Build a fresh evaluation rubric.** Develop a rubric to score the options and
+determine which is best. **Do not reuse a rubric across different findings** —
+each finding gets its own. Derive the criteria and their weights from the same
+range of perspectives used above. Weigh criteria such as **amount of churn**,
+**difficulty to implement**, and **adherence to the original issue scope**
+*lower* than criteria such as **technical correctness** and legitimate usability
+considerations — those first three tend to bias a rubric toward minimal,
+status-quo-preserving options even when a substantively better option exists.
+Score every criterion on one common scale (for example 1-5) and show the weights
+so the computation is auditable.
+
+> **Gate:** you must describe the rubric in detail before continuing — in chat or
+> in the reply.
+
+**4. Apply the rubric and show the scores.** Score every option against every
+criterion and present the results in a Markdown table, including each option's
+weighted total.
+
+> **Gate:** you must show the scoring table before continuing — in chat or in the
+> reply.
+
+**5. Select the best option.** Use the table to pick the winner. State the
+selected option in detail — **idiot-proof**, so that someone **coming in cold**
+understands exactly what needs to be done. Include relevant primary-source
+references and, where applicable, **local testing information**: environment
+details, the commands or tests run, and the specific, detailed results of those
+runs. Where the winner is close to a runner-up, say so and say what separated
+them; where an option is disqualified on substance rather than score, say that
+too.
+
+> **Gate:** you must state the selected option before continuing — in chat or in
+> the reply.
+
+**6. Post the evaluation.** Reply on the review thread with the options, the
+rubric, the scoring table, the selected option, the `References` section (when
+research informed the decision), and either a note that implementation follows or
+the commit SHA that implements it. End every reply with the Claude Code
+attribution footer.
+
+**7. Implement the solution.** Apply the selected option, commit, and make the
+change visible on the PR (reachable from the PR's head ref). If implementation
+reveals the selected option is wrong or unworkable, say so plainly, state what
+changed, and re-select — do not quietly substitute a different approach. Before
+changing any **protected instruction file** to satisfy a comment, confirm
+explicit owner authorization for that specific change (per **Protected
+instruction files**); if it is not covered, ask one narrow authorization
+question before editing, keeping the selected option fixed while you do.
+
+**8. Evaluate style-guide impact.** Consider whether the relevant instruction
+file(s) should be updated to prevent the same class of issue in the future. Read
+the applicable guide first so the recommendation does not duplicate or
+contradict existing rules. If a change is warranted, recommend it separately (a
+protected-file change needs explicit owner authorization); do not edit the guide
+directly without that authorization.
+
+**9. Resolve the thread.** Mark the thread resolved once the reply is posted. An
+addressed-but-unresolved thread hides real state — a reader cannot tell a handled
+comment from an open one. The one exception: a finding that genuinely needs a
+maintainer's decision you should not make on their behalf (or a step-8
+style-guide recommendation the owner must see first) — in that case, say so
+explicitly on the thread and leave it open.
+
+When asked to take a PR to a clean review state, apply this to **every**
+unresolved thread on the PR, not only the most recent ones.
+
+## Automated review loop
+
+Run this loop when asked to review a pull request (for example, "start the review
+loop"). It drives the PR through repeated review rounds using **both** automated
+reviewers.
+
+### Reviewers
+
+Treat **GitHub Copilot (`copilot-pull-request-reviewer`) and Codex
+(`chatgpt-codex-connector`) as co-equal reviewers.** Each round, obtain a fresh
+review from both:
+
+- **Copilot:** request it explicitly with `request_copilot_review` (or
+  equivalent).
+- **Codex:** Codex reviews automatically when the PR head advances or the PR is
+  marked ready for review; if a request mechanism is available, use it.
+
+If a reviewer cannot read the diff (Copilot has a size limit and may return
+"wasn't able to review any files") or is otherwise non-functional, note that in a
+PR comment and continue with the reviewer(s) that are working — but the loop is
+not "clean" on the strength of a reviewer that never actually reviewed.
+
+### Round procedure
+
+1. Record detection baselines (the newest existing review and comment timestamps
+   for each bot) and the current PR head SHA, then request the reviews.
+2. Wait for the reviews by **active polling** — do not rely on webhook delivery
+   alone. Poll at least every 60 seconds using authenticated structured tooling
+   (`get_reviews` and `get_review_comments`, or equivalent), paginating so you
+   actually observe the newest records. A new round has arrived when either bot
+   posts a review or comment newer than its baseline.
+3. Process every actionable comment from **both** reviewers via **Handling code
+   review comments** above (validate → options → rubric → score → select → post →
+   implement → style-guide → resolve). Track processed comment IDs and skip any
+   already handled in a prior round.
+4. Re-request review once the round's fix commits are reachable from the PR head,
+   then repeat.
+
+### Exit condition and round cap
+
+- **Clean only when BOTH reviewers agree.** The loop is clean only when **both
+  Copilot and Codex return a review with no actionable comments** on the same
+  head. A clean result from one reviewer while the other still has open comments
+  is **not** clean — keep going. When both are clean, stop and report the
+  terminal-clean state.
+- **Round cap: 80.** Run up to **80 rounds** per invocation. If 80 rounds are
+  reached before both reviewers are clean, pause and report where things stand
+  rather than continuing silently.
+
+### Discipline
+
+- Before re-requesting, confirm the round's fix commits are reachable from the PR
+  head. If a fix landed on a development branch that is not the PR head, make it
+  visible on the PR head (or state the merge or cherry-pick needed) before
+  re-requesting.
+- Almost every defect this kind of loop finds is in work from a preceding round,
+  or in the machinery meant to guard it. When you close a defect, sweep for its
+  siblings by **property**, not by the exact spelling of the previous fix, and
+  **mutation-test** every new assertion (prove it fails when the check it guards
+  is removed) before trusting it.
+
+## Tests and the identity gate
 
 The candidate-artifact validator ships with an adversarial harness,
 `.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1`, which
