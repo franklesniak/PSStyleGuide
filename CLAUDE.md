@@ -1,6 +1,6 @@
 # Agent Instructions for Claude Code
 
-**Version:** 1.0.20260806.2
+**Version:** 1.0.20260806.3
 
 ## Metadata
 
@@ -245,6 +245,35 @@ a scope that issue #146 fixed — that is a scope change. Raise it explicitly an
 get the owner's decision, exactly as a protected-file or scope change would. Do
 not absorb a required item into a "Known gaps" list on your own authority.
 
+**7. Before a PR is taken clean or merged, sweep for stranded deferrals.** A
+per-finding deferral decision (rules 1-6) only governs the finding in front of
+you at the time. It does not catch work that an earlier round — or a moment when
+an agent was low on context, budget, or turns — pushed into a comment and walked
+away from. That stranded work is exactly what disappears when the PR merges. So
+before you declare a PR terminally clean or merge it, **sweep every review thread
+(resolved or not), every PR-level comment, and the PR body** for deferred-work
+language ("defer," "follow-up," "future," "later," "TODO," "known gap," "left
+open," "being added," "will be added," and the like). Re-evaluate each item you
+find against this section — **whoever deferred it and whenever, including
+deferrals you did not create**:
+
+- If it was deferred for a **worker-fact** — the agent's context, budget, turns,
+  or the size or tedium of the change (rule 2) — it was never a legitimate
+  deferral. **Complete it now, in this PR.**
+- If it is **genuinely deferred** (rule-1-earned, on the merits), it must live in
+  a **GitHub issue** (rule 3) that the PR cites. If no such issue exists, open it
+  and cite it *before* proceeding — a review comment or a "Known gaps" bullet is
+  not a tracker (rule 5).
+- If it is really an **accepted residual** or an **intentional deviation**
+  (rule 4), relabel it in those terms — do not leave "deferred" or "deliberately
+  left open" language asserting pending work that does not exist.
+
+The sweep's guarantee is exact: when the PR is declared clean or merged, **no
+deferred work is left living only in a comment** — every item is either done in
+this PR or tracked in a cited issue. Run this sweep as a distinct pass, not as a
+side effect of processing the latest round's comments; the deferrals most likely
+to be lost are the oldest ones.
+
 ## Automated review loop
 
 Run this loop when asked to review a pull request (for example, "start the review
@@ -297,6 +326,11 @@ not "clean" on the strength of a reviewer that never actually reviewed.
   clean at the current head; a reviewer that genuinely cannot read the diff (per
   **Reviewers**) is recorded non-functional and excepted. When both are clean,
   stop and report the terminal-clean state.
+- **Deferred-work sweep before clean.** Before declaring the loop terminally
+  clean, run the **Deferring work** rule-7 sweep across the whole PR. A PR is not
+  clean while deferred work sits untracked in a comment or a PR-body bullet:
+  complete convenience-deferrals in this PR, and open and cite a GitHub issue for
+  any genuine deferral, before you call the loop clean.
 - **Round cap: 80.** Run up to **80 rounds** per invocation. If 80 rounds are
   reached before both reviewers are clean, pause and report where things stand
   rather than continuing silently.
