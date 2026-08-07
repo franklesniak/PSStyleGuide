@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260806.2
+Version: 1.0.20260807.0
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260806.2'
+$script:versionCandidateHarness = [System.Version]'1.0.20260807.0'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260806.1'
@@ -4132,24 +4132,99 @@ $script:scriptBlockAssertCandidateRecordUnchangedRefused = {
     }
 
     foreach ($hashtableMutation in @(
-            @{ Name = 'SchemaVersion'; Apply = { param ($r) $r.SchemaVersion = [uint32]2 } },
-            @{ Name = 'Sequence'; Apply = { param ($r) $r.Sequence = [uint32]5 } },
-            @{ Name = 'Kind'; Apply = { param ($r) $r.Kind = 'DownloadFile' } },
-            @{ Name = 'ExpectedEntryType'; Apply = { param ($r) $r.ExpectedEntryType = 'File' } },
-            @{ Name = 'CreationPhase'; Apply = { param ($r) $r.CreationPhase = 'destination' } },
-            @{ Name = 'ContentLength'; Apply = { param ($r) $r.ContentLength = [uint64]1 } },
-            @{ Name = 'ContentSha256'; Apply = { param ($r) $r.ContentSha256 = ('0' * 64) } },
-            @{ Name = 'Path'; Apply = { param ($r) $r.Path = 'candidate-root/other' } },
-            @{ Name = 'ParentPath'; Apply = { param ($r) $r.ParentPath = 'evil-root' } },
-            @{ Name = 'LeafName'; Apply = { param ($r) $r.LeafName = 'other' } },
-            @{ Name = 'AddedProperty'; Apply = { param ($r)
-                    $r.PSObject.Properties.Add(
+            @{
+                Name = 'SchemaVersion'
+                Apply = {
+                    param ($RecordToMutate)
+                    $RecordToMutate.SchemaVersion = [uint32]2
+                }
+            },
+            @{
+                Name = 'Sequence'
+                Apply = {
+                    param ($RecordToMutate)
+                    $RecordToMutate.Sequence = [uint32]5
+                }
+            },
+            @{
+                Name = 'Kind'
+                Apply = {
+                    param ($RecordToMutate)
+                    $RecordToMutate.Kind = 'DownloadFile'
+                }
+            },
+            @{
+                Name = 'ExpectedEntryType'
+                Apply = {
+                    param ($RecordToMutate)
+                    $RecordToMutate.ExpectedEntryType = 'File'
+                }
+            },
+            @{
+                Name = 'CreationPhase'
+                Apply = {
+                    param ($RecordToMutate)
+                    $RecordToMutate.CreationPhase = 'destination'
+                }
+            },
+            @{
+                Name = 'ContentLength'
+                Apply = {
+                    param ($RecordToMutate)
+                    $RecordToMutate.ContentLength = [uint64]1
+                }
+            },
+            @{
+                Name = 'ContentSha256'
+                Apply = {
+                    param ($RecordToMutate)
+                    $RecordToMutate.ContentSha256 = '0' * 64
+                }
+            },
+            @{
+                Name = 'Path'
+                Apply = {
+                    param ($RecordToMutate)
+                    $RecordToMutate.Path = 'candidate-root/other'
+                }
+            },
+            @{
+                Name = 'ParentPath'
+                Apply = {
+                    param ($RecordToMutate)
+                    $RecordToMutate.ParentPath = 'evil-root'
+                }
+            },
+            @{
+                Name = 'LeafName'
+                Apply = {
+                    param ($RecordToMutate)
+                    $RecordToMutate.LeafName = 'other'
+                }
+            },
+            @{
+                Name = 'AddedProperty'
+                Apply = {
+                    param ($RecordToMutate)
+                    $RecordToMutate.PSObject.Properties.Add(
                         [System.Management.Automation.PSNoteProperty]::new(
-                            'Injected', [uint32]1)) } },
-            @{ Name = 'RemovedProperty'; Apply = { param ($r)
-                    $r.PSObject.Properties.Remove('ContentSha256') } },
-            @{ Name = 'TypeName'; Apply = { param ($r)
-                    $r.PSObject.TypeNames.Insert(0, 'Evil.Injected.Type') } })) {
+                            'Injected', [uint32]1))
+                }
+            },
+            @{
+                Name = 'RemovedProperty'
+                Apply = {
+                    param ($RecordToMutate)
+                    $RecordToMutate.PSObject.Properties.Remove('ContentSha256')
+                }
+            },
+            @{
+                Name = 'TypeName'
+                Apply = {
+                    param ($RecordToMutate)
+                    $RecordToMutate.PSObject.TypeNames.Insert(0, 'Evil.Injected.Type')
+                }
+            })) {
         $objRecord = & $scriptBlockFreshRecord
         & $hashtableMutation.Apply $objRecord
         $boolRefused = $false
@@ -4213,12 +4288,12 @@ $script:scriptBlockAssertPreexistingRecordReproofRefused = {
             -ContextValue $objReproofContext
         $uintReproofSequence = [uint32]$objReproofJournal.Count
         $scriptBlockReproofSnapshot = {
-            param ($ObjRecord)
+            param ($Record)
             [pscustomobject]@{
-                Sequence   = [uint32]$ObjRecord.Sequence
-                Path       = [string]$ObjRecord.Path
-                ParentPath = [string]$ObjRecord.ParentPath
-                LeafName   = [string]$ObjRecord.LeafName
+                Sequence   = [uint32]$Record.Sequence
+                Path       = [string]$Record.Path
+                ParentPath = [string]$Record.ParentPath
+                LeafName   = [string]$Record.LeafName
             }
         }
         $objCandidateSnapshot = & $scriptBlockReproofSnapshot (@($objReproofJournal |
@@ -4227,27 +4302,34 @@ $script:scriptBlockAssertPreexistingRecordReproofRefused = {
             Where-Object { $_.Kind -eq 'InvocationRootDirectory' })[0])
         $objDownloadSnapshot = & $scriptBlockReproofSnapshot (@($objReproofJournal |
             Where-Object { $_.Kind -eq 'DownloadDirectory' })[0])
-        $strReproofCandidateDir = [string]$objReproofContext.CandidatePath
-        $strReproofRootDir = [string]$objReproofContext.InvocationRootPath
-        $strReproofDownloadDir = [string]$objReproofContext.DownloadDirectoryPath
+        $strReproofCandidateDirectory = [string]$objReproofContext.CandidatePath
+        $strReproofRootDirectory = [string]$objReproofContext.InvocationRootPath
 
         # The pre-create guard sequence expansion runs, on the real scriptblocks
         # and in the real order: the journal-current reference guard, then the
         # candidate re-proof, then the two pre-existing-record re-proofs.
         $scriptBlockReproofGuards = {
-            param ($Ctx, $Journal, $Seq, $CandSnap, $RootSnap, $DlSnap)
+            param (
+                $Context,
+                $Journal,
+                $Sequence,
+                $CandidateSnapshot,
+                $RootSnapshot,
+                $DownloadSnapshot
+            )
             & $script:scriptBlockAssertCandidateHelperJournalCurrent `
-                -ContextValue $Ctx -JournalValue $Journal `
-                -NextSequenceValue $Seq -PhaseValue 'destination'
+                -ContextValue $Context -JournalValue $Journal `
+                -NextSequenceValue $Sequence -PhaseValue 'destination'
             & $script:scriptBlockAssertCandidateHelperRecordUnchanged `
-                -Record $Journal[$CandSnap.Sequence] -Snapshot $CandSnap `
+                -Record $Journal[$CandidateSnapshot.Sequence] `
+                -Snapshot $CandidateSnapshot `
                 -PhaseValue 'destination'
             & $script:scriptBlockAssertCandidateHelperRecordUnchanged `
-                -Record $Journal[$RootSnap.Sequence] -Snapshot $RootSnap `
+                -Record $Journal[$RootSnapshot.Sequence] -Snapshot $RootSnapshot `
                 -ExpectedKind 'InvocationRootDirectory' -ExpectedEntryState 'Created' `
                 -PhaseValue 'destination'
             & $script:scriptBlockAssertCandidateHelperRecordUnchanged `
-                -Record $Journal[$DlSnap.Sequence] -Snapshot $DlSnap `
+                -Record $Journal[$DownloadSnapshot.Sequence] -Snapshot $DownloadSnapshot `
                 -ExpectedKind 'DownloadDirectory' -ExpectedEntryState 'Created' `
                 -PhaseValue 'destination'
         }
@@ -4293,7 +4375,7 @@ $script:scriptBlockAssertPreexistingRecordReproofRefused = {
                 & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                     -Detail ('preexisting-reproof-subreason-' + $strReproofSubreason)
             }
-            if ([System.IO.Directory]::Exists($strReproofCandidateDir)) {
+            if ([System.IO.Directory]::Exists($strReproofCandidateDirectory)) {
                 & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                     -Detail 'preexisting-reproof-created-despite-refusal'
             }
@@ -4302,7 +4384,7 @@ $script:scriptBlockAssertPreexistingRecordReproofRefused = {
             # to. Replay the create, the marking, the post-create context assertion
             # and the real rollback exactly as expansion does, then fail on the leak
             # the manager retains.
-            $null = [System.IO.Directory]::CreateDirectory($strReproofCandidateDir)
+            $null = [System.IO.Directory]::CreateDirectory($strReproofCandidateDirectory)
             $objReproofCandidateLive =
                 $objReproofContext.OwnershipJournal[$objCandidateSnapshot.Sequence]
             $objReproofCandidateLive.CreationPhase = 'destination'
@@ -4311,11 +4393,12 @@ $script:scriptBlockAssertPreexistingRecordReproofRefused = {
                 [void](& $script:scriptBlockAssertCandidateHelperContext `
                     -ContextValue $objReproofContext)
             } catch {
+                Write-Debug ('Expected corrupted-context refusal: {0}' -f $_)
             }
             [void](Remove-StyleGuideCandidateInvocationState -Context $objReproofContext)
             & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                 -Detail ('preexisting-reproof-attack-not-refused-rootleak-' +
-                    [string]([System.IO.Directory]::Exists($strReproofRootDir)))
+                    [string]([System.IO.Directory]::Exists($strReproofRootDirectory)))
         }
     } finally {
         # The context was deliberately corrupted, so its own cleanup is not trusted
@@ -5797,7 +5880,7 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
         DownloadDirectoryPath = [string]$objRecordRefusedContext.DownloadDirectoryPath
         CandidatePath = [string]$objRecordRefusedContext.CandidatePath
     }
-    $strRecordRefusedRootDir = [string]$objRecordRefusedContext.InvocationRootPath
+    $strRecordRefusedRootDirectory = [string]$objRecordRefusedContext.InvocationRootPath
     # Target: the seq-0 ROOT record, deleted last, so its courtesy write is the last
     # in the whole cleanup. Trigger: the highest-sequence file, deleted first.
     $objRecordRefusedTarget = $objRecordRefusedContext.OwnershipJournal[0]
@@ -5848,7 +5931,7 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
         $objRecordRefusedRunspace.Dispose()
     }
     $boolRecordRefusedTreeGone =
-        (-not [System.IO.Directory]::Exists($strRecordRefusedRootDir))
+        (-not [System.IO.Directory]::Exists($strRecordRefusedRootDirectory))
     # Does the register hold a terminal Disposed for this context? Asked through the
     # issuance gate on the captured paths, so the swapped record field is not read.
     $boolRecordRefusedRegisterDisposed = [bool](
@@ -6353,8 +6436,10 @@ $script:scriptBlockAssertProductionTaxonomyClosed = {
                     }
                     continue
                 }
-                if ($objValueNode -is
-                    [System.Management.Automation.Language.TernaryExpressionAst]) {
+                # TernaryExpressionAst exists only in PowerShell 7, but this
+                # harness must remain loadable in Windows PowerShell 5.1.
+                if ($objValueNode.GetType().FullName -ceq
+                    'System.Management.Automation.Language.TernaryExpressionAst') {
                     $queueValueNode.Enqueue($objValueNode.IfTrue)
                     $queueValueNode.Enqueue($objValueNode.IfFalse)
                     continue
@@ -10353,7 +10438,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260806.2
+    # Version: 1.0.20260807.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
