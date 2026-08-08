@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260808.1
+Version: 1.0.20260808.2
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,10 +53,10 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260808.1'
+$script:versionCandidateHarness = [System.Version]'1.0.20260808.2'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260808.0'
+$script:strCandidateExpectedHelperVersion = '1.0.20260808.1'
 $script:strCandidateExpectedContextVersion = '1.0.20260808.0'
 $script:strCandidateCatalogVersion = '1.0.20260805.1'
 # The documented ceiling on what an authenticated native query may return, the
@@ -2699,14 +2699,7 @@ $script:hashtableCandidateHelperMemberReceiver = @{
     'Copy' = @{ Static = [string[]]@('System.Array'); Instance = $false }
     'Create' = @{ Static = [string[]]@('System.Security.Cryptography.SHA256'); Instance = $false }
     'CreateDirectory' = @{ Static = [string[]]@('System.IO.Directory'); Instance = $false }
-    # Round 73: the deep-capture rollback helper (scriptBlockRemoveCandidate-
-    # HelperCapturedTree) removes the owned tree directly from the immutable
-    # capture rather than through the manager, so Expand now makes the same
-    # static, non-recursive [System.IO.Directory]::Delete calls the context
-    # manager already makes. Static only, Instance = $false, so the round-52
-    # protection (a permitted NAME must not admit $objDirectoryInfo.Delete($true))
-    # is unchanged.
-    'Delete' = @{ Static = [string[]]@('System.IO.Directory', 'System.IO.File'); Instance = $false }
+    'Delete' = @{ Static = [string[]]@('System.IO.File'); Instance = $false }
     'Dispose' = @{ Static = [string[]]@(); Instance = $true }
     'EnumerateFileSystemEntries' = @{ Static = [string[]]@('System.IO.Directory'); Instance = $false }
     'Equals' = @{ Static = [string[]]@('System.String'); Instance = $false }
@@ -6109,10 +6102,31 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
     # calls must then grow all three by ZERO. Reverting either deregister call reddens
     # this on the leak: growth returns to one-per-failed-call.
     #
-    # chattr +i is the immutability lever (root on ext4) that provokes the
-    # post-registration failure; where it is unavailable or ineffective the failure
-    # cannot be triggered, so the probe records that and returns rather than asserting
-    # a leak it never provoked -- a missing lever is not a production regression.
+    # The fix is called from BOTH New-failure branches, and the two are distinct:
+    #   * the NO-ROLLBACK branch (Manage ~2302-2303), taken when the invocation-root
+    #     create itself fails so $boolRootCreated is still false and nothing was
+    #     rolled back; and
+    #   * the POST-ROLLBACK branch (Manage ~2272-2280), taken when the root (and
+    #     download) were created, the failure came later, and the manager runs its
+    #     filesystem rollback FIRST and then deregisters.
+    # A single lever exercises only one branch (Codex round 74: chattr +i on the
+    # parent fails the root create, so it drives the no-rollback branch only, and
+    # reverting just the post-rollback deregister would leave this probe green). So
+    # this probe drives BOTH, with a separate growth-zero assertion for each, and is
+    # mutation-proven per branch: reverting the no-rollback deregister reddens the
+    # chattr batch, reverting the post-rollback deregister reddens the forced batch.
+    #
+    #   * No-rollback lever: chattr +i on the trusted parent (root on ext4) makes the
+    #     invocation-root create throw before it is made. Where chattr is unavailable
+    #     or ineffective the failure cannot be provoked, so that batch records the
+    #     miss and is not asserted -- a missing lever is not a production regression.
+    #   * Post-rollback lever: a throw injected into the instrumented copy at the end
+    #     of a SUCCESSFUL build -- after the root and download dirs exist and the
+    #     context is registered, immediately before New returns -- gated by a global
+    #     the probe sets only for that batch. Deterministic and needs no chattr, so
+    #     the post-rollback branch is always exercised; the forced failures must also
+    #     leave the parent empty, proving the manager's rollback ran before it
+    #     deregistered.
     $intFailingCallCount = 3
     $strLeakProbeRoot = [System.IO.Path]::Combine($RunRoot, 'round73-register-leak')
     [void][System.IO.Directory]::CreateDirectory($strLeakProbeRoot)
@@ -6133,6 +6147,10 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
             ThrewCount             = [int]0
             ReturnedAnyContext     = $false
             FailureGrowth          = @([int]-1, [int]-1, [int]-1)
+            PostRootThrewCount     = [int]0
+            PostRootReturnedAny    = $false
+            PostRootGrowth         = @([int]-1, [int]-1, [int]-1)
+            PostRootTreeRetained   = $false
             Error                  = ''
         }
         $strImmutableParent = [System.IO.Path]::Combine($strProbeRoot, 'immutable')
@@ -6148,9 +6166,25 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
                 '$global:objRound73RegisterSnapshot = $arrCandidateIssuedSnapshot' + [System.Environment]::NewLine +
                 '$global:objRound73RegisterState = $arrCandidateIssuedState'
             $strManageText = $strManageText.Replace($strAnchor, $strInstrumented)
+            # The post-rollback failure lever: a throw at the end of a successful
+            # build, gated by a global set only for the post-rollback batch. The
+            # anchor is New-context's final in-memory assertion, immediately before
+            # it returns -- root and download created, context registered -- so the
+            # throw takes the manager's $boolRootCreated (rollback-then-deregister)
+            # branch. Must match exactly once.
+            $strForceAnchor = '[void](& $scriptBlockAssertCandidateInMemoryContext -Context $objContext)'
+            if (([regex]::Matches($strManageText, [regex]::Escape($strForceAnchor))).Count -ne 1) {
+                $objOutcome.Error = 'force-anchor-count'
+                return $objOutcome
+            }
+            $strForceInjected =
+                'if ($global:objRound73ForcePostRootFailure) { throw ''round73-forced-post-root-failure'' }' +
+                [System.Environment]::NewLine + '            ' + $strForceAnchor
+            $strManageText = $strManageText.Replace($strForceAnchor, $strForceInjected)
             $strInstrumentedPath = [System.IO.Path]::Combine($strProbeRoot, 'Manage-instrumented.ps1')
             [System.IO.File]::WriteAllText($strInstrumentedPath, $strManageText)
             . $strInstrumentedPath
+            $global:objRound73ForcePostRootFailure = $false
 
             $scriptBlockRegisterCounts = {
                 @([int]$global:objRound73RegisterContext.Count,
@@ -6176,9 +6210,9 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
                 $null = $_
             }
 
-            # Failure: an immutable trusted parent makes the post-registration
-            # invocation-root create throw. Confirm the immutability actually took
-            # before trusting the failing-call growth to mean anything.
+            # No-rollback branch: an immutable trusted parent makes the
+            # post-registration invocation-root create throw before the root is made.
+            # Confirm the immutability actually took before trusting the growth.
             [void][System.IO.Directory]::CreateDirectory($strImmutableParent)
             $null = & chattr +i $strImmutableParent 2>&1
             try {
@@ -6212,6 +6246,38 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
                     ($arrFailAfter[1] - $arrFailBefore[1]),
                     ($arrFailAfter[2] - $arrFailBefore[2]))
             }
+
+            # Post-rollback branch: force a failure AFTER root and download exist and
+            # the context is registered, so the manager rolls the tree back and THEN
+            # deregisters. Deterministic (no chattr), so this branch is always
+            # exercised. Growth must be zero and, because every forced failure ran the
+            # rollback, the parent must hold no leftover invocation root.
+            $strPostRootParent = [System.IO.Path]::Combine($strProbeRoot, 'postroot')
+            [void][System.IO.Directory]::CreateDirectory($strPostRootParent)
+            $global:objRound73ForcePostRootFailure = $true
+            $arrPostBefore = & $scriptBlockRegisterCounts
+            try {
+                for ($intCall = 0; $intCall -lt $intFailingCallCount; $intCall++) {
+                    $objPostContext = $null
+                    try {
+                        $objPostContext = New-StyleGuideCandidateInvocationContext `
+                            -TrustedTemporaryRoot $strPostRootParent `
+                            -DiagnosticLabel ('round73-register-postroot-' + [string]$intCall)
+                    } catch {
+                        $objOutcome.PostRootThrewCount = [int]($objOutcome.PostRootThrewCount + 1)
+                    }
+                    if ($null -ne $objPostContext) { $objOutcome.PostRootReturnedAny = $true }
+                }
+            } finally {
+                $global:objRound73ForcePostRootFailure = $false
+            }
+            $arrPostAfter = & $scriptBlockRegisterCounts
+            $objOutcome.PostRootGrowth = @(
+                ($arrPostAfter[0] - $arrPostBefore[0]),
+                ($arrPostAfter[1] - $arrPostBefore[1]),
+                ($arrPostAfter[2] - $arrPostBefore[2]))
+            $objOutcome.PostRootTreeRetained =
+                ((@([System.IO.Directory]::GetFileSystemEntries($strPostRootParent))).Count -ne 0)
         } catch {
             $objOutcome.Error = [string]$_.Exception.Message
             try { $null = & chattr -i $strImmutableParent 2>&1 } catch { $null = $_ }
@@ -6248,8 +6314,26 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
         & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
             -Detail ('round73-register-leak-control-' + ($arrControlGrowth -join '-'))
     }
+    # Post-rollback branch, asserted unconditionally: the forced failure needs no
+    # chattr, so this batch always ran. Every forced call must have thrown, returned
+    # no context, rolled its tree back (empty parent), and left the registers
+    # unchanged. Reverting the post-rollback deregister reddens the growth check here.
+    if ($objLeakOutcome.PostRootThrewCount -ne $intFailingCallCount -or $objLeakOutcome.PostRootReturnedAny) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+            -Detail ('round73-register-leak-postroot-precondition-t' +
+                [string]$objLeakOutcome.PostRootThrewCount + '-r' + [string]$objLeakOutcome.PostRootReturnedAny)
+    }
+    if ($objLeakOutcome.PostRootTreeRetained) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+            -Detail 'round73-register-leak-postroot-tree-retained'
+    }
+    $arrPostRootGrowth = [int[]]@($objLeakOutcome.PostRootGrowth)
+    if ($arrPostRootGrowth[0] -ne 0 -or $arrPostRootGrowth[1] -ne 0 -or $arrPostRootGrowth[2] -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+            -Detail ('round73-register-leak-postroot-' + ($arrPostRootGrowth -join '-'))
+    }
     # A missing or ineffective immutability lever is not a production regression; the
-    # failing-call growth was never provoked, so there is nothing to assert.
+    # no-rollback-branch growth was never provoked, so there is nothing to assert.
     if (-not $objLeakOutcome.ImmutableEffective) {
         return
     }
@@ -6262,128 +6346,6 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
     if ($arrFailureGrowth[0] -ne 0 -or $arrFailureGrowth[1] -ne 0 -or $arrFailureGrowth[2] -ne 0) {
         & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
             -Detail ('round73-register-leak-' + ($arrFailureGrowth -join '-'))
-    }
-}
-
-$script:scriptBlockAssertRound73DeepCaptureRollbackNoLeak = {
-    param (
-        [Parameter(Mandatory = $true)]
-        [string]$RunRoot
-    )
-
-    # Round 73 (Codex P2): a same-session writer that corrupted a PRE-EXISTING journal
-    # record in place -- the seq-0 root or seq-1 download record's EntryState, Path, or
-    # Kind -- AFTER the expansion authenticated the context made the expansion's own
-    # rollback, Remove-StyleGuideCandidateInvocationState, re-validate the corrupted
-    # LIVE context, throw cleanup-context-invalid with zero filesystem calls, and LEAK
-    # the 0700 root+download(+candidate/files) tree for the life of the machine. The
-    # round-71 pre-create re-proof could not close it: the mutation is in place and is
-    # seen whenever rollback validates, not only before a create.
-    #
-    # The fix builds an IMMUTABLE, entry-authenticated, progress-tracked deep capture
-    # (string copies of the trusted-parent/root/download/candidate paths, created
-    # flags, and the download/candidate file paths), extends it as each entry is
-    # created, and hands it to rollback via a new optional -DeepCapture parameter. On
-    # live-context authentication failure the tree is removed from THAT capture --
-    # never re-read from the corrupted caller -- by scriptBlockRemoveCandidateHelper-
-    # CapturedTree: fail-closed, non-recursive, each delete proven gone.
-    #
-    # The catalog cannot express a same-session in-place mutation, so the leak is
-    # replayed here on the real rollback. Each case builds a realistic mid-download
-    # state on disk (root + download created, one download file journaled and present,
-    # candidate not yet created), the exact deep capture the expansion would have
-    # handed rollback, applies ONE in-place mutation to a pre-existing live record, and
-    # drives the REAL Remove-StyleGuideCandidateInvocationState with the capture. Clean
-    # production disposes the tree from the capture and reports Disposed / Success /
-    # cleanup-succeeded with the tree GONE. A positive control with no mutation must
-    # dispose too, which gives the mutated cases teeth: a rollback that always threw
-    # would fail the control. Reverting the DeepCapture branch reddens every mutated
-    # case on the leak it restores -- cleanup-context-invalid, zero filesystem calls,
-    # tree retained.
-    $strDeepCaptureRoot = [System.IO.Path]::Combine($RunRoot, 'round73-deepcapture')
-    [void][System.IO.Directory]::CreateDirectory($strDeepCaptureRoot)
-    try {
-        foreach ($strDeepCaptureCase in @(
-                'control', 'root-entrystate', 'download-path', 'root-kind'
-            )) {
-            $strCaseRoot = [System.IO.Path]::Combine(
-                $strDeepCaptureRoot, [System.IO.Path]::GetRandomFileName())
-            [void][System.IO.Directory]::CreateDirectory($strCaseRoot)
-            $objDeepContext = New-StyleGuideCandidateInvocationContext `
-                -TrustedTemporaryRoot $strCaseRoot -DiagnosticLabel 'round73-deepcapture'
-            $strDeepRoot = [string]$objDeepContext.InvocationRootPath
-            $strDeepDownload = [string]$objDeepContext.DownloadDirectoryPath
-            # Authenticate exactly as the expansion does, then journal one download
-            # file that is genuinely on disk -- the mid-download state.
-            $objDeepJournal = & $script:scriptBlockAssertCandidateHelperContext `
-                -ContextValue $objDeepContext
-            $uintDeepSequence = [uint32]$objDeepJournal.Count
-            $strDeepArchive = [System.IO.Path]::Combine($strDeepDownload, 'candidate.zip')
-            $arrDeepBytes = [System.Text.Encoding]::ASCII.GetBytes(
-                'round73 deep-capture rollback fixture bytes')
-            [System.IO.File]::WriteAllBytes($strDeepArchive, $arrDeepBytes)
-            $objDeepRecord = & $script:scriptBlockNewCandidateHelperRecord `
-                -Sequence $uintDeepSequence -Kind 'DownloadFile' -Path $strDeepArchive `
-                -ParentPath $strDeepDownload -LeafName 'candidate.zip' -CreationPhase 'download' `
-                -ContentLength ([uint64]$arrDeepBytes.Length) `
-                -ContentSha256 (& $script:scriptBlockGetByteArraySha256 -Bytes $arrDeepBytes)
-            $objDeepJournal = & $script:scriptBlockAddCandidateHelperRecord `
-                -ContextValue $objDeepContext -Record $objDeepRecord `
-                -JournalValue $objDeepJournal -NextSequenceValue $uintDeepSequence `
-                -PhaseValue 'download'
-            # The immutable deep capture the expansion hands to rollback, in the exact
-            # shape the expansion builds it (Expand's objDeepCapture).
-            $objDeepCapture = [pscustomobject]@{
-                InvocationId = [System.Guid]$objDeepContext.InvocationId
-                TrustedParentPath = [string]$objDeepContext.TrustedParentPath
-                InvocationRootPath = $strDeepRoot
-                DownloadDirectoryPath = $strDeepDownload
-                CandidatePath = [string]$objDeepContext.CandidatePath
-                RootCreated = $true
-                DownloadCreated = $true
-                CandidateCreated = $false
-                DownloadFilePaths = [System.Collections.Generic.List[string]]@($strDeepArchive)
-                CandidateFilePaths = New-Object 'System.Collections.Generic.List[string]'
-            }
-            # The in-place mutation on a pre-existing live record (or nothing, for the
-            # control), applied after the capture is built -- exactly the same-session
-            # corruption the fix defends against. Each makes the rollback's live-context
-            # authentication throw.
-            switch ($strDeepCaptureCase) {
-                'control' { $null = $objDeepContext }
-                'root-entrystate' { $objDeepContext.OwnershipJournal[0].EntryState = 'Deleted' }
-                'download-path' {
-                    $objDeepContext.OwnershipJournal[1].Path =
-                        [System.IO.Path]::Combine($strDeepRoot, 'repointed-elsewhere')
-                }
-                'root-kind' { $objDeepContext.OwnershipJournal[0].Kind = 'Bogus' }
-            }
-            $objDeepResult = Remove-StyleGuideCandidateInvocationState `
-                -Context $objDeepContext -DeepCapture $objDeepCapture
-            $boolDeepTreeGone =
-                (-not [System.IO.Directory]::Exists($strDeepRoot)) -and
-                (-not [System.IO.Directory]::Exists($strDeepDownload)) -and
-                (-not [System.IO.File]::Exists($strDeepArchive))
-            if (($null -eq $objDeepResult) -or
-                (([string]$objDeepResult.FinalState) -cne 'Disposed') -or
-                (-not [bool]$objDeepResult.Success) -or
-                (([string]$objDeepResult.DiagnosticCode) -cne 'cleanup-succeeded') -or
-                (-not $boolDeepTreeGone)) {
-                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-                    -Detail ('round73-deepcapture-leak-' + $strDeepCaptureCase +
-                        '-' + $(if ($null -eq $objDeepResult) {
-                            'no-result'
-                        } else {
-                            [string]$objDeepResult.FinalState +
-                                '-s' + [string]$objDeepResult.Success +
-                                '-tg' + [string]$boolDeepTreeGone
-                        }))
-            }
-        }
-    } finally {
-        if ([System.IO.Directory]::Exists($strDeepCaptureRoot)) {
-            [System.IO.Directory]::Delete($strDeepCaptureRoot, $true)
-        }
     }
 }
 
@@ -6480,73 +6442,95 @@ $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow = {
 
     try {
         # ---- Case (a): refused write + unrelated InvocationId=Empty must REFUSE ----
-        $strMainParent = [System.IO.Path]::Combine($strToleranceRoot, 'refused-plus-unrelated')
-        [void][System.IO.Directory]::CreateDirectory($strMainParent)
-        $objMainContext = & $scriptBlockBuildToleranceContext -TrustedParent $strMainParent
-        $strMainRootDirectory = [string]$objMainContext.InvocationRootPath
-        $objMainTargetRecord = $objMainContext.OwnershipJournal[0]
-        $strMainTrigger = [string]$objMainContext.OwnershipJournal[6].Path
-        $hashtableMainSignal = [hashtable]::Synchronized(@{ Running = $false })
-        $objMainRunspace = [runspacefactory]::CreateRunspace()
-        $objMainRunspace.Open()
-        $objMainRunspace.SessionStateProxy.SetVariable('objTarget', $objMainTargetRecord)
-        $objMainRunspace.SessionStateProxy.SetVariable('objContext', $objMainContext)
-        $objMainRunspace.SessionStateProxy.SetVariable('strTrigger', $strMainTrigger)
-        $objMainRunspace.SessionStateProxy.SetVariable('hashtableSignal', $hashtableMainSignal)
-        $objMainShell = [powershell]::Create()
-        $objMainShell.Runspace = $objMainRunspace
-        [void]$objMainShell.AddScript({
-            $objWatch = [System.Diagnostics.Stopwatch]::StartNew()
-            $hashtableSignal.Running = $true
-            while ($objWatch.ElapsedMilliseconds -lt 5000) {
-                if (-not [System.IO.File]::Exists($strTrigger)) {
-                    # (1) refuse the seq-0 root record's courtesy write by making its
-                    # EntryState setter throw, and (2) an UNRELATED mutation: zero the
-                    # context InvocationId. Both land together, on the first deletion,
-                    # long before the end-of-cleanup re-assertion reads them.
-                    Add-Member -InputObject $objTarget -MemberType ScriptProperty `
-                        -Name EntryState -Force `
-                        -Value { 'Created' } `
-                        -SecondValue { throw 'entrystate-refused-by-same-session-holder' }
-                    $objContext.InvocationId = [System.Guid]::Empty
-                    return
+        # The rig races cleanup: both mutations land on the FIRST file deletion, long
+        # before the end-of-cleanup re-assertion, so on every observed run they are
+        # present when production re-asserts. A lost race (runner load, a future
+        # cleanup-order change) would leave the mutation un-landed -- and a probe that
+        # simply SKIPPED the assertion there could let a reverted production fix pass
+        # unnoticed (Codex round 74). So the rig is RETRIED until the mutation lands,
+        # the distinguishing assertion runs on the attempt that lands, and if none of
+        # the bounded attempts lands the probe FAILS LOUD rather than skipping: a
+        # mutation test that can silently not-run is not a mutation test.
+        $intToleranceMaxAttempt = 8
+        $boolMainMutationLanded = $false
+        for ($intMainAttempt = 0;
+            $intMainAttempt -lt $intToleranceMaxAttempt -and -not $boolMainMutationLanded;
+            $intMainAttempt++) {
+            $strMainParent = [System.IO.Path]::Combine(
+                $strToleranceRoot, 'refused-plus-unrelated-' + [string]$intMainAttempt)
+            [void][System.IO.Directory]::CreateDirectory($strMainParent)
+            $objMainContext = & $scriptBlockBuildToleranceContext -TrustedParent $strMainParent
+            $objMainTargetRecord = $objMainContext.OwnershipJournal[0]
+            $strMainTrigger = [string]$objMainContext.OwnershipJournal[6].Path
+            $hashtableMainSignal = [hashtable]::Synchronized(@{ Running = $false })
+            $objMainRunspace = [runspacefactory]::CreateRunspace()
+            $objMainRunspace.Open()
+            $objMainRunspace.SessionStateProxy.SetVariable('objTarget', $objMainTargetRecord)
+            $objMainRunspace.SessionStateProxy.SetVariable('objContext', $objMainContext)
+            $objMainRunspace.SessionStateProxy.SetVariable('strTrigger', $strMainTrigger)
+            $objMainRunspace.SessionStateProxy.SetVariable('hashtableSignal', $hashtableMainSignal)
+            $objMainShell = [powershell]::Create()
+            $objMainShell.Runspace = $objMainRunspace
+            [void]$objMainShell.AddScript({
+                $objWatch = [System.Diagnostics.Stopwatch]::StartNew()
+                $hashtableSignal.Running = $true
+                while ($objWatch.ElapsedMilliseconds -lt 5000) {
+                    if (-not [System.IO.File]::Exists($strTrigger)) {
+                        # (1) refuse the seq-0 root record's courtesy write by making its
+                        # EntryState setter throw, and (2) an UNRELATED mutation: zero the
+                        # context InvocationId. Both land together, on the first deletion,
+                        # long before the end-of-cleanup re-assertion reads them.
+                        Add-Member -InputObject $objTarget -MemberType ScriptProperty `
+                            -Name EntryState -Force `
+                            -Value { 'Created' } `
+                            -SecondValue { throw 'entrystate-refused-by-same-session-holder' }
+                        $objContext.InvocationId = [System.Guid]::Empty
+                        return
+                    }
+                }
+            })
+            $objMainResult = $null
+            try {
+                $objMainHandle = $objMainShell.BeginInvoke()
+                $objMainStart = [System.Diagnostics.Stopwatch]::StartNew()
+                while (-not $hashtableMainSignal.Running -and
+                    $objMainStart.ElapsedMilliseconds -lt 5000) {
+                }
+                $objMainResult = Remove-StyleGuideCandidateInvocationContext -Context $objMainContext
+                [void]$objMainShell.EndInvoke($objMainHandle)
+            } finally {
+                $objMainShell.Dispose()
+                $objMainRunspace.Close()
+                $objMainRunspace.Dispose()
+            }
+            $boolMainRigActive = $false
+            try { $objMainTargetRecord.EntryState = 'probe' } catch { $boolMainRigActive = $true }
+            $boolMainMutationLanded = $boolMainRigActive -and
+                ($objMainContext.InvocationId -eq [System.Guid]::Empty)
+            # The regression is a bless of a context the holder really did alter, so the
+            # assertion runs only on an attempt where BOTH mutations are present at the
+            # re-assertion. Clean production refuses (cleanup-context-altered); the
+            # round-71 skip-everything blesses, which reddens here.
+            if ($boolMainMutationLanded) {
+                if (($null -eq $objMainResult) -or
+                    ([bool]$objMainResult.Success) -or
+                    (([string]$objMainResult.DiagnosticCode) -cne 'cleanup-context-altered')) {
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                        -Detail ('round73-tolerance-main-' + $(if ($null -eq $objMainResult) {
+                            'no-result'
+                        } else {
+                            's' + [string]$objMainResult.Success +
+                                '-' + [string]$objMainResult.DiagnosticCode
+                        }))
                 }
             }
-        })
-        $objMainResult = $null
-        try {
-            $objMainHandle = $objMainShell.BeginInvoke()
-            $objMainStart = [System.Diagnostics.Stopwatch]::StartNew()
-            while (-not $hashtableMainSignal.Running -and
-                $objMainStart.ElapsedMilliseconds -lt 5000) {
-            }
-            $objMainResult = Remove-StyleGuideCandidateInvocationContext -Context $objMainContext
-            [void]$objMainShell.EndInvoke($objMainHandle)
-        } finally {
-            $objMainShell.Dispose()
-            $objMainRunspace.Close()
-            $objMainRunspace.Dispose()
         }
-        $boolMainRigActive = $false
-        try { $objMainTargetRecord.EntryState = 'probe' } catch { $boolMainRigActive = $true }
-        $boolMainMutationLanded = $boolMainRigActive -and
-            ($objMainContext.InvocationId -eq [System.Guid]::Empty)
-        # Gated on the mutation actually landing: only a bless of a context the holder
-        # really did alter is the regression. On every observed run the two mutations
-        # land together on the first deletion and are present at the re-assertion, so
-        # clean production refuses; the round-71 skip blesses.
-        if ($boolMainMutationLanded) {
-            if (($null -eq $objMainResult) -or
-                ([bool]$objMainResult.Success) -or
-                (([string]$objMainResult.DiagnosticCode) -cne 'cleanup-context-altered')) {
-                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-                    -Detail ('round73-tolerance-main-' + $(if ($null -eq $objMainResult) {
-                        'no-result'
-                    } else {
-                        's' + [string]$objMainResult.Success +
-                            '-' + [string]$objMainResult.DiagnosticCode
-                    }))
-            }
+        # Fail loud rather than skip: if no bounded attempt landed the mutation, the
+        # distinguishing assertion never ran, so the probe cannot vouch for the fix.
+        if (-not $boolMainMutationLanded) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('round73-tolerance-main-mutation-never-landed-' +
+                    [string]$intToleranceMaxAttempt)
         }
 
         # ---- Case (b): refused write ONLY still reports Disposed / success ----
@@ -11000,7 +10984,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260808.1
+    # Version: 1.0.20260808.2
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
@@ -11273,7 +11257,6 @@ function Invoke-StyleGuideCandidateHarness {
             -HelperLiteralPath $strHelperLiteralPath
         & $script:scriptBlockAssertRound73RegisterLeakDeregistered -RunRoot $strRunRoot `
             -ContextLiteralPath $strContextLiteralPath
-        & $script:scriptBlockAssertRound73DeepCaptureRollbackNoLeak -RunRoot $strRunRoot
         & $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow -RunRoot $strRunRoot
         & $script:scriptBlockAssertResourceGuardsReached `
             -LiteralPath $strHelperLiteralPath `
