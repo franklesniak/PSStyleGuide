@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260807.0
+Version: 1.0.20260808.0
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260807.0'
+$script:versionCandidateHarness = [System.Version]'1.0.20260808.0'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260806.1'
-$script:strCandidateExpectedContextVersion = '1.0.20260806.1'
+$script:strCandidateExpectedHelperVersion = '1.0.20260808.0'
+$script:strCandidateExpectedContextVersion = '1.0.20260808.0'
 $script:strCandidateCatalogVersion = '1.0.20260805.1'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
@@ -2699,7 +2699,14 @@ $script:hashtableCandidateHelperMemberReceiver = @{
     'Copy' = @{ Static = [string[]]@('System.Array'); Instance = $false }
     'Create' = @{ Static = [string[]]@('System.Security.Cryptography.SHA256'); Instance = $false }
     'CreateDirectory' = @{ Static = [string[]]@('System.IO.Directory'); Instance = $false }
-    'Delete' = @{ Static = [string[]]@('System.IO.File'); Instance = $false }
+    # Round 73: the deep-capture rollback helper (scriptBlockRemoveCandidate-
+    # HelperCapturedTree) removes the owned tree directly from the immutable
+    # capture rather than through the manager, so Expand now makes the same
+    # static, non-recursive [System.IO.Directory]::Delete calls the context
+    # manager already makes. Static only, Instance = $false, so the round-52
+    # protection (a permitted NAME must not admit $objDirectoryInfo.Delete($true))
+    # is unchanged.
+    'Delete' = @{ Static = [string[]]@('System.IO.Directory', 'System.IO.File'); Instance = $false }
     'Dispose' = @{ Static = [string[]]@(); Instance = $true }
     'EnumerateFileSystemEntries' = @{ Static = [string[]]@('System.IO.Directory'); Instance = $false }
     'Equals' = @{ Static = [string[]]@('System.String'); Instance = $false }
@@ -2785,6 +2792,10 @@ $script:hashtableCandidateContextMemberReceiver = @{
     'NewGuid' = @{ Static = [string[]]@('System.Guid'); Instance = $false }
     'Read' = @{ Static = [string[]]@(); Instance = $true }
     'ReferenceEquals' = @{ Static = [string[]]@('System.Object'); Instance = $false }
+    # Round 73: scriptBlockDeregisterCandidateContext removes a never-returned
+    # context from the three private issuance ArrayLists on creation failure.
+    # Instance only, like Add, on lists this manager owns.
+    'RemoveAt' = @{ Static = [string[]]@(); Instance = $true }
     'SetAccessRuleProtection' = @{ Static = [string[]]@(); Instance = $true }
     'Split' = @{ Static = [string[]]@(); Instance = $true }
     'Substring' = @{ Static = [string[]]@(); Instance = $true }
@@ -2820,7 +2831,8 @@ $script:arrCandidateContextPermittedMember = [string[]]@(
     'GetInvalidFileNameChars', 'GetNewClosure', 'GetRandomFileName',
     'GetResolvedProviderPathFromPSPath', 'GetType', 'IndexOf', 'IndexOfAny',
     'Insert', 'IsControl', 'IsLetter', 'IsNullOrWhiteSpace', 'IsPathRooted',
-    'MoveNext', 'NewGuid', 'Read', 'ReferenceEquals', 'SetAccessRuleProtection',
+    'MoveNext', 'NewGuid', 'Read', 'ReferenceEquals', 'RemoveAt',
+    'SetAccessRuleProtection',
     'Split',
     'Substring', 'ToArray', 'ToCharArray', 'ToInt32', 'ToLowerInvariant',
     'ToObject', 'ToString', 'TransformBlock', 'TransformFinalBlock', 'TrimEnd'
@@ -10438,7 +10450,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260807.0
+    # Version: 1.0.20260808.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()

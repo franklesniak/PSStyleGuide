@@ -27,14 +27,14 @@ a caller that deletes first and validates afterwards has already
 deleted, so it needs a way to ask about issuance that changes nothing.
 
 .NOTES
-Version: 1.0.20260806.1
+Version: 1.0.20260808.0
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260806.1'
+$versionCandidateContext = [System.Version]'1.0.20260808.0'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -841,22 +841,97 @@ $scriptBlockCandidateContextIssuedIndex = {
     return -1
 }
 
+$scriptBlockDeregisterCandidateContext = {
+    param (
+        [AllowNull()]
+        [object]$Context
+    )
+
+    # A context is appended to the three parallel registers the instant it is
+    # built, before New has created a single directory, so no caller can ever
+    # hold one this manager does not know it issued. That append has no partner:
+    # the registers expose only Add. The creation-failure path was therefore
+    # leaking, one strong reference into EACH register per failed New call --
+    # New registers, creation throws, the catch runs filesystem rollback and
+    # marks the entry Disposed, then throws WITHOUT returning the context. The
+    # entry stays on the register forever, describing a context the caller never
+    # received and can never pass back to be disposed of. Reported by Codex P2;
+    # reproduced by 5 failing New calls growing each register by 5.
+    #
+    # The remedy is symmetric with the append: a context that New never returns
+    # leaves no register entry, exactly as a returned one keeps its entry until
+    # a genuine Remove disposes it. The three lists are parallel -- the same
+    # index names a context, its issuance snapshot, and its lifecycle state --
+    # so the reference index is resolved ONCE and the same index is removed from
+    # all three together, which keeps them parallel. Reference identity is the
+    # comparer (through the leaf helper above), so a structural clone is not a
+    # member and cannot deregister a genuine entry. A context that is not on the
+    # register (index below zero) is a no-op: there is nothing to withdraw.
+    $intIndex = & $scriptBlockCandidateContextIssuedIndex -Context $Context
+    if ($intIndex -ge 0) {
+        $arrCandidateIssuedContext.RemoveAt($intIndex)
+        $arrCandidateIssuedSnapshot.RemoveAt($intIndex)
+        $arrCandidateIssuedState.RemoveAt($intIndex)
+    }
+}
+
 $scriptBlockAssertCandidateExactPropertySchema = {
     param (
         [Parameter(Mandatory = $true)]
         [object]$Value,
 
         [Parameter(Mandatory = $true)]
-        [string[]]$ExpectedNames
+        [string[]]$ExpectedNames,
+
+        # A property whose NOTE-ness is not required, though its name and position
+        # still are. The cleanup re-assertion for a refused courtesy write
+        # tolerates the ONE record whose EntryState the caller replaced with a
+        # throwing member after the plan was captured -- the manager already knows
+        # that record's true state is Deleted -- while still refusing every OTHER
+        # schema departure, a second property turned non-note included. Empty (the
+        # default) keeps every other caller's exact-note check unchanged.
+        [string[]]$NoteExemptName = @()
     )
 
     $arrProperties = @($Value.PSObject.Properties)
     if ($arrProperties.Count -ne $ExpectedNames.Count) {
         throw 'cleanup-context-invalid'
     }
-    for ($intIndex = 0; $intIndex -lt $ExpectedNames.Count; $intIndex++) {
-        if ($arrProperties[$intIndex].Name -cne $ExpectedNames[$intIndex] -or
-            $arrProperties[$intIndex].MemberType -ne [System.Management.Automation.PSMemberTypes]::NoteProperty) {
+    if (@($NoteExemptName).Count -eq 0) {
+        # Strict: exact order AND note-ness. The default for every caller but the
+        # refused-write cleanup re-assertion.
+        for ($intIndex = 0; $intIndex -lt $ExpectedNames.Count; $intIndex++) {
+            if ($arrProperties[$intIndex].Name -cne $ExpectedNames[$intIndex] -or
+                $arrProperties[$intIndex].MemberType -ne [System.Management.Automation.PSMemberTypes]::NoteProperty) {
+                throw 'cleanup-context-invalid'
+            }
+        }
+        return
+    }
+    # Tolerant: replacing a note property with a throwing member is done on
+    # PowerShell with Add-Member -Force, which not only changes the member type
+    # but MOVES the member to the end -- reordering the property set. So the
+    # exempt name is validated neither for order nor for note-ness, and order is
+    # not enforced for the rest either: every downstream read here is by NAME,
+    # never by position, so a reorder of note properties changes no value the
+    # checks below act on. What is still enforced is exactly the set -- each
+    # expected name present exactly once (case-sensitive), the count above
+    # bounding extras -- and note-ness for every name that is NOT exempt, so a
+    # SECOND property turned non-note, a missing name, or a duplicate is refused.
+    foreach ($strExpectedName in $ExpectedNames) {
+        $intFound = 0
+        $objMatchedMemberType = $null
+        foreach ($objProperty in $arrProperties) {
+            if (([string]$objProperty.Name) -ceq $strExpectedName) {
+                $intFound++
+                $objMatchedMemberType = $objProperty.MemberType
+            }
+        }
+        if ($intFound -ne 1) {
+            throw 'cleanup-context-invalid'
+        }
+        if ($strExpectedName -cnotin $NoteExemptName -and
+            $objMatchedMemberType -ne [System.Management.Automation.PSMemberTypes]::NoteProperty) {
             throw 'cleanup-context-invalid'
         }
     }
@@ -957,7 +1032,20 @@ $scriptBlockAssertCandidateCanonicalStoredPath = {
 $scriptBlockAssertCandidateInMemoryContext = {
     param (
         [AllowNull()]
-        [object]$Context
+        [object]$Context,
+
+        # Sequences of the records whose LIVE EntryState this re-assertion must
+        # neither read nor require to be a note property, because the caller
+        # replaced that member with a throwing one after the plan captured the
+        # record's real state. The manager passes these ONLY from the cleanup
+        # success path, where every listed record was deleted and its plan state
+        # is Deleted; for a listed record the captured EntryState is that known
+        # Deleted rather than a read of the hostile member. EVERYTHING else --
+        # every other field of that record, every other record, and every context
+        # field -- is validated against the live object exactly as always, so an
+        # unrelated mutation (a zeroed InvocationId, another record's Kind, Path,
+        # or state) is still caught. Empty (the default) is full strictness.
+        [uint32[]]$ToleratedRefusedDeletedSequence = @()
     )
 
     if ($null -eq $Context -or
@@ -1101,6 +1189,15 @@ $scriptBlockAssertCandidateInMemoryContext = {
             $objLiveRecord.PSObject.TypeNames[0] -cne $strCandidateRecordTypeName) {
             throw 'cleanup-context-invalid'
         }
+        # A tolerated record is one whose courtesy EntryState write the caller
+        # rigged to throw AFTER the plan was captured; matched by sequence, which
+        # this loop proves equal to the index just below, so the position and the
+        # plan's record agree. For it, and only it, EntryState may be a non-note
+        # member and is not read -- the substituted value below is the plan's
+        # known Deleted. Every other field is read and validated as always.
+        $boolToleratedRecord =
+            [uint32[]]$ToleratedRefusedDeletedSequence -contains [uint32]$intIndex
+        $arrRecordNoteExempt = if ($boolToleratedRecord) { @('EntryState') } else { @() }
         # Shape first, on the live record, for the reason given at the context
         # capture above: this is what establishes that a second read cannot
         # answer differently by design, leaving only the concurrent writer.
@@ -1116,9 +1213,12 @@ $scriptBlockAssertCandidateInMemoryContext = {
             'EntryState',
             'ContentLength',
             'ContentSha256'
-        ))
+        ) -NoteExemptName $arrRecordNoteExempt)
         # Then one read of each field into values this manager owns. Record is
-        # kept so cleanup can WRITE EntryState back; nothing reads through it.
+        # kept so cleanup can WRITE EntryState back; nothing reads through it. A
+        # tolerated record's EntryState is the plan's known Deleted, taken WITHOUT
+        # reading the live member the caller rigged to throw; every other field,
+        # tolerated record or not, is one read of the live property.
         $objRecord = [pscustomobject]@{
             SchemaVersion = $objLiveRecord.SchemaVersion
             Sequence = $objLiveRecord.Sequence
@@ -1128,7 +1228,7 @@ $scriptBlockAssertCandidateInMemoryContext = {
             LeafName = $objLiveRecord.LeafName
             ExpectedEntryType = $objLiveRecord.ExpectedEntryType
             CreationPhase = $objLiveRecord.CreationPhase
-            EntryState = $objLiveRecord.EntryState
+            EntryState = if ($boolToleratedRecord) { 'Deleted' } else { $objLiveRecord.EntryState }
             ContentLength = $objLiveRecord.ContentLength
             ContentSha256 = $objLiveRecord.ContentSha256
             Record = $objLiveRecord
@@ -1785,7 +1885,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260806.1
+    # Version: 1.0.20260808.0
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2170,6 +2270,14 @@ function New-StyleGuideCandidateInvocationContext {
             # assignment still resolves the value, because the lookup falls
             # through to this script's scope at call time.
             $objCleanupResult = & $scriptBlockRemoveContextFunction -Context $objContext
+            # Withdrawn from the registers now that filesystem rollback has run.
+            # The order matters: the rollback above is the manager's own Remove,
+            # which authenticates issuance, so the context has to still be on the
+            # register while it runs -- deregistering first would make cleanup
+            # refuse the very context it was handed. Withdrawn only after, so a
+            # context New never returns leaves no register entry, and the register
+            # growth this failure path used to leak is gone.
+            & $scriptBlockDeregisterCandidateContext -Context $objContext
             $strRecordSequences = (@($objContext.OwnershipJournal | ForEach-Object {
                 [string]$_.Sequence
             })) -join ','
@@ -2182,6 +2290,17 @@ function New-StyleGuideCandidateInvocationContext {
             throw (& $scriptBlockNewCandidateException `
                 -Code 'context-create-composite-failure' `
                 -Message $strMessage)
+        }
+        # No filesystem rollback is owed here (the root was never created, or the
+        # context was never built), but a context that WAS built was already
+        # appended to the registers at construction. If one exists it is withdrawn
+        # before this throw, for the same reason as the cleanup branch above: New
+        # is not returning it, so it must leave no register entry. Guarded on the
+        # context existing -- a failure before construction has nothing to
+        # withdraw, and the withdrawal is a no-op for an unregistered object
+        # anyway.
+        if ($null -ne $objContext) {
+            & $scriptBlockDeregisterCandidateContext -Context $objContext
         }
         throw (& $scriptBlockNewCandidateException `
             -Code $strCreationCategory `
@@ -2252,7 +2371,7 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260806.1
+    # Version: 1.0.20260808.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param (
@@ -2364,7 +2483,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260806.1
+    # Version: 1.0.20260808.0
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2693,33 +2812,57 @@ function Remove-StyleGuideCandidateInvocationContext {
                 -ReferenceToFilesystemCallCount $uintFilesystemCallCount `
                 -RetainedRecordSequences ([uint32[]]@()))
         }
-        # Round 71 (Codex P2): the delete loops above recorded, per record, whether
-        # the best-effort courtesy write onto the caller's LIVE record threw
-        # (RecordWriteRefused). That flag was set at three sites and never read.
-        # The register is already Disposed here -- the transition above succeeded,
-        # or this line is unreachable -- and the manager's register, plan, and
-        # per-delete filesystem verification have authenticated the disposal: every
-        # owned entry was deleted and its parent re-read to prove it gone. If any
-        # courtesy write was refused, the caller replaced a live record's EntryState
-        # with a throwing member AFTER the plan captured its valid value, so the
-        # ONLY thing the final live-context re-assertion below could fail on is that
-        # same caller-tampered record -- turning a completed, verified disposal into
-        # a false terminal CleanupFailed with EMPTY retained sequences (round 68's
-        # failure mode re-entered from the record side rather than the LifecycleState
-        # side). The delete loops' own contract already says a throw on the courtesy
-        # write must not turn a completed deletion into a failure, so the manager
-        # returns its authenticated terminal disposal directly, skipping the
-        # re-assertion whose only failure here is the caller's own tamper. The
-        # no-refusal path is unchanged: it runs the re-assertion, then reports
-        # Disposed/success exactly as before.
-        $boolCourtesyRecordWriteRefused = $false
+        # Round 71 recorded, per record, whether the best-effort courtesy write
+        # onto the caller's LIVE record threw (RecordWriteRefused). The register is
+        # already Disposed here, and the register, plan, and per-delete filesystem
+        # verification have authenticated the disposal: every owned entry was
+        # deleted and its parent re-read to prove it gone.
+        #
+        # Round 71 then SKIPPED the final live-context re-assertion whenever any
+        # courtesy write was refused, reasoning that the only thing it could fail
+        # on was that same caller-tampered record. Codex P2 refuted that: a caller
+        # that rigs one record's EntryState AND, in the same window, zeroes the
+        # InvocationId (or corrupts any other field of any other record) had the
+        # malformed context BLESSED with Disposed/success, because the skip bypassed
+        # every check, not only the one on the refused record.
+        #
+        # So the re-assertion RUNS, tolerating ONLY the refused records' live
+        # EntryState -- their true state is Deleted, known from the plan -- and
+        # validating every other field, record, and context invariant against the
+        # live object. The pure refused-EntryState case still passes and reports
+        # Disposed/success. An unrelated mutation makes it throw; that is reported
+        # as an altered context, NOT blessed, and NOT routed into the catch below
+        # (which would mint round 68's false terminal CleanupFailed with empty
+        # retained sequences over a tree that is already gone). The no-refusal path
+        # is unchanged: full-strictness re-assertion, then Disposed/success.
+        $listCourtesyRefusedSequence = New-Object 'System.Collections.Generic.List[uint32]'
         foreach ($objCourtesyRecord in $objCleanupPlan.Journal) {
             if ($objCourtesyRecord.RecordWriteRefused -eq $true) {
-                $boolCourtesyRecordWriteRefused = $true
-                break
+                $listCourtesyRefusedSequence.Add([uint32]$objCourtesyRecord.Sequence)
             }
         }
-        if ($boolCourtesyRecordWriteRefused) {
+        if ($listCourtesyRefusedSequence.Count -ne 0) {
+            $boolToleratedReassertionPassed = $true
+            try {
+                [void](& $scriptBlockAssertCandidateInMemoryContext -Context $Context `
+                    -ToleratedRefusedDeletedSequence ([uint32[]]$listCourtesyRefusedSequence.ToArray()))
+            } catch {
+                $boolToleratedReassertionPassed = $false
+            }
+            if (-not $boolToleratedReassertionPassed) {
+                # The disposal happened (tree gone, register Disposed), but the live
+                # context carries a mutation beyond the tolerated refused EntryState.
+                # Report it as altered rather than bless it -- and rather than a
+                # terminal CleanupFailed, which would falsely claim retention.
+                return (& $scriptBlockNewCandidateCleanupResult `
+                    -InvocationId $guidInvocationId `
+                    -PreviousState $strPreviousState `
+                    -FinalState 'Disposed' `
+                    -Success $false `
+                    -DiagnosticCode 'cleanup-context-altered' `
+                    -ReferenceToFilesystemCallCount $uintFilesystemCallCount `
+                    -RetainedRecordSequences ([uint32[]]@()))
+            }
             return (& $scriptBlockNewCandidateCleanupResult `
                 -InvocationId $objCleanupPlan.InvocationId `
                 -PreviousState $strPreviousState `
@@ -2830,6 +2973,12 @@ function Remove-StyleGuideCandidateInvocationContext {
 # all of them.
 $scriptBlockCandidateContextIssuedIndex = `
     $scriptBlockCandidateContextIssuedIndex.GetNewClosure()
+# Deregistration consumes all three registers and calls index, so it is closed
+# after index (whose closure it must capture) and before the New function that
+# calls it -- and before the register names are removed below, or its RemoveAt
+# calls would resolve nothing.
+$scriptBlockDeregisterCandidateContext = `
+    $scriptBlockDeregisterCandidateContext.GetNewClosure()
 $scriptBlockSetCandidateIssuedState = `
     $scriptBlockSetCandidateIssuedState.GetNewClosure()
 $scriptBlockAssertCandidateInMemoryContext = `

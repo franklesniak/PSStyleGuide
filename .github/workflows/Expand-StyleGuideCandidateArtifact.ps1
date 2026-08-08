@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260806.1
+Version: 1.0.20260808.0
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260806.1'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260806.1'
+$script:versionCandidateHelper = [System.Version]'1.0.20260808.0'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260808.0'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -2375,6 +2375,104 @@ $script:scriptBlockAssertCandidateHelperOrdinaryFileMetadata = {
     }
 }
 
+$script:scriptBlockRemoveCandidateHelperCapturedTree = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [object]$Capture
+    )
+
+    # Removes the owned tree from an IMMUTABLE, entry-authenticated, progress-
+    # tracked capture the expansion built at authentication and extended as it
+    # created each entry: string copies of the trusted-parent, root, download, and
+    # candidate paths, flags for which directories exist, and the download- and
+    # candidate-file paths. Nothing here reads the caller's live context, so a
+    # record a same-session writer corrupted after authentication cannot redirect
+    # or block this removal, and no manager is consulted -- this deletes what the
+    # capture names, itself. That is the whole point: the live journal is exactly
+    # what the corruption is in, and the rebound-manager / swapped-journal defence
+    # the failure catch already carries is preserved because the capture's strings
+    # were copied and authenticated at entry and are never re-read from the caller.
+    #
+    # Fail-closed by construction. Files are deleted by name (File.Delete no-ops on
+    # an already-absent path) and each is proven gone. Directories are proven
+    # ordinary and link-free, then deleted NON-recursively -- so a directory
+    # holding anything the capture does not name throws rather than being blown
+    # away, and the throw becomes a retained, no-success result. Children before
+    # parents, so each parent still exists to enumerate the child's absence.
+    $uintCalls = [uint32]0
+    $strTrustedParent = [string]$Capture.TrustedParentPath
+    $strRoot = [string]$Capture.InvocationRootPath
+    $strDownload = [string]$Capture.DownloadDirectoryPath
+    $strCandidate = [string]$Capture.CandidatePath
+    try {
+        foreach ($strCandidateFile in @($Capture.CandidateFilePaths)) {
+            $uintCalls = [uint32]($uintCalls + 1)
+            [System.IO.File]::Delete([string]$strCandidateFile)
+            [void](& $script:scriptBlockAssertCandidateHelperEntryAbsent `
+                -ParentPath $strCandidate -ExpectedPath ([string]$strCandidateFile) `
+                -Phase 'cleanup' -Code 'cleanup-delete-failed')
+        }
+        if ($Capture.CandidateCreated) {
+            [void](& $script:scriptBlockAssertCandidateHelperDirectoryEnvelope `
+                -LiteralPath $strCandidate -Phase 'cleanup' `
+                -ReferenceToFilesystemCallCount ([ref]$uintCalls))
+            $uintCalls = [uint32]($uintCalls + 1)
+            [System.IO.Directory]::Delete($strCandidate, $false)
+            [void](& $script:scriptBlockAssertCandidateHelperEntryAbsent `
+                -ParentPath $strRoot -ExpectedPath $strCandidate `
+                -Phase 'cleanup' -Code 'cleanup-delete-failed')
+        }
+        foreach ($strDownloadFile in @($Capture.DownloadFilePaths)) {
+            $uintCalls = [uint32]($uintCalls + 1)
+            [System.IO.File]::Delete([string]$strDownloadFile)
+            [void](& $script:scriptBlockAssertCandidateHelperEntryAbsent `
+                -ParentPath $strDownload -ExpectedPath ([string]$strDownloadFile) `
+                -Phase 'cleanup' -Code 'cleanup-delete-failed')
+        }
+        if ($Capture.DownloadCreated) {
+            [void](& $script:scriptBlockAssertCandidateHelperDirectoryEnvelope `
+                -LiteralPath $strDownload -Phase 'cleanup' `
+                -ReferenceToFilesystemCallCount ([ref]$uintCalls))
+            $uintCalls = [uint32]($uintCalls + 1)
+            [System.IO.Directory]::Delete($strDownload, $false)
+            [void](& $script:scriptBlockAssertCandidateHelperEntryAbsent `
+                -ParentPath $strRoot -ExpectedPath $strDownload `
+                -Phase 'cleanup' -Code 'cleanup-delete-failed')
+        }
+        if ($Capture.RootCreated) {
+            [void](& $script:scriptBlockAssertCandidateHelperDirectoryEnvelope `
+                -LiteralPath $strRoot -Phase 'cleanup' `
+                -ReferenceToFilesystemCallCount ([ref]$uintCalls))
+            $uintCalls = [uint32]($uintCalls + 1)
+            [System.IO.Directory]::Delete($strRoot, $false)
+            [void](& $script:scriptBlockAssertCandidateHelperEntryAbsent `
+                -ParentPath $strTrustedParent -ExpectedPath $strRoot `
+                -Phase 'cleanup' -Code 'cleanup-delete-failed')
+        }
+    } catch {
+        # Fail-closed: an unexpected child made a non-recursive delete throw, or a
+        # delete did not take. The tree is partially retained rather than force-
+        # removed, and reported as a no-success uncertain cleanup.
+        return (& $script:scriptBlockNewCandidateHelperCleanupResult `
+            -InvocationId ([System.Guid]$Capture.InvocationId) `
+            -PreviousState 'Active' `
+            -FinalState 'Active' `
+            -Success $false `
+            -DiagnosticCode 'cleanup-owned-entry-uncertain' `
+            -ReferenceToFilesystemCallCount $uintCalls `
+            -RetainedRecordSequences ([uint32[]]@()))
+    }
+    # The whole captured tree is gone: the root and everything beneath it.
+    return (& $script:scriptBlockNewCandidateHelperCleanupResult `
+        -InvocationId ([System.Guid]$Capture.InvocationId) `
+        -PreviousState 'Active' `
+        -FinalState 'Disposed' `
+        -Success $true `
+        -DiagnosticCode 'cleanup-succeeded' `
+        -ReferenceToFilesystemCallCount $uintCalls `
+        -RetainedRecordSequences ([uint32[]]@()))
+}
+
 function Remove-StyleGuideCandidateInvocationState {
     # .SYNOPSIS
     # Removes candidate and caller-owned invocation state in trusted order.
@@ -2416,7 +2514,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260806.1
+    # Version: 1.0.20260808.0
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2429,7 +2527,17 @@ function Remove-StyleGuideCandidateInvocationState {
         [AllowNull()]
         [AllowEmptyString()]
         [AllowEmptyCollection()]
-        [object]$Context
+        [object]$Context,
+
+        # The expansion's entry-authenticated, immutable, progress-tracked capture
+        # of exactly what it created. Supplied by the primary path so that when the
+        # live context fails authentication -- a same-session writer corrupted a
+        # pre-existing record in place after authentication -- the tree can still be
+        # removed from the capture rather than leaked. Omitted by any caller that
+        # built no capture, in which case the invalid-context result is unchanged.
+        [Parameter()]
+        [AllowNull()]
+        [object]$DeepCapture = $null
     )
 
     Set-StrictMode -Version Latest
@@ -2477,6 +2585,24 @@ function Remove-StyleGuideCandidateInvocationState {
             CandidatePath = [string]$Context.CandidatePath
         }
     } catch {
+        # The live context failed authentication. A same-session writer corrupted a
+        # pre-existing record (the root or download EntryState, Path, or Kind) in
+        # place after the expansion authenticated it, so this rollback sees the
+        # corruption the instant it validates -- moving the re-proof earlier cannot
+        # help, because the mutation is already present at entry. Round 71 guarded
+        # the pre-create window and this leak survived it: the corrupted context
+        # reaches rollback, the assertion above throws, and the 0700
+        # root+download(+candidate/files) tree is retained with zero filesystem
+        # calls. Reproduced end-to-end (Codex P2).
+        #
+        # With the expansion's deep capture the tree is removed from THAT -- the
+        # immutable, entry-authenticated, progress-tracked record of exactly what
+        # was created -- instead of from the corrupted live journal, which is where
+        # the corruption lives. Without a capture the original bounded
+        # invalid-context result stands unchanged.
+        if ($null -ne $DeepCapture) {
+            return (& $script:scriptBlockRemoveCandidateHelperCapturedTree -Capture $DeepCapture)
+        }
         return (& $script:scriptBlockNewCandidateHelperCleanupResult `
             -InvocationId $guidInvocationId `
             -PreviousState $strPreviousState `
@@ -3210,6 +3336,10 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
     $objZipArchive = $null
     $objPrimaryError = $null
     $objValidatedContext = $null
+    # The deep capture handed to rollback so a corrupted live context cannot make
+    # the tree leak. Built once below from the authenticated strings, extended as
+    # each entry is created, and never re-read from the caller's object.
+    $objDeepCapture = $null
     $strPhase = 'parameter'
 
     try {
@@ -3477,6 +3607,28 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
                 -ExpectedState $strAuthenticatedState)) {
             & $script:scriptBlockStopCandidateHelperOperation `
                 -Code 'parameter' -Phase 'parameter' -Subreason 'context-unissued'
+        }
+
+        # The deep capture, built here from values authenticated above and never
+        # from a later live read. The four paths are the immutable strings already
+        # captured and issuance-checked; the InvocationId comes from the same
+        # authenticated set. The invocation root and download directory were created
+        # by the context manager before this expansion began, so they are already
+        # marked created; the candidate directory and every file are marked as this
+        # expansion creates and journals them, so the capture always names exactly
+        # what is on disk. Rollback removes the tree from THIS when the live context
+        # can no longer be trusted, and the strings here cannot be repointed.
+        $objDeepCapture = [pscustomobject]@{
+            InvocationId = [System.Guid]$objAuthenticatedValues.InvocationId
+            TrustedParentPath = [string]$strAuthenticatedTrustedParent
+            InvocationRootPath = [string]$strAuthenticatedRoot
+            DownloadDirectoryPath = [string]$strAuthenticatedDownload
+            CandidatePath = [string]$strAuthenticatedCandidate
+            RootCreated = $true
+            DownloadCreated = $true
+            CandidateCreated = $false
+            DownloadFilePaths = New-Object 'System.Collections.Generic.List[string]'
+            CandidateFilePaths = New-Object 'System.Collections.Generic.List[string]'
         }
 
         $strCheckoutPath = & $script:scriptBlockConvertToCandidateHelperNormalizedPath `
@@ -3766,6 +3918,9 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         # the caller could have moved in between.
         $uintAuthenticatedSequence = [uint32]($uintAuthenticatedSequence + 1)
         [void](& $script:scriptBlockAssertCandidateHelperContext -ContextValue $Context)
+        # The download file is now journaled and owned, so the deep capture records
+        # it too. $strArchivePath is a local string, not a live-context read.
+        $objDeepCapture.DownloadFilePaths.Add([string]$strArchivePath)
 
         if (-not [System.String]::Equals(
             $strActualDigest,
@@ -4010,6 +4165,10 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
         $null = [System.IO.Directory]::CreateDirectory($strCandidatePath)
         $objCandidateDirectoryRecord.CreationPhase = 'destination'
         $objCandidateDirectoryRecord.EntryState = 'Created'
+        # Ownership of the candidate directory is claimed on the call that may have
+        # created it, so the deep capture marks it created here too -- before the
+        # checks below can reject it -- exactly as the journal record above is.
+        $objDeepCapture.CandidateCreated = $true
         [void](& $script:scriptBlockAssertCandidateHelperDirectoryEnvelope `
             -LiteralPath $strCandidatePath `
             -Phase 'destination')
@@ -4161,6 +4320,11 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
                 # second record is numbered from the first rather than from a field
                 # the caller could have moved in between.
                 $uintAuthenticatedSequence = [uint32]($uintAuthenticatedSequence + 1)
+                # The candidate file exists (CreateNew above) and is now journaled,
+                # so the deep capture records it too. $strDestinationPath is a local
+                # string built from the authenticated candidate path and a manifest
+                # name, not a live-context read.
+                $objDeepCapture.CandidateFilePaths.Add([string]$strDestinationPath)
                 & $scriptBlockAssertCandidateStillSame
 
                 $objEntryStream = $objEntry.Open()
@@ -4306,7 +4470,8 @@ $script:scriptBlockInvokeCandidateArtifactExpansion = {
 
         $objCleanupResult = $null
         if ($strPrimaryPhase -cne 'parameter' -and $null -ne $objValidatedContext) {
-            $objCleanupResult = Remove-StyleGuideCandidateInvocationState -Context $objValidatedContext
+            $objCleanupResult = Remove-StyleGuideCandidateInvocationState `
+                -Context $objValidatedContext -DeepCapture $objDeepCapture
         }
         $strCleanupCode = if ($null -eq $objCleanupResult) {
             'not-required'
