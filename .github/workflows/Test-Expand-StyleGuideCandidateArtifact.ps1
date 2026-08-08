@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260808.2
+Version: 1.0.20260808.3
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260808.2'
+$script:versionCandidateHarness = [System.Version]'1.0.20260808.3'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260808.1'
@@ -6442,19 +6442,24 @@ $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow = {
 
     try {
         # ---- Case (a): refused write + unrelated InvocationId=Empty must REFUSE ----
-        # The rig races cleanup: both mutations land on the FIRST file deletion, long
-        # before the end-of-cleanup re-assertion, so on every observed run they are
-        # present when production re-asserts. A lost race (runner load, a future
-        # cleanup-order change) would leave the mutation un-landed -- and a probe that
-        # simply SKIPPED the assertion there could let a reverted production fix pass
-        # unnoticed (Codex round 74). So the rig is RETRIED until the mutation lands,
-        # the distinguishing assertion runs on the attempt that lands, and if none of
-        # the bounded attempts lands the probe FAILS LOUD rather than skipping: a
-        # mutation test that can silently not-run is not a mutation test.
+        # The rig applies the seq-0 setter and the InvocationId=Empty mutation from a
+        # second runspace on the first file deletion -- the wide window before the
+        # end-of-cleanup re-assertion. The rig CANNOT be applied before the call: an
+        # up-front ScriptProperty on EntryState is rejected by the initial
+        # authentication (cleanup-context-invalid) before any courtesy write, so it must
+        # land mid-cleanup. But the PASS condition is production's OWN verdict, not a
+        # post-hoc guess about that race (Codex round 75): only cleanup-context-altered
+        # (Success=$false) counts, and it is reachable only when the unrelated mutation
+        # was present as the re-assertion ran, so it PROVES the mutation preceded the
+        # assertion. Every other outcome is inconclusive for the attempt and RETRIED,
+        # never a failure -- a mutation that landed after the re-assertion (a clean
+        # cleanup-succeeded, round 75) or never landed (round 74). The bounded loop
+        # fails loud only if NO attempt is ever refused-as-altered, which is exactly
+        # what a reverted fix produces.
         $intToleranceMaxAttempt = 8
-        $boolMainMutationLanded = $false
+        $boolMainRefusedAsAltered = $false
         for ($intMainAttempt = 0;
-            $intMainAttempt -lt $intToleranceMaxAttempt -and -not $boolMainMutationLanded;
+            $intMainAttempt -lt $intToleranceMaxAttempt -and -not $boolMainRefusedAsAltered;
             $intMainAttempt++) {
             $strMainParent = [System.IO.Path]::Combine(
                 $strToleranceRoot, 'refused-plus-unrelated-' + [string]$intMainAttempt)
@@ -6503,33 +6508,27 @@ $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow = {
                 $objMainRunspace.Close()
                 $objMainRunspace.Dispose()
             }
-            $boolMainRigActive = $false
-            try { $objMainTargetRecord.EntryState = 'probe' } catch { $boolMainRigActive = $true }
-            $boolMainMutationLanded = $boolMainRigActive -and
-                ($objMainContext.InvocationId -eq [System.Guid]::Empty)
-            # The regression is a bless of a context the holder really did alter, so the
-            # assertion runs only on an attempt where BOTH mutations are present at the
-            # re-assertion. Clean production refuses (cleanup-context-altered); the
-            # round-71 skip-everything blesses, which reddens here.
-            if ($boolMainMutationLanded) {
-                if (($null -eq $objMainResult) -or
-                    ([bool]$objMainResult.Success) -or
-                    (([string]$objMainResult.DiagnosticCode) -cne 'cleanup-context-altered')) {
-                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-                        -Detail ('round73-tolerance-main-' + $(if ($null -eq $objMainResult) {
-                            'no-result'
-                        } else {
-                            's' + [string]$objMainResult.Success +
-                                '-' + [string]$objMainResult.DiagnosticCode
-                        }))
-                }
+            # Production's verdict is the proof of ordering: cleanup-context-altered
+            # (Success=$false) is reachable only when the unrelated mutation was present
+            # as the final re-assertion ran. Anything else -- a clean cleanup-succeeded
+            # (the mutation landed after the re-assertion, or never landed), or a null --
+            # is inconclusive for this attempt and retried, so a lost or late race is
+            # never a false failure, and nothing is inferred from the caller's object
+            # state after the call.
+            if (($null -ne $objMainResult) -and
+                (-not [bool]$objMainResult.Success) -and
+                (([string]$objMainResult.DiagnosticCode) -ceq 'cleanup-context-altered')) {
+                $boolMainRefusedAsAltered = $true
             }
         }
-        # Fail loud rather than skip: if no bounded attempt landed the mutation, the
-        # distinguishing assertion never ran, so the probe cannot vouch for the fix.
-        if (-not $boolMainMutationLanded) {
+        # Fail loud rather than skip: the round-71 skip-everything blesses the altered
+        # context, so it NEVER returns cleanup-context-altered -- no bounded attempt
+        # passes and the probe reddens. (A runner so loaded that the wide first-deletion
+        # -to-re-assertion window is lost on every attempt also reddens, not silently
+        # passes.)
+        if (-not $boolMainRefusedAsAltered) {
             & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-                -Detail ('round73-tolerance-main-mutation-never-landed-' +
+                -Detail ('round73-tolerance-main-never-refused-as-altered-' +
                     [string]$intToleranceMaxAttempt)
         }
 
@@ -10984,7 +10983,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260808.2
+    # Version: 1.0.20260808.3
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
