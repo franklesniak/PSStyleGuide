@@ -1,12 +1,12 @@
 # Agent Instructions for Claude Code
 
-**Version:** 1.0.20260806.3
+**Version:** 1.0.20260809.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository maintainer (@franklesniak)
-- **Last Updated:** 2026-08-06
+- **Last Updated:** 2026-08-09
 - **Scope:** Agent-specific entry point for Claude Code and compatible AI coding
   agents operating in this repository. It captures the pull-request review-loop
   workflow the maintainer runs, the per-finding decision process to apply to
@@ -130,8 +130,9 @@ weighted total.
 
 **5. Select the best option.** Use the table to pick the winner. State the
 selected option in detail — **idiot-proof**, so that someone **coming in cold**
-understands exactly what needs to be done. Include relevant primary-source
-references and, where applicable, **local testing information**: environment
+understands exactly what needs to be done. Ensure that when you state the
+selected option in detail, your response follows `ASD-STE100`. Include relevant
+primary-source references and, where applicable, **local testing information**: environment
 details, the commands or tests run, and the specific, detailed results of those
 runs. Where the winner is close to a runner-up, say so and say what separated
 them; where an option is disqualified on substance rather than score, say that
