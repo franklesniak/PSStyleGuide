@@ -27,14 +27,14 @@ a caller that deletes first and validates afterwards has already
 deleted, so it needs a way to ask about issuance that changes nothing.
 
 .NOTES
-Version: 1.0.20260808.0
+Version: 1.0.20260810.0
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260808.0'
+$versionCandidateContext = [System.Version]'1.0.20260810.0'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -1893,7 +1893,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260808.0
+    # Version: 1.0.20260810.0
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2384,7 +2384,7 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260808.0
+    # Version: 1.0.20260810.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param (
@@ -2496,7 +2496,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260808.0
+    # Version: 1.0.20260810.0
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
