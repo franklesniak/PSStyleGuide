@@ -897,7 +897,15 @@ $scriptBlockAssertCandidateExactPropertySchema = {
     if ($arrProperties.Count -ne $ExpectedNames.Count) {
         throw 'cleanup-context-invalid'
     }
-    if (@($NoteExemptName).Count -eq 0) {
+    # Windows PowerShell 5.1 under StrictMode throws PropertyNotFoundStrict when a
+    # count is read from an empty array-subexpression wrapping a variable;
+    # PowerShell 7 tolerates it. -not decides emptiness with no member access, so
+    # it is safe on every edition, and a null or empty list takes the fail-closed
+    # strict branch. The three other array-subexpression counts in the two scripts
+    # wrap PIPELINES, not variables, and are exercised empty on 5.1 (the
+    # download-already-journaled guard runs empty on every normal expansion), so
+    # they are not affected.
+    if (-not $NoteExemptName) {
         # Strict: exact order AND note-ness. The default for every caller but the
         # refused-write cleanup re-assertion.
         for ($intIndex = 0; $intIndex -lt $ExpectedNames.Count; $intIndex++) {
