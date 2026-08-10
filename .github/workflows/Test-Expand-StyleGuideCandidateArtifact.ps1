@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260810.1
+Version: 1.0.20260810.2
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260810.1'
+$script:versionCandidateHarness = [System.Version]'1.0.20260810.2'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260810.0'
@@ -6154,7 +6154,13 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
             Error                  = ''
         }
         $strImmutableParent = [System.IO.Path]::Combine($strProbeRoot, 'immutable')
-        $objChattrCommand = Get-Command -Name 'chattr' -CommandType Application -ErrorAction SilentlyContinue
+        $arrChattrCommand = @(
+            Get-Command -Name 'chattr' -CommandType Application -ErrorAction SilentlyContinue
+        )
+        $strChattrPath = ''
+        if ($arrChattrCommand.Count -ne 0) {
+            $strChattrPath = [string]$arrChattrCommand[0].Source
+        }
         try {
             $strAnchor = '$arrCandidateIssuedState = New-Object System.Collections.ArrayList'
             $strManageText = [System.IO.File]::ReadAllText($strManageSourcePath)
@@ -6227,8 +6233,8 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
             # post-registration invocation-root create throw before the root is made.
             # Confirm the immutability actually took before trusting the growth.
             [void][System.IO.Directory]::CreateDirectory($strImmutableParent)
-            if ($null -ne $objChattrCommand) {
-                $null = & $objChattrCommand.Source +i $strImmutableParent 2>&1
+            if ($strChattrPath.Length -ne 0) {
+                $null = & $strChattrPath +i $strImmutableParent 2>&1
                 try {
                     $strWriteProbe = [System.IO.Path]::Combine($strImmutableParent, 'writeprobe')
                     [void][System.IO.Directory]::CreateDirectory($strWriteProbe)
@@ -6253,7 +6259,7 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
                         if ($null -ne $objFailContext) { $objOutcome.ReturnedAnyContext = $true }
                     }
                 } finally {
-                    $null = & $objChattrCommand.Source -i $strImmutableParent 2>&1
+                    $null = & $strChattrPath -i $strImmutableParent 2>&1
                 }
                 $arrFailAfter = & $scriptBlockRegisterCounts
                 $objOutcome.FailureGrowth = @(
@@ -6295,8 +6301,8 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
                 ((@([System.IO.Directory]::GetFileSystemEntries($strPostRootParent))).Count -ne 0)
         } catch {
             $objOutcome.Error = [string]$_.Exception.Message
-            if ($null -ne $objChattrCommand) {
-                try { $null = & $objChattrCommand.Source -i $strImmutableParent 2>&1 } catch { $null = $_ }
+            if ($strChattrPath.Length -ne 0) {
+                try { $null = & $strChattrPath -i $strImmutableParent 2>&1 } catch { $null = $_ }
             }
         }
         return $objOutcome
@@ -11004,7 +11010,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260810.1
+    # Version: 1.0.20260810.2
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
