@@ -6214,7 +6214,20 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
             # post-registration invocation-root create throw before the root is made.
             # Confirm the immutability actually took before trusting the growth.
             [void][System.IO.Directory]::CreateDirectory($strImmutableParent)
-            $null = & chattr +i $strImmutableParent 2>&1
+            # chattr is Linux-only. Where it is absent -- Windows, or a Linux
+            # build without e2fsprogs -- the native invocation raises a
+            # terminating CommandNotFoundException under this block's Stop
+            # preference. That aborted the whole probe before the deterministic
+            # post-rollback batch below could run, leaving the unconditional
+            # post-rollback precondition reading its uninitialised t0/rFalse
+            # defaults. Probe for the command first: an absent lever leaves the
+            # parent mutable, so the write-probe records ImmutableEffective =
+            # $false and the no-rollback assertions are skipped downstream -- a
+            # missing lever is not a production regression.
+            if ($null -ne (Get-Command -Name 'chattr' -CommandType Application `
+                        -ErrorAction SilentlyContinue)) {
+                $null = & chattr +i $strImmutableParent 2>&1
+            }
             try {
                 $strWriteProbe = [System.IO.Path]::Combine($strImmutableParent, 'writeprobe')
                 [void][System.IO.Directory]::CreateDirectory($strWriteProbe)

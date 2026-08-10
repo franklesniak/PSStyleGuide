@@ -2265,10 +2265,15 @@ function New-StyleGuideCandidateInvocationContext {
             # provider a rebinder writes to. The harness's nameless-invocation
             # rule refused that spelling, which is what exposed the error.
             #
-            # Taking the closure before this one is assigned is safe, and that
-            # was measured rather than assumed: a closure captured before its
-            # assignment still resolves the value, because the lookup falls
-            # through to this script's scope at call time.
+            # This resolves on every PowerShell edition because the remove-closure
+            # is assigned BEFORE New's function closure is captured at load time
+            # (see the capture order below the function definitions), so New's
+            # closure carries it by value. An earlier order captured New first and
+            # relied on the reference falling through to this script's scope at
+            # call time; PowerShell 7 resolves that, but Windows PowerShell 5.1
+            # left the variable undefined here, and the creation-failure rollback
+            # threw VariableIsUndefined instead of removing the tree this branch
+            # exists to remove.
             $objCleanupResult = & $scriptBlockRemoveContextFunction -Context $objContext
             # Withdrawn from the registers now that filesystem rollback has run.
             # The order matters: the rollback above is the manager's own Remove,
@@ -2986,8 +2991,16 @@ $scriptBlockAssertCandidateInMemoryContext = `
 $scriptBlockNewCandidateContext = `
     $scriptBlockNewCandidateContext.GetNewClosure()
 
-$scriptBlockNewContextFunction = ${function:New-StyleGuideCandidateInvocationContext}.GetNewClosure()
+# New's creation-failure rollback calls the remove-closure from its own catch
+# block (see that call site above). Capture the remove-closure FIRST, so New's
+# function closure freezes it by value at load time. The earlier order captured
+# New first, while the remove-closure variable was still unassigned, and relied
+# on the reference falling through to this script's scope at call time:
+# PowerShell 7 resolves that fall-through, but Windows PowerShell 5.1 does not,
+# so the rollback threw VariableIsUndefined instead of cleaning up. Remove and
+# Test never call New, so this order carries no cycle.
 $scriptBlockRemoveContextFunction = ${function:Remove-StyleGuideCandidateInvocationContext}.GetNewClosure()
+$scriptBlockNewContextFunction = ${function:New-StyleGuideCandidateInvocationContext}.GetNewClosure()
 $scriptBlockTestContextFunction = ${function:Test-StyleGuideCandidateInvocationContextIssued}.GetNewClosure()
 [void](Set-Item -LiteralPath Function:\New-StyleGuideCandidateInvocationContext `
     -Value $scriptBlockNewContextFunction -Force)
