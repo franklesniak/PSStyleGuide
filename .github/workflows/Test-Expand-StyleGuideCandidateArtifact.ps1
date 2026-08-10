@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260810.0
+Version: 1.0.20260810.1
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,7 +53,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260810.0'
+$script:versionCandidateHarness = [System.Version]'1.0.20260810.1'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
 $script:strCandidateExpectedHelperVersion = '1.0.20260810.0'
@@ -6087,7 +6087,7 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
     # the dot-sourcing caller's reach, so their counts cannot be read off the loaded
     # production. This probe therefore mirrors the reproduction exactly: it writes an
     # INSTRUMENTED copy of the REAL context-manager bytes into the run root --
-    # byte-identical but for three global aliases captured at the register-declaration
+    # byte-identical but for three runspace-global aliases captured at the register-declaration
     # site, BEFORE the load-time Remove-Variable takes the names away -- and drives it
     # in a FRESH runspace, so neither the instrumented copy's functions nor the
     # register aliases touch the outer session's already-loaded production. (A
@@ -6122,7 +6122,7 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
     #     miss and is not asserted -- a missing lever is not a production regression.
     #   * Post-rollback lever: a throw injected into the instrumented copy at the end
     #     of a SUCCESSFUL build -- after the root and download dirs exist and the
-    #     context is registered, immediately before New returns -- gated by a global
+    #     context is registered, immediately before New returns -- gated by a runspace-global flag
     #     the probe sets only for that batch. Deterministic and needs no chattr, so
     #     the post-rollback branch is always exercised; the forced failures must also
     #     leave the parent empty, proving the manager's rollback ran before it
@@ -6154,6 +6154,7 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
             Error                  = ''
         }
         $strImmutableParent = [System.IO.Path]::Combine($strProbeRoot, 'immutable')
+        $objChattrCommand = Get-Command -Name 'chattr' -CommandType Application -ErrorAction SilentlyContinue
         try {
             $strAnchor = '$arrCandidateIssuedState = New-Object System.Collections.ArrayList'
             $strManageText = [System.IO.File]::ReadAllText($strManageSourcePath)
@@ -6162,12 +6163,17 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
                 return $objOutcome
             }
             $strInstrumented = $strAnchor + [System.Environment]::NewLine +
-                '$global:objRound73RegisterContext = $arrCandidateIssuedContext' + [System.Environment]::NewLine +
-                '$global:objRound73RegisterSnapshot = $arrCandidateIssuedSnapshot' + [System.Environment]::NewLine +
-                '$global:objRound73RegisterState = $arrCandidateIssuedState'
+                'Set-Variable -Name ''objRound73RegisterContext'' -Scope Global ' +
+                '-Value $arrCandidateIssuedContext' +
+                [System.Environment]::NewLine +
+                'Set-Variable -Name ''objRound73RegisterSnapshot'' -Scope Global ' +
+                '-Value $arrCandidateIssuedSnapshot' +
+                [System.Environment]::NewLine +
+                'Set-Variable -Name ''objRound73RegisterState'' -Scope Global ' +
+                '-Value $arrCandidateIssuedState'
             $strManageText = $strManageText.Replace($strAnchor, $strInstrumented)
             # The post-rollback failure lever: a throw at the end of a successful
-            # build, gated by a global set only for the post-rollback batch. The
+            # build, gated by a runspace-global flag set only for the post-rollback batch. The
             # anchor is New-context's final in-memory assertion, immediately before
             # it returns -- root and download created, context registered -- so the
             # throw takes the manager's $boolRootCreated (rollback-then-deregister)
@@ -6178,18 +6184,25 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
                 return $objOutcome
             }
             $strForceInjected =
-                'if ($global:objRound73ForcePostRootFailure) { throw ''round73-forced-post-root-failure'' }' +
+                'if ((Get-Variable -Name ''boolRound73ForcePostRootFailure'' ' +
+                '-Scope Global -ValueOnly)) { throw ''round73-forced-post-root-failure'' }' +
                 [System.Environment]::NewLine + '            ' + $strForceAnchor
             $strManageText = $strManageText.Replace($strForceAnchor, $strForceInjected)
             $strInstrumentedPath = [System.IO.Path]::Combine($strProbeRoot, 'Manage-instrumented.ps1')
             [System.IO.File]::WriteAllText($strInstrumentedPath, $strManageText)
             . $strInstrumentedPath
-            $global:objRound73ForcePostRootFailure = $false
+            # The instrumented manager owns a distinct script scope. These explicitly
+            # global variables are confined to this disposable runspace and bridge only
+            # the manager and its probe.
+            Set-Variable -Name 'boolRound73ForcePostRootFailure' -Scope Global -Value $false
 
             $scriptBlockRegisterCounts = {
-                @([int]$global:objRound73RegisterContext.Count,
-                    [int]$global:objRound73RegisterSnapshot.Count,
-                    [int]$global:objRound73RegisterState.Count)
+                $objRegisterContext = Get-Variable -Name 'objRound73RegisterContext' -Scope Global -ValueOnly
+                $objRegisterSnapshot = Get-Variable -Name 'objRound73RegisterSnapshot' -Scope Global -ValueOnly
+                $objRegisterState = Get-Variable -Name 'objRound73RegisterState' -Scope Global -ValueOnly
+                @([int]$objRegisterContext.Count,
+                    [int]$objRegisterSnapshot.Count,
+                    [int]$objRegisterState.Count)
             }
 
             # Control: one successful New bumps all three registers by one.
@@ -6214,27 +6227,16 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
             # post-registration invocation-root create throw before the root is made.
             # Confirm the immutability actually took before trusting the growth.
             [void][System.IO.Directory]::CreateDirectory($strImmutableParent)
-            # chattr is Linux-only. Where it is absent -- Windows, or a Linux
-            # build without e2fsprogs -- the native invocation raises a
-            # terminating CommandNotFoundException under this block's Stop
-            # preference. That aborted the whole probe before the deterministic
-            # post-rollback batch below could run, leaving the unconditional
-            # post-rollback precondition reading its uninitialised t0/rFalse
-            # defaults. Probe for the command first: an absent lever leaves the
-            # parent mutable, so the write-probe records ImmutableEffective =
-            # $false and the no-rollback assertions are skipped downstream -- a
-            # missing lever is not a production regression.
-            if ($null -ne (Get-Command -Name 'chattr' -CommandType Application `
-                        -ErrorAction SilentlyContinue)) {
-                $null = & chattr +i $strImmutableParent 2>&1
-            }
-            try {
-                $strWriteProbe = [System.IO.Path]::Combine($strImmutableParent, 'writeprobe')
-                [void][System.IO.Directory]::CreateDirectory($strWriteProbe)
-                [void][System.IO.Directory]::Delete($strWriteProbe, $true)
-                $objOutcome.ImmutableEffective = $false
-            } catch {
-                $objOutcome.ImmutableEffective = $true
+            if ($null -ne $objChattrCommand) {
+                $null = & $objChattrCommand.Source +i $strImmutableParent 2>&1
+                try {
+                    $strWriteProbe = [System.IO.Path]::Combine($strImmutableParent, 'writeprobe')
+                    [void][System.IO.Directory]::CreateDirectory($strWriteProbe)
+                    [void][System.IO.Directory]::Delete($strWriteProbe, $true)
+                    $objOutcome.ImmutableEffective = $false
+                } catch {
+                    $objOutcome.ImmutableEffective = $true
+                }
             }
             if ($objOutcome.ImmutableEffective) {
                 $arrFailBefore = & $scriptBlockRegisterCounts
@@ -6251,7 +6253,7 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
                         if ($null -ne $objFailContext) { $objOutcome.ReturnedAnyContext = $true }
                     }
                 } finally {
-                    $null = & chattr -i $strImmutableParent 2>&1
+                    $null = & $objChattrCommand.Source -i $strImmutableParent 2>&1
                 }
                 $arrFailAfter = & $scriptBlockRegisterCounts
                 $objOutcome.FailureGrowth = @(
@@ -6267,7 +6269,7 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
             # rollback, the parent must hold no leftover invocation root.
             $strPostRootParent = [System.IO.Path]::Combine($strProbeRoot, 'postroot')
             [void][System.IO.Directory]::CreateDirectory($strPostRootParent)
-            $global:objRound73ForcePostRootFailure = $true
+            Set-Variable -Name 'boolRound73ForcePostRootFailure' -Scope Global -Value $true
             $arrPostBefore = & $scriptBlockRegisterCounts
             try {
                 for ($intCall = 0; $intCall -lt $intFailingCallCount; $intCall++) {
@@ -6282,7 +6284,7 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
                     if ($null -ne $objPostContext) { $objOutcome.PostRootReturnedAny = $true }
                 }
             } finally {
-                $global:objRound73ForcePostRootFailure = $false
+                Set-Variable -Name 'boolRound73ForcePostRootFailure' -Scope Global -Value $false
             }
             $arrPostAfter = & $scriptBlockRegisterCounts
             $objOutcome.PostRootGrowth = @(
@@ -6293,7 +6295,9 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
                 ((@([System.IO.Directory]::GetFileSystemEntries($strPostRootParent))).Count -ne 0)
         } catch {
             $objOutcome.Error = [string]$_.Exception.Message
-            try { $null = & chattr -i $strImmutableParent 2>&1 } catch { $null = $_ }
+            if ($null -ne $objChattrCommand) {
+                try { $null = & $objChattrCommand.Source -i $strImmutableParent 2>&1 } catch { $null = $_ }
+            }
         }
         return $objOutcome
     })
@@ -6321,6 +6325,10 @@ $script:scriptBlockAssertRound73RegisterLeakDeregistered = {
             } else {
                 [string]$objLeakOutcome.Error
             }))
+    }
+    if (-not [string]::IsNullOrEmpty($objLeakOutcome.Error)) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+            -Detail ('round73-register-leak-runtime-' + [string]$objLeakOutcome.Error)
     }
     $arrControlGrowth = [int[]]@($objLeakOutcome.ControlGrowth)
     if ($arrControlGrowth[0] -ne 1 -or $arrControlGrowth[1] -ne 1 -or $arrControlGrowth[2] -ne 1) {
@@ -10996,7 +11004,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260810.0
+    # Version: 1.0.20260810.1
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
