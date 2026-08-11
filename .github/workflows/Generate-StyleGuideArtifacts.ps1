@@ -10,17 +10,17 @@ fixed destination. Serialization is UTF-8 without a BOM and normalizes CRLF
 and lone CR to LF at the final payload boundary.
 
 .NOTES
-Version: 1.0.20260801.1
+Version: 1.0.20260812.0
 #>
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:GeneratorVersion = '1.0.20260801.1'
-$script:GeneratorResultSchema = 'PSStyleGuide.GeneratorResult.v1'
-$script:Utf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
-$script:Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-$script:PathComparison = if ($env:OS -eq 'Windows_NT') {
+$script:versionGenerator = '1.0.20260812.0'
+$script:strGeneratorResultSchema = 'PSStyleGuide.GeneratorResult.v1'
+$script:objUtf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
+$script:objUtf8NoBom = New-Object System.Text.UTF8Encoding($false)
+$script:objPathComparison = if ($env:OS -eq 'Windows_NT') {
     [System.StringComparison]::OrdinalIgnoreCase
 } else {
     [System.StringComparison]::Ordinal
@@ -290,7 +290,7 @@ function Test-PathContainedByRoot {
         [System.IO.Path]::AltDirectorySeparatorChar
     ) + [System.IO.Path]::DirectorySeparatorChar
 
-    return $Candidate.StartsWith($strRootWithSeparator, $script:PathComparison)
+    return $Candidate.StartsWith($strRootWithSeparator, $script:objPathComparison)
 }
 
 function Initialize-WindowsFileIdentityType {
@@ -393,7 +393,7 @@ function ConvertFrom-StrictUtf8 {
     if ($Bytes.Length -ge 3 -and $Bytes[0] -eq 0xEF -and $Bytes[1] -eq 0xBB -and $Bytes[2] -eq 0xBF) {
         throw "utf8-bom"
     }
-    return $script:Utf8Strict.GetString($Bytes)
+    return $script:objUtf8Strict.GetString($Bytes)
 }
 
 function ConvertTo-NormalizedUtf8 {
@@ -404,10 +404,15 @@ function ConvertTo-NormalizedUtf8 {
     )
 
     $strNormalizedContent = $CompleteFinalPayload -replace "`r`n?", "`n"
-    return $script:Utf8NoBom.GetBytes($strNormalizedContent)
+    return $script:objUtf8NoBom.GetBytes($strNormalizedContent)
 }
 
 function New-CopilotPayload {
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseShouldProcessForStateChangingFunctions',
+        '',
+        Justification = 'Builds an in-memory value and changes no system state; ShouldProcess does not apply.'
+    )]
     param (
         [Parameter(Mandatory = $true)]
         [string]$GuideContent
@@ -417,6 +422,11 @@ function New-CopilotPayload {
 }
 
 function New-PowerShellInstructionsPayload {
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseShouldProcessForStateChangingFunctions',
+        '',
+        Justification = 'Builds an in-memory value and changes no system state; ShouldProcess does not apply.'
+    )]
     param (
         [Parameter(Mandatory = $true)]
         [string]$GuideContent
@@ -434,6 +444,11 @@ function New-PowerShellInstructionsPayload {
 }
 
 function New-ChatPayload {
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseShouldProcessForStateChangingFunctions',
+        '',
+        Justification = 'Builds an in-memory value and changes no system state; ShouldProcess does not apply.'
+    )]
     param (
         [Parameter(Mandatory = $true)]
         [string]$GuideContent
@@ -454,6 +469,11 @@ function New-ChatPayload {
 }
 
 function New-FullPayload {
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseShouldProcessForStateChangingFunctions',
+        '',
+        Justification = 'Builds an in-memory value and changes no system state; ShouldProcess does not apply.'
+    )]
     param (
         [Parameter(Mandatory = $true)]
         [string]$GuideContent,
@@ -584,7 +604,12 @@ function New-FullPayload {
     return $strOutput.TrimEnd("`n") + "`n"
 }
 
-function New-StyleGuidePayloads {
+function New-StyleGuidePayload {
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseShouldProcessForStateChangingFunctions',
+        '',
+        Justification = 'Builds an in-memory value and changes no system state; ShouldProcess does not apply.'
+    )]
     param (
         [Parameter(Mandatory = $true)]
         [byte[]]$GuideBytes,
@@ -617,6 +642,11 @@ function New-StyleGuidePayloads {
 }
 
 function New-ArtifactRecord {
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseShouldProcessForStateChangingFunctions',
+        '',
+        Justification = 'Builds an in-memory value and changes no system state; ShouldProcess does not apply.'
+    )]
     param (
         [Parameter(Mandatory = $true)]
         [string]$ArtifactId,
@@ -696,7 +726,7 @@ function Write-StyleGuideArtifact {
         )
         $strDestinationPath = [System.IO.Path]::GetFullPath($RawDestinationPath)
         if (-not (Test-PathContainedByRoot -Root $RepositoryRoot -Candidate $strDestinationPath) -or
-            -not $strDestinationPath.Equals($strExpectedFullPath, $script:PathComparison)) {
+            -not $strDestinationPath.Equals($strExpectedFullPath, $script:objPathComparison)) {
             throw "artifact-path-mismatch"
         }
         $strDestinationPath = Assert-OrdinaryAbsolutePath -LiteralPath $strDestinationPath -ExpectedLeafType File
@@ -755,7 +785,7 @@ function Write-StyleGuideArtifact {
 
         $strPhase = 'verify-candidate'
         $strCandidateFullPath = Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File
-        if (-not [System.IO.Path]::GetDirectoryName($strCandidateFullPath).Equals($strParentPath, $script:PathComparison)) {
+        if (-not [System.IO.Path]::GetDirectoryName($strCandidateFullPath).Equals($strParentPath, $script:objPathComparison)) {
             throw "candidate-parent-mismatch"
         }
         $strCandidateIdentity = Get-OrdinaryFileIdentity -LiteralPath $strCandidateFullPath
@@ -878,8 +908,8 @@ try {
     Test-ScriptVersionParser
     $strSelfPath = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot 'Generate-StyleGuideArtifacts.ps1'))
     $arrSelfBytes = [System.IO.File]::ReadAllBytes($strSelfPath)
-    $strSelfText = $script:Utf8Strict.GetString($arrSelfBytes)
-    [void](Get-ScriptVersionRecord -ScriptText $strSelfText -ExpectedVersion $script:GeneratorVersion)
+    $strSelfText = $script:objUtf8Strict.GetString($arrSelfBytes)
+    [void](Get-ScriptVersionRecord -ScriptText $strSelfText -ExpectedVersion $script:versionGenerator)
 
     $strResultPhase = 'validate-fixed-authority'
     $strWorkflowRoot = Assert-OrdinaryAbsolutePath -LiteralPath $PSScriptRoot -ExpectedLeafType Directory
@@ -933,7 +963,7 @@ try {
     }
 
     $strResultPhase = 'compute-complete-payloads'
-    $hashtablePayloads = New-StyleGuidePayloads `
+    $hashtablePayloads = New-StyleGuidePayload `
         -GuideBytes $hashtableSourceBytes.guide `
         -RationaleBytes $hashtableSourceBytes.rationale
     if ($hashtablePayloads.Count -ne 4) {
@@ -987,8 +1017,8 @@ try {
 }
 
 $hashtableResult = [ordered]@{
-    Schema = $script:GeneratorResultSchema
-    GeneratorVersion = $script:GeneratorVersion
+    Schema = $script:strGeneratorResultSchema
+    GeneratorVersion = $script:versionGenerator
     Overall = $strOverall
     Phase = $strResultPhase
     Category = $strResultCategory

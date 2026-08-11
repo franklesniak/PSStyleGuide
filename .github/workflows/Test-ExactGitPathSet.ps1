@@ -22,7 +22,7 @@ Working, Staged, or Both.
 Also require git diff --exit-code to report no working-tree difference.
 
 .NOTES
-Version: 1.0.20260731.0
+Version: 1.0.20260812.0
 #>
 
 [CmdletBinding()]
@@ -45,8 +45,8 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:VerifierVersion = '1.0.20260731.0'
-$script:VerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v1'
+$script:versionVerifier = '1.0.20260812.0'
+$script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v1'
 
 function Get-ScriptVersionRecord {
     param (
@@ -268,7 +268,7 @@ function Invoke-GitRaw {
     }
 }
 
-function ConvertFrom-NulPathRecords {
+function ConvertFrom-NulPathRecord {
     param (
         [Parameter(Mandatory = $true)]
         [AllowEmptyCollection()]
@@ -306,7 +306,12 @@ function ConvertFrom-NulPathRecords {
     return ,$objKeys
 }
 
-function New-ExpectedPathKeys {
+function New-ExpectedPathKey {
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseShouldProcessForStateChangingFunctions',
+        '',
+        Justification = 'Builds an in-memory value and changes no system state; ShouldProcess does not apply.'
+    )]
     param (
         [Parameter(Mandatory = $true)]
         [AllowEmptyCollection()]
@@ -398,11 +403,11 @@ try {
     $strSelfText = (New-Object System.Text.UTF8Encoding($false, $true)).GetString(
         [System.IO.File]::ReadAllBytes($strSelfPath)
     )
-    [void](Get-ScriptVersionRecord -ScriptText $strSelfText -ExpectedVersion $script:VerifierVersion)
+    [void](Get-ScriptVersionRecord -ScriptText $strSelfText -ExpectedVersion $script:versionVerifier)
 
     $strRepositoryRoot = Assert-OrdinaryRepositoryRoot -LiteralPath $RepositoryRoot
 
-    $objExpectedKeys = New-ExpectedPathKeys -PathList $ExpectedPath
+    $objExpectedKeys = New-ExpectedPathKey -PathList $ExpectedPath
     $arrGitCommands = @(Get-Command -Name git -CommandType Application -ErrorAction Stop)
     $strGitPath = [string]$arrGitCommands[0].Source
 
@@ -413,7 +418,7 @@ try {
             $intNativeExit = $hashtableWorkingResult.ExitCode
             throw 'native-command'
         }
-        $objWorkingKeys = ConvertFrom-NulPathRecords -Bytes $hashtableWorkingResult.Stdout
+        $objWorkingKeys = ConvertFrom-NulPathRecord -Bytes $hashtableWorkingResult.Stdout
 
         $hashtableUntrackedResult = Invoke-GitRaw -GitPath $strGitPath -WorkingDirectory $strRepositoryRoot `
             -ArgumentList @('ls-files', '--others', '--exclude-standard', '-z', '--')
@@ -421,7 +426,7 @@ try {
             $intNativeExit = $hashtableUntrackedResult.ExitCode
             throw 'native-command'
         }
-        $objUntrackedKeys = ConvertFrom-NulPathRecords -Bytes $hashtableUntrackedResult.Stdout
+        $objUntrackedKeys = ConvertFrom-NulPathRecord -Bytes $hashtableUntrackedResult.Stdout
         Add-KeySet -Target $objWorkingKeys -Source $objUntrackedKeys
     }
 
@@ -432,7 +437,7 @@ try {
             $intNativeExit = $hashtableStagedResult.ExitCode
             throw 'native-command'
         }
-        $objStagedKeys = ConvertFrom-NulPathRecords -Bytes $hashtableStagedResult.Stdout
+        $objStagedKeys = ConvertFrom-NulPathRecord -Bytes $hashtableStagedResult.Stdout
     }
 
     if ($RequireCleanWorkingAgainstIndex) {
@@ -497,8 +502,8 @@ try {
 $intExpectedCount = if ($null -eq $objExpectedKeys) { 0 } else { $objExpectedKeys.Count }
 $intActualCount = if ($null -eq $objActualKeys) { 0 } else { $objActualKeys.Count }
 $hashtableResult = [ordered]@{
-    Schema = $script:VerifierResultSchema
-    VerifierVersion = $script:VerifierVersion
+    Schema = $script:strVerifierResultSchema
+    VerifierVersion = $script:versionVerifier
     Success = $intExitCode -eq 0
     Mode = $Mode
     Category = $strCategory
