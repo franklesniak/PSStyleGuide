@@ -6398,11 +6398,13 @@ $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow = {
     # mutation is reported as an altered context (Success=$false, cleanup-context-
     # altered), NOT blessed.
     #
-    # Two cases, both driving the REAL Remove-StyleGuideCandidateInvocationContext on a
-    # populated Active context whose seq-0 root record's courtesy write is the LAST of
-    # the cleanup, rigged from a second runspace that fires on the FIRST file deletion
-    # -- the wide, measured-reliable window the sibling round-71 record-write-refused
-    # probe uses.
+    # Three cases, all driving the REAL Remove-StyleGuideCandidateInvocationContext on a
+    # populated Active context, each rigged from a second runspace that fires on the
+    # FIRST file deletion -- the wide, measured-reliable window the sibling round-71
+    # record-write-refused probe uses. Cases (a) and (b) rig the seq-0 root record's
+    # courtesy write (the LAST of the cleanup) so it is refused and the tolerated branch
+    # runs; case (c) refuses NO write and drives the no-refusal branch of the same
+    # end-of-cleanup re-assertion, added in round 77 to mirror the tolerated branch.
     #
     #   (a) refused EntryState PLUS an unrelated InvocationId=Empty: the fix must
     #       REFUSE (Success=$false, cleanup-context-altered) rather than bless.
@@ -6421,6 +6423,22 @@ $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow = {
     #       re-assertion already passed on the true Deleted state), so a lost race is
     #       only a weaker pass. This is the control the narrowed tolerance must not
     #       break.
+    #
+    #   (c) NO refused write, only an unrelated InvocationId=Empty: the round-77 fix
+    #       (Codex P2 "#B") must REFUSE the NO-refusal branch as Disposed / cleanup-
+    #       context-altered / Success=$false / empty retained -- NOT bless it, and NOT
+    #       let the bare re-assertion throw into the outer catch, which minted a terminal
+    #       CleanupFailed with an EMPTY retained set over a tree already gone (a state the
+    #       manager's own table forbids, so a SUBSEQUENT cleanup refused with cleanup-
+    #       context-invalid and #146's disposed result could never be returned). Because
+    #       no courtesy write is refused, listCourtesyRefusedSequence is empty and
+    #       production takes the no-refusal branch rather than the tolerated branch (a) /
+    #       (b) exercise. Reverting the fix to the bare re-assertion returns CleanupFailed
+    #       / cleanup-owned-entry-uncertain instead, which reddens this. Race-RELIABLE for
+    #       the same reason as (a): the InvocationId zeroing lands on the first deletion,
+    #       long before the end-of-cleanup re-assertion, so the holder wins on every
+    #       observed run. The PASS is production's OWN altered verdict (round-75
+    #       discipline), so a lost or late race is retried, never a false failure.
     $strToleranceRoot = [System.IO.Path]::Combine($RunRoot, 'round73-tolerance')
     [void][System.IO.Directory]::CreateDirectory($strToleranceRoot)
 
@@ -6620,6 +6638,102 @@ $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow = {
                         '-' + [string]$objControlResult.DiagnosticCode +
                         '-tg' + [string]$boolControlTreeGone
                 }))
+        }
+
+        # ---- Case (c): NO refused write + unrelated InvocationId=Empty must REFUSE
+        # as Disposed / cleanup-context-altered on the no-refusal re-assertion path ----
+        # Round 77 (Codex P2 "#B") wrapped the NO-refusal branch's final re-assertion --
+        # the branch entered when listCourtesyRefusedSequence is empty -- in try/catch so
+        # a same-session mutation landing after the plan was captured returns the already-
+        # committed Disposed transition as altered (Success=$false, cleanup-context-
+        # altered, no retained sequences), mirroring the tolerated branch (a) exercises.
+        # This drives the SAME rig as (a) but rigs NO EntryState setter, so no courtesy
+        # write is refused and production takes the no-refusal branch. The PASS is
+        # production's OWN verdict (round-75 discipline): only a Disposed / cleanup-
+        # context-altered / Success=$false / empty-retained result is reachable, and only
+        # when the InvocationId zeroing preceded the final re-assertion on the no-refusal
+        # branch, so it PROVES the ordering. Every other outcome (a clean cleanup-
+        # succeeded because the mutation landed after the re-assertion, or a null) is
+        # inconclusive and RETRIED. Reverting the fix to the bare re-assertion makes the
+        # branch throw into the outer catch and return CleanupFailed / cleanup-owned-
+        # entry-uncertain, which this altered verdict is NEVER among -- so no attempt
+        # passes and the probe reddens loud rather than skipping.
+        $boolNoRefusalAlteredDisposed = $false
+        $strNoRefusalObservedDetail = 'none'
+        for ($intNoRefusalAttempt = 0;
+            $intNoRefusalAttempt -lt $intToleranceMaxAttempt -and
+                -not $boolNoRefusalAlteredDisposed;
+            $intNoRefusalAttempt++) {
+            $strNoRefusalParent = [System.IO.Path]::Combine(
+                $strToleranceRoot, 'no-refusal-unrelated-' + [string]$intNoRefusalAttempt)
+            [void][System.IO.Directory]::CreateDirectory($strNoRefusalParent)
+            $objNoRefusalContext = & $scriptBlockBuildToleranceContext -TrustedParent $strNoRefusalParent
+            $strNoRefusalTrigger = [string]$objNoRefusalContext.OwnershipJournal[6].Path
+            $hashtableNoRefusalSignal = [hashtable]::Synchronized(@{ Running = $false })
+            $objNoRefusalRunspace = [runspacefactory]::CreateRunspace()
+            $objNoRefusalRunspace.Open()
+            $objNoRefusalRunspace.SessionStateProxy.SetVariable('objContext', $objNoRefusalContext)
+            $objNoRefusalRunspace.SessionStateProxy.SetVariable('strTrigger', $strNoRefusalTrigger)
+            $objNoRefusalRunspace.SessionStateProxy.SetVariable(
+                'hashtableSignal', $hashtableNoRefusalSignal)
+            $objNoRefusalShell = [powershell]::Create()
+            $objNoRefusalShell.Runspace = $objNoRefusalRunspace
+            [void]$objNoRefusalShell.AddScript({
+                $objWatch = [System.Diagnostics.Stopwatch]::StartNew()
+                $hashtableSignal.Running = $true
+                while ($objWatch.ElapsedMilliseconds -lt 5000) {
+                    if (-not [System.IO.File]::Exists($strTrigger)) {
+                        # ONE unrelated mutation and NO courtesy-write refusal: zero the
+                        # context InvocationId on the first deletion, long before the end-
+                        # of-cleanup re-assertion reads it. No EntryState setter is rigged,
+                        # so RecordWriteRefused stays clear and production takes the no-
+                        # refusal branch rather than the tolerated one.
+                        $objContext.InvocationId = [System.Guid]::Empty
+                        return
+                    }
+                }
+            })
+            $objNoRefusalResult = $null
+            try {
+                $objNoRefusalHandle = $objNoRefusalShell.BeginInvoke()
+                $objNoRefusalStart = [System.Diagnostics.Stopwatch]::StartNew()
+                while (-not $hashtableNoRefusalSignal.Running -and
+                    $objNoRefusalStart.ElapsedMilliseconds -lt 5000) {
+                }
+                $objNoRefusalResult = `
+                    Remove-StyleGuideCandidateInvocationContext -Context $objNoRefusalContext
+                [void]$objNoRefusalShell.EndInvoke($objNoRefusalHandle)
+            } finally {
+                $objNoRefusalShell.Dispose()
+                $objNoRefusalRunspace.Close()
+                $objNoRefusalRunspace.Dispose()
+            }
+            if ($null -ne $objNoRefusalResult) {
+                $strNoRefusalObservedDetail = [string]$objNoRefusalResult.FinalState +
+                    '-s' + [string]$objNoRefusalResult.Success +
+                    '-' + [string]$objNoRefusalResult.DiagnosticCode +
+                    '-r' + [string]@([uint32[]]@(
+                        $objNoRefusalResult.RetainedRecordSequences)).Count
+            }
+            # Production's altered verdict on the no-refusal branch is the proof of
+            # ordering, exactly as case (a). Anything else is inconclusive and retried.
+            if (($null -ne $objNoRefusalResult) -and
+                (-not [bool]$objNoRefusalResult.Success) -and
+                (([string]$objNoRefusalResult.FinalState) -ceq 'Disposed') -and
+                (([string]$objNoRefusalResult.DiagnosticCode) -ceq 'cleanup-context-altered') -and
+                (@([uint32[]]@($objNoRefusalResult.RetainedRecordSequences)).Count -eq 0)) {
+                $boolNoRefusalAlteredDisposed = $true
+            }
+        }
+        # Fail loud rather than skip: the pre-round-77 bare re-assertion NEVER returns the
+        # Disposed altered verdict (it throws into the outer catch and returns terminal
+        # CleanupFailed / cleanup-owned-entry-uncertain over a tree already gone), so no
+        # bounded attempt passes and the probe reddens. (A runner so loaded that the wide
+        # first-deletion-to-re-assertion window is lost on every attempt also reddens.)
+        if (-not $boolNoRefusalAlteredDisposed) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
+                -Detail ('no-refusal-reassertion-altered-preserves-disposed-' +
+                    [string]$intToleranceMaxAttempt + '-last-' + $strNoRefusalObservedDetail)
         }
     } finally {
         if ([System.IO.Directory]::Exists($strToleranceRoot)) {
