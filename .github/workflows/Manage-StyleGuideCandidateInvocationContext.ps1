@@ -94,6 +94,20 @@ $arrCandidateIssuedSnapshot = New-Object System.Collections.ArrayList
 # So the state is not read from the caller's copy and trusted; it is compared
 # against what the manager itself last recorded.
 $arrCandidateIssuedState = New-Object System.Collections.ArrayList
+# Accepted residual (single-threaded invocation contract). The three registers
+# above are held parallel by index and mutated by unsynchronized .Add and
+# indexed writes; there is no lock. That is correct under the topology #146
+# specifies -- one invocation at a time within one process, the load-bearing
+# single-process register this PR documents -- because nothing runs between the
+# three appends, so they are effectively atomic. Two callers invoking the public
+# interface CONCURRENTLY against one loaded manager could interleave those
+# appends and desync the lists, refusing both otherwise genuine contexts; that
+# is the same excluded competing/concurrent-writer actor as #146's Non-goals and
+# the #155 residual family, not a supported caller. A single-entry register would
+# make the desync inexpressible but would not make construction thread-safe --
+# List.Add is itself unsafe under concurrent mutation -- so only a lock would
+# close it, and that is a concurrency guarantee #146 does not make. Left as the
+# serial contract the suite tests.
 $strCandidateRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $strCandidateCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
 # The same ceilings the expansion helper enforces. They are restated rather
