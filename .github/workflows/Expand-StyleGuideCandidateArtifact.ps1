@@ -53,7 +53,7 @@ None. You can't pipe objects to this script.
 the caller.
 
 .NOTES
-Version: 1.0.20260811.0
+Version: 1.0.20260811.1
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -121,8 +121,8 @@ param (
 
 $script:boolCandidateHelperWasDotSourced = $MyInvocation.InvocationName -eq '.'
 $script:hashtableCandidateHelperBoundParameters = $PSBoundParameters
-$script:versionCandidateHelper = [System.Version]'1.0.20260811.0'
-$script:versionCandidateExpectedContext = [System.Version]'1.0.20260811.0'
+$script:versionCandidateHelper = [System.Version]'1.0.20260811.1'
+$script:versionCandidateExpectedContext = [System.Version]'1.0.20260811.1'
 $script:strCandidateHelperContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 $script:strCandidateHelperRecordTypeName = 'PSStyleGuide.CandidateOwnershipRecord.v1'
 $script:strCandidateHelperCleanupTypeName = 'PSStyleGuide.CandidateCleanupResult.v1'
@@ -2380,11 +2380,12 @@ function Remove-StyleGuideCandidateInvocationState {
     # Removes candidate and caller-owned invocation state in trusted order.
     #
     # .DESCRIPTION
-    # Proves and removes exact journaled candidate files and the candidate
-    # directory first, then invokes the loaded context-manager cleanup function
-    # for the download file, download directory, and invocation root. Validation
-    # and cleanup uncertainty are reported as Success false rather than thrown
-    # to the caller.
+    # Validates the supplied context, then delegates all removal -- the candidate
+    # files and directory, the download file and directory, and the invocation
+    # root -- to the loaded context-manager cleanup function, which owns the
+    # deletions so they sit behind the single place issuance is proven. This
+    # function performs no candidate cleanup of its own. Validation and cleanup
+    # uncertainty are reported as Success false rather than thrown to the caller.
     #
     # .PARAMETER Context
     # Specifies the raw PSStyleGuide.CandidateInvocationContext.v1 object to
@@ -2416,7 +2417,7 @@ function Remove-StyleGuideCandidateInvocationState {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260811.0
+    # Version: 1.0.20260811.1
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

@@ -27,14 +27,14 @@ a caller that deletes first and validates afterwards has already
 deleted, so it needs a way to ask about issuance that changes nothing.
 
 .NOTES
-Version: 1.0.20260811.0
+Version: 1.0.20260811.1
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260811.0'
+$versionCandidateContext = [System.Version]'1.0.20260811.1'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -1907,7 +1907,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260811.0
+    # Version: 1.0.20260811.1
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2007,15 +2007,14 @@ function New-StyleGuideCandidateInvocationContext {
             # UserWrite and UserExecute -- written numerically so the enum type
             # is not referenced on a runtime that lacks it.
             #
-            # PowerShell 7 releases older than the UnixFileMode overload fall
-            # back to the same form and are no worse than before.
             # The overload is attempted rather than predicted. An earlier
             # revision tested whether the UnixFileMode TYPE resolved and treated
             # that as proof the two-argument CreateDirectory existed, which is a
             # proxy for the thing actually invoked rather than the thing itself:
             # a runtime carrying the enum without the overload would take the
-            # branch and throw a binding error instead of the fallback this code
-            # documents. Only a missing overload is caught -- a real creation
+            # branch and throw a binding error. The catch below turns that
+            # MethodException into the same fail-closed refusal an absent type
+            # gets, so only a missing overload is absorbed -- a real creation
             # failure, such as a permission error, still propagates.
             # Private at creation on both platforms, or not created at all.
             #
@@ -2330,13 +2329,15 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # caller can ask before it acts rather than discovering the answer after.
     #
     # This exists because a caller that deletes first and validates afterwards
-    # has already deleted. The helper removes candidate entries before handing
-    # the remainder to Remove-StyleGuideCandidateInvocationContext, and that is
-    # where issuance was proven -- too late to protect the entries the helper
-    # had already removed on the strength of paths the caller supplied. Their
-    # recorded lengths and digests do not close that: a supplied context carries
-    # both the paths and the values they are checked against, so the check
-    # proves the context is self-consistent, not that it is authentic.
+    # has already deleted. That was the expansion helper's own shape until round
+    # 32 moved candidate deletion into the context manager, where issuance is
+    # proven: deleting on the strength of caller-supplied paths and proving
+    # issuance only afterward was too late for the entries already removed. A
+    # caller that must still act on a context before that authority runs has the
+    # same need to ask first, and a supplied context's recorded lengths and
+    # digests do not answer it: the context carries both the paths and the values
+    # they are checked against, so the check proves it is self-consistent, not
+    # that it is authentic.
     #
     # .PARAMETER Context
     # Specifies the raw PSStyleGuide.CandidateInvocationContext.v1 object to
@@ -2375,13 +2376,18 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
-    # [bool] True when this manager issued the context and it still describes
-    # what it described at issuance; false in every other case.
+    # [bool] In the default mode (neither ExpectedState nor ExpectedValues
+    # supplied), true when this manager issued the context and the LIVE object
+    # still describes what it described at issuance, and false in every other
+    # case. When ExpectedState or ExpectedValues is supplied, the CAPTURED value
+    # the caller passed -- not the live field -- is what is authenticated against
+    # the manager's record, so a true result attests that capture; a live field
+    # mutated after capture is by design not consulted (see those parameters).
     #
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260811.0
+    # Version: 1.0.20260811.1
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param (
@@ -2493,7 +2499,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260811.0
+    # Version: 1.0.20260811.1
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
