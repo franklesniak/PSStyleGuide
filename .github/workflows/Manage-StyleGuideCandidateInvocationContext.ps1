@@ -27,14 +27,14 @@ a caller that deletes first and validates afterwards has already
 deleted, so it needs a way to ask about issuance that changes nothing.
 
 .NOTES
-Version: 1.0.20260810.0
+Version: 1.0.20260811.0
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260810.0'
+$versionCandidateContext = [System.Version]'1.0.20260811.0'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -1893,7 +1893,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260810.0
+    # Version: 1.0.20260811.0
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -1992,23 +1992,6 @@ function New-StyleGuideCandidateInvocationContext {
             # already had to close one of those. 448 is 0700 -- UserRead,
             # UserWrite and UserExecute -- written numerically so the enum type
             # is not referenced on a runtime that lacks it.
-            #
-            # Windows keeps the single-argument form and therefore inherits
-            # whatever the trusted parent's ACL grants. An earlier revision
-            # claimed the envelope check reasoned about that ACL. It does not:
-            # that check reads GetAttributes and tests only for Directory and
-            # ReparsePoint, so the claim was false and made a real gap look
-            # covered. If the caller supplies a shared trusted root whose
-            # inheritable ACL grants other local users read access, the archive
-            # and the extracted files stay readable to them.
-            #
-            # No ACL is written here, deliberately. This code cannot be executed
-            # on Windows from where it is being changed, and a wrong DACL would
-            # break every Windows run rather than announce itself -- two Windows
-            # defects have already reached this branch that way. The harness
-            # instead refuses a created root that grants Everyone or Users, so
-            # the single Windows run this PR owes reports the condition
-            # precisely rather than leaving it to be reasoned about.
             #
             # PowerShell 7 releases older than the UnixFileMode overload fall
             # back to the same form and are no worse than before.
@@ -2384,7 +2367,7 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260810.0
+    # Version: 1.0.20260811.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param (
@@ -2496,7 +2479,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260810.0
+    # Version: 1.0.20260811.0
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2885,7 +2868,35 @@ function Remove-StyleGuideCandidateInvocationContext {
                 -ReferenceToFilesystemCallCount $uintFilesystemCallCount `
                 -RetainedRecordSequences ([uint32[]]@()))
         }
-        [void](& $scriptBlockAssertCandidateInMemoryContext -Context $Context)
+        # The no-refusal path mirrors the refused-EntryState branch above. The
+        # disposal has already happened (tree gone, register Disposed at the
+        # SetCandidateIssuedState call), so a full-strictness re-assertion that
+        # throws means the live context carries an unrelated mutation -- NOT that
+        # anything is retained. Letting that throw fall into the outer catch
+        # would mint round 68's false terminal CleanupFailed with zero
+        # RetainedUncertain records over a tree that is already gone; that state
+        # violates this manager's own state table (CleanupFailed requires at
+        # least one RetainedUncertain record), so a subsequent cleanup of the
+        # same context would refuse with cleanup-context-invalid and could never
+        # return the disposed result #146 mandates. Catch it here and report the
+        # authenticated Disposed transition as altered, exactly as the tolerated
+        # branch does.
+        $boolFinalReassertionPassed = $true
+        try {
+            [void](& $scriptBlockAssertCandidateInMemoryContext -Context $Context)
+        } catch {
+            $boolFinalReassertionPassed = $false
+        }
+        if (-not $boolFinalReassertionPassed) {
+            return (& $scriptBlockNewCandidateCleanupResult `
+                -InvocationId $guidInvocationId `
+                -PreviousState $strPreviousState `
+                -FinalState 'Disposed' `
+                -Success $false `
+                -DiagnosticCode 'cleanup-context-altered' `
+                -ReferenceToFilesystemCallCount $uintFilesystemCallCount `
+                -RetainedRecordSequences ([uint32[]]@()))
+        }
         return (& $scriptBlockNewCandidateCleanupResult `
             -InvocationId $objCleanupPlan.InvocationId `
             -PreviousState $strPreviousState `

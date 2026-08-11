@@ -1,6 +1,6 @@
 # Agent Instructions for Claude Code
 
-**Version:** 1.0.20260811.0
+**Version:** 1.0.20260811.1
 
 ## Metadata
 
@@ -46,17 +46,23 @@ separately and wait for approval.
   fail-closed cross-platform candidate-artifact validator under
   `.github/workflows/` (two production scripts, an adversarial harness, and a
   versioned case catalog).
-- **PowerShell style (the repository follows its own guide).** All PowerShell
-  authored in this repository — every tracked `.ps1` file — MUST follow the
-  repository's own published guide, **`STYLE_GUIDE.md`**, the normative source of
-  truth. (`STYLE_GUIDE_FULL.md`, `STYLE_GUIDE_CHAT.md`, `powershell.instructions.md`,
-  and the root `copilot-instructions.md` are generated derivatives of it, not
-  hand-edited.) Apply each rule by its scope tag (`[All]` / `[Modern]` / `[v1.0]`)
-  and honor its RFC 2119 keyword. New or modified PowerShell MUST leave the
-  in-repository style check clean: zero parser errors, zero PSScriptAnalyzer
-  warnings or errors (a documented `[SuppressMessage]` is acceptable only where a
-  default rule genuinely does not apply, as the shipped scripts do), and zero
-  `MUST`/`MUST NOT` violations against `STYLE_GUIDE.md`. Authoring the guide files themselves is a separate concern
+- **PowerShell style (the repository follows its own guide).** All PowerShell in
+  this repository MUST follow the repository's own published guide,
+  **`STYLE_GUIDE.md`**, the normative source of truth. (`STYLE_GUIDE_FULL.md`,
+  `STYLE_GUIDE_CHAT.md`, `powershell.instructions.md`, and the root
+  `copilot-instructions.md` are generated derivatives of it, not hand-edited.)
+  Apply each rule by its scope tag (`[All]` / `[Modern]` / `[v1.0]`) and honor its
+  RFC 2119 keyword. **The operational bar for any change is per-file: the
+  PowerShell you author or modify MUST leave the file(s) your change touches
+  clean** — zero parser errors, zero PSScriptAnalyzer warnings or errors (a
+  documented `[SuppressMessage]` is acceptable only where a default rule genuinely
+  does not apply, as the shipped scripts do), and zero `MUST`/`MUST NOT` violations
+  against `STYLE_GUIDE.md`, **including the guide rules PSScriptAnalyzer does not
+  enforce** (for example, type-prefixed camelCase variable names). Do not introduce
+  a new violation, and do not copy a non-conforming pattern into new or modified
+  code. A pre-existing violation in a tracked `.ps1` file your change does not
+  touch does not block your change and does not make the baseline unattainable;
+  bring such a file into conformance as its own scoped change. Authoring the guide files themselves is a separate concern
   governed by `.github/copilot-instructions.md` (see **Canonical instructions**
   above), not by this bullet.
 - **Safety and security.** Treat all external input as untrusted. Never hardcode
