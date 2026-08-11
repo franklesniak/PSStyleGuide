@@ -1,17 +1,18 @@
 # Agent Instructions for Claude Code
 
-**Version:** 1.0.20260809.0
+**Version:** 1.0.20260811.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository maintainer (@franklesniak)
-- **Last Updated:** 2026-08-09
+- **Last Updated:** 2026-08-11
 - **Scope:** Agent-specific entry point for Claude Code and compatible AI coding
   agents operating in this repository. It captures the pull-request review-loop
   workflow the maintainer runs, the per-finding decision process to apply to
-  every code-review comment, and the discipline governing when and how work may
-  be deferred.
+  every code-review comment, the discipline governing when and how work may be
+  deferred, and the requirement that the repository's own PowerShell follow its
+  published style guide.
 
 This file is adapted from the `franklesniak/copilot-repo-template` agent
 instructions and tailored to this GitHub-hosted PowerShell and Markdown
@@ -45,6 +46,19 @@ separately and wait for approval.
   fail-closed cross-platform candidate-artifact validator under
   `.github/workflows/` (two production scripts, an adversarial harness, and a
   versioned case catalog).
+- **PowerShell style (the repository follows its own guide).** All PowerShell
+  authored in this repository — every tracked `.ps1` file — MUST follow the
+  repository's own published guide, **`STYLE_GUIDE.md`**, the normative source of
+  truth. (`STYLE_GUIDE_FULL.md`, `STYLE_GUIDE_CHAT.md`, `powershell.instructions.md`,
+  and the root `copilot-instructions.md` are generated derivatives of it, not
+  hand-edited.) Apply each rule by its scope tag (`[All]` / `[Modern]` / `[v1.0]`)
+  and honor its RFC 2119 keyword. New or modified PowerShell MUST leave the
+  in-repository style check clean: zero parser errors, zero PSScriptAnalyzer
+  warnings or errors (a documented `[SuppressMessage]` is acceptable only where a
+  default rule genuinely does not apply, as the shipped scripts do), and zero
+  `MUST`/`MUST NOT` violations against `STYLE_GUIDE.md`. Authoring the guide files themselves is a separate concern
+  governed by `.github/copilot-instructions.md` (see **Canonical instructions**
+  above), not by this bullet.
 - **Safety and security.** Treat all external input as untrusted. Never hardcode
   secrets. Do not weaken a security constraint to "make it work," and do not
   invent behavior when requirements are ambiguous — raise an explicit open
