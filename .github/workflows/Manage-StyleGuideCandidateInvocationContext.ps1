@@ -27,14 +27,14 @@ a caller that deletes first and validates afterwards has already
 deleted, so it needs a way to ask about issuance that changes nothing.
 
 .NOTES
-Version: 1.0.20260811.1
+Version: 1.0.20260811.0
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param ()
 
-$versionCandidateContext = [System.Version]'1.0.20260811.1'
+$versionCandidateContext = [System.Version]'1.0.20260811.0'
 $strCandidateContextTypeName = 'PSStyleGuide.CandidateInvocationContext.v1'
 # The exact context objects this manager has issued. Membership is decided by
 # reference, so a structurally identical clone is not a member.
@@ -1907,7 +1907,7 @@ function New-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260811.1
+    # Version: 1.0.20260811.0
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -2323,10 +2323,14 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     #
     # .DESCRIPTION
     # Answers one question and changes nothing: was this exact object handed out
-    # by New-StyleGuideCandidateInvocationContext in this process, does it still
-    # describe what it described then, and does its lifecycle state still match
-    # the one this manager last set. Touches no filesystem entry, so a
-    # caller can ask before it acts rather than discovering the answer after.
+    # by New-StyleGuideCandidateInvocationContext in this process, and -- in the
+    # default mode -- does the LIVE object still describe what it described then,
+    # with a lifecycle state still matching the one this manager last set. When
+    # ExpectedState or ExpectedValues is supplied, the CAPTURED value the caller
+    # passed is authenticated in place of the corresponding live field, so a live
+    # field mutated after capture is by design not consulted in that mode (see
+    # those parameters and .OUTPUTS). Touches no filesystem entry, so a caller
+    # can ask before it acts rather than discovering the answer after.
     #
     # This exists because a caller that deletes first and validates afterwards
     # has already deleted. That was the expansion helper's own shape until round
@@ -2387,7 +2391,7 @@ function Test-StyleGuideCandidateInvocationContextIssued {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260811.1
+    # Version: 1.0.20260811.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param (
@@ -2417,14 +2421,21 @@ function Test-StyleGuideCandidateInvocationContextIssued {
         return $false
     }
     try {
-        # Built from the caller's CAPTURED values when it supplies them, and
-        # from the live object otherwise. A caller that captures five fields,
-        # asks whether the object is issued, and then acts on its captures has
+        # Built from the caller's CAPTURED values when the ExpectedValues
+        # parameter is bound, and from the live object when it is omitted. The
+        # mode is chosen by ContainsKey, not by the value: $null is itself a
+        # capture a caller may pass, so reading it as omission -- the round-72
+        # -MaximumEntry 0 in-band-sentinel mistake, in a second place -- would
+        # silently authenticate the live object for a caller that meant to
+        # authenticate its capture. A caller that captures five fields, asks
+        # whether the object is issued, and then acts on its captures has
         # authenticated a different read from the one it will use -- the paths
         # can be moved to match at this instant and moved back. Handing the
         # captured set here authenticates exactly what the caller will act on,
-        # as a set, against the values this manager recorded at issuance.
-        $objSnapshotSource = if ($null -eq $ExpectedValues) {
+        # as a set, against the values this manager recorded at issuance; an
+        # invalid supplied capture fails the comparison below rather than
+        # falling through to the live read.
+        $objSnapshotSource = if (-not $PSBoundParameters.ContainsKey('ExpectedValues')) {
             $Context
         } else {
             $ExpectedValues
@@ -2450,7 +2461,10 @@ function Test-StyleGuideCandidateInvocationContextIssued {
         # 40 runs, with a concurrent writer flipping the property. A caller that
         # passes the value it captured gets that value authenticated instead, so
         # what was checked and what gets used are one value by construction.
-        $strClaimedState = if ($ExpectedState.Length -eq 0) {
+        # ContainsKey again, not a length test: an explicitly supplied empty
+        # string is a capture, not an omission, and must not fall through to the
+        # live read.
+        $strClaimedState = if (-not $PSBoundParameters.ContainsKey('ExpectedState')) {
             [string]$Context.LifecycleState
         } else {
             $ExpectedState
@@ -2467,10 +2481,13 @@ function Remove-StyleGuideCandidateInvocationContext {
     #
     # .DESCRIPTION
     # Proves the exact in-memory journal and live filesystem identity, removes
-    # only journaled download and invocation entries without recursion, and
-    # returns one bounded cleanup result. Uncertainty is retained fail-closed.
-    # Validation and cleanup uncertainty are reported as Success false rather
-    # than thrown to the caller.
+    # only journaled candidate, download, and invocation entries without
+    # recursion, and returns one bounded cleanup result. Since round 32 this
+    # manager owns candidate cleanup as well: it validates the candidate entries
+    # and deletes the candidate directory alongside the download directory and
+    # invocation root. Uncertainty is retained fail-closed. Validation and
+    # cleanup uncertainty are reported as Success false rather than thrown to the
+    # caller.
     #
     # .PARAMETER Context
     # Specifies the raw PSStyleGuide.CandidateInvocationContext.v1 object to
@@ -2499,7 +2516,7 @@ function Remove-StyleGuideCandidateInvocationContext {
     # .NOTES
     # This function supports named parameters only.
     #
-    # Version: 1.0.20260811.1
+    # Version: 1.0.20260811.0
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',

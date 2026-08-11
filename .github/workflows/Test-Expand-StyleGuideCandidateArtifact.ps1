@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260811.1
+Version: 1.0.20260811.0
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,11 +53,11 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260811.1'
+$script:versionCandidateHarness = [System.Version]'1.0.20260811.0'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260811.1'
-$script:strCandidateExpectedContextVersion = '1.0.20260811.1'
+$script:strCandidateExpectedHelperVersion = '1.0.20260811.0'
+$script:strCandidateExpectedContextVersion = '1.0.20260811.0'
 $script:strCandidateCatalogVersion = '1.0.20260805.1'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
@@ -5642,6 +5642,36 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
             }))
     }
 
+    # Test-...Issued selects a capture by parameter BINDING, not by value, so
+    # that $null and the empty string -- both legitimate captures -- are not read
+    # as omission and allowed to fall through to the live object (the round-72
+    # -MaximumEntry 0 in-band-sentinel mistake, here in the two capture
+    # parameters). Driven directly on a genuine, unaltered issued context, the
+    # default mode returns true (positive control: the context IS issued), while
+    # an explicit -ExpectedValues $null or -ExpectedState '' returns false: the
+    # sentinel value is authenticated as a capture and cannot match issuance,
+    # rather than being re-read as the live object. Reverting either ContainsKey
+    # selection reddens this -- the sentinel is read as omission and the matching
+    # live object is authenticated, so the altered-capture call wrongly returns
+    # true.
+    $strSentinelRoot = [System.IO.Path]::Combine($RunRoot, 'issued-capture-sentinel')
+    [void][System.IO.Directory]::CreateDirectory($strSentinelRoot)
+    $objSentinelContext = New-StyleGuideCandidateInvocationContext `
+        -TrustedTemporaryRoot $strSentinelRoot `
+        -DiagnosticLabel 'issued-capture-sentinel'
+    $boolSentinelDefault = [bool](Test-StyleGuideCandidateInvocationContextIssued `
+        -Context $objSentinelContext)
+    $boolSentinelNullValues = [bool](Test-StyleGuideCandidateInvocationContextIssued `
+        -Context $objSentinelContext -ExpectedValues $null)
+    $boolSentinelEmptyState = [bool](Test-StyleGuideCandidateInvocationContextIssued `
+        -Context $objSentinelContext -ExpectedState '')
+    if ((-not $boolSentinelDefault) -or $boolSentinelNullValues -or $boolSentinelEmptyState) {
+        & $script:scriptBlockStopHarness -Code 'orchestration-failed' `
+            -Detail ('issued-capture-sentinel-d' + [string]$boolSentinelDefault +
+                '-nv' + [string]$boolSentinelNullValues +
+                '-es' + [string]$boolSentinelEmptyState)
+    }
+
     # The context manager's cleanup CATCH must not over-claim when the terminal
     # transition it attempts is REFUSED. A cleanup that has begun deleting can
     # throw; the catch then tries to record CleanupFailed through the object's own
@@ -11124,7 +11154,7 @@ function Invoke-StyleGuideCandidateHarness {
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260811.1
+    # Version: 1.0.20260811.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param ()
