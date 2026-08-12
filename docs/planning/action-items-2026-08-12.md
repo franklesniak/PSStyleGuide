@@ -10,7 +10,7 @@ Keep each repository self-contained. A common behavior may differ only when a re
 
 ## Verified baseline
 
-This state was verified at `2026-08-12T14:37:36Z`. Re-query GitHub and fetch both `origin/main` refs immediately before every issue edit, branch rewrite, merge, or settings change. If an identity or dependency has changed, stop and refresh the affected comparison.
+This state was verified at `2026-08-12T19:13:43Z`. Re-query GitHub and fetch both `origin/main` refs immediately before every issue edit, branch rewrite, merge, or settings change. If an identity or dependency has changed, stop and refresh the affected comparison.
 
 ### Completed coordination work
 
@@ -24,6 +24,16 @@ The following work is complete and is not part of the remaining work queue:
 - [Terraform issue #21](https://github.com/franklesniak/TerraformStyleGuide/issues/21) pins PS PR #153's landed commit and four source blobs, names exactly four affected paths, preserves the 115 PS rows and 141-row Terraform allocation, prohibits copying `CLAUDE.md`, and requires reciprocal comparison.
 - [PS issue #152](https://github.com/franklesniak/PSStyleGuide/issues/152) contains the Terraform PR #29 bypass-eligibility finding and the limited 2026-08-01 approval scope.
 - [PS issue #158](https://github.com/franklesniak/PSStyleGuide/issues/158) exists with Terraform PR #27's immutable supply-freeze source pins.
+- The verified native dependency chain is [PS #147](https://github.com/franklesniak/PSStyleGuide/issues/147) -> [#148](https://github.com/franklesniak/PSStyleGuide/issues/148) -> [#149](https://github.com/franklesniak/PSStyleGuide/issues/149) -> [#151](https://github.com/franklesniak/PSStyleGuide/issues/151). Both GitHub dependency views contain the #148-to-#149 relationship.
+- [PS #159](https://github.com/franklesniak/PSStyleGuide/issues/159) is the foundation-convergence umbrella. Its ordered native sub-issues are [#160](https://github.com/franklesniak/PSStyleGuide/issues/160), [#161](https://github.com/franklesniak/PSStyleGuide/issues/161), [#162](https://github.com/franklesniak/PSStyleGuide/issues/162), and [#158](https://github.com/franklesniak/PSStyleGuide/issues/158).
+- PS #160 blocks PS #161. PS #161 blocks PS #162.
+- [PS #163](https://github.com/franklesniak/PSStyleGuide/issues/163) owns the separate Claude command-parity cycle.
+- [Terraform #31](https://github.com/franklesniak/TerraformStyleGuide/issues/31) is the non-implementing tracker for all five initial reciprocal cycles.
+- The deferred Terraform #22 and #24 update prompts and the PS #151 applicability path remain in Step 6.
+
+### Current active work
+
+[PS PR #164](https://github.com/franklesniak/PSStyleGuide/pull/164) is the only active feature implementation PR. It is configured to close PS #160 when it merges. It rebases the infrastructure-conformance patch onto PS `main` commit `2d56357d9f52c76734027174bf62278e6f3d4cd6`. The current head is `1e35e9b50045cca8946c97070109e3c9fc38c804`, and the current tree is `33937c64d45b20769cf80d1036fa9ffbf4077ebe`. The PR is open, draft, mergeable, and clean. Its `verify_generated_artifacts` and `markdownlint` checks pass. It is not a landed baseline.
 
 ### Immutable implementation baselines
 
@@ -34,7 +44,8 @@ The following work is complete and is not part of the remaining work queue:
 | Terraform T1 implementation, PR #26 | `143f54e52075a1ae1e999a6e242073e3d8d4a46b` | Landed Terraform issue #20 implementation |
 | Terraform supply-freeze method, PR #27 | `aae05282b57f093cec8b63e59138db72c982f10e` | `.github/workflows/Get-SupplyFreezeDigest.mjs` blob `05778c0eda0273a9217f7dc953795c2240473a14`; `docs/T1-SUPPLY-FREEZE-v1.md` blob `36010d2dac98631845d8e880689f7c315ccbcdb7` |
 | Current Terraform `main`, PR #30 | `fbfc3aca874e235cace92f506377f5c9e0704160` | `3c6e54be9d722b8f61aa225b1414f228f7531268` |
-| PS infrastructure-conformance branch | `904df87c24abb4abcb44d2a71859c0589b82c167` | Based on PS PR #150; changes exactly the generator, path verifier, and build workflow |
+| PS infrastructure-conformance source | `904df87c24abb4abcb44d2a71859c0589b82c167` | Original three-path patch based on PS PR #150 |
+| PS infrastructure-conformance candidate, PR #164 | `1e35e9b50045cca8946c97070109e3c9fc38c804` | Draft tree `33937c64d45b20769cf80d1036fa9ffbf4077ebe`; five-path rebased candidate, not landed |
 
 ### Current convergence inventory
 
@@ -59,7 +70,7 @@ The material common-foundation differences are:
 | Markdown topology | `.github/workflows/markdownlint.yml`, blob `4afa4f3aba03ffe3796ca72223cb0ebe26c8f34a` | Same path, blob `6a64b2a3b5b737bb7f69dc971b1b21b298013ab0` | Adopt separate action-free policy and lint jobs with verified Node acquisition. |
 | Workflow policy | Validator blob `00263451aa8287a36ad0694143d96741c4cdd1f9`, contract blob `36374dbf88cb280126f780052e5d860ec96af9a7`, case-catalog blob `252423934501a1a5ffa7a9d33ea0f001b4068d11` | Validator blob `fb17e06f2f456a0d7df510b0bb34c52d88b7893b`; Terraform embeds its contract and cases | Preserve PS machine-readable authority and add every applicable Terraform invariant and negative case. |
 | Supply-freeze reproducibility | No recorder or method | PR #27 recorder and method | Complete PS issue #158 after the PS policy contract stabilizes. |
-| PowerShell conformance | Unmerged three-file branch | PR #30 landed conformance | Land the PS branch through a focused issue before behavior-changing convergence. |
+| PowerShell conformance | Draft PR #164 at head `1e35e9b50045cca8946c97070109e3c9fc38c804` | PR #30 landed conformance | Review and land PR #164, then complete the reciprocal comparison before behavior-changing convergence. |
 | Husky preparation | `install-husky.mjs` and a PS-specific `prepare` command | Direct `husky` command with accepted failure | Reconcile through PS issue #149 and later Terraform issue #24; do not change it in the foundation issues. |
 | Decision records | PS-specific trust-root and baseline-provenance records | Terraform-specific historical writer and required-check records | Preserve history. Compare active residuals; do not copy records by filename. |
 
@@ -155,33 +166,9 @@ Use this closed reciprocal catalog for every foundation comparison:
 
 Each row occurs exactly once. Record both repository URLs and commits, normative and implementation locators, evidence paths and SHA-256 values, observed values or fixture IDs, one status (`same`, `intentional difference`, or `blocker`), and a reason. An intentional difference must name both literals, the repository need, proof of equal security and failure strength, the owner, and any review or expiry condition. Duplicate, missing, unknown, renamed, empty, or unexplained rows block merge.
 
-## Step 1 — repair dependency metadata and protect the deadline
+## Step 1 — protect the advisory deadline
 
 The current PS P1 advisory decision expires at `2026-08-30T23:59:59Z`. PS issue #149 requires P1, P1A, P1B, and P2 handoffs before implementation, so it is not safe to treat #149 as immediately executable.
-
-### 1.1 Add PS issue #148 as a blocker of #149
-
-Correct the missing native dependency now. Add PS issue #148 as a blocker of #149. Verify the resulting chain is `#147 -> #148 -> #149 -> #151`. Do not remove the existing #147-to-#148 or #149-to-#151 edges.
-
-The REST database ID of #148 is `5026320401`:
-
-```powershell
-gh api `
-    --method POST `
-    -H 'Accept: application/vnd.github+json' `
-    -H 'X-GitHub-Api-Version: 2026-03-10' `
-    repos/franklesniak/PSStyleGuide/issues/149/dependencies/blocked_by `
-    -F issue_id=5026320401
-
-gh api repos/franklesniak/PSStyleGuide/issues/149/dependencies/blocked_by `
-    --jq '.[] | [.number, .state, .title] | @tsv'
-gh api repos/franklesniak/PSStyleGuide/issues/148/dependencies/blocking `
-    --jq '.[] | [.number, .state, .title] | @tsv'
-```
-
-Require both queries to show the #148-to-#149 relationship.
-
-### 1.2 Run the advisory go/no-go track
 
 Use `2026-08-21T23:59:59Z` as the internal go/no-go checkpoint.
 
@@ -192,53 +179,15 @@ Use `2026-08-21T23:59:59Z` as the internal go/no-go checkpoint.
 - Do not silently extend a date, reuse old approval, or allow the validator to enter `advisory-expired`.
 - Do not add a false #149 dependency to the convergence issues. The date is a coordination gate, not an issue-graph claim.
 
-## Step 2 — open the convergence trackers and source issues
+Run Step 1 in parallel with Steps 2–6. Repository-settings work under PS #152 may run only within its separate authorization. Neither exception permits a second feature implementation PR.
 
-### 2.1 Open or update the issues in order
+## Step 2 — complete the convergence issue contracts
 
-Open or update items in this order before implementation:
+These sections retain the issue-level scope and closure requirements. Step 3 controls their execution order.
 
-1. Add PS issue #148 as a native blocker of #149 and verify `#147 -> #148 -> #149 -> #151`.
-2. Open the PS foundation-convergence umbrella.
-3. Open the focused PS infrastructure-conformance issue and attach the existing branch.
-4. Open the focused PS generator/path-contract issue and make the infrastructure issue its blocker.
-5. Open the focused PS workflow-isolation/policy issue and make the generator/path issue its blocker.
-6. Link existing PS #158 as the final foundation child; do not rewrite its technical contract.
-7. Open the separate PS Claude command-parity issue.
-8. Open a non-implementing Terraform convergence tracker. Use it to retain each Step 3 comparison, focused sync issue or pinned no-change record, reverse comparison, and cycle-closure record. Do not use one aggregate foundation implementation PR.
-9. Keep the Terraform #22, #24, and possible P4 prompts in this plan until their PS source PRs land.
+### 2.1 PS foundation-convergence umbrella
 
-After Step 2, execute Steps 3–6 in this order:
-
-```text
-Step 3 — import Terraform work into PS, one fixed-point cycle at a time
-  PS infrastructure -> Terraform compare/sync -> PS reverse compare
-  -> PS generator/path -> Terraform compare/sync -> PS reverse compare
-  -> PS workflow/policy -> Terraform compare/sync -> PS reverse compare
-  -> PS #158 -> Terraform compare/sync -> PS reverse compare
-  -> PS Claude command -> Terraform compare/sync -> PS reverse compare
-
-Step 4 — catch Terraform up from already landed PS work
-  Terraform #21 from PS PR #153 -> PS compare/sync -> Terraform reverse compare
-
-Step 5 — discover and close untracked differences
-  global two-repository sweep -> focused repair cycles until no blocker remains
-
-Step 6 — PS-first steady state
-  PS #147/#152 -> Terraform #22 -> PS compare/sync -> Terraform reverse compare
-  -> PS #148 -> repository-applicability record
-  -> Terraform #23 -> PS non-applicability/comparison record
-  -> PS #149 -> Terraform #24 -> PS compare/sync -> Terraform reverse compare
-  -> PS #151 -> applicable Terraform issue or pinned non-applicability record
-```
-
-The advisory go/no-go and fallback run alongside these steps and keep their fixed dates. Repository-settings work under #152 may run only within its separate authorization. Neither exception permits a second feature implementation PR.
-
-### 2.2 PS foundation-convergence umbrella prompt
-
-Create a new PSStyleGuide issue with a title such as `Converge the P1/T1 foundations and make PSStyleGuide the canonical cross-repository source`.
-
-Use this body:
+[PS issue #159](https://github.com/franklesniak/PSStyleGuide/issues/159) is open. Its creation and native child links are complete. Use the retained contract below for implementation and closure. Re-query the live issue before each write.
 
 ```markdown
 ## Objective
@@ -258,12 +207,12 @@ Keep PSStyleGuide and TerraformStyleGuide self-contained. Do not create a shared
 
 ## Children
 
-- [ ] `<PS_INFRA_ISSUE_URL>` — land the existing PowerShell-conformance branch.
-- [ ] `<PS_GENERATOR_ISSUE_URL>` — reconcile generator and reusable Git/path behavior.
-- [ ] `<PS_WORKFLOW_POLICY_ISSUE_URL>` — reconcile workflow isolation, Node acquisition, and policy coverage.
+- [ ] [PS issue #160](https://github.com/franklesniak/PSStyleGuide/issues/160) — land the existing PowerShell-conformance branch.
+- [ ] [PS issue #161](https://github.com/franklesniak/PSStyleGuide/issues/161) — reconcile generator and reusable Git/path behavior.
+- [ ] [PS issue #162](https://github.com/franklesniak/PSStyleGuide/issues/162) — reconcile workflow isolation, Node acquisition, and policy coverage.
 - [ ] [PS issue #158](https://github.com/franklesniak/PSStyleGuide/issues/158) — port the supply-freeze recorder and method after the policy contract stabilizes.
 
-Replace the three placeholders after creating the child issues.
+The live umbrella contains these four native sub-issues in this order.
 
 ## Common-behavior gate
 
@@ -278,11 +227,9 @@ After the infrastructure, generator/path, and workflow-policy children reach the
 Close this umbrella only after all four children and their reciprocal cycles close. Post one permanent final handoff with every child issue/PR URL, both repositories' final landed identities, source/destination blob maps, final reciprocal matrices, validation evidence, and all intentional differences. Do not create a later aggregate Terraform foundation implementation issue.
 ```
 
-### 2.3 PS infrastructure-conformance issue prompt
+### 2.2 PS infrastructure-conformance contract
 
-Create a focused issue with a title such as `Land the existing P1 infrastructure PowerShell-conformance patch`.
-
-Use this body:
+[PS issue #160](https://github.com/franklesniak/PSStyleGuide/issues/160) is open. [Draft PR #164](https://github.com/franklesniak/PSStyleGuide/pull/164) implements the current candidate. The issue creation, rebase, and current-head validation are complete. Review, landing, reciprocal comparison, and fixed-point closure remain. Re-run validation if the candidate bytes change. Use this contract for the remaining work:
 
 ```markdown
 ## Objective
@@ -302,30 +249,30 @@ The original patch changes exactly:
 - `.github/workflows/Test-ExactGitPathSet.ps1`; and
 - `.github/workflows/build.yml`.
 
-## Required work
+The draft candidate also changes `.github/workflows/workflow-policy-contract.json` and `.github/workflows/Validate-WorkflowPolicy.mjs` only for the coupled identity refresh required by the final script bytes.
 
-- Rebase the branch onto the pinned PS baseline.
+## Implementation and preservation requirements
+
+- Preserve the completed rebase onto the pinned PS baseline.
 - Preserve the complete original patch unless a line is superseded by a proved equivalent landed change.
 - Apply every applicable Terraform PR #30 authoring idiom: descriptive type-prefixed names, `List[T]` instead of array `+=`, `[void]` output suppression, complete comment-based help, approved function naming, and descriptive loop variables.
 - Keep runtime behavior unchanged.
 - Do not edit `CLAUDE.md` or the four P1A files.
-- Update script versions and every trusted pin only when the final material bytes require it.
-- Record the old and rebased commits; do not claim the old commit survived the rebase.
+- Preserve the current script versions and trusted pins. Update them only if the final material bytes change.
+- Preserve the old and rebased commit record. Do not claim that the old commit survived the rebase.
 
 ## Validation
 
-Run both Markdown lint surfaces, PowerShell parsing, PSScriptAnalyzer under Windows PowerShell 5.1 and PowerShell 7 where available, workflow-policy validation, generator drift verification, and exact-path verification. Record exact commands, runtime versions, exit codes, and results.
+If the candidate bytes change, rerun both Markdown lint surfaces, PowerShell parsing, PSScriptAnalyzer under Windows PowerShell 5.1 and PowerShell 7 where available, workflow-policy validation, generator drift verification, and exact-path verification. Retain the exact commands, runtime versions, exit codes, and results.
 
 ## Handoff
 
-The PR must give the umbrella issue its reviewed head/tree, landed commit/tree, three landed blobs, version/digest changes, validation evidence, and every intentional repository-specific difference. After merge, run the Terraform comparison and sync prompt. Do not start the generator/path issue until the reverse comparison closes this cycle.
+The PR must give the umbrella issue its reviewed head/tree, landed commit/tree, all five landed blobs, version/digest changes, validation evidence, and every intentional repository-specific difference. After merge, run the Terraform comparison and sync prompt. Do not start the generator/path issue until the reverse comparison closes this cycle.
 ```
 
-### 2.4 PS generator and path-contract issue prompt
+### 2.3 PS generator and path-contract
 
-Create a focused issue with a title such as `Reconcile the P1/T1 generator and exact Git path contracts`.
-
-Make the infrastructure-conformance issue a native blocker. Use this body:
+[PS issue #161](https://github.com/franklesniak/PSStyleGuide/issues/161) is open, and PS #160 is its verified native blocker. Do not start implementation until the PS #160 reciprocal cycle closes. Use this contract for implementation and closure:
 
 ```markdown
 ## Objective
@@ -343,7 +290,7 @@ Read these blobs again before implementation:
 - Terraform policy validator containing related fixtures: `fb17e06f2f456a0d7df510b0bb34c52d88b7893b`.
 - Landed infrastructure-conformance commit: `<PS_INFRA_LANDED_COMMIT>`.
 
-Replace the placeholder before posting.
+Replace this placeholder in the plan and update the live issue before implementation.
 
 Use the landed infrastructure-conformance commit as the editing baseline. The older PS blobs above identify the original P1 behavior for comparison only. Do not restore them over the landed conformance bytes.
 
@@ -384,11 +331,9 @@ Run fault injection without touching the real repository. Run Windows PowerShell
 Record base, reviewed head/tree, landed commit/tree, source and landed blobs, script versions, SHA-256 values, result schema, fixture identities, runtime matrix, and every intentional difference. Run the Terraform comparison and any reverse PS sync-back to a fixed point. The workflow-policy issue must consume the final PS landed commit from that cycle, never an earlier branch head.
 ```
 
-### 2.5 PS workflow-isolation and policy issue prompt
+### 2.4 PS workflow-isolation and policy
 
-Create a focused issue with a title such as `Adopt the T1 action-free code-job boundary and converge workflow-policy coverage`.
-
-Make the generator/path-contract issue a native blocker. Use this body:
+[PS issue #162](https://github.com/franklesniak/PSStyleGuide/issues/162) is open, and PS #161 is its verified native blocker. Do not start implementation until the PS #161 reciprocal cycle closes. Use this contract for implementation and closure:
 
 ```markdown
 ## Objective
@@ -407,7 +352,7 @@ Make PSStyleGuide's P1 workflows use the strongest applicable PS and Terraform c
 - Terraform validator blob: `fb17e06f2f456a0d7df510b0bb34c52d88b7893b`.
 - Canonical PS generator/path commit: `<PS_GENERATOR_LANDED_COMMIT>`.
 
-Replace the placeholder before posting.
+Replace this placeholder in the plan and update the live issue before implementation.
 
 Use the canonical landed generator/path commit as the editing baseline. The older PS workflow and policy blobs above identify the pre-convergence behavior for comparison only. Re-read every overlapping path from the landed commit before editing.
 
@@ -447,19 +392,19 @@ Run all offline fixtures, both Markdown surfaces, generator drift, exact-path ch
 Record every source and landed blob, contract and catalog version/digest, Node/npm/archive identities, action pins/manifests/defaults, final topology, case allocation, runtime results, reviewed head/tree, landed commit/tree, and intentional difference. Run the Terraform comparison and any reverse PS sync-back to a fixed point. PS issue #158 must consume the final landed PS contract from this cycle.
 ```
 
-### 2.6 PS issue #158 linkage update
+### 2.5 PS issue #158 linkage and implementation
 
-After the workflow-isolation/policy issue exists, add one short planning comment to #158. Do not replace its body.
+PS #158 is already a native child of PS #159. After the PS #162 PR lands, add one short planning comment to #158. Do not replace its body.
 
 ```markdown
-This issue is a child of `<PS_FOUNDATION_UMBRELLA_URL>` and starts after `<PS_WORKFLOW_POLICY_PR_URL>` lands. Re-read the final landed `workflow-policy-contract.json` from `<PS_WORKFLOW_POLICY_LANDED_COMMIT>` before adapting the recorder. Preserve this issue's existing nonblocking scope and immutable Terraform PR #27 source pins.
+This issue is a child of [PS issue #159](https://github.com/franklesniak/PSStyleGuide/issues/159) and starts after `<PS_WORKFLOW_POLICY_PR_URL>` lands. Re-read the final landed `workflow-policy-contract.json` from `<PS_WORKFLOW_POLICY_LANDED_COMMIT>` before adapting the recorder. Preserve this issue's existing nonblocking scope and immutable Terraform PR #27 source pins.
 ```
 
-Replace all three placeholders before posting. Complete #158 after the workflow-policy contract lands. Its PR must keep the recorder read-only, capture output outside the repository, and prove no manifest, lockfile, installed-tree, contract, generated-output, or worktree mutation. After merge, run the Terraform comparison and any reverse PS sync-back to a fixed point before the Claude command cycle starts.
+Replace the two remaining placeholders before posting. Complete #158 after the workflow-policy contract lands. Its PR must keep the recorder read-only, capture output outside the repository, and prove no manifest, lockfile, installed-tree, contract, generated-output, or worktree mutation. After merge, run the Terraform comparison and any reverse PS sync-back to a fixed point before the Claude command cycle starts.
 
-### 2.7 PS Claude command issue prompt
+### 2.6 PS Claude command
 
-Open a separate PS issue to add `.claude/commands/review-loop.md`. It is Step 3 cycle 5, but it remains independent of the foundation issue graph.
+[PS issue #163](https://github.com/franklesniak/PSStyleGuide/issues/163) is open and remains unimplemented. Issue creation and owner authorization are complete. It is Step 3 cycle 5 and remains independent of the foundation issue graph. Use this contract for implementation and closure:
 
 ```markdown
 ## Objective
@@ -486,9 +431,9 @@ Do not copy it unchanged. It says `all six steps`, while PSStyleGuide's landed `
 Keep this issue and PR separate from the foundation, supply-freeze, and infrastructure-conformance work. After it lands, run the Terraform comparison and sync prompt. If Terraform changes, run the reverse PS comparison before closing the cycle.
 ```
 
-### 2.8 Terraform convergence tracker prompt
+### 2.7 Terraform convergence tracker
 
-Create one non-implementing TerraformStyleGuide issue with a title such as `Track reciprocal convergence for Terraform-derived PSStyleGuide work`.
+[Terraform issue #31](https://github.com/franklesniak/TerraformStyleGuide/issues/31) is open. Tracker creation is complete, but all five reciprocal cycle records remain open. Use this contract to maintain and close the tracker:
 
 ```markdown
 ## Objective
@@ -516,11 +461,11 @@ Run these source issues as separate fixed-point cycles in this order:
 
 | Order | PS source issue | Immutable Terraform design input | Required Terraform-side closure |
 | ---: | --- | --- | --- |
-| 1 | New infrastructure-conformance issue | PR #30 merge `fbfc3aca874e235cace92f506377f5c9e0704160` | Compare the generator, path verifier, and build workflow; implement one focused sync only if PS adds common behavior. |
-| 2 | New generator/path issue | PR #26 merge `143f54e52075a1ae1e999a6e242073e3d8d4a46b` and PR #30 merge above | Compare the generator, reusable verifier, embedded Terraform checks, and fixtures; sync every common contract. |
-| 3 | New workflow/policy issue | PR #26 and PR #30 merges above | Compare workflow topology, Node acquisition, permissions, policy authority, and negative cases; sync every common contract. |
+| 1 | [PS #160](https://github.com/franklesniak/PSStyleGuide/issues/160), draft [PR #164](https://github.com/franklesniak/PSStyleGuide/pull/164) | PR #30 merge `fbfc3aca874e235cace92f506377f5c9e0704160` | Review and land PR #164. Compare the generator, path verifier, and build workflow. Implement one focused sync only if PS adds common behavior. |
+| 2 | [PS #161](https://github.com/franklesniak/PSStyleGuide/issues/161), blocked by #160 | PR #26 merge `143f54e52075a1ae1e999a6e242073e3d8d4a46b` and PR #30 merge above | Compare the generator, reusable verifier, embedded Terraform checks, and fixtures; sync every common contract. |
+| 3 | [PS #162](https://github.com/franklesniak/PSStyleGuide/issues/162), blocked by #161 | PR #26 and PR #30 merges above | Compare workflow topology, Node acquisition, permissions, policy authority, and negative cases; sync every common contract. |
 | 4 | [PS issue #158](https://github.com/franklesniak/PSStyleGuide/issues/158) | PR #27 merge `aae05282b57f093cec8b63e59138db72c982f10e` | Compare the adapted recorder and method with Terraform; sync any generally useful correction. |
-| 5 | New Claude command-parity issue | Commit `fbdecbae787055a2117d4ada83ae294a7decfe62`, blob `7b0e41361a8ab7259245ad5f0d86d9300008347d` | Remove any avoidable protocol drift in Terraform, then compare the result back in PS. |
+| 5 | [PS #163](https://github.com/franklesniak/PSStyleGuide/issues/163) | Commit `fbdecbae787055a2117d4ada83ae294a7decfe62`, blob `7b0e41361a8ab7259245ad5f0d86d9300008347d` | Remove any avoidable protocol drift in Terraform, then compare the result back in PS. |
 
 After each PS PR lands, run the Terraform comparison and sync prompt below. If a Terraform PR lands, run the reverse PS comparison prompt. Repeat until the cycle reaches the per-issue fixed-point gate. Only then start the next numbered PS issue.
 
@@ -736,7 +681,7 @@ This plan is complete only when all of the following are true:
 - The PS foundation umbrella and its four children are closed with a permanent landed handoff that identifies both repositories' final commits and blobs.
 - The separate Claude command cycle closes without duplicating volatile protocol text.
 - The Terraform convergence tracker contains all five Step 3 cycle records and no aggregate foundation implementation PR exists.
-- The existing infrastructure branch is rebased and landed through its focused issue.
+- Draft PS PR #164 is reviewed and landed through PS #160, and its reciprocal cycle reaches a fixed point.
 - PS and Terraform generators share the canonical tracked-present/tracked-absent publication and structured-result behavior.
 - Repository-code jobs in both repositories contain no actions and have no repository-token scopes.
 - Both repositories use the same common workflow-policy behaviors and case coverage, with only recorded repository-specific literals.
@@ -756,9 +701,11 @@ This plan is complete only when all of the following are true:
 
 - [PS issue #145](https://github.com/franklesniak/PSStyleGuide/issues/145) and [PS PR #150](https://github.com/franklesniak/PSStyleGuide/pull/150)
 - [PS PR #153](https://github.com/franklesniak/PSStyleGuide/pull/153) and PS issues [#147](https://github.com/franklesniak/PSStyleGuide/issues/147), [#148](https://github.com/franklesniak/PSStyleGuide/issues/148), [#149](https://github.com/franklesniak/PSStyleGuide/issues/149), [#151](https://github.com/franklesniak/PSStyleGuide/issues/151), [#152](https://github.com/franklesniak/PSStyleGuide/issues/152), and [#158](https://github.com/franklesniak/PSStyleGuide/issues/158)
+- [PS foundation umbrella #159](https://github.com/franklesniak/PSStyleGuide/issues/159), child issues [#160](https://github.com/franklesniak/PSStyleGuide/issues/160), [#161](https://github.com/franklesniak/PSStyleGuide/issues/161), and [#162](https://github.com/franklesniak/PSStyleGuide/issues/162), and [draft PR #164](https://github.com/franklesniak/PSStyleGuide/pull/164)
+- [PS Claude command-parity issue #163](https://github.com/franklesniak/PSStyleGuide/issues/163)
 - [Terraform issue #20](https://github.com/franklesniak/TerraformStyleGuide/issues/20) and [Terraform PR #26](https://github.com/franklesniak/TerraformStyleGuide/pull/26)
 - [Terraform PR #27](https://github.com/franklesniak/TerraformStyleGuide/pull/27) and [Terraform PR #30](https://github.com/franklesniak/TerraformStyleGuide/pull/30)
-- Terraform issues [#21](https://github.com/franklesniak/TerraformStyleGuide/issues/21), [#22](https://github.com/franklesniak/TerraformStyleGuide/issues/22), [#23](https://github.com/franklesniak/TerraformStyleGuide/issues/23), and [#24](https://github.com/franklesniak/TerraformStyleGuide/issues/24)
+- Terraform issues [#21](https://github.com/franklesniak/TerraformStyleGuide/issues/21), [#22](https://github.com/franklesniak/TerraformStyleGuide/issues/22), [#23](https://github.com/franklesniak/TerraformStyleGuide/issues/23), [#24](https://github.com/franklesniak/TerraformStyleGuide/issues/24), and [convergence tracker #31](https://github.com/franklesniak/TerraformStyleGuide/issues/31)
 - [GitHub secure-use guidance for Actions](https://docs.github.com/en/actions/reference/security/secure-use)
 - [GitHub Actions runner authentication design](https://github.com/actions/runner/blob/main/docs/design/auth.md)
 - [GitHub Actions `GITHUB_TOKEN`](https://docs.github.com/en/actions/concepts/security/github_token)
