@@ -66,133 +66,6 @@ The old tracker closures were `FF` conditions. This report removes the ambiguity
 - Task 25 closes PS #159 after cycle 4 finishes (`FS`).
 - Task 32 closes Terraform #31 after cycle 5 finishes (`FS`).
 
-## Global execution contract
-
-Apply these controls to every task:
-
-1. Re-query GitHub and fetch both current `origin/main` refs before an issue write, branch rewrite, merge, or settings change.
-2. Open or identify a focused issue before implementation. Issue creation does not start implementation.
-3. Pin every cross-repository input to a landed commit and Git blob. Never copy from a moving branch.
-4. Verify that the implementation slot is free before a feature branch, implementation edit, or implementation PR starts.
-5. After a PR exists, treat candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions.
-6. Do not change repository settings unless an applicable administrator issue authorizes the exact request.
-7. Replace every placeholder before posting text. Never fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
-8. Use native dependencies only for real completion prerequisites. A tracker can list children without creating a false blocking edge.
-9. Validate each finding before editing. List the options, create a finding-specific weighted rubric, score the options, and select the best option.
-10. State the selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not permanent planning or implementation documents.
-11. Record issue and PR URLs, bases, reviewed heads and trees, merge methods, landed commits and trees, affected paths, Git blobs, validation commands, runtime identities, and review outcomes.
-
-No PR can merge directly from an implementation or comparison task. A known PR uses separate numbered tasks for the review loop, final quality check, and merge. A conditional or repeatable repair PR uses the discrete conditional lifecycle defined below. This rule applies to PS, Terraform, initial adaptations, reciprocal sync-backs, audit repairs, residual work, fallback work, and future paired cycles.
-
-## Mandatory PR lifecycle
-
-Use this lifecycle for every PR created or changed by this plan:
-
-1. **Prepare the candidate.** Create or update the PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, and issue links. Stop before merge.
-2. **Run the Anthropic Claude Code review loop.** Use a dedicated Anthropic Claude Code session and the copy-paste prompt below. Do not combine this action with candidate preparation or merge.
-3. **Run the independent final quality check.** Use a fresh coding-agent session and the second copy-paste prompt below. The agent can be any coding agent. It must not rely on the Claude Code session's unverified summary.
-4. **Merge.** Merge only when the review loop is terminally clean and the independent final quality check returns `PASS` for the same head SHA and tree.
-
-If the Claude review loop or final quality check changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to lifecycle step 2. Run a new Claude review loop against the new head. Then run lifecycle step 3 again in another fresh session. A PR-body-only correction does not change the head, but it requires the final quality check to revalidate the corrected body.
-
-### Anthropic Claude Code review-loop prompt
-
-Copy this prompt into Anthropic Claude Code. Replace only `<PR_URL_OR_NUMBER>`:
-
-~~~text
-Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
-
-Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
-
-Do not merge the pull request.
-
-1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
-2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
-3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
-4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
-5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
-6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
-7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
-9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
-10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
-12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
-
-If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
-~~~
-
-### Independent final PR quality-check prompt
-
-Copy this prompt into a fresh coding-agent session after the Claude Code review loop is terminally clean. Replace only `<PR_URL_OR_NUMBER>`:
-
-~~~text
-Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
-
-Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
-
-1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
-2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
-4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
-5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
-6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
-7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
-8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
-9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
-10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
-11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
-12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
-13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
-15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
-
-PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
-~~~
-
-### Merge gate
-
-Immediately before every merge:
-
-1. Re-query the PR, its linked issues, reviews, threads, and checks.
-2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency/authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path/blob identities, and post-merge checks.
-5. Post the permanent handoff only from the landed commit. Never use a reviewed head or anticipated squash SHA as the landed identity.
-
-### Conditional or repeatable repair PR lifecycle
-
-When a comparison, reverse comparison, audit, residual cycle, or future cycle finds work and creates a repair PR, perform these as discrete steps before the comparison task can continue:
-
-1. **Candidate step:** Implement the selected repair, open or update one focused PR, run local validation, and record its head SHA and tree. Stop before merge.
-2. **Claude Code review-loop step:** Run the mandatory Anthropic Claude Code prompt. Require `TERMINALLY CLEAN` for the candidate head.
-3. **Independent quality-check step:** In a fresh coding-agent session, run the mandatory final quality-check prompt. Require `PASS` for the same head and tree.
-4. **Merge step:** Apply the merge gate and record the landed identity.
-
-Repeat all four steps for every additional reciprocal repair PR. If the comparison produces a pinned no-change or non-applicability result, record that result and do not run PR-only gates.
-
-Allowed intentional differences are limited to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
-
-For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Convenience, implementation history, separate authorship, and lower effort are not repository-specific reasons.
-
-## Reciprocal fixed-point contract
-
-Use this sequence when a task requires a destination comparison or reverse comparison:
-
-1. Read both repositories only from pinned commits. Record every compared blob.
-2. Map files by role, not only by filename.
-3. Classify each applicable row as `same`, `intentional difference`, or `blocker`.
-4. If no common difference exists, post a pinned no-change or non-applicability record. Do not open an implementation issue only for symmetry.
-5. If a common difference exists, create or update one focused destination issue. Pin the source commit and blobs.
-6. After issue setup and a free implementation slot, start the destination adaptation. Do not redesign the capability independently.
-7. Prepare one destination PR candidate. Run the conditional repair PR lifecycle: Claude Code review loop, fresh-agent final quality check, and merge. Record the complete landed identity and validation evidence.
-8. Compare the destination result back against the source repository.
-9. If the adaptation added or corrected common behavior, create a focused source sync-back issue. Start it only after issue setup and a free implementation slot.
-10. Prepare the source sync-back PR candidate. Run the conditional repair PR lifecycle before merge. Then compare the new source result in the destination again.
-11. Stop if the same matrix row changes direction twice. Run a new decision process that evaluates both implementations.
-12. Close the cycle only when every common row is `same`, every intentional difference has complete evidence, and no blocker remains.
-13. Post one permanent closure record with final identities from both repositories, the matrix digest, validation, review outcomes, and non-applicability results.
-
 ## Target common foundation
 
 The final PS canonical implementation and synchronized Terraform implementation must share these behaviors:
@@ -308,6 +181,20 @@ These files already have identical Git blobs in both repositories. Do not rewrit
 | --- | --- | --- |
 | None | — | PR #164 already exists, has no open native blocker, and has successful initial checks. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Objective
 
 Take PR #164 through the mandatory Anthropic Claude Code review loop. Do not merge it.
@@ -326,9 +213,36 @@ Take PR #164 through the mandatory Anthropic Claude Code review loop. Do not mer
 
 1. Re-query PR #164 and verify its base, head, tree, draft state, checks, affected paths, and PS #160 closing reference.
 2. Confirm that the completed rebase, original patch, Terraform PR #30 authoring conformance, timeless version grammar, and coupled policy identities are present in the candidate.
-3. Run the mandatory Anthropic Claude Code review-loop prompt with `<PR_URL_OR_NUMBER>` set to `https://github.com/franklesniak/PSStyleGuide/pull/164`.
+3. Run the task-local Anthropic Claude Code review-loop prompt below with `<PR_URL_OR_NUMBER>` set to `https://github.com/franklesniak/PSStyleGuide/pull/164`.
 4. Preserve runtime behavior and the prohibition on editing `CLAUDE.md` or the four P1A files unless an independently authorized finding requires a different action.
 5. If the loop changes bytes, rerun both Markdown surfaces, PowerShell parsing, PSScriptAnalyzer under Windows PowerShell 5.1 and PowerShell 7 where available, policy validation, generator drift, and exact-path verification before the next review round.
+
+### Anthropic Claude Code review-loop prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a dedicated Anthropic Claude Code session:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
 
 ### Complete when
 
@@ -344,13 +258,55 @@ The loop returns `TERMINALLY CLEAN` and records the final PR head/tree, review r
 | --- | --- | --- |
 | Task 1 | `FS` | The Claude Code review loop is terminally clean. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Start a fresh coding-agent session that does not inherit the Claude review-loop context.
-2. Run the mandatory independent final PR quality-check prompt with `<PR_URL_OR_NUMBER>` set to `https://github.com/franklesniak/PSStyleGuide/pull/164`.
+2. Run the task-local independent final PR quality-check prompt below with `<PR_URL_OR_NUMBER>` set to `https://github.com/franklesniak/PSStyleGuide/pull/164`.
 3. Require the audit to cover all review comments and threads, stranded deferrals, PS #160 requirements, PR title/body accuracy, final diff quality, validation, checks, mergeability, and current-head review evidence.
 4. If the check changes any reviewable repository byte or finds unfinished implementation work, stop. Complete the work and return to Task 1.
 5. If the check changes only PR or issue metadata, re-query it and repeat the affected check sections before accepting the result.
+
+### Independent final PR quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Claude Code review loop is terminally clean:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
 
 ### Complete when
 
@@ -366,12 +322,36 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 1, with no
 | --- | --- | --- |
 | Task 2 | `FS` | The independent check returned `PASS` for the current head and tree. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-1. Apply the mandatory merge gate.
+1. Apply the task-local merge gate below.
 2. Verify again that the Claude Code terminal-clean record and independent `PASS` record identify the current PR #164 head and tree.
 3. Merge PR #164 with the approved method and close PS #160.
 4. Record the base, final reviewed head/tree, merge method, landed commit/tree, all five landed blobs, version and digest changes, validation commands and results, runtime identities, review-loop result, final quality-check result, and intentional differences.
+
+### Merge gate
+
+Immediately before the merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -387,6 +367,20 @@ PR #164 is merged, PS #160 is closed, and the permanent landed record exists. Do
 | --- | --- | --- |
 | Task 3 | `FS` | Use only the landed PS #160 commit and blobs. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Fetch both repositories. Record the landed PS #160 commit, tree, and five source blobs.
@@ -397,7 +391,100 @@ PR #164 is merged, PS #160 is closed, and the permanent landed record exists. Do
 6. If a common difference exists, create or update one focused Terraform issue. Pin the landed PS commit and blobs.
 7. Start the Terraform adaptation only after issue setup and a free implementation slot.
 8. Preserve common behavior. Change only proved repository-specific literals or behavior.
-9. If a Terraform repair is required, prepare one focused PR and run all four discrete conditional repair PR lifecycle steps before it merges.
+9. If a Terraform repair is required, prepare one focused PR and run all four task-local conditional repair PR lifecycle actions before it merges.
+
+### Destination-comparison controls
+
+1. Read both repositories only from pinned commits. Record every compared blob.
+2. Map files by role, not only by filename.
+3. Classify each applicable matrix row as `same`, `intentional difference`, or `blocker`.
+4. If no common difference exists, post a pinned no-change or non-applicability record. Do not open an implementation issue only for symmetry.
+5. If a common difference exists, create or update one focused destination issue. Pin the source commit and blobs.
+6. Start the destination adaptation only after issue setup and a free implementation slot. Adapt the landed capability; do not redesign it independently.
+7. Prepare one destination candidate and complete the task-local conditional repair PR lifecycle. Record the complete landed identity and validation evidence.
+8. Stop this task at its stated destination result. The dependent reverse-comparison task must compare the landed destination result back against the source before the cycle can close.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -413,16 +500,124 @@ Terraform has either a landed focused repair or a pinned no-change record. Recor
 | --- | --- | --- |
 | Task 4 | `FS` | Use the final Task 3 PS commit and final Task 4 Terraform commit. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Read both repositories only from the two landed commits. Record all compared blobs.
 2. Repeat the same role map and reciprocal matrix in the PS direction.
 3. If Terraform added or corrected common behavior, create a focused PS sync-back issue. Pin both landed commits and blobs.
 4. Start the PS sync-back only after issue setup and a free implementation slot.
-5. If a PS sync-back is required, prepare one focused PR and run all four discrete conditional repair PR lifecycle steps before it merges.
-6. If a PS PR lands, compare the new PS commit in Terraform again. For a required Terraform repair, run the same four discrete lifecycle steps before merge.
+5. If a PS sync-back is required, prepare one focused PR and run all four task-local conditional repair PR lifecycle actions before it merges.
+6. If a PS PR lands, compare the new PS commit in Terraform again. For a required Terraform repair, run the same four task-local conditional repair PR lifecycle actions before merge.
 7. Stop and run a new decision process if a matrix row changes direction twice.
 8. Update PS #159 and Terraform #31 with the permanent cycle 1 record.
+
+### Reverse-comparison and closure controls
+
+1. Read both repositories only from the final pinned commits. Record every compared blob and map files by role.
+2. Classify each applicable matrix row as `same`, `intentional difference`, or `blocker`.
+3. If the destination adaptation added or corrected common behavior, create or update one focused source sync-back issue. Pin both landed commits and blobs.
+4. Start a source sync-back only after issue setup and a free implementation slot. Adapt the common behavior; do not redesign it independently.
+5. Prepare the source sync-back candidate and complete the task-local conditional repair PR lifecycle.
+6. If the source changes, compare the new landed source result in the destination again. Use the same issue, slot, lifecycle, and evidence controls for each required destination repair.
+7. Stop if the same matrix row changes direction twice. Run a new decision process that evaluates both implementations.
+8. Close the cycle only when every common row is `same`, every intentional difference has complete evidence, and no blocker remains.
+9. Post one permanent closure record with both repositories' final identities, the matrix digest, validation, review outcomes, and no-change or non-applicability results. If a dependent final-recheck task owns closure, post the current reciprocal record and leave final closure to that task.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -437,6 +632,20 @@ Every common row is `same`, every intentional difference has complete evidence, 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
 | Task 5 | `FS` | Cycle 1 has a permanent fixed-point record. |
+
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
 
 ### Immutable inputs
 
@@ -475,6 +684,16 @@ Keep `Test-ExactGitPathSet.ps1` as the reusable implementation. Add all applicab
 6. Create or update one focused PS #161 PR. Run initial local validation and required checks.
 7. Record the base, candidate head/tree, source and candidate blobs, versions, SHA-256 values, result schema, fixture identities, runtime matrix, and intentional differences. Stop before merge.
 
+### Candidate preparation gate
+
+Before this task is complete:
+
+1. Create or update only the focused PR for the stated issue or approved task.
+2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
+3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
+4. Replace every placeholder and verify every posted identity.
+5. Stop before the Claude Code review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+
 ### Complete when
 
 The PS #161 candidate PR exists with complete initial validation and an accurate PR body. It is ready for the Claude Code review loop.
@@ -489,9 +708,50 @@ The PS #161 candidate PR exists with complete initial validation and an accurate
 | --- | --- | --- |
 | Task 6 | `FS` | The PS #161 candidate PR exists and initial checks pass. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory Anthropic Claude Code review-loop prompt against the PS #161 PR. Do not merge. If the loop changes bytes, rerun the Task 6 validation and continue the loop on the new head.
+Run the task-local Anthropic Claude Code review-loop prompt below against the PS #161 PR. Do not merge. If the loop changes bytes, rerun the Task 6 validation and continue the loop on the new head.
+
+### Anthropic Claude Code review-loop prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a dedicated Anthropic Claude Code session:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
 
 ### Complete when
 
@@ -507,9 +767,51 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree with comple
 | --- | --- | --- |
 | Task 7 | `FS` | The Claude Code review loop is terminally clean. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory independent final PR quality-check prompt against the PS #161 PR. Require full PS #161 issue-requirement coverage, comment and deferral audits, PR-body accuracy, final-diff inspection, validation, checks, and mergeability. Return to Task 7 after any head change.
+Run the task-local independent final PR quality-check prompt below against the PS #161 PR. Require full PS #161 issue-requirement coverage, comment and deferral audits, PR-body accuracy, final-diff inspection, validation, checks, and mergeability. Return to Task 7 after any head change.
+
+### Independent final PR quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Claude Code review loop is terminally clean:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
 
 ### Complete when
 
@@ -525,9 +827,33 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 7.
 | --- | --- | --- |
 | Task 8 | `FS` | The independent quality check passed for the current head and tree. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Apply the mandatory merge gate. Merge the focused PS #161 PR, close PS #161, and record the base, reviewed head/tree, merge method, landed commit/tree, source and landed blobs, versions, SHA-256 values, result schema, fixture identities, runtime matrix, validation, review-loop result, final quality-check result, and intentional differences.
+Apply the task-local merge gate below. Merge the focused PS #161 PR, close PS #161, and record the base, reviewed head/tree, merge method, landed commit/tree, source and landed blobs, versions, SHA-256 values, result schema, fixture identities, runtime matrix, validation, review-loop result, final quality-check result, and intentional differences.
+
+### Merge gate
+
+Immediately before the merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -543,15 +869,122 @@ PS #161 is closed by the landed PR and its permanent handoff is ready for the Te
 | --- | --- | --- |
 | Task 9 | `FS` | Use the final landed PS #161 commit. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Pin the Task 9 PS commit, tree, generator and verifier blobs, result schemas, and fixtures.
 2. Compare the complete generated-destination algorithm and reusable Git/path contract with Terraform.
 3. Complete the full foundation catalog and the Task 9 file-operation matrix.
 4. If all common behavior matches, post a pinned no-change record.
-5. If a common difference exists, create or update one focused Terraform issue before implementation. Then run the four discrete conditional repair PR lifecycle steps.
+5. If a common difference exists, create or update one focused Terraform issue before implementation. Then run the four task-local conditional repair PR lifecycle actions.
 6. Preserve repository-specific filenames and identity only when the intentional-difference record proves equal security and failure strength.
 7. Post the result to PS #161, PS #159, and Terraform #31.
+
+### Destination-comparison controls
+
+1. Read both repositories only from pinned commits. Record every compared blob.
+2. Map files by role, not only by filename.
+3. Classify each applicable matrix row as `same`, `intentional difference`, or `blocker`.
+4. If no common difference exists, post a pinned no-change or non-applicability record. Do not open an implementation issue only for symmetry.
+5. If a common difference exists, create or update one focused destination issue. Pin the source commit and blobs.
+6. Start the destination adaptation only after issue setup and a free implementation slot. Adapt the landed capability; do not redesign it independently.
+7. Prepare one destination candidate and complete the task-local conditional repair PR lifecycle. Record the complete landed identity and validation evidence.
+8. Stop this task at its stated destination result. The dependent reverse-comparison task must compare the landed destination result back against the source before the cycle can close.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -567,9 +1000,117 @@ Terraform has a landed focused repair or a pinned no-change record, with full id
 | --- | --- | --- |
 | Task 10 | `FS` | Use only the final landed commits from Tasks 9 and 10. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Use the reciprocal fixed-point contract. Repeat the foundation and file-operation matrices in the PS direction. Create a focused PS sync-back issue before any correction. Run the four discrete conditional repair PR lifecycle steps for every PS or later Terraform repair. Stop for a new decision process if a row changes direction twice. Update PS #159 and Terraform #31 with the permanent cycle 2 record.
+Use the task-local reverse-comparison and closure controls below. Repeat the foundation and file-operation matrices in the PS direction. Create a focused PS sync-back issue before any correction. Run the four task-local conditional repair PR lifecycle actions for every PS or later Terraform repair. Stop for a new decision process if a row changes direction twice. Update PS #159 and Terraform #31 with the permanent cycle 2 record.
+
+### Reverse-comparison and closure controls
+
+1. Read both repositories only from the final pinned commits. Record every compared blob and map files by role.
+2. Classify each applicable matrix row as `same`, `intentional difference`, or `blocker`.
+3. If the destination adaptation added or corrected common behavior, create or update one focused source sync-back issue. Pin both landed commits and blobs.
+4. Start a source sync-back only after issue setup and a free implementation slot. Adapt the common behavior; do not redesign it independently.
+5. Prepare the source sync-back candidate and complete the task-local conditional repair PR lifecycle.
+6. If the source changes, compare the new landed source result in the destination again. Use the same issue, slot, lifecycle, and evidence controls for each required destination repair.
+7. Stop if the same matrix row changes direction twice. Run a new decision process that evaluates both implementations.
+8. Close the cycle only when every common row is `same`, every intentional difference has complete evidence, and no blocker remains.
+9. Post one permanent closure record with both repositories' final identities, the matrix digest, validation, review outcomes, and no-change or non-applicability results. If a dependent final-recheck task owns closure, post the current reciprocal record and leave final closure to that task.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -584,6 +1125,20 @@ The generator/path cycle has no blocker, every common row is `same`, and every i
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
 | Task 11 | `FS` | Cycle 2 has a permanent fixed-point record. |
+
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
 
 ### Immutable inputs
 
@@ -621,6 +1176,16 @@ The generator/path cycle has no blocker, every common row is `same`, and every i
 5. Record the final case count and prove that every case runs exactly once. Require all initial checks to pass at the candidate head.
 6. Create or update one focused PS #162 PR. Record all source and candidate blobs, contract and catalog versions/digests, Node/npm/archive identities, action pins and manifest defaults, final topology, case allocation, runtime results, candidate head/tree, and intentional differences. Stop before merge.
 
+### Candidate preparation gate
+
+Before this task is complete:
+
+1. Create or update only the focused PR for the stated issue or approved task.
+2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
+3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
+4. Replace every placeholder and verify every posted identity.
+5. Stop before the Claude Code review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+
 ### Complete when
 
 The PS #162 candidate PR exists with complete initial validation and an accurate PR body.
@@ -635,9 +1200,50 @@ The PS #162 candidate PR exists with complete initial validation and an accurate
 | --- | --- | --- |
 | Task 12 | `FS` | The PS #162 candidate PR exists and initial checks pass. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory Anthropic Claude Code review-loop prompt against the PS #162 PR. Do not merge. If the loop changes bytes, rerun the Task 12 validation and continue on the new head.
+Run the task-local Anthropic Claude Code review-loop prompt below against the PS #162 PR. Do not merge. If the loop changes bytes, rerun the Task 12 validation and continue on the new head.
+
+### Anthropic Claude Code review-loop prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a dedicated Anthropic Claude Code session:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
 
 ### Complete when
 
@@ -653,9 +1259,51 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 | --- | --- | --- |
 | Task 13 | `FS` | The Claude Code review loop is terminally clean. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory independent final PR quality-check prompt against the PS #162 PR. Require full issue-contract, workflow-topology, policy-case, comment, deferral, PR-body, validation, and mergeability coverage. Return to Task 13 after any head change.
+Run the task-local independent final PR quality-check prompt below against the PS #162 PR. Require full issue-contract, workflow-topology, policy-case, comment, deferral, PR-body, validation, and mergeability coverage. Return to Task 13 after any head change.
+
+### Independent final PR quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Claude Code review loop is terminally clean:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
 
 ### Complete when
 
@@ -671,9 +1319,33 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 13.
 | --- | --- | --- |
 | Task 14 | `FS` | The independent quality check passed for the current head and tree. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Apply the mandatory merge gate. Merge the focused PR, close PS #162, and record all source and landed blobs, contract and catalog versions/digests, Node/npm/archive identities, action pins and manifest defaults, final topology, case allocation, runtime results, reviewed and landed identities, review-loop result, final quality-check result, and intentional differences.
+Apply the task-local merge gate below. Merge the focused PR, close PS #162, and record all source and landed blobs, contract and catalog versions/digests, Node/npm/archive identities, action pins and manifest defaults, final topology, case allocation, runtime results, reviewed and landed identities, review-loop result, final quality-check result, and intentional differences.
+
+### Merge gate
+
+Immediately before the merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -689,13 +1361,120 @@ PS #162 is closed and the final landed policy contract is ready for Task 16.
 | --- | --- | --- |
 | Task 15 | `FS` | Use the final landed PS #162 commit and policy contract. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Pin all Task 15 workflow, policy, contract, case, and validation blobs.
 2. Complete the full foundation catalog and workflow-topology table in Terraform.
 3. Apply all blockers from Task 15's required topology and policy.
-4. Post a pinned no-change record or prepare one focused Terraform repair and run the four discrete conditional repair PR lifecycle steps.
+4. Post a pinned no-change record or prepare one focused Terraform repair and run the four task-local conditional repair PR lifecycle actions.
 5. Update PS #162, PS #159, and Terraform #31 with full identities and validation.
+
+### Destination-comparison controls
+
+1. Read both repositories only from pinned commits. Record every compared blob.
+2. Map files by role, not only by filename.
+3. Classify each applicable matrix row as `same`, `intentional difference`, or `blocker`.
+4. If no common difference exists, post a pinned no-change or non-applicability record. Do not open an implementation issue only for symmetry.
+5. If a common difference exists, create or update one focused destination issue. Pin the source commit and blobs.
+6. Start the destination adaptation only after issue setup and a free implementation slot. Adapt the landed capability; do not redesign it independently.
+7. Prepare one destination candidate and complete the task-local conditional repair PR lifecycle. Record the complete landed identity and validation evidence.
+8. Stop this task at its stated destination result. The dependent reverse-comparison task must compare the landed destination result back against the source before the cycle can close.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -711,9 +1490,117 @@ Terraform matches every common workflow-policy behavior or has fully proved inte
 | --- | --- | --- |
 | Task 16 | `FS` | Use only the final landed commits from Tasks 15 and 16. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Use the reciprocal fixed-point contract with the complete foundation catalog and workflow-topology table. Create a focused PS issue before a sync-back. Run the four discrete conditional repair PR lifecycle steps for every PS or later Terraform repair. Update PS #159 and Terraform #31 with the permanent cycle 3 record.
+Use the task-local reverse-comparison and closure controls below with the complete foundation catalog and workflow-topology table. Create a focused PS issue before a sync-back. Run the four task-local conditional repair PR lifecycle actions for every PS or later Terraform repair. Update PS #159 and Terraform #31 with the permanent cycle 3 record.
+
+### Reverse-comparison and closure controls
+
+1. Read both repositories only from the final pinned commits. Record every compared blob and map files by role.
+2. Classify each applicable matrix row as `same`, `intentional difference`, or `blocker`.
+3. If the destination adaptation added or corrected common behavior, create or update one focused source sync-back issue. Pin both landed commits and blobs.
+4. Start a source sync-back only after issue setup and a free implementation slot. Adapt the common behavior; do not redesign it independently.
+5. Prepare the source sync-back candidate and complete the task-local conditional repair PR lifecycle.
+6. If the source changes, compare the new landed source result in the destination again. Use the same issue, slot, lifecycle, and evidence controls for each required destination repair.
+7. Stop if the same matrix row changes direction twice. Run a new decision process that evaluates both implementations.
+8. Close the cycle only when every common row is `same`, every intentional difference has complete evidence, and no blocker remains.
+9. Post one permanent closure record with both repositories' final identities, the matrix digest, validation, review outcomes, and no-change or non-applicability results. If a dependent final-recheck task owns closure, post the current reciprocal record and leave final closure to that task.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -728,6 +1615,20 @@ Every common workflow-policy behavior is `same`, all differences have complete e
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
 | Task 17 | `FS` | Cycles 1 through 3 have permanent fixed-point records. |
+
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
 
 ### Procedure
 
@@ -747,6 +1648,20 @@ Both trackers contain a permanent, internally consistent handoff for cycles 1 th
 | --- | --- | --- |
 | Task 18 | `FS` | The final cycle 3 policy contract and interim handoff exist. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Issue update
 
 Before implementation, replace both placeholders and post this planning comment to PS #158 without replacing its body:
@@ -763,6 +1678,16 @@ Before implementation, replace both placeholders and post this planning comment 
 6. Create or update one focused PS #158 PR. Run initial validation and required checks.
 7. Record the candidate head/tree, all source and candidate blobs, tool/runtime identities, exact output location, mutation-absence evidence, validation, and intentional differences. Stop before merge.
 
+### Candidate preparation gate
+
+Before this task is complete:
+
+1. Create or update only the focused PR for the stated issue or approved task.
+2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
+3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
+4. Replace every placeholder and verify every posted identity.
+5. Stop before the Claude Code review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+
 ### Complete when
 
 The PS #158 candidate PR exists with complete initial validation and an accurate PR body.
@@ -777,9 +1702,50 @@ The PS #158 candidate PR exists with complete initial validation and an accurate
 | --- | --- | --- |
 | Task 19 | `FS` | The PS #158 candidate PR exists and initial checks pass. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory Anthropic Claude Code review-loop prompt against the PS #158 PR. Do not merge. If the loop changes bytes, rerun the Task 19 validation.
+Run the task-local Anthropic Claude Code review-loop prompt below against the PS #158 PR. Do not merge. If the loop changes bytes, rerun the Task 19 validation.
+
+### Anthropic Claude Code review-loop prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a dedicated Anthropic Claude Code session:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
 
 ### Complete when
 
@@ -795,9 +1761,51 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 | --- | --- | --- |
 | Task 20 | `FS` | The Claude Code review loop is terminally clean. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory independent final PR quality-check prompt. Require PS #158 issue coverage, immutable-source verification, read-only and mutation-absence proof, comments, deferrals, PR-body accuracy, validation, and mergeability. Return to Task 20 after any head change.
+Run the task-local independent final PR quality-check prompt below. Require PS #158 issue coverage, immutable-source verification, read-only and mutation-absence proof, comments, deferrals, PR-body accuracy, validation, and mergeability. Return to Task 20 after any head change.
+
+### Independent final PR quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Claude Code review loop is terminally clean:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
 
 ### Complete when
 
@@ -813,9 +1821,33 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 20.
 | --- | --- | --- |
 | Task 21 | `FS` | The independent quality check passed for the current head and tree. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Apply the mandatory merge gate. Merge the PR, close PS #158, and record the reviewed and landed identities, all source and destination blobs, tool/runtime identities, exact output location, mutation-absence evidence, validation, review-loop result, final quality-check result, and intentional differences.
+Apply the task-local merge gate below. Merge the PR, close PS #158, and record the reviewed and landed identities, all source and destination blobs, tool/runtime identities, exact output location, mutation-absence evidence, validation, review-loop result, final quality-check result, and intentional differences.
+
+### Merge gate
+
+Immediately before the merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -831,13 +1863,120 @@ PS #158 is closed and its permanent handoff is ready for Terraform.
 | --- | --- | --- |
 | Task 22 | `FS` | Use the final landed PS #158 recorder and handoff. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Pin the PS source and landed commits and blobs and the immutable Terraform PR #27 inputs.
 2. Compare the read-only recorder roles with a documented reduced matrix.
 3. Prove that both implementations preserve repository state and capture output outside the repository.
-4. Post a pinned no-change record or prepare one focused Terraform repair and run the four discrete conditional repair PR lifecycle steps.
+4. Post a pinned no-change record or prepare one focused Terraform repair and run the four task-local conditional repair PR lifecycle actions.
 5. Update PS #158, PS #159, and Terraform #31 with all identities, validation, and differences.
+
+### Destination-comparison controls
+
+1. Read both repositories only from pinned commits. Record every compared blob.
+2. Map files by role, not only by filename.
+3. Classify each applicable matrix row as `same`, `intentional difference`, or `blocker`.
+4. If no common difference exists, post a pinned no-change or non-applicability record. Do not open an implementation issue only for symmetry.
+5. If a common difference exists, create or update one focused destination issue. Pin the source commit and blobs.
+6. Start the destination adaptation only after issue setup and a free implementation slot. Adapt the landed capability; do not redesign it independently.
+7. Prepare one destination candidate and complete the task-local conditional repair PR lifecycle. Record the complete landed identity and validation evidence.
+8. Stop this task at its stated destination result. The dependent reverse-comparison task must compare the landed destination result back against the source before the cycle can close.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -853,9 +1992,117 @@ Terraform and PS have the same common supply-freeze behavior or fully proved int
 | --- | --- | --- |
 | Task 23 | `FS` | Use only the final landed commits from Tasks 22 and 23. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Use the reciprocal fixed-point contract and the same reduced matrix. Create a focused PS sync-back issue before any correction. Run the four discrete conditional repair PR lifecycle steps for every PS or later Terraform repair. Update PS #159 and Terraform #31 with the permanent cycle 4 record.
+Use the task-local reverse-comparison and closure controls below and the same reduced matrix. Create a focused PS sync-back issue before any correction. Run the four task-local conditional repair PR lifecycle actions for every PS or later Terraform repair. Update PS #159 and Terraform #31 with the permanent cycle 4 record.
+
+### Reverse-comparison and closure controls
+
+1. Read both repositories only from the final pinned commits. Record every compared blob and map files by role.
+2. Classify each applicable matrix row as `same`, `intentional difference`, or `blocker`.
+3. If the destination adaptation added or corrected common behavior, create or update one focused source sync-back issue. Pin both landed commits and blobs.
+4. Start a source sync-back only after issue setup and a free implementation slot. Adapt the common behavior; do not redesign it independently.
+5. Prepare the source sync-back candidate and complete the task-local conditional repair PR lifecycle.
+6. If the source changes, compare the new landed source result in the destination again. Use the same issue, slot, lifecycle, and evidence controls for each required destination repair.
+7. Stop if the same matrix row changes direction twice. Run a new decision process that evaluates both implementations.
+8. Close the cycle only when every common row is `same`, every intentional difference has complete evidence, and no blocker remains.
+9. Post one permanent closure record with both repositories' final identities, the matrix digest, validation, review outcomes, and no-change or non-applicability results. If a dependent final-recheck task owns closure, post the current reciprocal record and leave final closure to that task.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -870,6 +2117,20 @@ The supply-freeze cycle has no common difference or blocker and has one permanen
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
 | Task 24 | `FS` | PS #160, #161, #162, and #158 and all four reciprocal cycles are complete. |
+
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
 
 ### Procedure
 
@@ -893,6 +2154,20 @@ PS #159 is closed with complete, matching evidence in both repositories.
 | --- | --- | --- |
 | Task 25 | `FS` | The foundation umbrella is closed and the implementation slot is free. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Immutable design input
 
 Read TerraformStyleGuide `.claude/commands/review-loop.md` from commit `fbdecbae787055a2117d4ada83ae294a7decfe62`, blob `7b0e41361a8ab7259245ad5f0d86d9300008347d`. Do not copy it unchanged: it says `all six steps`, but PSStyleGuide's landed `CLAUDE.md` defines nine review-comment handling steps.
@@ -911,6 +2186,16 @@ Read TerraformStyleGuide `.claude/commands/review-loop.md` from commit `fbdecbae
 10. Keep the issue and PR separate from foundation, supply-freeze, and infrastructure-conformance work.
 11. Create or update one focused PS #163 PR. Record the candidate head/tree, pinned input, line comparison, validation, and initial checks. Stop before merge.
 
+### Candidate preparation gate
+
+Before this task is complete:
+
+1. Create or update only the focused PR for the stated issue or approved task.
+2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
+3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
+4. Replace every placeholder and verify every posted identity.
+5. Stop before the Claude Code review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+
 ### Complete when
 
 The PS #163 candidate PR exists with complete initial validation and an accurate PR body.
@@ -925,9 +2210,50 @@ The PS #163 candidate PR exists with complete initial validation and an accurate
 | --- | --- | --- |
 | Task 26 | `FS` | The PS #163 candidate PR exists and initial checks pass. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory Anthropic Claude Code review-loop prompt against the PS #163 PR. Do not merge. If the loop changes bytes, rerun the Task 26 validation.
+Run the task-local Anthropic Claude Code review-loop prompt below against the PS #163 PR. Do not merge. If the loop changes bytes, rerun the Task 26 validation.
+
+### Anthropic Claude Code review-loop prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a dedicated Anthropic Claude Code session:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
 
 ### Complete when
 
@@ -943,9 +2269,51 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 | --- | --- | --- |
 | Task 27 | `FS` | The Claude Code review loop is terminally clean. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory independent final PR quality-check prompt. Require PS #163 issue coverage, protected-entry-point authorization, pinned-input comparison, absence of volatile protocol duplication, comments, deferrals, PR-body accuracy, validation, and mergeability. Return to Task 27 after any head change.
+Run the task-local independent final PR quality-check prompt below. Require PS #163 issue coverage, protected-entry-point authorization, pinned-input comparison, absence of volatile protocol duplication, comments, deferrals, PR-body accuracy, validation, and mergeability. Return to Task 27 after any head change.
+
+### Independent final PR quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Claude Code review loop is terminally clean:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
 
 ### Complete when
 
@@ -961,9 +2329,33 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 27.
 | --- | --- | --- |
 | Task 28 | `FS` | The independent quality check passed for the current head and tree. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Apply the mandatory merge gate. Merge the PR, close PS #163, and record the pinned design input, line comparison, validation, reviewed head/tree, landed commit/tree, review-loop result, final quality-check result, and intentional differences.
+Apply the task-local merge gate below. Merge the PR, close PS #163, and record the pinned design input, line comparison, validation, reviewed head/tree, landed commit/tree, review-loop result, final quality-check result, and intentional differences.
+
+### Merge gate
+
+Immediately before the merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -979,13 +2371,120 @@ PS #163 is closed and its permanent handoff is ready for Terraform comparison.
 | --- | --- | --- |
 | Task 29 | `FS` | Use the final landed PS #163 command. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Pin the PS command and authoritative `CLAUDE.md` blobs and the immutable Terraform command blob.
 2. Compare both thin wrappers line by line with a documented reduced matrix.
 3. Preserve each repository's authoritative local instruction file and repository identity.
-4. Post a pinned no-change record or prepare one focused Terraform repair and run the four discrete conditional repair PR lifecycle steps.
+4. Post a pinned no-change record or prepare one focused Terraform repair and run the four task-local conditional repair PR lifecycle actions.
 5. Update PS #163 and Terraform #31 with all identities, validation, and intentional differences.
+
+### Destination-comparison controls
+
+1. Read both repositories only from pinned commits. Record every compared blob.
+2. Map files by role, not only by filename.
+3. Classify each applicable matrix row as `same`, `intentional difference`, or `blocker`.
+4. If no common difference exists, post a pinned no-change or non-applicability record. Do not open an implementation issue only for symmetry.
+5. If a common difference exists, create or update one focused destination issue. Pin the source commit and blobs.
+6. Start the destination adaptation only after issue setup and a free implementation slot. Adapt the landed capability; do not redesign it independently.
+7. Prepare one destination candidate and complete the task-local conditional repair PR lifecycle. Record the complete landed identity and validation evidence.
+8. Stop this task at its stated destination result. The dependent reverse-comparison task must compare the landed destination result back against the source before the cycle can close.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -1001,9 +2500,117 @@ Terraform and PS have the same common wrapper behavior and no duplicated volatil
 | --- | --- | --- |
 | Task 30 | `FS` | Use only the final landed commits from Tasks 29 and 30. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Use the reciprocal fixed-point contract and the same line comparison and reduced matrix. Create a focused PS sync-back issue before any correction. Run the four discrete conditional repair PR lifecycle steps for every PS or later Terraform repair. Update PS #163 and Terraform #31 with the permanent cycle 5 record.
+Use the task-local reverse-comparison and closure controls below and the same line comparison and reduced matrix. Create a focused PS sync-back issue before any correction. Run the four task-local conditional repair PR lifecycle actions for every PS or later Terraform repair. Update PS #163 and Terraform #31 with the permanent cycle 5 record.
+
+### Reverse-comparison and closure controls
+
+1. Read both repositories only from the final pinned commits. Record every compared blob and map files by role.
+2. Classify each applicable matrix row as `same`, `intentional difference`, or `blocker`.
+3. If the destination adaptation added or corrected common behavior, create or update one focused source sync-back issue. Pin both landed commits and blobs.
+4. Start a source sync-back only after issue setup and a free implementation slot. Adapt the common behavior; do not redesign it independently.
+5. Prepare the source sync-back candidate and complete the task-local conditional repair PR lifecycle.
+6. If the source changes, compare the new landed source result in the destination again. Use the same issue, slot, lifecycle, and evidence controls for each required destination repair.
+7. Stop if the same matrix row changes direction twice. Run a new decision process that evaluates both implementations.
+8. Close the cycle only when every common row is `same`, every intentional difference has complete evidence, and no blocker remains.
+9. Post one permanent closure record with both repositories' final identities, the matrix digest, validation, review outcomes, and no-change or non-applicability results. If a dependent final-recheck task owns closure, post the current reciprocal record and leave final closure to that task.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -1018,6 +2625,20 @@ The Claude-command cycle has no common difference or blocker and has one permane
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
 | Task 31 | `FS` | All five initial reciprocal cycles have permanent closure records. |
+
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
 
 ### Tracker contract
 
@@ -1052,6 +2673,20 @@ Terraform #31 is closed and its five records match the permanent records in PSSt
 
 Terraform #21 exists, but its creation did not start implementation. Do not start Terraform #22 or #24 in this task.
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Immutable source and scope
 
 - PS source issue and PR: [PS #146](https://github.com/franklesniak/PSStyleGuide/issues/146) and [PS PR #153](https://github.com/franklesniak/PSStyleGuide/pull/153).
@@ -1072,6 +2707,16 @@ Terraform #21 exists, but its creation did not start implementation. Do not star
 6. Create or update one focused Terraform #21 PR. Run initial local validation and required checks.
 7. Record its base, candidate head/tree, affected paths and destination blobs, validation, runtime identities, and issue links. Stop before merge.
 
+### Candidate preparation gate
+
+Before this task is complete:
+
+1. Create or update only the focused PR for the stated issue or approved task.
+2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
+3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
+4. Replace every placeholder and verify every posted identity.
+5. Stop before the Claude Code review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+
 ### Complete when
 
 The Terraform #21 candidate PR exists with complete initial validation and an accurate PR body. Keep #21 open.
@@ -1086,9 +2731,50 @@ The Terraform #21 candidate PR exists with complete initial validation and an ac
 | --- | --- | --- |
 | Task 33 | `FS` | The Terraform #21 candidate PR exists and initial checks pass. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory Anthropic Claude Code review-loop prompt in TerraformStyleGuide against the Terraform #21 PR. Read that repository's current root `CLAUDE.md`. Do not merge. If the loop changes bytes, rerun the Task 33 validation.
+Run the task-local Anthropic Claude Code review-loop prompt below in TerraformStyleGuide against the Terraform #21 PR. Read that repository's current root `CLAUDE.md`. Do not merge. If the loop changes bytes, rerun the Task 33 validation.
+
+### Anthropic Claude Code review-loop prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a dedicated Anthropic Claude Code session:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
 
 ### Complete when
 
@@ -1104,9 +2790,51 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 | --- | --- | --- |
 | Task 34 | `FS` | The Claude Code review loop is terminally clean. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory independent final PR quality-check prompt. Require all Terraform #21 requirements, four-path scope, 115/141-row allocation, comments, deferrals, PR-body accuracy, validation, checks, and mergeability. Return to Task 34 after any head change.
+Run the task-local independent final PR quality-check prompt below. Require all Terraform #21 requirements, four-path scope, 115/141-row allocation, comments, deferrals, PR-body accuracy, validation, checks, and mergeability. Return to Task 34 after any head change.
+
+### Independent final PR quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Claude Code review loop is terminally clean:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
 
 ### Complete when
 
@@ -1122,9 +2850,33 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 34.
 | --- | --- | --- |
 | Task 35 | `FS` | The independent quality check passed for the current head and tree. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Apply the mandatory merge gate. Merge the focused PR. Record its base, reviewed head/tree, merge method, landed commit/tree, affected paths and destination blobs, validation, runtime identities, review-loop result, final quality-check result, and review outcome. Keep Terraform #21 open for reciprocal closure.
+Apply the task-local merge gate below. Merge the focused PR. Record its base, reviewed head/tree, merge method, landed commit/tree, affected paths and destination blobs, validation, runtime identities, review-loop result, final quality-check result, and review outcome. Keep Terraform #21 open for reciprocal closure.
+
+### Merge gate
+
+Immediately before the merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -1140,6 +2892,20 @@ The Terraform #21 implementation is landed and its permanent implementation hand
 | --- | --- | --- |
 | Task 36 | `FS` | Use the landed Terraform #21 result and immutable PS P1A commit. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Replace every placeholder in the reverse-comparison record with a verified identity.
@@ -1147,10 +2913,104 @@ The Terraform #21 implementation is landed and its permanent implementation hand
 3. Complete every applicable foundation row and the exact four-file mapping. Preserve the stated 115-row PS and 141-row Terraform allocations.
 4. If no common difference remains, make no PS change and post a pinned reverse-comparison record.
 5. If Terraform added or corrected common behavior, create or update one focused PS sync-back issue. Pin both landed commits and blobs.
-6. Start the sync-back only after issue setup and a free implementation slot. Prepare one focused PS PR and run the four discrete conditional repair PR lifecycle steps.
-7. If PS changes, compare its new landed commit in Terraform. For a required Terraform repair, run the same four discrete lifecycle steps.
+6. Start the sync-back only after issue setup and a free implementation slot. Prepare one focused PS PR and run the four task-local conditional repair PR lifecycle actions.
+7. If PS changes, compare its new landed commit in Terraform. For a required Terraform repair, run the same four task-local conditional repair PR lifecycle actions.
 8. Stop for a new decision process if a row changes direction twice.
 9. Post the current reciprocal evidence on Terraform #21 and the PS P1A handoff. Do not close Terraform #21 until Task 38 confirms the final Terraform state.
+
+### Reverse-comparison and closure controls
+
+1. Read both repositories only from the final pinned commits. Record every compared blob and map files by role.
+2. Classify each applicable matrix row as `same`, `intentional difference`, or `blocker`.
+3. If the destination adaptation added or corrected common behavior, create or update one focused source sync-back issue. Pin both landed commits and blobs.
+4. Start a source sync-back only after issue setup and a free implementation slot. Adapt the common behavior; do not redesign it independently.
+5. Prepare the source sync-back candidate and complete the task-local conditional repair PR lifecycle.
+6. If the source changes, compare the new landed source result in the destination again. Use the same issue, slot, lifecycle, and evidence controls for each required destination repair.
+7. Stop if the same matrix row changes direction twice. Run a new decision process that evaluates both implementations.
+8. Close the cycle only when every common row is `same`, every intentional difference has complete evidence, and no blocker remains.
+9. Post one permanent closure record with both repositories' final identities, the matrix digest, validation, review outcomes, and no-change or non-applicability results. If a dependent final-recheck task owns closure, post the current reciprocal record and leave final closure to that task.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -1166,13 +3026,118 @@ The reverse PS comparison and any PS sync-back are complete, and the final PS ca
 | --- | --- | --- |
 | Task 37 | `FS` | Use the final landed PS state from Task 37. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Compare the final Task 37 PS landed commit against Terraform.
-2. If a common difference remains, create a focused Terraform issue before implementation. Use the global start gate, conditional repair PR lifecycle, and reciprocal fixed-point contract until the row is `same` or a proved intentional difference.
+2. If a common difference remains, create a focused Terraform issue before implementation. Use the task-local execution controls, conditional repair PR lifecycle, and final reciprocal-recheck controls below until the row is `same` or a proved intentional difference.
 3. Verify that every common row is `same`, every intentional difference has complete evidence, and no row is a blocker.
 4. Post one permanent closure record on Terraform #21 and the PS P1A handoff. Include both repositories' final issue and PR URLs, bases, reviewed heads/trees, merge methods, landed commits/trees, affected paths, source and destination blobs, final matrix digest, validation, runtime identities, review outcomes, and explicit non-applicability results.
 5. Close Terraform #21.
+
+### Final reciprocal-recheck controls
+
+1. Read the final source and destination states only from pinned commits. Record every compared blob and map files by role.
+2. Classify each applicable matrix row as `same`, `intentional difference`, or `blocker`.
+3. If a common destination difference remains, create one focused destination issue. Start it only after issue setup and a free implementation slot. Complete the task-local conditional repair PR lifecycle.
+4. After each repair, compare the landed result in the other repository. Stop if the same row changes direction twice and run a new decision process that evaluates both implementations.
+5. Close the cycle only when every common row is `same`, every intentional difference has complete evidence, and no blocker remains.
+6. Post one permanent closure record with both repositories' final identities, the matrix digest, validation, review outcomes, and no-change or non-applicability results.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -1188,6 +3153,20 @@ Terraform #21 is closed at a proved reciprocal fixed point.
 | --- | --- | --- |
 | Task 38 | `FS` | The P1A/Terraform #21 reciprocal cycle is closed. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Fetch both current `main` commits and trees in clean checkouts. Pin them as the sweep baselines.
@@ -1196,10 +3175,16 @@ Terraform #21 is closed at a proved reciprocal fixed point.
 4. For every common role, compare bytes and semantics, success and negative cases, failure classification, cleanup, credentials, permissions, native statuses, platform coverage, evidence retention, documentation, and validation commands.
 5. Run the full foundation catalog for foundation roles. Use a documented reduced matrix only for a narrow non-foundation role.
 6. Classify each row as `same`, `intentional difference`, `tracked work`, or `untracked blocker`.
-7. Accept an intentional difference only under the global proof requirements. Link the owning issue for every `tracked work` row.
+7. Accept an intentional difference only under the task-local intentional-difference evidence requirements below. Link the owning issue for every `tracked work` row.
 8. Treat a missing, duplicate, unknown, renamed, empty, or unexplained row as an `untracked blocker`.
 9. For each untracked blocker, validate the finding and complete the required finding-specific decision process before proposing a repair.
 10. Publish a read-only inventory that identifies the behind repository, affected role and blobs, evidence, owner/disposition, and proposed focused issue for each blocker. Do not edit implementation files in this task.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
 
 ### Complete when
 
@@ -1216,6 +3201,20 @@ Every inventoried role has one supported classification and owner. The report co
 | Task 39 | `FS` | The complete read-only inventory and ordered blocker list exist. |
 | Prior Task 40 instance | `FS` | Close the prior repair cycle before the next instance starts. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Select the next untracked blocker in the published order.
@@ -1228,6 +3227,104 @@ Every inventoried role has one supported classification and owner. The report co
 8. Close the cycle only when every common row is `same`, all intentional differences have complete evidence, and no blocker remains.
 9. Post the permanent closure record with both repositories' final issue and PR URLs, bases, reviewed heads/trees, merge methods, landed commits/trees, paths, blobs, matrix digest, validation, runtimes, review outcomes, and non-applicability results.
 10. Repeat Task 40 only if another ordered blocker remains.
+
+### Reciprocal fixed-point controls
+
+1. Read both repositories only from pinned commits. Record every compared blob.
+2. Map files by role, not only by filename.
+3. Classify each applicable row as `same`, `intentional difference`, or `blocker`.
+4. If no common difference exists, post a pinned no-change or non-applicability record. Do not open an implementation issue only for symmetry.
+5. If a common difference exists, create or update one focused destination issue. Pin the source commit and blobs.
+6. Start the destination adaptation only after issue setup and a free implementation slot. Adapt the landed capability; do not redesign it independently.
+7. Prepare one destination candidate and complete the task-local conditional repair PR lifecycle. Record the complete landed identity and validation evidence.
+8. Compare the landed destination result back against the source repository.
+9. If the destination added or corrected common behavior, create a focused source sync-back issue. Start it only after issue setup and a free implementation slot.
+10. Prepare the source sync-back candidate and complete the task-local conditional repair PR lifecycle. Then compare the new source result in the destination again.
+11. Stop if the same matrix row changes direction twice. Run a new decision process that evaluates both implementations.
+12. Close the cycle only when every common row is `same`, every intentional difference has complete evidence, and no blocker remains.
+13. Post one permanent closure record with final identities from both repositories, the matrix digest, validation, review outcomes, and no-change or non-applicability results.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -1244,12 +3341,32 @@ One blocker cycle is closed at a fixed point. All Task 40 instances are complete
 | Task 39 | `FS` | The inventory exists. |
 | Every applicable Task 40 instance | `FS` | All untracked blocker cycles are closed. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Fetch both final `main` commits and trees.
 2. Re-run the complete inventory, file-role map, foundation catalog, and every required reduced matrix.
 3. Verify that every role has an owner and disposition, each `tracked work` row links its live planned issue, and no `untracked blocker` remains.
 4. Post the final sweep record. Include final commits/trees, file/blob map, matrices and digests, validation, runtimes, intentional differences, explicit non-applicability results, and zero untracked blockers.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
 
 ### Complete when
 
@@ -1265,6 +3382,20 @@ The permanent global-sweep record proves zero untracked blockers and identifies 
 | --- | --- | --- |
 | Task 41 | `FS` | The global sweep proves zero untracked blockers. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Re-read the final PS foundation handoff and every landed contract.
@@ -1276,6 +3407,16 @@ The permanent global-sweep record proves zero untracked blockers and identifies 
 7. Record workflow identity, permissions, required-check name, unique evidence ref, source pins, and rollback inputs.
 8. Prepare the exact temporary and persistent settings requests and proof plan for PS #152.
 9. Do not give the writer effective `contents: write` access before Task 46 records human approval.
+
+### Candidate preparation gate
+
+Before this task is complete:
+
+1. Create or update only the focused PR for the stated issue or approved task.
+2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
+3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
+4. Replace every placeholder and verify every posted identity.
+5. Stop before the Claude Code review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Complete when
 
@@ -1290,6 +3431,20 @@ One locally validated P1B candidate and the complete decision/settings evidence 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
 | Task 42 | `SS` | Begin only after Task 42 starts and its proposed design is identifiable. |
+
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
 
 ### Procedure
 
@@ -1315,9 +3470,50 @@ PS #152 contains a complete, current, read-only evidence package that an owner c
 | Task 42 | `FS` | The PS #147 candidate PR exists and initial checks pass. |
 | Task 43 | `FS` | The read-only PS #152 evidence package is complete. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory Anthropic Claude Code review-loop prompt against the PS #147 PR. Do not merge or change repository settings. If the loop changes bytes or the writer design, rerun the applicable Task 42 validation and refresh Task 43 settings evidence before the next round.
+Run the task-local Anthropic Claude Code review-loop prompt below against the PS #147 PR. Do not merge or change repository settings. If the loop changes bytes or the writer design, rerun the applicable Task 42 validation and refresh Task 43 settings evidence before the next round.
+
+### Anthropic Claude Code review-loop prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a dedicated Anthropic Claude Code session:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
 
 ### Complete when
 
@@ -1333,9 +3529,51 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree, and the PS
 | --- | --- | --- |
 | Task 44 | `FS` | The Claude Code review loop is terminally clean. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory independent final PR quality-check prompt. Require full PS #147 issue coverage; writer, evidence, lease/refspec, credential, terminal-result, rollback, comment, deferral, PR-body, validation, and mergeability checks; and consistency with the PS #152 settings request. Return to Task 44 after any head change.
+Run the task-local independent final PR quality-check prompt below. Require full PS #147 issue coverage; writer, evidence, lease/refspec, credential, terminal-result, rollback, comment, deferral, PR-body, validation, and mergeability checks; and consistency with the PS #152 settings request. Return to Task 44 after any head change.
+
+### Independent final PR quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Claude Code review loop is terminally clean:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
 
 ### Complete when
 
@@ -1351,6 +3589,20 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 44, and th
 | --- | --- | --- |
 | Task 43 | `FS` | Review the exact settings requests and proof plan. |
 | Task 45 | `FS` | Review the exact candidate bytes and independent quality-check result. |
+
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
 
 ### Human actions
 
@@ -1375,6 +3627,20 @@ The canonical records contain an explicit disposition for every required decisio
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
 | Task 46 | `FS` | Every applicable approval exists and applies to the current candidate and exact settings. |
+
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
 
 ### Procedure
 
@@ -1407,13 +3673,37 @@ PS #152 is closed with a proved active persistent rule, complete retained eviden
 | --- | --- | --- |
 | Task 47 | `FS` | PS #152 is closed and the approved persistent rule is active. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Revalidate the reviewed PS #147 head, checks, workflow identity, required check, active ruleset, application identity, and approvals.
 2. Stop if any byte, setting, identity, or approval differs from the proved state.
-3. Apply the mandatory merge gate. Require the Task 44 terminal-clean record and Task 45 independent `PASS` record to match the current head and tree.
+3. Apply the task-local merge gate below. Require the Task 44 terminal-clean record and Task 45 independent `PASS` record to match the current head and tree.
 4. Merge the reviewed P1B PR and close PS #147.
 5. Post the permanent P1B handoff for Terraform #22. Include all source and landed identities, paths and blobs, permission and credential boundaries, candidate consumption, ancestry/lease/refspec and native-status behavior, failure and cleanup postconditions, ruleset evidence, rollback proof, validation, review-loop result, final quality-check result, and review outcome.
+
+### Merge gate
+
+Immediately before the merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -1429,6 +3719,20 @@ PS #147 is closed by the proved merge and the permanent landed handoff is suffic
 | --- | --- | --- |
 | Task 48 | `FS` | Use the landed PS P1B commit and permanent handoff. |
 | Task 38 | `FS` | Terraform #21 is closed. |
+
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
 
 ### Issue update
 
@@ -1456,6 +3760,20 @@ Terraform #22 contains verified P1B source pins, scope, expected differences, se
 | --- | --- | --- |
 | Task 49 | `FS` | The issue record is complete, Terraform #21 is closed, and the implementation slot is free. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Explicitly commence only Terraform #22 from the landed PS P1B commit and final Terraform baseline.
@@ -1463,6 +3781,16 @@ Terraform #22 contains verified P1B source pins, scope, expected differences, se
 3. Use only Terraform's authorized settings and live evidence.
 4. Complete the reciprocal matrix at candidate preparation. Treat unexplained weaker behavior as a blocker.
 5. Create or update one focused Terraform #22 PR. Run initial validation and required checks. Record its head SHA and tree. Stop before merge.
+
+### Candidate preparation gate
+
+Before this task is complete:
+
+1. Create or update only the focused PR for the stated issue or approved task.
+2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
+3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
+4. Replace every placeholder and verify every posted identity.
+5. Stop before the Claude Code review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Complete when
 
@@ -1478,9 +3806,50 @@ The Terraform #22 candidate PR exists with complete source, destination, validat
 | --- | --- | --- |
 | Task 50 | `FS` | The Terraform #22 candidate PR exists and initial checks pass. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory Anthropic Claude Code review-loop prompt in TerraformStyleGuide. Do not merge or change settings without exact authorization. If bytes change, rerun Task 50 validation and refresh the reciprocal matrix.
+Run the task-local Anthropic Claude Code review-loop prompt below in TerraformStyleGuide. Do not merge or change settings without exact authorization. If bytes change, rerun Task 50 validation and refresh the reciprocal matrix.
+
+### Anthropic Claude Code review-loop prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a dedicated Anthropic Claude Code session:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
 
 ### Complete when
 
@@ -1496,9 +3865,51 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 | --- | --- | --- |
 | Task 51 | `FS` | The Claude Code review loop is terminally clean. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory independent final PR quality-check prompt. Require complete Terraform #22 issue, writer, settings, permissions, credentials, evidence, comment, deferral, PR-body, validation, and mergeability coverage. Return to Task 51 after any head change.
+Run the task-local independent final PR quality-check prompt below. Require complete Terraform #22 issue, writer, settings, permissions, credentials, evidence, comment, deferral, PR-body, validation, and mergeability coverage. Return to Task 51 after any head change.
+
+### Independent final PR quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Claude Code review loop is terminally clean:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
 
 ### Complete when
 
@@ -1514,9 +3925,33 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 51.
 | --- | --- | --- |
 | Task 52 | `FS` | The independent quality check passed for the current head and tree. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Apply the mandatory merge gate. Merge the PR, close Terraform #22, and post the complete landed handoff with source, destination, validation, settings, audit, review-loop, and final quality-check evidence.
+Apply the task-local merge gate below. Merge the PR, close Terraform #22, and post the complete landed handoff with source, destination, validation, settings, audit, review-loop, and final quality-check evidence.
+
+### Merge gate
+
+Immediately before the merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -1532,9 +3967,117 @@ Terraform #22 is closed by the landed PR and its complete handoff is ready for r
 | --- | --- | --- |
 | Task 53 | `FS` | Use only the landed P1B and T1B commits and blobs. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Use the reciprocal fixed-point contract and complete catalog. Preserve repository-specific settings identities. If Terraform added or corrected common behavior, prepare one focused PS sync-back and run the four discrete conditional repair PR lifecycle steps. If PS changes, compare Terraform again and run the same lifecycle for any required repair. Post the current reciprocal record without closing the cycle until Task 55.
+Use the task-local reverse-comparison and closure controls below and complete catalog. Preserve repository-specific settings identities. If Terraform added or corrected common behavior, prepare one focused PS sync-back and run the four task-local conditional repair PR lifecycle actions. If PS changes, compare Terraform again and run the same lifecycle for any required repair. Post the current reciprocal record without closing the cycle until Task 55.
+
+### Reverse-comparison and closure controls
+
+1. Read both repositories only from the final pinned commits. Record every compared blob and map files by role.
+2. Classify each applicable matrix row as `same`, `intentional difference`, or `blocker`.
+3. If the destination adaptation added or corrected common behavior, create or update one focused source sync-back issue. Pin both landed commits and blobs.
+4. Start a source sync-back only after issue setup and a free implementation slot. Adapt the common behavior; do not redesign it independently.
+5. Prepare the source sync-back candidate and complete the task-local conditional repair PR lifecycle.
+6. If the source changes, compare the new landed source result in the destination again. Use the same issue, slot, lifecycle, and evidence controls for each required destination repair.
+7. Stop if the same matrix row changes direction twice. Run a new decision process that evaluates both implementations.
+8. Close the cycle only when every common row is `same`, every intentional difference has complete evidence, and no blocker remains.
+9. Post one permanent closure record with both repositories' final identities, the matrix digest, validation, review outcomes, and no-change or non-applicability results. If a dependent final-recheck task owns closure, post the current reciprocal record and leave final closure to that task.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -1550,9 +4093,114 @@ The reverse PS comparison and any PS sync-back are complete, and the final PS id
 | --- | --- | --- |
 | Task 54 | `FS` | Use the final landed PS state from Task 54. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Compare the final PS state back in Terraform. If a focused Terraform repair is required, run the four discrete conditional repair PR lifecycle steps. Apply the row-direction stop rule. Post the permanent P1B/T1B closure record with all required identities and evidence.
+Compare the final PS state back in Terraform. If a focused Terraform repair is required, run the four task-local conditional repair PR lifecycle actions. Apply the row-direction stop rule. Post the permanent P1B/T1B closure record with all required identities and evidence.
+
+### Final reciprocal-recheck controls
+
+1. Read the final source and destination states only from pinned commits. Record every compared blob and map files by role.
+2. Classify each applicable matrix row as `same`, `intentional difference`, or `blocker`.
+3. If a common destination difference remains, create one focused destination issue. Start it only after issue setup and a free implementation slot. Complete the task-local conditional repair PR lifecycle.
+4. After each repair, compare the landed result in the other repository. Stop if the same row changes direction twice and run a new decision process that evaluates both implementations.
+5. Close the cycle only when every common row is `same`, every intentional difference has complete evidence, and no blocker remains.
+6. Post one permanent closure record with both repositories' final identities, the matrix digest, validation, review outcomes, and no-change or non-applicability results.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -1568,12 +4216,36 @@ The P1B/T1B cycle is at a fixed point and no blocker remains. Do not start PS #1
 | --- | --- | --- |
 | Task 55 | `FS` | The P1B/T1B cycle is closed and the implementation slot is free. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Re-query PS #148 and its native dependency. Classify the capability and pin all landed inputs and affected paths.
 2. Explicitly commence only PS #148.
 3. Implement the issue contract.
 4. Create or update one focused PS #148 PR. Run initial local validation and required checks. Record its head SHA and tree. Stop before merge.
+
+### Candidate preparation gate
+
+Before this task is complete:
+
+1. Create or update only the focused PR for the stated issue or approved task.
+2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
+3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
+4. Replace every placeholder and verify every posted identity.
+5. Stop before the Claude Code review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Complete when
 
@@ -1589,9 +4261,50 @@ The PS #148 candidate PR exists with all required identities, initial validation
 | --- | --- | --- |
 | Task 56 | `FS` | The PS #148 candidate PR exists and initial checks pass. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory Anthropic Claude Code review-loop prompt against the PS #148 PR. Do not merge. If bytes change, rerun Task 56 validation.
+Run the task-local Anthropic Claude Code review-loop prompt below against the PS #148 PR. Do not merge. If bytes change, rerun Task 56 validation.
+
+### Anthropic Claude Code review-loop prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a dedicated Anthropic Claude Code session:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
 
 ### Complete when
 
@@ -1607,9 +4320,51 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 | --- | --- | --- |
 | Task 57 | `FS` | The Claude Code review loop is terminally clean. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory independent final PR quality-check prompt. Require complete PS #148 issue-contract, comment, deferral, PR-body, final-diff, validation, checks, and mergeability coverage. Return to Task 57 after any head change.
+Run the task-local independent final PR quality-check prompt below. Require complete PS #148 issue-contract, comment, deferral, PR-body, final-diff, validation, checks, and mergeability coverage. Return to Task 57 after any head change.
+
+### Independent final PR quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Claude Code review loop is terminally clean:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
 
 ### Complete when
 
@@ -1625,9 +4380,33 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 57.
 | --- | --- | --- |
 | Task 58 | `FS` | The independent quality check passed for the current head and tree. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Apply the mandatory merge gate. Merge the PR, close PS #148, and post the complete landed PS handoff with issue-contract, validation, review-loop, and final quality-check evidence.
+Apply the task-local merge gate below. Merge the PR, close PS #148, and post the complete landed PS handoff with issue-contract, validation, review-loop, and final quality-check evidence.
+
+### Merge gate
+
+Immediately before the merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -1643,13 +4422,120 @@ PS #148 is closed by the landed PR and its handoff is ready for Terraform compar
 | --- | --- | --- |
 | Task 59 | `FS` | Use the final landed PS #148 commit and blobs. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Compare the affected PS #148 role with Terraform.
-2. If common behavior is absent or weaker, create one focused Terraform issue from the landed PS handoff, then run the four discrete conditional repair PR lifecycle steps.
+2. If common behavior is absent or weaker, create one focused Terraform issue from the landed PS handoff, then run the four task-local conditional repair PR lifecycle actions.
 3. If Terraform is already equivalent, post a pinned no-change record.
 4. If the blank-line example is PowerShell-specific, post a pinned non-applicability record.
 5. Do not create an issue only for symmetry.
+
+### Destination-comparison controls
+
+1. Read both repositories only from pinned commits. Record every compared blob.
+2. Map files by role, not only by filename.
+3. Classify each applicable matrix row as `same`, `intentional difference`, or `blocker`.
+4. If no common difference exists, post a pinned no-change or non-applicability record. Do not open an implementation issue only for symmetry.
+5. If a common difference exists, create or update one focused destination issue. Pin the source commit and blobs.
+6. Start the destination adaptation only after issue setup and a free implementation slot. Adapt the landed capability; do not redesign it independently.
+7. Prepare one destination candidate and complete the task-local conditional repair PR lifecycle. Record the complete landed identity and validation evidence.
+8. Stop this task at its stated destination result. The dependent reverse-comparison task must compare the landed destination result back against the source before the cycle can close.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -1665,9 +4551,117 @@ Terraform has a landed applicable adaptation, a pinned no-change result, or a pr
 | --- | --- | --- |
 | Task 60 | `FS` | Use the final landed or no-change result from Task 60. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Use the reciprocal fixed-point contract with the applicable complete or reduced matrix. For any focused PS sync-back or later Terraform repair, run the four discrete conditional repair PR lifecycle steps. Post the permanent closure or non-applicability record.
+Use the task-local reverse-comparison and closure controls below with the applicable complete or reduced matrix. For any focused PS sync-back or later Terraform repair, run the four task-local conditional repair PR lifecycle actions. Post the permanent closure or non-applicability record.
+
+### Reverse-comparison and closure controls
+
+1. Read both repositories only from the final pinned commits. Record every compared blob and map files by role.
+2. Classify each applicable matrix row as `same`, `intentional difference`, or `blocker`.
+3. If the destination adaptation added or corrected common behavior, create or update one focused source sync-back issue. Pin both landed commits and blobs.
+4. Start a source sync-back only after issue setup and a free implementation slot. Adapt the common behavior; do not redesign it independently.
+5. Prepare the source sync-back candidate and complete the task-local conditional repair PR lifecycle.
+6. If the source changes, compare the new landed source result in the destination again. Use the same issue, slot, lifecycle, and evidence controls for each required destination repair.
+7. Stop if the same matrix row changes direction twice. Run a new decision process that evaluates both implementations.
+8. Close the cycle only when every common row is `same`, every intentional difference has complete evidence, and no blocker remains.
+9. Post one permanent closure record with both repositories' final identities, the matrix digest, validation, review outcomes, and no-change or non-applicability results. If a dependent final-recheck task owns closure, post the current reciprocal record and leave final closure to that task.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -1684,6 +4678,20 @@ The PS #148 cross-repository cycle is closed with no blocker.
 | Task 61 | `FS` | The PS #148 cycle is closed and the implementation slot is free. |
 | Task 53 | `FS` | Terraform #22, the native predecessor of #23, is closed. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Re-query Terraform #23 and verify its native prerequisites.
@@ -1691,6 +4699,16 @@ The PS #148 cross-repository cycle is closed with no blocker.
 3. Explicitly commence only Terraform #23.
 4. Implement its state-version recovery contract.
 5. Create or update one focused Terraform #23 PR. Run initial local validation and required checks. Record its head SHA and tree. Stop before merge.
+
+### Candidate preparation gate
+
+Before this task is complete:
+
+1. Create or update only the focused PR for the stated issue or approved task.
+2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
+3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
+4. Replace every placeholder and verify every posted identity.
+5. Stop before the Claude Code review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Complete when
 
@@ -1706,9 +4724,50 @@ The Terraform #23 candidate PR exists with complete initial identity, validation
 | --- | --- | --- |
 | Task 62 | `FS` | The Terraform #23 candidate PR exists and initial checks pass. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory Anthropic Claude Code review-loop prompt in TerraformStyleGuide. Do not merge. If bytes change, rerun Task 62 validation.
+Run the task-local Anthropic Claude Code review-loop prompt below in TerraformStyleGuide. Do not merge. If bytes change, rerun Task 62 validation.
+
+### Anthropic Claude Code review-loop prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a dedicated Anthropic Claude Code session:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
 
 ### Complete when
 
@@ -1724,9 +4783,51 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 | --- | --- | --- |
 | Task 63 | `FS` | The Claude Code review loop is terminally clean. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory independent final PR quality-check prompt. Require complete Terraform #23 state-version recovery, issue, comment, deferral, PR-body, final-diff, validation, checks, and mergeability coverage. Return to Task 63 after any head change.
+Run the task-local independent final PR quality-check prompt below. Require complete Terraform #23 state-version recovery, issue, comment, deferral, PR-body, final-diff, validation, checks, and mergeability coverage. Return to Task 63 after any head change.
+
+### Independent final PR quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Claude Code review loop is terminally clean:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
 
 ### Complete when
 
@@ -1742,9 +4843,33 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 63.
 | --- | --- | --- |
 | Task 64 | `FS` | The independent quality check passed for the current head and tree. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Apply the mandatory merge gate. Merge the PR, close Terraform #23, and post the complete landed identity, validation, failure, recovery, evidence, review-loop, and final quality-check record.
+Apply the task-local merge gate below. Merge the PR, close Terraform #23, and post the complete landed identity, validation, failure, recovery, evidence, review-loop, and final quality-check record.
+
+### Merge gate
+
+Immediately before the merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -1760,13 +4885,125 @@ Terraform #23 is closed by the landed PR and its handoff is ready for PS applica
 | --- | --- | --- |
 | Task 65 | `FS` | Use the landed Terraform #23 commit and blobs. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Search PS for a role affected by Terraform #23's state-version recovery behavior.
-2. If PS has a common role and is absent or weaker, create one focused PS issue, then use the global start gate, conditional repair PR lifecycle, and reciprocal fixed-point contract.
+2. If PS has a common role and is absent or weaker, create one focused PS issue, then use the task-local execution controls, conditional repair PR lifecycle, and reciprocal fixed-point controls below.
 3. If PS is already equivalent, post a pinned no-change record.
 4. If PS has no corresponding role, post a pinned non-applicability record.
 5. Do not invent a PS issue only for symmetry.
+
+### Reciprocal fixed-point controls
+
+1. Read both repositories only from pinned commits. Record every compared blob.
+2. Map files by role, not only by filename.
+3. Classify each applicable row as `same`, `intentional difference`, or `blocker`.
+4. If no common difference exists, post a pinned no-change or non-applicability record. Do not open an implementation issue only for symmetry.
+5. If a common difference exists, create or update one focused destination issue. Pin the source commit and blobs.
+6. Start the destination adaptation only after issue setup and a free implementation slot. Adapt the landed capability; do not redesign it independently.
+7. Prepare one destination candidate and complete the task-local conditional repair PR lifecycle. Record the complete landed identity and validation evidence.
+8. Compare the landed destination result back against the source repository.
+9. If the destination added or corrected common behavior, create a focused source sync-back issue. Start it only after issue setup and a free implementation slot.
+10. Prepare the source sync-back candidate and complete the task-local conditional repair PR lifecycle. Then compare the new source result in the destination again.
+11. Stop if the same matrix row changes direction twice. Run a new decision process that evaluates both implementations.
+12. Close the cycle only when every common row is `same`, every intentional difference has complete evidence, and no blocker remains.
+13. Post one permanent closure record with final identities from both repositories, the matrix digest, validation, review outcomes, and no-change or non-applicability results.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -1785,6 +5022,20 @@ The Task 65 result has one proved PS disposition and every applicable reciprocal
 | Task 59 | `FS` | The P2 PS handoff exists. |
 | Completed PS #145 and #146 | `FS` | The P1 and P1A handoffs exist. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Scope
 
 PS #149 owns the PS Husky preparation mechanism and dependency/update-governance convergence. Compare Terraform #24's current contract and Terraform's direct `prepare` command. Select one common mechanism unless a proved repository-specific need requires a difference.
@@ -1798,6 +5049,16 @@ PS #149 owns the PS Husky preparation mechanism and dependency/update-governance
 5. Implement the complete PS #149 contract. Preserve common isolation, exact toolchain selection, install/audit vectors, configuration neutralization, bounded process I/O, termination states, JSON validation, exception governance, live-issue verification, scheduled/manual read-only behavior, failure truth, and evidence retention.
 6. Create or update one PS #149 PR. Reach one locally validated candidate head. Record its base, head/tree, checks, paths and blobs, validation, runtime identities, decision-record changes, and rollback inputs.
 7. Stop before review-loop execution or merge.
+
+### Candidate preparation gate
+
+Before this task is complete:
+
+1. Create or update only the focused PR for the stated issue or approved task.
+2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
+3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
+4. Replace every placeholder and verify every posted identity.
+5. Stop before the Claude Code review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Complete when
 
@@ -1813,9 +5074,50 @@ PS #149 has one locally validated candidate PR and a verified evidence package.
 | --- | --- | --- |
 | Task 67 | `FS` | The PS #149 candidate PR exists and initial checks pass. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory Anthropic Claude Code review-loop prompt against the PS #149 PR. Do not merge. If bytes change, rerun Task 67 validation and refresh its evidence package.
+Run the task-local Anthropic Claude Code review-loop prompt below against the PS #149 PR. Do not merge. If bytes change, rerun Task 67 validation and refresh its evidence package.
+
+### Anthropic Claude Code review-loop prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a dedicated Anthropic Claude Code session:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
 
 ### Complete when
 
@@ -1831,9 +5133,51 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 | --- | --- | --- |
 | Task 68 | `FS` | The Claude Code review loop is terminally clean. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory independent final PR quality-check prompt. Require complete PS #149 governance, dependency, audit, Husky, exception, scheduled/manual behavior, issue, comment, deferral, PR-body, validation, and mergeability coverage. Return to Task 68 after any head change.
+Run the task-local independent final PR quality-check prompt below. Require complete PS #149 governance, dependency, audit, Husky, exception, scheduled/manual behavior, issue, comment, deferral, PR-body, validation, and mergeability coverage. Return to Task 68 after any head change.
+
+### Independent final PR quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Claude Code review loop is terminally clean:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
 
 ### Complete when
 
@@ -1850,6 +5194,20 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 68. The PR
 | None | Calendar constraint | Run at `2026-08-21T23:59:59Z` even if an earlier numbered task is incomplete. |
 
 The PS P1 advisory decision expires at `2026-08-30T23:59:59Z`. The checkpoint is a coordination gate, not a native issue dependency.
+
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
 
 ### Procedure
 
@@ -1872,6 +5230,20 @@ One timestamped, verified checkpoint record states whether the PS #149 merge pat
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
 | Task 70 | `FS` | Use the exact timestamped checkpoint evidence. |
+
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
 
 ### Human actions
 
@@ -1897,6 +5269,20 @@ The canonical record approves the current PS #149 merge path or a separate fallb
 | --- | --- | --- |
 | Task 71 | `FS` | The owner approved a separate superseding-decision task and its exact scope. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Verify that no feature implementation issue or PR is active. If the PS #149 PR is still active, preserve its exact head and tree. Close it only when the Task 71 approval expressly authorizes closure. Otherwise, do not start fallback implementation.
@@ -1906,6 +5292,16 @@ The canonical record approves the current PS #149 merge path or a separate fallb
 5. Include validation and rollback instructions.
 6. Create one focused fallback PR under the separately approved task. Run initial local validation and required checks. Record its head SHA and tree.
 7. Prove on the candidate that the validator does not enter `advisory-expired`. Stop before merge.
+
+### Candidate preparation gate
+
+Before this task is complete:
+
+1. Create or update only the focused PR for the stated issue or approved task.
+2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
+3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
+4. Replace every placeholder and verify every posted identity.
+5. Stop before the Claude Code review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Complete when
 
@@ -1921,9 +5317,50 @@ The approved fallback candidate PR exists with all required decision, identity, 
 | --- | --- | --- |
 | Task 72 | `FS` | The approved fallback candidate PR exists and initial checks pass. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory Anthropic Claude Code review-loop prompt against the fallback PR. Do not merge. If bytes change, rerun Task 72 validation and expiry proof.
+Run the task-local Anthropic Claude Code review-loop prompt below against the fallback PR. Do not merge. If bytes change, rerun Task 72 validation and expiry proof.
+
+### Anthropic Claude Code review-loop prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a dedicated Anthropic Claude Code session:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
 
 ### Complete when
 
@@ -1939,9 +5376,51 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 | --- | --- | --- |
 | Task 73 | `FS` | The Claude Code review loop is terminally clean. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory independent final PR quality-check prompt. Require exact approval/scope, advisory-expiry, contract, validator, case, pin, rollback, comment, deferral, PR-body, validation, and mergeability coverage. Return to Task 73 after any head change.
+Run the task-local independent final PR quality-check prompt below. Require exact approval/scope, advisory-expiry, contract, validator, case, pin, rollback, comment, deferral, PR-body, validation, and mergeability coverage. Return to Task 73 after any head change.
+
+### Independent final PR quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Claude Code review loop is terminally clean:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
 
 ### Complete when
 
@@ -1957,9 +5436,33 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 73.
 | --- | --- | --- |
 | Task 74 | `FS` | The independent quality check passed for the current head and tree. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Apply the mandatory merge gate. Merge the approved fallback before `2026-08-30T23:59:59Z`. Prove that the validator never enters `advisory-expired`. Record the landed identity, validation, review-loop result, final quality-check result, and rollback evidence.
+Apply the task-local merge gate below. Merge the approved fallback before `2026-08-30T23:59:59Z`. Prove that the validator never enters `advisory-expired`. Record the landed identity, validation, review-loop result, final quality-check result, and rollback evidence.
+
+### Merge gate
+
+Immediately before the merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -1977,14 +5480,47 @@ The approved fallback is landed with all required evidence before advisory expir
 | Task 71 | `FS` | The owner approved the current merge path or supplied a later applicable approval. |
 | Task 75 | `FS` when applicable | The approved fallback is landed. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Revalidate the approved candidate head, tree, checks, dependencies, decisions, settings, and approval.
 2. If Task 75 changed an input or overlapping path, rebase or update the PS #149 candidate. Return to Task 68 for the Claude Code review loop and Task 69 for a new independent quality check. Obtain a new Task 71 approval when the prior approval does not cover the resulting bytes.
 3. Stop if any item still differs from the approved evidence.
-4. Apply the mandatory merge gate.
+4. Apply the task-local merge gate below.
 5. Merge one PS #149 PR and close the issue.
 6. Post the permanent P3 handoff. Include source and landed identities, paths and blobs, common mechanism choice, package and tool identities, validation, runtime evidence, decision records, review-loop result, final quality-check result, intentional differences, and rollback instructions.
+
+### Candidate-refresh gate
+
+Apply this gate only if Procedure step 2 changes the PS #149 PR:
+
+1. Complete the affected issue scope, local validation, PR-body correction, and initial required checks on the new candidate.
+2. Record the new base, head SHA and tree, affected paths, issue links, validation, runtime identities, and changed decision or rollback evidence.
+3. Stop the merge action. Return to Task 68 for a new Claude Code review loop and Task 69 for a new independent final quality check.
+4. Require a new Task 71 approval when the current approval does not cover the new bytes or settings. Do not resume this task until all three records apply to the same current head and tree.
+
+### Merge gate
+
+Immediately before the merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -2000,6 +5536,20 @@ PS #149 is closed by the approved merge and Terraform #24 can adapt the landed r
 | --- | --- | --- |
 | Task 76 | `FS` | Use the final landed PS #149 commit and handoff. |
 | Task 65 | `FS` | Terraform #23, the native predecessor of #24, is closed. |
+
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
 
 ### Issue update
 
@@ -2027,6 +5577,20 @@ Terraform #24 contains the complete pinned starting point, scope, common control
 | --- | --- | --- |
 | Task 77 | `FS` | The issue update is complete and the implementation slot is free. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Explicitly commence only Terraform #24 from the landed PS P3 source.
@@ -2034,6 +5598,16 @@ Terraform #24 contains the complete pinned starting point, scope, common control
 3. Preserve all common controls from Task 77 and record every repository-specific adaptation.
 4. Complete the reciprocal matrix at candidate preparation.
 5. Create or update one focused Terraform #24 PR. Run initial local validation and required checks. Record its head SHA and tree. Stop before merge.
+
+### Candidate preparation gate
+
+Before this task is complete:
+
+1. Create or update only the focused PR for the stated issue or approved task.
+2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
+3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
+4. Replace every placeholder and verify every posted identity.
+5. Stop before the Claude Code review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Complete when
 
@@ -2049,9 +5623,50 @@ The Terraform #24 candidate PR exists with complete source, destination, identit
 | --- | --- | --- |
 | Task 78 | `FS` | The Terraform #24 candidate PR exists and initial checks pass. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory Anthropic Claude Code review-loop prompt in TerraformStyleGuide. Do not merge. If bytes change, rerun Task 78 validation and refresh the reciprocal matrix.
+Run the task-local Anthropic Claude Code review-loop prompt below in TerraformStyleGuide. Do not merge. If bytes change, rerun Task 78 validation and refresh the reciprocal matrix.
+
+### Anthropic Claude Code review-loop prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a dedicated Anthropic Claude Code session:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
 
 ### Complete when
 
@@ -2067,9 +5682,51 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 | --- | --- | --- |
 | Task 79 | `FS` | The Claude Code review loop is terminally clean. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory independent final PR quality-check prompt. Require complete Terraform #24 package, audit, exception, Husky, workflow, issue, comment, deferral, PR-body, validation, checks, and mergeability coverage. Return to Task 79 after any head change.
+Run the task-local independent final PR quality-check prompt below. Require complete Terraform #24 package, audit, exception, Husky, workflow, issue, comment, deferral, PR-body, validation, checks, and mergeability coverage. Return to Task 79 after any head change.
+
+### Independent final PR quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Claude Code review loop is terminally clean:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
 
 ### Complete when
 
@@ -2085,9 +5742,33 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 79.
 | --- | --- | --- |
 | Task 80 | `FS` | The independent quality check passed for the current head and tree. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Apply the mandatory merge gate. Merge the PR, close Terraform #24, and post the full landed handoff with source and destination blobs, identities, validation, runtimes, review-loop result, final quality-check result, and intentional differences.
+Apply the task-local merge gate below. Merge the PR, close Terraform #24, and post the full landed handoff with source and destination blobs, identities, validation, runtimes, review-loop result, final quality-check result, and intentional differences.
+
+### Merge gate
+
+Immediately before the merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -2103,9 +5784,117 @@ Terraform #24 is closed by the landed PR and the result is ready for reverse PS 
 | --- | --- | --- |
 | Task 81 | `FS` | Use only the landed PS #149 and Terraform #24 commits and blobs. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Use the reciprocal fixed-point contract and complete catalog. Compare the Husky mechanism and every common dependency/update-governance behavior. If Terraform added or corrected common behavior, run the four discrete conditional repair PR lifecycle steps for one focused PS sync-back. Compare Terraform again if PS changes and use the same lifecycle for any further repair. Post the current evidence without closing the cycle until Task 83.
+Use the task-local reverse-comparison and closure controls below and complete catalog. Compare the Husky mechanism and every common dependency/update-governance behavior. If Terraform added or corrected common behavior, run the four task-local conditional repair PR lifecycle actions for one focused PS sync-back. Compare Terraform again if PS changes and use the same lifecycle for any further repair. Post the current evidence without closing the cycle until Task 83.
+
+### Reverse-comparison and closure controls
+
+1. Read both repositories only from the final pinned commits. Record every compared blob and map files by role.
+2. Classify each applicable matrix row as `same`, `intentional difference`, or `blocker`.
+3. If the destination adaptation added or corrected common behavior, create or update one focused source sync-back issue. Pin both landed commits and blobs.
+4. Start a source sync-back only after issue setup and a free implementation slot. Adapt the common behavior; do not redesign it independently.
+5. Prepare the source sync-back candidate and complete the task-local conditional repair PR lifecycle.
+6. If the source changes, compare the new landed source result in the destination again. Use the same issue, slot, lifecycle, and evidence controls for each required destination repair.
+7. Stop if the same matrix row changes direction twice. Run a new decision process that evaluates both implementations.
+8. Close the cycle only when every common row is `same`, every intentional difference has complete evidence, and no blocker remains.
+9. Post one permanent closure record with both repositories' final identities, the matrix digest, validation, review outcomes, and no-change or non-applicability results. If a dependent final-recheck task owns closure, post the current reciprocal record and leave final closure to that task.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -2121,9 +5910,114 @@ The reverse PS comparison and any PS sync-back are complete, and the final PS id
 | --- | --- | --- |
 | Task 82 | `FS` | Use the final landed PS state from Task 82. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Compare the final PS state back in Terraform. If a focused Terraform repair is required, run the four discrete conditional repair PR lifecycle steps. Apply the row-direction stop rule. Post the permanent P3/T3 closure record with all required identities, matrices, validation, reviews, and non-applicability results.
+Compare the final PS state back in Terraform. If a focused Terraform repair is required, run the four task-local conditional repair PR lifecycle actions. Apply the row-direction stop rule. Post the permanent P3/T3 closure record with all required identities, matrices, validation, reviews, and non-applicability results.
+
+### Final reciprocal-recheck controls
+
+1. Read the final source and destination states only from pinned commits. Record every compared blob and map files by role.
+2. Classify each applicable matrix row as `same`, `intentional difference`, or `blocker`.
+3. If a common destination difference remains, create one focused destination issue. Start it only after issue setup and a free implementation slot. Complete the task-local conditional repair PR lifecycle.
+4. After each repair, compare the landed result in the other repository. Stop if the same row changes direction twice and run a new decision process that evaluates both implementations.
+5. Close the cycle only when every common row is `same`, every intentional difference has complete evidence, and no blocker remains.
+6. Post one permanent closure record with both repositories' final identities, the matrix digest, validation, review outcomes, and no-change or non-applicability results.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -2139,12 +6033,36 @@ The P3/T3 cycle is at a fixed point and no blocker remains.
 | --- | --- | --- |
 | Task 83 | `FS` | PS #149 and its full reciprocal cycle are closed. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Re-query PS #151 and all landed policy and P3 contracts.
 2. Verify the implementation slot is free. Explicitly commence only PS #151.
 3. Implement the issue's Node permission-model confinement and duplicate-key preflight controls without silently attributing them to PS #162.
 4. Create or update one focused PS #151 PR. Run initial local validation and required checks. Record its head SHA and tree, affected controls, files and blobs, runtimes, and intentional differences. Stop before merge.
+
+### Candidate preparation gate
+
+Before this task is complete:
+
+1. Create or update only the focused PR for the stated issue or approved task.
+2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
+3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
+4. Replace every placeholder and verify every posted identity.
+5. Stop before the Claude Code review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Complete when
 
@@ -2160,9 +6078,50 @@ The PS #151 candidate PR exists with a complete affected-control map and initial
 | --- | --- | --- |
 | Task 84 | `FS` | The PS #151 candidate PR exists and initial checks pass. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory Anthropic Claude Code review-loop prompt against the PS #151 PR. Do not merge. If bytes change, rerun Task 84 validation.
+Run the task-local Anthropic Claude Code review-loop prompt below against the PS #151 PR. Do not merge. If bytes change, rerun Task 84 validation.
+
+### Anthropic Claude Code review-loop prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a dedicated Anthropic Claude Code session:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
 
 ### Complete when
 
@@ -2178,9 +6137,51 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 | --- | --- | --- |
 | Task 85 | `FS` | The Claude Code review loop is terminally clean. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Run the mandatory independent final PR quality-check prompt. Require complete PS #151 Node permission-model, duplicate-key preflight, issue, comment, deferral, PR-body, final-diff, validation, checks, and mergeability coverage. Return to Task 85 after any head change.
+Run the task-local independent final PR quality-check prompt below. Require complete PS #151 Node permission-model, duplicate-key preflight, issue, comment, deferral, PR-body, final-diff, validation, checks, and mergeability coverage. Return to Task 85 after any head change.
+
+### Independent final PR quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Claude Code review loop is terminally clean:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
 
 ### Complete when
 
@@ -2196,9 +6197,33 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 85.
 | --- | --- | --- |
 | Task 86 | `FS` | The independent quality check passed for the current head and tree. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Apply the mandatory merge gate. Merge the PR, close PS #151, and post the full landed handoff with affected controls, files and blobs, validation, runtimes, review-loop result, final quality-check result, and intentional differences.
+Apply the task-local merge gate below. Merge the PR, close PS #151, and post the full landed handoff with affected controls, files and blobs, validation, runtimes, review-loop result, final quality-check result, and intentional differences.
+
+### Merge gate
+
+Immediately before the merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -2214,13 +6239,120 @@ PS #151 is closed by the landed PR and its affected-control map is ready for Ter
 | --- | --- | --- |
 | Task 87 | `FS` | Use the final landed PS #151 commit and blobs. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Compare the landed Node permission-model and duplicate-key controls with the Terraform validator and workflow topology.
-2. If an applicable control is absent or weaker, create one focused Terraform issue from the landed PS commit and blobs, then run the four discrete conditional repair PR lifecycle steps.
+2. If an applicable control is absent or weaker, create one focused Terraform issue from the landed PS commit and blobs, then run the four task-local conditional repair PR lifecycle actions.
 3. If Terraform is equivalent, post a pinned no-change record.
 4. If a control is structurally inapplicable, post a pinned non-applicability record.
 5. Do not create a placeholder issue only for symmetry.
+
+### Destination-comparison controls
+
+1. Read both repositories only from pinned commits. Record every compared blob.
+2. Map files by role, not only by filename.
+3. Classify each applicable matrix row as `same`, `intentional difference`, or `blocker`.
+4. If no common difference exists, post a pinned no-change or non-applicability record. Do not open an implementation issue only for symmetry.
+5. If a common difference exists, create or update one focused destination issue. Pin the source commit and blobs.
+6. Start the destination adaptation only after issue setup and a free implementation slot. Adapt the landed capability; do not redesign it independently.
+7. Prepare one destination candidate and complete the task-local conditional repair PR lifecycle. Record the complete landed identity and validation evidence.
+8. Stop this task at its stated destination result. The dependent reverse-comparison task must compare the landed destination result back against the source before the cycle can close.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -2236,9 +6368,117 @@ Terraform has a landed adaptation, pinned no-change result, or proved structural
 | --- | --- | --- |
 | Task 88 | `FS` | Use the final Task 88 Terraform result. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
-Use the reciprocal fixed-point contract with the applicable complete or reduced matrix. For any focused PS sync-back or later Terraform repair, run the four discrete conditional repair PR lifecycle steps. Post the permanent closure or non-applicability record.
+Use the task-local reverse-comparison and closure controls below with the applicable complete or reduced matrix. For any focused PS sync-back or later Terraform repair, run the four task-local conditional repair PR lifecycle actions. Post the permanent closure or non-applicability record.
+
+### Reverse-comparison and closure controls
+
+1. Read both repositories only from the final pinned commits. Record every compared blob and map files by role.
+2. Classify each applicable matrix row as `same`, `intentional difference`, or `blocker`.
+3. If the destination adaptation added or corrected common behavior, create or update one focused source sync-back issue. Pin both landed commits and blobs.
+4. Start a source sync-back only after issue setup and a free implementation slot. Adapt the common behavior; do not redesign it independently.
+5. Prepare the source sync-back candidate and complete the task-local conditional repair PR lifecycle.
+6. If the source changes, compare the new landed source result in the destination again. Use the same issue, slot, lifecycle, and evidence controls for each required destination repair.
+7. Stop if the same matrix row changes direction twice. Run a new decision process that evaluates both implementations.
+8. Close the cycle only when every common row is `same`, every intentional difference has complete evidence, and no blocker remains.
+9. Post one permanent closure record with both repositories' final identities, the matrix digest, validation, review outcomes, and no-change or non-applicability results. If a dependent final-recheck task owns closure, post the current reciprocal record and leave final closure to that task.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -2255,6 +6495,20 @@ The PS #151 cross-repository cycle is closed and every applicable common control
 | None | — | No technical predecessor. Run here to avoid interrupting the known capability cycles. Re-run when a listed input changes. |
 
 Keep PS #155 and #156 open and independent. Do not add either issue as a blocker for PS #159, #152, #147, Terraform #21, or Terraform #22 without a new material trigger.
+
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
 
 ### Trigger check
 
@@ -2281,18 +6535,130 @@ Each trigger has a current, evidence-backed classification and each present trig
 | Task 89 | `FS` | The preceding known fixed-point cycle is closed. |
 | Prior Task 91 instance | `FS` | Close one residual cycle before starting another. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Validate the trigger and complete the required finding-specific decision process.
 2. Create one focused issue with only its real dependencies. Issue creation does not start implementation.
 3. Verify the implementation slot is free. Explicitly start only that residual issue.
-4. Prepare one focused PR and run the four discrete conditional repair PR lifecycle steps.
+4. Prepare one focused PR and run the four task-local conditional repair PR lifecycle actions.
 5. Record the complete landed identity, validation, review, and rollback evidence.
 6. Do not change repository settings without exact administrator authorization.
 7. If the other repository has the same role, compare the landed result there.
 8. Create a reciprocal issue before implementation only when a common difference exists.
-9. Start the reciprocal issue only after issue setup and a free implementation slot. Run the four discrete conditional repair PR lifecycle steps, then run the reverse comparison.
+9. Start the reciprocal issue only after issue setup and a free implementation slot. Run the four task-local conditional repair PR lifecycle actions, then run the reverse comparison.
 10. Close the cycle only when each common behavior is `same` or a proved intentional difference with equal security and failure strength.
+
+### Reciprocal fixed-point controls
+
+1. Read both repositories only from pinned commits. Record every compared blob.
+2. Map files by role, not only by filename.
+3. Classify each applicable row as `same`, `intentional difference`, or `blocker`.
+4. If no common difference exists, post a pinned no-change or non-applicability record. Do not open an implementation issue only for symmetry.
+5. If a common difference exists, create or update one focused destination issue. Pin the source commit and blobs.
+6. Start the destination adaptation only after issue setup and a free implementation slot. Adapt the landed capability; do not redesign it independently.
+7. Prepare one destination candidate and complete the task-local conditional repair PR lifecycle. Record the complete landed identity and validation evidence.
+8. Compare the landed destination result back against the source repository.
+9. If the destination added or corrected common behavior, create a focused source sync-back issue. Start it only after issue setup and a free implementation slot.
+10. Prepare the source sync-back candidate and complete the task-local conditional repair PR lifecycle. Then compare the new source result in the destination again.
+11. Stop if the same matrix row changes direction twice. Run a new decision process that evaluates both implementations.
+12. Close the cycle only when every common row is `same`, every intentional difference has complete evidence, and no blocker remains.
+13. Post one permanent closure record with final identities from both repositories, the matrix digest, validation, review outcomes, and no-change or non-applicability results.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Complete when
 
@@ -2310,17 +6676,31 @@ One triggered residual cycle is at a fixed point. All Task 91 instances are comp
 | Every applicable Task 91 instance | `FS` | Triggered residual work is closed. |
 | Prior Task 92 instance | `FS` | The prior future cycle has a permanent fixed-point record. |
 
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
+
 ### Procedure
 
 1. Create or update the PS issue. Classify it as `common capability`, `repository-specific capability`, or `administrative only`. Issue creation does not start implementation.
 2. Record landed inputs and blobs, intended paths, real native dependencies, expected differences, and any mapped Terraform issue.
 3. Verify the implementation slot is free. Explicitly start only the PS implementation.
-4. Prepare one PS PR and run the four discrete conditional repair PR lifecycle steps. Post a permanent handoff with exact landed identities and matrix rows.
+4. Prepare one PS PR and run the four task-local conditional repair PR lifecycle actions. Post a permanent handoff with exact landed identities and matrix rows.
 5. Create or update the Terraform issue only from that landed PS handoff. Do not replace placeholders before the PS PR lands, and never use a branch, reviewed head, test-merge ref, or anticipated squash SHA as the landed commit.
 6. After issue setup and a free implementation slot, explicitly start only the Terraform adaptation. Do not create a shared runtime dependency.
-7. Run the four discrete conditional repair PR lifecycle steps for the Terraform PR.
+7. Run the four task-local conditional repair PR lifecycle actions for the Terraform PR.
 8. Run the reverse PS comparison. Create a focused PS sync-back issue before any correction and start it only after issue setup and a free implementation slot.
-9. If PS changes, compare Terraform again. Run the four discrete conditional repair PR lifecycle steps for any required Terraform repair.
+9. If PS changes, compare Terraform again. Run the four task-local conditional repair PR lifecycle actions for any required Terraform repair.
 10. Apply the row-direction stop rule. Repeat until the cycle reaches a fixed point. Do not start the next PS capability before the permanent closure record exists.
 
 ### Terraform starting-point template
@@ -2341,6 +6721,104 @@ Replace all placeholders with verified landed identities:
 >
 > Do not change repository settings without exact administrator authorization. Run the candidate, Anthropic Claude Code review-loop, independent final quality-check, and merge actions as separate steps. Record source and destination blobs, tests, runtime identities, reviewed head/tree, merge method, landed commit/tree, and the next handoff.
 
+### Reciprocal fixed-point controls
+
+1. Read both repositories only from pinned commits. Record every compared blob.
+2. Map files by role, not only by filename.
+3. Classify each applicable row as `same`, `intentional difference`, or `blocker`.
+4. If no common difference exists, post a pinned no-change or non-applicability record. Do not open an implementation issue only for symmetry.
+5. If a common difference exists, create or update one focused destination issue. Pin the source commit and blobs.
+6. Start the destination adaptation only after issue setup and a free implementation slot. Adapt the landed capability; do not redesign it independently.
+7. Prepare one destination candidate and complete the task-local conditional repair PR lifecycle. Record the complete landed identity and validation evidence.
+8. Compare the landed destination result back against the source repository.
+9. If the destination added or corrected common behavior, create a focused source sync-back issue. Start it only after issue setup and a free implementation slot.
+10. Prepare the source sync-back candidate and complete the task-local conditional repair PR lifecycle. Then compare the new source result in the destination again.
+11. Stop if the same matrix row changes direction twice. Run a new decision process that evaluates both implementations.
+12. Close the cycle only when every common row is `same`, every intentional difference has complete evidence, and no blocker remains.
+13. Post one permanent closure record with final identities from both repositories, the matrix digest, validation, review outcomes, and no-change or non-applicability results.
+
+### Intentional-difference evidence
+
+Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence.
+
+For each intentional difference, name both literals or behaviors. Explain the repository need. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not use convenience, implementation history, separate authorship, or lower effort as a repository-specific reason.
+
+### Conditional repair PR lifecycle
+
+If this task finds no change or proves non-applicability, record the pinned result and skip the PR-only actions. For each repair PR that this task requires, perform all of these actions in order and keep them discrete:
+
+1. **Candidate action:** Validate the finding through exhaustive options, a finding-specific weighted rubric, a scoring table, and an ASD-STE100-compliant selection. Implement the selected repair. Open or update one focused PR. Complete the issue scope, local validation, PR body, and initial checks. Record the base, head SHA, head tree, affected paths, source and candidate blobs, validation, and issue links. Stop before review or merge.
+2. **Claude Code review-loop action:** In a dedicated Anthropic Claude Code session, use the repair prompt below. Require `TERMINALLY CLEAN` for the candidate head. Do not combine this action with candidate preparation or merge.
+3. **Independent quality-check action:** After the Claude Code result is terminally clean, use the independent repair prompt below in a fresh coding-agent session. Require `PASS` for the same head SHA and tree. Do not rely on the Claude Code session's unverified summary.
+4. **Merge action:** Apply the repair merge gate below. Record the landed identity and validation evidence.
+5. If either review action changes implementation bytes, commits, generated files, tests, or another reviewable repository artifact, return to action 2 for the new head. Then repeat action 3 in another fresh session. If only the PR body changes, revalidate the corrected body in action 3.
+6. Repeat all four actions for each later reciprocal repair PR. Do not merge a repair directly from the comparison action.
+
+#### Repair Anthropic Claude Code prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into Anthropic Claude Code:
+
+~~~text
+Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
+
+Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
+
+Do not merge the pull request.
+
+1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
+2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
+3. For each review round, request fresh reviews from both GitHub Copilot (copilot-pull-request-reviewer) and Codex (chatgpt-codex-connector). Treat them as co-equal reviewers.
+4. Poll authenticated structured review and comment data at least every 60 seconds. Paginate all results. Count a review for the round only when it is newer than the recorded reviewer baseline and its commit_id equals the recorded PR head SHA.
+5. Process every actionable comment from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and resolve the thread.
+6. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
+7. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
+8. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
+9. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
+10. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
+11. Declare terminal clean only when Copilot and Codex each have a current-head review with no actionable comments, except a reviewer proved non-functional under CLAUDE.md, and no untracked or illegitimate deferral remains.
+12. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
+
+If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
+~~~
+
+#### Repair independent final quality-check prompt
+
+Replace only `<PR_URL_OR_NUMBER>` with the verified repair-PR URL or number. Copy the resulting prompt into a fresh coding-agent session:
+
+~~~text
+Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
+
+Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
+
+1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
+2. Enumerate and paginate every review, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
+3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
+4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
+5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
+6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
+7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
+8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
+9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
+10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
+11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
+12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
+13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
+
+PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
+~~~
+
+#### Repair merge gate
+
+Immediately before the repair merge:
+
+1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
+2. Verify that the Claude Code terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
+4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
+
 ### Complete when
 
 One future capability has a landed PS source, Terraform adaptation or proved non-applicability, reverse PS comparison, all required sync-backs, and a permanent fixed-point closure record.
@@ -2356,6 +6834,20 @@ One future capability has a landed PS source, Terraform adaptation or proved non
 | Tasks 1–89 | `FS` | Every known task and reciprocal cycle is complete. |
 | Every applicable Task 91 and Task 92 instance | `FS` | All triggered residual and in-scope future cycles are complete. |
 | Task 90 | `FS` | The latest residual-trigger record is current. |
+
+### Execution controls
+
+1. Re-query GitHub and fetch both current `origin/main` refs before any issue write, branch rewrite, merge, or settings change in this task.
+2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
+3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
+4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
+5. Keep candidate preparation, the Anthropic Claude Code review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
+8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
+9. Validate each finding before editing. List exhaustive options, create a finding-specific weighted rubric, score the options in a table, and select the best option.
+10. State each selected action in ASD-STE100-compliant language. Keep decision analysis in `TEMP-*` files, not in permanent planning or implementation documents.
+11. Record each applicable issue and PR URL, base, reviewed head and tree, merge method, landed commit and tree, affected path, Git blob, validation command, runtime identity, and review outcome.
 
 ### Completion audit
 
