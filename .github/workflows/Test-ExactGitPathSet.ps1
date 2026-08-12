@@ -45,7 +45,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionVerifier = '1.0.20260812.0'
+$script:strVerifierVersion = '1.0.20260812.0'
 $script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v1'
 
 function Get-ScriptVersionRecord {
@@ -403,7 +403,7 @@ try {
     $strSelfText = (New-Object System.Text.UTF8Encoding($false, $true)).GetString(
         [System.IO.File]::ReadAllBytes($strSelfPath)
     )
-    [void](Get-ScriptVersionRecord -ScriptText $strSelfText -ExpectedVersion $script:versionVerifier)
+    [void](Get-ScriptVersionRecord -ScriptText $strSelfText -ExpectedVersion $script:strVerifierVersion)
 
     $strRepositoryRoot = Assert-OrdinaryRepositoryRoot -LiteralPath $RepositoryRoot
 
@@ -503,7 +503,7 @@ $intExpectedCount = if ($null -eq $objExpectedKeys) { 0 } else { $objExpectedKey
 $intActualCount = if ($null -eq $objActualKeys) { 0 } else { $objActualKeys.Count }
 $hashtableResult = [ordered]@{
     Schema = $script:strVerifierResultSchema
-    VerifierVersion = $script:versionVerifier
+    VerifierVersion = $script:strVerifierVersion
     Success = $intExitCode -eq 0
     Mode = $Mode
     Category = $strCategory

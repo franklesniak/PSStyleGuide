@@ -16,7 +16,7 @@ Version: 1.0.20260812.0
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionGenerator = '1.0.20260812.0'
+$script:strGeneratorVersion = '1.0.20260812.0'
 $script:strGeneratorResultSchema = 'PSStyleGuide.GeneratorResult.v1'
 $script:objUtf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
 $script:objUtf8NoBom = New-Object System.Text.UTF8Encoding($false)
@@ -909,7 +909,7 @@ try {
     $strSelfPath = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot 'Generate-StyleGuideArtifacts.ps1'))
     $arrSelfBytes = [System.IO.File]::ReadAllBytes($strSelfPath)
     $strSelfText = $script:objUtf8Strict.GetString($arrSelfBytes)
-    [void](Get-ScriptVersionRecord -ScriptText $strSelfText -ExpectedVersion $script:versionGenerator)
+    [void](Get-ScriptVersionRecord -ScriptText $strSelfText -ExpectedVersion $script:strGeneratorVersion)
 
     $strResultPhase = 'validate-fixed-authority'
     $strWorkflowRoot = Assert-OrdinaryAbsolutePath -LiteralPath $PSScriptRoot -ExpectedLeafType Directory
@@ -1018,7 +1018,7 @@ try {
 
 $hashtableResult = [ordered]@{
     Schema = $script:strGeneratorResultSchema
-    GeneratorVersion = $script:versionGenerator
+    GeneratorVersion = $script:strGeneratorVersion
     Overall = $strOverall
     Phase = $strResultPhase
     Category = $strResultCategory
