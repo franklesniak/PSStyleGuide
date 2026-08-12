@@ -8,9 +8,11 @@ Bring the already implemented PSStyleGuide P1 and TerraformStyleGuide T1 foundat
 
 Keep each repository self-contained. A common behavior may differ only when a repository-specific name, file, schema prefix, check name, platform requirement, or historical decision requires it. Every other difference needs an explicit, reviewed reason and equal security and failure strength.
 
+Issue creation, contract maintenance, dependency maintenance, and read-only comparison are setup activities. They do not commence implementation. Implementation starts only at an explicit commencement gate in the applicable execution step.
+
 ## Verified baseline
 
-This state was verified at `2026-08-12T19:13:43Z`. Re-query GitHub and fetch both `origin/main` refs immediately before every issue edit, branch rewrite, merge, or settings change. If an identity or dependency has changed, stop and refresh the affected comparison.
+This state was verified at `2026-08-12T19:39:25Z`. Re-query GitHub and fetch both `origin/main` refs immediately before every issue edit, branch rewrite, merge, or settings change. If an identity or dependency has changed, stop and refresh the affected comparison.
 
 ### Completed coordination work
 
@@ -74,101 +76,11 @@ The material common-foundation differences are:
 | Husky preparation | `install-husky.mjs` and a PS-specific `prepare` command | Direct `husky` command with accepted failure | Reconcile through PS issue #149 and later Terraform issue #24; do not change it in the foundation issues. |
 | Decision records | PS-specific trust-root and baseline-provenance records | Terraform-specific historical writer and required-check records | Preserve history. Compare active residuals; do not copy records by filename. |
 
-## Nonnegotiable execution rules
-
-1. Open or identify an issue before implementation. Do not reopen closed #145 or #20 for new convergence scope.
-2. Pin every cross-repository input to a landed commit and Git blob. Never copy from a moving branch.
-3. Keep both repositories self-contained. Do not add a shared module, cross-repository runtime fetch, reusable workflow dependency, submodule, package, or third source of truth.
-4. Keep exactly one implementation issue active. Read-only status checks, dependency maintenance, and separately authorized time-bound advisory or repository-settings work may continue, but these exceptions must not create a second feature implementation branch or PR.
-5. During the initial PS import pass, land one PS issue, compare it in TerraformStyleGuide, implement any required Terraform sync, and compare the result back in PSStyleGuide. During the Terraform catch-up pass, reverse that direction. Do not start the next implementation issue until the current cycle reaches a fixed point.
-6. After the two initial passes and the global consistency sweep, complete new common capabilities in PSStyleGuide first. Update or open the Terraform issue only from the landed PS commit and blobs. Do not develop equivalent new behavior independently.
-7. For every port and sync-back, use one closed reciprocal matrix. Each common behavior must be `same`, `intentional difference`, or `blocker`. A changed or unexplained security, credential, path, serialization, atomicity, cleanup, native-status, or failure-truth behavior is a blocker.
-8. Record both repositories' issue and PR URLs, base, reviewed head and tree, merge method, landed commit and tree, affected-path set, source and destination blobs, validation commands, runtime identities, and review outcome.
-9. Replace every placeholder in a prompt before posting it. If an identity is not known, keep the prompt in this plan and wait. Do not post a fabricated SHA, URL, PR number, tree, or blob.
-10. Use native dependencies only for real completion prerequisites. A tracking umbrella may list children without falsely blocking unrelated implementation.
-11. Run the repository's review protocol for every PR. A clean earlier review does not cover changed bytes.
-12. Do not change repository settings unless the applicable administrator issue explicitly authorizes the exact request.
-
-## Per-issue fixed-point gate
-
-One cycle contains one source implementation issue and all comparison or repair work needed to make that capability converge. Complete these steps in order:
-
-1. Classify the source issue as `common capability`, `repository-specific capability`, or `administrative only`. Name the mapped issue in the other repository when one exists.
-2. Record the source issue URL, immutable input commits and blobs, intended affected paths, and expected repository-specific differences.
-3. Implement and review only the source issue. Land its PR and record the landed commit, tree, and affected blobs.
-4. Run the destination comparison prompt against the landed source commit and a fetched destination `main` commit. Complete every applicable `GF-*` row and exact file/blob mapping.
-5. If no common difference exists, post a pinned no-change record. Do not open an implementation issue only for symmetry.
-6. If a common difference exists, open or update one focused destination issue. Pin the source commit and blobs. Implement, review, and land one destination PR.
-7. Run the reverse comparison prompt in the source repository against both landed commits.
-8. If the destination adaptation added or corrected common behavior, open or update one focused source sync-back issue. Implement and land it. Then repeat the destination comparison.
-9. End the cycle only when every common row is `same`, every intentional difference has the required evidence, and no row is a `blocker`.
-10. Post one permanent closure record with both repositories' final landed identities, the final matrix digest, validation evidence, intentional differences, and any explicit non-applicability result.
-
-Do not count a tracker, read-only comparison, dependency edit, or separately authorized settings operation as the active implementation issue. Do not use that exception to develop two features at the same time.
-
-If the same matrix row changes direction twice, stop the cycle. Revalidate the requirement and run a new decision process with both repository implementations as options. Do not alternate implementations indefinitely or choose the last edit merely because it is newer.
-
-Allowed intentional differences are limited to:
-
-- repository identity and canonical URLs;
-- PowerShell or Terraform source and generated filenames and payloads;
-- domain-specific examples and documentation;
-- artifact IDs, schema/type/diagnostic prefixes, check names, ruleset names, and local evidence identifiers;
-- a platform condition that is proved inapplicable in the other repository; and
-- repository-specific historical decisions or live settings evidence.
-
-An item on this list is not automatically acceptable. The matrix must name both literals or behaviors, explain the repository need, prove equal security and failure strength, name the owner, and state any review or expiry condition. Convenience, implementation history, separate authorship, and lower effort are not repository-specific reasons.
-
-## Target common foundation
-
-The landed PS canonical implementation and the synchronized Terraform implementation must share these behaviors:
-
-- fixed repository-root and source/destination authority;
-- complete-payload, BOM-less UTF-8 and LF serialization;
-- fresh same-directory candidate creation, durable flush, byte verification, and single-call publication without direct destination truncation;
-- an existing ordinary tracked destination published with `File.Replace`;
-- an absent but index-tracked destination published with non-overwriting same-directory `File.Move`;
-- a closed structured result that distinguishes pre-publish failure from `ReplacementStateUncertain`;
-- no rollback claim after `File.Replace` or `File.Move` returns;
-- reusable raw NUL-delimited Git path/status validation with exact native-status handling;
-- no JavaScript action in a job that runs repository-controlled code;
-- `permissions: {}` on repository-code jobs;
-- a separate action-only job for any artifact publication;
-- a verified official Node distribution in action-free Node jobs;
-- strict offline workflow-policy parsing and fixtures;
-- machine-readable authority for roles, inputs, defaults, supply identities, and case allocation;
-- read-only supply-freeze recording and a reproducible method;
-- the same script-version grammar and PowerShell authoring rules; and
-- no workflow writer until P1B/T1B explicitly introduces and proves it.
-
-Expected intentional differences are limited to repository identity, source and artifact filenames, artifact IDs, schema/type prefixes, stable check names required by successor issues, documentation text, platform applicability proved by tests, and genuinely repository-specific historical decisions.
-
-Use this closed reciprocal catalog for every foundation comparison:
-
-| Stable row | Required comparison |
-| --- | --- |
-| `GF-PARAMETERS` | Public names, types, defaults, and omission, null, empty, and raw-value rules |
-| `GF-DESTINATION` | Trusted root, fixed destinations, provider, wildcard, rooted-path, normalization, comparison, and failure rules |
-| `GF-CONTENT` | Source order, wrappers, frontmatter, repository-specific names, and complete payload |
-| `GF-SERIALIZATION` | CRLF and lone-CR normalization, LF and final-newline rules, BOM-less UTF-8, and byte checks |
-| `GF-WRITE` | Complete-payload candidate creation, durable flush, verification, single-call publication, and prohibited fallbacks |
-| `GF-FAILURE` | Phase postconditions, cleanup and uncertainty, bounded diagnostics, and fault cases |
-| `GF-HOSTS` | Supported editions and hosts, executable identity, cross-cell equality, and idempotence |
-| `GF-VERSION` | Timeless marker grammar, trusted expected version, authoring progression, and independent fixtures |
-| `GF-NODE-LOCK` | Exact Node/npm producer and provenance, distribution verification, cache and side effects, dependency graph, and frozen consumers |
-| `GF-YAML` | Parser package and API, document and schema strictness, diagnostics, and forbidden features |
-| `GF-ACTION-PINS` | Closed action roles, full commit pins, provenance, runtime, and atomic pin updates |
-| `GF-ACTION-INPUTS` | Authored security inputs and separately reviewed manifest defaults |
-| `GF-GIT` | NUL records, byte allowlists, native statuses, cardinality, refs, ancestry, lease, and refspec |
-| `GF-GRAPH` | Production and evidence triggers, permissions, needs, conditions, outputs, side effects, and sole writer |
-| `GF-CREDENTIALS` | Job-token availability, authentication projection, cleanup, push-only materialization, and absence proofs |
-| `GF-EVIDENCE` | Temporary workflow/ref structural equality, drills, retained identities, cleanup, and final absence |
-
-Each row occurs exactly once. Record both repository URLs and commits, normative and implementation locators, evidence paths and SHA-256 values, observed values or fixture IDs, one status (`same`, `intentional difference`, or `blocker`), and a reason. An intentional difference must name both literals, the repository need, proof of equal security and failure strength, the owner, and any review or expiry condition. Duplicate, missing, unknown, renamed, empty, or unexplained rows block merge.
-
 ## Step 1 — protect the advisory deadline
 
 The current PS P1 advisory decision expires at `2026-08-30T23:59:59Z`. PS issue #149 requires P1, P1A, P1B, and P2 handoffs before implementation, so it is not safe to treat #149 as immediately executable.
+
+This step manages the deadline and any separately authorized repository-settings work. It does not authorize implementation of PS #149 or another feature issue. Do not change repository settings unless PS #152 or another applicable administrator issue authorizes the exact change.
 
 Use `2026-08-21T23:59:59Z` as the internal go/no-go checkpoint.
 
@@ -179,15 +91,17 @@ Use `2026-08-21T23:59:59Z` as the internal go/no-go checkpoint.
 - Do not silently extend a date, reuse old approval, or allow the validator to enter `advisory-expired`.
 - Do not add a false #149 dependency to the convergence issues. The date is a coordination gate, not an issue-graph claim.
 
-Run Step 1 in parallel with Steps 2–6. Repository-settings work under PS #152 may run only within its separate authorization. Neither exception permits a second feature implementation PR.
+Run Step 1 in parallel with Steps 2–6. A deadline check, read-only status check, dependency edit, or separately authorized repository-settings operation does not count as the active implementation issue. None of these operations permits a second feature implementation branch or PR.
 
-## Step 2 — complete the convergence issue contracts
+## Step 2 — prepare and maintain convergence issues
 
-These sections retain the issue-level scope and closure requirements. Step 3 controls their execution order.
+Step 2 creates or updates issue records, dependencies, trackers, and implementation contracts. It does not commence implementation. Do not create a feature branch, edit implementation files, or open an implementation PR merely because an issue is ready. Implementation commences only at the explicit start gate in Step 3, Step 4, or Step 6. Keep native dependencies limited to real completion prerequisites. A tracking umbrella may list children without blocking unrelated work.
+
+Before posting any issue body or comment, replace every placeholder with a verified identity. If an identity does not exist, keep the text in this plan and wait. Never post a fabricated SHA, URL, PR number, tree, or blob.
 
 ### 2.1 PS foundation-convergence umbrella
 
-[PS issue #159](https://github.com/franklesniak/PSStyleGuide/issues/159) is open. Its creation and native child links are complete. Use the retained contract below for implementation and closure. Re-query the live issue before each write.
+[PS issue #159](https://github.com/franklesniak/PSStyleGuide/issues/159) is open. Its creation and native child links are complete. This umbrella is a tracker and never counts as the active implementation issue. Use the retained contract below to maintain scope and closure evidence. Re-query the live issue before each write.
 
 ```markdown
 ## Objective
@@ -229,7 +143,7 @@ Close this umbrella only after all four children and their reciprocal cycles clo
 
 ### 2.2 PS infrastructure-conformance contract
 
-[PS issue #160](https://github.com/franklesniak/PSStyleGuide/issues/160) is open. [Draft PR #164](https://github.com/franklesniak/PSStyleGuide/pull/164) implements the current candidate. The issue creation, rebase, and current-head validation are complete. Review, landing, reciprocal comparison, and fixed-point closure remain. Re-run validation if the candidate bytes change. Use this contract for the remaining work:
+[PS issue #160](https://github.com/franklesniak/PSStyleGuide/issues/160) is open. [Draft PR #164](https://github.com/franklesniak/PSStyleGuide/pull/164) shows that implementation has already commenced for Step 3 cycle 1. The issue creation, rebase, and current-head validation are complete. Review, landing, reciprocal comparison, and fixed-point closure remain. Re-run validation if the candidate bytes change. Use this contract for the remaining work:
 
 ```markdown
 ## Objective
@@ -256,6 +170,7 @@ The draft candidate also changes `.github/workflows/workflow-policy-contract.jso
 - Preserve the completed rebase onto the pinned PS baseline.
 - Preserve the complete original patch unless a line is superseded by a proved equivalent landed change.
 - Apply every applicable Terraform PR #30 authoring idiom: descriptive type-prefixed names, `List[T]` instead of array `+=`, `[void]` output suppression, complete comment-based help, approved function naming, and descriptive loop variables.
+- Preserve the timeless four-component script-version grammar and the corresponding trusted expected-version pins.
 - Keep runtime behavior unchanged.
 - Do not edit `CLAUDE.md` or the four P1A files.
 - Preserve the current script versions and trusted pins. Update them only if the final material bytes change.
@@ -272,7 +187,7 @@ The PR must give the umbrella issue its reviewed head/tree, landed commit/tree, 
 
 ### 2.3 PS generator and path-contract
 
-[PS issue #161](https://github.com/franklesniak/PSStyleGuide/issues/161) is open, and PS #160 is its verified native blocker. Do not start implementation until the PS #160 reciprocal cycle closes. Use this contract for implementation and closure:
+[PS issue #161](https://github.com/franklesniak/PSStyleGuide/issues/161) is open, and PS #160 is its verified native blocker. Issue setup is complete. Do not commence implementation until Step 3 closes the PS #160 reciprocal cycle and reaches the cycle 2 start gate. Use this contract for implementation and closure:
 
 ```markdown
 ## Objective
@@ -320,7 +235,37 @@ Do not duplicate the same normative algorithm in workflow YAML. Thin workflow ca
 
 Freeze the exact affected-path set before coding. If `build.yml` or the policy files need only pin/fixture updates, assign those bytes to the later workflow-policy issue instead of editing them here.
 
+Use this closed foundation catalog. Each row occurs exactly once:
+
+| Stable row | Required comparison |
+| --- | --- |
+| `GF-PARAMETERS` | Public names, types, defaults, and omission, null, empty, and raw-value rules |
+| `GF-DESTINATION` | Trusted root, fixed destinations, provider, wildcard, rooted-path, normalization, comparison, and failure rules |
+| `GF-CONTENT` | Source order, wrappers, frontmatter, repository-specific names, and complete payload |
+| `GF-SERIALIZATION` | CRLF and lone-CR normalization, LF and final-newline rules, BOM-less UTF-8, and byte checks |
+| `GF-WRITE` | Complete-payload candidate creation, durable flush, verification, single-call publication, and prohibited fallbacks |
+| `GF-FAILURE` | Phase postconditions, cleanup and uncertainty, bounded diagnostics, and fault cases |
+| `GF-HOSTS` | Supported editions and hosts, executable identity, cross-cell equality, and idempotence |
+| `GF-VERSION` | Timeless marker grammar, trusted expected version, authoring progression, and independent fixtures |
+| `GF-NODE-LOCK` | Exact Node/npm producer and provenance, distribution verification, cache and side effects, dependency graph, and frozen consumers |
+| `GF-YAML` | Parser package and API, document and schema strictness, diagnostics, and forbidden features |
+| `GF-ACTION-PINS` | Closed action roles, full commit pins, provenance, runtime, and atomic pin updates |
+| `GF-ACTION-INPUTS` | Authored security inputs and separately reviewed manifest defaults |
+| `GF-GIT` | NUL records, byte allowlists, native statuses, cardinality, refs, ancestry, lease, and refspec |
+| `GF-GRAPH` | Production and evidence triggers, permissions, needs, conditions, outputs, side effects, and sole writer |
+| `GF-CREDENTIALS` | Job-token availability, authentication projection, cleanup, push-only materialization, and absence proofs |
+| `GF-EVIDENCE` | Temporary workflow/ref structural equality, drills, retained identities, cleanup, and final absence |
+
+For every row, record both repository URLs and commits, normative and implementation locators, evidence paths and SHA-256 values, observed values or fixture IDs, one status (`same`, `intentional difference`, or `blocker`), and a reason. Missing, duplicate, unknown, renamed, empty, or unexplained rows block merge.
+
 Complete the 16-row `GF-*` reciprocal matrix and a file-operation matrix for existing destination, absent tracked destination, unexpected destination, link/reparse substitution, create collision, write/flush/verify failure, publish failure, post-publish uncertainty, cleanup failure, and multi-artifact partial success. No unexplained blocker may remain.
+
+Expected intentional differences are limited to repository identity, source and artifact filenames, artifact IDs, schema/type prefixes, stable check names required by successor issues, documentation text, platform applicability proved by tests, and genuinely repository-specific historical decisions. For each intentional difference, name both literals or behaviors, explain the repository need, prove equal security and failure strength, name the owner, and state any review or expiry condition.
+
+## Version and scope boundary
+
+- Use the same script-version grammar and PowerShell authoring rules in both repositories.
+- Keep this issue read-only with respect to workflow publication. P1B/T1B owns the first workflow writer.
 
 ## Validation
 
@@ -333,7 +278,7 @@ Record base, reviewed head/tree, landed commit/tree, source and landed blobs, sc
 
 ### 2.4 PS workflow-isolation and policy
 
-[PS issue #162](https://github.com/franklesniak/PSStyleGuide/issues/162) is open, and PS #161 is its verified native blocker. Do not start implementation until the PS #161 reciprocal cycle closes. Use this contract for implementation and closure:
+[PS issue #162](https://github.com/franklesniak/PSStyleGuide/issues/162) is open, and PS #161 is its verified native blocker. Issue setup is complete. Do not commence implementation until Step 3 closes the PS #161 reciprocal cycle and reaches the cycle 3 start gate. Use this contract for implementation and closure:
 
 ```markdown
 ## Objective
@@ -373,13 +318,40 @@ Use the canonical landed generator/path commit as the editing baseline. The olde
 
 Keep `workflow-policy-contract.json` as machine-readable authority and `workflow-policy-cases.json` as the external case catalog. Port every applicable Terraform PR #26/#30 policy invariant and negative fixture, including job isolation, action-role multiset, immutable acquire, runner communication channels, credential absence, fixed tools, control-surface integrity, worktree containment, Node supply verification, strict YAML/JSON shapes, native statuses, terminal graph behavior, and publish-job restrictions.
 
+Run policy parsing and all policy fixtures strictly offline. Keep machine-readable authority for job roles, authored inputs, reviewed defaults, supply identities, and exact case allocation.
+
 Do not reduce Terraform's current coverage merely to keep PS's smaller case count. Do not copy Terraform repository literals or historical decision text.
 
 PS issue #151 remains a later P4 task after #149. Do not silently claim that this issue completes Node permission-model confinement or duplicate-key preflight work unless #151 is explicitly amended and all of its acceptance evidence is satisfied.
 
 ## Required comparison
 
-Refresh the 16-row `GF-*` matrix against the landed canonical generator/path commit and Terraform current `main`. Add a workflow-topology table containing every workflow, job, step, permission, condition, action, authored input, reviewed default, credential, repository-code execution point, produced bytes, consumed bytes, and side effect.
+Use this closed foundation catalog. Each row occurs exactly once:
+
+| Stable row | Required comparison |
+| --- | --- |
+| `GF-PARAMETERS` | Public names, types, defaults, and omission, null, empty, and raw-value rules |
+| `GF-DESTINATION` | Trusted root, fixed destinations, provider, wildcard, rooted-path, normalization, comparison, and failure rules |
+| `GF-CONTENT` | Source order, wrappers, frontmatter, repository-specific names, and complete payload |
+| `GF-SERIALIZATION` | CRLF and lone-CR normalization, LF and final-newline rules, BOM-less UTF-8, and byte checks |
+| `GF-WRITE` | Complete-payload candidate creation, durable flush, verification, single-call publication, and prohibited fallbacks |
+| `GF-FAILURE` | Phase postconditions, cleanup and uncertainty, bounded diagnostics, and fault cases |
+| `GF-HOSTS` | Supported editions and hosts, executable identity, cross-cell equality, and idempotence |
+| `GF-VERSION` | Timeless marker grammar, trusted expected version, authoring progression, and independent fixtures |
+| `GF-NODE-LOCK` | Exact Node/npm producer and provenance, distribution verification, cache and side effects, dependency graph, and frozen consumers |
+| `GF-YAML` | Parser package and API, document and schema strictness, diagnostics, and forbidden features |
+| `GF-ACTION-PINS` | Closed action roles, full commit pins, provenance, runtime, and atomic pin updates |
+| `GF-ACTION-INPUTS` | Authored security inputs and separately reviewed manifest defaults |
+| `GF-GIT` | NUL records, byte allowlists, native statuses, cardinality, refs, ancestry, lease, and refspec |
+| `GF-GRAPH` | Production and evidence triggers, permissions, needs, conditions, outputs, side effects, and sole writer |
+| `GF-CREDENTIALS` | Job-token availability, authentication projection, cleanup, push-only materialization, and absence proofs |
+| `GF-EVIDENCE` | Temporary workflow/ref structural equality, drills, retained identities, cleanup, and final absence |
+
+For every row, record both repository URLs and commits, normative and implementation locators, evidence paths and SHA-256 values, observed values or fixture IDs, one status (`same`, `intentional difference`, or `blocker`), and a reason. Missing, duplicate, unknown, renamed, empty, or unexplained rows block merge.
+
+Expected intentional differences are limited to repository identity, source and artifact filenames, artifact IDs, schema/type prefixes, stable check names required by successor issues, documentation text, platform applicability proved by tests, and genuinely repository-specific historical decisions. For each intentional difference, name both literals or behaviors, explain the repository need, prove equal security and failure strength, name the owner, and state any review or expiry condition.
+
+Complete this matrix against the landed canonical generator/path commit and Terraform current `main`. Add a workflow-topology table containing every workflow, job, step, permission, condition, action, authored input, reviewed default, credential, repository-code execution point, produced bytes, consumed bytes, and side effect.
 
 An action in a repository-code job, a repository token scope on such a job, an unverified Node distribution, an unexplained missing Terraform negative case, or a weaker failure postcondition blocks merge.
 
@@ -392,19 +364,19 @@ Run all offline fixtures, both Markdown surfaces, generator drift, exact-path ch
 Record every source and landed blob, contract and catalog version/digest, Node/npm/archive identities, action pins/manifests/defaults, final topology, case allocation, runtime results, reviewed head/tree, landed commit/tree, and intentional difference. Run the Terraform comparison and any reverse PS sync-back to a fixed point. PS issue #158 must consume the final landed PS contract from this cycle.
 ```
 
-### 2.5 PS issue #158 linkage and implementation
+### 2.5 PS issue #158 linkage and implementation contract
 
-PS #158 is already a native child of PS #159. After the PS #162 PR lands, add one short planning comment to #158. Do not replace its body.
+PS #158 is already a native child of PS #159. After the PS #162 PR lands, add one short planning comment to #158. This issue update does not commence implementation. Do not replace its body.
 
 ```markdown
 This issue is a child of [PS issue #159](https://github.com/franklesniak/PSStyleGuide/issues/159) and starts after `<PS_WORKFLOW_POLICY_PR_URL>` lands. Re-read the final landed `workflow-policy-contract.json` from `<PS_WORKFLOW_POLICY_LANDED_COMMIT>` before adapting the recorder. Preserve this issue's existing nonblocking scope and immutable Terraform PR #27 source pins.
 ```
 
-Replace the two remaining placeholders before posting. Complete #158 after the workflow-policy contract lands. Its PR must keep the recorder read-only, capture output outside the repository, and prove no manifest, lockfile, installed-tree, contract, generated-output, or worktree mutation. After merge, run the Terraform comparison and any reverse PS sync-back to a fixed point before the Claude command cycle starts.
+Replace the two remaining placeholders before posting. Commence PS #158 implementation only at the Step 3 cycle 4 start gate. Its PR must keep the recorder read-only, capture output outside the repository, and prove no manifest, lockfile, installed-tree, contract, generated-output, or worktree mutation. After merge, run the Terraform comparison and any reverse PS sync-back to a fixed point before the Claude command cycle starts.
 
 ### 2.6 PS Claude command
 
-[PS issue #163](https://github.com/franklesniak/PSStyleGuide/issues/163) is open and remains unimplemented. Issue creation and owner authorization are complete. It is Step 3 cycle 5 and remains independent of the foundation issue graph. Use this contract for implementation and closure:
+[PS issue #163](https://github.com/franklesniak/PSStyleGuide/issues/163) is open and remains unimplemented. Issue creation and owner authorization are complete. It is Step 3 cycle 5 and remains independent of the foundation issue graph. Do not commence implementation until Step 3 closes cycle 4 and reaches the cycle 5 start gate. Use this contract for implementation and closure:
 
 ```markdown
 ## Objective
@@ -433,7 +405,7 @@ Keep this issue and PR separate from the foundation, supply-freeze, and infrastr
 
 ### 2.7 Terraform convergence tracker
 
-[Terraform issue #31](https://github.com/franklesniak/TerraformStyleGuide/issues/31) is open. Tracker creation is complete, but all five reciprocal cycle records remain open. Use this contract to maintain and close the tracker:
+[Terraform issue #31](https://github.com/franklesniak/TerraformStyleGuide/issues/31) is open. Tracker creation is complete, but all five reciprocal cycle records remain open. Updating this tracker does not commence implementation and does not count as the active implementation issue. Use this contract to maintain and close the tracker:
 
 ```markdown
 ## Objective
@@ -450,7 +422,7 @@ Retain the reciprocal evidence for the initial PSStyleGuide import pass. This is
 
 Complete the cycles in order. For each cycle, record the PS issue and landed PR, source and destination commits and blobs, the 16-row matrix or a documented reduced matrix for a narrow non-foundation file, any focused Terraform sync issue and PR, the reverse PS comparison, validation, intentional differences, and the permanent fixed-point closure record.
 
-If a comparison finds no common difference, post a pinned no-change record. If it finds work, open one focused Terraform implementation issue. Do not combine unrelated cycles in one PR.
+If a comparison finds no common difference, post a pinned no-change record. If it finds work, create one focused Terraform issue. Creating the issue does not commence implementation. Commence it only after the issue record is complete, the preceding cycle has closed, and the implementation slot is free. Do not combine unrelated cycles in one PR.
 ```
 
 ## Step 3 — import Terraform behavior into PSStyleGuide
@@ -467,7 +439,7 @@ Run these source issues as separate fixed-point cycles in this order:
 | 4 | [PS issue #158](https://github.com/franklesniak/PSStyleGuide/issues/158) | PR #27 merge `aae05282b57f093cec8b63e59138db72c982f10e` | Compare the adapted recorder and method with Terraform; sync any generally useful correction. |
 | 5 | [PS #163](https://github.com/franklesniak/PSStyleGuide/issues/163) | Commit `fbdecbae787055a2117d4ada83ae294a7decfe62`, blob `7b0e41361a8ab7259245ad5f0d86d9300008347d` | Remove any avoidable protocol drift in Terraform, then compare the result back in PS. |
 
-After each PS PR lands, run the Terraform comparison and sync prompt below. If a Terraform PR lands, run the reverse PS comparison prompt. Repeat until the cycle reaches the per-issue fixed-point gate. Only then start the next numbered PS issue.
+After each PS PR lands, use the complete cycle sequence in section 3.2. Run the Terraform comparison prompt in section 3.3. If a Terraform PR lands, run the reverse PS comparison prompt in section 3.4. Repeat until the cycle reaches the fixed point. Only then commence the next numbered PS issue.
 
 The current identical support blobs do not need implementation issues: `.gitattributes`, `.github/dependabot.yml`, `.github/workflows/.markdownlint.jsonc`, `.github/workflows/lint-nested-markdown.js`, `.github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md`, and `.github/workflows/scripts-README.md`. Preserve repository-specific historical decision records. Defer the Husky preparation difference to the paired PS #149 and Terraform #24 cycle. Recheck these dispositions in the Step 5 global sweep.
 
@@ -475,9 +447,34 @@ The first three cycles may post the interim core-foundation handoff for PS P1B a
 
 Close the PS foundation umbrella after cycle 4 closes. Post final identities from both repositories. Do not open one aggregate Terraform foundation implementation issue. Cycle 5 remains separate from the foundation umbrella.
 
-### 3.2 Terraform comparison and sync prompt
+### 3.2 Commence implementation and close one PS import cycle
 
-Run this prompt in a clean TerraformStyleGuide checkout after each Step 3 PS PR lands. Reuse it in Steps 4–6 after a PS sync-back PR lands. Replace every placeholder first.
+Issue setup in Step 2 and implementation commencement in Step 3 are separate actions. Cycle 1 implementation has already commenced through draft PS PR #164. For cycles 2–5, do not create a branch, edit implementation files, or open an implementation PR until the preceding cycle has its permanent fixed-point closure record.
+
+Complete this sequence for one cycle before the next cycle starts:
+
+1. Verify that no other feature implementation issue or PR is active. A tracker update, read-only comparison, dependency edit, or separately authorized settings operation does not count as the active implementation issue, but it does not permit a second feature branch or PR.
+2. Classify the PS source issue as `common capability`, `repository-specific capability`, or `administrative only`. Name the mapped Terraform issue when one exists.
+3. Record the PS issue URL, immutable landed input commits and Git blobs, intended affected paths, and expected repository-specific differences. Never copy from a moving branch.
+4. Commence implementation for only that PS issue. Keep both repositories self-contained. Do not add a shared module, cross-repository runtime fetch, reusable cross-repository workflow, submodule, package, or third source of truth.
+5. Run the PS repository review protocol. Re-run it after every change because an earlier clean review does not cover changed bytes. Land the PS PR and record its base, reviewed head and tree, merge method, landed commit and tree, affected-path set, landed blobs, validation commands, runtime identities, and review outcome.
+6. Run the Terraform comparison prompt in section 3.3 against the landed PS commit and a newly fetched Terraform `main` commit. Complete every applicable foundation row and exact file/blob mapping.
+7. If no common difference exists, make no implementation change. Post a pinned no-change or non-applicability record. Do not open an implementation issue only for symmetry.
+8. If a common difference exists, create or update one focused Terraform issue and pin the landed PS commit and blobs. Issue creation does not commence implementation. After the issue record is complete and no other implementation is active, explicitly commence the Terraform adaptation. Run the Terraform review protocol and re-run it after every byte change. Land one PR only after review covers the final bytes, and record the same identities and validation evidence.
+9. Run the reverse PS comparison prompt in section 3.4 against both landed commits.
+10. If the Terraform adaptation added or corrected common behavior, create or update one focused PS sync-back issue. Issue creation does not commence implementation. After the issue record is complete and no other implementation is active, explicitly commence the sync-back. Run the PS review protocol and re-run it after every byte change. Land one PS PR only after review covers the final bytes, and rerun the Terraform comparison.
+11. End the cycle only when every common row is `same`, every intentional difference has complete evidence, and no row is a `blocker`.
+12. Post one permanent closure record with both repositories' final issue and PR URLs, bases, reviewed heads and trees, merge methods, landed commits and trees, affected paths, source and destination blobs, matrix digest, validation commands, runtime identities, review outcomes, intentional differences, and explicit non-applicability results.
+
+Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+
+Allowed intentional differences are limited to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain-specific examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence. For each intentional difference, name both literals or behaviors, explain the repository need, prove equal security and failure strength, name the owner, and state the review or expiry condition. Convenience, implementation history, separate authorship, and lower effort are not repository-specific reasons.
+
+If the same matrix row changes direction twice, stop. Revalidate the requirement and run a new decision process that evaluates both repository implementations. Do not alternate implementations indefinitely and do not select the last edit merely because it is newer.
+
+### 3.3 Terraform comparison and sync prompt
+
+Run this prompt in a clean TerraformStyleGuide checkout after each Step 3 PS PR lands. Replace every placeholder with a verified identity before use.
 
 ```markdown
 Compare one landed PSStyleGuide capability with TerraformStyleGuide and close all common differences.
@@ -492,16 +489,41 @@ Fetch both repositories. Read PS source files only from `<PS_LANDED_COMMIT>`. Re
 
 Map files by role, not only by filename. Complete all applicable `GF-*` rows. For a narrow file, use a reduced matrix only when the omitted rows are proved inapplicable. Compare semantics, negative cases, validation, documentation, and operational evidence. Treat only repository identity, PowerShell-versus-Terraform filenames or payloads, domain examples, prefixes, local names, proved platform conditions, historical decisions, and live settings evidence as candidate intentional differences.
 
+For each intentional difference, name both literals or behaviors, explain the repository need, prove equal security and failure strength, name the owner, and state the review or expiry condition. Convenience, implementation history, separate authorship, and lower effort are not repository-specific reasons.
+
+Use this closed catalog for each foundation comparison:
+
+| Stable row | Required comparison |
+| --- | --- |
+| `GF-PARAMETERS` | Public names, types, defaults, and omission, null, empty, and raw-value rules |
+| `GF-DESTINATION` | Trusted root, fixed destinations, provider, wildcard, rooted-path, normalization, comparison, and failure rules |
+| `GF-CONTENT` | Source order, wrappers, frontmatter, repository-specific names, and complete payload |
+| `GF-SERIALIZATION` | CRLF and lone-CR normalization, LF and final-newline rules, BOM-less UTF-8, and byte checks |
+| `GF-WRITE` | Complete-payload candidate creation, durable flush, verification, single-call publication, and prohibited fallbacks |
+| `GF-FAILURE` | Phase postconditions, cleanup and uncertainty, bounded diagnostics, and fault cases |
+| `GF-HOSTS` | Supported editions and hosts, executable identity, cross-cell equality, and idempotence |
+| `GF-VERSION` | Timeless marker grammar, trusted expected version, authoring progression, and independent fixtures |
+| `GF-NODE-LOCK` | Exact Node/npm producer and provenance, distribution verification, cache and side effects, dependency graph, and frozen consumers |
+| `GF-YAML` | Parser package and API, document and schema strictness, diagnostics, and forbidden features |
+| `GF-ACTION-PINS` | Closed action roles, full commit pins, provenance, runtime, and atomic pin updates |
+| `GF-ACTION-INPUTS` | Authored security inputs and separately reviewed manifest defaults |
+| `GF-GIT` | NUL records, byte allowlists, native statuses, cardinality, refs, ancestry, lease, and refspec |
+| `GF-GRAPH` | Production and evidence triggers, permissions, needs, conditions, outputs, side effects, and sole writer |
+| `GF-CREDENTIALS` | Job-token availability, authentication projection, cleanup, push-only materialization, and absence proofs |
+| `GF-EVIDENCE` | Temporary workflow/ref structural equality, drills, retained identities, cleanup, and final absence |
+
+Each row occurs exactly once. Record both repository URLs and commits, normative and implementation locators, evidence paths and SHA-256 values, observed values or fixture IDs, one status (`same`, `intentional difference`, or `blocker`), and a reason. Missing, duplicate, unknown, renamed, empty, or unexplained rows block closure.
+
 Before editing, validate every finding. List the options, create a finding-specific weighted rubric, score the options in a table, select the best option, and state the selected work in ASD-STE100-compliant language. Save analysis only in `TEMP-*` files. Do not put analysis artifacts in permanent planning or implementation documents.
 
 If no common difference remains, make no implementation change. Post a pinned no-change record to the cycle record with both commits, blobs, matrix digest, validation, and intentional differences.
 
-If a common difference remains, open or update one focused Terraform issue. Pin the PS commit and source blobs. Adapt the landed PS behavior. Do not redesign it independently and do not create a shared dependency. Review and land one Terraform PR. Record its reviewed head/tree, merge method, landed commit/tree, destination blobs, commands, runtimes, and results. Then run the reverse PS comparison prompt before closing the cycle.
+If a common difference remains, create or update one focused Terraform issue and pin the PS commit and source blobs. Issue creation is a planning action and does not commence implementation. Stop if another feature implementation is active. After the issue record is complete and the implementation slot is free, explicitly commence the Terraform adaptation. Adapt the landed PS behavior; do not redesign it independently. Keep the repository self-contained and do not create a shared dependency. Do not change repository settings unless the applicable administrator issue authorizes the exact request. Run the Terraform review protocol and re-run it after every byte change. Land one PR only after review covers the final bytes, and record its base, reviewed head/tree, merge method, landed commit/tree, affected paths, destination blobs, validation commands, runtimes, and review outcome. Then run the reverse PS comparison prompt before closing the cycle.
 ```
 
-### 3.3 Reverse PS comparison and sync-back prompt
+### 3.4 Reverse PS comparison and sync-back prompt
 
-Run this prompt in a clean PSStyleGuide checkout after any Terraform PR in the cycle lands. Replace every placeholder first.
+Run this prompt in a clean PSStyleGuide checkout after any Terraform PR in the cycle lands. Replace every placeholder with a verified identity before use.
 
 ```markdown
 Compare the landed TerraformStyleGuide adaptation back against its landed PSStyleGuide source and close any common improvement that exists only in TerraformStyleGuide.
@@ -512,34 +534,119 @@ Terraform issue, PR, commit, and tree: `<TF_ISSUE_URL>`, `<TF_PR_URL>`, `<TF_LAN
 
 Fetch both repositories. Read files only from the two landed commits and record all compared blobs. Re-run the same file-role map and reciprocal matrix. Do not assume that an adaptation-only edit is repository-specific. Require an exact reason and equal security and failure strength.
 
+For each intentional difference, name both literals or behaviors, explain the repository need, prove equal security and failure strength, name the owner, and state the review or expiry condition. Convenience, implementation history, separate authorship, and lower effort are not repository-specific reasons.
+
+Use this closed catalog for each foundation comparison:
+
+| Stable row | Required comparison |
+| --- | --- |
+| `GF-PARAMETERS` | Public names, types, defaults, and omission, null, empty, and raw-value rules |
+| `GF-DESTINATION` | Trusted root, fixed destinations, provider, wildcard, rooted-path, normalization, comparison, and failure rules |
+| `GF-CONTENT` | Source order, wrappers, frontmatter, repository-specific names, and complete payload |
+| `GF-SERIALIZATION` | CRLF and lone-CR normalization, LF and final-newline rules, BOM-less UTF-8, and byte checks |
+| `GF-WRITE` | Complete-payload candidate creation, durable flush, verification, single-call publication, and prohibited fallbacks |
+| `GF-FAILURE` | Phase postconditions, cleanup and uncertainty, bounded diagnostics, and fault cases |
+| `GF-HOSTS` | Supported editions and hosts, executable identity, cross-cell equality, and idempotence |
+| `GF-VERSION` | Timeless marker grammar, trusted expected version, authoring progression, and independent fixtures |
+| `GF-NODE-LOCK` | Exact Node/npm producer and provenance, distribution verification, cache and side effects, dependency graph, and frozen consumers |
+| `GF-YAML` | Parser package and API, document and schema strictness, diagnostics, and forbidden features |
+| `GF-ACTION-PINS` | Closed action roles, full commit pins, provenance, runtime, and atomic pin updates |
+| `GF-ACTION-INPUTS` | Authored security inputs and separately reviewed manifest defaults |
+| `GF-GIT` | NUL records, byte allowlists, native statuses, cardinality, refs, ancestry, lease, and refspec |
+| `GF-GRAPH` | Production and evidence triggers, permissions, needs, conditions, outputs, side effects, and sole writer |
+| `GF-CREDENTIALS` | Job-token availability, authentication projection, cleanup, push-only materialization, and absence proofs |
+| `GF-EVIDENCE` | Temporary workflow/ref structural equality, drills, retained identities, cleanup, and final absence |
+
+Each row occurs exactly once. Record both repository URLs and commits, normative and implementation locators, evidence paths and SHA-256 values, observed values or fixture IDs, one status (`same`, `intentional difference`, or `blocker`), and a reason. Missing, duplicate, unknown, renamed, empty, or unexplained rows block closure.
+
 Before editing, validate every finding. List the options, create a finding-specific weighted rubric, score the options in a table, select the best option, and state the selected work in ASD-STE100-compliant language. Save analysis only in `TEMP-*` files.
 
-If Terraform added or corrected common behavior, open or update one focused PS sync-back issue, implement and land one PS PR, and rerun the Terraform comparison against the new PS commit. If no common difference remains, make no implementation change and post the pinned reverse-comparison record.
+If Terraform added or corrected common behavior, create or update one focused PS sync-back issue. Issue creation is a planning action and does not commence implementation. Stop if another feature implementation is active. After the issue record is complete and the implementation slot is free, explicitly commence the PS sync-back. Keep the repository self-contained. Do not change repository settings unless the applicable administrator issue authorizes the exact request. Run the PS review protocol and re-run it after every byte change. Land one PS PR only after review covers the final bytes, record the complete landed identity and validation evidence, and rerun the Terraform comparison against the new PS commit. If no common difference remains, make no implementation change and post the pinned reverse-comparison record.
 
 Close the cycle only when every common row is `same`, every intentional difference is fully justified, no blocker remains, and the permanent closure record identifies both repositories' final landed commits and blobs.
 ```
 
 ## Step 4 — catch TerraformStyleGuide up from landed PS work
 
-### 4.1 Implement Terraform issue #21 and close the reciprocal cycle
+### 4.1 Commence Terraform issue #21 and close the reciprocal cycle
 
-Start Step 4 only after all five Step 3 cycles close. The only currently ready Terraform catch-up implementation is [Terraform issue #21](https://github.com/franklesniak/TerraformStyleGuide/issues/21). Terraform #22 requires a future landed PS #147 handoff. Terraform #24 requires a future landed PS #149 handoff and Terraform #23.
+Start Step 4 only after all five Step 3 cycles close. [Terraform issue #21](https://github.com/franklesniak/TerraformStyleGuide/issues/21) already exists, but issue creation did not commence implementation. Terraform #22 requires a future landed PS #147 handoff. Terraform #24 requires a future landed PS #149 handoff and Terraform #23. Do not commence either issue in Step 4.
 
 Complete Step 4 in this order:
 
-1. Fetch Terraform issue #21 and verify that it still pins PS PR #153 landed commit `2d56357d9f52c76734027174bf62278e6f3d4cd6` and its four source blobs.
-2. Rebase its assumptions on the final Terraform commits produced by Step 3. Do not change its immutable PS P1A source pin.
-3. Implement, review, and land only Terraform #21 by adapting landed PS PR #153. Do not copy `CLAUDE.md`.
-4. Run the reverse PS comparison and sync-back prompt with PS PR #153 as the source and the landed Terraform #21 PR as the destination.
-5. If a PS sync-back PR is required, land it and rerun the Terraform comparison. Close the cycle only at the fixed point.
+1. Verify that Step 3 has five permanent fixed-point closure records and that no feature implementation issue or PR is active.
+2. Fetch Terraform #21. Verify that it still pins PS PR #153 landed commit `2d56357d9f52c76734027174bf62278e6f3d4cd6` and its four source blobs. Rebase only its destination assumptions on the final Terraform commit from Step 3. Do not change its immutable PS source pin.
+3. Classify the capability as common and record both issue URLs, immutable source and destination commits and blobs, intended affected paths, and expected repository-specific differences.
+4. Explicitly commence only Terraform #21. Keep both repositories self-contained. Do not add a shared module, runtime fetch, reusable cross-repository workflow, submodule, package, or third source of truth. Do not copy `CLAUDE.md`.
+5. Adapt the landed PS implementation instead of redesigning the capability independently. Run the Terraform review protocol. Re-run review after every byte change.
+6. Land one Terraform PR. Record its base, reviewed head and tree, merge method, landed commit and tree, affected paths, destination blobs, validation commands, runtime identities, and review outcome.
+7. Run the copy-paste prompt in section 4.2 from a clean PS checkout. Complete every applicable foundation row and exact file/blob mapping.
+8. If no common difference remains, make no PS implementation change and post a pinned reverse-comparison record.
+9. If the Terraform adaptation added or corrected common behavior, create or update one focused PS sync-back issue and pin both landed commits and blobs. Issue creation does not commence implementation. After the issue record is complete and the implementation slot is free, explicitly commence the PS sync-back. Run the PS review protocol and re-run it after every byte change. Land one PS PR only after review covers the final bytes.
+10. If a PS sync-back PR lands, run the Terraform comparison included in section 4.2 against the new PS landed commit. If Terraform then needs another repair, create the focused issue first and commence it only after the issue record is complete and the implementation slot is free. Run the Terraform review protocol against the final repair bytes before landing.
+11. End the cycle only when every common row is `same`, every intentional difference has complete evidence, and no row is a `blocker`. If the same row changes direction twice, stop and run a new decision process that evaluates both implementations.
+12. Post one permanent closure record on Terraform #21 and the PS P1A handoff. Include both repositories' final issue and PR URLs, bases, reviewed heads and trees, merge methods, landed commits and trees, affected paths, source and destination blobs, final matrix digest, validation commands, runtime identities, review outcomes, intentional differences, and explicit non-applicability results.
 
-Record the final cycle identity on Terraform #21 and the PS P1A handoff. Do not start Terraform #22 in Step 4 because its PS source implementation does not exist yet.
+Do not commence Terraform #22 in Step 4 because its PS source implementation does not exist yet.
+
+Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+
+### 4.2 Terraform #21 reciprocal-closure prompt
+
+Replace every placeholder with a verified identity. If an identity does not exist, do not run the prompt.
+
+```markdown
+Close the Terraform #21 reciprocal cycle against the landed PS P1A source.
+
+PS source issue and PR: [PS issue #146](https://github.com/franklesniak/PSStyleGuide/issues/146) and [PS PR #153](https://github.com/franklesniak/PSStyleGuide/pull/153).
+PS landed commit and tree: `2d56357d9f52c76734027174bf62278e6f3d4cd6`, `46f5f4e8627eb341ddc4ef0c8d52483dc4006b50`.
+Terraform issue and landed PR: [Terraform issue #21](https://github.com/franklesniak/TerraformStyleGuide/issues/21) and `<TF_PR_URL>`.
+Terraform landed commit and tree: `<TF_LANDED_COMMIT>`, `<TF_LANDED_TREE>`.
+Permanent cycle record: `<CYCLE_RECORD_URL>`.
+
+Fetch both repositories. Read files only from the two landed commits. Record every compared Git blob and map files by role. Do not compare moving branches. Keep both repositories self-contained. Do not add a shared module, runtime fetch, reusable cross-repository workflow, submodule, package, or third source of truth. Do not copy `CLAUDE.md`.
+
+Use this closed catalog:
+
+| Stable row | Required comparison |
+| --- | --- |
+| `GF-PARAMETERS` | Public names, types, defaults, and omission, null, empty, and raw-value rules |
+| `GF-DESTINATION` | Trusted root, fixed destinations, provider, wildcard, rooted-path, normalization, comparison, and failure rules |
+| `GF-CONTENT` | Source order, wrappers, frontmatter, repository-specific names, and complete payload |
+| `GF-SERIALIZATION` | CRLF and lone-CR normalization, LF and final-newline rules, BOM-less UTF-8, and byte checks |
+| `GF-WRITE` | Complete-payload candidate creation, durable flush, verification, single-call publication, and prohibited fallbacks |
+| `GF-FAILURE` | Phase postconditions, cleanup and uncertainty, bounded diagnostics, and fault cases |
+| `GF-HOSTS` | Supported editions and hosts, executable identity, cross-cell equality, and idempotence |
+| `GF-VERSION` | Timeless marker grammar, trusted expected version, authoring progression, and independent fixtures |
+| `GF-NODE-LOCK` | Exact Node/npm producer and provenance, distribution verification, cache and side effects, dependency graph, and frozen consumers |
+| `GF-YAML` | Parser package and API, document and schema strictness, diagnostics, and forbidden features |
+| `GF-ACTION-PINS` | Closed action roles, full commit pins, provenance, runtime, and atomic pin updates |
+| `GF-ACTION-INPUTS` | Authored security inputs and separately reviewed manifest defaults |
+| `GF-GIT` | NUL records, byte allowlists, native statuses, cardinality, refs, ancestry, lease, and refspec |
+| `GF-GRAPH` | Production and evidence triggers, permissions, needs, conditions, outputs, side effects, and sole writer |
+| `GF-CREDENTIALS` | Job-token availability, authentication projection, cleanup, push-only materialization, and absence proofs |
+| `GF-EVIDENCE` | Temporary workflow/ref structural equality, drills, retained identities, cleanup, and final absence |
+
+Each row occurs exactly once. Record both repository URLs and commits, normative and implementation locators, evidence paths and SHA-256 values, observed values or fixture IDs, one status (`same`, `intentional difference`, or `blocker`), and a reason. Prove omitted rows inapplicable. Missing, duplicate, unknown, renamed, empty, or unexplained rows block closure.
+
+Allowed intentional differences are limited to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence. For each intentional difference, name both literals or behaviors, explain the repository need, prove equal security and failure strength, name the owner, and state the review or expiry condition.
+
+Before editing, validate every finding. List the options, create a finding-specific weighted rubric, score the options in a table, select the best option, and state the selected work in ASD-STE100-compliant language. Save analysis only in `TEMP-*` files.
+
+If no common difference remains, make no implementation change. Post a pinned reverse-comparison record with both commits, blobs, the matrix digest, validation, and intentional differences.
+
+If Terraform added or corrected common behavior, create or update one focused PS sync-back issue and pin both landed commits and blobs. Issue creation does not commence implementation. Stop if another feature implementation is active. After the issue record is complete and the implementation slot is free, explicitly commence the PS sync-back. Do not change repository settings unless the applicable administrator issue authorizes the exact request. Run the PS review protocol and re-run it after every byte change. Land one PR only after review covers the final bytes, and record its base, reviewed head/tree, merge method, landed commit/tree, affected paths, blobs, validation commands, runtime identities, and review outcome.
+
+After a PS sync-back lands, compare its landed commit with Terraform again. If Terraform needs another repair, create or update the focused Terraform issue first. Issue creation does not commence implementation. Explicitly commence the repair only after the issue record is complete and the implementation slot is free. Run the Terraform review protocol and re-run it after every byte change. Land one PR only after review covers the final bytes.
+
+If the same matrix row changes direction twice, stop and run a new decision process that evaluates both implementations. Close the cycle only when every common row is `same`, every intentional difference has complete evidence, no blocker remains, and the permanent closure record contains both repositories' final landed identities and validation evidence.
+```
 
 ## Step 5 — run the global consistency sweep
 
 ### 5.1 Find and close untracked differences
 
-Start the sweep only after Step 4 reaches a fixed point. Run it in a clean checkout with both fetched `main` commits. This sweep finds configuration and process differences that no planned issue currently tracks. It is not permission to combine unrelated fixes.
+Start the sweep only after Step 4 reaches a fixed point. Run it in a clean checkout with both fetched `main` commits. The inventory and comparison are read-only and do not commence implementation. This sweep finds configuration and process differences that no planned issue currently tracks. It is not permission to combine unrelated fixes.
 
 Replace all four placeholders with the fetched commits and trees. Then use this prompt:
 
@@ -553,11 +660,38 @@ Read both repositories only from these fetched commits. Inventory every path tha
 
 For every common role, compare bytes and semantics, including success and negative cases, failure classification, cleanup, credentials, permissions, native statuses, platform coverage, evidence retention, documentation, and validation commands. Re-run the full 16-row `GF-*` catalog for the foundation. Use a documented reduced matrix only for narrow non-foundation roles.
 
-Classify each difference as `same`, `intentional difference`, `tracked work`, or `untracked blocker`. Accept an intentional difference only for a proved repository-specific reason with equal security and failure strength. Link the issue that owns every `tracked work` row.
+Use this closed catalog for the foundation:
+
+| Stable row | Required comparison |
+| --- | --- |
+| `GF-PARAMETERS` | Public names, types, defaults, and omission, null, empty, and raw-value rules |
+| `GF-DESTINATION` | Trusted root, fixed destinations, provider, wildcard, rooted-path, normalization, comparison, and failure rules |
+| `GF-CONTENT` | Source order, wrappers, frontmatter, repository-specific names, and complete payload |
+| `GF-SERIALIZATION` | CRLF and lone-CR normalization, LF and final-newline rules, BOM-less UTF-8, and byte checks |
+| `GF-WRITE` | Complete-payload candidate creation, durable flush, verification, single-call publication, and prohibited fallbacks |
+| `GF-FAILURE` | Phase postconditions, cleanup and uncertainty, bounded diagnostics, and fault cases |
+| `GF-HOSTS` | Supported editions and hosts, executable identity, cross-cell equality, and idempotence |
+| `GF-VERSION` | Timeless marker grammar, trusted expected version, authoring progression, and independent fixtures |
+| `GF-NODE-LOCK` | Exact Node/npm producer and provenance, distribution verification, cache and side effects, dependency graph, and frozen consumers |
+| `GF-YAML` | Parser package and API, document and schema strictness, diagnostics, and forbidden features |
+| `GF-ACTION-PINS` | Closed action roles, full commit pins, provenance, runtime, and atomic pin updates |
+| `GF-ACTION-INPUTS` | Authored security inputs and separately reviewed manifest defaults |
+| `GF-GIT` | NUL records, byte allowlists, native statuses, cardinality, refs, ancestry, lease, and refspec |
+| `GF-GRAPH` | Production and evidence triggers, permissions, needs, conditions, outputs, side effects, and sole writer |
+| `GF-CREDENTIALS` | Job-token availability, authentication projection, cleanup, push-only materialization, and absence proofs |
+| `GF-EVIDENCE` | Temporary workflow/ref structural equality, drills, retained identities, cleanup, and final absence |
+
+Each row occurs exactly once. Record both repository URLs and commits, normative and implementation locators, evidence paths and SHA-256 values, observed values or fixture IDs, one status (`same`, `intentional difference`, `tracked work`, or `untracked blocker`), and a reason. Prove omitted rows inapplicable. Missing, duplicate, unknown, renamed, empty, or unexplained rows are untracked blockers.
+
+Classify each difference as `same`, `intentional difference`, `tracked work`, or `untracked blocker`. Accept an intentional difference only for a proved repository-specific reason with equal security and failure strength. Name both literals or behaviors, explain the repository need, name the owner, state the review or expiry condition, and link the evidence. Convenience, implementation history, separate authorship, and lower effort are not repository-specific reasons. Link the issue that owns every `tracked work` row.
 
 Before changing anything, validate each untracked finding. For each finding, list all practical options, create a unique weighted rubric, score the options in a table, and state the selected action in ASD-STE100-compliant language. Save analysis only in `TEMP-*` files.
 
-For each untracked blocker, identify which repository is behind. Open or update one focused issue in that repository, pin the other repository's landed commit and source blobs, implement and land one PR, and run the reciprocal comparison. Work on one implementation issue at a time. Do not create a shared module or one bulk cleanup PR.
+For each untracked blocker, identify which repository is behind. Create or update one focused issue in that repository and pin the other repository's landed commit and source blobs. Issue creation does not commence implementation. Stop if another feature implementation is active. After the issue record is complete and the implementation slot is free, explicitly commence only that repair. Keep both repositories self-contained; do not create a shared module, runtime fetch, reusable cross-repository workflow, submodule, package, third source of truth, or one bulk cleanup PR. Do not change repository settings unless the applicable administrator issue authorizes the exact request. Run the repository review protocol and re-run it after every byte change. Land one PR only after review covers the final bytes, and record its base, reviewed head/tree, merge method, landed commit/tree, affected paths, blobs, validation commands, runtime identities, and review outcome.
+
+After the repair lands, compare it in the other repository. If no common difference remains, post a pinned no-change record. If a focused reciprocal repair is required, create its issue first and commence it only after the issue record is complete and the implementation slot is free. Run the applicable repository review protocol and re-run it after every byte change. Land only after review covers the final bytes, and then run the reverse comparison. If the same matrix row changes direction twice, stop and run a new decision process that evaluates both implementations.
+
+Close one repair cycle before commencing the next. Require every common row to be `same`, every intentional difference to have complete evidence, and no row to be a `blocker`. Post a permanent closure record with both repositories' final issue and PR URLs, bases, reviewed heads and trees, merge methods, landed commits and trees, affected paths, blobs, final matrix digest, validation commands, runtime identities, review outcomes, intentional differences, and explicit non-applicability results.
 
 Finish only when every inventoried role has an owner and disposition, all repair cycles reach a fixed point, and the final record contains both repositories' final commits and trees, file/blob map, matrices and digests, tests, runtimes, intentional differences, and zero untracked blockers.
 ```
@@ -566,12 +700,56 @@ Finish only when every inventoried role has an owner and disposition, all repair
 
 After the global sweep closes, use one paired cycle for each common capability: implement PSStyleGuide, update or open the Terraform issue from the landed PS handoff, implement TerraformStyleGuide, compare the Terraform result back in PSStyleGuide, and sync back any common improvement. If a capability is repository-specific, record the exact non-applicability reason and do not open a fake counterpart.
 
-### 6.1 Complete PS P1B and the protection interlock
+### 6.1 Run one PSStyleGuide-first paired cycle
+
+Issue setup and implementation commencement are separate actions. Complete this sequence for one capability before the next PS implementation starts:
+
+1. Create or update the PS issue and classify it as `common capability`, `repository-specific capability`, or `administrative only`. Name the mapped Terraform issue when one exists. Issue creation does not commence implementation.
+2. Record the PS issue URL, immutable landed input commits and blobs, intended affected paths, expected repository-specific differences, and every real native dependency.
+3. Verify that the preceding paired cycle has a permanent fixed-point closure record and that no feature implementation issue or PR is active. Then explicitly commence only the PS implementation.
+4. Keep both repositories self-contained. Do not add a shared module, runtime fetch, reusable cross-repository workflow, submodule, package, or third source of truth. Run the PS review protocol and re-run it after every byte change. Land one PR only after review covers the final bytes, and record its base, reviewed head/tree, merge method, landed commit/tree, affected paths, blobs, validation commands, runtime identities, and review outcome.
+5. Create or update the mapped Terraform issue only from the landed PS handoff and source blobs. Issue creation does not commence implementation. Do not develop an equivalent implementation independently.
+6. After the Terraform issue record is complete and the implementation slot is free, explicitly commence only the Terraform adaptation. Preserve common behavior and change only proved repository-specific literals or behavior. Run the Terraform review protocol and re-run it after every byte change. Land one PR only after review covers the final bytes, and record the complete landed identity and validation evidence.
+7. Compare the landed Terraform adaptation back against the landed PS source with the catalog below.
+8. If no common difference remains, make no PS implementation change and post a pinned reverse-comparison record. Do not open an issue only for symmetry.
+9. If Terraform added or corrected common behavior, create or update one focused PS sync-back issue. Issue creation does not commence implementation. After the record is complete and the implementation slot is free, explicitly commence the sync-back. Run the PS review protocol and re-run it after every byte change. Land one PS PR only after review covers the final bytes, and rerun the Terraform comparison.
+10. If Terraform then requires another repair, create or update its focused issue first and commence implementation only after the issue record is complete and the implementation slot is free. Run the Terraform review protocol and re-run it after every byte change. Land only after review covers the final bytes.
+11. End the cycle only when every common row is `same`, every intentional difference has complete evidence, and no row is a `blocker`. If the same row changes direction twice, stop and run a new decision process that evaluates both implementations.
+12. Post one permanent closure record with both repositories' final issue and PR URLs, bases, reviewed heads and trees, merge methods, landed commits and trees, affected paths, source and destination blobs, final matrix digest, validation commands, runtime identities, review outcomes, intentional differences, and explicit non-applicability results.
+
+A tracker update, read-only comparison, dependency edit, or separately authorized settings operation does not count as the active implementation issue, but it does not permit a second feature branch or PR. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+
+Allowed intentional differences are limited to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific historical decisions or live settings evidence. For each intentional difference, name both literals or behaviors, explain the repository need, prove equal security and failure strength, name the owner, and state the review or expiry condition. Convenience, implementation history, separate authorship, and lower effort are not repository-specific reasons.
+
+Use this closed catalog for every common capability. Prove omitted rows inapplicable for a narrow repository-specific capability.
+
+| Stable row | Required comparison |
+| --- | --- |
+| `GF-PARAMETERS` | Public names, types, defaults, and omission, null, empty, and raw-value rules |
+| `GF-DESTINATION` | Trusted root, fixed destinations, provider, wildcard, rooted-path, normalization, comparison, and failure rules |
+| `GF-CONTENT` | Source order, wrappers, frontmatter, repository-specific names, and complete payload |
+| `GF-SERIALIZATION` | CRLF and lone-CR normalization, LF and final-newline rules, BOM-less UTF-8, and byte checks |
+| `GF-WRITE` | Complete-payload candidate creation, durable flush, verification, single-call publication, and prohibited fallbacks |
+| `GF-FAILURE` | Phase postconditions, cleanup and uncertainty, bounded diagnostics, and fault cases |
+| `GF-HOSTS` | Supported editions and hosts, executable identity, cross-cell equality, and idempotence |
+| `GF-VERSION` | Timeless marker grammar, trusted expected version, authoring progression, and independent fixtures |
+| `GF-NODE-LOCK` | Exact Node/npm producer and provenance, distribution verification, cache and side effects, dependency graph, and frozen consumers |
+| `GF-YAML` | Parser package and API, document and schema strictness, diagnostics, and forbidden features |
+| `GF-ACTION-PINS` | Closed action roles, full commit pins, provenance, runtime, and atomic pin updates |
+| `GF-ACTION-INPUTS` | Authored security inputs and separately reviewed manifest defaults |
+| `GF-GIT` | NUL records, byte allowlists, native statuses, cardinality, refs, ancestry, lease, and refspec |
+| `GF-GRAPH` | Production and evidence triggers, permissions, needs, conditions, outputs, side effects, and sole writer |
+| `GF-CREDENTIALS` | Job-token availability, authentication projection, cleanup, push-only materialization, and absence proofs |
+| `GF-EVIDENCE` | Temporary workflow/ref structural equality, drills, retained identities, cleanup, and final absence |
+
+Each row occurs exactly once. Record both repository URLs and commits, normative and implementation locators, evidence paths and SHA-256 values, observed values or fixture IDs, one status (`same`, `intentional difference`, or `blocker`), and a reason. Missing, duplicate, unknown, renamed, empty, or unexplained rows block closure.
+
+### 6.2 Complete PS P1B and the protection interlock
 
 The first Step 6 capability is PS P1B. Steps 3–5 must already be complete. Execute PS issues #147 and #152 as one interlocked capability cycle. Issue #152 is separately authorized settings work; it may overlap read-only preparation for #147, but it does not authorize a second feature implementation PR:
 
 1. Re-read the PS foundation handoff and compare #147's assumptions with every landed contract.
-2. Implement #147's writer and terminal check `Build Style Guide Artifacts / approve_candidate`.
+2. Verify that no feature implementation issue or PR is active. Then explicitly commence #147 and implement its writer and terminal check `Build Style Guide Artifacts / approve_candidate`.
 3. Reopen or supersede `docs/decisions/0001-accept-in-repository-trust-root.md` before the writer gains `contents: write`.
 4. Reach one reviewed PR head. Record its exact head/tree, workflow identity, permissions, required-check name, unique evidence ref, source pins, and rollback inputs.
 5. Start #152's bounded temporary proof. Re-export rules, classic protection, `main`, application identity, and writer permissions.
@@ -585,64 +763,72 @@ The first Step 6 capability is PS P1B. Steps 3–5 must already be complete. Exe
 
 Do not copy Terraform ruleset IDs, digests, or effective-rule JSON. Do not add a human bypass without a separate owner-approved decision.
 
-### 6.2 Adapt landed P1B in Terraform issue #22
+### 6.3 Adapt landed P1B in Terraform issue #22
 
-Terraform issue #22 is blocked by #21. Do not implement #22 until #21 lands and PS #147 has a permanent landed handoff.
+Terraform issue #22 is blocked by #21. Updating #22 is issue setup and does not commence implementation. Do not commence #22 until #21 lands, PS #147 has a permanent landed handoff, the P1B issue update is complete, and the implementation slot is free.
 
-#### 6.2.1 Terraform #22 update prompt
+#### 6.3.1 Terraform #22 update prompt
 
 Replace the placeholders, then add or amend a `Starting point — reuse landed PSStyleGuide P1B` section in #22:
 
 ```markdown
-PSStyleGuide P1B landed through `<PS_P1B_PR_URL>` at `<PS_P1B_LANDED_COMMIT>`, tree `<PS_P1B_LANDED_TREE>`. Start T1B from that landed implementation and the permanent handoff `<PS_P1B_HANDOFF_URL>`. Do not rebuild the writer, evidence protocol, lease/refspec checks, credential boundary, terminal result, or rollback design from the beginning.
+PSStyleGuide P1B landed through `<PS_P1B_PR_URL>` at `<PS_P1B_LANDED_COMMIT>`, tree `<PS_P1B_LANDED_TREE>`. Use that landed implementation and the permanent handoff `<PS_P1B_HANDOFF_URL>` as the T1B implementation source. Do not rebuild the writer, evidence protocol, lease/refspec checks, credential boundary, terminal result, or rollback design from the beginning.
+
+This issue update records the starting point. It does not commence implementation. Do not create a feature branch or edit implementation files until this record is complete, the preceding cycle has a permanent closure record, and no feature implementation issue or PR is active.
 
 Record every PS source blob read from the landed commit and every adapted Terraform destination blob. Change repository names, generated filenames, schema/type prefixes, check names, ruleset names, and local evidence identifiers. Preserve common permissions, job isolation, credential materialization, candidate consumption, ancestry/lease/refspec checks, native statuses, failure postconditions, cleanup, and audit truth.
 
 Use Terraform's own administrator issue and live settings evidence. Never copy PS ruleset IDs, request digests, application/rule responses, main-ref values, or audit records.
 
 Refresh the reciprocal matrix at implementation start and before merge. An unexplained weaker behavior blocks merge. Keep both repositories self-contained.
+
+At explicit implementation start, do not change repository settings without exact administrator-issue authorization. Run the Terraform review protocol and re-run it after every byte change. Merge only after review covers the final bytes.
 ```
 
-Terraform #21 is complete before Step 6 starts. Implement #22 from the landed PS P1B commit and the final Terraform baseline from Steps 3–5. After #22 lands, run the reverse PS comparison and sync-back prompt. If a PS PR lands, run the Terraform comparison again. Do not start PS #148 until the P1B/T1B cycle reaches a fixed point.
+Terraform #21 is complete before Step 6 starts. After the issue update is complete and the start gate in section 6.1 is satisfied, explicitly commence #22 from the landed PS P1B commit and the final Terraform baseline from Steps 3–5. After #22 lands, run the reverse PS comparison and sync-back sequence in section 6.1. If a PS PR lands, run the Terraform comparison again. Do not commence PS #148 until the P1B/T1B cycle reaches a fixed point.
 
-### 6.3 Complete the remaining known issues in order
+### 6.4 Complete the remaining known issues in order
 
 After the P1B/T1B cycle closes:
 
-1. Implement and land PS #148. Compare its affected role with TerraformStyleGuide. If the behavior is common and absent or weaker in Terraform, open one focused Terraform issue and close the reciprocal cycle. If Terraform is already equivalent, post a pinned no-change record. If the blank-line example is PowerShell-specific, post a pinned non-applicability record.
-2. Implement and land Terraform #23, which is Terraform-specific but is a native prerequisite of #24. Run a PS applicability check. If PS has a common affected role, complete the reciprocal PS cycle. If PS is already equivalent, post a pinned no-change record. If the state-version recovery content has no PS role, post a pinned non-applicability record. Do not invent a PS issue only for symmetry.
-3. Implement and land PS #149 from all four required predecessor handoffs, subject to the advisory deadline track. Update Terraform #24 from the landed PS handoff, implement #24, then run the reverse PS comparison and any required sync-back cycle.
-4. Implement PS #151 only after #149, as its issue requires. Compare the landed result with the Terraform validator. If an applicable control is absent or weaker in Terraform, open one focused Terraform issue from the landed PS #151 commit and blobs. If the control is already equivalent, post a pinned no-change record. If the control is structurally inapplicable, post a pinned non-applicability record.
-5. Do not start the next numbered item until the current item and every applicable reciprocal repair reaches a fixed point.
+1. Verify the PS #148 issue record and the section 6.1 start gate. Then explicitly commence and land PS #148. Compare its affected role with TerraformStyleGuide. If the behavior is common and absent or weaker in Terraform, create one focused Terraform issue. Issue creation does not commence implementation. Explicitly commence its implementation only after the issue record is complete and the implementation slot is free, then close the reciprocal cycle. If Terraform is already equivalent, post a pinned no-change record. If the blank-line example is PowerShell-specific, post a pinned non-applicability record.
+2. Verify the Terraform #23 issue record and the section 6.1 start gate. Then explicitly commence and land Terraform #23, which is Terraform-specific but is a native prerequisite of #24. Run a PS applicability check. If PS has a common affected role, create the focused PS issue first and commence it only after the issue record is complete and the implementation slot is free. If PS is already equivalent, post a pinned no-change record. If the state-version recovery content has no PS role, post a pinned non-applicability record. Do not invent a PS issue only for symmetry.
+3. Verify all four predecessor handoffs and resolve the Step 1 advisory gate. Then explicitly commence and land PS #149. Update Terraform #24 from the landed PS handoff; this issue update does not commence implementation. After the update is complete and the implementation slot is free, explicitly commence #24, land it, and run the reverse PS comparison and any required sync-back cycle.
+4. Verify that #149 and the section 6.1 start gate are complete. Then explicitly commence PS #151. Compare the landed result with the Terraform validator. If an applicable control is absent or weaker in Terraform, create one focused Terraform issue from the landed PS #151 commit and blobs. Issue creation does not commence implementation. Explicitly commence the Terraform work only after the issue record is complete and the implementation slot is free. If the control is already equivalent, post a pinned no-change record. If the control is structurally inapplicable, post a pinned non-applicability record.
+5. Do not commence the next numbered item until the current item and every applicable reciprocal repair reaches a fixed point.
 
 PS #149 owns the PS Husky preparation mechanism and dependency/update-governance convergence. It must explicitly compare Terraform issue #24's current contract and the direct Terraform `prepare` command. Select one common mechanism unless a proved repository-specific need requires a difference.
 
-#### 6.3.1 Terraform #24 update prompt
+#### 6.4.1 Terraform #24 update prompt
 
 After PS #149 lands, replace the placeholders and update Terraform issue #24:
 
 ```markdown
 PSStyleGuide dependency and npm governance landed through `<PS_P3_PR_URL>` at `<PS_P3_LANDED_COMMIT>`, tree `<PS_P3_LANDED_TREE>`. Use the permanent handoff `<PS_P3_HANDOFF_URL>` as the implementation source.
 
+This issue update records the starting point. It does not commence implementation. Do not create a feature branch or edit implementation files until this record is complete, the preceding cycle has a permanent closure record, and no feature implementation issue or PR is active.
+
 Read every relevant PS source blob from that commit. Do not independently select a package-manager policy, audit parser, process runner, exception schema, Husky installer, workflow topology, or evidence format. Adapt repository identity, issue URLs, package findings, generated filenames, check names, and any Terraform-specific dependency graph.
 
 Preserve common isolation, exact toolchain selection, install/audit vectors, config neutralization, bounded process I/O, termination states, JSON validation, exception governance, live issue verification, schedule/manual read-only behavior, and failure truth. Refresh the reciprocal matrix at start and before merge. An unexplained weaker behavior blocks merge.
+
+At explicit implementation start, keep the repository self-contained and do not change repository settings without exact administrator-issue authorization. Run the Terraform review protocol and re-run it after every byte change. Merge only after review covers the final bytes.
 ```
 
 After any Terraform #151-equivalent PR lands, run the reverse PS comparison and any required sync-back cycle. Do not create a placeholder issue merely for symmetry.
 
-### 6.4 Use the reusable paired-cycle prompt for future work
+### 6.5 Use the reusable paired-cycle prompt for future work
 
 For each future capability that can apply to both repositories:
 
-1. Open and implement the PS issue first.
-2. Land and review the PS PR.
-3. Post a permanent handoff with exact identities and common/intentional-difference rows.
-4. Update or open the Terraform issue only from that landed handoff.
-5. Implement the Terraform adaptation without a shared module.
-6. Land and review the Terraform PR.
-7. Run the reverse PS comparison and implement any common sync-back correction.
-8. Repeat the reciprocal comparison until the cycle reaches a fixed point.
+1. Create or update the PS issue. Issue creation does not commence implementation.
+2. Satisfy the section 6.1 start gate, then explicitly commence the PS implementation.
+3. Review and land the PS PR. Post a permanent handoff with exact identities and common or intentional-difference rows.
+4. Create or update the Terraform issue only from that landed handoff. Issue creation does not commence implementation.
+5. After the issue record is complete and the implementation slot is free, explicitly commence the Terraform adaptation without a shared module.
+6. Review and land the Terraform PR.
+7. Run the reverse PS comparison. Create a focused PS sync-back issue before any correction, then commence it only after the issue record is complete and the implementation slot is free.
+8. Repeat the reciprocal comparison until the cycle reaches a fixed point. Do not commence the next PS capability before the permanent closure record exists.
 
 Use this placeholder text in the Terraform issue:
 
@@ -651,15 +837,46 @@ Use this placeholder text in the Terraform issue:
 
 PSStyleGuide issue `<PS_ISSUE_URL>` landed through PR `<PS_PR_URL>` at commit `<PS_LANDED_COMMIT>`, tree `<PS_LANDED_TREE>`. The permanent implementation handoff is `<PS_HANDOFF_URL>`.
 
+This issue update records the starting point. It does not commence implementation. Do not create a feature branch or edit implementation files until the issue record is complete, the preceding cycle has a permanent closure record, and no feature implementation issue or PR is active.
+
 Read the source files only from `<PS_LANDED_COMMIT>` and record their Git blobs before copying. Do not follow a branch and do not rebuild the capability independently.
 
 Adapt only repository identity, domain-specific filenames and payloads, schema/type prefixes, check or ruleset names, platform applicability, and repository-specific evidence. Preserve all common security, serialization, path, credential, native-status, atomicity, cleanup, error-handling, and failure-truth behavior.
 
 Create no shared runtime dependency. At implementation start and before merge, complete the closed reciprocal matrix. Classify each row as `same`, `intentional difference`, or `blocker`. An unexplained or weaker behavior blocks merge.
 
-Record source and destination blobs, tests, runtime identities, reviewed head/tree, merge method, landed commit/tree, and the next handoff.
+Use this closed reciprocal catalog:
 
-After the Terraform PR lands, run the plan's `Reverse PS comparison and sync-back prompt`. If that produces a PS PR, run the `Terraform comparison and sync prompt` against the new PS landed commit. Repeat until no common difference remains. Post the fixed-point closure record before the next PS issue starts.
+| Stable row | Required comparison |
+| --- | --- |
+| `GF-PARAMETERS` | Public names, types, defaults, and omission, null, empty, and raw-value rules |
+| `GF-DESTINATION` | Trusted root, fixed destinations, provider, wildcard, rooted-path, normalization, comparison, and failure rules |
+| `GF-CONTENT` | Source order, wrappers, frontmatter, repository-specific names, and complete payload |
+| `GF-SERIALIZATION` | CRLF and lone-CR normalization, LF and final-newline rules, BOM-less UTF-8, and byte checks |
+| `GF-WRITE` | Complete-payload candidate creation, durable flush, verification, single-call publication, and prohibited fallbacks |
+| `GF-FAILURE` | Phase postconditions, cleanup and uncertainty, bounded diagnostics, and fault cases |
+| `GF-HOSTS` | Supported editions and hosts, executable identity, cross-cell equality, and idempotence |
+| `GF-VERSION` | Timeless marker grammar, trusted expected version, authoring progression, and independent fixtures |
+| `GF-NODE-LOCK` | Exact Node/npm producer and provenance, distribution verification, cache and side effects, dependency graph, and frozen consumers |
+| `GF-YAML` | Parser package and API, document and schema strictness, diagnostics, and forbidden features |
+| `GF-ACTION-PINS` | Closed action roles, full commit pins, provenance, runtime, and atomic pin updates |
+| `GF-ACTION-INPUTS` | Authored security inputs and separately reviewed manifest defaults |
+| `GF-GIT` | NUL records, byte allowlists, native statuses, cardinality, refs, ancestry, lease, and refspec |
+| `GF-GRAPH` | Production and evidence triggers, permissions, needs, conditions, outputs, side effects, and sole writer |
+| `GF-CREDENTIALS` | Job-token availability, authentication projection, cleanup, push-only materialization, and absence proofs |
+| `GF-EVIDENCE` | Temporary workflow/ref structural equality, drills, retained identities, cleanup, and final absence |
+
+Each row occurs exactly once. Record both repository URLs and commits, normative and implementation locators, evidence paths and SHA-256 values, observed values or fixture IDs, one status (`same`, `intentional difference`, or `blocker`), and a reason. Prove omitted rows inapplicable. Missing, duplicate, unknown, renamed, empty, or unexplained rows block closure.
+
+For each intentional difference, name both literals or behaviors, explain the repository need, prove equal security and failure strength, name the owner, and state the review or expiry condition. Convenience, implementation history, separate authorship, and lower effort are not repository-specific reasons.
+
+Do not change repository settings unless the applicable administrator issue authorizes the exact request. Run the Terraform review protocol and re-run it after every byte change. Merge only after review covers the final bytes. Record source and destination blobs, tests, runtime identities, reviewed head/tree, merge method, landed commit/tree, and the next handoff.
+
+After the Terraform PR lands, use a clean PS checkout. Fetch both repositories, read only the landed PS and Terraform commits, record all compared blobs, and run the same catalog in reverse. If no common difference remains, make no PS implementation change and post a pinned reverse-comparison record.
+
+If Terraform added or corrected common behavior, create or update one focused PS sync-back issue and pin both landed commits and blobs. Issue creation does not commence implementation. After the issue record is complete and the implementation slot is free, explicitly commence the PS sync-back. Run the PS review protocol and re-run it after every byte change. Land one PR only after review covers the final bytes. Then compare the new PS landed commit back in Terraform. Create any focused Terraform repair issue before implementation and commence it only after the record is complete and the implementation slot is free. Run the Terraform review protocol against the final repair bytes before landing.
+
+If the same matrix row changes direction twice, stop and run a new decision process that evaluates both implementations. Repeat until every common row is `same`, every intentional difference has complete evidence, and no blocker remains. Post the permanent fixed-point closure record before the next PS implementation starts.
 ```
 
 Do not replace placeholders until the PS PR has landed. Never use a reviewed head, test-merge ref, branch name, or anticipated squash SHA as `<PS_LANDED_COMMIT>`.
@@ -670,21 +887,32 @@ Leave PS issues #155 and #156 open and independent.
 
 - Revisit #155 only if the candidate validator admits a competing writer, Windows PowerShell 5.1 support ends and a portable API becomes available, or a later step adopts a suitable native helper.
 - Pick up #156 opportunistically when the candidate files change or a suitable external runner becomes available.
-- If an item becomes mandatory, create a focused actionable issue and give that issue the real dependency.
+- If an item becomes mandatory, validate and record the trigger. Create a focused actionable issue and give that issue only its real dependencies. Issue creation does not commence implementation.
+- Explicitly commence the residual implementation only after its issue record is complete, the preceding fixed-point cycle is closed, and no feature implementation issue or PR is active. Run the repository review protocol and re-run it after every byte change. Land only after review covers the final bytes, and record the complete landed identity and validation evidence.
+- Do not change repository settings unless the applicable administrator issue authorizes the exact request.
+- If the residual changes a role that exists in both repositories, compare the landed result in the other repository. Create any reciprocal issue before implementation and commence it only when the implementation slot is free. Run the applicable review protocol and re-run it after every byte change. Land only after review covers the final bytes, run the reverse comparison, and close the cycle only when every common behavior is the same or has a proved intentional difference with equal security and failure strength.
 - Do not add #155 or #156 as blockers of the foundation umbrella, #152, #147, Terraform #21, or Terraform #22 without a new material trigger.
 
 ## Step 8 — verify completion
 
 This plan is complete only when all of the following are true:
 
+- Every implementation has a pre-existing focused issue record and a separate, explicit commencement record. No two feature implementation issues or PRs were active at the same time.
+- Every cross-repository input is pinned to a landed commit and Git blob. No implementation copied from a moving branch or introduced a shared runtime dependency, reusable cross-repository workflow, submodule, package, or third source of truth.
+- Every PR ran its repository review protocol against the final bytes. Every cycle records both repositories' issue and PR URLs, bases, reviewed heads and trees, merge methods, landed commits and trees, affected paths, blobs, validation commands, runtime identities, and review outcomes.
+- Every required reciprocal matrix contains each applicable row exactly once. Every common row is `same`; every intentional difference names both behaviors, repository need, equal security and failure strength, owner, and review or expiry condition; and no blocker remains.
+- Every posted issue body and comment contains verified identities. No placeholder or fabricated SHA, URL, PR number, tree, or blob was posted.
+- Every native dependency represents a real completion prerequisite. No tracker relationship falsely blocks implementation, and no repository setting changed without exact authorization from the applicable administrator issue.
 - Step 3's five PS import cycles close in order, each with a Terraform comparison, any required Terraform repair, a reverse PS comparison, and a permanent fixed-point record.
 - The PS foundation umbrella and its four children are closed with a permanent landed handoff that identifies both repositories' final commits and blobs.
 - The separate Claude command cycle closes without duplicating volatile protocol text.
 - The Terraform convergence tracker contains all five Step 3 cycle records and no aggregate foundation implementation PR exists.
 - Draft PS PR #164 is reviewed and landed through PS #160, and its reciprocal cycle reaches a fixed point.
 - PS and Terraform generators share the canonical tracked-present/tracked-absent publication and structured-result behavior.
+- Both generators use fixed root and destination authority, complete BOM-less UTF-8/LF payloads, same-directory durable candidate verification, one `File.Replace` or non-overwriting `File.Move` publication call, truthful `ReplacementStateUncertain` reporting, no post-publication rollback claim, and reusable raw NUL-delimited Git validation with exact native-status handling.
 - Repository-code jobs in both repositories contain no actions and have no repository-token scopes.
-- Both repositories use the same common workflow-policy behaviors and case coverage, with only recorded repository-specific literals.
+- Both repositories use separate action-only publication jobs, verified official Node distributions in action-free Node jobs, strict offline workflow-policy parsing and fixtures, machine-readable authority for roles, inputs, defaults, supply identities, and case allocation, and the same script-version grammar and PowerShell authoring rules.
+- Both repositories use the same common workflow-policy behaviors and case coverage, with only recorded repository-specific literals. No workflow writer exists before its P1B/T1B introduction and proof.
 - PS issue #158 is implemented and both repositories have a read-only reproducible supply-freeze method.
 - Step 4 closes Terraform issue #21 from landed PS PR #153 and completes the reciprocal PS comparison and any sync-back work.
 - Step 5 inventories all common roles, resolves every untracked blocker through focused fixed-point cycles, and retains the final two-repository evidence.
