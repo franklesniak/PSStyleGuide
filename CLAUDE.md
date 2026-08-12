@@ -1,6 +1,6 @@
 # Agent Instructions for Claude Code
 
-**Version:** 1.0.20260813.0
+**Version:** 1.0.20260813.1
 
 ## Metadata
 
@@ -342,8 +342,14 @@ review from both:
 
 - **Copilot:** request it explicitly with `request_copilot_review` (or
   equivalent).
-- **Codex:** Codex reviews automatically when the PR head advances or the PR is
-  marked ready for review; if a request mechanism is available, use it.
+- **Codex:** request it explicitly every round by posting a pull-request comment
+  whose body is exactly `@codex review`. There is no dedicated review-request
+  tool for Codex the way `request_copilot_review` exists for Copilot, so post the
+  comment with the ordinary issue-comment tool (for example `add_issue_comment`
+  or equivalent). Codex also auto-reviews when a pull request is opened for review
+  or a draft is marked ready, but that auto-trigger is not reliable enough to
+  depend on — always post the explicit `@codex review` request so a Codex review
+  is actually obtained for the round.
 
 If a reviewer cannot read the diff (Copilot has a size limit and may return
 "wasn't able to review any files") or is otherwise non-functional, note that in a
@@ -360,7 +366,10 @@ not "clean" on the strength of a reviewer that never actually reviewed.
    identity evidence is incomplete.
 2. Record detection baselines (the newest existing review-submission ID/time,
    inline-comment ID/time, and PR-comment ID/time for each bot) and the current
-   PR head SHA, then request the reviews.
+   PR head SHA, then request the reviews: request Copilot with
+   `request_copilot_review` (or equivalent), and request Codex by posting an
+   `@codex review` pull-request comment. Do not rely on Codex's auto-trigger to
+   stand in for this explicit request.
 3. Wait for the reviews by **active polling** — do not rely on webhook delivery
    alone. Poll at least every 60 seconds using authenticated structured tooling,
    paginating the complete review submissions **with their bodies**, inline
