@@ -10,9 +10,19 @@ Keep each repository self-contained. A common behavior may differ only when a re
 
 Issue creation, contract maintenance, dependency maintenance, and read-only comparison are setup activities. They do not commence implementation. Implementation starts only at an explicit commencement gate in the applicable execution step.
 
+## Execution classes
+
+- **Coding agent executable:** A coding agent can do the full task with the specified tools and authority. A stated human approval remains a required input.
+- **Human execution required:** A repository owner or administrator must make or approve the decision. A coding agent can prepare evidence or a draft. It cannot give the approval.
+- **Not executable:** The unit is a parent container, tracker, reference-only contract, sequence control, or inactive policy. Do not start implementation from this unit.
+
+Apply the class at the lowest numbered level. A parent step is not executable when its numbered substeps contain the work.
+
+A `Not executable` tracker can receive evidence. The tracker update is an output of the executable task that produced the evidence.
+
 ## Verified baseline
 
-This state was verified at `2026-08-12T19:39:25Z`. Re-query GitHub and fetch both `origin/main` refs immediately before every issue edit, branch rewrite, merge, or settings change. If an identity or dependency has changed, stop and refresh the affected comparison.
+This state was verified at `2026-08-12T20:18:17Z`. Re-query GitHub and fetch both `origin/main` refs immediately before every issue edit, branch rewrite, merge, or settings change. If an identity or dependency has changed, stop and refresh the affected comparison.
 
 ### Completed coordination work
 
@@ -78,37 +88,75 @@ The material common-foundation differences are:
 
 ## Step 1 — protect the advisory deadline
 
-The current PS P1 advisory decision expires at `2026-08-30T23:59:59Z`. PS issue #149 requires P1, P1A, P1B, and P2 handoffs before implementation, so it is not safe to treat #149 as immediately executable.
+> **Execution class: Not executable.** This step is a parent container. Use substeps 1.1–1.3.
 
-This step manages the deadline and any separately authorized repository-settings work. It does not authorize implementation of PS #149 or another feature issue. Do not change repository settings unless PS #152 or another applicable administrator issue authorizes the exact change.
+The PS P1 advisory decision expires at `2026-08-30T23:59:59Z`. PS issue #149 requires four landed handoffs before implementation. These handoffs are P1, P1A, P1B, and P2.
+
+Step 1 does not authorize implementation of PS #149 or another feature issue. It controls the deadline and its required decision.
+
+### 1.1 Check the deadline state
+
+> **Execution class: Coding agent executable.** Run this check at the specified time. Do not start PS #149 from this substep.
 
 Use `2026-08-21T23:59:59Z` as the internal go/no-go checkpoint.
 
-- If #149 is at a reviewed, merge-ready head by the checkpoint, continue its approved merge path.
-- If it is not, start a separate owner-approved superseding-decision task on 2026-08-22.
-- The fallback must contain the current audit, exact accepted findings, reason, compensating controls, canonical approval and expiry, exact replacement contract bytes, validator and case updates, every dependent version/digest/name pin, validation, and rollback.
-- Land the complete approved fallback before `2026-08-30T23:59:59Z`.
-- Do not silently extend a date, reuse old approval, or allow the validator to enter `advisory-expired`.
-- Do not add a false #149 dependency to the convergence issues. The date is a coordination gate, not an issue-graph claim.
+1. Re-query PS #149 and each required handoff.
+2. Record the issue state, PR state, reviewed head, checks, dependencies, and merge readiness.
+3. If #149 is merge-ready, record that the approved merge path remains available under Step 6.4.
+4. If #149 is not merge-ready, prepare the fallback evidence package for substep 1.2.
+5. Do not create a false #149 dependency. The date is a coordination gate, not an issue dependency.
 
-Run Step 1 in parallel with Steps 2–6. A deadline check, read-only status check, dependency edit, or separately authorized repository-settings operation does not count as the active implementation issue. None of these operations permits a second feature implementation branch or PR.
+### 1.2 Select and approve the deadline path
+
+> **Execution class: Human execution required.** The repository owner must select and approve the deadline path.
+
+At the `2026-08-21T23:59:59Z` checkpoint, review the evidence from substep 1.1.
+
+1. If #149 is merge-ready, approve or reject its existing merge path.
+2. If #149 is not merge-ready, approve or reject a separate superseding-decision task.
+3. If you approve the new task, set its start date to `2026-08-22`.
+4. State the approved scope, owner, canonical approval, and expiry.
+5. Approve each repository-settings change in an applicable administrator issue.
+6. Do not extend the expiry without a new recorded decision.
+7. Do not reuse an approval that applies to different bytes or settings.
+
+### 1.3 Implement the approved fallback
+
+> **Execution class: Coding agent executable.** Start only if substep 1.2 approves the superseding-decision task.
+
+If the owner approves a superseding decision, prepare the complete fallback. Include the current audit and each accepted finding. Include the reason and compensating controls. Include the canonical approval and expiry. Include the exact replacement contract bytes. Include all validator and case changes. Include each dependent version, digest, and name pin. Include validation and rollback instructions.
+
+Land the approved fallback before `2026-08-30T23:59:59Z`. Do not let the validator enter `advisory-expired`.
+
+Run Step 1 at the same time as Steps 2–6. A status check or dependency edit does not use the implementation slot. An authorized settings operation also does not use that slot. These activities do not permit a second feature branch or PR.
 
 ## Step 2 — prepare and maintain convergence issues
 
-Step 2 creates or updates issue records, dependencies, trackers, and implementation contracts. It does not commence implementation. Do not create a feature branch, edit implementation files, or open an implementation PR merely because an issue is ready. Implementation commences only at the explicit start gate in Step 3, Step 4, or Step 6. Keep native dependencies limited to real completion prerequisites. A tracking umbrella may list children without blocking unrelated work.
+> **Execution class: Not executable.** This step is a parent container. Use only its classified substeps.
+
+Use Step 2 to prepare issue records, dependencies, trackers, and implementation contracts. Step 2 does not start implementation. Do not create a feature branch from an issue contract. Do not edit implementation files from an issue contract. Do not open an implementation PR because an issue is ready. Start implementation only at the applicable gate in Step 3, Step 4, or Step 6. Use native dependencies only for real completion prerequisites. A tracking umbrella can list children without blocking unrelated work.
 
 Before posting any issue body or comment, replace every placeholder with a verified identity. If an identity does not exist, keep the text in this plan and wait. Never post a fabricated SHA, URL, PR number, tree, or blob.
 
 ### 2.1 PS foundation-convergence umbrella
 
-[PS issue #159](https://github.com/franklesniak/PSStyleGuide/issues/159) is open. Its creation and native child links are complete. This umbrella is a tracker and never counts as the active implementation issue. Use the retained contract below to maintain scope and closure evidence. Re-query the live issue before each write.
+> **Execution class: Not executable.** This issue is a tracker. Update it only with evidence from its executable child cycles.
+
+[PS issue #159](https://github.com/franklesniak/PSStyleGuide/issues/159) is open. Its creation and native child links are complete. Do not start a branch or PR from this issue. Re-query the live issue before each update. Use the retained contract to control scope and record closure evidence.
 
 ```markdown
 ## Objective
 
-Reconcile the already implemented PSStyleGuide P1 and TerraformStyleGuide T1 foundations. Land the strongest applicable behavior in PSStyleGuide first. This issue is the tracking umbrella; focused child issues own implementation.
+Reconcile the implemented PSStyleGuide P1 and TerraformStyleGuide T1 foundations. Land the strongest applicable behavior in PSStyleGuide first. This issue is the tracking umbrella. Focused child issues own implementation.
 
-Keep PSStyleGuide and TerraformStyleGuide self-contained. Do not create a shared module, reusable cross-repository workflow, submodule, package, runtime download from the other repository, or third source of truth.
+Keep PSStyleGuide and TerraformStyleGuide self-contained. Do not create these shared dependencies:
+
+- a shared module;
+- a reusable cross-repository workflow;
+- a submodule;
+- a package;
+- a runtime download from the other repository; or
+- a third source of truth.
 
 ## Immutable baselines
 
@@ -130,18 +178,29 @@ The live umbrella contains these four native sub-issues in this order.
 
 ## Common-behavior gate
 
-For each child, compare immutable PS and Terraform sources in a closed matrix. Classify every row as `same`, `intentional difference`, or `blocker`. A weaker or unexplained security, credential, path, serialization, atomicity, cleanup, native-status, or failure-truth behavior blocks merge. After the PS PR lands, complete the Terraform comparison, any focused Terraform sync PR, and the reverse PS comparison before the next child starts.
+For each child, compare immutable PS and Terraform sources in a closed matrix. Classify each row as `same`, `intentional difference`, or `blocker`. A weaker or unexplained common behavior blocks merge. This rule applies to security, credentials, paths, serialization, atomicity, cleanup, native status, and failure truth. After the PS PR lands, complete the Terraform comparison. Complete each required Terraform sync PR. Then complete the reverse PS comparison. Do not start the next child before these actions are complete.
 
-Intentional differences are limited to repository identity, source and generated filenames, artifact IDs, schema/type prefixes, required check names, proved platform applicability, documentation wording, and repository-specific historical decisions.
+Intentional differences are limited to these items:
+
+- repository identity;
+- source and generated filenames;
+- artifact IDs;
+- schema and type prefixes;
+- required check names;
+- proved platform applicability;
+- documentation wording; and
+- repository-specific historical decisions.
 
 ## Completion
 
 After the infrastructure, generator/path, and workflow-policy children reach their fixed points, post an interim core-foundation handoff for PS P1B. State that issue #158 remains nonblocking.
 
-Close this umbrella only after all four children and their reciprocal cycles close. Post one permanent final handoff with every child issue/PR URL, both repositories' final landed identities, source/destination blob maps, final reciprocal matrices, validation evidence, and all intentional differences. Do not create a later aggregate Terraform foundation implementation issue.
+Close this umbrella only after all four children and their reciprocal cycles close. Post one permanent final handoff. Include each child issue and PR URL. Include both repositories' final landed identities. Include the source and destination blob maps. Include the final reciprocal matrices, validation evidence, and intentional differences. Do not create an aggregate Terraform foundation implementation issue.
 ```
 
 ### 2.2 PS infrastructure-conformance contract
+
+> **Execution class: Coding agent executable.** Implementation is active in draft PR #164. Complete the stated review and fixed-point work.
 
 [PS issue #160](https://github.com/franklesniak/PSStyleGuide/issues/160) is open. [Draft PR #164](https://github.com/franklesniak/PSStyleGuide/pull/164) shows that implementation has already commenced for Step 3 cycle 1. The issue creation, rebase, and current-head validation are complete. Review, landing, reciprocal comparison, and fixed-point closure remain. Re-run validation if the candidate bytes change. Use this contract for the remaining work:
 
@@ -186,6 +245,8 @@ The PR must give the umbrella issue its reviewed head/tree, landed commit/tree, 
 ```
 
 ### 2.3 PS generator and path-contract
+
+> **Execution class: Coding agent executable.** Start only after the PS #160 reciprocal cycle closes.
 
 [PS issue #161](https://github.com/franklesniak/PSStyleGuide/issues/161) is open, and PS #160 is its verified native blocker. Issue setup is complete. Do not commence implementation until Step 3 closes the PS #160 reciprocal cycle and reaches the cycle 2 start gate. Use this contract for implementation and closure:
 
@@ -278,6 +339,8 @@ Record base, reviewed head/tree, landed commit/tree, source and landed blobs, sc
 
 ### 2.4 PS workflow-isolation and policy
 
+> **Execution class: Coding agent executable.** Start only after the PS #161 reciprocal cycle closes.
+
 [PS issue #162](https://github.com/franklesniak/PSStyleGuide/issues/162) is open, and PS #161 is its verified native blocker. Issue setup is complete. Do not commence implementation until Step 3 closes the PS #161 reciprocal cycle and reaches the cycle 3 start gate. Use this contract for implementation and closure:
 
 ```markdown
@@ -366,6 +429,8 @@ Record every source and landed blob, contract and catalog version/digest, Node/n
 
 ### 2.5 PS issue #158 linkage and implementation contract
 
+> **Execution class: Coding agent executable.** Start the issue update after PS #162 lands. Start implementation only at the Step 3 cycle 4 gate.
+
 PS #158 is already a native child of PS #159. After the PS #162 PR lands, add one short planning comment to #158. This issue update does not commence implementation. Do not replace its body.
 
 ```markdown
@@ -375,6 +440,8 @@ This issue is a child of [PS issue #159](https://github.com/franklesniak/PSStyle
 Replace the two remaining placeholders before posting. Commence PS #158 implementation only at the Step 3 cycle 4 start gate. Its PR must keep the recorder read-only, capture output outside the repository, and prove no manifest, lockfile, installed-tree, contract, generated-output, or worktree mutation. After merge, run the Terraform comparison and any reverse PS sync-back to a fixed point before the Claude command cycle starts.
 
 ### 2.6 PS Claude command
+
+> **Execution class: Coding agent executable.** Start only after the PS #158 reciprocal cycle closes.
 
 [PS issue #163](https://github.com/franklesniak/PSStyleGuide/issues/163) is open and remains unimplemented. Issue creation and owner authorization are complete. It is Step 3 cycle 5 and remains independent of the foundation issue graph. Do not commence implementation until Step 3 closes cycle 4 and reaches the cycle 5 start gate. Use this contract for implementation and closure:
 
@@ -391,7 +458,7 @@ Do not copy it unchanged. It says `all six steps`, while PSStyleGuide's landed `
 
 ## Requirements
 
-- Obtain explicit owner authorization because this file is an agent entry point.
+- Verify the existing owner authorization because this file is an agent entry point.
 - Accept a pull-request URL and require one when it is not supplied.
 - Delegate the authoritative process to the repository-local root `CLAUDE.md`.
 - Treat Codex and Copilot as co-equal reviewers as local `CLAUDE.md` requires.
@@ -405,7 +472,9 @@ Keep this issue and PR separate from the foundation, supply-freeze, and infrastr
 
 ### 2.7 Terraform convergence tracker
 
-[Terraform issue #31](https://github.com/franklesniak/TerraformStyleGuide/issues/31) is open. Tracker creation is complete, but all five reciprocal cycle records remain open. Updating this tracker does not commence implementation and does not count as the active implementation issue. Use this contract to maintain and close the tracker:
+> **Execution class: Not executable.** This issue is a tracker. Update it only with evidence from the five executable cycles.
+
+[Terraform issue #31](https://github.com/franklesniak/TerraformStyleGuide/issues/31) is open. Tracker creation is complete. All five reciprocal cycle records remain open. Do not start a branch or PR from this issue. Update it only after an applicable cycle produces evidence. Use this contract to close the tracker:
 
 ```markdown
 ## Objective
@@ -420,14 +489,27 @@ Retain the reciprocal evidence for the initial PSStyleGuide import pass. This is
 - [ ] PS issue #158 supply-freeze method from Terraform PR #27.
 - [ ] PS Claude command parity from Terraform commit `fbdecbae787055a2117d4ada83ae294a7decfe62`.
 
-Complete the cycles in order. For each cycle, record the PS issue and landed PR, source and destination commits and blobs, the 16-row matrix or a documented reduced matrix for a narrow non-foundation file, any focused Terraform sync issue and PR, the reverse PS comparison, validation, intentional differences, and the permanent fixed-point closure record.
+Complete the cycles in order. For each cycle, record this evidence:
 
-If a comparison finds no common difference, post a pinned no-change record. If it finds work, create one focused Terraform issue. Creating the issue does not commence implementation. Commence it only after the issue record is complete, the preceding cycle has closed, and the implementation slot is free. Do not combine unrelated cycles in one PR.
+- the PS issue and landed PR;
+- the source and destination commits and blobs;
+- the 16-row matrix;
+- a documented reduced matrix when the cycle contains only a narrow non-foundation file;
+- each focused Terraform sync issue and PR;
+- the reverse PS comparison;
+- the validation and intentional differences; and
+- the permanent fixed-point closure record.
+
+If a comparison finds no common difference, post a pinned no-change record. If it finds work, create one focused Terraform issue. Issue creation does not start implementation. Start implementation only after the issue record is complete. Also verify that the preceding cycle is closed and the implementation slot is free. Do not combine unrelated cycles in one PR.
 ```
 
 ## Step 3 — import Terraform behavior into PSStyleGuide
 
-### 3.1 Complete the source cycles in order
+> **Execution class: Not executable.** This step is a parent container. Use substep 3.1, then use substeps 3.2–3.4.
+
+### 3.1 Select and complete the source cycles in order
+
+> **Execution class: Coding agent executable.** Select one cycle from the table. Complete it with substeps 3.2–3.4 before you select another cycle.
 
 Run these source issues as separate fixed-point cycles in this order:
 
@@ -448,6 +530,8 @@ The first three cycles may post the interim core-foundation handoff for PS P1B a
 Close the PS foundation umbrella after cycle 4 closes. Post final identities from both repositories. Do not open one aggregate Terraform foundation implementation issue. Cycle 5 remains separate from the foundation umbrella.
 
 ### 3.2 Commence implementation and close one PS import cycle
+
+> **Execution class: Coding agent executable.** Cycle 1 is active. For later cycles, start only after the prior cycle closes.
 
 Issue setup in Step 2 and implementation commencement in Step 3 are separate actions. Cycle 1 implementation has already commenced through draft PS PR #164. For cycles 2–5, do not create a branch, edit implementation files, or open an implementation PR until the preceding cycle has its permanent fixed-point closure record.
 
@@ -473,6 +557,8 @@ Allowed intentional differences are limited to repository identity and canonical
 If the same matrix row changes direction twice, stop. Revalidate the requirement and run a new decision process that evaluates both repository implementations. Do not alternate implementations indefinitely and do not select the last edit merely because it is newer.
 
 ### 3.3 Terraform comparison and sync prompt
+
+> **Execution class: Coding agent executable.** Run this prompt after the applicable PS PR lands.
 
 Run this prompt in a clean TerraformStyleGuide checkout after each Step 3 PS PR lands. Replace every placeholder with a verified identity before use.
 
@@ -523,6 +609,8 @@ If a common difference remains, create or update one focused Terraform issue and
 
 ### 3.4 Reverse PS comparison and sync-back prompt
 
+> **Execution class: Coding agent executable.** Run this prompt after an applicable Terraform PR lands.
+
 Run this prompt in a clean PSStyleGuide checkout after any Terraform PR in the cycle lands. Replace every placeholder with a verified identity before use.
 
 ```markdown
@@ -568,7 +656,11 @@ Close the cycle only when every common row is `same`, every intentional differen
 
 ## Step 4 — catch TerraformStyleGuide up from landed PS work
 
+> **Execution class: Not executable.** This step is a parent container. Use substeps 4.1 and 4.2 after Step 3 closes.
+
 ### 4.1 Commence Terraform issue #21 and close the reciprocal cycle
+
+> **Execution class: Coding agent executable.** Start only after all five Step 3 cycles close.
 
 Start Step 4 only after all five Step 3 cycles close. [Terraform issue #21](https://github.com/franklesniak/TerraformStyleGuide/issues/21) already exists, but issue creation did not commence implementation. Terraform #22 requires a future landed PS #147 handoff. Terraform #24 requires a future landed PS #149 handoff and Terraform #23. Do not commence either issue in Step 4.
 
@@ -592,6 +684,8 @@ Do not commence Terraform #22 in Step 4 because its PS source implementation doe
 Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 
 ### 4.2 Terraform #21 reciprocal-closure prompt
+
+> **Execution class: Coding agent executable.** Run this prompt after the Terraform #21 PR lands.
 
 Replace every placeholder with a verified identity. If an identity does not exist, do not run the prompt.
 
@@ -644,7 +738,11 @@ If the same matrix row changes direction twice, stop and run a new decision proc
 
 ## Step 5 — run the global consistency sweep
 
+> **Execution class: Not executable.** This step is a parent container. Use substep 5.1 after Step 4 closes.
+
 ### 5.1 Find and close untracked differences
+
+> **Execution class: Coding agent executable.** Start only after Step 4 reaches a fixed point.
 
 Start the sweep only after Step 4 reaches a fixed point. Run it in a clean checkout with both fetched `main` commits. The inventory and comparison are read-only and do not commence implementation. This sweep finds configuration and process differences that no planned issue currently tracks. It is not permission to combine unrelated fixes.
 
@@ -698,9 +796,15 @@ Finish only when every inventoried role has an owner and disposition, all repair
 
 ## Step 6 — use PSStyleGuide-first paired cycles
 
-After the global sweep closes, use one paired cycle for each common capability: implement PSStyleGuide, update or open the Terraform issue from the landed PS handoff, implement TerraformStyleGuide, compare the Terraform result back in PSStyleGuide, and sync back any common improvement. If a capability is repository-specific, record the exact non-applicability reason and do not open a fake counterpart.
+> **Execution class: Not executable.** This step is a parent container. Use its classified substeps after Step 5 closes.
+
+After the global sweep closes, Step 6 controls each new common capability. Implement the capability in PSStyleGuide first. Create or update the Terraform issue from the landed PS handoff. Then implement the TerraformStyleGuide adaptation. Compare the TerraformStyleGuide result back in PSStyleGuide. Sync back each common improvement.
+
+If a capability is repository-specific, record the exact non-applicability reason. Do not open a counterpart only for symmetry.
 
 ### 6.1 Run one PSStyleGuide-first paired cycle
+
+> **Execution class: Coding agent executable.** Start one capability only after Step 5 and the prior paired cycle close.
 
 Issue setup and implementation commencement are separate actions. Complete this sequence for one capability before the next PS implementation starts:
 
@@ -746,28 +850,77 @@ Each row occurs exactly once. Record both repository URLs and commits, normative
 
 ### 6.2 Complete PS P1B and the protection interlock
 
-The first Step 6 capability is PS P1B. Steps 3–5 must already be complete. Execute PS issues #147 and #152 as one interlocked capability cycle. Issue #152 is separately authorized settings work; it may overlap read-only preparation for #147, but it does not authorize a second feature implementation PR:
+> **Execution class: Not executable.** This substep is a parent container. Use substeps 6.2.1–6.2.3 in order.
 
-1. Re-read the PS foundation handoff and compare #147's assumptions with every landed contract.
-2. Verify that no feature implementation issue or PR is active. Then explicitly commence #147 and implement its writer and terminal check `Build Style Guide Artifacts / approve_candidate`.
-3. Reopen or supersede `docs/decisions/0001-accept-in-repository-trust-root.md` before the writer gains `contents: write`.
-4. Reach one reviewed PR head. Record its exact head/tree, workflow identity, permissions, required-check name, unique evidence ref, source pins, and rollback inputs.
-5. Start #152's bounded temporary proof. Re-export rules, classic protection, `main`, application identity, and writer permissions.
-6. Perform the non-mutating bypass-eligibility check. If GitHub Actions integration ID `15368` is unavailable, stop and run the required writer-design decision. Do not create a substitute rule.
-7. If eligible, create the temporary field-equivalent rule, run effective-bypass and rejection drills, retain evidence, delete the temporary rule and evidence ref, and prove exact restoration.
-8. Revalidate the reviewed head. Create the approved persistent ruleset immediately before merge.
-9. Retain the create response, ruleset ID, normalized JSON and digest, effective rules, exact required check and integration, `main` before and after, and rollback proof.
-10. Close #152 only after the persistent rule is active and its evidence is complete.
-11. Merge and close #147 only after #152 closes.
-12. Post one permanent PS P1B handoff for Terraform issue #22.
+The first Step 6 capability is PS P1B. Steps 3–5 must be complete. Treat PS #147 and PS #152 as one interlocked capability cycle. Settings work under #152 can overlap read-only preparation for #147. It does not permit a second feature implementation PR.
 
-Do not copy Terraform ruleset IDs, digests, or effective-rule JSON. Do not add a human bypass without a separate owner-approved decision.
+#### 6.2.1 Prepare the P1B candidate and decision evidence
+
+> **Execution class: Coding agent executable.** Prepare the candidate and evidence. Do not merge or change repository settings in this substep.
+
+1. Re-read the PS foundation handoff.
+2. Compare the assumptions in #147 with each landed contract.
+3. Verify that no feature implementation issue or PR is active.
+4. Start #147 and implement its writer.
+5. Implement the terminal check `Build Style Guide Artifacts / approve_candidate`.
+6. Prepare an amendment or replacement for `docs/decisions/0001-accept-in-repository-trust-root.md`.
+7. Reach one reviewed PR head.
+8. Record the exact head and tree.
+9. Record the workflow identity, permissions, and required-check name.
+10. Record the unique evidence ref, source pins, and rollback inputs.
+11. Prepare the exact settings requests and proof plan for #152.
+
+Do not give the writer effective `contents: write` access before the human approval in substep 6.2.2.
+
+#### 6.2.2 Approve the P1B authority decisions
+
+> **Execution class: Human execution required.** The repository owner or administrator must approve each applicable decision.
+
+1. Review the proposed trust-root decision from substep 6.2.1.
+2. Approve or reject the proposed decision.
+3. Review the exact temporary and persistent settings requests in #152.
+4. Approve or reject each settings request.
+5. If integration ID `15368` is unavailable, select and approve a different writer design.
+6. Do not approve a substitute rule without the writer-design decision.
+7. If the design includes a human bypass, approve or reject it in a separate decision.
+8. Record each approval, rejection, condition, owner, and expiry in its canonical issue or decision record.
+
+#### 6.2.3 Prove the settings, land P1B, and post the handoff
+
+> **Execution class: Coding agent executable.** Start only after substep 6.2.2 contains every required approval.
+
+1. Verify the recorded approvals against the exact candidate and settings requests.
+2. Stop if an approval is absent, expired, or for different bytes or settings.
+3. Revalidate the reviewed PR head.
+4. Start the bounded temporary proof under #152.
+5. Export the rules, classic protection, `main`, application identity, and writer permissions.
+6. Perform the non-mutating bypass-eligibility check.
+7. If integration ID `15368` is unavailable, stop and return to substep 6.2.2.
+8. Create the approved temporary field-equivalent rule.
+9. Run the effective-bypass and rejection drills.
+10. Retain the required evidence.
+11. Delete the temporary rule and evidence ref.
+12. Prove exact restoration.
+13. Revalidate the reviewed PR head.
+14. Create the approved persistent ruleset immediately before merge.
+15. Retain the create response, ruleset ID, normalized JSON, and digest.
+16. Retain the effective rules, exact required check, and integration.
+17. Retain `main` before and after the change. Retain the rollback proof.
+18. Close #152 only after the persistent rule is active and its evidence is complete.
+19. Merge and close #147 only after #152 closes.
+20. Post one permanent PS P1B handoff for Terraform issue #22.
+
+Do not copy Terraform ruleset IDs, digests, or effective-rule JSON. Use only the approved PS values.
 
 ### 6.3 Adapt landed P1B in Terraform issue #22
+
+> **Execution class: Coding agent executable.** Start after the P1B handoff and Terraform #21 closure exist.
 
 Terraform issue #22 is blocked by #21. Updating #22 is issue setup and does not commence implementation. Do not commence #22 until #21 lands, PS #147 has a permanent landed handoff, the P1B issue update is complete, and the implementation slot is free.
 
 #### 6.3.1 Terraform #22 update prompt
+
+> **Execution class: Coding agent executable.** Update the issue before implementation. This update does not start implementation.
 
 Replace the placeholders, then add or amend a `Starting point — reuse landed PSStyleGuide P1B` section in #22:
 
@@ -789,6 +942,8 @@ Terraform #21 is complete before Step 6 starts. After the issue update is comple
 
 ### 6.4 Complete the remaining known issues in order
 
+> **Execution class: Coding agent executable.** Start after the P1B/T1B cycle closes. Complete one numbered item at a time.
+
 After the P1B/T1B cycle closes:
 
 1. Verify the PS #148 issue record and the section 6.1 start gate. Then explicitly commence and land PS #148. Compare its affected role with TerraformStyleGuide. If the behavior is common and absent or weaker in Terraform, create one focused Terraform issue. Issue creation does not commence implementation. Explicitly commence its implementation only after the issue record is complete and the implementation slot is free, then close the reciprocal cycle. If Terraform is already equivalent, post a pinned no-change record. If the blank-line example is PowerShell-specific, post a pinned non-applicability record.
@@ -800,6 +955,8 @@ After the P1B/T1B cycle closes:
 PS #149 owns the PS Husky preparation mechanism and dependency/update-governance convergence. It must explicitly compare Terraform issue #24's current contract and the direct Terraform `prepare` command. Select one common mechanism unless a proved repository-specific need requires a difference.
 
 #### 6.4.1 Terraform #24 update prompt
+
+> **Execution class: Coding agent executable.** Update Terraform #24 only after PS #149 lands. This update does not start implementation.
 
 After PS #149 lands, replace the placeholders and update Terraform issue #24:
 
@@ -818,6 +975,8 @@ At explicit implementation start, keep the repository self-contained and do not 
 After any Terraform #151-equivalent PR lands, run the reverse PS comparison and any required sync-back cycle. Do not create a placeholder issue merely for symmetry.
 
 ### 6.5 Use the reusable paired-cycle prompt for future work
+
+> **Execution class: Coding agent executable.** Use this substep for one future common capability after the prior cycle closes.
 
 For each future capability that can apply to both repositories:
 
@@ -883,17 +1042,48 @@ Do not replace placeholders until the PS PR has landed. Never use a reviewed hea
 
 ## Step 7 — retain the independent residual policy
 
-Leave PS issues #155 and #156 open and independent.
+> **Execution class: Not executable.** This step is a parent container. Use substep 7.1 until a trigger permits substep 7.2.
 
-- Revisit #155 only if the candidate validator admits a competing writer, Windows PowerShell 5.1 support ends and a portable API becomes available, or a later step adopts a suitable native helper.
-- Pick up #156 opportunistically when the candidate files change or a suitable external runner becomes available.
-- If an item becomes mandatory, validate and record the trigger. Create a focused actionable issue and give that issue only its real dependencies. Issue creation does not commence implementation.
-- Explicitly commence the residual implementation only after its issue record is complete, the preceding fixed-point cycle is closed, and no feature implementation issue or PR is active. Run the repository review protocol and re-run it after every byte change. Land only after review covers the final bytes, and record the complete landed identity and validation evidence.
-- Do not change repository settings unless the applicable administrator issue authorizes the exact request.
-- If the residual changes a role that exists in both repositories, compare the landed result in the other repository. Create any reciprocal issue before implementation and commence it only when the implementation slot is free. Run the applicable review protocol and re-run it after every byte change. Land only after review covers the final bytes, run the reverse comparison, and close the cycle only when every common behavior is the same or has a proved intentional difference with equal security and failure strength.
-- Do not add #155 or #156 as blockers of the foundation umbrella, #152, #147, Terraform #21, or Terraform #22 without a new material trigger.
+### 7.1 Apply the residual trigger policy
+
+> **Execution class: Not executable.** This substep defines future triggers. Do not start implementation from this substep.
+
+Keep PS issues #155 and #156 open. Keep them independent.
+
+- Revisit #155 only if the candidate validator permits a competing writer.
+- Revisit #155 if Windows PowerShell 5.1 support ends and a portable API becomes available.
+- Revisit #155 if a later step adopts a suitable native helper.
+- Revisit #156 when the candidate files change.
+- Revisit #156 when a suitable external runner becomes available.
+
+Do not add #155 or #156 as a blocker without a new material trigger. This restriction applies to the foundation umbrella, #152, #147, Terraform #21, and Terraform #22.
+
+### 7.2 Close a triggered residual cycle
+
+> **Execution class: Coding agent executable.** Start only after substep 7.1 has a documented material trigger.
+
+1. Validate the trigger and record its evidence.
+2. Create one focused issue with only its real dependencies.
+3. Do not start implementation when you create the issue.
+4. Wait for the preceding fixed-point cycle to close.
+5. Verify that the implementation slot is free.
+6. Start only the focused residual issue.
+7. Run the repository review protocol after each byte change.
+8. Land only after the review covers the final bytes.
+9. Record the complete landed identity and validation evidence.
+10. Do not change repository settings without exact authorization in an applicable administrator issue.
+11. If the other repository has the same role, compare the landed result in that repository.
+12. Create a reciprocal issue before implementation when a common difference exists.
+13. Start the reciprocal issue only when the implementation slot is free.
+14. Run the applicable review protocol after each byte change.
+15. Land only after the review covers the final bytes.
+16. Run the reverse comparison.
+17. Close the cycle only when each common behavior is the same or has a proved intentional difference.
+18. For each intentional difference, prove equal security and failure strength.
 
 ## Step 8 — verify completion
+
+> **Execution class: Coding agent executable.** Run this audit after all applicable execution cycles close.
 
 This plan is complete only when all of the following are true:
 
