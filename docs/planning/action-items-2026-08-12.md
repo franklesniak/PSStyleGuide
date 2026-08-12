@@ -14,15 +14,15 @@ Issue creation, contract maintenance, dependency maintenance, and read-only comp
 
 - **Coding agent executable:** A coding agent can do the full task with the specified tools and authority. A stated human approval remains a required input.
 - **Human execution required:** A repository owner or administrator must make or approve the decision. A coding agent can prepare evidence or a draft. It cannot give the approval.
-- **Not executable:** The unit is a parent container, tracker, reference-only contract, sequence control, or inactive policy. Do not start implementation from this unit.
+- **Not executable — required control:** The unit is a parent container, not a standalone task. Do not skip it. Read its dependencies, then use its classified child steps.
 
-Apply the class at the lowest numbered level. A parent step is not executable when its numbered substeps contain the work.
+Apply the class at the lowest numbered level. A parent step is not executable when its numbered child steps contain the work.
 
-A `Not executable` tracker can receive evidence. The tracker update is an output of the executable task that produced the evidence.
+A tracker-maintenance step is coding-agent executable. It can record evidence and close the tracker. It does not authorize implementation.
 
 ## Verified baseline
 
-This state was verified at `2026-08-12T20:18:17Z`. Re-query GitHub and fetch both `origin/main` refs immediately before every issue edit, branch rewrite, merge, or settings change. If an identity or dependency has changed, stop and refresh the affected comparison.
+This state was verified at `2026-08-12T20:36:11Z`. Re-query GitHub and fetch both `origin/main` refs immediately before every issue edit, branch rewrite, merge, or settings change. If an identity or dependency has changed, stop and refresh the affected comparison.
 
 ### Completed coordination work
 
@@ -88,7 +88,14 @@ The material common-foundation differences are:
 
 ## Step 1 — protect the advisory deadline
 
-> **Execution class: Not executable.** This step is a parent container. Use substeps 1.1–1.3.
+> **Execution class: Not executable — required control.** This parent step has no standalone action. Do not skip it.
+
+### Dependencies
+
+- Upstream dependency: None.
+- Parallel work: Steps 2–6 can continue before the checkpoint.
+- Child order: Complete substep 1.1 before substep 1.2.
+- Fallback gate: Use substep 1.3 only if substep 1.2 approves the superseding-decision task.
 
 The PS P1 advisory decision expires at `2026-08-30T23:59:59Z`. PS issue #149 requires four landed handoffs before implementation. These handoffs are P1, P1A, P1B, and P2.
 
@@ -132,7 +139,14 @@ Run Step 1 at the same time as Steps 2–6. A status check or dependency edit do
 
 ## Step 2 — prepare and maintain convergence issues
 
-> **Execution class: Not executable.** This step is a parent container. Use only its classified substeps.
+> **Execution class: Not executable — required control.** This parent step controls issue preparation. Do not skip it or start implementation from it.
+
+### Dependencies
+
+- Upstream dependency: None.
+- Freshness dependency: Re-query the verified baseline before each issue write.
+- Parallel work: Step 2 can run with Step 1 and permitted read-only work.
+- Implementation gate: Use the applicable Step 3, Step 4, or Step 6 start gate.
 
 Use Step 2 to prepare issue records, dependencies, trackers, and implementation contracts. Step 2 does not start implementation. Do not create a feature branch from an issue contract. Do not edit implementation files from an issue contract. Do not open an implementation PR because an issue is ready. Start implementation only at the applicable gate in Step 3, Step 4, or Step 6. Use native dependencies only for real completion prerequisites. A tracking umbrella can list children without blocking unrelated work.
 
@@ -140,9 +154,23 @@ Before posting any issue body or comment, replace every placeholder with a verif
 
 ### 2.1 PS foundation-convergence umbrella
 
-> **Execution class: Not executable.** This issue is a tracker. Update it only with evidence from its executable child cycles.
+> **Execution class: Coding agent executable.** Maintain the tracker with landed cycle evidence. Do not start implementation from the tracker.
 
-[PS issue #159](https://github.com/franklesniak/PSStyleGuide/issues/159) is open. Its creation and native child links are complete. Do not start a branch or PR from this issue. Re-query the live issue before each update. Use the retained contract to control scope and record closure evidence.
+#### Dependencies
+
+- Initial maintenance dependency: None. The issue and its four native child links exist.
+- Update dependency: Each update requires evidence from the applicable Step 3 cycle.
+- Interim-handoff dependency: Step 3 cycles 1–3 must reach their fixed points.
+- Closure dependency: Step 3 cycles 1–4 and all reciprocal work must close.
+
+#### Maintenance actions
+
+1. Re-query the live issue before each write.
+2. Add each child cycle's landed identities and reciprocal closure evidence.
+3. Post the interim core-foundation handoff after cycles 1–3 close.
+4. Close the umbrella only after cycle 4 and all four child issues close.
+
+[PS issue #159](https://github.com/franklesniak/PSStyleGuide/issues/159) is open. Its creation and native child links are complete. Use the retained contract to control scope and record closure evidence.
 
 ```markdown
 ## Objective
@@ -472,9 +500,22 @@ Keep this issue and PR separate from the foundation, supply-freeze, and infrastr
 
 ### 2.7 Terraform convergence tracker
 
-> **Execution class: Not executable.** This issue is a tracker. Update it only with evidence from the five executable cycles.
+> **Execution class: Coding agent executable.** Maintain the tracker with landed cycle evidence. Do not start implementation from the tracker.
 
-[Terraform issue #31](https://github.com/franklesniak/TerraformStyleGuide/issues/31) is open. Tracker creation is complete. All five reciprocal cycle records remain open. Do not start a branch or PR from this issue. Update it only after an applicable cycle produces evidence. Use this contract to close the tracker:
+#### Dependencies
+
+- Initial maintenance dependency: None. Terraform issue #31 exists.
+- Update dependency: Each update requires evidence from the applicable Step 3 cycle.
+- Closure dependency: All five Step 3 cycles and their reciprocal work must close.
+
+#### Maintenance actions
+
+1. Re-query Terraform issue #31 before each write.
+2. Record each cycle's issues, PRs, landed identities, matrices, validation, and closure result.
+3. Link each focused Terraform repair issue and PR.
+4. Close the tracker only after all five cycles close.
+
+[Terraform issue #31](https://github.com/franklesniak/TerraformStyleGuide/issues/31) is open. Tracker creation is complete. All five reciprocal cycle records remain open. Use this contract to close the tracker:
 
 ```markdown
 ## Objective
@@ -505,7 +546,15 @@ If a comparison finds no common difference, post a pinned no-change record. If i
 
 ## Step 3 — import Terraform behavior into PSStyleGuide
 
-> **Execution class: Not executable.** This step is a parent container. Use substep 3.1, then use substeps 3.2–3.4.
+> **Execution class: Not executable — required control.** This parent step controls the five initial PS import cycles. Do not skip it.
+
+### Dependencies
+
+- Contract dependency: Complete the applicable Step 2 issue contract before each cycle starts.
+- Slot dependency: No other feature implementation issue or PR can be active.
+- Cycle 1 status: Draft PS PR #164 has already started cycle 1.
+- Later-cycle dependency: Close the prior cycle at a fixed point before the next cycle starts.
+- Parallel work: Step 1 can continue. It is not a Step 3 dependency.
 
 ### 3.1 Select and complete the source cycles in order
 
@@ -656,7 +705,15 @@ Close the cycle only when every common row is `same`, every intentional differen
 
 ## Step 4 — catch TerraformStyleGuide up from landed PS work
 
-> **Execution class: Not executable.** This step is a parent container. Use substeps 4.1 and 4.2 after Step 3 closes.
+> **Execution class: Not executable — required control.** This parent step controls the Terraform catch-up pass. Do not skip it.
+
+### Dependencies
+
+- Upstream dependency: All five Step 3 cycles must have permanent fixed-point closure records.
+- Source dependency: Terraform issue #21 must retain the landed PS PR #153 commit and blobs.
+- Baseline dependency: Rebase only the Terraform destination assumptions on the final Step 3 Terraform baseline.
+- Slot dependency: No feature implementation issue or PR can be active when Step 4 starts.
+- Parallel work: Step 1 can continue. It is not a Step 4 dependency.
 
 ### 4.1 Commence Terraform issue #21 and close the reciprocal cycle
 
@@ -738,7 +795,14 @@ If the same matrix row changes direction twice, stop and run a new decision proc
 
 ## Step 5 — run the global consistency sweep
 
-> **Execution class: Not executable.** This step is a parent container. Use substep 5.1 after Step 4 closes.
+> **Execution class: Not executable — required control.** This parent step controls the global consistency sweep. Do not skip it.
+
+### Dependencies
+
+- Upstream dependency: Step 4 must reach a fixed point.
+- Baseline dependency: Fetch both current `main` commits and trees before the sweep.
+- Analysis dependency: Complete the read-only inventory before any repair starts.
+- Repair-slot dependency: No other feature implementation issue or PR can be active when a repair starts.
 
 ### 5.1 Find and close untracked differences
 
@@ -796,7 +860,15 @@ Finish only when every inventoried role has an owner and disposition, all repair
 
 ## Step 6 — use PSStyleGuide-first paired cycles
 
-> **Execution class: Not executable.** This step is a parent container. Use its classified substeps after Step 5 closes.
+> **Execution class: Not executable — required control.** This parent step controls PSStyleGuide-first steady-state work. Do not skip it.
+
+### Dependencies
+
+- Upstream dependency: Step 5 must close with zero untracked blockers.
+- Cycle dependency: The prior paired cycle must have a permanent fixed-point closure record.
+- Source dependency: Each Terraform adaptation requires a landed PS commit, blobs, and handoff.
+- Slot dependency: Only one feature implementation issue or PR can be active.
+- Deadline dependency: Resolve Step 1.2 before the PS #149 cycle starts.
 
 After the global sweep closes, Step 6 controls each new common capability. Implement the capability in PSStyleGuide first. Create or update the Terraform issue from the landed PS handoff. Then implement the TerraformStyleGuide adaptation. Compare the TerraformStyleGuide result back in PSStyleGuide. Sync back each common improvement.
 
@@ -850,7 +922,15 @@ Each row occurs exactly once. Record both repository URLs and commits, normative
 
 ### 6.2 Complete PS P1B and the protection interlock
 
-> **Execution class: Not executable.** This substep is a parent container. Use substeps 6.2.1–6.2.3 in order.
+> **Execution class: Not executable — required control.** This parent substep controls the P1B protection interlock. Do not skip it.
+
+#### Dependencies
+
+- Upstream dependency: Steps 3–5 must be complete.
+- Cycle dependency: Apply the Step 6.1 paired-cycle controls.
+- Slot dependency: No feature implementation issue or PR can be active when #147 starts.
+- Human-decision dependency: Complete substep 6.2.2 before effective write access or settings changes.
+- Child order: Complete substeps 6.2.1, 6.2.2, and 6.2.3 in order.
 
 The first Step 6 capability is PS P1B. Steps 3–5 must be complete. Treat PS #147 and PS #152 as one interlocked capability cycle. Settings work under #152 can overlap read-only preparation for #147. It does not permit a second feature implementation PR.
 
@@ -1042,11 +1122,32 @@ Do not replace placeholders until the PS PR has landed. Never use a reviewed hea
 
 ## Step 7 — retain the independent residual policy
 
-> **Execution class: Not executable.** This step is a parent container. Use substep 7.1 until a trigger permits substep 7.2.
+> **Execution class: Not executable — required control.** This parent step controls independent residual work. Do not skip it.
 
-### 7.1 Apply the residual trigger policy
+### Dependencies
 
-> **Execution class: Not executable.** This substep defines future triggers. Do not start implementation from this substep.
+- Trigger-check dependency: None. A coding agent can run substep 7.1 at any time.
+- Implementation dependency: Substep 7.2 requires a documented material trigger from substep 7.1.
+- Cycle dependency: The preceding fixed-point cycle must close before residual implementation starts.
+- Slot dependency: No feature implementation issue or PR can be active when residual implementation starts.
+
+### 7.1 Check the residual triggers
+
+> **Execution class: Coding agent executable.** Check each trigger and record the result. This check does not start implementation.
+
+#### Dependencies
+
+- Upstream dependency: None.
+- Freshness dependency: Re-run the check when a candidate file, supported host, native helper, or external runner changes.
+
+#### Trigger-check actions
+
+1. Re-query the current issue, repository, host, helper, and runner evidence.
+2. Classify each trigger as `present` or `absent`.
+3. If all triggers are absent, record a dated no-trigger result and stop.
+4. If a trigger is present, record its evidence and the affected issue.
+5. Do not start residual implementation from this check.
+6. Use substep 7.2 only after a material trigger is documented.
 
 Keep PS issues #155 and #156 open. Keep them independent.
 
