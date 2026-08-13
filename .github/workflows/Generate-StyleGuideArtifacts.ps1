@@ -10,23 +10,68 @@ fixed destination. Serialization is UTF-8 without a BOM and normalizes CRLF
 and lone CR to LF at the final payload boundary.
 
 .NOTES
-Version: 1.0.20260801.1
+Version: 1.0.20260813.0
 #>
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:GeneratorVersion = '1.0.20260801.1'
-$script:GeneratorResultSchema = 'PSStyleGuide.GeneratorResult.v1'
-$script:Utf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
-$script:Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-$script:PathComparison = if ($env:OS -eq 'Windows_NT') {
+$script:strGeneratorVersion = '1.0.20260813.0'
+$script:strGeneratorResultSchema = 'PSStyleGuide.GeneratorResult.v1'
+$script:objUtf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
+$script:objUtf8NoBom = New-Object System.Text.UTF8Encoding($false)
+$script:objPathComparison = if ($env:OS -eq 'Windows_NT') {
     [System.StringComparison]::OrdinalIgnoreCase
 } else {
     [System.StringComparison]::Ordinal
 }
 
 function Get-ScriptVersionRecord {
+    # .SYNOPSIS
+    # Validates and parses the script's canonical version marker.
+    #
+    # .DESCRIPTION
+    # Locates the only pre-function .NOTES block and the only Version marker,
+    # validates its four numeric components and build date, requires it to equal
+    # the expected version, and returns the parsed version fields.
+    #
+    # .PARAMETER ScriptText
+    # Complete text of the script whose version marker is validated.
+    #
+    # .PARAMETER ExpectedVersion
+    # Exact canonical four-component version that the marker must contain.
+    #
+    # .EXAMPLE
+    # $hashtableVersion = Get-ScriptVersionRecord -ScriptText $strScriptText -ExpectedVersion '1.0.20000229.0'
+    #
+    # # Returns the validated version fields when the marker is canonical and equal.
+    #
+    # .EXAMPLE
+    # Get-ScriptVersionRecord -ScriptText $strScriptText -ExpectedVersion '1.0.20000229.1'
+    #
+    # # Throws 'unexpected-version' when the canonical marker does not equal the expected value.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Collections.Specialized.OrderedDictionary. Contains Version, Major,
+    # Minor, BuildDate, and Revision. Throws 'invalid-version' for malformed or
+    # ambiguous metadata and 'unexpected-version' for an expected-value mismatch.
+    # Parameter-binding and underlying regex or allocation failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: ScriptText
+    #   Position 1: ExpectedVersion
     param (
         [Parameter(Mandatory = $true)]
         [string]$ScriptText,
@@ -109,6 +154,42 @@ function Get-ScriptVersionRecord {
 }
 
 function Test-ScriptVersionParser {
+    # .SYNOPSIS
+    # Exercises the script-version parser against fixed acceptance fixtures.
+    #
+    # .DESCRIPTION
+    # Confirms one leap-day version is accepted, a version mismatch is
+    # categorized as unexpected, and malformed, duplicate, overflow, misplaced,
+    # and non-date markers are rejected as invalid.
+    #
+    # .EXAMPLE
+    # Test-ScriptVersionParser
+    #
+    # # Produces no output when every acceptance and rejection fixture behaves as expected.
+    #
+    # .EXAMPLE
+    # [void](Test-ScriptVersionParser)
+    #
+    # # Re-runs the fixed parser self-test and discards its intentionally empty output.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # None. Throws 'version-fixture-failure' when a mismatched or invalid fixture
+    # is unexpectedly accepted and reaches its explicit sentinel. A valid-fixture
+    # rejection, a wrong rejection category, and other parser exceptions propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function declares no parameters.
+    param ()
+
     $strValid = "<#`n.NOTES`nVersion: 1.0.20000229.0`n#>`nfunction Test-Fixture {}`n"
     $arrInvalid = @(
         "<#`n.NOTES`n#>`nfunction Test-Fixture {}`n",
@@ -142,6 +223,44 @@ function Test-ScriptVersionParser {
 }
 
 function ConvertTo-LowerHex {
+    # .SYNOPSIS
+    # Converts bytes to lowercase hexadecimal text.
+    #
+    # .DESCRIPTION
+    # Formats every byte as two hexadecimal digits, removes the separators that
+    # BitConverter inserts, and normalizes the result to lowercase.
+    #
+    # .PARAMETER Bytes
+    # Byte sequence to encode as hexadecimal text.
+    #
+    # .EXAMPLE
+    # $strHex = ConvertTo-LowerHex -Bytes ([byte[]](0, 15, 255))
+    #
+    # # $strHex is '000fff'.
+    #
+    # .EXAMPLE
+    # $strHex = ConvertTo-LowerHex -Bytes ([byte[]](16, 32))
+    #
+    # # $strHex is '1020'.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.String. Lowercase hexadecimal text with no separators. Parameter
+    # binding or underlying .NET formatting failures are propagated.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: Bytes
     param (
         [Parameter(Mandatory = $true)]
         [byte[]]$Bytes
@@ -151,6 +270,46 @@ function ConvertTo-LowerHex {
 }
 
 function Get-Sha256Hex {
+    # .SYNOPSIS
+    # Computes the SHA-256 digest of a byte sequence.
+    #
+    # .DESCRIPTION
+    # Hashes the complete input byte sequence and returns its digest as exactly
+    # 64 lowercase hexadecimal characters without separators.
+    #
+    # .PARAMETER Bytes
+    # Byte sequence to hash.
+    #
+    # .EXAMPLE
+    # $strDigest = Get-Sha256Hex -Bytes ([byte[]](0))
+    #
+    # # Returns the SHA-256 digest of the one-byte sequence.
+    #
+    # .EXAMPLE
+    # $strDigest = Get-Sha256Hex -Bytes ([System.Text.Encoding]::UTF8.GetBytes('content'))
+    #
+    # # Returns the lowercase SHA-256 digest of the UTF-8 bytes.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.String. A 64-character lowercase SHA-256 digest. After provider
+    # creation, hashing and formatting failures propagate after it is disposed.
+    # Provider-creation failures propagate before the protected block, and
+    # parameter-binding failures propagate before the function body runs.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: Bytes
     param (
         [Parameter(Mandatory = $true)]
         [byte[]]$Bytes
@@ -165,6 +324,47 @@ function Get-Sha256Hex {
 }
 
 function Get-FileSha256Hex {
+    # .SYNOPSIS
+    # Computes the SHA-256 digest of a file.
+    #
+    # .DESCRIPTION
+    # Opens the literal file path for shared reading, hashes the complete stream,
+    # and returns the digest as lowercase hexadecimal text. Once the stream and
+    # hash provider are both created, the finally block disposes both resources.
+    #
+    # .PARAMETER LiteralPath
+    # Literal path of the file to hash. Wildcards are not expanded.
+    #
+    # .EXAMPLE
+    # $strDigest = Get-FileSha256Hex -LiteralPath './STYLE_GUIDE.md'
+    #
+    # # Returns the lowercase SHA-256 digest of the file bytes.
+    #
+    # .EXAMPLE
+    # Get-FileSha256Hex -LiteralPath '.\missing-file'
+    #
+    # # Throws the underlying file-open exception when the file is unavailable.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.String. A 64-character lowercase SHA-256 digest. File-open and
+    # provider-creation failures propagate before protected hashing begins. Read
+    # and hashing failures propagate after both created resources are disposed;
+    # parameter-binding failures propagate before the function body runs.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: LiteralPath
     param (
         [Parameter(Mandatory = $true)]
         [string]$LiteralPath
@@ -186,6 +386,46 @@ function Get-FileSha256Hex {
 }
 
 function Test-PathTextIsSafe {
+    # .SYNOPSIS
+    # Tests whether path text is an acceptable absolute literal path.
+    #
+    # .DESCRIPTION
+    # Rejects null, empty, whitespace-only, control-bearing, wildcard-bearing,
+    # provider-qualified, relative, and drive-relative path text. The test is
+    # lexical and does not access the filesystem.
+    #
+    # .PARAMETER RawPath
+    # Path text to test. Null is accepted as input and returns false.
+    #
+    # .EXAMPLE
+    # $boolSafe = Test-PathTextIsSafe -RawPath ([System.IO.Path]::GetFullPath('.'))
+    #
+    # # $boolSafe is true for an ordinary absolute path string.
+    #
+    # .EXAMPLE
+    # $boolSafe = Test-PathTextIsSafe -RawPath '..\relative'
+    #
+    # # $boolSafe is false because the path is not rooted.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Boolean. True only when the supplied text passes every lexical
+    # safety check; otherwise false. Parameter-binding or platform path-parser
+    # failures are propagated.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: RawPath
     param (
         [AllowNull()]
         [string]$RawPath
@@ -214,6 +454,51 @@ function Test-PathTextIsSafe {
 }
 
 function Assert-OrdinaryPathComponent {
+    # .SYNOPSIS
+    # Asserts that one path component has the required ordinary filesystem type.
+    #
+    # .DESCRIPTION
+    # Requires the literal path to exist, rejects reparse points, and requires
+    # its directory attribute to agree with the requested Directory or File type.
+    #
+    # .PARAMETER LiteralPath
+    # Literal filesystem path to inspect. Wildcards are not expanded.
+    #
+    # .PARAMETER ExpectedType
+    # Required component type: Directory or File.
+    #
+    # .EXAMPLE
+    # Assert-OrdinaryPathComponent -LiteralPath $strRoot -ExpectedType Directory
+    #
+    # # Produces no output when the path is an ordinary directory.
+    #
+    # .EXAMPLE
+    # Assert-OrdinaryPathComponent -LiteralPath $strLink -ExpectedType File
+    #
+    # # Throws 'reparse-path' when the component is a reparse point.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # None. Throws 'missing-path' when both existence probes return false,
+    # including when those APIs absorb an access or filesystem error. Throws
+    # 'reparse-path' or 'nonordinary-path' for later assertion failures. Metadata
+    # and access exceptions raised after existence is established are propagated;
+    # parameter-binding failures occur before the function body runs.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: LiteralPath
+    #   Position 1: ExpectedType
     param (
         [Parameter(Mandatory = $true)]
         [string]$LiteralPath,
@@ -240,6 +525,50 @@ function Assert-OrdinaryPathComponent {
 }
 
 function Assert-OrdinaryAbsolutePath {
+    # .SYNOPSIS
+    # Resolves and validates an absolute ordinary filesystem path.
+    #
+    # .DESCRIPTION
+    # Applies the lexical path-safety check, normalizes the path to a full path,
+    # and validates the leaf and every ancestor as non-reparse ordinary filesystem
+    # objects of the required types.
+    #
+    # .PARAMETER LiteralPath
+    # Absolute literal path to normalize and validate.
+    #
+    # .PARAMETER ExpectedLeafType
+    # Required type of the leaf path: Directory or File.
+    #
+    # .EXAMPLE
+    # $strRoot = Assert-OrdinaryAbsolutePath -LiteralPath $strCandidate -ExpectedLeafType Directory
+    #
+    # # Returns the normalized full path after validating the directory and its ancestors.
+    #
+    # .EXAMPLE
+    # Assert-OrdinaryAbsolutePath -LiteralPath '..\relative' -ExpectedLeafType File
+    #
+    # # Throws 'invalid-path' because the supplied text is not an absolute safe path.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.String. The normalized full path. Throws 'invalid-path' or a failure
+    # from Assert-OrdinaryPathComponent; parameter-binding and path-normalization
+    # failures are propagated.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: LiteralPath
+    #   Position 1: ExpectedLeafType
     param (
         [Parameter(Mandatory = $true)]
         [string]$LiteralPath,
@@ -277,6 +606,49 @@ function Assert-OrdinaryAbsolutePath {
 }
 
 function Test-PathContainedByRoot {
+    # .SYNOPSIS
+    # Tests whether a candidate path is lexically below a root path.
+    #
+    # .DESCRIPTION
+    # Appends one directory separator to the trimmed root and compares the
+    # candidate prefix with the platform-specific ordinal path comparison. The
+    # root itself is not considered contained by this test.
+    #
+    # .PARAMETER Root
+    # Normalized absolute root path that defines the containment boundary.
+    #
+    # .PARAMETER Candidate
+    # Normalized absolute candidate path to compare with the root boundary.
+    #
+    # .EXAMPLE
+    # $boolContained = Test-PathContainedByRoot -Root $strRoot -Candidate (Join-Path $strRoot 'file.md')
+    #
+    # # $boolContained is true for a lexical descendant of the root.
+    #
+    # .EXAMPLE
+    # $boolContained = Test-PathContainedByRoot -Root $strRoot -Candidate $strRoot
+    #
+    # # $boolContained is false because the root path is not its own descendant.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Boolean. True for a lexical descendant and false otherwise. String
+    # operation or parameter-binding failures are propagated.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: Root
+    #   Position 1: Candidate
     param (
         [Parameter(Mandatory = $true)]
         [string]$Root,
@@ -290,10 +662,46 @@ function Test-PathContainedByRoot {
         [System.IO.Path]::AltDirectorySeparatorChar
     ) + [System.IO.Path]::DirectorySeparatorChar
 
-    return $Candidate.StartsWith($strRootWithSeparator, $script:PathComparison)
+    return $Candidate.StartsWith($strRootWithSeparator, $script:objPathComparison)
 }
 
 function Initialize-WindowsFileIdentityType {
+    # .SYNOPSIS
+    # Loads the Windows ordinary-file identity helper type when required.
+    #
+    # .DESCRIPTION
+    # On Windows, compiles the PSStyleGuide.NativeFileIdentity type once. The
+    # type reads volume and file-index identity from an open handle and rejects
+    # files whose hard-link count is not exactly one. Other platforms are no-ops.
+    #
+    # .EXAMPLE
+    # Initialize-WindowsFileIdentityType
+    #
+    # # Loads the helper on Windows or returns without output on another platform.
+    #
+    # .EXAMPLE
+    # Initialize-WindowsFileIdentityType
+    # Initialize-WindowsFileIdentityType
+    #
+    # # The second call returns without recompiling an already loaded type.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # None. Add-Type compilation and type-loading failures are propagated on
+    # Windows. Non-Windows and already-initialized calls return without failure.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function declares no parameters.
+    param ()
+
     if ($env:OS -ne 'Windows_NT' -or ('PSStyleGuide.NativeFileIdentity' -as [type])) {
         return
     }
@@ -344,6 +752,48 @@ namespace PSStyleGuide {
 }
 
 function Get-OrdinaryFileIdentity {
+    # .SYNOPSIS
+    # Gets the stable ordinary-file identity of a literal path.
+    #
+    # .DESCRIPTION
+    # Reads the Windows volume serial and file index or the Unix device and inode
+    # from the supplied file. Both implementations require exactly one hard link
+    # so aliases cannot pass as distinct ordinary files.
+    #
+    # .PARAMETER LiteralPath
+    # Literal path of the ordinary file whose identity is required.
+    #
+    # .EXAMPLE
+    # $strIdentity = Get-OrdinaryFileIdentity -LiteralPath './STYLE_GUIDE.md'
+    #
+    # # Returns a platform-specific stable identity string for the file.
+    #
+    # .EXAMPLE
+    # Get-OrdinaryFileIdentity -LiteralPath $strHardLink
+    #
+    # # Throws 'hardlink-alias' when the file has more than one hard link.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.String. Windows returns volume:file-index text; Unix returns
+    # device:inode text. Throws 'identity-failure' for a nonzero Unix stat exit,
+    # unexpected output cardinality, or malformed output, and 'hardlink-alias'
+    # for a non-unique link count. Parameter-binding, native invocation, and
+    # identity-read failures that prevent those Unix checks from running propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: LiteralPath
     param (
         [Parameter(Mandatory = $true)]
         [string]$LiteralPath
@@ -367,6 +817,50 @@ function Get-OrdinaryFileIdentity {
 }
 
 function Assert-TrackedFile {
+    # .SYNOPSIS
+    # Asserts that one exact repository path is tracked by Git.
+    #
+    # .DESCRIPTION
+    # Resolves the Git application and runs ls-files with error-on-unmatched-path.
+    # The assertion succeeds only when Git returns exactly one case-sensitive path
+    # equal to the supplied repository-relative path.
+    #
+    # .PARAMETER RepositoryRoot
+    # Absolute worktree root in which Git is invoked.
+    #
+    # .PARAMETER RepositoryPath
+    # Canonical repository-relative path that must be tracked exactly once.
+    #
+    # .EXAMPLE
+    # Assert-TrackedFile -RepositoryRoot $strRoot -RepositoryPath 'STYLE_GUIDE.md'
+    #
+    # # Produces no output when Git reports the exact tracked path.
+    #
+    # .EXAMPLE
+    # Assert-TrackedFile -RepositoryRoot $strRoot -RepositoryPath 'missing.md'
+    #
+    # # Throws 'untracked-destination' when Git does not report exactly that path.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # None. Throws 'untracked-destination' for a nonzero Git result, unexpected
+    # cardinality, or case mismatch. Parameter-binding, Git discovery, and native
+    # invocation failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: RepositoryRoot
+    #   Position 1: RepositoryPath
     param (
         [Parameter(Mandatory = $true)]
         [string]$RepositoryRoot,
@@ -385,6 +879,45 @@ function Assert-TrackedFile {
 }
 
 function ConvertFrom-StrictUtf8 {
+    # .SYNOPSIS
+    # Decodes BOM-free bytes as strict UTF-8 text.
+    #
+    # .DESCRIPTION
+    # Rejects the UTF-8 byte-order mark and decodes the complete byte sequence
+    # with the script's exception-throwing UTF-8 decoder.
+    #
+    # .PARAMETER Bytes
+    # Complete byte sequence to decode.
+    #
+    # .EXAMPLE
+    # $strText = ConvertFrom-StrictUtf8 -Bytes ([System.Text.Encoding]::UTF8.GetBytes('text'))
+    #
+    # # $strText is 'text'.
+    #
+    # .EXAMPLE
+    # ConvertFrom-StrictUtf8 -Bytes ([byte[]](0xEF, 0xBB, 0xBF, 0x41))
+    #
+    # # Throws 'utf8-bom' because a byte-order mark is forbidden.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.String. Strictly decoded UTF-8 text. Throws 'utf8-bom' for a BOM and
+    # propagates DecoderFallbackException for malformed UTF-8. Parameter-binding
+    # failures occur before the function body runs.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: Bytes
     param (
         [Parameter(Mandatory = $true)]
         [byte[]]$Bytes
@@ -393,10 +926,49 @@ function ConvertFrom-StrictUtf8 {
     if ($Bytes.Length -ge 3 -and $Bytes[0] -eq 0xEF -and $Bytes[1] -eq 0xBB -and $Bytes[2] -eq 0xBF) {
         throw "utf8-bom"
     }
-    return $script:Utf8Strict.GetString($Bytes)
+    return $script:objUtf8Strict.GetString($Bytes)
 }
 
 function ConvertTo-NormalizedUtf8 {
+    # .SYNOPSIS
+    # Serializes complete payload text as normalized BOM-free UTF-8 bytes.
+    #
+    # .DESCRIPTION
+    # Converts CRLF and lone CR line endings to LF in memory, then encodes the
+    # complete resulting text with the script's UTF-8-without-BOM encoder.
+    #
+    # .PARAMETER CompleteFinalPayload
+    # Complete final payload text to normalize and encode. An empty string is allowed.
+    #
+    # .EXAMPLE
+    # $arrBytes = @(ConvertTo-NormalizedUtf8 -CompleteFinalPayload "a`r`nb`r")
+    #
+    # # Contains one System.Byte success-stream object per UTF-8 byte for "a`nb`n".
+    #
+    # .EXAMPLE
+    # $arrBytes = @(ConvertTo-NormalizedUtf8 -CompleteFinalPayload '')
+    #
+    # # $arrBytes.Count is 0 because an empty payload emits no success-stream objects.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Byte success-stream objects, one per normalized LF-only UTF-8 byte
+    # without a BOM; an empty payload emits no output. String replacement,
+    # encoding, and parameter-binding failures are propagated.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: CompleteFinalPayload
     param (
         [Parameter(Mandatory = $true)]
         [AllowEmptyString()]
@@ -404,10 +976,53 @@ function ConvertTo-NormalizedUtf8 {
     )
 
     $strNormalizedContent = $CompleteFinalPayload -replace "`r`n?", "`n"
-    return $script:Utf8NoBom.GetBytes($strNormalizedContent)
+    return $script:objUtf8NoBom.GetBytes($strNormalizedContent)
 }
 
 function New-CopilotPayload {
+    # .SYNOPSIS
+    # Builds the repository Copilot-instructions payload.
+    #
+    # .DESCRIPTION
+    # Returns the complete normative guide content unchanged for use as the
+    # repository's root Copilot instruction artifact.
+    #
+    # .PARAMETER GuideContent
+    # Complete decoded normative style-guide text.
+    #
+    # .EXAMPLE
+    # $strPayload = New-CopilotPayload -GuideContent $strGuideContent
+    #
+    # # Returns the supplied guide content unchanged.
+    #
+    # .EXAMPLE
+    # $strPayload = New-CopilotPayload -GuideContent 'guide'
+    #
+    # # $strPayload is 'guide'.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.String. The exact GuideContent value. Parameter-binding failures are
+    # propagated; the function defines no categorized runtime failure.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: GuideContent
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseShouldProcessForStateChangingFunctions',
+        '',
+        Justification = 'Builds an in-memory value and changes no system state; ShouldProcess does not apply.'
+    )]
     param (
         [Parameter(Mandatory = $true)]
         [string]$GuideContent
@@ -417,6 +1032,49 @@ function New-CopilotPayload {
 }
 
 function New-PowerShellInstructionsPayload {
+    # .SYNOPSIS
+    # Builds the scoped PowerShell-instructions payload.
+    #
+    # .DESCRIPTION
+    # Prefixes the complete normative guide content with the fixed YAML
+    # frontmatter that scopes the generated instructions to PowerShell scripts.
+    #
+    # .PARAMETER GuideContent
+    # Complete decoded normative style-guide text.
+    #
+    # .EXAMPLE
+    # $strPayload = New-PowerShellInstructionsPayload -GuideContent $strGuideContent
+    #
+    # # Returns the fixed frontmatter followed by the complete guide content.
+    #
+    # .EXAMPLE
+    # $strPayload = New-PowerShellInstructionsPayload -GuideContent 'guide'
+    #
+    # # The payload ends with the supplied text 'guide'.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.String. The fixed instruction frontmatter and GuideContent.
+    # Parameter-binding and string-construction failures are propagated.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: GuideContent
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseShouldProcessForStateChangingFunctions',
+        '',
+        Justification = 'Builds an in-memory value and changes no system state; ShouldProcess does not apply.'
+    )]
     param (
         [Parameter(Mandatory = $true)]
         [string]$GuideContent
@@ -434,6 +1092,51 @@ function New-PowerShellInstructionsPayload {
 }
 
 function New-ChatPayload {
+    # .SYNOPSIS
+    # Builds the copy-and-paste chat payload around the normative guide.
+    #
+    # .DESCRIPTION
+    # Removes one trailing LF or CRLF sequence, finds the longest backtick run
+    # in the guide, selects a longer outer Markdown fence with a minimum length
+    # of four, and wraps the guide with the fixed chat-artifact heading and
+    # language tag.
+    #
+    # .PARAMETER GuideContent
+    # Complete decoded normative style-guide text to place inside the outer fence.
+    #
+    # .EXAMPLE
+    # $strPayload = New-ChatPayload -GuideContent $strGuideContent
+    #
+    # # Returns the heading and safely fenced complete guide.
+    #
+    # .EXAMPLE
+    # $strPayload = New-ChatPayload -GuideContent ('text with ```` backticks' + "`n")
+    #
+    # # Uses an outer fence longer than the four-backtick run in the content.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.String. A newline-terminated Markdown chat payload. Regular-expression,
+    # string-construction, and parameter-binding failures are propagated.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: GuideContent
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseShouldProcessForStateChangingFunctions',
+        '',
+        Justification = 'Builds an in-memory value and changes no system state; ShouldProcess does not apply.'
+    )]
     param (
         [Parameter(Mandatory = $true)]
         [string]$GuideContent
@@ -454,6 +1157,56 @@ function New-ChatPayload {
 }
 
 function New-FullPayload {
+    # .SYNOPSIS
+    # Builds the full style guide by combining normative and rationale content.
+    #
+    # .DESCRIPTION
+    # Indexes rationale sections by normalized heading anchors, removes
+    # repository-only cross-references and boundary markers, injects matching
+    # rationale at explicit markers and headings, and normalizes excess blank lines.
+    #
+    # .PARAMETER GuideContent
+    # Complete decoded normative style-guide text that defines output ordering.
+    #
+    # .PARAMETER RationaleContent
+    # Complete decoded rationale text whose indexed sections are injected.
+    #
+    # .EXAMPLE
+    # $strFull = New-FullPayload -GuideContent $strGuideContent -RationaleContent $strRationaleContent
+    #
+    # # Returns the combined newline-terminated full style guide.
+    #
+    # .EXAMPLE
+    # New-FullPayload -GuideContent '<!-- rationale-anchor: absent -->' -RationaleContent '## Other'
+    #
+    # # Throws 'missing-rationale-anchor' for an explicit marker without a matching section.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.String. The combined full-guide payload with LF-oriented text and one
+    # final LF. Throws 'missing-rationale-anchor' for an unresolved explicit
+    # rationale marker; parameter-binding, regex, collection, and string-operation
+    # failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: GuideContent
+    #   Position 1: RationaleContent
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseShouldProcessForStateChangingFunctions',
+        '',
+        Justification = 'Builds an in-memory value and changes no system state; ShouldProcess does not apply.'
+    )]
     param (
         [Parameter(Mandatory = $true)]
         [string]$GuideContent,
@@ -584,7 +1337,58 @@ function New-FullPayload {
     return $strOutput.TrimEnd("`n") + "`n"
 }
 
-function New-StyleGuidePayloads {
+function New-StyleGuidePayloadMap {
+    # .SYNOPSIS
+    # Builds all four serialized style-guide payloads in memory.
+    #
+    # .DESCRIPTION
+    # Strictly decodes the two source byte sequences, constructs the Copilot,
+    # PowerShell-instructions, chat, and full text payloads, normalizes each to
+    # BOM-free LF-only UTF-8 bytes, and verifies the serialization invariants.
+    #
+    # .PARAMETER GuideBytes
+    # Complete BOM-free UTF-8 bytes of the normative style guide.
+    #
+    # .PARAMETER RationaleBytes
+    # Complete BOM-free UTF-8 bytes of the style-guide rationale.
+    #
+    # .EXAMPLE
+    # $hashtablePayload = New-StyleGuidePayloadMap -GuideBytes $arrGuideBytes -RationaleBytes $arrRationaleBytes
+    #
+    # # Returns four artifact identifiers mapped to their complete serialized bytes.
+    #
+    # .EXAMPLE
+    # New-StyleGuidePayloadMap -GuideBytes ([byte[]](0xEF, 0xBB, 0xBF)) -RationaleBytes $arrRationaleBytes
+    #
+    # # Throws 'utf8-bom' because source byte-order marks are forbidden.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Collections.Specialized.OrderedDictionary. Keys are copilot,
+    # powershell-instructions, chat, and full. Every value is System.Byte[],
+    # including zero- or one-byte payloads. Throws 'utf8-bom', 'payload-bom',
+    # 'payload-cr', or a payload-builder failure. Parameter-binding and strict
+    # UTF-8 decoding failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: GuideBytes
+    #   Position 1: RationaleBytes
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseShouldProcessForStateChangingFunctions',
+        '',
+        Justification = 'Builds an in-memory value and changes no system state; ShouldProcess does not apply.'
+    )]
     param (
         [Parameter(Mandatory = $true)]
         [byte[]]$GuideBytes,
@@ -604,7 +1408,9 @@ function New-StyleGuidePayloads {
 
     $hashtablePayloadBytes = [ordered]@{}
     foreach ($strArtifactId in $hashtablePayloadStrings.Keys) {
-        $arrBytes = ConvertTo-NormalizedUtf8 -CompleteFinalPayload $hashtablePayloadStrings[$strArtifactId]
+        [byte[]]$arrBytes = @(
+            ConvertTo-NormalizedUtf8 -CompleteFinalPayload $hashtablePayloadStrings[$strArtifactId]
+        )
         if ($arrBytes.Length -ge 3 -and $arrBytes[0] -eq 0xEF -and $arrBytes[1] -eq 0xBB -and $arrBytes[2] -eq 0xBF) {
             throw "payload-bom"
         }
@@ -617,6 +1423,55 @@ function New-StyleGuidePayloads {
 }
 
 function New-ArtifactRecord {
+    # .SYNOPSIS
+    # Creates the initial evidence record for one generated artifact.
+    #
+    # .DESCRIPTION
+    # Returns the fixed ordered record schema with the artifact identity and path,
+    # null measurement fields, false replacement evidence, initial temporary and
+    # cleanup dispositions, and a Pending status.
+    #
+    # .PARAMETER ArtifactId
+    # Internal artifact identifier stored in the record.
+    #
+    # .PARAMETER RepositoryPath
+    # Canonical repository-relative destination path stored in the record.
+    #
+    # .EXAMPLE
+    # $hashtableRecord = New-ArtifactRecord -ArtifactId copilot -RepositoryPath 'copilot-instructions.md'
+    #
+    # # Returns a Pending record with all measurement fields set to null.
+    #
+    # .EXAMPLE
+    # $hashtableRecord = New-ArtifactRecord -ArtifactId full -RepositoryPath 'STYLE_GUIDE_FULL.md'
+    #
+    # # $hashtableRecord.ReplaceReturned is false and CleanupResult is 'NotRequired'.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Collections.Specialized.OrderedDictionary. Contains the fixed artifact
+    # evidence fields in serialization order. Parameter-binding or allocation
+    # failures are propagated.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: ArtifactId
+    #   Position 1: RepositoryPath
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseShouldProcessForStateChangingFunctions',
+        '',
+        Justification = 'Builds an in-memory value and changes no system state; ShouldProcess does not apply.'
+    )]
     param (
         [Parameter(Mandatory = $true)]
         [string]$ArtifactId,
@@ -645,6 +1500,42 @@ function New-ArtifactRecord {
 }
 
 function Initialize-AtomicFileReplacementType {
+    # .SYNOPSIS
+    # Loads the atomic file-replacement helper type when required.
+    #
+    # .DESCRIPTION
+    # Compiles PSStyleGuide.AtomicFileReplacement once. Its Replace method calls
+    # System.IO.File.Replace without a backup path so the candidate replaces the
+    # existing destination atomically on the same filesystem.
+    #
+    # .EXAMPLE
+    # Initialize-AtomicFileReplacementType
+    #
+    # # Loads the replacement type without producing success output.
+    #
+    # .EXAMPLE
+    # Initialize-AtomicFileReplacementType
+    # Initialize-AtomicFileReplacementType
+    #
+    # # The second call returns without recompiling the loaded type.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # None. Add-Type compilation and type-loading failures are propagated; an
+    # already initialized call returns without failure.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function declares no parameters.
+    param ()
+
     if ('PSStyleGuide.AtomicFileReplacement' -as [type]) {
         return
     }
@@ -663,6 +1554,67 @@ namespace PSStyleGuide {
 }
 
 function Write-StyleGuideArtifact {
+    # .SYNOPSIS
+    # Publishes one complete style-guide payload to its fixed destination.
+    #
+    # .DESCRIPTION
+    # Validates the authorized tracked destination and its ordinary identity,
+    # returns NoChange for identical bytes, or writes and verifies a unique sibling
+    # candidate before atomically replacing and remeasuring the destination. On
+    # a failure raised after the artifact record is initialized, it preserves
+    # phase and artifact evidence on the thrown exception.
+    #
+    # .PARAMETER ArtifactId
+    # Authorized artifact identifier: copilot, powershell-instructions, chat, or full.
+    #
+    # .PARAMETER RawDestinationPath
+    # Absolute literal destination path supplied for the selected artifact.
+    #
+    # .PARAMETER CompletePayloadBytes
+    # Complete normalized payload bytes to compare and, when needed, publish.
+    #
+    # .PARAMETER RepositoryRoot
+    # Validated absolute repository root that bounds and anchors the destination.
+    #
+    # .PARAMETER DestinationMap
+    # Artifact identifier to canonical repository-relative destination mapping.
+    #
+    # .EXAMPLE
+    # $hashtableRecord = Write-StyleGuideArtifact -ArtifactId copilot -RawDestinationPath $strPath -CompletePayloadBytes $arrBytes -RepositoryRoot $strRoot -DestinationMap $hashtableMap
+    #
+    # # Returns a NoChange or Success artifact evidence record.
+    #
+    # .EXAMPLE
+    # Write-StyleGuideArtifact -ArtifactId full -RawDestinationPath $strWrongPath -CompletePayloadBytes $arrBytes -RepositoryRoot $strRoot -DestinationMap $hashtableMap
+    #
+    # # Throws InvalidOperationException with ArtifactRecord and Phase data after validation fails.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Collections.Specialized.OrderedDictionary. Status is NoChange or
+    # Success. After artifact-record initialization, any failure throws
+    # System.InvalidOperationException whose Data contains ArtifactRecord and
+    # Phase; the record status is Failed or ReplacementStateUncertain and retains
+    # cleanup and replacement evidence. Parameter binding, destination-map lookup,
+    # and record-initialization failures propagate without those Data entries.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: ArtifactId
+    #   Position 1: RawDestinationPath
+    #   Position 2: CompletePayloadBytes
+    #   Position 3: RepositoryRoot
+    #   Position 4: DestinationMap
     param (
         [Parameter(Mandatory = $true)]
         [ValidateSet('copilot', 'powershell-instructions', 'chat', 'full')]
@@ -696,7 +1648,7 @@ function Write-StyleGuideArtifact {
         )
         $strDestinationPath = [System.IO.Path]::GetFullPath($RawDestinationPath)
         if (-not (Test-PathContainedByRoot -Root $RepositoryRoot -Candidate $strDestinationPath) -or
-            -not $strDestinationPath.Equals($strExpectedFullPath, $script:PathComparison)) {
+            -not $strDestinationPath.Equals($strExpectedFullPath, $script:objPathComparison)) {
             throw "artifact-path-mismatch"
         }
         $strDestinationPath = Assert-OrdinaryAbsolutePath -LiteralPath $strDestinationPath -ExpectedLeafType File
@@ -755,7 +1707,7 @@ function Write-StyleGuideArtifact {
 
         $strPhase = 'verify-candidate'
         $strCandidateFullPath = Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File
-        if (-not [System.IO.Path]::GetDirectoryName($strCandidateFullPath).Equals($strParentPath, $script:PathComparison)) {
+        if (-not [System.IO.Path]::GetDirectoryName($strCandidateFullPath).Equals($strParentPath, $script:objPathComparison)) {
             throw "candidate-parent-mismatch"
         }
         $strCandidateIdentity = Get-OrdinaryFileIdentity -LiteralPath $strCandidateFullPath
@@ -859,6 +1811,45 @@ function Write-StyleGuideArtifact {
 }
 
 function Write-GeneratorResult {
+    # .SYNOPSIS
+    # Writes the generator result as one compact JSON line.
+    #
+    # .DESCRIPTION
+    # Serializes the complete ordered result with a depth of eight and writes it
+    # directly to standard output as one newline-terminated compact JSON document.
+    #
+    # .PARAMETER Result
+    # Complete generator result dictionary to serialize.
+    #
+    # .EXAMPLE
+    # Write-GeneratorResult -Result $hashtableResult
+    #
+    # # Writes one compact JSON result line to standard output and returns no pipeline output.
+    #
+    # .EXAMPLE
+    # Write-GeneratorResult -Result ([ordered]@{ Overall = 'NoChange' })
+    #
+    # # Writes {"Overall":"NoChange"} followed by the platform newline.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # None on the PowerShell success stream. Writes one System.String line to
+    # standard output. Parameter-binding, JSON serialization, and console-write
+    # failures are propagated.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260813.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: Result
     param (
         [Parameter(Mandatory = $true)]
         [System.Collections.IDictionary]$Result
@@ -878,8 +1869,8 @@ try {
     Test-ScriptVersionParser
     $strSelfPath = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot 'Generate-StyleGuideArtifacts.ps1'))
     $arrSelfBytes = [System.IO.File]::ReadAllBytes($strSelfPath)
-    $strSelfText = $script:Utf8Strict.GetString($arrSelfBytes)
-    [void](Get-ScriptVersionRecord -ScriptText $strSelfText -ExpectedVersion $script:GeneratorVersion)
+    $strSelfText = $script:objUtf8Strict.GetString($arrSelfBytes)
+    [void](Get-ScriptVersionRecord -ScriptText $strSelfText -ExpectedVersion $script:strGeneratorVersion)
 
     $strResultPhase = 'validate-fixed-authority'
     $strWorkflowRoot = Assert-OrdinaryAbsolutePath -LiteralPath $PSScriptRoot -ExpectedLeafType Directory
@@ -933,7 +1924,7 @@ try {
     }
 
     $strResultPhase = 'compute-complete-payloads'
-    $hashtablePayloads = New-StyleGuidePayloads `
+    $hashtablePayloads = New-StyleGuidePayloadMap `
         -GuideBytes $hashtableSourceBytes.guide `
         -RationaleBytes $hashtableSourceBytes.rationale
     if ($hashtablePayloads.Count -ne 4) {
@@ -987,8 +1978,8 @@ try {
 }
 
 $hashtableResult = [ordered]@{
-    Schema = $script:GeneratorResultSchema
-    GeneratorVersion = $script:GeneratorVersion
+    Schema = $script:strGeneratorResultSchema
+    GeneratorVersion = $script:strGeneratorVersion
     Overall = $strOverall
     Phase = $strResultPhase
     Category = $strResultCategory
