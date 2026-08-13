@@ -22,7 +22,7 @@ Working, Staged, or Both.
 Also require git diff --exit-code to report no working-tree difference.
 
 .NOTES
-Version: 1.0.20260812.3
+Version: 1.0.20260812.4
 #>
 
 [CmdletBinding()]
@@ -45,7 +45,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strVerifierVersion = '1.0.20260812.3'
+$script:strVerifierVersion = '1.0.20260812.4'
 $script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v1'
 
 function Get-ScriptVersionRecord {
@@ -80,8 +80,11 @@ function Get-ScriptVersionRecord {
     # System.Collections.Specialized.OrderedDictionary. Contains Version, Major,
     # Minor, BuildDate, and Revision. Throws 'invalid-version' for malformed or
     # ambiguous metadata and 'unexpected-version' for an expected-value mismatch.
+    # Parameter-binding and underlying regex or allocation failures propagate.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -195,10 +198,13 @@ function Test-ScriptVersionParser {
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
-    # None. Throws 'version-fixture-failure' when a fixture is accepted or
-    # rejected incorrectly, and propagates any unexpected parser exception.
+    # None. Throws 'version-fixture-failure' when a mismatched or invalid fixture
+    # is unexpectedly accepted and reaches its explicit sentinel. A valid-fixture
+    # rejection, a wrong rejection category, and other parser exceptions propagate.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -269,6 +275,8 @@ function ConvertTo-NativeArgumentString {
     # failures propagate.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -359,9 +367,12 @@ function Invoke-GitRaw {
     # System.Collections.Specialized.OrderedDictionary. Contains System.Int32
     # ExitCode, System.Byte[] Stdout, and System.Int32 StderrLength. Throws
     # 'native-command' when Process.Start returns false and 'native-output-limit'
-    # for oversized output; process, task, and I/O failures propagate.
+    # for oversized output; parameter-binding, process, task, and I/O failures
+    # propagate.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -458,9 +469,12 @@ function ConvertFrom-NulPathRecord {
     # .OUTPUTS
     # System.Collections.Generic.HashSet[System.String]. One non-enumerated set of
     # opaque Base64 keys. Throws 'malformed-records' for missing terminators, empty
-    # records, duplicate records, or inconsistent traversal; allocation failures propagate.
+    # records, or duplicate records; parameter-binding and allocation failures
+    # propagate.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -535,9 +549,12 @@ function New-ExpectedPathKey {
     # .OUTPUTS
     # System.Collections.Generic.HashSet[System.String]. One non-enumerated set of
     # expected Base64 keys. Throws 'invalid-expected-path' for invalid, non-ASCII,
-    # or duplicate paths; encoding and allocation failures propagate.
+    # or duplicate paths; parameter-binding, encoding, and allocation failures
+    # propagate.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -606,10 +623,14 @@ function Assert-OrdinaryRepositoryRoot {
     #
     # .OUTPUTS
     # System.String. The normalized full repository path. Throws
-    # 'invalid-repository-root' for a relative, missing, non-directory, or reparse
-    # component; path-normalization and metadata failures propagate.
+    # 'invalid-repository-root' for a relative path or when DirectoryInfo.Exists
+    # returns false, including absorbed access/filesystem errors, and for a
+    # non-directory or reparse component. Parameter-binding, path-normalization,
+    # and metadata failures after existence is established propagate.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -672,6 +693,8 @@ function Add-KeySet {
     # parameter-binding failures are propagated.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -722,9 +745,12 @@ function Write-VerifierResult {
     #
     # .OUTPUTS
     # None on the PowerShell success stream. Writes one System.String line to
-    # standard output. JSON serialization and console-write failures are propagated.
+    # standard output. Parameter-binding, JSON serialization, and console-write
+    # failures are propagated.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.

@@ -10,13 +10,13 @@ fixed destination. Serialization is UTF-8 without a BOM and normalizes CRLF
 and lone CR to LF at the final payload boundary.
 
 .NOTES
-Version: 1.0.20260812.3
+Version: 1.0.20260812.4
 #>
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strGeneratorVersion = '1.0.20260812.3'
+$script:strGeneratorVersion = '1.0.20260812.4'
 $script:strGeneratorResultSchema = 'PSStyleGuide.GeneratorResult.v1'
 $script:objUtf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
 $script:objUtf8NoBom = New-Object System.Text.UTF8Encoding($false)
@@ -58,8 +58,11 @@ function Get-ScriptVersionRecord {
     # System.Collections.Specialized.OrderedDictionary. Contains Version, Major,
     # Minor, BuildDate, and Revision. Throws 'invalid-version' for malformed or
     # ambiguous metadata and 'unexpected-version' for an expected-value mismatch.
+    # Parameter-binding and underlying regex or allocation failures propagate.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -173,10 +176,13 @@ function Test-ScriptVersionParser {
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
-    # None. Throws 'version-fixture-failure' when a fixture is accepted or
-    # rejected incorrectly, and propagates any unexpected parser exception.
+    # None. Throws 'version-fixture-failure' when a mismatched or invalid fixture
+    # is unexpectedly accepted and reaches its explicit sentinel. A valid-fixture
+    # rejection, a wrong rejection category, and other parser exceptions propagate.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -245,6 +251,8 @@ function ConvertTo-LowerHex {
     # binding or underlying .NET formatting failures are propagated.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -286,10 +294,14 @@ function Get-Sha256Hex {
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
-    # System.String. A 64-character lowercase SHA-256 digest. Cryptographic or
-    # parameter-binding failures are propagated after the hash provider is disposed.
+    # System.String. A 64-character lowercase SHA-256 digest. After provider
+    # creation, hashing and formatting failures propagate after it is disposed.
+    # Provider-creation failures propagate before the protected block, and
+    # parameter-binding failures propagate before the function body runs.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -343,6 +355,8 @@ function Get-FileSha256Hex {
     # parameter-binding failures propagate before the function body runs.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -402,6 +416,8 @@ function Test-PathTextIsSafe {
     # failures are propagated.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -465,10 +481,15 @@ function Assert-OrdinaryPathComponent {
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
-    # None. Throws 'missing-path', 'reparse-path', or 'nonordinary-path' when an
-    # assertion fails. Filesystem metadata and access exceptions are propagated.
+    # None. Throws 'missing-path' when both existence probes return false,
+    # including when those APIs absorb an access or filesystem error. Throws
+    # 'reparse-path' or 'nonordinary-path' for later assertion failures. Metadata
+    # and access exceptions raised after existence is established are propagated;
+    # parameter-binding failures occur before the function body runs.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -533,9 +554,12 @@ function Assert-OrdinaryAbsolutePath {
     #
     # .OUTPUTS
     # System.String. The normalized full path. Throws 'invalid-path' or a failure
-    # from Assert-OrdinaryPathComponent; path-normalization failures are propagated.
+    # from Assert-OrdinaryPathComponent; parameter-binding and path-normalization
+    # failures are propagated.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -614,6 +638,8 @@ function Test-PathContainedByRoot {
     # operation or parameter-binding failures are propagated.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -667,6 +693,8 @@ function Initialize-WindowsFileIdentityType {
     # Windows. Non-Windows and already-initialized calls return without failure.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -752,10 +780,12 @@ function Get-OrdinaryFileIdentity {
     # System.String. Windows returns volume:file-index text; Unix returns
     # device:inode text. Throws 'identity-failure' for a nonzero Unix stat exit,
     # unexpected output cardinality, or malformed output, and 'hardlink-alias'
-    # for a non-unique link count. Native invocation and identity-read failures
-    # that prevent those Unix checks from running are propagated.
+    # for a non-unique link count. Parameter-binding, native invocation, and
+    # identity-read failures that prevent those Unix checks from running propagate.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -816,9 +846,12 @@ function Assert-TrackedFile {
     #
     # .OUTPUTS
     # None. Throws 'untracked-destination' for a nonzero Git result, unexpected
-    # cardinality, or case mismatch. Git discovery and invocation failures propagate.
+    # cardinality, or case mismatch. Parameter-binding, Git discovery, and native
+    # invocation failures propagate.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -871,9 +904,12 @@ function ConvertFrom-StrictUtf8 {
     #
     # .OUTPUTS
     # System.String. Strictly decoded UTF-8 text. Throws 'utf8-bom' for a BOM and
-    # propagates DecoderFallbackException for malformed UTF-8.
+    # propagates DecoderFallbackException for malformed UTF-8. Parameter-binding
+    # failures occur before the function body runs.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -923,6 +959,8 @@ function ConvertTo-NormalizedUtf8 {
     # encoding, and parameter-binding failures are propagated.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -970,6 +1008,8 @@ function New-CopilotPayload {
     # propagated; the function defines no categorized runtime failure.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -1020,6 +1060,8 @@ function New-PowerShellInstructionsPayload {
     # Parameter-binding and string-construction failures are propagated.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -1080,6 +1122,8 @@ function New-ChatPayload {
     # string-construction, and parameter-binding failures are propagated.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -1143,9 +1187,12 @@ function New-FullPayload {
     # .OUTPUTS
     # System.String. The combined full-guide payload with LF-oriented text and one
     # final LF. Throws 'missing-rationale-anchor' for an unresolved explicit
-    # rationale marker; regex, collection, and string-operation failures propagate.
+    # rationale marker; parameter-binding, regex, collection, and string-operation
+    # failures propagate.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -1320,11 +1367,15 @@ function New-StyleGuidePayload {
     #
     # .OUTPUTS
     # System.Collections.Specialized.OrderedDictionary. Keys are copilot,
-    # powershell-instructions, chat, and full; values are System.Object[]
-    # collections whose elements are System.Byte. Throws 'utf8-bom',
-    # 'payload-bom', 'payload-cr', or a payload-builder failure.
+    # powershell-instructions, chat, and full. A value is System.Byte when its
+    # payload emits exactly one byte, or System.Object[] containing System.Byte
+    # elements when it emits multiple bytes. Throws 'utf8-bom', 'payload-bom',
+    # 'payload-cr', or a payload-builder failure. Parameter-binding and strict
+    # UTF-8 decoding failures propagate.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -1404,6 +1455,8 @@ function New-ArtifactRecord {
     # failures are propagated.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -1473,6 +1526,8 @@ function Initialize-AtomicFileReplacementType {
     # already initialized call returns without failure.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -1505,8 +1560,8 @@ function Write-StyleGuideArtifact {
     # Validates the authorized tracked destination and its ordinary identity,
     # returns NoChange for identical bytes, or writes and verifies a unique sibling
     # candidate before atomically replacing and remeasuring the destination. On
-    # a failure raised after successful parameter binding, it preserves phase
-    # and artifact evidence on the thrown exception.
+    # a failure raised after the artifact record is initialized, it preserves
+    # phase and artifact evidence on the thrown exception.
     #
     # .PARAMETER ArtifactId
     # Authorized artifact identifier: copilot, powershell-instructions, chat, or full.
@@ -1538,13 +1593,15 @@ function Write-StyleGuideArtifact {
     #
     # .OUTPUTS
     # System.Collections.Specialized.OrderedDictionary. Status is NoChange or
-    # Success. After successful binding, any failure throws
+    # Success. After artifact-record initialization, any failure throws
     # System.InvalidOperationException whose Data contains ArtifactRecord and
     # Phase; the record status is Failed or ReplacementStateUncertain and retains
-    # cleanup and replacement evidence. Parameter-binding failures propagate
-    # without those Data entries.
+    # cleanup and replacement evidence. Parameter binding, destination-map lookup,
+    # and record-initialization failures propagate without those Data entries.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
@@ -1778,9 +1835,12 @@ function Write-GeneratorResult {
     #
     # .OUTPUTS
     # None on the PowerShell success stream. Writes one System.String line to
-    # standard output. JSON serialization and console-write failures are propagated.
+    # standard output. Parameter-binding, JSON serialization, and console-write
+    # failures are propagated.
     #
     # .NOTES
+    # Version: 1.0.20260812.4
+    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
