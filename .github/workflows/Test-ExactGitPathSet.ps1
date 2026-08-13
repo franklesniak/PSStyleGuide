@@ -22,7 +22,7 @@ Working, Staged, or Both.
 Also require git diff --exit-code to report no working-tree difference.
 
 .NOTES
-Version: 1.0.20260812.0
+Version: 1.0.20260812.1
 #>
 
 [CmdletBinding()]
@@ -45,10 +45,52 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strVerifierVersion = '1.0.20260812.0'
+$script:strVerifierVersion = '1.0.20260812.1'
 $script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v1'
 
 function Get-ScriptVersionRecord {
+    # .SYNOPSIS
+    # Validates and parses the script's canonical version marker.
+    #
+    # .DESCRIPTION
+    # Locates the only pre-function .NOTES block and the only Version marker,
+    # validates its four numeric components and build date, requires it to equal
+    # the expected version, and returns the parsed version fields.
+    #
+    # .PARAMETER ScriptText
+    # Complete text of the script whose version marker is validated.
+    #
+    # .PARAMETER ExpectedVersion
+    # Exact canonical four-component version that the marker must contain.
+    #
+    # .EXAMPLE
+    # $hashtableVersion = Get-ScriptVersionRecord -ScriptText $strScriptText -ExpectedVersion '1.0.20000229.0'
+    #
+    # # Returns the validated version fields when the marker is canonical and equal.
+    #
+    # .EXAMPLE
+    # Get-ScriptVersionRecord -ScriptText $strScriptText -ExpectedVersion '1.0.20000229.1'
+    #
+    # # Throws 'unexpected-version' when the canonical marker does not equal the expected value.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Collections.Specialized.OrderedDictionary. Contains Version, Major,
+    # Minor, BuildDate, and Revision. Throws 'invalid-version' for malformed or
+    # ambiguous metadata and 'unexpected-version' for an expected-value mismatch.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: ScriptText
+    #   Position 1: ExpectedVersion
     param (
         [Parameter(Mandatory = $true)]
         [string]$ScriptText,
@@ -131,6 +173,37 @@ function Get-ScriptVersionRecord {
 }
 
 function Test-ScriptVersionParser {
+    # .SYNOPSIS
+    # Exercises the script-version parser against fixed acceptance fixtures.
+    #
+    # .DESCRIPTION
+    # Confirms one leap-day version is accepted, a version mismatch is
+    # categorized as unexpected, and malformed, duplicate, overflow, misplaced,
+    # and non-date markers are rejected as invalid.
+    #
+    # .EXAMPLE
+    # Test-ScriptVersionParser
+    #
+    # # Produces no output when every acceptance and rejection fixture behaves as expected.
+    #
+    # .EXAMPLE
+    # [void](Test-ScriptVersionParser)
+    #
+    # # Re-runs the fixed parser self-test and discards its intentionally empty output.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # None. Throws 'version-fixture-failure' when a fixture is accepted or
+    # rejected incorrectly, and propagates any unexpected parser exception.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # This function declares no parameters.
     $strValid = "<#`n.NOTES`nVersion: 1.0.20000229.0`n#>`nfunction Test-Fixture {}`n"
     $arrInvalid = @(
         "<#`n.NOTES`n#>`nfunction Test-Fixture {}`n",
@@ -164,6 +237,43 @@ function Test-ScriptVersionParser {
 }
 
 function ConvertTo-NativeArgumentString {
+    # .SYNOPSIS
+    # Encodes native arguments as one Windows-compatible command-line string.
+    #
+    # .DESCRIPTION
+    # Applies the CommandLineToArgvW-compatible quoting and backslash rules used
+    # when ProcessStartInfo.ArgumentList is unavailable, then joins the encoded
+    # arguments with single spaces.
+    #
+    # .PARAMETER ArgumentList
+    # Ordered native argument values to encode without changing their content.
+    #
+    # .EXAMPLE
+    # $strArguments = ConvertTo-NativeArgumentString -ArgumentList @('diff', '--name-only')
+    #
+    # # Returns 'diff --name-only'.
+    #
+    # .EXAMPLE
+    # $strArguments = ConvertTo-NativeArgumentString -ArgumentList @('a b', '')
+    #
+    # # Returns a quoted command line that preserves the space and empty argument.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.String. One encoded native command-line string, or an empty string
+    # for an empty argument list. Allocation and parameter-binding failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: ArgumentList
     param (
         [Parameter(Mandatory = $true)]
         [string[]]$ArgumentList
@@ -210,6 +320,54 @@ function ConvertTo-NativeArgumentString {
 }
 
 function Invoke-GitRaw {
+    # .SYNOPSIS
+    # Invokes Git and captures its standard streams as raw bytes.
+    #
+    # .DESCRIPTION
+    # Starts the exact Git executable without a shell, supplies arguments through
+    # ArgumentList when available or compatible quoting otherwise, closes standard
+    # input, concurrently drains both output streams, and enforces a 4 MiB limit
+    # on each captured stream.
+    #
+    # .PARAMETER GitPath
+    # Exact filesystem path of the Git application to invoke.
+    #
+    # .PARAMETER WorkingDirectory
+    # Existing working directory assigned to the native process.
+    #
+    # .PARAMETER ArgumentList
+    # Ordered Git arguments passed without shell interpretation.
+    #
+    # .EXAMPLE
+    # $hashtableResult = Invoke-GitRaw -GitPath $strGitPath -WorkingDirectory $strRoot -ArgumentList @('status', '--porcelain=v1', '-z')
+    #
+    # # Returns ExitCode, raw Stdout bytes, and StderrLength.
+    #
+    # .EXAMPLE
+    # Invoke-GitRaw -GitPath $strGitPath -WorkingDirectory $strRoot -ArgumentList @('command-with-large-output')
+    #
+    # # Throws 'native-output-limit' when either captured stream exceeds 4 MiB.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Collections.Specialized.OrderedDictionary. Contains System.Int32
+    # ExitCode, System.Byte[] Stdout, and System.Int32 StderrLength. Throws
+    # 'native-command' when Process.Start returns false and 'native-output-limit'
+    # for oversized output; process, task, and I/O failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: GitPath
+    #   Position 1: WorkingDirectory
+    #   Position 2: ArgumentList
     param (
         [Parameter(Mandatory = $true)]
         [string]$GitPath,
@@ -269,6 +427,44 @@ function Invoke-GitRaw {
 }
 
 function ConvertFrom-NulPathRecord {
+    # .SYNOPSIS
+    # Converts NUL-delimited path records to opaque Base64 keys.
+    #
+    # .DESCRIPTION
+    # Splits the raw byte sequence only at NUL delimiters, preserves each path as
+    # bytes by Base64-encoding it, and returns an ordinal set. It never decodes or
+    # prints observed path bytes.
+    #
+    # .PARAMETER Bytes
+    # Complete NUL-delimited raw path-record stream. An empty sequence is allowed.
+    #
+    # .EXAMPLE
+    # $objKeys = ConvertFrom-NulPathRecord -Bytes ([byte[]](0x61, 0x00))
+    #
+    # # Returns a one-element ordinal HashSet containing the Base64 key for byte 0x61.
+    #
+    # .EXAMPLE
+    # ConvertFrom-NulPathRecord -Bytes ([byte[]](0x61))
+    #
+    # # Throws 'malformed-records' because the final NUL delimiter is missing.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Collections.Generic.HashSet[System.String]. One non-enumerated set of
+    # opaque Base64 keys. Throws 'malformed-records' for missing terminators, empty
+    # records, duplicate records, or inconsistent traversal; allocation failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: Bytes
     param (
         [Parameter(Mandatory = $true)]
         [AllowEmptyCollection()]
@@ -307,6 +503,44 @@ function ConvertFrom-NulPathRecord {
 }
 
 function New-ExpectedPathKey {
+    # .SYNOPSIS
+    # Builds opaque keys for the caller's expected repository paths.
+    #
+    # .DESCRIPTION
+    # Validates each path as unique canonical printable ASCII repository-relative
+    # text without traversal, backslashes, drive or provider separators, or empty
+    # segments, then Base64-encodes its ASCII bytes into an ordinal set.
+    #
+    # .PARAMETER PathList
+    # Exact expected repository-relative path strings. An empty collection is allowed.
+    #
+    # .EXAMPLE
+    # $objKeys = New-ExpectedPathKey -PathList @('STYLE_GUIDE.md')
+    #
+    # # Returns a one-element ordinal HashSet containing the path's Base64 key.
+    #
+    # .EXAMPLE
+    # New-ExpectedPathKey -PathList @('../outside')
+    #
+    # # Throws 'invalid-expected-path' because traversal segments are forbidden.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Collections.Generic.HashSet[System.String]. One non-enumerated set of
+    # expected Base64 keys. Throws 'invalid-expected-path' for invalid, non-ASCII,
+    # or duplicate paths; encoding and allocation failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: PathList
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
         'PSUseShouldProcessForStateChangingFunctions',
         '',
@@ -341,6 +575,44 @@ function New-ExpectedPathKey {
 }
 
 function Assert-OrdinaryRepositoryRoot {
+    # .SYNOPSIS
+    # Resolves and validates an ordinary absolute repository root.
+    #
+    # .DESCRIPTION
+    # Requires rooted path text, normalizes it to a full path, and walks from the
+    # leaf through every ancestor. Each component must exist as a non-reparse
+    # directory.
+    #
+    # .PARAMETER LiteralPath
+    # Absolute literal worktree-root path to normalize and validate.
+    #
+    # .EXAMPLE
+    # $strRoot = Assert-OrdinaryRepositoryRoot -LiteralPath (Resolve-Path '.').Path
+    #
+    # # Returns the normalized full path when every component is an ordinary directory.
+    #
+    # .EXAMPLE
+    # Assert-OrdinaryRepositoryRoot -LiteralPath '..\relative'
+    #
+    # # Throws 'invalid-repository-root' because the supplied path is not rooted.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.String. The normalized full repository path. Throws
+    # 'invalid-repository-root' for a relative, missing, non-directory, or reparse
+    # component; path-normalization and metadata failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: LiteralPath
     param (
         [Parameter(Mandatory = $true)]
         [string]$LiteralPath
@@ -363,6 +635,47 @@ function Assert-OrdinaryRepositoryRoot {
 }
 
 function Add-KeySet {
+    # .SYNOPSIS
+    # Adds every source key to a target set.
+    #
+    # .DESCRIPTION
+    # Mutates the supplied target HashSet by adding each string from the source
+    # HashSet. Existing target keys remain present and duplicate Add results are
+    # deliberately suppressed.
+    #
+    # .PARAMETER Target
+    # Ordinal string HashSet that receives the source keys.
+    #
+    # .PARAMETER Source
+    # String HashSet whose keys are enumerated into the target.
+    #
+    # .EXAMPLE
+    # Add-KeySet -Target $objActualKeys -Source $objWorkingKeys
+    #
+    # # Adds all working keys to the actual-key set without producing output.
+    #
+    # .EXAMPLE
+    # Add-KeySet -Target $objKeys -Source $objKeys
+    #
+    # # Leaves the set unchanged because every key already exists.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # None. The Target object is mutated in place. Enumeration, collection, and
+    # parameter-binding failures are propagated.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: Target
+    #   Position 1: Source
     param (
         [Parameter(Mandatory = $true)]
         [AllowEmptyCollection()]
@@ -379,6 +692,42 @@ function Add-KeySet {
 }
 
 function Write-VerifierResult {
+    # .SYNOPSIS
+    # Writes the exact-path verifier result as one compact JSON line.
+    #
+    # .DESCRIPTION
+    # Serializes the complete ordered verifier result without pretty-printing and
+    # writes it directly to standard output as one newline-terminated JSON document.
+    #
+    # .PARAMETER Result
+    # Complete exact-path verifier result dictionary to serialize.
+    #
+    # .EXAMPLE
+    # Write-VerifierResult -Result $hashtableResult
+    #
+    # # Writes one compact JSON result line to standard output and returns no pipeline output.
+    #
+    # .EXAMPLE
+    # Write-VerifierResult -Result ([ordered]@{ Success = $true })
+    #
+    # # Writes {"Success":true} followed by the platform newline.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # None on the PowerShell success stream. Writes one System.String line to
+    # standard output. JSON serialization and console-write failures are propagated.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: Result
     param (
         [Parameter(Mandatory = $true)]
         [System.Collections.IDictionary]$Result
