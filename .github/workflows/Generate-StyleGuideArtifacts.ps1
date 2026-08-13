@@ -10,13 +10,13 @@ fixed destination. Serialization is UTF-8 without a BOM and normalizes CRLF
 and lone CR to LF at the final payload boundary.
 
 .NOTES
-Version: 1.0.20260812.1
+Version: 1.0.20260812.2
 #>
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strGeneratorVersion = '1.0.20260812.1'
+$script:strGeneratorVersion = '1.0.20260812.2'
 $script:strGeneratorResultSchema = 'PSStyleGuide.GeneratorResult.v1'
 $script:objUtf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
 $script:objUtf8NoBom = New-Object System.Text.UTF8Encoding($false)
@@ -182,6 +182,8 @@ function Test-ScriptVersionParser {
     # without notice.
     #
     # This function declares no parameters.
+    param ()
+
     $strValid = "<#`n.NOTES`nVersion: 1.0.20000229.0`n#>`nfunction Test-Fixture {}`n"
     $arrInvalid = @(
         "<#`n.NOTES`n#>`nfunction Test-Fixture {}`n",
@@ -322,7 +324,7 @@ function Get-FileSha256Hex {
     # Literal path of the file to hash. Wildcards are not expanded.
     #
     # .EXAMPLE
-    # $strDigest = Get-FileSha256Hex -LiteralPath '.\STYLE_GUIDE.md'
+    # $strDigest = Get-FileSha256Hex -LiteralPath './STYLE_GUIDE.md'
     #
     # # Returns the lowercase SHA-256 digest of the file bytes.
     #
@@ -668,6 +670,8 @@ function Initialize-WindowsFileIdentityType {
     # without notice.
     #
     # This function declares no parameters.
+    param ()
+
     if ($env:OS -ne 'Windows_NT' -or ('PSStyleGuide.NativeFileIdentity' -as [type])) {
         return
     }
@@ -730,7 +734,7 @@ function Get-OrdinaryFileIdentity {
     # Literal path of the ordinary file whose identity is required.
     #
     # .EXAMPLE
-    # $strIdentity = Get-OrdinaryFileIdentity -LiteralPath '.\STYLE_GUIDE.md'
+    # $strIdentity = Get-OrdinaryFileIdentity -LiteralPath './STYLE_GUIDE.md'
     #
     # # Returns a platform-specific stable identity string for the file.
     #
@@ -897,21 +901,22 @@ function ConvertTo-NormalizedUtf8 {
     # Complete final payload text to normalize and encode. An empty string is allowed.
     #
     # .EXAMPLE
-    # $arrBytes = ConvertTo-NormalizedUtf8 -CompleteFinalPayload "a`r`nb`r"
+    # $arrBytes = @(ConvertTo-NormalizedUtf8 -CompleteFinalPayload "a`r`nb`r")
     #
-    # # Returns UTF-8 bytes for "a`nb`n" without a BOM.
+    # # Contains one System.Byte success-stream object per UTF-8 byte for "a`nb`n".
     #
     # .EXAMPLE
-    # $arrBytes = ConvertTo-NormalizedUtf8 -CompleteFinalPayload ''
+    # $arrBytes = @(ConvertTo-NormalizedUtf8 -CompleteFinalPayload '')
     #
-    # # Returns an empty byte array.
+    # # $arrBytes.Count is 0 because an empty payload emits no success-stream objects.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
-    # System.Byte[]. Normalized LF-only UTF-8 bytes without a BOM. String
-    # replacement, encoding, and parameter-binding failures are propagated.
+    # System.Byte success-stream objects, one per normalized LF-only UTF-8 byte
+    # without a BOM; an empty payload emits no output. String replacement,
+    # encoding, and parameter-binding failures are propagated.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
@@ -1058,7 +1063,7 @@ function New-ChatPayload {
     # # Returns the heading and safely fenced complete guide.
     #
     # .EXAMPLE
-    # $strPayload = New-ChatPayload -GuideContent "text with ```` backticks`n"
+    # $strPayload = New-ChatPayload -GuideContent ('text with ```` backticks' + "`n")
     #
     # # Uses an outer fence longer than the four-backtick run in the content.
     #
@@ -1467,6 +1472,8 @@ function Initialize-AtomicFileReplacementType {
     # without notice.
     #
     # This function declares no parameters.
+    param ()
+
     if ('PSStyleGuide.AtomicFileReplacement' -as [type]) {
         return
     }

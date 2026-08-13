@@ -22,7 +22,7 @@ Working, Staged, or Both.
 Also require git diff --exit-code to report no working-tree difference.
 
 .NOTES
-Version: 1.0.20260812.1
+Version: 1.0.20260812.2
 #>
 
 [CmdletBinding()]
@@ -45,7 +45,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strVerifierVersion = '1.0.20260812.1'
+$script:strVerifierVersion = '1.0.20260812.2'
 $script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v1'
 
 function Get-ScriptVersionRecord {
@@ -204,6 +204,8 @@ function Test-ScriptVersionParser {
     # without notice.
     #
     # This function declares no parameters.
+    param ()
+
     $strValid = "<#`n.NOTES`nVersion: 1.0.20000229.0`n#>`nfunction Test-Fixture {}`n"
     $arrInvalid = @(
         "<#`n.NOTES`n#>`nfunction Test-Fixture {}`n",
@@ -344,9 +346,10 @@ function Invoke-GitRaw {
     # # Returns ExitCode, raw Stdout bytes, and StderrLength.
     #
     # .EXAMPLE
-    # Invoke-GitRaw -GitPath $strGitPath -WorkingDirectory $strRoot -ArgumentList @('command-with-large-output')
+    # $strLargeBlobId = '<Git blob object ID larger than 4 MiB>'
+    # Invoke-GitRaw -GitPath $strGitPath -WorkingDirectory $strRoot -ArgumentList @('cat-file', 'blob', $strLargeBlobId)
     #
-    # # Throws 'native-output-limit' when either captured stream exceeds 4 MiB.
+    # # Schematic: with a blob larger than 4 MiB, throws 'native-output-limit'.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
@@ -508,8 +511,9 @@ function New-ExpectedPathKey {
     #
     # .DESCRIPTION
     # Validates each path as unique canonical printable ASCII repository-relative
-    # text without traversal, backslashes, drive or provider separators, or empty
-    # segments, then Base64-encodes its ASCII bytes into an ordinal set.
+    # text. Rejects empty or whitespace-only text, a leading separator, a traversal
+    # segment, a backslash, a colon, a doubled slash, control or non-ASCII text,
+    # and duplicates, then Base64-encodes its ASCII bytes into an ordinal set.
     #
     # .PARAMETER PathList
     # Exact expected repository-relative path strings. An empty collection is allowed.
