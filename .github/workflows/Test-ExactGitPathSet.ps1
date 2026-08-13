@@ -22,7 +22,7 @@ Working, Staged, or Both.
 Also require git diff --exit-code to report no working-tree difference.
 
 .NOTES
-Version: 1.0.20260812.2
+Version: 1.0.20260812.3
 #>
 
 [CmdletBinding()]
@@ -45,7 +45,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strVerifierVersion = '1.0.20260812.2'
+$script:strVerifierVersion = '1.0.20260812.3'
 $script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v1'
 
 function Get-ScriptVersionRecord {
@@ -264,8 +264,9 @@ function ConvertTo-NativeArgumentString {
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
-    # System.String. One encoded native command-line string, or an empty string
-    # for an empty argument list. Allocation and parameter-binding failures propagate.
+    # System.String. One encoded native command-line string. Empty collections
+    # are rejected during parameter binding; allocation and other binding
+    # failures propagate.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API

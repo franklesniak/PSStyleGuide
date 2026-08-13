@@ -125,13 +125,13 @@
   "scriptVersions": {
     "generator": {
       "path": "Generate-StyleGuideArtifacts.ps1",
-      "version": "1.0.20260812.2",
-      "sha256": "6e2efae0248904503614472aa3494b7623e7df1028da9231b4199feb6b3d4eb6"
+      "version": "1.0.20260812.3",
+      "sha256": "7473a414e07f51b3ab50ba59b45eb23087de3a3766b1f513173d38867b34c733"
     },
     "pathVerifier": {
       "path": "Test-ExactGitPathSet.ps1",
-      "version": "1.0.20260812.2",
-      "sha256": "9a74226176b1bdd7c66cb13193b35ed95493489622242870f9b0ed9ca76c87ae"
+      "version": "1.0.20260812.3",
+      "sha256": "4c89fb97a39720bda9604bfde95095fc538613378bd9c0e328dcbcece18d8453"
     }
   },
   "caseCatalog": {
@@ -140,7 +140,7 @@
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "48b96bb1ae727d094f9746560f3b762d9a3c05181e6a129fca1aae3e16a06c3f"
+    "sha256": "92f4613c92b7046d2db5e0cd6c9461a22d8c821982b090662e41a3be5d09f416"
   },
   "actions": {
     "checkout": {
@@ -233,7 +233,7 @@
             "permissions": { "contents": "read" },
             "steps": [
               { "kind": "action", "role": "build.verify_generated_artifacts.checkout_repository", "name": "Checkout repository", "id": "checkout_repository", "action": "checkout" },
-              { "kind": "run", "role": "build.verify_generated_artifacts.generate_style_guide_artifacts", "name": "Generate style guide artifacts", "id": "generate_style_guide_artifacts", "shell": "pwsh", "runSha256": "7e948fa12a88dfad22afa1b3b73455ed7ad9819208f269b0ff965b7dff8f1ef7" },
+              { "kind": "run", "role": "build.verify_generated_artifacts.generate_style_guide_artifacts", "name": "Generate style guide artifacts", "id": "generate_style_guide_artifacts", "shell": "pwsh", "runSha256": "1eb732f262f41783dfd6ff2fd542e0404a8284ca94df2fba48889de7a9029a7a" },
               { "kind": "run", "role": "build.verify_generated_artifacts.verify_generated_artifact_drift", "name": "Verify generated artifact drift", "id": "verify_generated_artifact_drift", "shell": "pwsh", "runSha256": "11af88f59f622acb61606ee82be47b63ed2b7b37b383b5d003575effabdde42a" },
               { "kind": "run", "role": "build.verify_generated_artifacts.create_failure_diagnostics", "name": "Create failure diagnostics", "id": "create_failure_diagnostics", "shell": "pwsh", "if": "${{ failure() && !cancelled() }}", "continueOnError": true, "runSha256": "c7ffffe2913b4fe43d733a7ba918b39b84903efb4822089393458d54d520ec45" },
               { "kind": "action", "role": "build.verify_generated_artifacts.upload_failure_diagnostics", "name": "Upload failure diagnostics", "id": "upload_failure_diagnostics", "action": "uploadArtifact", "if": "${{ failure() && !cancelled() }}", "continueOnError": true }

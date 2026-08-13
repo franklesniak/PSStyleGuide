@@ -10,13 +10,13 @@ fixed destination. Serialization is UTF-8 without a BOM and normalizes CRLF
 and lone CR to LF at the final payload boundary.
 
 .NOTES
-Version: 1.0.20260812.2
+Version: 1.0.20260812.3
 #>
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strGeneratorVersion = '1.0.20260812.2'
+$script:strGeneratorVersion = '1.0.20260812.3'
 $script:strGeneratorResultSchema = 'PSStyleGuide.GeneratorResult.v1'
 $script:objUtf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
 $script:objUtf8NoBom = New-Object System.Text.UTF8Encoding($false)
@@ -317,8 +317,8 @@ function Get-FileSha256Hex {
     #
     # .DESCRIPTION
     # Opens the literal file path for shared reading, hashes the complete stream,
-    # and returns the digest as lowercase hexadecimal text. The stream and hash
-    # provider are disposed on both success and failure.
+    # and returns the digest as lowercase hexadecimal text. Once the stream and
+    # hash provider are both created, the finally block disposes both resources.
     #
     # .PARAMETER LiteralPath
     # Literal path of the file to hash. Wildcards are not expanded.
@@ -337,8 +337,10 @@ function Get-FileSha256Hex {
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
-    # System.String. A 64-character lowercase SHA-256 digest. File-open, access,
-    # read, and cryptographic failures are propagated after resources are disposed.
+    # System.String. A 64-character lowercase SHA-256 digest. File-open and
+    # provider-creation failures propagate before protected hashing begins. Read
+    # and hashing failures propagate after both created resources are disposed;
+    # parameter-binding failures propagate before the function body runs.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
@@ -748,8 +750,10 @@ function Get-OrdinaryFileIdentity {
     #
     # .OUTPUTS
     # System.String. Windows returns volume:file-index text; Unix returns
-    # device:inode text. Throws 'identity-failure' for malformed Unix stat output
-    # and 'hardlink-alias' for a non-unique link count; native failures propagate.
+    # device:inode text. Throws 'identity-failure' for a nonzero Unix stat exit,
+    # unexpected output cardinality, or malformed output, and 'hardlink-alias'
+    # for a non-unique link count. Native invocation and identity-read failures
+    # that prevent those Unix checks from running are propagated.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
@@ -1050,9 +1054,10 @@ function New-ChatPayload {
     # Builds the copy-and-paste chat payload around the normative guide.
     #
     # .DESCRIPTION
-    # Removes one trailing line ending, finds the longest backtick run in the
-    # guide, selects a longer outer Markdown fence with a minimum length of four,
-    # and wraps the guide with the fixed chat-artifact heading and language tag.
+    # Removes one trailing LF or CRLF sequence, finds the longest backtick run
+    # in the guide, selects a longer outer Markdown fence with a minimum length
+    # of four, and wraps the guide with the fixed chat-artifact heading and
+    # language tag.
     #
     # .PARAMETER GuideContent
     # Complete decoded normative style-guide text to place inside the outer fence.
@@ -1315,8 +1320,9 @@ function New-StyleGuidePayload {
     #
     # .OUTPUTS
     # System.Collections.Specialized.OrderedDictionary. Keys are copilot,
-    # powershell-instructions, chat, and full; values are System.Byte[]. Throws
-    # 'utf8-bom', 'payload-bom', 'payload-cr', or a payload-builder failure.
+    # powershell-instructions, chat, and full; values are System.Object[]
+    # collections whose elements are System.Byte. Throws 'utf8-bom',
+    # 'payload-bom', 'payload-cr', or a payload-builder failure.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
@@ -1499,7 +1505,8 @@ function Write-StyleGuideArtifact {
     # Validates the authorized tracked destination and its ordinary identity,
     # returns NoChange for identical bytes, or writes and verifies a unique sibling
     # candidate before atomically replacing and remeasuring the destination. On
-    # failure it preserves phase and artifact evidence on the thrown exception.
+    # a failure raised after successful parameter binding, it preserves phase
+    # and artifact evidence on the thrown exception.
     #
     # .PARAMETER ArtifactId
     # Authorized artifact identifier: copilot, powershell-instructions, chat, or full.
@@ -1531,9 +1538,11 @@ function Write-StyleGuideArtifact {
     #
     # .OUTPUTS
     # System.Collections.Specialized.OrderedDictionary. Status is NoChange or
-    # Success. Any failure throws System.InvalidOperationException whose Data
-    # contains ArtifactRecord and Phase; the record status is Failed or
-    # ReplacementStateUncertain and retains cleanup and replacement evidence.
+    # Success. After successful binding, any failure throws
+    # System.InvalidOperationException whose Data contains ArtifactRecord and
+    # Phase; the record status is Failed or ReplacementStateUncertain and retains
+    # cleanup and replacement evidence. Parameter-binding failures propagate
+    # without those Data entries.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API

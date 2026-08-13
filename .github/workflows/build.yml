@@ -55,7 +55,7 @@ jobs:
           $objResult = $arrResult[0] | ConvertFrom-Json
           if ($intGeneratorExit -ne 0 -or
               $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v1' -or
-              $objResult.GeneratorVersion -cne '1.0.20260812.2' -or
+              $objResult.GeneratorVersion -cne '1.0.20260812.3' -or
               $objResult.Overall -notin @('Success', 'NoChange')) {
               throw "Artifact generation failed with native exit $intGeneratorExit."
           }
