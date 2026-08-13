@@ -10,13 +10,13 @@ fixed destination. Serialization is UTF-8 without a BOM and normalizes CRLF
 and lone CR to LF at the final payload boundary.
 
 .NOTES
-Version: 1.0.20260812.4
+Version: 1.0.20260813.0
 #>
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strGeneratorVersion = '1.0.20260812.4'
+$script:strGeneratorVersion = '1.0.20260813.0'
 $script:strGeneratorResultSchema = 'PSStyleGuide.GeneratorResult.v1'
 $script:objUtf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
 $script:objUtf8NoBom = New-Object System.Text.UTF8Encoding($false)
@@ -61,11 +61,11 @@ function Get-ScriptVersionRecord {
     # Parameter-binding and underlying regex or allocation failures propagate.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -181,11 +181,11 @@ function Test-ScriptVersionParser {
     # rejection, a wrong rejection category, and other parser exceptions propagate.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function declares no parameters.
     param ()
@@ -251,11 +251,11 @@ function ConvertTo-LowerHex {
     # binding or underlying .NET formatting failures are propagated.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -300,11 +300,11 @@ function Get-Sha256Hex {
     # parameter-binding failures propagate before the function body runs.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -355,11 +355,11 @@ function Get-FileSha256Hex {
     # parameter-binding failures propagate before the function body runs.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -416,11 +416,11 @@ function Test-PathTextIsSafe {
     # failures are propagated.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -488,11 +488,11 @@ function Assert-OrdinaryPathComponent {
     # parameter-binding failures occur before the function body runs.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -558,11 +558,11 @@ function Assert-OrdinaryAbsolutePath {
     # failures are propagated.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -638,11 +638,11 @@ function Test-PathContainedByRoot {
     # operation or parameter-binding failures are propagated.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -693,11 +693,11 @@ function Initialize-WindowsFileIdentityType {
     # Windows. Non-Windows and already-initialized calls return without failure.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function declares no parameters.
     param ()
@@ -784,11 +784,11 @@ function Get-OrdinaryFileIdentity {
     # identity-read failures that prevent those Unix checks from running propagate.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -850,11 +850,11 @@ function Assert-TrackedFile {
     # invocation failures propagate.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -908,11 +908,11 @@ function ConvertFrom-StrictUtf8 {
     # failures occur before the function body runs.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -959,11 +959,11 @@ function ConvertTo-NormalizedUtf8 {
     # encoding, and parameter-binding failures are propagated.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1008,11 +1008,11 @@ function New-CopilotPayload {
     # propagated; the function defines no categorized runtime failure.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1060,11 +1060,11 @@ function New-PowerShellInstructionsPayload {
     # Parameter-binding and string-construction failures are propagated.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1122,11 +1122,11 @@ function New-ChatPayload {
     # string-construction, and parameter-binding failures are propagated.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1191,11 +1191,11 @@ function New-FullPayload {
     # failures propagate.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1374,11 +1374,11 @@ function New-StyleGuidePayload {
     # UTF-8 decoding failures propagate.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1455,11 +1455,11 @@ function New-ArtifactRecord {
     # failures are propagated.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1526,11 +1526,11 @@ function Initialize-AtomicFileReplacementType {
     # already initialized call returns without failure.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function declares no parameters.
     param ()
@@ -1600,11 +1600,11 @@ function Write-StyleGuideArtifact {
     # and record-initialization failures propagate without those Data entries.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1839,11 +1839,11 @@ function Write-GeneratorResult {
     # failures are propagated.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):

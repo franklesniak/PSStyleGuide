@@ -22,7 +22,7 @@ Working, Staged, or Both.
 Also require git diff --exit-code to report no working-tree difference.
 
 .NOTES
-Version: 1.0.20260812.4
+Version: 1.0.20260813.0
 #>
 
 [CmdletBinding()]
@@ -45,7 +45,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strVerifierVersion = '1.0.20260812.4'
+$script:strVerifierVersion = '1.0.20260813.0'
 $script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v1'
 
 function Get-ScriptVersionRecord {
@@ -83,11 +83,11 @@ function Get-ScriptVersionRecord {
     # Parameter-binding and underlying regex or allocation failures propagate.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -203,11 +203,11 @@ function Test-ScriptVersionParser {
     # rejection, a wrong rejection category, and other parser exceptions propagate.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function declares no parameters.
     param ()
@@ -275,11 +275,11 @@ function ConvertTo-NativeArgumentString {
     # failures propagate.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -371,11 +371,11 @@ function Invoke-GitRaw {
     # propagate.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -473,11 +473,11 @@ function ConvertFrom-NulPathRecord {
     # propagate.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -553,11 +553,11 @@ function New-ExpectedPathKey {
     # propagate.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -629,11 +629,11 @@ function Assert-OrdinaryRepositoryRoot {
     # and metadata failures after existence is established propagate.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -693,11 +693,11 @@ function Add-KeySet {
     # parameter-binding failures are propagated.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -749,11 +749,11 @@ function Write-VerifierResult {
     # failures are propagated.
     #
     # .NOTES
-    # Version: 1.0.20260812.4
-    #
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
+    #
+    # Version: 1.0.20260813.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
