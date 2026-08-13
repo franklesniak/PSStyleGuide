@@ -1337,7 +1337,7 @@ function New-FullPayload {
     return $strOutput.TrimEnd("`n") + "`n"
 }
 
-function New-StyleGuidePayload {
+function New-StyleGuidePayloadMap {
     # .SYNOPSIS
     # Builds all four serialized style-guide payloads in memory.
     #
@@ -1353,12 +1353,12 @@ function New-StyleGuidePayload {
     # Complete BOM-free UTF-8 bytes of the style-guide rationale.
     #
     # .EXAMPLE
-    # $hashtablePayload = New-StyleGuidePayload -GuideBytes $arrGuideBytes -RationaleBytes $arrRationaleBytes
+    # $hashtablePayload = New-StyleGuidePayloadMap -GuideBytes $arrGuideBytes -RationaleBytes $arrRationaleBytes
     #
     # # Returns four artifact identifiers mapped to their complete serialized bytes.
     #
     # .EXAMPLE
-    # New-StyleGuidePayload -GuideBytes ([byte[]](0xEF, 0xBB, 0xBF)) -RationaleBytes $arrRationaleBytes
+    # New-StyleGuidePayloadMap -GuideBytes ([byte[]](0xEF, 0xBB, 0xBF)) -RationaleBytes $arrRationaleBytes
     #
     # # Throws 'utf8-bom' because source byte-order marks are forbidden.
     #
@@ -1367,9 +1367,8 @@ function New-StyleGuidePayload {
     #
     # .OUTPUTS
     # System.Collections.Specialized.OrderedDictionary. Keys are copilot,
-    # powershell-instructions, chat, and full. A value is System.Byte when its
-    # payload emits exactly one byte, or System.Object[] containing System.Byte
-    # elements when it emits multiple bytes. Throws 'utf8-bom', 'payload-bom',
+    # powershell-instructions, chat, and full. Every value is System.Byte[],
+    # including zero- or one-byte payloads. Throws 'utf8-bom', 'payload-bom',
     # 'payload-cr', or a payload-builder failure. Parameter-binding and strict
     # UTF-8 decoding failures propagate.
     #
@@ -1409,7 +1408,9 @@ function New-StyleGuidePayload {
 
     $hashtablePayloadBytes = [ordered]@{}
     foreach ($strArtifactId in $hashtablePayloadStrings.Keys) {
-        $arrBytes = ConvertTo-NormalizedUtf8 -CompleteFinalPayload $hashtablePayloadStrings[$strArtifactId]
+        [byte[]]$arrBytes = @(
+            ConvertTo-NormalizedUtf8 -CompleteFinalPayload $hashtablePayloadStrings[$strArtifactId]
+        )
         if ($arrBytes.Length -ge 3 -and $arrBytes[0] -eq 0xEF -and $arrBytes[1] -eq 0xBB -and $arrBytes[2] -eq 0xBF) {
             throw "payload-bom"
         }
@@ -1923,7 +1924,7 @@ try {
     }
 
     $strResultPhase = 'compute-complete-payloads'
-    $hashtablePayloads = New-StyleGuidePayload `
+    $hashtablePayloads = New-StyleGuidePayloadMap `
         -GuideBytes $hashtableSourceBytes.guide `
         -RationaleBytes $hashtableSourceBytes.rationale
     if ($hashtablePayloads.Count -ne 4) {

@@ -1,12 +1,12 @@
 # Agent Instructions for Claude Code
 
-**Version:** 1.0.20260811.1
+**Version:** 1.0.20260813.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository maintainer (@franklesniak)
-- **Last Updated:** 2026-08-11
+- **Last Updated:** 2026-08-13
 - **Scope:** Agent-specific entry point for Claude Code and compatible AI coding
   agents operating in this repository. It captures the pull-request review-loop
   workflow the maintainer runs, the per-finding decision process to apply to
@@ -91,8 +91,37 @@ it — **GitHub Copilot (`copilot-pull-request-reviewer`), Codex
 Codex comments identically to Copilot comments. Address comments **one at a
 time**.
 
-"Handled" means the thread is both **answered and resolved** — treat *address
-and resolve* as one unit of work, not two optional halves.
+Review feedback has two co-equal surfaces. Inspect both on every round and in
+every whole-PR audit:
+
+1. **Inline review comments and threads** — diff-anchored comments exposed by
+   pull-request review-comment and `reviewThreads` APIs.
+2. **Review-submission bodies** — the complete `body` of every review object,
+   including findings embedded in sections such as
+   `<summary>Suppressed comments (N)</summary>`. A review-level sentence such as
+   "generated no new comments" does not override findings elsewhere in that
+   same body.
+
+For each review-body-only finding, assign the stable synthetic key
+`review:<review-id>:suppressed:<ordinal>` (or replace `suppressed` with the
+reviewer's section label). Record the review `commit_id`, path/line when given,
+and complete finding text. If a section declares a count, enumerate exactly that
+many findings. A count mismatch, malformed section, truncated body, or ambiguous
+boundary is a fail-closed audit error: do not declare the review or PR clean
+until the inventory is complete.
+
+"Handled" depends on the feedback surface:
+
+- An inline thread is handled only when it is both **answered and resolved**.
+- A review-body-only finding has no native thread to resolve. It is handled only
+  when a PR-level comment cites its synthetic key and source review, contains
+  the required evaluation, and a later PR-level comment records implementation
+  or refutation evidence and marks that key **closed**. Never describe a
+  synthetic finding as natively resolved.
+
+Treat address-and-close as one unit of work, not two optional halves. Maintain
+an inventory of every native thread ID and synthetic key; a missing or open item
+blocks clean state.
 
 Steps 2 through 5 are **mandatory for every finding that survives step 1 as
 real**, whatever becomes of it. A fix you implement now, a deferral, and a
@@ -161,10 +190,12 @@ too.
 > **Gate:** you must state the selected option before continuing — in chat or in
 > the reply.
 
-**6. Post the evaluation.** Reply on the review thread with the options, the
-rubric, the scoring table, the selected option, the `References` section (when
-research informed the decision), and either a note that implementation follows or
-the commit SHA that implements it. End every reply with the Claude Code
+**6. Post the evaluation.** For an inline finding, reply on its review thread.
+For a review-body-only finding, post a PR-level comment that cites its synthetic
+key, review ID/URL, reviewed commit, and path/line when available. Include the
+options, rubric, scoring table, selected option, `References` section (when
+research informed the decision), and either a note that implementation follows
+or the commit SHA that implements it. End every reply with the Claude Code
 attribution footer. Before posting, verify the reply actually contains all four
 artifacts — **options, rubric, scoring table, and selected option** — for any
 finding that survived step 1; a reply missing any of them is incomplete whatever
@@ -186,21 +217,23 @@ contradict existing rules. If a change is warranted, recommend it separately (a
 protected-file change needs explicit owner authorization); do not edit the guide
 directly without that authorization.
 
-**9. Resolve the thread.** Mark the thread resolved once the reply is posted. An
-addressed-but-unresolved thread hides real state — a reader cannot tell a handled
-comment from an open one. The one exception: a finding that genuinely needs a
+**9. Close the finding.** Mark an inline thread resolved once the reply is
+posted. For a review-body-only finding, post the implementation/refutation
+evidence as a PR-level comment, cite the synthetic key, and mark it **closed** in
+the inventory; GitHub supplies no thread resolution control for it. An
+addressed-but-open item hides real state — a reader cannot tell a handled finding
+from an open one. The one exception: a finding that genuinely needs a
 maintainer's decision you should not make on their behalf (or a step-8
 style-guide recommendation the owner must see first) — in that case, say so
-explicitly on the thread and leave it open. That exception governs **resolution
-only** — whether the thread stays open — and never exempts steps 2-5: the
-options, rubric, and scoring table are exactly what make a maintainer-facing
-recommendation decision-grade, so produce them in full before leaving the thread
-open. When the selected option is to **defer** the work, that is not one of
-those cases: follow **Deferring work** below — open the tracking issue, reference
-it in the reply, and resolve the thread.
+explicitly and leave the native thread or synthetic key open. That exception
+governs **closure only** and never exempts steps 2-5. When the selected option is
+to **defer** the work, that is not one of those cases: follow **Deferring work**
+below, open the tracking issue, reference it in the reply, and close the native
+thread or synthetic key.
 
-When asked to take a PR to a clean review state, apply this to **every**
-unresolved thread on the PR, not only the most recent ones.
+When asked to take a PR to a clean review state, apply this to **every** open
+native thread and every open or previously uninventoried review-body finding on
+the PR, not only the most recent ones.
 
 ## Deferring work
 
@@ -271,12 +304,12 @@ per-finding deferral decision (rules 1-6) only governs the finding in front of
 you at the time. It does not catch work that an earlier round — or a moment when
 an agent was low on context, budget, or turns — pushed into a comment and walked
 away from. That stranded work is exactly what disappears when the PR merges. So
-before you declare a PR terminally clean or merge it, **sweep every review thread
-(resolved or not), every PR-level comment, and the PR body** for deferred-work
-language ("defer," "follow-up," "future," "later," "TODO," "known gap," "left
-open," "being added," "will be added," and the like). Re-evaluate each item you
-find against this section — **whoever deferred it and whenever, including
-deferrals you did not create**:
+before you declare a PR terminally clean or merge it, **sweep every review
+submission body, every review thread (resolved or not), every PR-level comment,
+and the PR body** for deferred-work language ("defer," "follow-up," "future,"
+"later," "TODO," "known gap," "left open," "being added," "will be added," and
+the like). Re-evaluate each item you find against this section — **whoever
+deferred it and whenever, including deferrals you did not create**:
 
 - If it was deferred for a **worker-fact** — the agent's context, budget, turns,
   or the size or tedium of the change (rule 2) — it was never a legitimate
@@ -319,34 +352,46 @@ not "clean" on the strength of a reviewer that never actually reviewed.
 
 ### Round procedure
 
-1. Record detection baselines (the newest existing review and comment timestamps
-   for each bot) and the current PR head SHA, then request the reviews.
-2. Wait for the reviews by **active polling** — do not rely on webhook delivery
-   alone. Poll at least every 60 seconds using authenticated structured tooling
-   (`get_reviews` and `get_review_comments`, or equivalent), paginating so you
-   actually observe the newest records. A new round has arrived for a reviewer
-   only when that reviewer posts a review or comment that is both newer than its
-   baseline **and carries a `commit_id` equal to the recorded head SHA**. A
-   verdict whose `commit_id` is an earlier head is stale — it reviewed code the
-   head has moved past; do not count it toward round-arrival or the clean state,
-   and never misattribute it to the current head.
-3. Process every actionable comment from **both** reviewers via **Handling code
-   review comments** above (validate → options → rubric → score → select → post →
-   implement → style-guide → resolve). Track processed comment IDs and skip any
-   already handled in a prior round.
-4. Re-request review once the round's fix commits are reachable from the PR head,
-   then repeat.
+1. Establish a **review-readiness gate** before requesting either reviewer.
+   Confirm the fix commit is reachable from the PR head. Update the PR body to
+   the exact current head/tree, versions, identities, commands, and results that
+   it claims. Read the body and head back through the API and compare them with
+   the committed files. Do not request review while the body is stale or while
+   identity evidence is incomplete.
+2. Record detection baselines (the newest existing review-submission ID/time,
+   inline-comment ID/time, and PR-comment ID/time for each bot) and the current
+   PR head SHA, then request the reviews.
+3. Wait for the reviews by **active polling** — do not rely on webhook delivery
+   alone. Poll at least every 60 seconds using authenticated structured tooling,
+   paginating the complete review submissions **with their bodies**, inline
+   review comments/threads, and PR-level comments. A new round has arrived for a
+   reviewer only when that reviewer posts a review or comment newer than its
+   baseline and the review/comment is explicitly anchored to the recorded head
+   SHA. A stale verdict never counts toward arrival or clean state.
+4. Inventory all feedback surfaces. Parse every new review body, including each
+   suppressed/advisory section, and verify any declared item count. Reconcile the
+   resulting synthetic keys with inline comments to avoid duplicates without
+   dropping either surface.
+5. Process every actionable inline and review-body finding from **both**
+   reviewers via **Handling code review comments** above (validate → options →
+   rubric → score → select → post → implement → style-guide → close). Track
+   native comment/thread IDs and synthetic keys; skip only items whose closure
+   evidence already exists.
+6. Re-request review once the round's fix commits are reachable from the PR head
+   and the review-readiness gate passes again, then repeat.
 
 ### Exit condition and round cap
 
-- **Clean only when BOTH reviewers agree.** The loop is clean only when **both
-  Copilot and Codex return a review whose `commit_id` equals the current head
-  SHA with no actionable comments**. A clean result from one reviewer while the
-  other still has open comments is **not** clean — keep going. A *stale* verdict,
-  one whose `commit_id` is an earlier head, never counts as a reviewer being
-  clean at the current head; a reviewer that genuinely cannot read the diff (per
-  **Reviewers**) is recorded non-functional and excepted. When both are clean,
-  stop and report the terminal-clean state.
+- **Clean only when BOTH reviewers agree and every surface is closed.** The loop
+  is clean only when **both Copilot and Codex return a review anchored to the
+  current head SHA with no actionable inline or review-body findings**, every
+  declared review-body count is reconciled, every native thread is resolved, and
+  every synthetic key is closed with evidence. A review sentence such as
+  "generated no new comments" is not a clean result when its body contains a
+  suppressed/advisory finding. A stale verdict never counts; a reviewer that
+  genuinely cannot read the diff (per **Reviewers**) is recorded non-functional
+  and excepted. When both reviewers and all feedback surfaces are clean, stop and
+  report the terminal-clean state.
 - **Deferred-work sweep before clean.** Before declaring the loop terminally
   clean, run the **Deferring work** rule-7 sweep across the whole PR. A PR is not
   clean while deferred work sits untracked in a comment or a PR-body bullet:

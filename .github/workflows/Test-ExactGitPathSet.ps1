@@ -441,7 +441,7 @@ function Invoke-GitRaw {
     }
 }
 
-function ConvertFrom-NulPathRecord {
+function ConvertFrom-NulPathRecordStream {
     # .SYNOPSIS
     # Converts NUL-delimited path records to opaque Base64 keys.
     #
@@ -454,12 +454,12 @@ function ConvertFrom-NulPathRecord {
     # Complete NUL-delimited raw path-record stream. An empty sequence is allowed.
     #
     # .EXAMPLE
-    # $objKeys = ConvertFrom-NulPathRecord -Bytes ([byte[]](0x61, 0x00))
+    # $objKeys = ConvertFrom-NulPathRecordStream -Bytes ([byte[]](0x61, 0x00))
     #
     # # Returns a one-element ordinal HashSet containing the Base64 key for byte 0x61.
     #
     # .EXAMPLE
-    # ConvertFrom-NulPathRecord -Bytes ([byte[]](0x61))
+    # ConvertFrom-NulPathRecordStream -Bytes ([byte[]](0x61))
     #
     # # Throws 'malformed-records' because the final NUL delimiter is missing.
     #
@@ -520,7 +520,7 @@ function ConvertFrom-NulPathRecord {
     return ,$objKeys
 }
 
-function New-ExpectedPathKey {
+function New-ExpectedPathKeySet {
     # .SYNOPSIS
     # Builds opaque keys for the caller's expected repository paths.
     #
@@ -534,12 +534,12 @@ function New-ExpectedPathKey {
     # Exact expected repository-relative path strings. An empty collection is allowed.
     #
     # .EXAMPLE
-    # $objKeys = New-ExpectedPathKey -PathList @('STYLE_GUIDE.md')
+    # $objKeys = New-ExpectedPathKeySet -PathList @('STYLE_GUIDE.md')
     #
     # # Returns a one-element ordinal HashSet containing the path's Base64 key.
     #
     # .EXAMPLE
-    # New-ExpectedPathKey -PathList @('../outside')
+    # New-ExpectedPathKeySet -PathList @('../outside')
     #
     # # Throws 'invalid-expected-path' because traversal segments are forbidden.
     #
@@ -787,7 +787,7 @@ try {
 
     $strRepositoryRoot = Assert-OrdinaryRepositoryRoot -LiteralPath $RepositoryRoot
 
-    $objExpectedKeys = New-ExpectedPathKey -PathList $ExpectedPath
+    $objExpectedKeys = New-ExpectedPathKeySet -PathList $ExpectedPath
     $arrGitCommands = @(Get-Command -Name git -CommandType Application -ErrorAction Stop)
     $strGitPath = [string]$arrGitCommands[0].Source
 
@@ -798,7 +798,7 @@ try {
             $intNativeExit = $hashtableWorkingResult.ExitCode
             throw 'native-command'
         }
-        $objWorkingKeys = ConvertFrom-NulPathRecord -Bytes $hashtableWorkingResult.Stdout
+        $objWorkingKeys = ConvertFrom-NulPathRecordStream -Bytes $hashtableWorkingResult.Stdout
 
         $hashtableUntrackedResult = Invoke-GitRaw -GitPath $strGitPath -WorkingDirectory $strRepositoryRoot `
             -ArgumentList @('ls-files', '--others', '--exclude-standard', '-z', '--')
@@ -806,7 +806,7 @@ try {
             $intNativeExit = $hashtableUntrackedResult.ExitCode
             throw 'native-command'
         }
-        $objUntrackedKeys = ConvertFrom-NulPathRecord -Bytes $hashtableUntrackedResult.Stdout
+        $objUntrackedKeys = ConvertFrom-NulPathRecordStream -Bytes $hashtableUntrackedResult.Stdout
         Add-KeySet -Target $objWorkingKeys -Source $objUntrackedKeys
     }
 
@@ -817,7 +817,7 @@ try {
             $intNativeExit = $hashtableStagedResult.ExitCode
             throw 'native-command'
         }
-        $objStagedKeys = ConvertFrom-NulPathRecord -Bytes $hashtableStagedResult.Stdout
+        $objStagedKeys = ConvertFrom-NulPathRecordStream -Bytes $hashtableStagedResult.Stdout
     }
 
     if ($RequireCleanWorkingAgainstIndex) {
