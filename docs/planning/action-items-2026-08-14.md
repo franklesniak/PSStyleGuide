@@ -5,11 +5,17 @@
 
 ## Purpose
 
-Complete the remaining PSStyleGuide and TerraformStyleGuide convergence work in one verified execution order. PS P1, P1A, infrastructure-conformance issue #160, PR #165 / issue #166, and the first pinned Terraform comparison are completed history. The first incomplete action is to create the focused Terraform cycle-1 authoring-conformance repair issue required by the completed comparison. Issue creation does not commence implementation.
+Complete the remaining PSStyleGuide and TerraformStyleGuide convergence work in one verified execution order. PS P1, P1A, infrastructure-conformance issue #160, PR #165 / issue #166, and the first pinned Terraform comparison are completed history. Terraform issue #32 now contains the focused cycle-1 authoring-conformance repair scope. Task 1 remains in place as a completed record so every existing task number stays stable; do not re-execute it. The first incomplete action is Task 2: explicitly commence issue #32 without editing implementation bytes or creating a PR.
 
 This plan contains only numbered atomic leaf tasks. Each task has one executor, one primary action or lifecycle gate, and one objectively testable result. Conditional leaves record `SKIPPED — NO_REPAIR` only when their named incomplete comparison predecessor emits `NO_REPAIR`. A reciprocal repair loop repeats only the explicitly named issue-through-handoff leaf range as a new instance.
 
 No task depends on a shared execution contract, common lifecycle, common prompt, or common-foundation section. Every operative requirement appears in each task that needs it.
+
+## Global replacement contract
+
+Only values enclosed in double braces are variables. Every token is globally unique by producer and meaning. When a task supplies a value, use literal document-wide find-and-replace on the complete token, including both braces; every downstream occurrence will update at once. Do not treat table labels as variables. Fixed values are already literal and require no replacement.
+
+Completion and authorization records never appear in tables. Each required record appears in a `markdown` fence directly below the task's table. Replace its brace-delimited token globally with the exact record as soon as the producer completes.
 
 ## Execution classes
 
@@ -21,7 +27,7 @@ No task depends on a shared execution contract, common lifecycle, common prompt,
 
 | Task range | Ordered result |
 | --- | --- |
-| 1–19 | Create, implement, review, merge, hand off, reverse-compare, and close the cycle-1 Terraform authoring-conformance repair. |
+| 1–19 | Task 1 is complete; commence issue #32, then implement, review, merge, hand off, reverse-compare, and close the cycle-1 Terraform authoring-conformance repair. |
 | 20–46 | Implement, review, merge, and reciprocally close PS #161. |
 | 47–74 | Implement, review, merge, and reciprocally close PS #162; post the interim handoff. |
 | 75–103 | Update, implement, review, merge, and reciprocally close PS #158; close PS #159. |
@@ -52,7 +58,7 @@ The graph contains no legitimate `SF` relationship. Former finish-to-finish trac
 
 ## Verified current state
 
-This state was re-queried with the authenticated GitHub connector, paginated REST reads, GraphQL dependency and review-thread reads, and local Git object verification at `2026-08-14T13:28:18Z`. Every state-changing task must re-query its task-local identities before acting.
+This state was re-queried with the authenticated GitHub connector, paginated REST reads, GraphQL dependency and review-thread reads, and local Git object verification at `2026-08-14T15:06:58Z`. Every state-changing task must re-query its task-local identities before acting.
 
 ### Completed history retained as downstream evidence
 
@@ -71,15 +77,15 @@ This state was re-queried with the authenticated GitHub connector, paginated RES
 - `GF-GIT` is a blocker: Terraform’s embedded verifier has zero help records, three plural helper nouns, and one assigned-but-unused variable.
 - The Terraform generator has eight basic help records but zero examples, zero `.INPUTS`, zero private-helper `.NOTES`, one missing `.DESCRIPTION`, and nine warnings. The embedded exact-path block has five functions, zero help records, and five warnings. One additional mapped `Write-Host` warning makes 15 mapped Terraform warnings.
 - Runtime behavior remained green: PS policy `46/46`; Terraform policy `286/286`, expected version `1.0.20260811.0`, run digest `0ad7d187e215c988758483cda2677748d1774c1dcd5d6e5c892d42342daf492c`; reviewed Node `v24.18.1`, npm `11.16.0`, archive SHA-256 `d6c664df3f3f61458e8c277585571328522d705166723a7c7823a9253a4d15a0`.
-- The required successor is one focused Terraform issue and one focused PR that correct authoring conformance without runtime, serialization, Git-status, atomic-write, credential, graph, or generated-artifact behavior change. It may refresh only coupled validator digests, guard/name identities, expected version, and append-only negative fixtures. The landed repair must be followed by the reverse PS comparison.
+- Focused Terraform issue #32 now records that required scope and is a child of tracker #31. It is open, has no comments, sub-issues, blocked-by edges, or blocking edges, and did not commence implementation. The next action is Task 2. One focused PR must correct authoring conformance without runtime, serialization, Git-status, atomic-write, credential, graph, or generated-artifact behavior change. It may refresh only coupled validator digests, guard/name identities, expected version, and append-only negative fixtures. The landed repair must be followed by the reverse PS comparison.
 
 ### Current open dependency slate
 
-- No issue or PR was created in either repository after the source-plan state. No implementation PR is open in either repository.
+- Terraform issue #32 was created at `2026-08-14T14:34:07Z` with the exact cycle-1 repair scope. No implementation PR is open in either repository, and issue #32 contains no implementation-commencement record.
 - PS #159 is open with child #160 closed and children #161, #162, and #158 open. Native edges remain #160 → #161 → #162. PS #158 remains a nonblocking child.
 - PS #147 remains blocked by open administrator issue #152 and closed #146, then blocks #148; the native chain continues #148 → #149 → #151.
 - PS #163 remains open and independent. PS #155 and #156 remain open and independent residual items.
-- Terraform #31 remains open, has no native dependencies, and contains only pre-landing cycle-1 comment `5269136547`; no cycle-1 comparison, repair issue, or disposition is posted there.
+- Terraform #31 remains open and contains pre-landing cycle-1 comment `5269136547`. Issue #32 is now its child. Issue #32 has no native dependency edge; the parent/child tracker relationship is not a blocker.
 - Terraform #21 is open with only closed blockers #20 and #28; the native chain continues #21 → #22 → #23 → #24 → #25.
 - Current PS `main` is `74488bd1b23dcc845449bf0be328202947c3102f`, tree `7e8c91d9892239105350ac6e20bda912930350b2`. Current Terraform `main` is `fbfc3aca874e235cace92f506377f5c9e0704160`, tree `3c6e54be9d722b8f61aa225b1414f228f7531268`.
 
@@ -100,6 +106,16 @@ This state was re-queried with the authenticated GitHub connector, paginated RES
 ## Task 1 — create the focused repair issue for cycle 1 in Terraform
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Repair issue number | `32` | Verified GitHub value |
+| Repair issue URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/32` | Verified GitHub value |
 
 ### Dependencies
 
@@ -169,40 +185,21 @@ The focused repair must:
 
 Required validation is: PowerShell `7.6.4` and Windows PowerShell `5.1.26100.8972`; zero parser errors and zero applicable PSScriptAnalyzer Warning/Error findings; generator byte-idempotence; embedded Git negative cases; the reviewed Linux Node `v24.18.1` / npm `11.16.0` policy run from archive SHA-256 `d6c664df3f3f61458e8c277585571328522d705166723a7c7823a9253a4d15a0` with all 286 existing fixtures plus any append-only cases; both repository Markdown lint surfaces; `git diff --check`; and successful current-head CI.
 
-Lifecycle placeholders are permitted only after their named predecessor creates them:
-
-- `[TERRAFORM_CYCLE1_REPAIR_ISSUE_URL]`: obtain from output Task 1’s created issue.
-- `[TERRAFORM_CYCLE1_REPAIR_PR_URL]`: obtain from output Task 4’s created PR.
-- `[TERRAFORM_CYCLE1_REVIEWED_HEAD]` and `[TERRAFORM_CYCLE1_REVIEWED_TREE]`: obtain from the final unchanged head accepted by output Tasks 5 and 6.
-- `[TERRAFORM_CYCLE1_LANDED_COMMIT]`, `[TERRAFORM_CYCLE1_LANDED_TREE]`, and affected blob identities: obtain from output Task 7 after merge and verify again in output Task 8.
-
-### Procedure
-
-1. Re-query both repositories’ `main` refs, Terraform issue #31, all open Terraform issues and PRs, and all items created or updated since the completed comparison. Paginate every relevant connection.
-2. Confirm that no existing issue has the exact validated repair scope. If one now exists, stop and reconcile identity and scope instead of creating a duplicate.
-3. Create one focused Terraform issue. Include the problem, completed GF matrix, exact pinned commits/trees/blobs, all affected roles and paths, the required help/naming/analyzer scope, prohibited behavior changes, allowed coupled validator updates, exact validation, security and failure-preservation requirements, real dependencies, trigger/reopen condition, and expected terminal state: one reviewed and independently quality-checked Terraform PR, landed evidence, then reverse PS comparison.
-4. Read the new issue, its timeline, and all native dependency connections back with pagination. Correct any false, missing, reversed, or tracker-only dependency only within this issue-creation action. Record its URL as `[TERRAFORM_CYCLE1_REPAIR_ISSUE_URL]` for output Task 2.
-5. Verify that no branch, repository byte, PR, review request, setting, or implementation-commencement record changed.
-
-### Validation and evidence
-
-Run or verify every validation and evidence action named in this task against the recorded current identities. Record exact commands, runtime identities, native exit codes, URLs, SHA values, checks, and results. Re-query affected GitHub state after any authorized write.
-
-### Stop and escalation conditions
-
-Stop without starting a successor action if a predecessor result is missing, an identity changed unexpectedly, required authority is absent, validation or a required check fails, a placeholder cannot be resolved from its named source, or the requested state transition would weaken security, failure truth, review coverage, or the reciprocal fixed-point contract. State the exact blocker and the next required decision.
-
-### Exact output
-
-One focused, self-contained Terraform issue with correct native dependencies exists, its URL is recorded, and implementation has not commenced.
-
-### Complete when
-
 One focused, self-contained Terraform issue with correct native dependencies exists, its URL is recorded, and authenticated read-back proves that implementation has not commenced and no other state changed.
 
 ## Task 2 — commence the focused repair for cycle 1 in Terraform
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Repair issue number | `32` | Verified GitHub value |
+| Repair issue URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/32` | Verified GitHub value |
 
 ### Dependencies
 
@@ -272,39 +269,33 @@ The focused repair must:
 
 Required validation is: PowerShell `7.6.4` and Windows PowerShell `5.1.26100.8972`; zero parser errors and zero applicable PSScriptAnalyzer Warning/Error findings; generator byte-idempotence; embedded Git negative cases; the reviewed Linux Node `v24.18.1` / npm `11.16.0` policy run from archive SHA-256 `d6c664df3f3f61458e8c277585571328522d705166723a7c7823a9253a4d15a0` with all 286 existing fixtures plus any append-only cases; both repository Markdown lint surfaces; `git diff --check`; and successful current-head CI.
 
-Lifecycle placeholders are permitted only after their named predecessor creates them:
-
-- `[TERRAFORM_CYCLE1_REPAIR_ISSUE_URL]`: obtain from output Task 1’s created issue.
-- `[TERRAFORM_CYCLE1_REPAIR_PR_URL]`: obtain from output Task 4’s created PR.
-- `[TERRAFORM_CYCLE1_REVIEWED_HEAD]` and `[TERRAFORM_CYCLE1_REVIEWED_TREE]`: obtain from the final unchanged head accepted by output Tasks 5 and 6.
-- `[TERRAFORM_CYCLE1_LANDED_COMMIT]`, `[TERRAFORM_CYCLE1_LANDED_TREE]`, and affected blob identities: obtain from output Task 7 after merge and verify again in output Task 8.
-
-### Procedure
-
-1. Read `[TERRAFORM_CYCLE1_REPAIR_ISSUE_URL]` from output Task 1, then re-query the issue and confirm that it retains the exact validated scope before recording commencement.
-2. Re-query the issue, native dependencies, target main ref, and all active feature implementation issues and PRs.
-3. Require every prerequisite to be complete and the one-at-a-time implementation slot to be free.
-4. Record `IMPLEMENTATION COMMENCED` with the issue URL, actor, timestamp, baseline commit/tree, pinned source identities, intended branch, affected-path boundary, and validation plan. Do not edit, push, or open/update a PR.
-
-### Validation and evidence
-
-Run or verify every validation and evidence action named in this task against the recorded current identities. Record exact commands, runtime identities, native exit codes, URLs, SHA values, checks, and results. Re-query affected GitHub state after any authorized write.
-
-### Stop and escalation conditions
-
-Stop without starting a successor action if a predecessor result is missing, an identity changed unexpectedly, required authority is absent, validation or a required check fails, a placeholder cannot be resolved from its named source, or the requested state transition would weaken security, failure truth, review coverage, or the reciprocal fixed-point contract. State the exact blocker and the next required decision.
-
-### Exact output
-
-The focused issue has an explicit commencement record and owns the implementation slot.
-
-### Complete when
-
 The focused issue has an explicit commencement record and owns the implementation slot.
 
 ## Task 3 — implement the focused repair for cycle 1 in Terraform
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Repair issue number | `32` | Verified GitHub value |
+| Repair issue URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/32` | Verified GitHub value |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 2 completion record
+
+~~~markdown
+# Task 2 completion record
+
+{{TASK_002_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -438,40 +429,34 @@ The focused repair must:
 
 Required validation is: PowerShell `7.6.4` and Windows PowerShell `5.1.26100.8972`; zero parser errors and zero applicable PSScriptAnalyzer Warning/Error findings; generator byte-idempotence; embedded Git negative cases; the reviewed Linux Node `v24.18.1` / npm `11.16.0` policy run from archive SHA-256 `d6c664df3f3f61458e8c277585571328522d705166723a7c7823a9253a4d15a0` with all 286 existing fixtures plus any append-only cases; both repository Markdown lint surfaces; `git diff --check`; and successful current-head CI.
 
-Lifecycle placeholders are permitted only after their named predecessor creates them:
-
-- `[TERRAFORM_CYCLE1_REPAIR_ISSUE_URL]`: obtain from output Task 1’s created issue.
-- `[TERRAFORM_CYCLE1_REPAIR_PR_URL]`: obtain from output Task 4’s created PR.
-- `[TERRAFORM_CYCLE1_REVIEWED_HEAD]` and `[TERRAFORM_CYCLE1_REVIEWED_TREE]`: obtain from the final unchanged head accepted by output Tasks 5 and 6.
-- `[TERRAFORM_CYCLE1_LANDED_COMMIT]`, `[TERRAFORM_CYCLE1_LANDED_TREE]`, and affected blob identities: obtain from output Task 7 after merge and verify again in output Task 8.
-
-### Procedure
-
-1. Read `[TERRAFORM_CYCLE1_REPAIR_ISSUE_URL]` from output Task 1 and the commencement record from output Task 2. Re-query both and stop unless the focused issue owns the free implementation slot.
-2. Work in an isolated branch or worktree from the exact commenced target baseline. Read cross-repository inputs only from the pinned landed commits and blobs.
-3. Implement the selected repair without independently redesigning common behavior. Limit differences to proved repository-specific needs with equal security and failure strength.
-4. Run every issue-specific validation and applicable matrix, negative, mutation, platform, generated-drift, path, policy, Markdown, and security check.
-5. Commit the candidate. Record the commit, tree, paths, blobs, versions, digests, runtimes, commands, exit codes, results, intentional differences, and rollback. Do not push or change PR state.
-
-### Validation and evidence
-
-Run or verify every validation and evidence action named in this task against the recorded current identities. Record exact commands, runtime identities, native exit codes, URLs, SHA values, checks, and results. Re-query affected GitHub state after any authorized write.
-
-### Stop and escalation conditions
-
-Stop without starting a successor action if a predecessor result is missing, an identity changed unexpectedly, required authority is absent, validation or a required check fails, a placeholder cannot be resolved from its named source, or the requested state transition would weaken security, failure truth, review coverage, or the reciprocal fixed-point contract. State the exact blocker and the next required decision.
-
-### Exact output
-
-A committed, locally validated repair candidate exists with exact evidence and no PR state changed.
-
-### Complete when
-
 A committed, locally validated repair candidate exists with exact evidence and no PR state changed.
 
 ## Task 4 — create or update the focused repair PR for cycle 1 in Terraform
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Repair issue number | `32` | Verified GitHub value |
+| Repair issue URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/32` | Verified GitHub value |
+| Task 4 PR URL | `{{TASK_004_PR_URL}}` | Produced by this task; replace {{TASK_004_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 3 completion record
+
+~~~markdown
+# Task 3 completion record
+
+{{TASK_003_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -541,50 +526,34 @@ The focused repair must:
 
 Required validation is: PowerShell `7.6.4` and Windows PowerShell `5.1.26100.8972`; zero parser errors and zero applicable PSScriptAnalyzer Warning/Error findings; generator byte-idempotence; embedded Git negative cases; the reviewed Linux Node `v24.18.1` / npm `11.16.0` policy run from archive SHA-256 `d6c664df3f3f61458e8c277585571328522d705166723a7c7823a9253a4d15a0` with all 286 existing fixtures plus any append-only cases; both repository Markdown lint surfaces; `git diff --check`; and successful current-head CI.
 
-Lifecycle placeholders are permitted only after their named predecessor creates them:
-
-- `[TERRAFORM_CYCLE1_REPAIR_ISSUE_URL]`: obtain from output Task 1’s created issue.
-- `[TERRAFORM_CYCLE1_REPAIR_PR_URL]`: obtain from output Task 4’s created PR.
-- `[TERRAFORM_CYCLE1_REVIEWED_HEAD]` and `[TERRAFORM_CYCLE1_REVIEWED_TREE]`: obtain from the final unchanged head accepted by output Tasks 5 and 6.
-- `[TERRAFORM_CYCLE1_LANDED_COMMIT]`, `[TERRAFORM_CYCLE1_LANDED_TREE]`, and affected blob identities: obtain from output Task 7 after merge and verify again in output Task 8.
-
-### Procedure
-
-1. Read the committed candidate and evidence from output Task 3 and `[TERRAFORM_CYCLE1_REPAIR_ISSUE_URL]` from output Task 1. Re-query both repository refs and the implementation slot before any push or PR write.
-2. Re-query the issue, target main ref, remote branch, implementation slot, and current required checks. Push the committed candidate safely.
-3. Create or update one focused PR. Link the issue and describe the complete diff, source and target identities, validation, security and failure effects, intentional differences, generated artifacts, deferrals, rollback, and closing behavior accurately.
-4. Read the PR back. Record base, head/tree, commits, paths, blobs, body edit state, linked and closing issues, reviews/comments baseline, merge state, and checks.
-5. Require all initial checks to pass. Replace every placeholder. Stop before the formal review loop or merge.
-
-### Candidate preparation gate
-
-Before this task is complete:
-
-1. Create or update only the focused PR for the stated issue or approved task.
-2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
-3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
-4. Replace every placeholder and verify every posted identity.
-5. Stop before the Claude Code review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
-
-### Validation and evidence
-
-Run or verify every validation and evidence action named in this task against the recorded current identities. Record exact commands, runtime identities, native exit codes, URLs, SHA values, checks, and results. Re-query affected GitHub state after any authorized write.
-
-### Stop and escalation conditions
-
-Stop without starting a successor action if a predecessor result is missing, an identity changed unexpectedly, required authority is absent, validation or a required check fails, a placeholder cannot be resolved from its named source, or the requested state transition would weaken security, failure truth, review coverage, or the reciprocal fixed-point contract. State the exact blocker and the next required decision.
-
-### Exact output
-
-The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks.
-
-### Complete when
-
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks.
 
 ## Task 5 — run the Anthropic Claude Code review loop on the focused repair PR for cycle 1 in Terraform
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Repair issue number | `32` | Verified GitHub value |
+| Repair issue URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/32` | Verified GitHub value |
+| Task 4 PR URL | `{{TASK_004_PR_URL}}` | Produced by Task 4; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 4 completion record
+
+~~~markdown
+# Task 4 completion record
+
+{{TASK_004_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -654,66 +623,34 @@ The focused repair must:
 
 Required validation is: PowerShell `7.6.4` and Windows PowerShell `5.1.26100.8972`; zero parser errors and zero applicable PSScriptAnalyzer Warning/Error findings; generator byte-idempotence; embedded Git negative cases; the reviewed Linux Node `v24.18.1` / npm `11.16.0` policy run from archive SHA-256 `d6c664df3f3f61458e8c277585571328522d705166723a7c7823a9253a4d15a0` with all 286 existing fixtures plus any append-only cases; both repository Markdown lint surfaces; `git diff --check`; and successful current-head CI.
 
-Lifecycle placeholders are permitted only after their named predecessor creates them:
-
-- `[TERRAFORM_CYCLE1_REPAIR_ISSUE_URL]`: obtain from output Task 1’s created issue.
-- `[TERRAFORM_CYCLE1_REPAIR_PR_URL]`: obtain from output Task 4’s created PR.
-- `[TERRAFORM_CYCLE1_REVIEWED_HEAD]` and `[TERRAFORM_CYCLE1_REVIEWED_TREE]`: obtain from the final unchanged head accepted by output Tasks 5 and 6.
-- `[TERRAFORM_CYCLE1_LANDED_COMMIT]`, `[TERRAFORM_CYCLE1_LANDED_TREE]`, and affected blob identities: obtain from output Task 7 after merge and verify again in output Task 8.
-
-### Procedure
-
-1. Read `[TERRAFORM_CYCLE1_REPAIR_PR_URL]` from output Task 4. Re-query its current head/tree, every feedback surface, all checks, linked issues, dependencies, and review baselines before requesting the first review round.
-2. Obtain `<PR_URL_OR_NUMBER>` from Task 4's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a dedicated Anthropic Claude Code session.
-4. If reviewable repository bytes change, repeat Task 5 for the new head before Task 6. Do not merge.
-
-### Anthropic Claude Code review-loop prompt
-
-~~~text
-Use Anthropic Claude Code to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
-
-Work in the pull request's repository. Read the repository-local root CLAUDE.md before you act. Follow its current "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. Do not use a summary of CLAUDE.md as a substitute for reading it.
-
-Do not merge the pull request.
-
-1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
-2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
-3. Before each round, run the review-readiness gate. Confirm every fix commit is reachable from the PR head; update the PR body to the exact current head/tree, versions, identities, commands, and results; then read the body and head back through the API and compare them with the committed files. Do not request review while the body or identity evidence is stale.
-4. Record baselines for each bot across review submissions, inline review comments, and PR-level comments. Request Copilot with `request_copilot_review` (or the repository-equivalent structured action). Request Codex every round by posting one ordinary PR conversation comment whose body is exactly `@codex review`. Do not rely on an automatic Codex trigger.
-5. Poll authenticated structured data at least every 60 seconds. Paginate every review submission with its body, every inline review comment and thread, and every PR-level comment. Count a result for the round only when it is newer than the applicable baseline and is explicitly anchored to the recorded PR head SHA. A stale result never counts.
-6. Inventory all feedback surfaces. Parse every new review body, including every suppressed or advisory section. Verify each declared item count. Reconcile synthetic review-body keys with native inline comments so no finding is duplicated or dropped.
-7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine CLAUDE.md comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
-8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as CLAUDE.md requires.
-9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-10. Re-request both reviewers after every head change. A stale review on an earlier head never counts as clean.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as CLAUDE.md permits.
-12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under CLAUDE.md; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
-14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
-
-If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
-~~~
-
-### Validation and evidence
-
-Run or verify every validation and evidence action named in this task against the recorded current identities. Record exact commands, runtime identities, native exit codes, URLs, SHA values, checks, and results. Re-query affected GitHub state after any authorized write.
-
-### Stop and escalation conditions
-
-Stop without starting a successor action if a predecessor result is missing, an identity changed unexpectedly, required authority is absent, validation or a required check fails, a placeholder cannot be resolved from its named source, or the requested state transition would weaken security, failure truth, review coverage, or the reciprocal fixed-point contract. State the exact blocker and the next required decision.
-
-### Exact output
-
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree.
-
-### Complete when
-
 The repair PR has a `TERMINALLY CLEAN` record for its current head/tree.
 
 ## Task 6 — run the independent final quality check on the focused repair PR for cycle 1 in Terraform
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Repair issue number | `32` | Verified GitHub value |
+| Repair issue URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/32` | Verified GitHub value |
+| Task 4 PR URL | `{{TASK_004_PR_URL}}` | Produced by Task 4; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 5 completion record
+
+~~~markdown
+# Task 5 completion record
+
+{{TASK_005_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -783,65 +720,34 @@ The focused repair must:
 
 Required validation is: PowerShell `7.6.4` and Windows PowerShell `5.1.26100.8972`; zero parser errors and zero applicable PSScriptAnalyzer Warning/Error findings; generator byte-idempotence; embedded Git negative cases; the reviewed Linux Node `v24.18.1` / npm `11.16.0` policy run from archive SHA-256 `d6c664df3f3f61458e8c277585571328522d705166723a7c7823a9253a4d15a0` with all 286 existing fixtures plus any append-only cases; both repository Markdown lint surfaces; `git diff --check`; and successful current-head CI.
 
-Lifecycle placeholders are permitted only after their named predecessor creates them:
-
-- `[TERRAFORM_CYCLE1_REPAIR_ISSUE_URL]`: obtain from output Task 1’s created issue.
-- `[TERRAFORM_CYCLE1_REPAIR_PR_URL]`: obtain from output Task 4’s created PR.
-- `[TERRAFORM_CYCLE1_REVIEWED_HEAD]` and `[TERRAFORM_CYCLE1_REVIEWED_TREE]`: obtain from the final unchanged head accepted by output Tasks 5 and 6.
-- `[TERRAFORM_CYCLE1_LANDED_COMMIT]`, `[TERRAFORM_CYCLE1_LANDED_TREE]`, and affected blob identities: obtain from output Task 7 after merge and verify again in output Task 8.
-
-### Procedure
-
-1. Read `[TERRAFORM_CYCLE1_REPAIR_PR_URL]` and the terminal review-loop record from output Task 5. Start a fresh coding-agent session and re-query the same current head/tree before the independent audit.
-2. Obtain `<PR_URL_OR_NUMBER>` from Task 4's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Claude session.
-4. If any reviewable repository byte changes, return `FAIL`, repeat Task 5 for the new head, and then repeat Task 6 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
-
-### Independent final quality-check prompt
-
-~~~text
-Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
-
-Read the repository-local root CLAUDE.md before you act. Apply its current code-review-comment process and deferral rules exactly. Do not merge the pull request.
-
-1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
-2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Claude Code review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under CLAUDE.md. A stale result or a head change after the loop is a blocker.
-4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required CLAUDE.md steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
-5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
-6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full CLAUDE.md decision process on the merits.
-7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
-8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
-9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
-10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
-11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
-12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
-13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Anthropic Claude Code review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
-15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
-
-PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
-~~~
-
-### Validation and evidence
-
-Run or verify every validation and evidence action named in this task against the recorded current identities. Record exact commands, runtime identities, native exit codes, URLs, SHA values, checks, and results. Re-query affected GitHub state after any authorized write.
-
-### Stop and escalation conditions
-
-Stop without starting a successor action if a predecessor result is missing, an identity changed unexpectedly, required authority is absent, validation or a required check fails, a placeholder cannot be resolved from its named source, or the requested state transition would weaken security, failure truth, review coverage, or the reciprocal fixed-point contract. State the exact blocker and the next required decision.
-
-### Exact output
-
-A fresh independent `PASS` applies to the same current head/tree as the terminal-clean record.
-
-### Complete when
-
 A fresh independent `PASS` applies to the same current head/tree as the terminal-clean record.
 
 ## Task 7 — merge the focused repair PR for cycle 1 in Terraform
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Repair issue number | `32` | Verified GitHub value |
+| Repair issue URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/32` | Verified GitHub value |
+| Task 4 PR URL | `{{TASK_004_PR_URL}}` | Produced by Task 4; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 6 completion record
+
+~~~markdown
+# Task 6 completion record
+
+{{TASK_006_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -921,39 +827,34 @@ The focused repair must:
 
 Required validation is: PowerShell `7.6.4` and Windows PowerShell `5.1.26100.8972`; zero parser errors and zero applicable PSScriptAnalyzer Warning/Error findings; generator byte-idempotence; embedded Git negative cases; the reviewed Linux Node `v24.18.1` / npm `11.16.0` policy run from archive SHA-256 `d6c664df3f3f61458e8c277585571328522d705166723a7c7823a9253a4d15a0` with all 286 existing fixtures plus any append-only cases; both repository Markdown lint surfaces; `git diff --check`; and successful current-head CI.
 
-Lifecycle placeholders are permitted only after their named predecessor creates them:
-
-- `[TERRAFORM_CYCLE1_REPAIR_ISSUE_URL]`: obtain from output Task 1’s created issue.
-- `[TERRAFORM_CYCLE1_REPAIR_PR_URL]`: obtain from output Task 4’s created PR.
-- `[TERRAFORM_CYCLE1_REVIEWED_HEAD]` and `[TERRAFORM_CYCLE1_REVIEWED_TREE]`: obtain from the final unchanged head accepted by output Tasks 5 and 6.
-- `[TERRAFORM_CYCLE1_LANDED_COMMIT]`, `[TERRAFORM_CYCLE1_LANDED_TREE]`, and affected blob identities: obtain from output Task 7 after merge and verify again in output Task 8.
-
-### Procedure
-
-1. Read `[TERRAFORM_CYCLE1_REPAIR_PR_URL]`, `[TERRAFORM_CYCLE1_REVIEWED_HEAD]`, and `[TERRAFORM_CYCLE1_REVIEWED_TREE]` from output Tasks 5 and 6. Re-query all merge-gate evidence before merge.
-2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
-4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
-
-### Validation and evidence
-
-Run or verify every validation and evidence action named in this task against the recorded current identities. Record exact commands, runtime identities, native exit codes, URLs, SHA values, checks, and results. Re-query affected GitHub state after any authorized write.
-
-### Stop and escalation conditions
-
-Stop without starting a successor action if a predecessor result is missing, an identity changed unexpectedly, required authority is absent, validation or a required check fails, a placeholder cannot be resolved from its named source, or the requested state transition would weaken security, failure truth, review coverage, or the reciprocal fixed-point contract. State the exact blocker and the next required decision.
-
-### Exact output
-
-The focused repair PR is merged and its actual landed identity is recorded.
-
-### Complete when
-
 The focused repair PR is merged and its actual landed identity is recorded.
 
 ## Task 8 — publish the landed repair handoff for cycle 1 in Terraform
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Repair issue number | `32` | Verified GitHub value |
+| Repair issue URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/32` | Verified GitHub value |
+| Task 4 PR URL | `{{TASK_004_PR_URL}}` | Produced by Task 4; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 7 completion record
+
+~~~markdown
+# Task 7 completion record
+
+{{TASK_007_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -1023,39 +924,33 @@ The focused repair must:
 
 Required validation is: PowerShell `7.6.4` and Windows PowerShell `5.1.26100.8972`; zero parser errors and zero applicable PSScriptAnalyzer Warning/Error findings; generator byte-idempotence; embedded Git negative cases; the reviewed Linux Node `v24.18.1` / npm `11.16.0` policy run from archive SHA-256 `d6c664df3f3f61458e8c277585571328522d705166723a7c7823a9253a4d15a0` with all 286 existing fixtures plus any append-only cases; both repository Markdown lint surfaces; `git diff --check`; and successful current-head CI.
 
-Lifecycle placeholders are permitted only after their named predecessor creates them:
-
-- `[TERRAFORM_CYCLE1_REPAIR_ISSUE_URL]`: obtain from output Task 1’s created issue.
-- `[TERRAFORM_CYCLE1_REPAIR_PR_URL]`: obtain from output Task 4’s created PR.
-- `[TERRAFORM_CYCLE1_REVIEWED_HEAD]` and `[TERRAFORM_CYCLE1_REVIEWED_TREE]`: obtain from the final unchanged head accepted by output Tasks 5 and 6.
-- `[TERRAFORM_CYCLE1_LANDED_COMMIT]`, `[TERRAFORM_CYCLE1_LANDED_TREE]`, and affected blob identities: obtain from output Task 7 after merge and verify again in output Task 8.
-
-### Procedure
-
-1. Read the actual merge output from output Task 7, including `[TERRAFORM_CYCLE1_LANDED_COMMIT]`, `[TERRAFORM_CYCLE1_LANDED_TREE]`, merge parents, affected paths, and blobs. Re-query the landed ref and checks before posting the handoff.
-2. Fetch the actual landed commit/tree and every affected blob. Verify landed checks and issue state.
-3. Post one permanent handoff with repository, issue and PR URLs, base, reviewed head/tree, review IDs, independent result, merge method, landed commit/tree/blobs, validation, runtimes, intentional differences, security/failure effects, rollback, and the next reciprocal-comparison input.
-4. Read the handoff back and verify every identity. Do not start a reciprocal repair in this task.
-
-### Validation and evidence
-
-Run or verify every validation and evidence action named in this task against the recorded current identities. Record exact commands, runtime identities, native exit codes, URLs, SHA values, checks, and results. Re-query affected GitHub state after any authorized write.
-
-### Stop and escalation conditions
-
-Stop without starting a successor action if a predecessor result is missing, an identity changed unexpectedly, required authority is absent, validation or a required check fails, a placeholder cannot be resolved from its named source, or the requested state transition would weaken security, failure truth, review coverage, or the reciprocal fixed-point contract. State the exact blocker and the next required decision.
-
-### Exact output
-
-The landed repair handoff exists and is verified from the actual landed commit.
-
-### Complete when
-
 The landed repair handoff exists and is verified from the actual landed commit.
 
 ## Task 9 — reverse-compare cycle 1 in PS — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Repair issue number | `32` | Verified GitHub value |
+| Repair issue URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/32` | Verified GitHub value |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 8 completion record
+
+~~~markdown
+# Task 8 completion record
+
+{{TASK_008_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -1170,7 +1065,7 @@ Each applicable row occurs exactly once. Record both repository URLs and commits
 
 ### Validated cycle-1 reverse-comparison inputs
 
-This task runs only after the focused Terraform repair handoff exists. Re-query both repositories and every cited item. Compare the immutable PS PR #164 landed source commit `18f577174196627c3c12f8ed8b67336bd17d1009`, tree `ec41501c2abeddb282df581bb2534177900564cc`, against `[TERRAFORM_CYCLE1_LANDED_COMMIT]`, `[TERRAFORM_CYCLE1_LANDED_TREE]`, and the final affected Terraform blobs obtained from output Task 8. Do not substitute the later PS PR #165 `CLAUDE.md` for PR #164’s immutable source.
+This task runs only after the focused Terraform repair handoff exists. Re-query both repositories and every cited item. Compare the immutable PS PR #164 landed source commit `18f577174196627c3c12f8ed8b67336bd17d1009`, tree `ec41501c2abeddb282df581bb2534177900564cc`, against the landed commit SHA in the Task 8 completion record, the landed tree SHA in the Task 8 completion record, and the final affected Terraform blobs obtained from output Task 8. Do not substitute the later PS PR #165 `CLAUDE.md` for PR #164’s immutable source.
 
 Verify that the focused repair changed only authoring conformance and coupled policy evidence; that runtime, serialization, raw-NUL Git status handling, atomic write, failure truth, credentials, graph, and generated outputs remain equivalent; that both hosts have complete help and zero applicable parser/PSScriptAnalyzer Warning/Error findings; that generator idempotence, embedded Git negative cases, the Node `v24.18.1` / npm `11.16.0` policy suite with 286 or more fixtures, both Markdown lint surfaces, `git diff --check`, and landed CI pass; and that every matrix row is `same` or a fully supported intentional difference. If Terraform added or corrected common behavior that PS lacks, emit `REPAIR_REQUIRED` for PS with exact pinned identities. Otherwise emit `NO_REPAIR`. Post only the comparison evidence record; do not edit issue bodies or dependencies and do not commence implementation.
 
@@ -1202,6 +1097,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 ## Task 10 — create or update the focused repair issue for cycle 1 in PS
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 10 issue URL | `{{TASK_010_ISSUE_URL}}` | Produced by this task; replace {{TASK_010_ISSUE_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 9 completion record
+
+~~~markdown
+# Task 9 completion record
+
+{{TASK_009_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -1254,6 +1170,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 10 issue URL | `{{TASK_010_ISSUE_URL}}` | Produced by Task 10; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 10 completion record
+
+~~~markdown
+# Task 10 completion record
+
+{{TASK_010_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -1304,6 +1241,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 12 — implement the focused repair for cycle 1 in PS
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 10 issue URL | `{{TASK_010_ISSUE_URL}}` | Produced by Task 10; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 11 completion record
+
+~~~markdown
+# Task 11 completion record
+
+{{TASK_011_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -1422,6 +1380,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 10 issue URL | `{{TASK_010_ISSUE_URL}}` | Produced by Task 10; resolve globally before execution |
+| Task 13 PR URL | `{{TASK_013_PR_URL}}` | Produced by this task; replace {{TASK_013_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 12 completion record
+
+~~~markdown
+# Task 12 completion record
+
+{{TASK_012_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -1483,6 +1463,27 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 14 — run the Anthropic Claude Code review loop on the focused repair PR for cycle 1 in PS
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 13 PR URL | `{{TASK_013_PR_URL}}` | Produced by Task 13; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 13 completion record
+
+~~~markdown
+# Task 13 completion record
+
+{{TASK_013_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -1562,6 +1563,27 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 13 PR URL | `{{TASK_013_PR_URL}}` | Produced by Task 13; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 14 completion record
+
+~~~markdown
+# Task 14 completion record
+
+{{TASK_014_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -1639,6 +1661,27 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 13 PR URL | `{{TASK_013_PR_URL}}` | Produced by Task 13; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 15 completion record
+
+~~~markdown
+# Task 15 completion record
+
+{{TASK_015_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -1700,6 +1743,27 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 13 PR URL | `{{TASK_013_PR_URL}}` | Produced by Task 13; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 16 completion record
+
+~~~markdown
+# Task 16 completion record
+
+{{TASK_016_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -1750,6 +1814,34 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 18 — recheck the reciprocal result for cycle 1 in PS
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 17 completion record
+
+~~~markdown
+# Task 17 completion record
+
+{{TASK_017_COMPLETION_RECORD}}
+~~~
+
+#### Task 9 completion record
+
+~~~markdown
+# Task 9 completion record
+
+{{TASK_009_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -1869,6 +1961,26 @@ This recheck instance emits exactly one complete branch record: `REPAIR_REQUIRED
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 18 completion record
+
+~~~markdown
+# Task 18 completion record
+
+{{TASK_018_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -1919,6 +2031,27 @@ The permanent fixed-point or issue-closure record exists and every task-local tr
 ## Task 20 — commence PS generator and exact-path convergence
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #161 URL | `https://github.com/franklesniak/PSStyleGuide/issues/161` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 19 completion record
+
+~~~markdown
+# Task 19 completion record
+
+{{TASK_019_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -2012,6 +2145,27 @@ The governing issue has an explicit, verified implementation-commencement record
 ## Task 21 — implement PS generator and exact-path convergence
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #161 URL | `https://github.com/franklesniak/PSStyleGuide/issues/161` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 20 completion record
+
+~~~markdown
+# Task 20 completion record
+
+{{TASK_020_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -2152,6 +2306,28 @@ A committed, locally validated implementation candidate exists with exact identi
 ## Task 22 — create or update the candidate PR for PS generator and exact-path convergence
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #161 URL | `https://github.com/franklesniak/PSStyleGuide/issues/161` | Verified existing GitHub issue |
+| Task 22 PR URL | `{{TASK_022_PR_URL}}` | Produced by this task; replace {{TASK_022_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 21 completion record
+
+~~~markdown
+# Task 21 completion record
+
+{{TASK_021_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -2301,6 +2477,28 @@ The PS #161 candidate PR exists with complete initial validation and an accurate
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #161 URL | `https://github.com/franklesniak/PSStyleGuide/issues/161` | Verified existing GitHub issue |
+| Task 22 PR URL | `{{TASK_022_PR_URL}}` | Produced by Task 22; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 22 completion record
+
+~~~markdown
+# Task 22 completion record
+
+{{TASK_022_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -2378,6 +2576,28 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree with comple
 
 > **Execution class: Coding agent executable.** Use a fresh coding-agent session.
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #161 URL | `https://github.com/franklesniak/PSStyleGuide/issues/161` | Verified existing GitHub issue |
+| Task 22 PR URL | `{{TASK_022_PR_URL}}` | Produced by Task 22; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 23 completion record
+
+~~~markdown
+# Task 23 completion record
+
+{{TASK_023_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -2454,6 +2674,28 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 23.
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #161 URL | `https://github.com/franklesniak/PSStyleGuide/issues/161` | Verified existing GitHub issue |
+| Task 22 PR URL | `{{TASK_022_PR_URL}}` | Produced by Task 22; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 24 completion record
+
+~~~markdown
+# Task 24 completion record
+
+{{TASK_024_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -2515,6 +2757,28 @@ The PR is merged and its actual landed identity is recorded, or the conditional 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #161 URL | `https://github.com/franklesniak/PSStyleGuide/issues/161` | Verified existing GitHub issue |
+| Task 22 PR URL | `{{TASK_022_PR_URL}}` | Produced by Task 22; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 25 completion record
+
+~~~markdown
+# Task 25 completion record
+
+{{TASK_025_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -2564,6 +2828,26 @@ PS #161 is closed by the landed PR and its permanent handoff is ready for the Te
 ## Task 27 — compare cycle 2 in Terraform — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 26 completion record
+
+~~~markdown
+# Task 26 completion record
+
+{{TASK_026_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -2702,6 +2986,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 28 issue URL | `{{TASK_028_ISSUE_URL}}` | Produced by this task; replace {{TASK_028_ISSUE_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 27 completion record
+
+~~~markdown
+# Task 27 completion record
+
+{{TASK_027_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -2753,6 +3058,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 28 issue URL | `{{TASK_028_ISSUE_URL}}` | Produced by Task 28; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 28 completion record
+
+~~~markdown
+# Task 28 completion record
+
+{{TASK_028_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -2803,6 +3129,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 30 — implement the focused repair for cycle 2 in Terraform
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 28 issue URL | `{{TASK_028_ISSUE_URL}}` | Produced by Task 28; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 29 completion record
+
+~~~markdown
+# Task 29 completion record
+
+{{TASK_029_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -2920,6 +3267,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 28 issue URL | `{{TASK_028_ISSUE_URL}}` | Produced by Task 28; resolve globally before execution |
+| Task 31 PR URL | `{{TASK_031_PR_URL}}` | Produced by this task; replace {{TASK_031_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 30 completion record
+
+~~~markdown
+# Task 30 completion record
+
+{{TASK_030_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -2981,6 +3350,27 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 32 — run the Anthropic Claude Code review loop on the focused repair PR for cycle 2 in Terraform
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 31 PR URL | `{{TASK_031_PR_URL}}` | Produced by Task 31; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 31 completion record
+
+~~~markdown
+# Task 31 completion record
+
+{{TASK_031_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -3060,6 +3450,27 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 31 PR URL | `{{TASK_031_PR_URL}}` | Produced by Task 31; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 32 completion record
+
+~~~markdown
+# Task 32 completion record
+
+{{TASK_032_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -3137,6 +3548,27 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 31 PR URL | `{{TASK_031_PR_URL}}` | Produced by Task 31; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 33 completion record
+
+~~~markdown
+# Task 33 completion record
+
+{{TASK_033_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -3198,6 +3630,27 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 31 PR URL | `{{TASK_031_PR_URL}}` | Produced by Task 31; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 34 completion record
+
+~~~markdown
+# Task 34 completion record
+
+{{TASK_034_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -3248,6 +3701,34 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 36 — reverse-compare cycle 2 in PS — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 35 completion record
+
+~~~markdown
+# Task 35 completion record
+
+{{TASK_035_COMPLETION_RECORD}}
+~~~
+
+#### Task 26 completion record
+
+~~~markdown
+# Task 26 completion record
+
+{{TASK_026_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -3381,6 +3862,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 37 issue URL | `{{TASK_037_ISSUE_URL}}` | Produced by this task; replace {{TASK_037_ISSUE_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 36 completion record
+
+~~~markdown
+# Task 36 completion record
+
+{{TASK_036_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -3432,6 +3934,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 37 issue URL | `{{TASK_037_ISSUE_URL}}` | Produced by Task 37; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 37 completion record
+
+~~~markdown
+# Task 37 completion record
+
+{{TASK_037_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -3482,6 +4005,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 39 — implement the focused repair for cycle 2 in PS
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 37 issue URL | `{{TASK_037_ISSUE_URL}}` | Produced by Task 37; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 38 completion record
+
+~~~markdown
+# Task 38 completion record
+
+{{TASK_038_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -3600,6 +4144,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 37 issue URL | `{{TASK_037_ISSUE_URL}}` | Produced by Task 37; resolve globally before execution |
+| Task 40 PR URL | `{{TASK_040_PR_URL}}` | Produced by this task; replace {{TASK_040_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 39 completion record
+
+~~~markdown
+# Task 39 completion record
+
+{{TASK_039_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -3661,6 +4227,27 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 41 — run the Anthropic Claude Code review loop on the focused repair PR for cycle 2 in PS
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 40 PR URL | `{{TASK_040_PR_URL}}` | Produced by Task 40; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 40 completion record
+
+~~~markdown
+# Task 40 completion record
+
+{{TASK_040_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -3740,6 +4327,27 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 40 PR URL | `{{TASK_040_PR_URL}}` | Produced by Task 40; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 41 completion record
+
+~~~markdown
+# Task 41 completion record
+
+{{TASK_041_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -3817,6 +4425,27 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 40 PR URL | `{{TASK_040_PR_URL}}` | Produced by Task 40; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 42 completion record
+
+~~~markdown
+# Task 42 completion record
+
+{{TASK_042_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -3878,6 +4507,27 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 40 PR URL | `{{TASK_040_PR_URL}}` | Produced by Task 40; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 43 completion record
+
+~~~markdown
+# Task 43 completion record
+
+{{TASK_043_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -3928,6 +4578,34 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 45 — recheck the reciprocal result for cycle 2 in PS
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 36 completion record
+
+~~~markdown
+# Task 36 completion record
+
+{{TASK_036_COMPLETION_RECORD}}
+~~~
+
+#### Task 44 completion record
+
+~~~markdown
+# Task 44 completion record
+
+{{TASK_044_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -4047,6 +4725,26 @@ This recheck instance emits exactly one complete branch record: `REPAIR_REQUIRED
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 45 completion record
+
+~~~markdown
+# Task 45 completion record
+
+{{TASK_045_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -4097,6 +4795,27 @@ The permanent fixed-point or issue-closure record exists and every task-local tr
 ## Task 47 — commence PS workflow isolation and policy convergence
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #162 URL | `https://github.com/franklesniak/PSStyleGuide/issues/162` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 46 completion record
+
+~~~markdown
+# Task 46 completion record
+
+{{TASK_046_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -4190,6 +4909,27 @@ The governing issue has an explicit, verified implementation-commencement record
 ## Task 48 — implement PS workflow isolation and policy convergence
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #162 URL | `https://github.com/franklesniak/PSStyleGuide/issues/162` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 47 completion record
+
+~~~markdown
+# Task 47 completion record
+
+{{TASK_047_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -4330,6 +5070,28 @@ A committed, locally validated implementation candidate exists with exact identi
 ## Task 49 — create or update the candidate PR for PS workflow isolation and policy convergence
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #162 URL | `https://github.com/franklesniak/PSStyleGuide/issues/162` | Verified existing GitHub issue |
+| Task 49 PR URL | `{{TASK_049_PR_URL}}` | Produced by this task; replace {{TASK_049_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 48 completion record
+
+~~~markdown
+# Task 48 completion record
+
+{{TASK_048_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -4479,6 +5241,28 @@ The PS #162 candidate PR exists with complete initial validation and an accurate
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #162 URL | `https://github.com/franklesniak/PSStyleGuide/issues/162` | Verified existing GitHub issue |
+| Task 49 PR URL | `{{TASK_049_PR_URL}}` | Produced by Task 49; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 49 completion record
+
+~~~markdown
+# Task 49 completion record
+
+{{TASK_049_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -4556,6 +5340,28 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 
 > **Execution class: Coding agent executable.** Use a fresh coding-agent session.
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #162 URL | `https://github.com/franklesniak/PSStyleGuide/issues/162` | Verified existing GitHub issue |
+| Task 49 PR URL | `{{TASK_049_PR_URL}}` | Produced by Task 49; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 50 completion record
+
+~~~markdown
+# Task 50 completion record
+
+{{TASK_050_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -4632,6 +5438,28 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 50.
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #162 URL | `https://github.com/franklesniak/PSStyleGuide/issues/162` | Verified existing GitHub issue |
+| Task 49 PR URL | `{{TASK_049_PR_URL}}` | Produced by Task 49; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 51 completion record
+
+~~~markdown
+# Task 51 completion record
+
+{{TASK_051_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -4693,6 +5521,28 @@ The PR is merged and its actual landed identity is recorded, or the conditional 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #162 URL | `https://github.com/franklesniak/PSStyleGuide/issues/162` | Verified existing GitHub issue |
+| Task 49 PR URL | `{{TASK_049_PR_URL}}` | Produced by Task 49; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 52 completion record
+
+~~~markdown
+# Task 52 completion record
+
+{{TASK_052_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -4742,6 +5592,26 @@ PS #162 is closed and the final landed policy contract is ready for Task 62.
 ## Task 54 — compare cycle 3 in Terraform — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 53 completion record
+
+~~~markdown
+# Task 53 completion record
+
+{{TASK_053_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -4878,6 +5748,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 55 issue URL | `{{TASK_055_ISSUE_URL}}` | Produced by this task; replace {{TASK_055_ISSUE_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 54 completion record
+
+~~~markdown
+# Task 54 completion record
+
+{{TASK_054_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -4929,6 +5820,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 55 issue URL | `{{TASK_055_ISSUE_URL}}` | Produced by Task 55; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 55 completion record
+
+~~~markdown
+# Task 55 completion record
+
+{{TASK_055_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -4979,6 +5891,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 57 — implement the focused repair for cycle 3 in Terraform
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 55 issue URL | `{{TASK_055_ISSUE_URL}}` | Produced by Task 55; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 56 completion record
+
+~~~markdown
+# Task 56 completion record
+
+{{TASK_056_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -5096,6 +6029,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 55 issue URL | `{{TASK_055_ISSUE_URL}}` | Produced by Task 55; resolve globally before execution |
+| Task 58 PR URL | `{{TASK_058_PR_URL}}` | Produced by this task; replace {{TASK_058_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 57 completion record
+
+~~~markdown
+# Task 57 completion record
+
+{{TASK_057_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -5157,6 +6112,27 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 59 — run the Anthropic Claude Code review loop on the focused repair PR for cycle 3 in Terraform
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 58 PR URL | `{{TASK_058_PR_URL}}` | Produced by Task 58; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 58 completion record
+
+~~~markdown
+# Task 58 completion record
+
+{{TASK_058_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -5236,6 +6212,27 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 58 PR URL | `{{TASK_058_PR_URL}}` | Produced by Task 58; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 59 completion record
+
+~~~markdown
+# Task 59 completion record
+
+{{TASK_059_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -5313,6 +6310,27 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 58 PR URL | `{{TASK_058_PR_URL}}` | Produced by Task 58; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 60 completion record
+
+~~~markdown
+# Task 60 completion record
+
+{{TASK_060_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -5374,6 +6392,27 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 58 PR URL | `{{TASK_058_PR_URL}}` | Produced by Task 58; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 61 completion record
+
+~~~markdown
+# Task 61 completion record
+
+{{TASK_061_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -5424,6 +6463,34 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 63 — reverse-compare cycle 3 in PS — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 62 completion record
+
+~~~markdown
+# Task 62 completion record
+
+{{TASK_062_COMPLETION_RECORD}}
+~~~
+
+#### Task 53 completion record
+
+~~~markdown
+# Task 53 completion record
+
+{{TASK_053_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -5557,6 +6624,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 64 issue URL | `{{TASK_064_ISSUE_URL}}` | Produced by this task; replace {{TASK_064_ISSUE_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 63 completion record
+
+~~~markdown
+# Task 63 completion record
+
+{{TASK_063_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -5608,6 +6696,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 64 issue URL | `{{TASK_064_ISSUE_URL}}` | Produced by Task 64; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 64 completion record
+
+~~~markdown
+# Task 64 completion record
+
+{{TASK_064_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -5658,6 +6767,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 66 — implement the focused repair for cycle 3 in PS
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 64 issue URL | `{{TASK_064_ISSUE_URL}}` | Produced by Task 64; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 65 completion record
+
+~~~markdown
+# Task 65 completion record
+
+{{TASK_065_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -5776,6 +6906,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 64 issue URL | `{{TASK_064_ISSUE_URL}}` | Produced by Task 64; resolve globally before execution |
+| Task 67 PR URL | `{{TASK_067_PR_URL}}` | Produced by this task; replace {{TASK_067_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 66 completion record
+
+~~~markdown
+# Task 66 completion record
+
+{{TASK_066_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -5837,6 +6989,27 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 68 — run the Anthropic Claude Code review loop on the focused repair PR for cycle 3 in PS
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 67 PR URL | `{{TASK_067_PR_URL}}` | Produced by Task 67; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 67 completion record
+
+~~~markdown
+# Task 67 completion record
+
+{{TASK_067_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -5916,6 +7089,27 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 67 PR URL | `{{TASK_067_PR_URL}}` | Produced by Task 67; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 68 completion record
+
+~~~markdown
+# Task 68 completion record
+
+{{TASK_068_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -5993,6 +7187,27 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 67 PR URL | `{{TASK_067_PR_URL}}` | Produced by Task 67; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 69 completion record
+
+~~~markdown
+# Task 69 completion record
+
+{{TASK_069_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -6054,6 +7269,27 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 67 PR URL | `{{TASK_067_PR_URL}}` | Produced by Task 67; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 70 completion record
+
+~~~markdown
+# Task 70 completion record
+
+{{TASK_070_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -6104,6 +7340,34 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 72 — recheck the reciprocal result for cycle 3 in PS
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 63 completion record
+
+~~~markdown
+# Task 63 completion record
+
+{{TASK_063_COMPLETION_RECORD}}
+~~~
+
+#### Task 71 completion record
+
+~~~markdown
+# Task 71 completion record
+
+{{TASK_071_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -6223,6 +7487,26 @@ This recheck instance emits exactly one complete branch record: `REPAIR_REQUIRED
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 72 completion record
+
+~~~markdown
+# Task 72 completion record
+
+{{TASK_072_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -6274,6 +7558,26 @@ The permanent fixed-point or issue-closure record exists and every task-local tr
 
 > **Execution class: Coding agent executable.** This is an evidence-publication task, not an implementation task.
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 73 completion record
+
+~~~markdown
+# Task 73 completion record
+
+{{TASK_073_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -6321,6 +7625,27 @@ Both trackers contain a permanent, internally consistent handoff for cycles 1 th
 ## Task 75 — update PS #158 with the landed workflow-policy starting point
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #158 URL | `https://github.com/franklesniak/PSStyleGuide/issues/158` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 74 completion record
+
+~~~markdown
+# Task 74 completion record
+
+{{TASK_074_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -6379,6 +7704,27 @@ PS #158 contains the verified starting-point comment, and implementation has not
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #158 URL | `https://github.com/franklesniak/PSStyleGuide/issues/158` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 75 completion record
+
+~~~markdown
+# Task 75 completion record
+
+{{TASK_075_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -6428,6 +7774,27 @@ The governing issue has an explicit, verified implementation-commencement record
 ## Task 77 — implement the PS read-only supply-freeze recorder
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #158 URL | `https://github.com/franklesniak/PSStyleGuide/issues/158` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 76 completion record
+
+~~~markdown
+# Task 76 completion record
+
+{{TASK_076_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -6527,6 +7894,28 @@ A committed, locally validated implementation candidate exists with exact identi
 ## Task 78 — create or update the candidate PR for the PS read-only supply-freeze recorder
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #158 URL | `https://github.com/franklesniak/PSStyleGuide/issues/158` | Verified existing GitHub issue |
+| Task 78 PR URL | `{{TASK_078_PR_URL}}` | Produced by this task; replace {{TASK_078_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 77 completion record
+
+~~~markdown
+# Task 77 completion record
+
+{{TASK_077_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -6632,6 +8021,28 @@ The PS #158 candidate PR exists with complete initial validation and an accurate
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #158 URL | `https://github.com/franklesniak/PSStyleGuide/issues/158` | Verified existing GitHub issue |
+| Task 78 PR URL | `{{TASK_078_PR_URL}}` | Produced by Task 78; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 78 completion record
+
+~~~markdown
+# Task 78 completion record
+
+{{TASK_078_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -6709,6 +8120,28 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 
 > **Execution class: Coding agent executable.** Use a fresh coding-agent session.
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #158 URL | `https://github.com/franklesniak/PSStyleGuide/issues/158` | Verified existing GitHub issue |
+| Task 78 PR URL | `{{TASK_078_PR_URL}}` | Produced by Task 78; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 79 completion record
+
+~~~markdown
+# Task 79 completion record
+
+{{TASK_079_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -6785,6 +8218,28 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 79.
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #158 URL | `https://github.com/franklesniak/PSStyleGuide/issues/158` | Verified existing GitHub issue |
+| Task 78 PR URL | `{{TASK_078_PR_URL}}` | Produced by Task 78; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 80 completion record
+
+~~~markdown
+# Task 80 completion record
+
+{{TASK_080_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -6846,6 +8301,28 @@ The PR is merged and its actual landed identity is recorded, or the conditional 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #158 URL | `https://github.com/franklesniak/PSStyleGuide/issues/158` | Verified existing GitHub issue |
+| Task 78 PR URL | `{{TASK_078_PR_URL}}` | Produced by Task 78; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 81 completion record
+
+~~~markdown
+# Task 81 completion record
+
+{{TASK_081_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -6895,6 +8372,26 @@ PS #158 is closed and its permanent handoff is ready for Terraform.
 ## Task 83 — compare cycle 4 in Terraform — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 82 completion record
+
+~~~markdown
+# Task 82 completion record
+
+{{TASK_082_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -7031,6 +8528,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 84 issue URL | `{{TASK_084_ISSUE_URL}}` | Produced by this task; replace {{TASK_084_ISSUE_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 83 completion record
+
+~~~markdown
+# Task 83 completion record
+
+{{TASK_083_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -7082,6 +8600,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 84 issue URL | `{{TASK_084_ISSUE_URL}}` | Produced by Task 84; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 84 completion record
+
+~~~markdown
+# Task 84 completion record
+
+{{TASK_084_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -7132,6 +8671,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 86 — implement the focused repair for cycle 4 in Terraform
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 84 issue URL | `{{TASK_084_ISSUE_URL}}` | Produced by Task 84; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 85 completion record
+
+~~~markdown
+# Task 85 completion record
+
+{{TASK_085_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -7249,6 +8809,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 84 issue URL | `{{TASK_084_ISSUE_URL}}` | Produced by Task 84; resolve globally before execution |
+| Task 87 PR URL | `{{TASK_087_PR_URL}}` | Produced by this task; replace {{TASK_087_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 86 completion record
+
+~~~markdown
+# Task 86 completion record
+
+{{TASK_086_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -7310,6 +8892,27 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 88 — run the Anthropic Claude Code review loop on the focused repair PR for cycle 4 in Terraform
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 87 PR URL | `{{TASK_087_PR_URL}}` | Produced by Task 87; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 87 completion record
+
+~~~markdown
+# Task 87 completion record
+
+{{TASK_087_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -7389,6 +8992,27 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 87 PR URL | `{{TASK_087_PR_URL}}` | Produced by Task 87; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 88 completion record
+
+~~~markdown
+# Task 88 completion record
+
+{{TASK_088_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -7466,6 +9090,27 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 87 PR URL | `{{TASK_087_PR_URL}}` | Produced by Task 87; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 89 completion record
+
+~~~markdown
+# Task 89 completion record
+
+{{TASK_089_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -7527,6 +9172,27 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 87 PR URL | `{{TASK_087_PR_URL}}` | Produced by Task 87; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 90 completion record
+
+~~~markdown
+# Task 90 completion record
+
+{{TASK_090_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -7577,6 +9243,34 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 92 — reverse-compare cycle 4 in PS — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 91 completion record
+
+~~~markdown
+# Task 91 completion record
+
+{{TASK_091_COMPLETION_RECORD}}
+~~~
+
+#### Task 82 completion record
+
+~~~markdown
+# Task 82 completion record
+
+{{TASK_082_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -7710,6 +9404,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 93 issue URL | `{{TASK_093_ISSUE_URL}}` | Produced by this task; replace {{TASK_093_ISSUE_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 92 completion record
+
+~~~markdown
+# Task 92 completion record
+
+{{TASK_092_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -7761,6 +9476,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 93 issue URL | `{{TASK_093_ISSUE_URL}}` | Produced by Task 93; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 93 completion record
+
+~~~markdown
+# Task 93 completion record
+
+{{TASK_093_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -7811,6 +9547,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 95 — implement the focused repair for cycle 4 in PS
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 93 issue URL | `{{TASK_093_ISSUE_URL}}` | Produced by Task 93; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 94 completion record
+
+~~~markdown
+# Task 94 completion record
+
+{{TASK_094_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -7929,6 +9686,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 93 issue URL | `{{TASK_093_ISSUE_URL}}` | Produced by Task 93; resolve globally before execution |
+| Task 96 PR URL | `{{TASK_096_PR_URL}}` | Produced by this task; replace {{TASK_096_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 95 completion record
+
+~~~markdown
+# Task 95 completion record
+
+{{TASK_095_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -7990,6 +9769,27 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 97 — run the Anthropic Claude Code review loop on the focused repair PR for cycle 4 in PS
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 96 PR URL | `{{TASK_096_PR_URL}}` | Produced by Task 96; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 96 completion record
+
+~~~markdown
+# Task 96 completion record
+
+{{TASK_096_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -8069,6 +9869,27 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 96 PR URL | `{{TASK_096_PR_URL}}` | Produced by Task 96; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 97 completion record
+
+~~~markdown
+# Task 97 completion record
+
+{{TASK_097_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -8146,6 +9967,27 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 96 PR URL | `{{TASK_096_PR_URL}}` | Produced by Task 96; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 98 completion record
+
+~~~markdown
+# Task 98 completion record
+
+{{TASK_098_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -8207,6 +10049,27 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 96 PR URL | `{{TASK_096_PR_URL}}` | Produced by Task 96; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 99 completion record
+
+~~~markdown
+# Task 99 completion record
+
+{{TASK_099_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -8257,6 +10120,34 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 101 — recheck the reciprocal result for cycle 4 in PS
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 100 completion record
+
+~~~markdown
+# Task 100 completion record
+
+{{TASK_100_COMPLETION_RECORD}}
+~~~
+
+#### Task 92 completion record
+
+~~~markdown
+# Task 92 completion record
+
+{{TASK_092_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -8376,6 +10267,26 @@ This recheck instance emits exactly one complete branch record: `REPAIR_REQUIRED
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 101 completion record
+
+~~~markdown
+# Task 101 completion record
+
+{{TASK_101_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -8426,6 +10337,27 @@ The permanent fixed-point or issue-closure record exists and every task-local tr
 ## Task 103 — close the PS foundation umbrella
 
 > **Execution class: Coding agent executable.** This is an issue-evidence and closure task, not implementation.
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #159 URL | `https://github.com/franklesniak/PSStyleGuide/issues/159` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 102 completion record
+
+~~~markdown
+# Task 102 completion record
+
+{{TASK_102_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -8478,6 +10410,27 @@ PS #159 is closed with complete, matching evidence in both repositories.
 ## Task 104 — commence the PS Claude review-loop command
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #163 URL | `https://github.com/franklesniak/PSStyleGuide/issues/163` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 103 completion record
+
+~~~markdown
+# Task 103 completion record
+
+{{TASK_103_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -8534,6 +10487,27 @@ The governing issue has an explicit, verified implementation-commencement record
 ## Task 105 — implement the PS Claude review-loop command
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #163 URL | `https://github.com/franklesniak/PSStyleGuide/issues/163` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 104 completion record
+
+~~~markdown
+# Task 104 completion record
+
+{{TASK_104_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -8645,6 +10619,28 @@ A committed, locally validated implementation candidate exists with exact identi
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #163 URL | `https://github.com/franklesniak/PSStyleGuide/issues/163` | Verified existing GitHub issue |
+| Task 106 PR URL | `{{TASK_106_PR_URL}}` | Produced by this task; replace {{TASK_106_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 105 completion record
+
+~~~markdown
+# Task 105 completion record
+
+{{TASK_105_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -8754,6 +10750,28 @@ The PS #163 candidate PR exists with complete initial validation and an accurate
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #163 URL | `https://github.com/franklesniak/PSStyleGuide/issues/163` | Verified existing GitHub issue |
+| Task 106 PR URL | `{{TASK_106_PR_URL}}` | Produced by Task 106; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 106 completion record
+
+~~~markdown
+# Task 106 completion record
+
+{{TASK_106_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -8831,6 +10849,28 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 
 > **Execution class: Coding agent executable.** Use a fresh coding-agent session.
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #163 URL | `https://github.com/franklesniak/PSStyleGuide/issues/163` | Verified existing GitHub issue |
+| Task 106 PR URL | `{{TASK_106_PR_URL}}` | Produced by Task 106; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 107 completion record
+
+~~~markdown
+# Task 107 completion record
+
+{{TASK_107_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -8907,6 +10947,28 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 107.
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #163 URL | `https://github.com/franklesniak/PSStyleGuide/issues/163` | Verified existing GitHub issue |
+| Task 106 PR URL | `{{TASK_106_PR_URL}}` | Produced by Task 106; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 108 completion record
+
+~~~markdown
+# Task 108 completion record
+
+{{TASK_108_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -8968,6 +11030,28 @@ The PR is merged and its actual landed identity is recorded, or the conditional 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #163 URL | `https://github.com/franklesniak/PSStyleGuide/issues/163` | Verified existing GitHub issue |
+| Task 106 PR URL | `{{TASK_106_PR_URL}}` | Produced by Task 106; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 109 completion record
+
+~~~markdown
+# Task 109 completion record
+
+{{TASK_109_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -9017,6 +11101,26 @@ PS #163 is closed and its permanent handoff is ready for Terraform comparison.
 ## Task 111 — compare cycle 5 in Terraform — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 110 completion record
+
+~~~markdown
+# Task 110 completion record
+
+{{TASK_110_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -9153,6 +11257,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 112 issue URL | `{{TASK_112_ISSUE_URL}}` | Produced by this task; replace {{TASK_112_ISSUE_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 111 completion record
+
+~~~markdown
+# Task 111 completion record
+
+{{TASK_111_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -9204,6 +11329,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 112 issue URL | `{{TASK_112_ISSUE_URL}}` | Produced by Task 112; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 112 completion record
+
+~~~markdown
+# Task 112 completion record
+
+{{TASK_112_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -9254,6 +11400,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 114 — implement the focused repair for cycle 5 in Terraform
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 112 issue URL | `{{TASK_112_ISSUE_URL}}` | Produced by Task 112; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 113 completion record
+
+~~~markdown
+# Task 113 completion record
+
+{{TASK_113_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -9371,6 +11538,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 112 issue URL | `{{TASK_112_ISSUE_URL}}` | Produced by Task 112; resolve globally before execution |
+| Task 115 PR URL | `{{TASK_115_PR_URL}}` | Produced by this task; replace {{TASK_115_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 114 completion record
+
+~~~markdown
+# Task 114 completion record
+
+{{TASK_114_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -9432,6 +11621,27 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 116 — run the Anthropic Claude Code review loop on the focused repair PR for cycle 5 in Terraform
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 115 PR URL | `{{TASK_115_PR_URL}}` | Produced by Task 115; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 115 completion record
+
+~~~markdown
+# Task 115 completion record
+
+{{TASK_115_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -9511,6 +11721,27 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 115 PR URL | `{{TASK_115_PR_URL}}` | Produced by Task 115; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 116 completion record
+
+~~~markdown
+# Task 116 completion record
+
+{{TASK_116_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -9588,6 +11819,27 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 115 PR URL | `{{TASK_115_PR_URL}}` | Produced by Task 115; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 117 completion record
+
+~~~markdown
+# Task 117 completion record
+
+{{TASK_117_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -9649,6 +11901,27 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 115 PR URL | `{{TASK_115_PR_URL}}` | Produced by Task 115; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 118 completion record
+
+~~~markdown
+# Task 118 completion record
+
+{{TASK_118_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -9699,6 +11972,34 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 120 — reverse-compare cycle 5 in PS — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 119 completion record
+
+~~~markdown
+# Task 119 completion record
+
+{{TASK_119_COMPLETION_RECORD}}
+~~~
+
+#### Task 110 completion record
+
+~~~markdown
+# Task 110 completion record
+
+{{TASK_110_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -9832,6 +12133,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 121 issue URL | `{{TASK_121_ISSUE_URL}}` | Produced by this task; replace {{TASK_121_ISSUE_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 120 completion record
+
+~~~markdown
+# Task 120 completion record
+
+{{TASK_120_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -9883,6 +12205,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 121 issue URL | `{{TASK_121_ISSUE_URL}}` | Produced by Task 121; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 121 completion record
+
+~~~markdown
+# Task 121 completion record
+
+{{TASK_121_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -9933,6 +12276,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 123 — implement the focused repair for cycle 5 in PS
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 121 issue URL | `{{TASK_121_ISSUE_URL}}` | Produced by Task 121; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 122 completion record
+
+~~~markdown
+# Task 122 completion record
+
+{{TASK_122_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -10051,6 +12415,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 121 issue URL | `{{TASK_121_ISSUE_URL}}` | Produced by Task 121; resolve globally before execution |
+| Task 124 PR URL | `{{TASK_124_PR_URL}}` | Produced by this task; replace {{TASK_124_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 123 completion record
+
+~~~markdown
+# Task 123 completion record
+
+{{TASK_123_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -10112,6 +12498,27 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 125 — run the Anthropic Claude Code review loop on the focused repair PR for cycle 5 in PS
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 124 PR URL | `{{TASK_124_PR_URL}}` | Produced by Task 124; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 124 completion record
+
+~~~markdown
+# Task 124 completion record
+
+{{TASK_124_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -10191,6 +12598,27 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 124 PR URL | `{{TASK_124_PR_URL}}` | Produced by Task 124; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 125 completion record
+
+~~~markdown
+# Task 125 completion record
+
+{{TASK_125_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -10268,6 +12696,27 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 124 PR URL | `{{TASK_124_PR_URL}}` | Produced by Task 124; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 126 completion record
+
+~~~markdown
+# Task 126 completion record
+
+{{TASK_126_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -10329,6 +12778,27 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 124 PR URL | `{{TASK_124_PR_URL}}` | Produced by Task 124; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 127 completion record
+
+~~~markdown
+# Task 127 completion record
+
+{{TASK_127_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -10379,6 +12849,34 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 129 — recheck the reciprocal result for cycle 5 in PS
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 120 completion record
+
+~~~markdown
+# Task 120 completion record
+
+{{TASK_120_COMPLETION_RECORD}}
+~~~
+
+#### Task 128 completion record
+
+~~~markdown
+# Task 128 completion record
+
+{{TASK_128_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -10498,6 +12996,26 @@ This recheck instance emits exactly one complete branch record: `REPAIR_REQUIRED
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 129 completion record
+
+~~~markdown
+# Task 129 completion record
+
+{{TASK_129_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -10548,6 +13066,27 @@ The permanent fixed-point or issue-closure record exists and every task-local tr
 ## Task 131 — close the Terraform initial-convergence tracker
 
 > **Execution class: Coding agent executable.** This is an issue-evidence and closure task, not implementation.
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #31 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/31` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 130 completion record
+
+~~~markdown
+# Task 130 completion record
+
+{{TASK_130_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -10609,6 +13148,27 @@ Terraform #31 is closed and its five records match the permanent records in PSSt
 ## Task 132 — commence Terraform #21 from the landed PS P1A source
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #21 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/21` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 131 completion record
+
+~~~markdown
+# Task 131 completion record
+
+{{TASK_131_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -10673,6 +13233,27 @@ The governing issue has an explicit, verified implementation-commencement record
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #21 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/21` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 132 completion record
+
+~~~markdown
+# Task 132 completion record
+
+{{TASK_132_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -10736,6 +13317,28 @@ A committed, locally validated implementation candidate exists with exact identi
 ## Task 134 — create or update the candidate PR for Terraform #21 from the landed PS P1A source
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #21 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/21` | Verified existing GitHub issue |
+| Task 134 PR URL | `{{TASK_134_PR_URL}}` | Produced by this task; replace {{TASK_134_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 133 completion record
+
+~~~markdown
+# Task 133 completion record
+
+{{TASK_133_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -10807,6 +13410,28 @@ The Terraform #21 candidate PR exists with complete initial validation and an ac
 ## Task 135 — run the Anthropic Claude Code review loop on the Terraform #21 PR
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #21 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/21` | Verified existing GitHub issue |
+| Task 134 PR URL | `{{TASK_134_PR_URL}}` | Produced by Task 134; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 134 completion record
+
+~~~markdown
+# Task 134 completion record
+
+{{TASK_134_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -10885,6 +13510,28 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 
 > **Execution class: Coding agent executable.** Use a fresh coding-agent session.
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #21 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/21` | Verified existing GitHub issue |
+| Task 134 PR URL | `{{TASK_134_PR_URL}}` | Produced by Task 134; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 135 completion record
+
+~~~markdown
+# Task 135 completion record
+
+{{TASK_135_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -10961,6 +13608,28 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 135.
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #21 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/21` | Verified existing GitHub issue |
+| Task 134 PR URL | `{{TASK_134_PR_URL}}` | Produced by Task 134; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 136 completion record
+
+~~~markdown
+# Task 136 completion record
+
+{{TASK_136_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -11022,6 +13691,28 @@ The PR is merged and its actual landed identity is recorded, or the conditional 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #21 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/21` | Verified existing GitHub issue |
+| Task 134 PR URL | `{{TASK_134_PR_URL}}` | Produced by Task 134; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 137 completion record
+
+~~~markdown
+# Task 137 completion record
+
+{{TASK_137_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -11071,6 +13762,27 @@ The Terraform #21 implementation is landed and its permanent implementation hand
 ## Task 139 — reverse-compare Terraform #21 in PS — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #21 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/21` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 138 completion record
+
+~~~markdown
+# Task 138 completion record
+
+{{TASK_138_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -11213,6 +13925,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #21 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/21` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 139 completion record
+
+~~~markdown
+# Task 139 completion record
+
+{{TASK_139_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -11264,6 +13997,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #21 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/21` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 140 completion record
+
+~~~markdown
+# Task 140 completion record
+
+{{TASK_140_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -11314,6 +14068,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 142 — implement the focused repair for Terraform #21 in PS
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #21 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/21` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 141 completion record
+
+~~~markdown
+# Task 141 completion record
+
+{{TASK_141_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -11432,6 +14207,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #21 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/21` | Verified existing GitHub issue |
+| Task 143 PR URL | `{{TASK_143_PR_URL}}` | Produced by this task; replace {{TASK_143_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 142 completion record
+
+~~~markdown
+# Task 142 completion record
+
+{{TASK_142_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -11493,6 +14290,28 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 144 — run the Anthropic Claude Code review loop on the focused repair PR for Terraform #21 in PS
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #21 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/21` | Verified existing GitHub issue |
+| Task 143 PR URL | `{{TASK_143_PR_URL}}` | Produced by Task 143; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 143 completion record
+
+~~~markdown
+# Task 143 completion record
+
+{{TASK_143_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -11572,6 +14391,28 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #21 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/21` | Verified existing GitHub issue |
+| Task 143 PR URL | `{{TASK_143_PR_URL}}` | Produced by Task 143; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 144 completion record
+
+~~~markdown
+# Task 144 completion record
+
+{{TASK_144_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -11649,6 +14490,28 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #21 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/21` | Verified existing GitHub issue |
+| Task 143 PR URL | `{{TASK_143_PR_URL}}` | Produced by Task 143; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 145 completion record
+
+~~~markdown
+# Task 145 completion record
+
+{{TASK_145_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -11710,6 +14573,28 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #21 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/21` | Verified existing GitHub issue |
+| Task 143 PR URL | `{{TASK_143_PR_URL}}` | Produced by Task 143; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 146 completion record
+
+~~~markdown
+# Task 146 completion record
+
+{{TASK_146_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -11760,6 +14645,26 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 148 — perform the final Terraform recheck — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 147 completion record
+
+~~~markdown
+# Task 147 completion record
+
+{{TASK_147_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -11892,6 +14797,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 149 issue URL | `{{TASK_149_ISSUE_URL}}` | Produced by this task; replace {{TASK_149_ISSUE_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 148 completion record
+
+~~~markdown
+# Task 148 completion record
+
+{{TASK_148_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -11943,6 +14869,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 149 issue URL | `{{TASK_149_ISSUE_URL}}` | Produced by Task 149; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 149 completion record
+
+~~~markdown
+# Task 149 completion record
+
+{{TASK_149_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -11993,6 +14940,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 151 — implement the focused repair for the final Terraform recheck
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 149 issue URL | `{{TASK_149_ISSUE_URL}}` | Produced by Task 149; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 150 completion record
+
+~~~markdown
+# Task 150 completion record
+
+{{TASK_150_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -12108,6 +15076,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 149 issue URL | `{{TASK_149_ISSUE_URL}}` | Produced by Task 149; resolve globally before execution |
+| Task 152 PR URL | `{{TASK_152_PR_URL}}` | Produced by this task; replace {{TASK_152_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 151 completion record
+
+~~~markdown
+# Task 151 completion record
+
+{{TASK_151_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -12169,6 +15159,27 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 153 — run the Anthropic Claude Code review loop on the focused repair PR for the final Terraform recheck
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 152 PR URL | `{{TASK_152_PR_URL}}` | Produced by Task 152; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 152 completion record
+
+~~~markdown
+# Task 152 completion record
+
+{{TASK_152_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -12248,6 +15259,27 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 152 PR URL | `{{TASK_152_PR_URL}}` | Produced by Task 152; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 153 completion record
+
+~~~markdown
+# Task 153 completion record
+
+{{TASK_153_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -12325,6 +15357,27 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 152 PR URL | `{{TASK_152_PR_URL}}` | Produced by Task 152; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 154 completion record
+
+~~~markdown
+# Task 154 completion record
+
+{{TASK_154_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -12386,6 +15439,27 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 152 PR URL | `{{TASK_152_PR_URL}}` | Produced by Task 152; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 155 completion record
+
+~~~markdown
+# Task 155 completion record
+
+{{TASK_155_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -12436,6 +15510,34 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 157 — recheck the reciprocal result for the final Terraform recheck
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 148 completion record
+
+~~~markdown
+# Task 148 completion record
+
+{{TASK_148_COMPLETION_RECORD}}
+~~~
+
+#### Task 156 completion record
+
+~~~markdown
+# Task 156 completion record
+
+{{TASK_156_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -12552,6 +15654,26 @@ This recheck instance emits exactly one complete branch record: `REPAIR_REQUIRED
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 157 completion record
+
+~~~markdown
+# Task 157 completion record
+
+{{TASK_157_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -12602,6 +15724,26 @@ The permanent fixed-point or issue-closure record exists and every task-local tr
 ## Task 159 — inventory all untracked cross-repository differences
 
 > **Execution class: Coding agent executable.** This is read-only analysis and does not start implementation.
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 158 completion record
+
+~~~markdown
+# Task 158 completion record
+
+{{TASK_158_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -12710,6 +15852,27 @@ Every inventoried role has one supported classification and owner. The report co
 ## Task 160 — assess one untracked-blocker reciprocal cycle — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | This disposition task reads both repositories |
+| Selected repair target | `{{TASK_160_SELECTED_TARGET_REPOSITORY}}` | Produced by this task when repair is required; replace globally when known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 159 completion record
+
+~~~markdown
+# Task 159 completion record
+
+{{TASK_159_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -12862,6 +16025,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_160_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 160; resolve globally before execution |
+| Task 161 issue URL | `{{TASK_161_ISSUE_URL}}` | Produced by this task; replace {{TASK_161_ISSUE_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 160 completion record
+
+~~~markdown
+# Task 160 completion record
+
+{{TASK_160_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -12913,6 +16097,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_160_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 160; resolve globally before execution |
+| Task 161 issue URL | `{{TASK_161_ISSUE_URL}}` | Produced by Task 161; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 161 completion record
+
+~~~markdown
+# Task 161 completion record
+
+{{TASK_161_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -12963,6 +16168,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 163 — implement the focused repair for one untracked-blocker reciprocal cycle
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_160_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 160; resolve globally before execution |
+| Task 161 issue URL | `{{TASK_161_ISSUE_URL}}` | Produced by Task 161; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 162 completion record
+
+~~~markdown
+# Task 162 completion record
+
+{{TASK_162_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -13085,6 +16311,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_160_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 160; resolve globally before execution |
+| Task 161 issue URL | `{{TASK_161_ISSUE_URL}}` | Produced by Task 161; resolve globally before execution |
+| Task 164 PR URL | `{{TASK_164_PR_URL}}` | Produced by this task; replace {{TASK_164_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 163 completion record
+
+~~~markdown
+# Task 163 completion record
+
+{{TASK_163_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -13146,6 +16394,27 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 165 — run the Anthropic Claude Code review loop on the focused repair PR for one untracked-blocker reciprocal cycle
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_160_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 160; resolve globally before execution |
+| Task 164 PR URL | `{{TASK_164_PR_URL}}` | Produced by Task 164; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 164 completion record
+
+~~~markdown
+# Task 164 completion record
+
+{{TASK_164_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -13225,6 +16494,27 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_160_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 160; resolve globally before execution |
+| Task 164 PR URL | `{{TASK_164_PR_URL}}` | Produced by Task 164; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 165 completion record
+
+~~~markdown
+# Task 165 completion record
+
+{{TASK_165_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -13302,6 +16592,27 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_160_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 160; resolve globally before execution |
+| Task 164 PR URL | `{{TASK_164_PR_URL}}` | Produced by Task 164; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 166 completion record
+
+~~~markdown
+# Task 166 completion record
+
+{{TASK_166_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -13363,6 +16674,27 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_160_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 160; resolve globally before execution |
+| Task 164 PR URL | `{{TASK_164_PR_URL}}` | Produced by Task 164; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 167 completion record
+
+~~~markdown
+# Task 167 completion record
+
+{{TASK_167_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -13413,6 +16745,34 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 169 — recheck the reciprocal result for one untracked-blocker reciprocal cycle
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 160 completion record
+
+~~~markdown
+# Task 160 completion record
+
+{{TASK_160_COMPLETION_RECORD}}
+~~~
+
+#### Task 168 completion record
+
+~~~markdown
+# Task 168 completion record
+
+{{TASK_168_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -13536,6 +16896,26 @@ This recheck instance emits exactly one complete branch record: `REPAIR_REQUIRED
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 169 completion record
+
+~~~markdown
+# Task 169 completion record
+
+{{TASK_169_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -13586,6 +16966,34 @@ The permanent fixed-point or issue-closure record exists and every task-local tr
 ## Task 171 — finalize the global consistency sweep
 
 > **Execution class: Coding agent executable.** This is a verification and evidence-publication task.
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 159 completion record
+
+~~~markdown
+# Task 159 completion record
+
+{{TASK_159_COMPLETION_RECORD}}
+~~~
+
+#### Task 170 completion record
+
+~~~markdown
+# Task 170 completion record
+
+{{TASK_170_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -13690,6 +17098,27 @@ The permanent global-sweep record proves zero untracked blockers and identifies 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #147 URL | `https://github.com/franklesniak/PSStyleGuide/issues/147` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 171 completion record
+
+~~~markdown
+# Task 171 completion record
+
+{{TASK_171_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -13737,6 +17166,27 @@ The governing issue has an explicit, verified implementation-commencement record
 ## Task 173 — prepare the PS P1B writer candidate and decision evidence
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #147 URL | `https://github.com/franklesniak/PSStyleGuide/issues/147` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 172 completion record
+
+~~~markdown
+# Task 172 completion record
+
+{{TASK_172_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -13793,6 +17243,28 @@ A committed, locally validated implementation candidate exists with exact identi
 ## Task 174 — create or update the candidate PR for the PS P1B writer candidate and decision evidence
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #147 URL | `https://github.com/franklesniak/PSStyleGuide/issues/147` | Verified existing GitHub issue |
+| Task 174 PR URL | `{{TASK_174_PR_URL}}` | Produced by this task; replace {{TASK_174_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 173 completion record
+
+~~~markdown
+# Task 173 completion record
+
+{{TASK_173_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -13852,6 +17324,44 @@ One locally validated P1B candidate and the complete decision/settings evidence 
 
 > **Execution class: Coding agent executable.** This is read-only preparation and can overlap Task 174.
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #147 URL | `https://github.com/franklesniak/PSStyleGuide/issues/147` | Verified existing GitHub issue |
+| PS issue #152 URL | `https://github.com/franklesniak/PSStyleGuide/issues/152` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 172 completion record
+
+~~~markdown
+# Task 172 completion record
+
+{{TASK_172_COMPLETION_RECORD}}
+~~~
+
+#### Task 174 completion record
+
+~~~markdown
+# Task 174 completion record
+
+{{TASK_174_COMPLETION_RECORD}}
+~~~
+
+#### Task 175 authorization record
+
+~~~markdown
+# Task 175 authorization record
+
+{{TASK_175_AUTHORIZATION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -13904,6 +17414,37 @@ PS #152 contains a complete, current, read-only evidence package that an owner c
 ## Task 176 — run the Anthropic Claude Code review loop on the PS #147 PR
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #147 URL | `https://github.com/franklesniak/PSStyleGuide/issues/147` | Verified existing GitHub issue |
+| PS issue #152 URL | `https://github.com/franklesniak/PSStyleGuide/issues/152` | Verified existing GitHub issue |
+| Task 174 PR URL | `{{TASK_174_PR_URL}}` | Produced by Task 174; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 174 completion record
+
+~~~markdown
+# Task 174 completion record
+
+{{TASK_174_COMPLETION_RECORD}}
+~~~
+
+#### Task 175 completion record
+
+~~~markdown
+# Task 175 completion record
+
+{{TASK_175_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -13983,6 +17524,29 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree, and the PS
 
 > **Execution class: Coding agent executable.** Use a fresh coding-agent session.
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #147 URL | `https://github.com/franklesniak/PSStyleGuide/issues/147` | Verified existing GitHub issue |
+| PS issue #152 URL | `https://github.com/franklesniak/PSStyleGuide/issues/152` | Verified existing GitHub issue |
+| Task 174 PR URL | `{{TASK_174_PR_URL}}` | Produced by Task 174; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 176 completion record
+
+~~~markdown
+# Task 176 completion record
+
+{{TASK_176_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -14059,6 +17623,44 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 176, and t
 
 > **Execution class: Human execution required.** The repository owner or administrator must decide each item.
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #147 URL | `https://github.com/franklesniak/PSStyleGuide/issues/147` | Verified existing GitHub issue |
+| PS issue #152 URL | `https://github.com/franklesniak/PSStyleGuide/issues/152` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 175 completion record
+
+~~~markdown
+# Task 175 completion record
+
+{{TASK_175_COMPLETION_RECORD}}
+~~~
+
+#### Task 177 completion record
+
+~~~markdown
+# Task 177 completion record
+
+{{TASK_177_COMPLETION_RECORD}}
+~~~
+
+#### Task 178 authorization record
+
+~~~markdown
+# Task 178 authorization record
+
+{{TASK_178_AUTHORIZATION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -14115,6 +17717,28 @@ The canonical records contain an explicit disposition for every required decisio
 ## Task 179 — prove and activate the approved PS #152 settings
 
 > **Execution class: Coding agent executable.** Recorded human approval is a required input. Do not merge PS #147 in this task.
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #147 URL | `https://github.com/franklesniak/PSStyleGuide/issues/147` | Verified existing GitHub issue |
+| PS issue #152 URL | `https://github.com/franklesniak/PSStyleGuide/issues/152` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 178 completion record
+
+~~~markdown
+# Task 178 completion record
+
+{{TASK_178_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -14176,6 +17800,28 @@ PS #152 is closed with a proved active persistent rule, complete retained eviden
 ## Task 180 — merge PS P1B
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #147 URL | `https://github.com/franklesniak/PSStyleGuide/issues/147` | Verified existing GitHub issue |
+| Task 174 PR URL | `{{TASK_174_PR_URL}}` | Produced by Task 174; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 179 completion record
+
+~~~markdown
+# Task 179 completion record
+
+{{TASK_179_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -14245,6 +17891,28 @@ The PR is merged and its actual landed identity is recorded, or the conditional 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #147 URL | `https://github.com/franklesniak/PSStyleGuide/issues/147` | Verified existing GitHub issue |
+| Task 174 PR URL | `{{TASK_174_PR_URL}}` | Produced by Task 174; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 180 completion record
+
+~~~markdown
+# Task 180 completion record
+
+{{TASK_180_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -14298,6 +17966,35 @@ PS #147 is closed by the proved merge and the permanent landed handoff is suffic
 ## Task 182 — update Terraform #22 from the landed PS P1B handoff
 
 > **Execution class: Coding agent executable.** This is issue setup and does not start implementation.
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #22 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/22` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 158 completion record
+
+~~~markdown
+# Task 158 completion record
+
+{{TASK_158_COMPLETION_RECORD}}
+~~~
+
+#### Task 181 completion record
+
+~~~markdown
+# Task 181 completion record
+
+{{TASK_181_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -14403,6 +18100,27 @@ Terraform #22 contains verified P1B source pins, scope, expected differences, se
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #22 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/22` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 182 completion record
+
+~~~markdown
+# Task 182 completion record
+
+{{TASK_182_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -14450,6 +18168,27 @@ The governing issue has an explicit, verified implementation-commencement record
 ## Task 184 — implement Terraform #22
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #22 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/22` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 183 completion record
+
+~~~markdown
+# Task 183 completion record
+
+{{TASK_183_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -14546,6 +18285,28 @@ A committed, locally validated implementation candidate exists with exact identi
 ## Task 185 — create or update the candidate PR for Terraform #22
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #22 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/22` | Verified existing GitHub issue |
+| Task 185 PR URL | `{{TASK_185_PR_URL}}` | Produced by this task; replace {{TASK_185_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 184 completion record
+
+~~~markdown
+# Task 184 completion record
+
+{{TASK_184_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -14650,6 +18411,28 @@ The Terraform #22 candidate PR exists with complete source, destination, validat
 ## Task 186 — run the Anthropic Claude Code review loop on the Terraform #22 PR
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #22 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/22` | Verified existing GitHub issue |
+| Task 185 PR URL | `{{TASK_185_PR_URL}}` | Produced by Task 185; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 185 completion record
+
+~~~markdown
+# Task 185 completion record
+
+{{TASK_185_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -14773,6 +18556,28 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 
 > **Execution class: Coding agent executable.** Use a fresh coding-agent session.
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #22 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/22` | Verified existing GitHub issue |
+| Task 185 PR URL | `{{TASK_185_PR_URL}}` | Produced by Task 185; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 186 completion record
+
+~~~markdown
+# Task 186 completion record
+
+{{TASK_186_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -14849,6 +18654,28 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 186.
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #22 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/22` | Verified existing GitHub issue |
+| Task 185 PR URL | `{{TASK_185_PR_URL}}` | Produced by Task 185; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 187 completion record
+
+~~~markdown
+# Task 187 completion record
+
+{{TASK_187_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -14910,6 +18737,28 @@ The PR is merged and its actual landed identity is recorded, or the conditional 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #22 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/22` | Verified existing GitHub issue |
+| Task 185 PR URL | `{{TASK_185_PR_URL}}` | Produced by Task 185; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 188 completion record
+
+~~~markdown
+# Task 188 completion record
+
+{{TASK_188_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -14959,6 +18808,26 @@ Terraform #22 is closed by the landed PR and its complete handoff is ready for r
 ## Task 190 — reverse-compare T1B in PS — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 189 completion record
+
+~~~markdown
+# Task 189 completion record
+
+{{TASK_189_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -15092,6 +18961,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 191 issue URL | `{{TASK_191_ISSUE_URL}}` | Produced by this task; replace {{TASK_191_ISSUE_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 190 completion record
+
+~~~markdown
+# Task 190 completion record
+
+{{TASK_190_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -15143,6 +19033,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 191 issue URL | `{{TASK_191_ISSUE_URL}}` | Produced by Task 191; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 191 completion record
+
+~~~markdown
+# Task 191 completion record
+
+{{TASK_191_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -15193,6 +19104,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 193 — implement the focused repair for T1B in PS
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 191 issue URL | `{{TASK_191_ISSUE_URL}}` | Produced by Task 191; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 192 completion record
+
+~~~markdown
+# Task 192 completion record
+
+{{TASK_192_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -15311,6 +19243,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 191 issue URL | `{{TASK_191_ISSUE_URL}}` | Produced by Task 191; resolve globally before execution |
+| Task 194 PR URL | `{{TASK_194_PR_URL}}` | Produced by this task; replace {{TASK_194_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 193 completion record
+
+~~~markdown
+# Task 193 completion record
+
+{{TASK_193_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -15372,6 +19326,27 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 195 — run the Anthropic Claude Code review loop on the focused repair PR for T1B in PS
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 194 PR URL | `{{TASK_194_PR_URL}}` | Produced by Task 194; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 194 completion record
+
+~~~markdown
+# Task 194 completion record
+
+{{TASK_194_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -15451,6 +19426,27 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 194 PR URL | `{{TASK_194_PR_URL}}` | Produced by Task 194; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 195 completion record
+
+~~~markdown
+# Task 195 completion record
+
+{{TASK_195_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -15528,6 +19524,27 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 194 PR URL | `{{TASK_194_PR_URL}}` | Produced by Task 194; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 196 completion record
+
+~~~markdown
+# Task 196 completion record
+
+{{TASK_196_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -15589,6 +19606,27 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 194 PR URL | `{{TASK_194_PR_URL}}` | Produced by Task 194; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 197 completion record
+
+~~~markdown
+# Task 197 completion record
+
+{{TASK_197_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -15639,6 +19677,26 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 199 — perform the final Terraform T1B recheck — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 198 completion record
+
+~~~markdown
+# Task 198 completion record
+
+{{TASK_198_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -15766,6 +19824,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 200 issue URL | `{{TASK_200_ISSUE_URL}}` | Produced by this task; replace {{TASK_200_ISSUE_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 199 completion record
+
+~~~markdown
+# Task 199 completion record
+
+{{TASK_199_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -15817,6 +19896,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 200 issue URL | `{{TASK_200_ISSUE_URL}}` | Produced by Task 200; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 200 completion record
+
+~~~markdown
+# Task 200 completion record
+
+{{TASK_200_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -15867,6 +19967,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 202 — implement the focused repair for the final Terraform T1B recheck
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 200 issue URL | `{{TASK_200_ISSUE_URL}}` | Produced by Task 200; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 201 completion record
+
+~~~markdown
+# Task 201 completion record
+
+{{TASK_201_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -15982,6 +20103,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 200 issue URL | `{{TASK_200_ISSUE_URL}}` | Produced by Task 200; resolve globally before execution |
+| Task 203 PR URL | `{{TASK_203_PR_URL}}` | Produced by this task; replace {{TASK_203_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 202 completion record
+
+~~~markdown
+# Task 202 completion record
+
+{{TASK_202_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -16043,6 +20186,27 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 204 — run the Anthropic Claude Code review loop on the focused repair PR for the final Terraform T1B recheck
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 203 PR URL | `{{TASK_203_PR_URL}}` | Produced by Task 203; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 203 completion record
+
+~~~markdown
+# Task 203 completion record
+
+{{TASK_203_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -16122,6 +20286,27 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 203 PR URL | `{{TASK_203_PR_URL}}` | Produced by Task 203; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 204 completion record
+
+~~~markdown
+# Task 204 completion record
+
+{{TASK_204_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -16199,6 +20384,27 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 203 PR URL | `{{TASK_203_PR_URL}}` | Produced by Task 203; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 205 completion record
+
+~~~markdown
+# Task 205 completion record
+
+{{TASK_205_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -16260,6 +20466,27 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 203 PR URL | `{{TASK_203_PR_URL}}` | Produced by Task 203; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 206 completion record
+
+~~~markdown
+# Task 206 completion record
+
+{{TASK_206_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -16310,6 +20537,34 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 208 — recheck the reciprocal result for the final Terraform T1B recheck
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 199 completion record
+
+~~~markdown
+# Task 199 completion record
+
+{{TASK_199_COMPLETION_RECORD}}
+~~~
+
+#### Task 207 completion record
+
+~~~markdown
+# Task 207 completion record
+
+{{TASK_207_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -16426,6 +20681,26 @@ This recheck instance emits exactly one complete branch record: `REPAIR_REQUIRED
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 208 completion record
+
+~~~markdown
+# Task 208 completion record
+
+{{TASK_208_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -16477,6 +20752,27 @@ The permanent fixed-point or issue-closure record exists and every task-local tr
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 209 completion record
+
+~~~markdown
+# Task 209 completion record
+
+{{TASK_209_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -16524,6 +20820,27 @@ The governing issue has an explicit, verified implementation-commencement record
 ## Task 211 — implement PS #148
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 210 completion record
+
+~~~markdown
+# Task 210 completion record
+
+{{TASK_210_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -16575,6 +20892,28 @@ A committed, locally validated implementation candidate exists with exact identi
 ## Task 212 — create or update the candidate PR for PS #148
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+| Task 212 PR URL | `{{TASK_212_PR_URL}}` | Produced by this task; replace {{TASK_212_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 211 completion record
+
+~~~markdown
+# Task 211 completion record
+
+{{TASK_211_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -16633,6 +20972,28 @@ The PS #148 candidate PR exists with all required identities, initial validation
 ## Task 213 — run the Anthropic Claude Code review loop on the PS #148 PR
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+| Task 212 PR URL | `{{TASK_212_PR_URL}}` | Produced by Task 212; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 212 completion record
+
+~~~markdown
+# Task 212 completion record
+
+{{TASK_212_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -16711,6 +21072,28 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 
 > **Execution class: Coding agent executable.** Use a fresh coding-agent session.
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+| Task 212 PR URL | `{{TASK_212_PR_URL}}` | Produced by Task 212; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 213 completion record
+
+~~~markdown
+# Task 213 completion record
+
+{{TASK_213_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -16787,6 +21170,28 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 213.
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+| Task 212 PR URL | `{{TASK_212_PR_URL}}` | Produced by Task 212; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 214 completion record
+
+~~~markdown
+# Task 214 completion record
+
+{{TASK_214_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -16848,6 +21253,28 @@ The PR is merged and its actual landed identity is recorded, or the conditional 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+| Task 212 PR URL | `{{TASK_212_PR_URL}}` | Produced by Task 212; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 215 completion record
+
+~~~markdown
+# Task 215 completion record
+
+{{TASK_215_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -16897,6 +21324,27 @@ PS #148 is closed by the landed PR and its handoff is ready for Terraform compar
 ## Task 217 — compare PS #148 in Terraform — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 216 completion record
+
+~~~markdown
+# Task 216 completion record
+
+{{TASK_216_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -17033,6 +21481,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 217 completion record
+
+~~~markdown
+# Task 217 completion record
+
+{{TASK_217_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -17084,6 +21553,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 218 completion record
+
+~~~markdown
+# Task 218 completion record
+
+{{TASK_218_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -17134,6 +21624,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 220 — implement the focused repair for PS #148 in Terraform
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 219 completion record
+
+~~~markdown
+# Task 219 completion record
+
+{{TASK_219_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -17251,6 +21762,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+| Task 221 PR URL | `{{TASK_221_PR_URL}}` | Produced by this task; replace {{TASK_221_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 220 completion record
+
+~~~markdown
+# Task 220 completion record
+
+{{TASK_220_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -17312,6 +21845,28 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 222 — run the Anthropic Claude Code review loop on the focused repair PR for PS #148 in Terraform
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+| Task 221 PR URL | `{{TASK_221_PR_URL}}` | Produced by Task 221; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 221 completion record
+
+~~~markdown
+# Task 221 completion record
+
+{{TASK_221_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -17391,6 +21946,28 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+| Task 221 PR URL | `{{TASK_221_PR_URL}}` | Produced by Task 221; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 222 completion record
+
+~~~markdown
+# Task 222 completion record
+
+{{TASK_222_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -17468,6 +22045,28 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+| Task 221 PR URL | `{{TASK_221_PR_URL}}` | Produced by Task 221; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 223 completion record
+
+~~~markdown
+# Task 223 completion record
+
+{{TASK_223_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -17529,6 +22128,28 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+| Task 221 PR URL | `{{TASK_221_PR_URL}}` | Produced by Task 221; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 224 completion record
+
+~~~markdown
+# Task 224 completion record
+
+{{TASK_224_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -17579,6 +22200,27 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 226 — reverse-compare the PS #148 cycle — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 225 completion record
+
+~~~markdown
+# Task 225 completion record
+
+{{TASK_225_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -17712,6 +22354,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 226 completion record
+
+~~~markdown
+# Task 226 completion record
+
+{{TASK_226_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -17763,6 +22426,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 227 completion record
+
+~~~markdown
+# Task 227 completion record
+
+{{TASK_227_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -17813,6 +22497,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 229 — implement the focused repair for the PS #148 cycle
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 228 completion record
+
+~~~markdown
+# Task 228 completion record
+
+{{TASK_228_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -17931,6 +22636,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+| Task 230 PR URL | `{{TASK_230_PR_URL}}` | Produced by this task; replace {{TASK_230_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 229 completion record
+
+~~~markdown
+# Task 229 completion record
+
+{{TASK_229_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -17992,6 +22719,28 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 231 — run the Anthropic Claude Code review loop on the focused repair PR for the PS #148 cycle
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+| Task 230 PR URL | `{{TASK_230_PR_URL}}` | Produced by Task 230; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 230 completion record
+
+~~~markdown
+# Task 230 completion record
+
+{{TASK_230_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -18071,6 +22820,28 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+| Task 230 PR URL | `{{TASK_230_PR_URL}}` | Produced by Task 230; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 231 completion record
+
+~~~markdown
+# Task 231 completion record
+
+{{TASK_231_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -18148,6 +22919,28 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+| Task 230 PR URL | `{{TASK_230_PR_URL}}` | Produced by Task 230; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 232 completion record
+
+~~~markdown
+# Task 232 completion record
+
+{{TASK_232_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -18209,6 +23002,28 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+| Task 230 PR URL | `{{TASK_230_PR_URL}}` | Produced by Task 230; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 233 completion record
+
+~~~markdown
+# Task 233 completion record
+
+{{TASK_233_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -18259,6 +23074,35 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 235 — recheck the reciprocal result for the PS #148 cycle
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 226 completion record
+
+~~~markdown
+# Task 226 completion record
+
+{{TASK_226_COMPLETION_RECORD}}
+~~~
+
+#### Task 234 completion record
+
+~~~markdown
+# Task 234 completion record
+
+{{TASK_234_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -18378,6 +23222,27 @@ This recheck instance emits exactly one complete branch record: `REPAIR_REQUIRED
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #148 URL | `https://github.com/franklesniak/PSStyleGuide/issues/148` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 235 completion record
+
+~~~markdown
+# Task 235 completion record
+
+{{TASK_235_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -18429,6 +23294,35 @@ The permanent fixed-point or issue-closure record exists and every task-local tr
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #23 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/23` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 189 completion record
+
+~~~markdown
+# Task 189 completion record
+
+{{TASK_189_COMPLETION_RECORD}}
+~~~
+
+#### Task 236 completion record
+
+~~~markdown
+# Task 236 completion record
+
+{{TASK_236_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -18477,6 +23371,27 @@ The governing issue has an explicit, verified implementation-commencement record
 ## Task 238 — implement Terraform #23
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #23 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/23` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 237 completion record
+
+~~~markdown
+# Task 237 completion record
+
+{{TASK_237_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -18529,6 +23444,28 @@ A committed, locally validated implementation candidate exists with exact identi
 ## Task 239 — create or update the candidate PR for Terraform #23
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #23 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/23` | Verified existing GitHub issue |
+| Task 239 PR URL | `{{TASK_239_PR_URL}}` | Produced by this task; replace {{TASK_239_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 238 completion record
+
+~~~markdown
+# Task 238 completion record
+
+{{TASK_238_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -18587,6 +23524,28 @@ The Terraform #23 candidate PR exists with complete initial identity, validation
 ## Task 240 — run the Anthropic Claude Code review loop on the Terraform #23 PR
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #23 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/23` | Verified existing GitHub issue |
+| Task 239 PR URL | `{{TASK_239_PR_URL}}` | Produced by Task 239; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 239 completion record
+
+~~~markdown
+# Task 239 completion record
+
+{{TASK_239_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -18665,6 +23624,28 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 
 > **Execution class: Coding agent executable.** Use a fresh coding-agent session.
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #23 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/23` | Verified existing GitHub issue |
+| Task 239 PR URL | `{{TASK_239_PR_URL}}` | Produced by Task 239; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 240 completion record
+
+~~~markdown
+# Task 240 completion record
+
+{{TASK_240_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -18741,6 +23722,28 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 240.
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #23 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/23` | Verified existing GitHub issue |
+| Task 239 PR URL | `{{TASK_239_PR_URL}}` | Produced by Task 239; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 241 completion record
+
+~~~markdown
+# Task 241 completion record
+
+{{TASK_241_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -18802,6 +23805,28 @@ The PR is merged and its actual landed identity is recorded, or the conditional 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #23 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/23` | Verified existing GitHub issue |
+| Task 239 PR URL | `{{TASK_239_PR_URL}}` | Produced by Task 239; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 242 completion record
+
+~~~markdown
+# Task 242 completion record
+
+{{TASK_242_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -18851,6 +23876,27 @@ Terraform #23 is closed by the landed PR and its handoff is ready for PS applica
 ## Task 244 — evaluate Terraform #23 applicability in PS — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #23 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/23` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 243 completion record
+
+~~~markdown
+# Task 243 completion record
+
+{{TASK_243_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -18997,6 +24043,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #23 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/23` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 244 completion record
+
+~~~markdown
+# Task 244 completion record
+
+{{TASK_244_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -19048,6 +24115,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #23 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/23` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 245 completion record
+
+~~~markdown
+# Task 245 completion record
+
+{{TASK_245_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -19098,6 +24186,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 247 — implement the focused repair for Terraform #23 applicability in PS
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #23 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/23` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 246 completion record
+
+~~~markdown
+# Task 246 completion record
+
+{{TASK_246_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -19220,6 +24329,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #23 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/23` | Verified existing GitHub issue |
+| Task 248 PR URL | `{{TASK_248_PR_URL}}` | Produced by this task; replace {{TASK_248_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 247 completion record
+
+~~~markdown
+# Task 247 completion record
+
+{{TASK_247_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -19281,6 +24412,28 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 249 — run the Anthropic Claude Code review loop on the focused repair PR for Terraform #23 applicability in PS
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #23 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/23` | Verified existing GitHub issue |
+| Task 248 PR URL | `{{TASK_248_PR_URL}}` | Produced by Task 248; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 248 completion record
+
+~~~markdown
+# Task 248 completion record
+
+{{TASK_248_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -19360,6 +24513,28 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #23 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/23` | Verified existing GitHub issue |
+| Task 248 PR URL | `{{TASK_248_PR_URL}}` | Produced by Task 248; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 249 completion record
+
+~~~markdown
+# Task 249 completion record
+
+{{TASK_249_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -19437,6 +24612,28 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #23 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/23` | Verified existing GitHub issue |
+| Task 248 PR URL | `{{TASK_248_PR_URL}}` | Produced by Task 248; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 250 completion record
+
+~~~markdown
+# Task 250 completion record
+
+{{TASK_250_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -19498,6 +24695,28 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #23 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/23` | Verified existing GitHub issue |
+| Task 248 PR URL | `{{TASK_248_PR_URL}}` | Produced by Task 248; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 251 completion record
+
+~~~markdown
+# Task 251 completion record
+
+{{TASK_251_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -19548,6 +24767,35 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 253 — recheck the reciprocal result for Terraform #23 applicability in PS
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #23 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/23` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 244 completion record
+
+~~~markdown
+# Task 244 completion record
+
+{{TASK_244_COMPLETION_RECORD}}
+~~~
+
+#### Task 252 completion record
+
+~~~markdown
+# Task 252 completion record
+
+{{TASK_252_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -19671,6 +24919,27 @@ This recheck instance emits exactly one complete branch record: `REPAIR_REQUIRED
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #23 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/23` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 253 completion record
+
+~~~markdown
+# Task 253 completion record
+
+{{TASK_253_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -19721,6 +24990,43 @@ The permanent fixed-point or issue-closure record exists and every task-local tr
 ## Task 255 — commence the PS P3 candidate for merge
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #149 URL | `https://github.com/franklesniak/PSStyleGuide/issues/149` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 181 completion record
+
+~~~markdown
+# Task 181 completion record
+
+{{TASK_181_COMPLETION_RECORD}}
+~~~
+
+#### Task 216 completion record
+
+~~~markdown
+# Task 216 completion record
+
+{{TASK_216_COMPLETION_RECORD}}
+~~~
+
+#### Task 254 completion record
+
+~~~markdown
+# Task 254 completion record
+
+{{TASK_254_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -19778,6 +25084,27 @@ The governing issue has an explicit, verified implementation-commencement record
 ## Task 256 — prepare the PS P3 candidate for merge
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #149 URL | `https://github.com/franklesniak/PSStyleGuide/issues/149` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 255 completion record
+
+~~~markdown
+# Task 255 completion record
+
+{{TASK_255_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -19837,6 +25164,28 @@ A committed, locally validated implementation candidate exists with exact identi
 ## Task 257 — create or update the candidate PR for the PS P3 candidate for merge
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #149 URL | `https://github.com/franklesniak/PSStyleGuide/issues/149` | Verified existing GitHub issue |
+| Task 257 PR URL | `{{TASK_257_PR_URL}}` | Produced by this task; replace {{TASK_257_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 256 completion record
+
+~~~markdown
+# Task 256 completion record
+
+{{TASK_256_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -19902,6 +25251,28 @@ PS #149 has one locally validated candidate PR and a verified evidence package.
 ## Task 258 — run the Anthropic Claude Code review loop on the PS #149 PR
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #149 URL | `https://github.com/franklesniak/PSStyleGuide/issues/149` | Verified existing GitHub issue |
+| Task 257 PR URL | `{{TASK_257_PR_URL}}` | Produced by Task 257; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 257 completion record
+
+~~~markdown
+# Task 257 completion record
+
+{{TASK_257_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -19980,6 +25351,28 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 
 > **Execution class: Coding agent executable.** Use a fresh coding-agent session.
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #149 URL | `https://github.com/franklesniak/PSStyleGuide/issues/149` | Verified existing GitHub issue |
+| Task 257 PR URL | `{{TASK_257_PR_URL}}` | Produced by Task 257; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 258 completion record
+
+~~~markdown
+# Task 258 completion record
+
+{{TASK_258_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -20056,6 +25449,16 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 258. The P
 
 > **Execution class: Coding agent executable.** Run this task at exactly `2026-08-21T23:59:59Z`. It is a status check, not implementation.
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #149 URL | `https://github.com/franklesniak/PSStyleGuide/issues/149` | Verified existing GitHub issue |
+| Task 257 PR URL | `{{TASK_257_PR_URL}}` | Produced by Task 257; resolve globally before execution |
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -20109,6 +25512,36 @@ One timestamped, verified checkpoint record states whether the PS #149 merge pat
 ## Task 261 — select and approve the PS #149 deadline path
 
 > **Execution class: Human execution required.** The repository owner must select the deadline path.
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #149 URL | `https://github.com/franklesniak/PSStyleGuide/issues/149` | Verified existing GitHub issue |
+| Task 257 PR URL | `{{TASK_257_PR_URL}}` | Produced by Task 257; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 260 completion record
+
+~~~markdown
+# Task 260 completion record
+
+{{TASK_260_COMPLETION_RECORD}}
+~~~
+
+#### Task 261 authorization record
+
+~~~markdown
+# Task 261 authorization record
+
+{{TASK_261_AUTHORIZATION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -20166,6 +25599,27 @@ The canonical record approves the current PS #149 merge path or a separate fallb
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #149 URL | `https://github.com/franklesniak/PSStyleGuide/issues/149` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 261 completion record
+
+~~~markdown
+# Task 261 completion record
+
+{{TASK_261_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -20218,6 +25672,27 @@ The exact approved fallback issue exists without implementation commencement, or
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #149 URL | `https://github.com/franklesniak/PSStyleGuide/issues/149` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 262 completion record
+
+~~~markdown
+# Task 262 completion record
+
+{{TASK_262_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -20268,6 +25743,27 @@ The governing issue has an explicit, verified implementation-commencement record
 ## Task 264 — implement an approved advisory fallback
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #149 URL | `https://github.com/franklesniak/PSStyleGuide/issues/149` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 263 completion record
+
+~~~markdown
+# Task 263 completion record
+
+{{TASK_263_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -20323,6 +25819,28 @@ A committed, locally validated implementation candidate exists with exact identi
 ## Task 265 — create or update the candidate PR for an approved advisory fallback
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #149 URL | `https://github.com/franklesniak/PSStyleGuide/issues/149` | Verified existing GitHub issue |
+| Task 265 PR URL | `{{TASK_265_PR_URL}}` | Produced by this task; replace {{TASK_265_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 264 completion record
+
+~~~markdown
+# Task 264 completion record
+
+{{TASK_264_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -20383,6 +25901,28 @@ The approved fallback candidate PR exists with all required decision, identity, 
 ## Task 266 — run the Anthropic Claude Code review loop on the fallback PR
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.** Skip this task when Task 265 is skipped.
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #149 URL | `https://github.com/franklesniak/PSStyleGuide/issues/149` | Verified existing GitHub issue |
+| Task 265 PR URL | `{{TASK_265_PR_URL}}` | Produced by Task 265; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 265 completion record
+
+~~~markdown
+# Task 265 completion record
+
+{{TASK_265_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -20461,6 +26001,28 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 
 > **Execution class: Coding agent executable.** Use a fresh coding-agent session. Skip this task when Task 265 is skipped.
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #149 URL | `https://github.com/franklesniak/PSStyleGuide/issues/149` | Verified existing GitHub issue |
+| Task 265 PR URL | `{{TASK_265_PR_URL}}` | Produced by Task 265; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 266 completion record
+
+~~~markdown
+# Task 266 completion record
+
+{{TASK_266_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -20537,6 +26099,28 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 266.
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #149 URL | `https://github.com/franklesniak/PSStyleGuide/issues/149` | Verified existing GitHub issue |
+| Task 265 PR URL | `{{TASK_265_PR_URL}}` | Produced by Task 265; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 267 completion record
+
+~~~markdown
+# Task 267 completion record
+
+{{TASK_267_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -20599,6 +26183,28 @@ The PR is merged and its actual landed identity is recorded, or the conditional 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #149 URL | `https://github.com/franklesniak/PSStyleGuide/issues/149` | Verified existing GitHub issue |
+| Task 265 PR URL | `{{TASK_265_PR_URL}}` | Produced by Task 265; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 268 completion record
+
+~~~markdown
+# Task 268 completion record
+
+{{TASK_268_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -20649,6 +26255,44 @@ The approved fallback is landed with all required evidence before advisory expir
 ## Task 270 — check whether the PS #149 candidate requires a post-fallback refresh
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #149 URL | `https://github.com/franklesniak/PSStyleGuide/issues/149` | Verified existing GitHub issue |
+| Task 257 PR URL | `{{TASK_257_PR_URL}}` | Produced by Task 257; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 259 completion record
+
+~~~markdown
+# Task 259 completion record
+
+{{TASK_259_COMPLETION_RECORD}}
+~~~
+
+#### Task 261 completion record
+
+~~~markdown
+# Task 261 completion record
+
+{{TASK_261_COMPLETION_RECORD}}
+~~~
+
+#### Task 269 completion record
+
+~~~markdown
+# Task 269 completion record
+
+{{TASK_269_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -20716,6 +26360,28 @@ The current PS #149 candidate has an exact `MERGE_READY` record, or this instanc
 ## Task 271 — merge the PS #149 PR
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #149 URL | `https://github.com/franklesniak/PSStyleGuide/issues/149` | Verified existing GitHub issue |
+| Task 257 PR URL | `{{TASK_257_PR_URL}}` | Produced by Task 257; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 270 completion record
+
+~~~markdown
+# Task 270 completion record
+
+{{TASK_270_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -20785,6 +26451,28 @@ The PR is merged and its actual landed identity is recorded, or the conditional 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #149 URL | `https://github.com/franklesniak/PSStyleGuide/issues/149` | Verified existing GitHub issue |
+| Task 257 PR URL | `{{TASK_257_PR_URL}}` | Produced by Task 257; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 271 completion record
+
+~~~markdown
+# Task 271 completion record
+
+{{TASK_271_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -20838,6 +26526,35 @@ PS #149 is closed by the approved merge and Terraform #24 can adapt the landed r
 ## Task 273 — update Terraform #24 from the landed PS P3 handoff
 
 > **Execution class: Coding agent executable.** This is issue setup and does not start implementation.
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #24 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/24` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 243 completion record
+
+~~~markdown
+# Task 243 completion record
+
+{{TASK_243_COMPLETION_RECORD}}
+~~~
+
+#### Task 272 completion record
+
+~~~markdown
+# Task 272 completion record
+
+{{TASK_272_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -20943,6 +26660,27 @@ Terraform #24 contains the complete pinned starting point, scope, common control
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #24 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/24` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 273 completion record
+
+~~~markdown
+# Task 273 completion record
+
+{{TASK_273_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -20990,6 +26728,27 @@ The governing issue has an explicit, verified implementation-commencement record
 ## Task 275 — implement Terraform #24
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #24 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/24` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 274 completion record
+
+~~~markdown
+# Task 274 completion record
+
+{{TASK_274_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -21086,6 +26845,28 @@ A committed, locally validated implementation candidate exists with exact identi
 ## Task 276 — create or update the candidate PR for Terraform #24
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #24 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/24` | Verified existing GitHub issue |
+| Task 276 PR URL | `{{TASK_276_PR_URL}}` | Produced by this task; replace {{TASK_276_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 275 completion record
+
+~~~markdown
+# Task 275 completion record
+
+{{TASK_275_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -21190,6 +26971,28 @@ The Terraform #24 candidate PR exists with complete source, destination, identit
 ## Task 277 — run the Anthropic Claude Code review loop on the Terraform #24 PR
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #24 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/24` | Verified existing GitHub issue |
+| Task 276 PR URL | `{{TASK_276_PR_URL}}` | Produced by Task 276; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 276 completion record
+
+~~~markdown
+# Task 276 completion record
+
+{{TASK_276_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -21313,6 +27116,28 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 
 > **Execution class: Coding agent executable.** Use a fresh coding-agent session.
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #24 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/24` | Verified existing GitHub issue |
+| Task 276 PR URL | `{{TASK_276_PR_URL}}` | Produced by Task 276; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 277 completion record
+
+~~~markdown
+# Task 277 completion record
+
+{{TASK_277_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -21389,6 +27214,28 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 277.
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #24 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/24` | Verified existing GitHub issue |
+| Task 276 PR URL | `{{TASK_276_PR_URL}}` | Produced by Task 276; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 278 completion record
+
+~~~markdown
+# Task 278 completion record
+
+{{TASK_278_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -21450,6 +27297,28 @@ The PR is merged and its actual landed identity is recorded, or the conditional 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Terraform issue #24 URL | `https://github.com/franklesniak/TerraformStyleGuide/issues/24` | Verified existing GitHub issue |
+| Task 276 PR URL | `{{TASK_276_PR_URL}}` | Produced by Task 276; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 279 completion record
+
+~~~markdown
+# Task 279 completion record
+
+{{TASK_279_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -21499,6 +27368,26 @@ Terraform #24 is closed by the landed PR and the result is ready for reverse PS 
 ## Task 281 — reverse-compare T3 in PS — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 280 completion record
+
+~~~markdown
+# Task 280 completion record
+
+{{TASK_280_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -21632,6 +27521,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 282 issue URL | `{{TASK_282_ISSUE_URL}}` | Produced by this task; replace {{TASK_282_ISSUE_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 281 completion record
+
+~~~markdown
+# Task 281 completion record
+
+{{TASK_281_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -21683,6 +27593,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 282 issue URL | `{{TASK_282_ISSUE_URL}}` | Produced by Task 282; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 282 completion record
+
+~~~markdown
+# Task 282 completion record
+
+{{TASK_282_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -21733,6 +27664,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 284 — implement the focused repair for T3 in PS
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 282 issue URL | `{{TASK_282_ISSUE_URL}}` | Produced by Task 282; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 283 completion record
+
+~~~markdown
+# Task 283 completion record
+
+{{TASK_283_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -21851,6 +27803,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 282 issue URL | `{{TASK_282_ISSUE_URL}}` | Produced by Task 282; resolve globally before execution |
+| Task 285 PR URL | `{{TASK_285_PR_URL}}` | Produced by this task; replace {{TASK_285_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 284 completion record
+
+~~~markdown
+# Task 284 completion record
+
+{{TASK_284_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -21912,6 +27886,27 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 286 — run the Anthropic Claude Code review loop on the focused repair PR for T3 in PS
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 285 PR URL | `{{TASK_285_PR_URL}}` | Produced by Task 285; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 285 completion record
+
+~~~markdown
+# Task 285 completion record
+
+{{TASK_285_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -21991,6 +27986,27 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 285 PR URL | `{{TASK_285_PR_URL}}` | Produced by Task 285; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 286 completion record
+
+~~~markdown
+# Task 286 completion record
+
+{{TASK_286_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -22068,6 +28084,27 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 285 PR URL | `{{TASK_285_PR_URL}}` | Produced by Task 285; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 287 completion record
+
+~~~markdown
+# Task 287 completion record
+
+{{TASK_287_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -22129,6 +28166,27 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 285 PR URL | `{{TASK_285_PR_URL}}` | Produced by Task 285; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 288 completion record
+
+~~~markdown
+# Task 288 completion record
+
+{{TASK_288_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -22179,6 +28237,26 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 290 — perform the final Terraform T3 recheck — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 289 completion record
+
+~~~markdown
+# Task 289 completion record
+
+{{TASK_289_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -22306,6 +28384,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 291 issue URL | `{{TASK_291_ISSUE_URL}}` | Produced by this task; replace {{TASK_291_ISSUE_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 290 completion record
+
+~~~markdown
+# Task 290 completion record
+
+{{TASK_290_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -22357,6 +28456,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 291 issue URL | `{{TASK_291_ISSUE_URL}}` | Produced by Task 291; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 291 completion record
+
+~~~markdown
+# Task 291 completion record
+
+{{TASK_291_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -22407,6 +28527,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 293 — implement the focused repair for the final Terraform T3 recheck
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 291 issue URL | `{{TASK_291_ISSUE_URL}}` | Produced by Task 291; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 292 completion record
+
+~~~markdown
+# Task 292 completion record
+
+{{TASK_292_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -22522,6 +28663,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 291 issue URL | `{{TASK_291_ISSUE_URL}}` | Produced by Task 291; resolve globally before execution |
+| Task 294 PR URL | `{{TASK_294_PR_URL}}` | Produced by this task; replace {{TASK_294_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 293 completion record
+
+~~~markdown
+# Task 293 completion record
+
+{{TASK_293_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -22583,6 +28746,27 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 295 — run the Anthropic Claude Code review loop on the focused repair PR for the final Terraform T3 recheck
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 294 PR URL | `{{TASK_294_PR_URL}}` | Produced by Task 294; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 294 completion record
+
+~~~markdown
+# Task 294 completion record
+
+{{TASK_294_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -22662,6 +28846,27 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 294 PR URL | `{{TASK_294_PR_URL}}` | Produced by Task 294; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 295 completion record
+
+~~~markdown
+# Task 295 completion record
+
+{{TASK_295_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -22739,6 +28944,27 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 294 PR URL | `{{TASK_294_PR_URL}}` | Produced by Task 294; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 296 completion record
+
+~~~markdown
+# Task 296 completion record
+
+{{TASK_296_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -22800,6 +29026,27 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| Task 294 PR URL | `{{TASK_294_PR_URL}}` | Produced by Task 294; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 297 completion record
+
+~~~markdown
+# Task 297 completion record
+
+{{TASK_297_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -22850,6 +29097,34 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 299 — recheck the reciprocal result for the final Terraform T3 recheck
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 290 completion record
+
+~~~markdown
+# Task 290 completion record
+
+{{TASK_290_COMPLETION_RECORD}}
+~~~
+
+#### Task 298 completion record
+
+~~~markdown
+# Task 298 completion record
+
+{{TASK_298_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -22966,6 +29241,26 @@ This recheck instance emits exactly one complete branch record: `REPAIR_REQUIRED
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 299 completion record
+
+~~~markdown
+# Task 299 completion record
+
+{{TASK_299_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -23017,6 +29312,27 @@ The permanent fixed-point or issue-closure record exists and every task-local tr
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 300 completion record
+
+~~~markdown
+# Task 300 completion record
+
+{{TASK_300_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -23064,6 +29380,27 @@ The governing issue has an explicit, verified implementation-commencement record
 ## Task 302 — implement PS #151
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 301 completion record
+
+~~~markdown
+# Task 301 completion record
+
+{{TASK_301_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -23115,6 +29452,28 @@ A committed, locally validated implementation candidate exists with exact identi
 ## Task 303 — create or update the candidate PR for PS #151
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+| Task 303 PR URL | `{{TASK_303_PR_URL}}` | Produced by this task; replace {{TASK_303_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 302 completion record
+
+~~~markdown
+# Task 302 completion record
+
+{{TASK_302_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -23173,6 +29532,28 @@ The PS #151 candidate PR exists with a complete affected-control map and initial
 ## Task 304 — run the Anthropic Claude Code review loop on the PS #151 PR
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+| Task 303 PR URL | `{{TASK_303_PR_URL}}` | Produced by Task 303; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 303 completion record
+
+~~~markdown
+# Task 303 completion record
+
+{{TASK_303_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -23251,6 +29632,28 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
 
 > **Execution class: Coding agent executable.** Use a fresh coding-agent session.
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+| Task 303 PR URL | `{{TASK_303_PR_URL}}` | Produced by Task 303; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 304 completion record
+
+~~~markdown
+# Task 304 completion record
+
+{{TASK_304_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -23327,6 +29730,28 @@ The fresh agent returns `PASS` for the same head SHA and tree as Task 304.
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+| Task 303 PR URL | `{{TASK_303_PR_URL}}` | Produced by Task 303; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 305 completion record
+
+~~~markdown
+# Task 305 completion record
+
+{{TASK_305_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -23388,6 +29813,28 @@ The PR is merged and its actual landed identity is recorded, or the conditional 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+| Task 303 PR URL | `{{TASK_303_PR_URL}}` | Produced by Task 303; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 306 completion record
+
+~~~markdown
+# Task 306 completion record
+
+{{TASK_306_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -23437,6 +29884,27 @@ PS #151 is closed by the landed PR and its affected-control map is ready for Ter
 ## Task 308 — compare PS #151 in Terraform — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 307 completion record
+
+~~~markdown
+# Task 307 completion record
+
+{{TASK_307_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -23573,6 +30041,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 308 completion record
+
+~~~markdown
+# Task 308 completion record
+
+{{TASK_308_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -23624,6 +30113,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 309 completion record
+
+~~~markdown
+# Task 309 completion record
+
+{{TASK_309_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -23674,6 +30184,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 311 — implement the focused repair for PS #151 in Terraform
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 310 completion record
+
+~~~markdown
+# Task 310 completion record
+
+{{TASK_310_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -23791,6 +30322,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+| Task 312 PR URL | `{{TASK_312_PR_URL}}` | Produced by this task; replace {{TASK_312_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 311 completion record
+
+~~~markdown
+# Task 311 completion record
+
+{{TASK_311_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -23852,6 +30405,28 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 313 — run the Anthropic Claude Code review loop on the focused repair PR for PS #151 in Terraform
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+| Task 312 PR URL | `{{TASK_312_PR_URL}}` | Produced by Task 312; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 312 completion record
+
+~~~markdown
+# Task 312 completion record
+
+{{TASK_312_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -23931,6 +30506,28 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+| Task 312 PR URL | `{{TASK_312_PR_URL}}` | Produced by Task 312; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 313 completion record
+
+~~~markdown
+# Task 313 completion record
+
+{{TASK_313_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -24008,6 +30605,28 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+| Task 312 PR URL | `{{TASK_312_PR_URL}}` | Produced by Task 312; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 314 completion record
+
+~~~markdown
+# Task 314 completion record
+
+{{TASK_314_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -24069,6 +30688,28 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+| Task 312 PR URL | `{{TASK_312_PR_URL}}` | Produced by Task 312; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 315 completion record
+
+~~~markdown
+# Task 315 completion record
+
+{{TASK_315_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -24119,6 +30760,27 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 317 — reverse-compare the PS #151 cycle — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 316 completion record
+
+~~~markdown
+# Task 316 completion record
+
+{{TASK_316_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -24252,6 +30914,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 317 completion record
+
+~~~markdown
+# Task 317 completion record
+
+{{TASK_317_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -24303,6 +30986,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 318 completion record
+
+~~~markdown
+# Task 318 completion record
+
+{{TASK_318_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -24353,6 +31057,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 320 — implement the focused repair for the PS #151 cycle
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 319 completion record
+
+~~~markdown
+# Task 319 completion record
+
+{{TASK_319_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -24471,6 +31196,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+| Task 321 PR URL | `{{TASK_321_PR_URL}}` | Produced by this task; replace {{TASK_321_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 320 completion record
+
+~~~markdown
+# Task 320 completion record
+
+{{TASK_320_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -24532,6 +31279,28 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 322 — run the Anthropic Claude Code review loop on the focused repair PR for the PS #151 cycle
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+| Task 321 PR URL | `{{TASK_321_PR_URL}}` | Produced by Task 321; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 321 completion record
+
+~~~markdown
+# Task 321 completion record
+
+{{TASK_321_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -24611,6 +31380,28 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+| Task 321 PR URL | `{{TASK_321_PR_URL}}` | Produced by Task 321; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 322 completion record
+
+~~~markdown
+# Task 322 completion record
+
+{{TASK_322_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -24688,6 +31479,28 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+| Task 321 PR URL | `{{TASK_321_PR_URL}}` | Produced by Task 321; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 323 completion record
+
+~~~markdown
+# Task 323 completion record
+
+{{TASK_323_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -24749,6 +31562,28 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+| Task 321 PR URL | `{{TASK_321_PR_URL}}` | Produced by Task 321; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 324 completion record
+
+~~~markdown
+# Task 324 completion record
+
+{{TASK_324_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -24799,6 +31634,35 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 326 — recheck the reciprocal result for the PS #151 cycle
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 317 completion record
+
+~~~markdown
+# Task 317 completion record
+
+{{TASK_317_COMPLETION_RECORD}}
+~~~
+
+#### Task 325 completion record
+
+~~~markdown
+# Task 325 completion record
+
+{{TASK_325_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -24918,6 +31782,27 @@ This recheck instance emits exactly one complete branch record: `REPAIR_REQUIRED
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+| PS issue #151 URL | `https://github.com/franklesniak/PSStyleGuide/issues/151` | Verified existing GitHub issue |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 326 completion record
+
+~~~markdown
+# Task 326 completion record
+
+{{TASK_326_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -24968,6 +31853,14 @@ The permanent fixed-point or issue-closure record exists and every task-local tr
 ## Task 328 — check the independent residual triggers
 
 > **Execution class: Coding agent executable.** This is a read-only trigger check and does not start implementation.
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
 
 ### Dependencies
 
@@ -25025,6 +31918,35 @@ Each trigger has a current, evidence-backed classification and each present trig
 ## Task 329 — assess one triggered residual cycle — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | This disposition task reads both repositories |
+| Selected repair target | `{{TASK_329_SELECTED_TARGET_REPOSITORY}}` | Produced by this task when repair is required; replace globally when known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 327 completion record
+
+~~~markdown
+# Task 327 completion record
+
+{{TASK_327_COMPLETION_RECORD}}
+~~~
+
+#### Task 328 completion record
+
+~~~markdown
+# Task 328 completion record
+
+{{TASK_328_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -25178,6 +32100,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_329_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 329; resolve globally before execution |
+| Task 330 issue URL | `{{TASK_330_ISSUE_URL}}` | Produced by this task; replace {{TASK_330_ISSUE_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 329 completion record
+
+~~~markdown
+# Task 329 completion record
+
+{{TASK_329_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -25229,6 +32172,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_329_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 329; resolve globally before execution |
+| Task 330 issue URL | `{{TASK_330_ISSUE_URL}}` | Produced by Task 330; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 330 completion record
+
+~~~markdown
+# Task 330 completion record
+
+{{TASK_330_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -25279,6 +32243,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 332 — implement the focused repair for one triggered residual cycle
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_329_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 329; resolve globally before execution |
+| Task 330 issue URL | `{{TASK_330_ISSUE_URL}}` | Produced by Task 330; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 331 completion record
+
+~~~markdown
+# Task 331 completion record
+
+{{TASK_331_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -25401,6 +32386,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_329_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 329; resolve globally before execution |
+| Task 330 issue URL | `{{TASK_330_ISSUE_URL}}` | Produced by Task 330; resolve globally before execution |
+| Task 333 PR URL | `{{TASK_333_PR_URL}}` | Produced by this task; replace {{TASK_333_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 332 completion record
+
+~~~markdown
+# Task 332 completion record
+
+{{TASK_332_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -25462,6 +32469,27 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 334 — run the Anthropic Claude Code review loop on the focused repair PR for one triggered residual cycle
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_329_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 329; resolve globally before execution |
+| Task 333 PR URL | `{{TASK_333_PR_URL}}` | Produced by Task 333; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 333 completion record
+
+~~~markdown
+# Task 333 completion record
+
+{{TASK_333_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -25541,6 +32569,27 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_329_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 329; resolve globally before execution |
+| Task 333 PR URL | `{{TASK_333_PR_URL}}` | Produced by Task 333; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 334 completion record
+
+~~~markdown
+# Task 334 completion record
+
+{{TASK_334_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -25618,6 +32667,27 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_329_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 329; resolve globally before execution |
+| Task 333 PR URL | `{{TASK_333_PR_URL}}` | Produced by Task 333; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 335 completion record
+
+~~~markdown
+# Task 335 completion record
+
+{{TASK_335_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -25679,6 +32749,27 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_329_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 329; resolve globally before execution |
+| Task 333 PR URL | `{{TASK_333_PR_URL}}` | Produced by Task 333; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 336 completion record
+
+~~~markdown
+# Task 336 completion record
+
+{{TASK_336_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -25729,6 +32820,34 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 338 — recheck the reciprocal result for one triggered residual cycle
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 329 completion record
+
+~~~markdown
+# Task 329 completion record
+
+{{TASK_329_COMPLETION_RECORD}}
+~~~
+
+#### Task 337 completion record
+
+~~~markdown
+# Task 337 completion record
+
+{{TASK_337_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -25852,6 +32971,26 @@ This recheck instance emits exactly one complete branch record: `REPAIR_REQUIRED
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 338 completion record
+
+~~~markdown
+# Task 338 completion record
+
+{{TASK_338_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -25902,6 +33041,35 @@ The permanent fixed-point or issue-closure record exists and every task-local tr
 ## Task 340 — assess one future PS-first paired capability cycle — determine the next disposition
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | This disposition task reads both repositories |
+| Selected repair target | `{{TASK_340_SELECTED_TARGET_REPOSITORY}}` | Produced by this task when repair is required; replace globally when known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 327 completion record
+
+~~~markdown
+# Task 327 completion record
+
+{{TASK_327_COMPLETION_RECORD}}
+~~~
+
+#### Task 339 completion record
+
+~~~markdown
+# Task 339 completion record
+
+{{TASK_339_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -26073,6 +33241,27 @@ The pinned comparison record exists and states exactly one of `NO_REPAIR` or `RE
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_340_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 340; resolve globally before execution |
+| Task 341 issue URL | `{{TASK_341_ISSUE_URL}}` | Produced by this task; replace {{TASK_341_ISSUE_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 340 completion record
+
+~~~markdown
+# Task 340 completion record
+
+{{TASK_340_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -26124,6 +33313,27 @@ One focused, self-contained issue with correct native dependencies exists, or th
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_340_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 340; resolve globally before execution |
+| Task 341 issue URL | `{{TASK_341_ISSUE_URL}}` | Produced by Task 341; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 341 completion record
+
+~~~markdown
+# Task 341 completion record
+
+{{TASK_341_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -26174,6 +33384,27 @@ The focused issue has an explicit commencement record and owns the implementatio
 ## Task 343 — implement the focused repair for one future PS-first paired capability cycle
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_340_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 340; resolve globally before execution |
+| Task 341 issue URL | `{{TASK_341_ISSUE_URL}}` | Produced by Task 341; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 342 completion record
+
+~~~markdown
+# Task 342 completion record
+
+{{TASK_342_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -26314,6 +33545,28 @@ A committed, locally validated repair candidate exists with exact evidence and n
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_340_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 340; resolve globally before execution |
+| Task 341 issue URL | `{{TASK_341_ISSUE_URL}}` | Produced by Task 341; resolve globally before execution |
+| Task 344 PR URL | `{{TASK_344_PR_URL}}` | Produced by this task; replace {{TASK_344_PR_URL}} globally when the exact URL is known |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 343 completion record
+
+~~~markdown
+# Task 343 completion record
+
+{{TASK_343_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -26375,6 +33628,27 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ## Task 345 — run the Anthropic Claude Code review loop on the focused repair PR for one future PS-first paired capability cycle
 
 > **Execution class: Coding agent executable by Anthropic Claude Code.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_340_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 340; resolve globally before execution |
+| Task 344 PR URL | `{{TASK_344_PR_URL}}` | Produced by Task 344; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 344 completion record
+
+~~~markdown
+# Task 344 completion record
+
+{{TASK_344_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -26454,6 +33728,27 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_340_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 340; resolve globally before execution |
+| Task 344 PR URL | `{{TASK_344_PR_URL}}` | Produced by Task 344; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 345 completion record
+
+~~~markdown
+# Task 345 completion record
+
+{{TASK_345_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -26531,6 +33826,27 @@ A fresh independent `PASS` applies to the same current head/tree as the terminal
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_340_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 340; resolve globally before execution |
+| Task 344 PR URL | `{{TASK_344_PR_URL}}` | Produced by Task 344; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 346 completion record
+
+~~~markdown
+# Task 346 completion record
+
+{{TASK_346_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -26592,6 +33908,27 @@ The focused repair PR is merged and its actual landed identity is recorded, or t
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | `{{TASK_340_SELECTED_TARGET_REPOSITORY}}` | Selected by Task 340; resolve globally before execution |
+| Task 344 PR URL | `{{TASK_344_PR_URL}}` | Produced by Task 344; resolve globally before execution |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 347 completion record
+
+~~~markdown
+# Task 347 completion record
+
+{{TASK_347_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -26642,6 +33979,34 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 ## Task 349 — recheck the reciprocal result for one future PS-first paired capability cycle
 
 > **Execution class: Coding agent executable.**
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 340 completion record
+
+~~~markdown
+# Task 340 completion record
+
+{{TASK_340_COMPLETION_RECORD}}
+~~~
+
+#### Task 348 completion record
+
+~~~markdown
+# Task 348 completion record
+
+{{TASK_348_COMPLETION_RECORD}}
+~~~
 
 ### Dependencies
 
@@ -26783,6 +34148,26 @@ This recheck instance emits exactly one complete branch record: `REPAIR_REQUIRED
 
 > **Execution class: Coding agent executable.**
 
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 349 completion record
+
+~~~markdown
+# Task 349 completion record
+
+{{TASK_349_COMPLETION_RECORD}}
+~~~
+
 ### Dependencies
 
 | Predecessor | Relationship | Requirement |
@@ -26833,6 +34218,50 @@ The permanent fixed-point or issue-closure record exists and every task-local tr
 ## Task 351 — verify final completion
 
 > **Execution class: Coding agent executable.** This is a read-only final audit and evidence-publication task.
+
+### Task variables
+
+Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
+
+| Item | Value | Source or resolution rule |
+| --- | --- | --- |
+| Target repository | Both: `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
+
+### Record inputs
+
+Completion and authorization records are intentionally outside the table. Replace each token inside its Markdown fence globally with the exact record before execution.
+
+#### Task 328 completion record
+
+~~~markdown
+# Task 328 completion record
+
+{{TASK_328_COMPLETION_RECORD}}
+~~~
+
+#### Task 339 completion record
+
+~~~markdown
+# Task 339 completion record
+
+{{TASK_339_COMPLETION_RECORD}}
+~~~
+
+#### Task 350 completion record
+
+~~~markdown
+# Task 350 completion record
+
+{{TASK_350_COMPLETION_RECORD}}
+~~~
+
+#### Tasks 1–327 aggregate completion records
+
+~~~markdown
+# Tasks 1–327 aggregate completion records
+
+{{TASKS_001_TO_327_COMPLETION_RECORDS}}
+~~~
 
 ### Dependencies
 
