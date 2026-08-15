@@ -1948,26 +1948,45 @@ function Write-StyleGuideArtifact {
 
         if ($hashtableRecord.PublicationReturned) {
             $hashtableRecord.Status = 'ReplacementStateUncertain'
-        } elseif ($null -ne $strTemporaryPath -and (Test-FileSystemEntry -LiteralPath $strTemporaryPath)) {
-            if ($boolTemporaryIdentityProven) {
-                try {
-                    [void](Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File)
-                    if ((Get-OrdinaryFileIdentity -LiteralPath $strTemporaryPath) -cne $strCandidateIdentity) {
-                        throw 'candidate-identity-drift'
+        } elseif ($null -ne $strTemporaryPath) {
+            # Probe candidate existence in a guarded step. Test-FileSystemEntry
+            # propagates access and metadata failures other than absence, so an
+            # unguarded probe in the branch condition would escape this catch and
+            # bypass the ArtifactRecord wrapper below, leaving a retained candidate
+            # reported as never attempted. On probe failure the candidate state is
+            # unknown, so record it as retained for recovery and uncertain.
+            $boolCandidatePresent = $false
+            $boolProbeFailed = $false
+            try {
+                $boolCandidatePresent = Test-FileSystemEntry -LiteralPath $strTemporaryPath
+            } catch {
+                $boolProbeFailed = $true
+            }
+            if ($boolProbeFailed) {
+                $hashtableRecord.TemporaryDisposition = 'RetainedForRecovery'
+                $hashtableRecord.CleanupResult = 'Failed'
+                $hashtableRecord.Status = 'ReplacementStateUncertain'
+            } elseif ($boolCandidatePresent) {
+                if ($boolTemporaryIdentityProven) {
+                    try {
+                        [void](Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File)
+                        if ((Get-OrdinaryFileIdentity -LiteralPath $strTemporaryPath) -cne $strCandidateIdentity) {
+                            throw 'candidate-identity-drift'
+                        }
+                        [System.IO.File]::Delete($strTemporaryPath)
+                        if (Test-FileSystemEntry -LiteralPath $strTemporaryPath) {
+                            throw 'candidate-cleanup-failure'
+                        }
+                        $hashtableRecord.TemporaryDisposition = 'RemovedAfterFailure'
+                        $hashtableRecord.CleanupResult = 'Success'
+                    } catch {
+                        $hashtableRecord.TemporaryDisposition = 'RetainedForRecovery'
+                        $hashtableRecord.CleanupResult = 'Failed'
                     }
-                    [System.IO.File]::Delete($strTemporaryPath)
-                    if (Test-FileSystemEntry -LiteralPath $strTemporaryPath) {
-                        throw 'candidate-cleanup-failure'
-                    }
-                    $hashtableRecord.TemporaryDisposition = 'RemovedAfterFailure'
-                    $hashtableRecord.CleanupResult = 'Success'
-                } catch {
-                    $hashtableRecord.TemporaryDisposition = 'RetainedForRecovery'
-                    $hashtableRecord.CleanupResult = 'Failed'
+                } else {
+                    $hashtableRecord.TemporaryDisposition = 'IdentityUnproven'
+                    $hashtableRecord.CleanupResult = 'NotAttempted'
                 }
-            } else {
-                $hashtableRecord.TemporaryDisposition = 'IdentityUnproven'
-                $hashtableRecord.CleanupResult = 'NotAttempted'
             }
         }
 

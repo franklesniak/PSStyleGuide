@@ -607,6 +607,15 @@ function Invoke-GitRaw {
     )
 
     $strGitPath = Assert-OrdinaryAbsoluteFile -LiteralPath ([string]$GitRecord.Path)
+    # Accepted, bounded residual: this length and SHA-256 check authenticates the
+    # executable bytes, but nothing holds the file between the check and the
+    # Process.Start call below, so a within-call time-of-check-to-time-of-use
+    # window remains. No portable mechanism closes it -- on the Linux CI that runs
+    # this verifier, .NET share modes are advisory and do not stop another
+    # principal from replacing or renaming the path, and Unix rename/unlink are
+    # not governed by file locks. The per-call re-hash bounds cross-call drift;
+    # exploitation needs write access to the resolved executable's directory,
+    # which in CI is a root-owned system path the unprivileged job cannot write.
     if ((New-Object System.IO.FileInfo($strGitPath)).Length -ne [int64]$GitRecord.Length -or
         (Get-FileSha256Hex -LiteralPath $strGitPath) -cne [string]$GitRecord.Sha256) {
         throw 'git-executable-drift'
@@ -1207,8 +1216,10 @@ function Get-GitControlSurfaceEvidence {
     #
     # .DESCRIPTION
     # Hashes the .git pointer when present, the applicable local configuration
-    # files, and ordinary bounded hook directory trees. Uses labeled components
-    # so absent and present state cannot collide.
+    # files, the staging index, info/exclude, HEAD, packed-refs, the loose refs
+    # tree, and ordinary bounded hook directory trees. Uses labeled components so
+    # absent and present state cannot collide. The refs tree excludes logs/
+    # (reflogs), a sibling of refs/, so benign reflog churn raises no drift.
     #
     # .PARAMETER AdministrativePathRecord
     # Validated GitEntry, GitDirectory, and CommonDirectory path record.
@@ -1228,8 +1239,11 @@ function Get-GitControlSurfaceEvidence {
     #
     # .OUTPUTS
     # System.Collections.Specialized.OrderedDictionary. Contains Digest,
-    # ComponentCount, HookEntryCount, and HookByteCount. Filesystem, ordinary
-    # path, size-bound, hashing, and parameter-binding failures propagate.
+    # ComponentCount, HookEntryCount, and HookByteCount. The Digest also covers
+    # the staging index, info/exclude, HEAD, packed-refs, and the loose refs tree,
+    # so concurrent drift of any path-set read input raises git-control-drift.
+    # Filesystem, ordinary path, size-bound, hashing, and parameter-binding
+    # failures propagate.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
@@ -1259,13 +1273,23 @@ function Get-GitControlSurfaceEvidence {
         $objComponents['git-entry'] = 'directory'
     }
 
-    $arrConfigSpecifications = @(
+    # Local config, plus the single-file administrative inputs the path-set reads
+    # depend on but the worktree tree evidence excludes: the staging index
+    # (working/staged/index-flags reads), info/exclude (the untracked read's
+    # --exclude-standard set), and HEAD plus packed-refs (the staged read resolves
+    # HEAD against the index). The index and HEAD are per-worktree (GitDirectory);
+    # info/exclude and packed-refs are shared (CommonDirectory).
+    $arrBoundedFileSpecifications = @(
         @('common-config', (Join-Path $AdministrativePathRecord.CommonDirectory 'config')),
         @('common-config-worktree', (Join-Path $AdministrativePathRecord.CommonDirectory 'config.worktree')),
         @('worktree-config', (Join-Path $AdministrativePathRecord.GitDirectory 'config')),
-        @('worktree-config-worktree', (Join-Path $AdministrativePathRecord.GitDirectory 'config.worktree'))
+        @('worktree-config-worktree', (Join-Path $AdministrativePathRecord.GitDirectory 'config.worktree')),
+        @('git-index', (Join-Path $AdministrativePathRecord.GitDirectory 'index')),
+        @('git-head', (Join-Path $AdministrativePathRecord.GitDirectory 'HEAD')),
+        @('info-exclude', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'exclude')),
+        @('packed-refs', (Join-Path $AdministrativePathRecord.CommonDirectory 'packed-refs'))
     )
-    foreach ($arrSpecification in $arrConfigSpecifications) {
+    foreach ($arrSpecification in $arrBoundedFileSpecifications) {
         $strLabel = [string]$arrSpecification[0]
         $strPath = [System.IO.Path]::GetFullPath([string]$arrSpecification[1])
         if ([System.IO.File]::Exists($strPath)) {
@@ -1300,6 +1324,22 @@ function Get-GitControlSurfaceEvidence {
         } else {
             $objComponents[$strLabel] = 'absent'
         }
+    }
+
+    # The staged read resolves HEAD against the index, so a concurrent move of the
+    # branch ref (commit, reset --soft, update-ref) changes the staged path set.
+    # Hash the shared loose refs tree so that drift is caught alongside HEAD and
+    # packed-refs above. logs/ (reflogs) is a sibling of refs/ and is deliberately
+    # not walked, so benign reflog churn raises no spurious drift.
+    $strLooseRefsPath = [System.IO.Path]::GetFullPath(
+        (Join-Path $AdministrativePathRecord.CommonDirectory 'refs'))
+    if ([System.IO.Directory]::Exists($strLooseRefsPath)) {
+        $objComponents['loose-refs'] = (
+            Get-TreeEvidence -RootPath $strLooseRefsPath -ExcludedPath $null).Digest
+    } elseif ([System.IO.File]::Exists($strLooseRefsPath)) {
+        throw 'invalid-git-control'
+    } else {
+        $objComponents['loose-refs'] = 'absent'
     }
     return [ordered]@{
         Digest = Get-FramedStringMapDigest -StringMap $objComponents
