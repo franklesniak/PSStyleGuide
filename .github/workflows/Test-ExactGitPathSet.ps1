@@ -1245,11 +1245,12 @@ function Get-GitControlSurfaceEvidence {
     #
     # .DESCRIPTION
     # Hashes the .git pointer when present, the applicable local configuration
-    # files, the staging index, info/exclude, info/attributes, HEAD, packed-refs,
-    # the commondir pointer, the shared and per-worktree loose refs trees, and
-    # ordinary bounded hook directory trees. Uses labeled components so absent and
-    # present state cannot collide. The refs trees exclude logs/ (reflogs), a
-    # sibling of refs/, so benign reflog churn raises no drift.
+    # files, the staging index, split-index backing files, info/exclude,
+    # info/attributes, HEAD, packed-refs, the commondir pointer, the shared and
+    # per-worktree loose refs trees, the shared and per-worktree reftable backend
+    # trees, and ordinary bounded hook directory trees. Uses labeled components so
+    # absent and present state cannot collide. The refs trees exclude logs/
+    # (reflogs), a sibling of refs/, so benign reflog churn raises no drift.
     #
     # .PARAMETER AdministrativePathRecord
     # Validated GitEntry, GitDirectory, and CommonDirectory path record.
@@ -1398,6 +1399,63 @@ function Get-GitControlSurfaceEvidence {
         throw 'invalid-git-control'
     } else {
         $objComponents['worktree-loose-refs'] = 'absent'
+    }
+
+    # Reftable reference backend: with extensions.refStorage=reftable, branch tips
+    # live under <dir>/reftable/ rather than the loose refs/ tree or packed-refs
+    # captured above, so a concurrent update-ref through that backend would change
+    # the staged read (HEAD resolved against the index) while the loose/packed
+    # components stayed equal. Hash the shared and per-worktree reftable trees;
+    # absent for the default files backend.
+    $strCommonReftablePath = [System.IO.Path]::GetFullPath(
+        (Join-Path $AdministrativePathRecord.CommonDirectory 'reftable'))
+    if ([System.IO.Directory]::Exists($strCommonReftablePath)) {
+        $objComponents['common-reftable'] = (
+            Get-TreeEvidence -RootPath $strCommonReftablePath -ExcludedPath $null).Digest
+    } elseif ([System.IO.File]::Exists($strCommonReftablePath)) {
+        throw 'invalid-git-control'
+    } else {
+        $objComponents['common-reftable'] = 'absent'
+    }
+    $strWorktreeReftablePath = [System.IO.Path]::GetFullPath(
+        (Join-Path $AdministrativePathRecord.GitDirectory 'reftable'))
+    if ([System.IO.Directory]::Exists($strWorktreeReftablePath)) {
+        $objComponents['worktree-reftable'] = (
+            Get-TreeEvidence -RootPath $strWorktreeReftablePath -ExcludedPath $null).Digest
+    } elseif ([System.IO.File]::Exists($strWorktreeReftablePath)) {
+        throw 'invalid-git-control'
+    } else {
+        $objComponents['worktree-reftable'] = 'absent'
+    }
+
+    # Split-index backing files: with core.splitIndex, GitDirectory/index is a small
+    # file whose link extension references the bulk of the entries in
+    # GitDirectory/sharedindex.<hash>. The git-index component and the direct index
+    # bracket cover only GitDirectory/index, so a change to a backing file would go
+    # unseen. Hash every top-level sharedindex.* file (ordinal-framed); without a
+    # split index there are none (absent).
+    $objSharedIndex = New-Object 'System.Collections.Generic.SortedDictionary[string,string]' `
+        ([System.StringComparer]::Ordinal)
+    if ([System.IO.Directory]::Exists($AdministrativePathRecord.GitDirectory)) {
+        foreach ($strSharedIndexFile in [System.IO.Directory]::GetFiles($AdministrativePathRecord.GitDirectory)) {
+            $strSharedIndexName = [System.IO.Path]::GetFileName($strSharedIndexFile)
+            if (-not $strSharedIndexName.StartsWith('sharedindex.', [System.StringComparison]::Ordinal)) {
+                continue
+            }
+            $strSharedIndexFull = [System.IO.Path]::GetFullPath(
+                (Assert-OrdinaryAbsoluteFile -LiteralPath $strSharedIndexFile))
+            $objSharedIndexInfo = New-Object System.IO.FileInfo($strSharedIndexFull)
+            if ($objSharedIndexInfo.Length -gt 4194304) {
+                throw 'git-control-limit'
+            }
+            $objSharedIndex[$strSharedIndexName] = ([string]$objSharedIndexInfo.Length + ':' +
+                (Get-FileSha256Hex -LiteralPath $strSharedIndexFull))
+        }
+    }
+    if ($objSharedIndex.Count -eq 0) {
+        $objComponents['shared-index'] = 'absent'
+    } else {
+        $objComponents['shared-index'] = Get-FramedStringMapDigest -StringMap $objSharedIndex
     }
     return [ordered]@{
         Digest = Get-FramedStringMapDigest -StringMap $objComponents

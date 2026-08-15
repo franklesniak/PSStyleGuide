@@ -1866,7 +1866,7 @@ function Write-StyleGuideArtifact {
         }
         $arrCandidateBytes = [System.IO.File]::ReadAllBytes($strCandidateFullPath)
         if ($arrCandidateBytes.Length -ne $CompletePayloadBytes.Length -or
-            (Get-FileSha256Hex -LiteralPath $strCandidateFullPath) -cne $hashtableRecord.CandidateSha256) {
+            (Get-Sha256Hex -Bytes $arrCandidateBytes) -cne $hashtableRecord.CandidateSha256) {
             throw 'candidate-byte-mismatch'
         }
         if (($arrCandidateBytes.Length -ge 3 -and $arrCandidateBytes[0] -eq 0xEF -and
@@ -1923,7 +1923,7 @@ function Write-StyleGuideArtifact {
         [void](Assert-OrdinaryAbsolutePath -LiteralPath $strDestinationPath -ExpectedLeafType File)
         $arrFinalBytes = [System.IO.File]::ReadAllBytes($strDestinationPath)
         $hashtableRecord.FinalLength = $arrFinalBytes.Length
-        $hashtableRecord.FinalSha256 = Get-FileSha256Hex -LiteralPath $strDestinationPath
+        $hashtableRecord.FinalSha256 = Get-Sha256Hex -Bytes $arrFinalBytes
         $hashtableRecord.FinalOrdinaryIdentity = Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath
         if ($hashtableRecord.FinalLength -ne $CompletePayloadBytes.Length -or
             $hashtableRecord.FinalSha256 -cne $hashtableRecord.CandidateSha256 -or
