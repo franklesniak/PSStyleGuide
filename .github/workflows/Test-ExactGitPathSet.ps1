@@ -1632,6 +1632,26 @@ try {
     $hashtableWorktreeBefore = Get-TreeEvidence `
         -RootPath $strRepositoryRoot `
         -ExcludedPath $hashtableAdministrativePaths.GitEntry
+    # Atomic single-file bracket for the staging index -- the input that drives the
+    # working and staged reads. Get-GitControlSurfaceEvidence hashes the index as
+    # one component of a multi-file traversal, so an index swap during that
+    # traversal's own tail (after its git-index hash, before the scan completes) can
+    # leave the aggregate digest stale. Because the index is a single file, hashing
+    # it here (before the reads) and again as the verifier's final evidence action
+    # (after convergence, below) brackets the reads with two atomic reads: a change
+    # across them raises git-control-drift, so the demonstrated concurrent-index-swap
+    # window is closed. The live worktree cannot be bracketed this way -- git must
+    # read the tree in place, and no portable mechanism snapshots a live tree
+    # atomically -- so a worktree byte change during the final converged tree sample
+    # remains the bounded, documented residual (a concurrent second writer only,
+    # which single-actor CI does not have).
+    $strIndexBracketPath = [System.IO.Path]::GetFullPath(
+        (Join-Path $hashtableAdministrativePaths.GitDirectory 'index'))
+    $strIndexDigestBefore = if ([System.IO.File]::Exists($strIndexBracketPath)) {
+        Get-FileSha256Hex -LiteralPath $strIndexBracketPath
+    } else {
+        'absent'
+    }
 
     $strNativeCommand = 'repository-root'
     $hashtableRootResult = Invoke-GitRaw `
@@ -1836,6 +1856,19 @@ try {
     }
     if ($hashtableWorktreeBefore.Digest -cne $hashtableWorktreeAfter.Digest) {
         throw 'worktree-drift'
+    }
+    # Final atomic index read -- the last evidence action. It re-reads the single
+    # index file after the converged control traversal, so an index swap during that
+    # traversal's tail (which the aggregate control digest could miss) is caught here
+    # against the pre-read atomic bracket. A change after this read is post-return
+    # state that no verifier can observe.
+    $strIndexDigestFinal = if ([System.IO.File]::Exists($strIndexBracketPath)) {
+        Get-FileSha256Hex -LiteralPath $strIndexBracketPath
+    } else {
+        'absent'
+    }
+    if ($strIndexDigestBefore -cne $strIndexDigestFinal) {
+        throw 'git-control-drift'
     }
     $boolEvidenceStable = $true
 
