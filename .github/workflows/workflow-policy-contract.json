@@ -131,7 +131,7 @@
     "pathVerifier": {
       "path": "Test-ExactGitPathSet.ps1",
       "version": "1.0.20260814.0",
-      "sha256": "95683b640832cb5c6635b73c592bb110122cfda912adcb712a9ea756730ed3de"
+      "sha256": "f37f410f4d0c4b0c50866cdce89c03203daa3712e6fe0a70923c5f4c60439cb9"
     }
   },
   "caseCatalog": {
@@ -140,7 +140,7 @@
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "bbf56dce252188e82d0df27d32b9b99f5165ff117c1c2021a21794c8dc3d184f"
+    "sha256": "eee2491b781100199ed9ec23070fb2feccb0be971f6ba7488174f9728d313448"
   },
   "actions": {
     "checkout": {
@@ -234,7 +234,7 @@
             "steps": [
               { "kind": "action", "role": "build.verify_generated_artifacts.checkout_repository", "name": "Checkout repository", "id": "checkout_repository", "action": "checkout" },
               { "kind": "run", "role": "build.verify_generated_artifacts.generate_style_guide_artifacts", "name": "Generate style guide artifacts", "id": "generate_style_guide_artifacts", "shell": "pwsh", "runSha256": "a5742266591c3b6af31ceb88b71de120549195702d1ae571d57bc90e800c669a" },
-              { "kind": "run", "role": "build.verify_generated_artifacts.verify_generated_artifact_drift", "name": "Verify generated artifact drift", "id": "verify_generated_artifact_drift", "shell": "pwsh", "runSha256": "f69d5ff98fe5f8b2c65ad6a219860d1e764efcbe13ab101f235ae9725133a8af" },
+              { "kind": "run", "role": "build.verify_generated_artifacts.verify_generated_artifact_drift", "name": "Verify generated artifact drift", "id": "verify_generated_artifact_drift", "shell": "pwsh", "runSha256": "a8d139046bec9c0facb7aa3febcf489f0891d990d589a6d6674ad88b1fc19586" },
               { "kind": "run", "role": "build.verify_generated_artifacts.create_failure_diagnostics", "name": "Create failure diagnostics", "id": "create_failure_diagnostics", "shell": "pwsh", "if": "${{ failure() && !cancelled() }}", "continueOnError": true, "runSha256": "c7ffffe2913b4fe43d733a7ba918b39b84903efb4822089393458d54d520ec45" },
               { "kind": "action", "role": "build.verify_generated_artifacts.upload_failure_diagnostics", "name": "Upload failure diagnostics", "id": "upload_failure_diagnostics", "action": "uploadArtifact", "if": "${{ failure() && !cancelled() }}", "continueOnError": true }
             ]

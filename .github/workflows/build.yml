@@ -106,7 +106,12 @@ jobs:
               $objPathSetResult.Schema -cne 'PSStyleGuide.ExactGitPathSetResult.v2' -or
               $objPathSetResult.VerifierVersion -cne '1.0.20260814.0' -or
               -not $objPathSetResult.Success) {
-              throw "The working path set was not empty; verifier exit $intPathSetExit."
+              throw ("Exact-path verification did not confirm an empty working " +
+                  "set: exit=$intPathSetExit success=$($objPathSetResult.Success) " +
+                  "category=$($objPathSetResult.Category) " +
+                  "nativeCommand=$($objPathSetResult.NativeCommand) " +
+                  "schema=$($objPathSetResult.Schema) " +
+                  "version=$($objPathSetResult.VerifierVersion).")
           }
 
       - name: Create failure diagnostics

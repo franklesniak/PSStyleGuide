@@ -636,7 +636,14 @@ function Invoke-GitRaw {
         }
     }
     $objChildEnvironment['GIT_CONFIG_NOSYSTEM'] = '1'
-    $objChildEnvironment['GIT_CONFIG_GLOBAL'] = if ($env:OS -eq 'Windows_NT') { 'NUL' } else { '/dev/null' }
+    # Neutralize every ambient input the path-set reads would otherwise depend on,
+    # so the result is hermetic and host-symmetric: no system or global config, no
+    # external excludes file (the untracked read's core.excludesFile, which may
+    # point outside the repository), and a host-independent core.filemode so that a
+    # tracked file's executable bit cannot make the working and staged reads differ
+    # between Windows (filemode false) and Linux (filemode true).
+    $strNullDevice = if ($env:OS -eq 'Windows_NT') { 'NUL' } else { '/dev/null' }
+    $objChildEnvironment['GIT_CONFIG_GLOBAL'] = $strNullDevice
     $objChildEnvironment['GIT_OPTIONAL_LOCKS'] = '0'
     $objChildEnvironment['GIT_TERMINAL_PROMPT'] = '0'
     $objChildEnvironment['LC_ALL'] = 'C'
@@ -644,7 +651,9 @@ function Invoke-GitRaw {
     $arrFixedArguments = @(
         '--no-optional-locks',
         '-c', 'core.fsmonitor=false',
-        '-c', 'core.untrackedCache=false'
+        '-c', 'core.untrackedCache=false',
+        '-c', 'core.filemode=false',
+        '-c', ('core.excludesFile=' + $strNullDevice)
     ) + $ArgumentList
     if ($null -ne $objStartInfo.PSObject.Properties['ArgumentList']) {
         foreach ($strArgument in $arrFixedArguments) {
