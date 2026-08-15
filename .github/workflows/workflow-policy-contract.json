@@ -131,7 +131,7 @@
     "pathVerifier": {
       "path": "Test-ExactGitPathSet.ps1",
       "version": "1.0.20260814.0",
-      "sha256": "6ffc8501e89037a8f1a511ce556c35ec8760b22d6cdcbf564bb0e2d2e168e07e"
+      "sha256": "2458c8eb58d1e92e09cbb980196cd4add3e8ac3950183591067fe95282ecbdb6"
     }
   },
   "caseCatalog": {
@@ -140,7 +140,7 @@
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "5d1f620958aee9af52ee7b491f15df2b70cb5fa65522c4c1063b1382cd8a1b08"
+    "sha256": "a036752b3f45c5e52a1961baecbcda2a03053857367b57a6749970234b40adc5"
   },
   "actions": {
     "checkout": {

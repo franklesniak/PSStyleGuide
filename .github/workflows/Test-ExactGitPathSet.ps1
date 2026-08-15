@@ -652,11 +652,13 @@ function Invoke-GitRaw {
     #     restored mtime read as clean through Git's cached stat.
     # info/exclude and info/attributes (repository-local, under the common Git
     # directory) remain covered by Get-GitControlSurfaceEvidence. Submodule
-    # ignoring is deliberately NOT a global config here: --ignore-submodules=all is
-    # passed per command only to the worktree-versus-index diffs (the working and
-    # clean reads), so a mutable submodule worktree state does not perturb them,
-    # while the staged read (git diff --cached) keeps submodule sensitivity and
-    # still reports a staged gitlink (index-versus-HEAD) change.
+    # ignoring is set per command, never as a global config: --ignore-submodules=all
+    # is passed to the worktree-versus-index diffs (the working and clean reads), so a
+    # mutable submodule worktree state does not perturb them, while the staged read
+    # (git diff --cached) passes --ignore-submodules=none so it keeps submodule
+    # sensitivity and still reports a staged gitlink (index-versus-HEAD) change even
+    # when a local config or a tracked .gitmodules sets submodule.<name>.ignore=all,
+    # which would otherwise suppress that staged gitlink change.
     $strNullDevice = if ($env:OS -eq 'Windows_NT') { 'NUL' } else { '/dev/null' }
     $objChildEnvironment['GIT_CONFIG_GLOBAL'] = $strNullDevice
     $objChildEnvironment['GIT_OPTIONAL_LOCKS'] = '0'
@@ -700,7 +702,18 @@ function Invoke-GitRaw {
         # CopyToAsync writes returns a valid (at worst slightly stale) length.
         while (-not ($objStdoutTask.IsCompleted -and $objStderrTask.IsCompleted)) {
             if ($objStdout.Length -gt 4194304 -or $objStderr.Length -gt 4194304) {
-                try { $objProcess.Kill($true) } catch { $null = $_ }
+                # Process.Kill(bool entireProcessTree) is .NET Core 3.0+ only; on the
+                # supported Windows PowerShell 5.1 (.NET Framework) host that overload
+                # is absent, so Kill($true) would raise a MethodException that this
+                # catch would silently discard, leaving the oversized child running
+                # (Dispose() in finally does not terminate it). Probe for the tree-kill
+                # overload and fall back to the parameterless Kill(), which every
+                # supported runtime exposes, so the resource bound is always enforced.
+                if ($null -ne $objProcess.GetType().GetMethod('Kill', [type[]]@([bool]))) {
+                    try { $objProcess.Kill($true) } catch { $null = $_ }
+                } else {
+                    try { $objProcess.Kill() } catch { $null = $_ }
+                }
                 throw 'native-output-limit'
             }
             [void][System.Threading.Tasks.Task]::WaitAny(@($objStdoutTask, $objStderrTask), 25)
@@ -844,7 +857,7 @@ function New-ExpectedPathKeySet {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 1.0.20260814.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -923,7 +936,7 @@ function Assert-OrdinaryRepositoryRoot {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 1.0.20260814.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1018,7 +1031,13 @@ function Get-FramedStringMapDigest {
                 $objBuffer.Write($arrValue, 0, $arrValue.Length)
             }
         }
-        return ([System.BitConverter]::ToString($objSha256.ComputeHash($objBuffer.ToArray()))).Replace('-', '').ToLowerInvariant()
+        # Hash the MemoryStream directly, rewound to its start, instead of
+        # $objBuffer.ToArray(): ToArray() would copy the entire framed buffer into a
+        # second array before hashing, doubling peak memory for a large map (up to the
+        # 100,000-entry ceiling in callers). ComputeHash(Stream) reads from the
+        # current position, so the digest is byte-identical to the array form.
+        $objBuffer.Position = 0
+        return ([System.BitConverter]::ToString($objSha256.ComputeHash($objBuffer))).Replace('-', '').ToLowerInvariant()
     } finally {
         $objSha256.Dispose()
         $objBuffer.Dispose()
@@ -1951,7 +1970,7 @@ try {
         $hashtableStagedResult = Invoke-GitRaw `
             -GitRecord $hashtableGitExecutable `
             -WorkingDirectory $strRepositoryRoot `
-            -ArgumentList @('diff', '--cached', '--no-ext-diff', '--no-textconv', '--no-renames', '--name-only', '-z', '--')
+            -ArgumentList @('diff', '--cached', '--no-ext-diff', '--no-textconv', '--no-renames', '--ignore-submodules=none', '--name-only', '-z', '--')
         $listNativeChecks.Add([ordered]@{
             Name = $strNativeCommand
             ExitCode = $hashtableStagedResult.ExitCode
