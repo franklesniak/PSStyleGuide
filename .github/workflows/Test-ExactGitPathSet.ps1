@@ -647,6 +647,9 @@ function Invoke-GitRaw {
     #   - a host-independent core.filemode, so a tracked file's executable bit
     #     cannot make the working and staged reads differ between Windows (filemode
     #     false) and Linux (filemode true);
+    #   - strict stat validation (core.checkStat=default, core.trustctime=true), so
+    #     a relaxed local setting cannot let a same-length content change with a
+    #     restored mtime read as clean through Git's cached stat;
     #   - submodule changes ignored, so an initialized submodule's checked-out
     #     commit is not part of the reads.
     # info/exclude and info/attributes (repository-local, under the common Git
@@ -662,6 +665,8 @@ function Invoke-GitRaw {
         '-c', 'core.fsmonitor=false',
         '-c', 'core.untrackedCache=false',
         '-c', 'core.filemode=false',
+        '-c', 'core.checkStat=default',
+        '-c', 'core.trustctime=true',
         '-c', ('core.excludesFile=' + $strNullDevice),
         '-c', ('core.attributesFile=' + $strNullDevice),
         '-c', 'diff.ignoreSubmodules=all'
@@ -1784,21 +1789,48 @@ try {
         }
     }
 
-    # Close the read window with the worktree tree first and the control surface
-    # last. The worktree scan can be long; sampling the control surface after it
-    # (rather than before it) means an administrative mutation that lands during
-    # that scan -- for example a concurrent 'git reset HEAD -- <path>' that resets
-    # the index without touching worktree bytes -- still changes control-after and
-    # raises git-control-drift here, instead of slipping through because the control
-    # sample was already taken. Residual: a worktree byte change during the bounded
-    # control-after sample (the shorter of the two samples) is not covered; like the
-    # executable re-hash window it needs a concurrent second writer that single-actor
-    # CI does not have.
+    # Close the read window with a bounded convergence loop, not a single
+    # after-sample. Each pass samples the worktree tree first and the control
+    # surface last, so an administrative mutation during the (possibly long)
+    # worktree scan changes control-after and is caught. A single control scan is
+    # not an atomic snapshot: Get-GitControlSurfaceEvidence hashes the index early,
+    # then keeps traversing HEAD, refs, and hooks, so an index (or other component)
+    # change after its own git-index hash but before that scan completes would leave
+    # a stale control-after. Requiring two consecutive full (worktree, control)
+    # samples to agree closes that intra-call gap: a change during one pass makes
+    # the next pass differ and forces another pass, so a converged pair reflects a
+    # window with no observed change. The before/after check below then rejects any
+    # net drift across the reads. Persistent churn that never settles within the
+    # bound is refused (evidence-unstable). A quiescent repository converges on the
+    # first confirmation. Residual: a change confined entirely to the tail of the
+    # final converged pass needs a concurrent second writer, which single-actor CI
+    # does not have.
+    $intConvergenceLimit = 8
+    $intConvergenceCount = 0
+    $boolConverged = $false
     $hashtableWorktreeAfter = Get-TreeEvidence `
         -RootPath $strRepositoryRoot `
         -ExcludedPath $hashtableAdministrativePaths.GitEntry
     $hashtableControlAfter = Get-GitControlSurfaceEvidence `
         -AdministrativePathRecord $hashtableAdministrativePaths
+    while ($intConvergenceCount -lt $intConvergenceLimit) {
+        $intConvergenceCount++
+        $hashtableWorktreeConfirm = Get-TreeEvidence `
+            -RootPath $strRepositoryRoot `
+            -ExcludedPath $hashtableAdministrativePaths.GitEntry
+        $hashtableControlConfirm = Get-GitControlSurfaceEvidence `
+            -AdministrativePathRecord $hashtableAdministrativePaths
+        if ($hashtableControlConfirm.Digest -ceq $hashtableControlAfter.Digest -and
+            $hashtableWorktreeConfirm.Digest -ceq $hashtableWorktreeAfter.Digest) {
+            $boolConverged = $true
+            break
+        }
+        $hashtableControlAfter = $hashtableControlConfirm
+        $hashtableWorktreeAfter = $hashtableWorktreeConfirm
+    }
+    if (-not $boolConverged) {
+        throw 'evidence-unstable'
+    }
     if ($hashtableControlBefore.Digest -cne $hashtableControlAfter.Digest) {
         throw 'git-control-drift'
     }
@@ -1841,7 +1873,7 @@ try {
         'malformed-index-records', 'unsafe-index-state', 'record-limit',
         'repository-boundary', 'invalid-git-control', 'git-control-limit',
         'worktree-link', 'worktree-limit', 'git-control-drift', 'worktree-drift',
-        'git-filter-active',
+        'evidence-unstable', 'git-filter-active',
         'native-command', 'native-output-limit', 'working-index-difference'
     )) {
         $strCategory = $_.Exception.Message
