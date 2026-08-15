@@ -54,8 +54,8 @@ jobs:
           }
           $objResult = $arrResult[0] | ConvertFrom-Json
           if ($intGeneratorExit -ne 0 -or
-              $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v1' -or
-              $objResult.GeneratorVersion -cne '1.0.20260813.0' -or
+              $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2' -or
+              $objResult.GeneratorVersion -cne '1.0.20260814.0' -or
               $objResult.Overall -notin @('Success', 'NoChange')) {
               throw "Artifact generation failed with native exit $intGeneratorExit."
           }
@@ -65,6 +65,10 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          $strPowerShellPath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
+          if (-not [System.IO.File]::Exists($strPowerShellPath)) {
+              throw 'The current PowerShell executable could not be resolved.'
+          }
           $arrArtifactPaths = @(
               'copilot-instructions.md',
               'powershell.instructions.md',
@@ -79,12 +83,29 @@ jobs:
           if ($intDiffExit -ne 0) {
               throw "git diff failed with native exit $intDiffExit."
           }
-          & ./.github/workflows/Test-ExactGitPathSet.ps1 `
+          $strVerifierCommand = @'
+          & './.github/workflows/Test-ExactGitPathSet.ps1' `
               -RepositoryRoot $env:GITHUB_WORKSPACE `
               -ExpectedPath @() `
               -Mode Working
+          '@
+          $strEncodedVerifierCommand = [System.Convert]::ToBase64String(
+              [System.Text.Encoding]::Unicode.GetBytes($strVerifierCommand)
+          )
+          $arrPathSetResult = @(& $strPowerShellPath `
+              -NoLogo `
+              -NoProfile `
+              -NonInteractive `
+              -EncodedCommand $strEncodedVerifierCommand)
           $intPathSetExit = $LASTEXITCODE
-          if ($intPathSetExit -ne 0) {
+          if ($arrPathSetResult.Count -ne 1) {
+              throw 'The exact-path verifier returned an unexpected output shape.'
+          }
+          $objPathSetResult = $arrPathSetResult[0] | ConvertFrom-Json
+          if ($intPathSetExit -ne 0 -or
+              $objPathSetResult.Schema -cne 'PSStyleGuide.ExactGitPathSetResult.v2' -or
+              $objPathSetResult.VerifierVersion -cne '1.0.20260814.0' -or
+              -not $objPathSetResult.Success) {
               throw "The working path set was not empty; verifier exit $intPathSetExit."
           }
 
