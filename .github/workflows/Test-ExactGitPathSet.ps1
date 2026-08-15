@@ -1241,10 +1241,10 @@ function Get-GitControlSurfaceEvidence {
     # .DESCRIPTION
     # Hashes the .git pointer when present, the applicable local configuration
     # files, the staging index, info/exclude, info/attributes, HEAD, packed-refs,
-    # the commondir pointer, the loose refs tree, and ordinary bounded hook
-    # directory trees. Uses labeled components so absent and present state cannot
-    # collide. The refs tree excludes logs/ (reflogs), a sibling of refs/, so
-    # benign reflog churn raises no drift.
+    # the commondir pointer, the shared and per-worktree loose refs trees, and
+    # ordinary bounded hook directory trees. Uses labeled components so absent and
+    # present state cannot collide. The refs trees exclude logs/ (reflogs), a
+    # sibling of refs/, so benign reflog churn raises no drift.
     #
     # .PARAMETER AdministrativePathRecord
     # Validated GitEntry, GitDirectory, and CommonDirectory path record.
@@ -1266,8 +1266,9 @@ function Get-GitControlSurfaceEvidence {
     # System.Collections.Specialized.OrderedDictionary. Contains Digest,
     # ComponentCount, HookEntryCount, and HookByteCount. The Digest also covers
     # the staging index, info/exclude, info/attributes, HEAD, packed-refs, the
-    # commondir pointer, and the loose refs tree, so concurrent drift of any
-    # path-set read input raises git-control-drift. Filesystem, ordinary path,
+    # commondir pointer, and the shared and per-worktree loose refs trees, so
+    # concurrent drift of any path-set read input raises git-control-drift.
+    # Filesystem, ordinary path,
     # size-bound, hashing, and parameter-binding failures propagate.
     #
     # .NOTES
@@ -1371,6 +1372,27 @@ function Get-GitControlSurfaceEvidence {
         throw 'invalid-git-control'
     } else {
         $objComponents['loose-refs'] = 'absent'
+    }
+
+    # Per-worktree refs (refs/bisect, refs/worktree, refs/rewritten) are not shared:
+    # Git stores them under the worktree's own Git directory, outside the common
+    # refs tree hashed above. For a linked worktree GitDirectory differs from
+    # CommonDirectory, so a HEAD that points at a per-worktree ref (for example
+    # refs/worktree/*) resolves the staged read against GitDirectory/refs, which
+    # loose-refs above does not cover; moving that ref would otherwise leave both
+    # before/after digests equal. Hash GitDirectory/refs under a distinct label so
+    # per-worktree ref drift is caught. For the main worktree GitDirectory equals
+    # CommonDirectory, so this repeats the shared tree, which is inert. logs/ stays
+    # a sibling of refs/ and is not walked, so reflog churn raises no spurious drift.
+    $strWorktreeRefsPath = [System.IO.Path]::GetFullPath(
+        (Join-Path $AdministrativePathRecord.GitDirectory 'refs'))
+    if ([System.IO.Directory]::Exists($strWorktreeRefsPath)) {
+        $objComponents['worktree-loose-refs'] = (
+            Get-TreeEvidence -RootPath $strWorktreeRefsPath -ExcludedPath $null).Digest
+    } elseif ([System.IO.File]::Exists($strWorktreeRefsPath)) {
+        throw 'invalid-git-control'
+    } else {
+        $objComponents['worktree-loose-refs'] = 'absent'
     }
     return [ordered]@{
         Digest = Get-FramedStringMapDigest -StringMap $objComponents
@@ -1627,6 +1649,47 @@ try {
         throw 'repository-boundary'
     }
 
+    if (($Mode -in @('Working', 'Both')) -or $RequireCleanWorkingAgainstIndex) {
+        # A worktree-versus-index diff (the working and clean reads below) makes Git
+        # run a clean or process filter driver for any path whose filter attribute
+        # names a driver with a configured clean/process command. That driver is an
+        # external program, outside the hashed evidence, so its output -- and thus
+        # the read -- can change while the config that names it, the attributes that
+        # assign it, the index, and both evidence digests all stay equal.
+        # '--no-textconv' disables only diff textconv, not clean/process, and no
+        # config or command-line override neutralizes an arbitrarily named driver
+        # assigned by an in-tree .gitattributes. Refuse (fail closed) when such a
+        # driver is configured. The probe runs in the same neutralized environment
+        # as the reads (no system or global config), so a developer's global Git LFS
+        # drivers are already excluded and never trip it; only a repository-local
+        # clean or process driver refuses.
+        $strNativeCommand = 'filter-config'
+        $hashtableFilterResult = Invoke-GitRaw `
+            -GitRecord $hashtableGitExecutable `
+            -WorkingDirectory $strRepositoryRoot `
+            -ArgumentList @('config', '-z', '--name-only', '--get-regexp', '^filter\.')
+        $listNativeChecks.Add([ordered]@{
+            Name = $strNativeCommand
+            ExitCode = $hashtableFilterResult.ExitCode
+            StdoutLength = $hashtableFilterResult.Stdout.Length
+            StderrLength = $hashtableFilterResult.StderrLength
+        })
+        $intNativeExit = $hashtableFilterResult.ExitCode
+        # 'git config --get-regexp' exits 1 when no key matches; that is the common
+        # hermetic case (no repository-local filter driver) and is not a failure.
+        if ($intNativeExit -notin @(0, 1)) {
+            throw 'native-command'
+        }
+        if ($intNativeExit -eq 0) {
+            $strFilterKeyText = $script:objUtf8Strict.GetString($hashtableFilterResult.Stdout)
+            foreach ($strFilterKey in $strFilterKeyText.Split([char]0)) {
+                if ($strFilterKey.Length -gt 0 -and $strFilterKey -imatch '\.(clean|process)$') {
+                    throw 'git-filter-active'
+                }
+            }
+        }
+    }
+
     if ($Mode -in @('Working', 'Both')) {
         $strNativeCommand = 'working'
         $hashtableWorkingResult = Invoke-GitRaw `
@@ -1721,11 +1784,21 @@ try {
         }
     }
 
-    $hashtableControlAfter = Get-GitControlSurfaceEvidence `
-        -AdministrativePathRecord $hashtableAdministrativePaths
+    # Close the read window with the worktree tree first and the control surface
+    # last. The worktree scan can be long; sampling the control surface after it
+    # (rather than before it) means an administrative mutation that lands during
+    # that scan -- for example a concurrent 'git reset HEAD -- <path>' that resets
+    # the index without touching worktree bytes -- still changes control-after and
+    # raises git-control-drift here, instead of slipping through because the control
+    # sample was already taken. Residual: a worktree byte change during the bounded
+    # control-after sample (the shorter of the two samples) is not covered; like the
+    # executable re-hash window it needs a concurrent second writer that single-actor
+    # CI does not have.
     $hashtableWorktreeAfter = Get-TreeEvidence `
         -RootPath $strRepositoryRoot `
         -ExcludedPath $hashtableAdministrativePaths.GitEntry
+    $hashtableControlAfter = Get-GitControlSurfaceEvidence `
+        -AdministrativePathRecord $hashtableAdministrativePaths
     if ($hashtableControlBefore.Digest -cne $hashtableControlAfter.Digest) {
         throw 'git-control-drift'
     }
@@ -1768,6 +1841,7 @@ try {
         'malformed-index-records', 'unsafe-index-state', 'record-limit',
         'repository-boundary', 'invalid-git-control', 'git-control-limit',
         'worktree-link', 'worktree-limit', 'git-control-drift', 'worktree-drift',
+        'git-filter-active',
         'native-command', 'native-output-limit', 'working-index-difference'
     )) {
         $strCategory = $_.Exception.Message
