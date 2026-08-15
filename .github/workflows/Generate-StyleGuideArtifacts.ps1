@@ -522,6 +522,27 @@ function Assert-OrdinaryPathComponent {
         ($ExpectedType -eq 'File' -and $boolIsDirectory)) {
         throw "nonordinary-path"
     }
+
+    # A required File component must be a regular file. On Unix a FIFO, socket, or
+    # device carries neither the Directory nor ReparsePoint attribute, so the
+    # checks above accept it, yet a later read of the validated path
+    # (Get-FileSha256Hex or ReadAllBytes on the candidate) would block forever on a
+    # FIFO. Reject the non-regular Unix types through the UnixMode string, matching
+    # the Get-TreeEvidence guard; the check is a no-op where UnixMode is absent
+    # (Windows) and never fires on a regular file ('-'). Directory components skip
+    # it because a special entry can never satisfy the Directory attribute above.
+    if ($ExpectedType -eq 'File') {
+        $objFileComponentInfo = New-Object System.IO.FileInfo($LiteralPath)
+        $objUnixModeProperty = $objFileComponentInfo.PSObject.Properties['UnixMode']
+        if ($null -ne $objUnixModeProperty) {
+            $strUnixMode = [string]$objUnixModeProperty.Value
+            if ($strUnixMode.Length -gt 0 -and ($strUnixMode[0] -eq 'p' -or
+                $strUnixMode[0] -eq 's' -or $strUnixMode[0] -eq 'b' -or
+                $strUnixMode[0] -eq 'c')) {
+                throw "nonordinary-path"
+            }
+        }
+    }
 }
 
 function Get-OrdinaryDestinationState {
@@ -581,6 +602,25 @@ function Get-OrdinaryDestinationState {
     if (($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0 -or
         ($objAttributes -band [System.IO.FileAttributes]::Directory) -ne 0) {
         throw 'unexpected-destination'
+    }
+    # On Unix an entry that is neither a directory nor a reparse point can still be
+    # a FIFO, socket, or device, which file attributes report as Normal and do not
+    # distinguish from a regular file. A later Get-FileSha256Hex opens the leaf for
+    # reading, and opening a FIFO blocks until a writer appears, so a non-regular
+    # entry must be refused here rather than classified as an ordinary file. Query
+    # the type through PowerShell's UnixMode string (StrictMode-safe via
+    # PSObject.Properties); the check is a no-op where UnixMode is absent (Windows,
+    # which has no such entries in the filesystem namespace) and never fires on a
+    # regular file ('-'). This mirrors the Get-TreeEvidence special-entry guard.
+    $objLeafInfo = New-Object System.IO.FileInfo($LiteralPath)
+    $objUnixModeProperty = $objLeafInfo.PSObject.Properties['UnixMode']
+    if ($null -ne $objUnixModeProperty) {
+        $strUnixMode = [string]$objUnixModeProperty.Value
+        if ($strUnixMode.Length -gt 0 -and ($strUnixMode[0] -eq 'p' -or
+            $strUnixMode[0] -eq 's' -or $strUnixMode[0] -eq 'b' -or
+            $strUnixMode[0] -eq 'c')) {
+            throw 'unexpected-destination'
+        }
     }
     return 'Existing'
 }
@@ -1849,6 +1889,13 @@ function Write-StyleGuideArtifact {
             $objCandidateStream = $null
         }
 
+        # The write and flush have already returned; this block captures the
+        # candidate's proven identity, so a failure here is not a flush failure.
+        # Tag it under its own phase rather than 'flush-candidate' so the artifact
+        # evidence names the step accurately. This phase ends exactly where
+        # $boolTemporaryIdentityProven becomes true, which is the same boundary the
+        # cleanup path uses to decide a retained candidate can be safely removed.
+        $strPhase = 'capture-candidate'
         $strCandidateFullPath = Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File
         if (-not [System.IO.Path]::GetDirectoryName($strCandidateFullPath).Equals($strParentPath, $script:objPathComparison)) {
             throw 'candidate-parent-mismatch'
@@ -1896,6 +1943,23 @@ function Write-StyleGuideArtifact {
             throw 'candidate-content-drift'
         }
 
+        # ACCEPTED BOUNDED RESIDUAL (publication substitution window). The revalidation
+        # above re-proves the candidate identity and bytes, but File.Replace and
+        # File.Move resolve the source by PATH. Between that final proof and the
+        # rename below, a second writer with write access to the parent directory
+        # could rename the verified candidate away and place different bytes at the
+        # same temporary path; the path-based rename would then publish the
+        # substituted bytes. No portable mechanism closes this: .NET exposes no
+        # handle-bound rename, POSIX rename is not fd-bound and does not honor a
+        # share mode, and a delete-denying handle held across the call would instead
+        # block the very rename this code must perform. The residual is bounded and
+        # never yields a false success -- the verify-publication phase below reads
+        # the published bytes and reports final-byte-drift / ReplacementStateUncertain
+        # on any mismatch, so a substitution fails closed with truthful evidence. The
+        # window requires a concurrent second writer racing a sub-second interval,
+        # which the single-actor CI trust root (docs/decisions/0001) does not have,
+        # and such a writer already has directory write access and so gains nothing
+        # beyond a truthfully reported failure it could cause by writing directly.
         $strPhase = 'publish-destination'
         if ($hashtableRecord.OriginalState -eq 'Existing') {
             $hashtableRecord.PublicationMethod = 'File.Replace'
