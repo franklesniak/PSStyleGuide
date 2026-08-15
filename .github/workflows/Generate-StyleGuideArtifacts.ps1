@@ -1831,24 +1831,15 @@ function Write-StyleGuideArtifact {
         if ($null -eq $objCandidateStream) {
             throw 'candidate-create-failure'
         }
-        $objCandidateStream.Dispose()
-        $objCandidateStream = $null
 
-        $strCandidateFullPath = Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File
-        if (-not [System.IO.Path]::GetDirectoryName($strCandidateFullPath).Equals($strParentPath, $script:objPathComparison)) {
-            throw 'candidate-parent-mismatch'
-        }
-        $strCandidateIdentity = Get-OrdinaryFileIdentity -LiteralPath $strCandidateFullPath
-        $boolTemporaryIdentityProven = $true
-        $hashtableRecord.CandidateOrdinaryIdentity = $strCandidateIdentity
-
+        # Write and flush through the retained CreateNew handle rather than closing it
+        # and reopening the path. A path-based reopen (FileMode.Open) would follow a
+        # symlink that another process could substitute at the candidate path after
+        # the close, sending the payload to the link target; the CreateNew handle is
+        # bound to the file this process created, so the write cannot be redirected.
+        # The ordinary-path assertion and identity capture below then confirm the
+        # on-disk candidate and fail closed if the path was replaced during the write.
         $strPhase = 'write-candidate'
-        $objCandidateStream = New-Object System.IO.FileStream(
-            $strCandidateFullPath,
-            [System.IO.FileMode]::Open,
-            [System.IO.FileAccess]::Write,
-            [System.IO.FileShare]::None
-        )
         try {
             $objCandidateStream.Write($CompletePayloadBytes, 0, $CompletePayloadBytes.Length)
             $strPhase = 'flush-candidate'
@@ -1857,6 +1848,14 @@ function Write-StyleGuideArtifact {
             $objCandidateStream.Dispose()
             $objCandidateStream = $null
         }
+
+        $strCandidateFullPath = Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File
+        if (-not [System.IO.Path]::GetDirectoryName($strCandidateFullPath).Equals($strParentPath, $script:objPathComparison)) {
+            throw 'candidate-parent-mismatch'
+        }
+        $strCandidateIdentity = Get-OrdinaryFileIdentity -LiteralPath $strCandidateFullPath
+        $boolTemporaryIdentityProven = $true
+        $hashtableRecord.CandidateOrdinaryIdentity = $strCandidateIdentity
 
         $strPhase = 'verify-candidate'
         $strCandidateFullPath = Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File

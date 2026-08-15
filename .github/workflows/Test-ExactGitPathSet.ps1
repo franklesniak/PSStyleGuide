@@ -692,6 +692,19 @@ function Invoke-GitRaw {
         $objProcess.StandardInput.Close()
         $objStdoutTask = $objProcess.StandardOutput.BaseStream.CopyToAsync($objStdout)
         $objStderrTask = $objProcess.StandardError.BaseStream.CopyToAsync($objStderr)
+        # Bound the drain instead of buffering the whole streams before the size
+        # check. If either sink crosses 4 MiB while the child is still writing,
+        # terminate the child (and its tree) and fail with native-output-limit, so a
+        # command that emits hundreds of megabytes cannot exhaust the verifier. The
+        # MemoryStream length getter reads a 64-bit field, so sampling it while
+        # CopyToAsync writes returns a valid (at worst slightly stale) length.
+        while (-not ($objStdoutTask.IsCompleted -and $objStderrTask.IsCompleted)) {
+            if ($objStdout.Length -gt 4194304 -or $objStderr.Length -gt 4194304) {
+                try { $objProcess.Kill($true) } catch { $null = $_ }
+                throw 'native-output-limit'
+            }
+            [void][System.Threading.Tasks.Task]::WaitAny(@($objStdoutTask, $objStderrTask), 25)
+        }
         $objProcess.WaitForExit()
         [System.Threading.Tasks.Task]::WaitAll(@($objStdoutTask, $objStderrTask))
         $intExitCode = $objProcess.ExitCode
@@ -1104,6 +1117,24 @@ function Get-TreeEvidence {
                 $objPending.Push($strFullEntry)
             } else {
                 $objFile = New-Object System.IO.FileInfo($strFullEntry)
+                # On Unix an entry that is neither a directory nor a reparse point can
+                # still be a FIFO, socket, or device, which File attributes do not
+                # distinguish from a regular file, so a zero-length FIFO would receive
+                # the same evidence as a zero-byte regular file. PowerShell's UnixMode
+                # string exposes the type in its first character. Reject the explicit
+                # special types so a special entry cannot alias a regular file; the
+                # check is a no-op where UnixMode is absent (Windows, which has no such
+                # entries in an ordinary worktree) and never fires on a regular file
+                # ('-') or directory ('d').
+                $objUnixModeProperty = $objFile.PSObject.Properties['UnixMode']
+                if ($null -ne $objUnixModeProperty) {
+                    $strUnixMode = [string]$objUnixModeProperty.Value
+                    if ($strUnixMode.Length -gt 0 -and ($strUnixMode[0] -eq 'p' -or
+                        $strUnixMode[0] -eq 's' -or $strUnixMode[0] -eq 'b' -or
+                        $strUnixMode[0] -eq 'c')) {
+                        throw 'worktree-special-entry'
+                    }
+                }
                 if ($objFile.Length -gt 67108864) {
                     throw 'worktree-limit'
                 }
@@ -1526,8 +1557,17 @@ function Get-PathSetControlInputDigest {
         $strLabel = [string]$arrSpecification[0]
         $strPath = [System.IO.Path]::GetFullPath([string]$arrSpecification[1])
         if ([System.IO.File]::Exists($strPath)) {
-            $objInputs[$strLabel] = ([string](New-Object System.IO.FileInfo($strPath)).Length + ':' +
+            # Mirror Get-GitControlSurfaceEvidence: reject a non-ordinary (reparse/
+            # symlink) file so a concurrently substituted link cannot read outside
+            # the repository, and enforce the same 4 MiB component bound.
+            $objInfo = New-Object System.IO.FileInfo((Assert-OrdinaryAbsoluteFile -LiteralPath $strPath))
+            if ($objInfo.Length -gt 4194304) {
+                throw 'git-control-limit'
+            }
+            $objInputs[$strLabel] = ([string]$objInfo.Length + ':' +
                 (Get-FileSha256Hex -LiteralPath $strPath))
+        } elseif ([System.IO.Directory]::Exists($strPath)) {
+            throw 'invalid-git-control'
         } else {
             $objInputs[$strLabel] = 'absent'
         }
@@ -2031,7 +2071,8 @@ try {
         'git-executable-resolution', 'git-executable-drift', 'malformed-records',
         'malformed-index-records', 'unsafe-index-state', 'record-limit',
         'repository-boundary', 'invalid-git-control', 'git-control-limit',
-        'worktree-link', 'worktree-limit', 'git-control-drift', 'worktree-drift',
+        'worktree-link', 'worktree-limit', 'worktree-special-entry',
+        'git-control-drift', 'worktree-drift',
         'evidence-unstable', 'git-filter-active',
         'native-command', 'native-output-limit', 'working-index-difference'
     )) {
