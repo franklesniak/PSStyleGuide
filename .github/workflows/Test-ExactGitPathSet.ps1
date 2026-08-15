@@ -1098,8 +1098,15 @@ function Get-TreeEvidence {
         # $objMap, an ordinal SortedDictionary, so the framed digest and the
         # counts are independent of enumeration order. A sort here would be dead
         # work, and Sort-Object specifically would add culture-dependent semantics.
-        $arrEntries = @([System.IO.Directory]::EnumerateFileSystemEntries($strDirectory))
-        foreach ($strEntry in $arrEntries) {
+        #
+        # Iterate the enumerable lazily rather than materializing it with @(...).
+        # A single directory holding far more than the 100,000-entry ceiling would
+        # otherwise retain every pathname in one array before the loop could reach
+        # the entry-count bound below, so a hostile or accidental directory could
+        # exhaust memory before the promised bounded failure. Streaming one entry
+        # at a time keeps the retained set within that ceiling, which is enforced
+        # after each entry is recorded.
+        foreach ($strEntry in [System.IO.Directory]::EnumerateFileSystemEntries($strDirectory)) {
             $strFullEntry = [System.IO.Path]::GetFullPath($strEntry)
             if ($null -ne $strExcluded -and $strFullEntry.Equals($strExcluded, $script:objPathComparison)) {
                 continue
@@ -1921,6 +1928,25 @@ try {
     }
 
     if ($Mode -in @('Staged', 'Both')) {
+        # A staged read (index versus HEAD) resolves HEAD's commit and tree through
+        # the object database, which may include an external store named by
+        # objects/info/alternates (for example a 'git clone --shared' repository).
+        # That external store sits outside the hashed control surface and the
+        # convergence bracket, so another process can redirect or remove it after
+        # the staged read while every control and worktree digest still converges,
+        # yielding a success whose staged path set no longer reproduces. The store
+        # cannot be snapshotted portably, so refuse (fail closed) when the staged
+        # comparison depends on an external object store rather than return an
+        # unsound result. An ordinary clone has no alternates file and is
+        # unaffected; the working read never traverses HEAD's tree objects, and CI
+        # runs Mode Working and never reaches here. Modeled on the git-filter-active
+        # refusal above.
+        $strAlternatesPath = [System.IO.Path]::Combine(
+            [string]$hashtableAdministrativePaths.CommonDirectory, 'objects', 'info', 'alternates')
+        if ([System.IO.File]::Exists($strAlternatesPath) -and
+            (New-Object System.IO.FileInfo($strAlternatesPath)).Length -gt 0) {
+            throw 'git-alternates-active'
+        }
         $strNativeCommand = 'staged'
         $hashtableStagedResult = Invoke-GitRaw `
             -GitRecord $hashtableGitExecutable `
@@ -2036,6 +2062,26 @@ try {
     if ($strControlInputDigestBefore -cne $strControlInputDigestFinal) {
         throw 'git-control-drift'
     }
+    # Re-resolve the Git administrative pointers from disk and require them to equal
+    # the record resolved before the reads. Every evidence pass and every control
+    # path above is joined onto the cached GitDirectory/CommonDirectory, but native
+    # Git re-follows the on-disk .git pointer on every call. On a linked worktree or
+    # submodule the .git gitdir pointer -- and the commondir pointer it resolves --
+    # can be rewritten after the initial resolution, leaving the cached directories
+    # hashing one index/HEAD while native Git reads another, with every cached-path
+    # digest still equal so no other bracket fires. Re-resolving here and comparing
+    # the resolved paths brackets that drift the same way the single-file inputs are
+    # bracketed; a mismatch fails closed. The record is resolved once before the
+    # reads (the pre-read snapshot), so this final resolution closes the window from
+    # that point through the last read. An ordinary clone whose .git is a directory
+    # resolves to the same paths and never trips this.
+    $hashtableAdministrativePathsFinal = Get-GitAdministrativePathRecord `
+        -RepositoryRoot $strRepositoryRoot
+    if ($hashtableAdministrativePathsFinal.GitEntry -cne $hashtableAdministrativePaths.GitEntry -or
+        $hashtableAdministrativePathsFinal.GitDirectory -cne $hashtableAdministrativePaths.GitDirectory -or
+        $hashtableAdministrativePathsFinal.CommonDirectory -cne $hashtableAdministrativePaths.CommonDirectory) {
+        throw 'git-control-drift'
+    }
     $boolEvidenceStable = $true
 
     $objActualKeys = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
@@ -2073,7 +2119,7 @@ try {
         'repository-boundary', 'invalid-git-control', 'git-control-limit',
         'worktree-link', 'worktree-limit', 'worktree-special-entry',
         'git-control-drift', 'worktree-drift',
-        'evidence-unstable', 'git-filter-active',
+        'evidence-unstable', 'git-filter-active', 'git-alternates-active',
         'native-command', 'native-output-limit', 'working-index-difference'
     )) {
         $strCategory = $_.Exception.Message
