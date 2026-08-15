@@ -21,8 +21,12 @@ Working, Staged, or Both.
 .PARAMETER RequireCleanWorkingAgainstIndex
 Also require git diff --exit-code to report no working-tree difference.
 
+.PARAMETER GitExecutablePath
+Optional exact absolute path of the Git executable. When omitted, the script
+uses the module-qualified application resolver once before any Git invocation.
+
 .NOTES
-Version: 1.0.20260813.0
+Version: 1.0.20260814.0
 #>
 
 [CmdletBinding()]
@@ -39,14 +43,23 @@ param (
     [ValidateSet('Working', 'Staged', 'Both')]
     [string]$Mode,
 
-    [switch]$RequireCleanWorkingAgainstIndex
+    [switch]$RequireCleanWorkingAgainstIndex,
+
+    [AllowNull()]
+    [string]$GitExecutablePath
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strVerifierVersion = '1.0.20260813.0'
-$script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v1'
+$script:strVerifierVersion = '1.0.20260814.0'
+$script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v2'
+$script:objUtf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
+$script:objPathComparison = if ($env:OS -eq 'Windows_NT') {
+    [System.StringComparison]::OrdinalIgnoreCase
+} else {
+    [System.StringComparison]::Ordinal
+}
 
 function Get-ScriptVersionRecord {
     # .SYNOPSIS
@@ -244,6 +257,204 @@ function Test-ScriptVersionParser {
     }
 }
 
+function Get-FileSha256Hex {
+    # .SYNOPSIS
+    # Gets the SHA-256 digest of one ordinary file.
+    #
+    # .DESCRIPTION
+    # Opens the literal file for shared reading, hashes its complete byte stream,
+    # and returns lowercase hexadecimal text without separators.
+    #
+    # .PARAMETER LiteralPath
+    # Absolute literal file path to hash. Wildcards are not expanded.
+    #
+    # .EXAMPLE
+    # $strDigest = Get-FileSha256Hex -LiteralPath $strGitPath
+    #
+    # # Returns the lowercase SHA-256 digest of the selected Git executable.
+    #
+    # .EXAMPLE
+    # Get-FileSha256Hex -LiteralPath $strMissingPath
+    #
+    # # Propagates the file-open failure for a missing path.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.String. The lowercase SHA-256 digest. File, stream, allocation, and
+    # parameter-binding failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260814.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: LiteralPath
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath
+    )
+
+    $objStream = New-Object System.IO.FileStream(
+        $LiteralPath,
+        [System.IO.FileMode]::Open,
+        [System.IO.FileAccess]::Read,
+        [System.IO.FileShare]::Read
+    )
+    $objSha256 = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        return ([System.BitConverter]::ToString($objSha256.ComputeHash($objStream))).Replace('-', '').ToLowerInvariant()
+    } finally {
+        $objSha256.Dispose()
+        $objStream.Dispose()
+    }
+}
+
+function Assert-OrdinaryAbsoluteFile {
+    # .SYNOPSIS
+    # Resolves one absolute ordinary file and every directory ancestor.
+    #
+    # .DESCRIPTION
+    # Rejects relative or control-bearing path text. Normalizes the path and
+    # requires the file and all ancestors to exist without a reparse-point flag.
+    #
+    # .PARAMETER LiteralPath
+    # Absolute literal file path to normalize and validate.
+    #
+    # .EXAMPLE
+    # $strGitPath = Assert-OrdinaryAbsoluteFile -LiteralPath $strCandidate
+    #
+    # # Returns the normalized path for one ordinary executable file.
+    #
+    # .EXAMPLE
+    # Assert-OrdinaryAbsoluteFile -LiteralPath '.\git'
+    #
+    # # Throws 'invalid-ordinary-file' because the path is not absolute.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.String. The normalized ordinary file path. Throws
+    # 'invalid-ordinary-file' for an invalid, missing, directory, or reparse
+    # entry. Path, metadata, access, and parameter-binding failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260814.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: LiteralPath
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath
+    )
+
+    if (-not [System.IO.Path]::IsPathRooted($LiteralPath)) {
+        throw 'invalid-ordinary-file'
+    }
+    foreach ($chrCharacter in $LiteralPath.ToCharArray()) {
+        if ([char]::IsControl($chrCharacter)) {
+            throw 'invalid-ordinary-file'
+        }
+    }
+    $strFullPath = [System.IO.Path]::GetFullPath($LiteralPath)
+    $objFile = New-Object System.IO.FileInfo($strFullPath)
+    if (-not $objFile.Exists -or
+        ($objFile.Attributes -band [System.IO.FileAttributes]::Directory) -ne 0 -or
+        ($objFile.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+        throw 'invalid-ordinary-file'
+    }
+    $objDirectory = $objFile.Directory
+    while ($null -ne $objDirectory) {
+        if (-not $objDirectory.Exists -or
+            ($objDirectory.Attributes -band [System.IO.FileAttributes]::Directory) -eq 0 -or
+            ($objDirectory.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+            throw 'invalid-ordinary-file'
+        }
+        $objDirectory = $objDirectory.Parent
+    }
+    return $strFullPath
+}
+
+function Get-GitExecutableRecord {
+    # .SYNOPSIS
+    # Resolves and fixes the Git executable identity for one verifier run.
+    #
+    # .DESCRIPTION
+    # Uses the caller's exact path or the module-qualified application resolver.
+    # Requires one ordinary file and records its normalized path, byte length,
+    # and SHA-256 digest for revalidation before every child process starts.
+    #
+    # .PARAMETER RequestedPath
+    # Optional exact Git executable path. Null or empty text selects resolution.
+    #
+    # .EXAMPLE
+    # $hashtableGit = Get-GitExecutableRecord -RequestedPath $null
+    #
+    # # Returns the fixed identity of the first resolved Git application.
+    #
+    # .EXAMPLE
+    # $hashtableGit = Get-GitExecutableRecord -RequestedPath 'C:\Program Files\Git\cmd\git.exe'
+    #
+    # # Returns the fixed identity when the exact path is an ordinary file.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Collections.Specialized.OrderedDictionary. Contains Path, Length,
+    # and Sha256. Throws 'git-executable-resolution' or a file-validation
+    # failure. Resolver, hashing, allocation, and parameter-binding failures
+    # propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260814.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: RequestedPath
+    param (
+        [AllowNull()]
+        [string]$RequestedPath
+    )
+
+    if ([string]::IsNullOrEmpty($RequestedPath)) {
+        $arrGitCommands = @(Microsoft.PowerShell.Core\Get-Command `
+            -Name git `
+            -CommandType Application `
+            -ErrorAction Stop)
+        if ($arrGitCommands.Count -eq 0) {
+            throw 'git-executable-resolution'
+        }
+        $strCandidatePath = [string]$arrGitCommands[0].Source
+    } else {
+        $strCandidatePath = $RequestedPath
+    }
+    $strGitPath = Assert-OrdinaryAbsoluteFile -LiteralPath $strCandidatePath
+    return [ordered]@{
+        Path = $strGitPath
+        Length = (New-Object System.IO.FileInfo($strGitPath)).Length
+        Sha256 = Get-FileSha256Hex -LiteralPath $strGitPath
+    }
+}
+
 function ConvertTo-NativeArgumentString {
     # .SYNOPSIS
     # Encodes native arguments as one Windows-compatible command-line string.
@@ -335,13 +546,14 @@ function Invoke-GitRaw {
     # Invokes Git and captures its standard streams as raw bytes.
     #
     # .DESCRIPTION
-    # Starts the exact Git executable without a shell, supplies arguments through
-    # ArgumentList when available or compatible quoting otherwise, closes standard
-    # input, concurrently drains both output streams, and enforces a 4 MiB limit
-    # on each captured stream.
+    # Revalidates the fixed Git executable and starts it without a shell. Builds
+    # a child environment that removes every inherited GIT_* variable and sets
+    # fixed noninteractive configuration controls. Supplies arguments through
+    # ArgumentList when available or compatible quoting otherwise. Closes input,
+    # drains both output streams concurrently, and limits each stream to 4 MiB.
     #
-    # .PARAMETER GitPath
-    # Exact filesystem path of the Git application to invoke.
+    # .PARAMETER GitRecord
+    # Fixed Git executable record with Path, Length, and Sha256 evidence.
     #
     # .PARAMETER WorkingDirectory
     # Existing working directory assigned to the native process.
@@ -350,13 +562,13 @@ function Invoke-GitRaw {
     # Ordered Git arguments passed without shell interpretation.
     #
     # .EXAMPLE
-    # $hashtableResult = Invoke-GitRaw -GitPath $strGitPath -WorkingDirectory $strRoot -ArgumentList @('status', '--porcelain=v1', '-z')
+    # $hashtableResult = Invoke-GitRaw -GitRecord $hashtableGit -WorkingDirectory $strRoot -ArgumentList @('status', '--porcelain=v1', '-z')
     #
     # # Returns ExitCode, raw Stdout bytes, and StderrLength.
     #
     # .EXAMPLE
     # $strLargeBlobId = '<Git blob object ID larger than 4 MiB>'
-    # Invoke-GitRaw -GitPath $strGitPath -WorkingDirectory $strRoot -ArgumentList @('cat-file', 'blob', $strLargeBlobId)
+    # Invoke-GitRaw -GitRecord $hashtableGit -WorkingDirectory $strRoot -ArgumentList @('cat-file', 'blob', $strLargeBlobId)
     #
     # # Schematic: with a blob larger than 4 MiB, throws 'native-output-limit'.
     #
@@ -375,17 +587,17 @@ function Invoke-GitRaw {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 1.0.20260814.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
     #
-    #   Position 0: GitPath
+    #   Position 0: GitRecord
     #   Position 1: WorkingDirectory
     #   Position 2: ArgumentList
     param (
         [Parameter(Mandatory = $true)]
-        [string]$GitPath,
+        [System.Collections.IDictionary]$GitRecord,
 
         [Parameter(Mandatory = $true)]
         [string]$WorkingDirectory,
@@ -394,20 +606,43 @@ function Invoke-GitRaw {
         [string[]]$ArgumentList
     )
 
+    $strGitPath = Assert-OrdinaryAbsoluteFile -LiteralPath ([string]$GitRecord.Path)
+    if ((New-Object System.IO.FileInfo($strGitPath)).Length -ne [int64]$GitRecord.Length -or
+        (Get-FileSha256Hex -LiteralPath $strGitPath) -cne [string]$GitRecord.Sha256) {
+        throw 'git-executable-drift'
+    }
+
     $objStartInfo = New-Object System.Diagnostics.ProcessStartInfo
-    $objStartInfo.FileName = $GitPath
+    $objStartInfo.FileName = $strGitPath
     $objStartInfo.WorkingDirectory = $WorkingDirectory
     $objStartInfo.UseShellExecute = $false
     $objStartInfo.CreateNoWindow = $true
     $objStartInfo.RedirectStandardInput = $true
     $objStartInfo.RedirectStandardOutput = $true
     $objStartInfo.RedirectStandardError = $true
+    $objChildEnvironment = $objStartInfo.EnvironmentVariables
+    foreach ($strEnvironmentName in @($objChildEnvironment.Keys)) {
+        if ($strEnvironmentName.StartsWith('GIT_', [System.StringComparison]::OrdinalIgnoreCase)) {
+            [void]$objChildEnvironment.Remove($strEnvironmentName)
+        }
+    }
+    $objChildEnvironment['GIT_CONFIG_NOSYSTEM'] = '1'
+    $objChildEnvironment['GIT_CONFIG_GLOBAL'] = if ($env:OS -eq 'Windows_NT') { 'NUL' } else { '/dev/null' }
+    $objChildEnvironment['GIT_OPTIONAL_LOCKS'] = '0'
+    $objChildEnvironment['GIT_TERMINAL_PROMPT'] = '0'
+    $objChildEnvironment['LC_ALL'] = 'C'
+    $objChildEnvironment['LANG'] = 'C'
+    $arrFixedArguments = @(
+        '--no-optional-locks',
+        '-c', 'core.fsmonitor=false',
+        '-c', 'core.untrackedCache=false'
+    ) + $ArgumentList
     if ($null -ne $objStartInfo.PSObject.Properties['ArgumentList']) {
-        foreach ($strArgument in $ArgumentList) {
+        foreach ($strArgument in $arrFixedArguments) {
             [void]$objStartInfo.ArgumentList.Add($strArgument)
         }
     } else {
-        $objStartInfo.Arguments = ConvertTo-NativeArgumentString -ArgumentList $ArgumentList
+        $objStartInfo.Arguments = ConvertTo-NativeArgumentString -ArgumentList $arrFixedArguments
     }
 
     $objProcess = New-Object System.Diagnostics.Process
@@ -469,15 +704,15 @@ function ConvertFrom-NulPathRecordStream {
     # .OUTPUTS
     # System.Collections.Generic.HashSet[System.String]. One non-enumerated set of
     # opaque Base64 keys. Throws 'malformed-records' for missing terminators, empty
-    # records, or duplicate records; parameter-binding and allocation failures
-    # propagate.
+    # records, or duplicate records, and 'record-limit' above 100,000 records.
+    # Parameter-binding and allocation failures propagate.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 1.0.20260814.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -511,6 +746,9 @@ function ConvertFrom-NulPathRecordStream {
         $strKey = [System.Convert]::ToBase64String($arrRecord)
         if (-not $objKeys.Add($strKey)) {
             throw 'malformed-records'
+        }
+        if ($objKeys.Count -gt 100000) {
+            throw 'record-limit'
         }
         $intRecordStart = $intIndex + 1
     }
@@ -576,6 +814,9 @@ function New-ExpectedPathKeySet {
 
     $objAscii = New-Object System.Text.ASCIIEncoding
     $objKeys = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+    if ($PathList.Count -gt 100000) {
+        throw 'invalid-expected-path'
+    }
     foreach ($strPath in $PathList) {
         if ($null -eq $strPath -or $strPath.Length -eq 0 -or $strPath.Trim().Length -eq 0 -or
             $strPath -match '^[\\/]' -or $strPath -match '(^|/)\.\.?(/|$)' -or
@@ -647,6 +888,11 @@ function Assert-OrdinaryRepositoryRoot {
     if (-not [System.IO.Path]::IsPathRooted($LiteralPath)) {
         throw 'invalid-repository-root'
     }
+    foreach ($chrCharacter in $LiteralPath.ToCharArray()) {
+        if ([char]::IsControl($chrCharacter)) {
+            throw 'invalid-repository-root'
+        }
+    }
     $strFullPath = [System.IO.Path]::GetFullPath($LiteralPath)
     $objCurrent = New-Object System.IO.DirectoryInfo($strFullPath)
     while ($null -ne $objCurrent) {
@@ -658,6 +904,491 @@ function Assert-OrdinaryRepositoryRoot {
         $objCurrent = $objCurrent.Parent
     }
     return $strFullPath
+}
+
+function Get-FramedStringMapDigest {
+    # .SYNOPSIS
+    # Hashes one ordered string map with unambiguous length framing.
+    #
+    # .DESCRIPTION
+    # Encodes each key and value as strict UTF-8. Writes a big-endian count and
+    # a big-endian byte length before each component, then hashes the frame.
+    #
+    # .PARAMETER StringMap
+    # Ordered string dictionary to frame and hash.
+    #
+    # .EXAMPLE
+    # $strDigest = Get-FramedStringMapDigest -StringMap $objEvidenceMap
+    #
+    # # Returns one lowercase SHA-256 digest for the complete map.
+    #
+    # .EXAMPLE
+    # $strDigest = Get-FramedStringMapDigest -StringMap ([ordered]@{})
+    #
+    # # Returns the digest of an explicitly framed empty map.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.String. The lowercase SHA-256 digest. Encoding, stream, allocation,
+    # hashing, enumeration, and parameter-binding failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260814.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: StringMap
+    param (
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IDictionary]$StringMap
+    )
+
+    $objBuffer = New-Object System.IO.MemoryStream
+    $objSha256 = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $arrCount = [System.BitConverter]::GetBytes([int64]$StringMap.Count)
+        if ([System.BitConverter]::IsLittleEndian) {
+            [System.Array]::Reverse($arrCount)
+        }
+        $objBuffer.Write($arrCount, 0, $arrCount.Length)
+        foreach ($strKey in $StringMap.Keys) {
+            foreach ($strValue in @([string]$strKey, [string]$StringMap[$strKey])) {
+                $arrValue = $script:objUtf8Strict.GetBytes($strValue)
+                $arrLength = [System.BitConverter]::GetBytes([int64]$arrValue.Length)
+                if ([System.BitConverter]::IsLittleEndian) {
+                    [System.Array]::Reverse($arrLength)
+                }
+                $objBuffer.Write($arrLength, 0, $arrLength.Length)
+                $objBuffer.Write($arrValue, 0, $arrValue.Length)
+            }
+        }
+        return ([System.BitConverter]::ToString($objSha256.ComputeHash($objBuffer.ToArray()))).Replace('-', '').ToLowerInvariant()
+    } finally {
+        $objSha256.Dispose()
+        $objBuffer.Dispose()
+    }
+}
+
+function Get-TreeEvidence {
+    # .SYNOPSIS
+    # Gets bounded byte evidence for one ordinary directory tree.
+    #
+    # .DESCRIPTION
+    # Walks without following links. Records every directory and regular file in
+    # ordinal relative-path order. Hashes file content and a length-framed map.
+    # Rejects more than 100,000 entries, one file above 64 MiB, or total file
+    # length above 1 GiB. Optionally excludes one exact child entry.
+    #
+    # .PARAMETER RootPath
+    # Absolute ordinary directory root to inspect.
+    #
+    # .PARAMETER ExcludedPath
+    # Optional exact absolute entry to exclude without traversal.
+    #
+    # .EXAMPLE
+    # $hashtableTree = Get-TreeEvidence -RootPath $strRepositoryRoot -ExcludedPath $strGitEntry
+    #
+    # # Returns bounded worktree digest and count evidence without reading .git.
+    #
+    # .EXAMPLE
+    # $hashtableHooks = Get-TreeEvidence -RootPath $strHooksPath -ExcludedPath $null
+    #
+    # # Returns bounded evidence for all ordinary hook entries.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Collections.Specialized.OrderedDictionary. Contains Digest,
+    # EntryCount, FileCount, and ByteCount. Throws 'worktree-link' or
+    # 'worktree-limit' for refused state. Filesystem and hashing failures
+    # propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260814.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: RootPath
+    #   Position 1: ExcludedPath
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$RootPath,
+
+        [AllowNull()]
+        [string]$ExcludedPath
+    )
+
+    $strRoot = Assert-OrdinaryRepositoryRoot -LiteralPath $RootPath
+    $strExcluded = if ([string]::IsNullOrEmpty($ExcludedPath)) {
+        $null
+    } else {
+        [System.IO.Path]::GetFullPath($ExcludedPath)
+    }
+    $objMap = New-Object 'System.Collections.Generic.SortedDictionary[string,string]' `
+        ([System.StringComparer]::Ordinal)
+    $objPending = New-Object 'System.Collections.Generic.Stack[string]'
+    $objPending.Push($strRoot)
+    $intFileCount = 0
+    $longByteCount = 0L
+    while ($objPending.Count -ne 0) {
+        $strDirectory = $objPending.Pop()
+        $arrEntries = @([System.IO.Directory]::EnumerateFileSystemEntries($strDirectory) | Sort-Object -CaseSensitive)
+        foreach ($strEntry in $arrEntries) {
+            $strFullEntry = [System.IO.Path]::GetFullPath($strEntry)
+            if ($null -ne $strExcluded -and $strFullEntry.Equals($strExcluded, $script:objPathComparison)) {
+                continue
+            }
+            $objAttributes = [System.IO.File]::GetAttributes($strFullEntry)
+            if (($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+                throw 'worktree-link'
+            }
+            $strRelativePath = $strFullEntry.Substring($strRoot.Length).TrimStart(
+                [System.IO.Path]::DirectorySeparatorChar,
+                [System.IO.Path]::AltDirectorySeparatorChar
+            ).Replace([System.IO.Path]::DirectorySeparatorChar, '/')
+            if (($objAttributes -band [System.IO.FileAttributes]::Directory) -ne 0) {
+                $objMap['D:' + $strRelativePath] = ''
+                $objPending.Push($strFullEntry)
+            } else {
+                $objFile = New-Object System.IO.FileInfo($strFullEntry)
+                if ($objFile.Length -gt 67108864) {
+                    throw 'worktree-limit'
+                }
+                $longByteCount += $objFile.Length
+                if ($longByteCount -gt 1073741824) {
+                    throw 'worktree-limit'
+                }
+                $strFileDigest = if ($objFile.Length -eq 0) {
+                    $objEmptySha = [System.Security.Cryptography.SHA256]::Create()
+                    try {
+                        ([System.BitConverter]::ToString($objEmptySha.ComputeHash((New-Object byte[] 0)))).Replace('-', '').ToLowerInvariant()
+                    } finally {
+                        $objEmptySha.Dispose()
+                    }
+                } else {
+                    Get-FileSha256Hex -LiteralPath $strFullEntry
+                }
+                $objMap['F:' + $strRelativePath] = ([string]$objFile.Length + ':' + $strFileDigest)
+                $intFileCount++
+            }
+            if ($objMap.Count -gt 100000) {
+                throw 'worktree-limit'
+            }
+        }
+    }
+    return [ordered]@{
+        Digest = Get-FramedStringMapDigest -StringMap $objMap
+        EntryCount = $objMap.Count
+        FileCount = $intFileCount
+        ByteCount = $longByteCount
+    }
+}
+
+function Get-GitAdministrativePathRecord {
+    # .SYNOPSIS
+    # Resolves the repository Git administrative paths without invoking Git.
+    #
+    # .DESCRIPTION
+    # Accepts an ordinary .git directory or an ordinary bounded gitdir pointer
+    # file. Resolves an optional bounded commondir pointer. Requires every
+    # resolved administrative directory and ancestor to be ordinary.
+    #
+    # .PARAMETER RepositoryRoot
+    # Validated absolute worktree root that owns the .git entry.
+    #
+    # .EXAMPLE
+    # $hashtableGitPath = Get-GitAdministrativePathRecord -RepositoryRoot $strRoot
+    #
+    # # Returns GitEntry, GitDirectory, and CommonDirectory for a normal clone or worktree.
+    #
+    # .EXAMPLE
+    # Get-GitAdministrativePathRecord -RepositoryRoot $strRootWithLinkedDotGit
+    #
+    # # Throws 'invalid-git-control' for a reparse-point .git entry.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Collections.Specialized.OrderedDictionary. Contains GitEntry,
+    # GitDirectory, and CommonDirectory. Throws 'invalid-git-control' for a
+    # missing, linked, malformed, oversized, or nonordinary control path.
+    # Filesystem, decoding, and parameter-binding failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260814.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: RepositoryRoot
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$RepositoryRoot
+    )
+
+    $strGitEntry = [System.IO.Path]::Combine($RepositoryRoot, '.git')
+    if (-not [System.IO.File]::Exists($strGitEntry) -and -not [System.IO.Directory]::Exists($strGitEntry)) {
+        throw 'invalid-git-control'
+    }
+    $objGitAttributes = [System.IO.File]::GetAttributes($strGitEntry)
+    if (($objGitAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+        throw 'invalid-git-control'
+    }
+    if (($objGitAttributes -band [System.IO.FileAttributes]::Directory) -ne 0) {
+        $strGitDirectory = Assert-OrdinaryRepositoryRoot -LiteralPath $strGitEntry
+    } else {
+        $strGitEntry = Assert-OrdinaryAbsoluteFile -LiteralPath $strGitEntry
+        $arrGitEntryBytes = [System.IO.File]::ReadAllBytes($strGitEntry)
+        if ($arrGitEntryBytes.Length -eq 0 -or $arrGitEntryBytes.Length -gt 4096) {
+            throw 'invalid-git-control'
+        }
+        $strGitEntryText = $script:objUtf8Strict.GetString($arrGitEntryBytes).TrimEnd("`r", "`n")
+        if ($strGitEntryText -notmatch '^gitdir: (.+)$' -or $Matches[1] -match '[\r\n]') {
+            throw 'invalid-git-control'
+        }
+        $strGitDirectoryCandidate = $Matches[1]
+        if (-not [System.IO.Path]::IsPathRooted($strGitDirectoryCandidate)) {
+            $strGitDirectoryCandidate = Join-Path $RepositoryRoot $strGitDirectoryCandidate
+        }
+        $strGitDirectory = Assert-OrdinaryRepositoryRoot -LiteralPath (
+            [System.IO.Path]::GetFullPath($strGitDirectoryCandidate)
+        )
+    }
+
+    $strCommonMarker = Join-Path $strGitDirectory 'commondir'
+    if ([System.IO.File]::Exists($strCommonMarker)) {
+        $strCommonMarker = Assert-OrdinaryAbsoluteFile -LiteralPath $strCommonMarker
+        $arrCommonBytes = [System.IO.File]::ReadAllBytes($strCommonMarker)
+        if ($arrCommonBytes.Length -eq 0 -or $arrCommonBytes.Length -gt 4096) {
+            throw 'invalid-git-control'
+        }
+        $strCommonText = $script:objUtf8Strict.GetString($arrCommonBytes).TrimEnd("`r", "`n")
+        if ($strCommonText -match '[\r\n]') {
+            throw 'invalid-git-control'
+        }
+        $strCommonCandidate = $strCommonText
+        if (-not [System.IO.Path]::IsPathRooted($strCommonCandidate)) {
+            $strCommonCandidate = Join-Path $strGitDirectory $strCommonCandidate
+        }
+        $strCommonDirectory = Assert-OrdinaryRepositoryRoot -LiteralPath (
+            [System.IO.Path]::GetFullPath($strCommonCandidate)
+        )
+    } else {
+        $strCommonDirectory = $strGitDirectory
+    }
+    return [ordered]@{
+        GitEntry = $strGitEntry
+        GitDirectory = $strGitDirectory
+        CommonDirectory = $strCommonDirectory
+    }
+}
+
+function Get-GitControlSurfaceEvidence {
+    # .SYNOPSIS
+    # Gets bounded evidence for repository-local Git configuration and hooks.
+    #
+    # .DESCRIPTION
+    # Hashes the .git pointer when present, the applicable local configuration
+    # files, and ordinary bounded hook directory trees. Uses labeled components
+    # so absent and present state cannot collide.
+    #
+    # .PARAMETER AdministrativePathRecord
+    # Validated GitEntry, GitDirectory, and CommonDirectory path record.
+    #
+    # .EXAMPLE
+    # $hashtableControl = Get-GitControlSurfaceEvidence -AdministrativePathRecord $hashtableGitPath
+    #
+    # # Returns one digest and bounded component counts.
+    #
+    # .EXAMPLE
+    # Get-GitControlSurfaceEvidence -AdministrativePathRecord $hashtableLinkedControl
+    #
+    # # Throws when a configuration or hook entry is not ordinary.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Collections.Specialized.OrderedDictionary. Contains Digest,
+    # ComponentCount, HookEntryCount, and HookByteCount. Filesystem, ordinary
+    # path, size-bound, hashing, and parameter-binding failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260814.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: AdministrativePathRecord
+    param (
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IDictionary]$AdministrativePathRecord
+    )
+
+    $objComponents = New-Object 'System.Collections.Generic.SortedDictionary[string,string]' `
+        ([System.StringComparer]::Ordinal)
+    $strGitEntry = [string]$AdministrativePathRecord.GitEntry
+    if ([System.IO.File]::Exists($strGitEntry)) {
+        $objGitEntryInfo = New-Object System.IO.FileInfo((Assert-OrdinaryAbsoluteFile -LiteralPath $strGitEntry))
+        $objComponents['git-entry'] = ([string]$objGitEntryInfo.Length + ':' +
+            (Get-FileSha256Hex -LiteralPath $strGitEntry))
+    } else {
+        [void](Assert-OrdinaryRepositoryRoot -LiteralPath $strGitEntry)
+        $objComponents['git-entry'] = 'directory'
+    }
+
+    $arrConfigSpecifications = @(
+        @('common-config', (Join-Path $AdministrativePathRecord.CommonDirectory 'config')),
+        @('common-config-worktree', (Join-Path $AdministrativePathRecord.CommonDirectory 'config.worktree')),
+        @('worktree-config', (Join-Path $AdministrativePathRecord.GitDirectory 'config')),
+        @('worktree-config-worktree', (Join-Path $AdministrativePathRecord.GitDirectory 'config.worktree'))
+    )
+    foreach ($arrSpecification in $arrConfigSpecifications) {
+        $strLabel = [string]$arrSpecification[0]
+        $strPath = [System.IO.Path]::GetFullPath([string]$arrSpecification[1])
+        if ([System.IO.File]::Exists($strPath)) {
+            $objInfo = New-Object System.IO.FileInfo((Assert-OrdinaryAbsoluteFile -LiteralPath $strPath))
+            if ($objInfo.Length -gt 4194304) {
+                throw 'git-control-limit'
+            }
+            $objComponents[$strLabel] = ([string]$objInfo.Length + ':' + (Get-FileSha256Hex -LiteralPath $strPath))
+        } elseif ([System.IO.Directory]::Exists($strPath)) {
+            throw 'invalid-git-control'
+        } else {
+            $objComponents[$strLabel] = 'absent'
+        }
+    }
+
+    $intHookEntryCount = 0
+    $longHookByteCount = 0L
+    $arrHookSpecifications = @(
+        @('common-hooks', (Join-Path $AdministrativePathRecord.CommonDirectory 'hooks')),
+        @('worktree-hooks', (Join-Path $AdministrativePathRecord.GitDirectory 'hooks'))
+    )
+    foreach ($arrSpecification in $arrHookSpecifications) {
+        $strLabel = [string]$arrSpecification[0]
+        $strPath = [System.IO.Path]::GetFullPath([string]$arrSpecification[1])
+        if ([System.IO.Directory]::Exists($strPath)) {
+            $hashtableHooks = Get-TreeEvidence -RootPath $strPath -ExcludedPath $null
+            $objComponents[$strLabel] = $hashtableHooks.Digest
+            $intHookEntryCount += $hashtableHooks.EntryCount
+            $longHookByteCount += $hashtableHooks.ByteCount
+        } elseif ([System.IO.File]::Exists($strPath)) {
+            throw 'invalid-git-control'
+        } else {
+            $objComponents[$strLabel] = 'absent'
+        }
+    }
+    return [ordered]@{
+        Digest = Get-FramedStringMapDigest -StringMap $objComponents
+        ComponentCount = $objComponents.Count
+        HookEntryCount = $intHookEntryCount
+        HookByteCount = $longHookByteCount
+    }
+}
+
+function ConvertFrom-NulIndexRecordStream {
+    # .SYNOPSIS
+    # Validates raw NUL-delimited Git index flag and path records.
+    #
+    # .DESCRIPTION
+    # Requires each record to contain the safe cached marker `H`, one ASCII
+    # space, and one nonempty opaque path. Rejects assume-unchanged,
+    # skip-worktree, unmerged, removed, duplicate, malformed, and excessive
+    # records without decoding or printing path bytes.
+    #
+    # .PARAMETER Bytes
+    # Complete raw output from `git ls-files -v -z`.
+    #
+    # .EXAMPLE
+    # $objIndexKeys = ConvertFrom-NulIndexRecordStream -Bytes ([byte[]](0x48,0x20,0x61,0x00))
+    #
+    # # Returns the opaque key for path byte 0x61.
+    #
+    # .EXAMPLE
+    # ConvertFrom-NulIndexRecordStream -Bytes ([byte[]](0x68,0x20,0x61,0x00))
+    #
+    # # Throws 'unsafe-index-state' for an assume-unchanged marker.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Collections.Generic.HashSet[System.String]. One non-enumerated set
+    # of opaque path keys. Throws 'malformed-index-records',
+    # 'unsafe-index-state', or 'record-limit'. Allocation and binding failures
+    # propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260814.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: Bytes
+    param (
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [byte[]]$Bytes
+    )
+
+    $objKeys = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+    if ($Bytes.Length -eq 0) {
+        return ,$objKeys
+    }
+    if ($Bytes[$Bytes.Length - 1] -ne 0) {
+        throw 'malformed-index-records'
+    }
+    $intStart = 0
+    for ($intIndex = 0; $intIndex -lt $Bytes.Length; $intIndex++) {
+        if ($Bytes[$intIndex] -ne 0) {
+            continue
+        }
+        $intLength = $intIndex - $intStart
+        if ($intLength -lt 3 -or $Bytes[$intStart + 1] -ne 0x20) {
+            throw 'malformed-index-records'
+        }
+        if ($Bytes[$intStart] -ne 0x48) {
+            throw 'unsafe-index-state'
+        }
+        $arrPath = New-Object byte[] ($intLength - 2)
+        [System.Array]::Copy($Bytes, $intStart + 2, $arrPath, 0, $arrPath.Length)
+        $strKey = [System.Convert]::ToBase64String($arrPath)
+        if (-not $objKeys.Add($strKey)) {
+            throw 'malformed-index-records'
+        }
+        if ($objKeys.Count -gt 100000) {
+            throw 'record-limit'
+        }
+        $intStart = $intIndex + 1
+    }
+    return ,$objKeys
 }
 
 function Add-KeySet {
@@ -724,8 +1455,8 @@ function Write-VerifierResult {
     # Writes the exact-path verifier result as one compact JSON line.
     #
     # .DESCRIPTION
-    # Serializes the complete ordered verifier result without pretty-printing and
-    # writes it directly to standard output as one newline-terminated JSON document.
+    # Serializes the complete ordered verifier result to depth six without
+    # pretty-printing. Writes one newline-terminated JSON document to stdout.
     #
     # .PARAMETER Result
     # Complete exact-path verifier result dictionary to serialize.
@@ -753,7 +1484,7 @@ function Write-VerifierResult {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 1.0.20260814.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -764,46 +1495,98 @@ function Write-VerifierResult {
         [System.Collections.IDictionary]$Result
     )
 
-    [Console]::Out.WriteLine(($Result | ConvertTo-Json -Compress))
+    [Console]::Out.WriteLine(($Result | ConvertTo-Json -Depth 6 -Compress))
 }
 
 $strCategory = 'tool-failure'
 $strNativeOutcome = 'NotApplicable'
+$strNativeCommand = 'NotApplicable'
 $intNativeExit = $null
 $objExpectedKeys = $null
 $objActualKeys = $null
 $objWorkingKeys = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
 $objStagedKeys = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
 $objUntrackedKeys = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+$objIndexKeys = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+$listNativeChecks = New-Object 'System.Collections.Generic.List[object]'
+$hashtableGitExecutable = $null
+$hashtableControlBefore = $null
+$hashtableControlAfter = $null
+$hashtableWorktreeBefore = $null
+$hashtableWorktreeAfter = $null
+$boolEvidenceStable = $false
+$intMissingCount = 0
+$intUnexpectedCount = 0
 $intExitCode = 1
 
 try {
     Test-ScriptVersionParser
     $strSelfPath = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot 'Test-ExactGitPathSet.ps1'))
-    $strSelfText = (New-Object System.Text.UTF8Encoding($false, $true)).GetString(
-        [System.IO.File]::ReadAllBytes($strSelfPath)
-    )
+    $strSelfText = $script:objUtf8Strict.GetString([System.IO.File]::ReadAllBytes($strSelfPath))
     [void](Get-ScriptVersionRecord -ScriptText $strSelfText -ExpectedVersion $script:strVerifierVersion)
 
     $strRepositoryRoot = Assert-OrdinaryRepositoryRoot -LiteralPath $RepositoryRoot
-
     $objExpectedKeys = New-ExpectedPathKeySet -PathList $ExpectedPath
-    $arrGitCommands = @(Get-Command -Name git -CommandType Application -ErrorAction Stop)
-    $strGitPath = [string]$arrGitCommands[0].Source
+    $hashtableGitExecutable = Get-GitExecutableRecord -RequestedPath $GitExecutablePath
+    $hashtableAdministrativePaths = Get-GitAdministrativePathRecord -RepositoryRoot $strRepositoryRoot
+    $hashtableControlBefore = Get-GitControlSurfaceEvidence `
+        -AdministrativePathRecord $hashtableAdministrativePaths
+    $hashtableWorktreeBefore = Get-TreeEvidence `
+        -RootPath $strRepositoryRoot `
+        -ExcludedPath $hashtableAdministrativePaths.GitEntry
+
+    $strNativeCommand = 'repository-root'
+    $hashtableRootResult = Invoke-GitRaw `
+        -GitRecord $hashtableGitExecutable `
+        -WorkingDirectory $strRepositoryRoot `
+        -ArgumentList @('rev-parse', '--is-inside-work-tree', '--show-prefix')
+    $listNativeChecks.Add([ordered]@{
+        Name = $strNativeCommand
+        ExitCode = $hashtableRootResult.ExitCode
+        StdoutLength = $hashtableRootResult.Stdout.Length
+        StderrLength = $hashtableRootResult.StderrLength
+    })
+    $intNativeExit = $hashtableRootResult.ExitCode
+    if ($intNativeExit -ne 0) {
+        throw 'native-command'
+    }
+    $arrRootExpected = [byte[]](0x74, 0x72, 0x75, 0x65, 0x0A, 0x0A)
+    if ([System.Convert]::ToBase64String($hashtableRootResult.Stdout) -cne
+        [System.Convert]::ToBase64String($arrRootExpected)) {
+        throw 'repository-boundary'
+    }
 
     if ($Mode -in @('Working', 'Both')) {
-        $hashtableWorkingResult = Invoke-GitRaw -GitPath $strGitPath -WorkingDirectory $strRepositoryRoot `
-            -ArgumentList @('diff', '--no-renames', '--name-only', '-z', '--')
-        if ($hashtableWorkingResult.ExitCode -ne 0) {
-            $intNativeExit = $hashtableWorkingResult.ExitCode
+        $strNativeCommand = 'working'
+        $hashtableWorkingResult = Invoke-GitRaw `
+            -GitRecord $hashtableGitExecutable `
+            -WorkingDirectory $strRepositoryRoot `
+            -ArgumentList @('diff', '--no-ext-diff', '--no-textconv', '--no-renames', '--name-only', '-z', '--')
+        $listNativeChecks.Add([ordered]@{
+            Name = $strNativeCommand
+            ExitCode = $hashtableWorkingResult.ExitCode
+            StdoutLength = $hashtableWorkingResult.Stdout.Length
+            StderrLength = $hashtableWorkingResult.StderrLength
+        })
+        $intNativeExit = $hashtableWorkingResult.ExitCode
+        if ($intNativeExit -ne 0) {
             throw 'native-command'
         }
         $objWorkingKeys = ConvertFrom-NulPathRecordStream -Bytes $hashtableWorkingResult.Stdout
 
-        $hashtableUntrackedResult = Invoke-GitRaw -GitPath $strGitPath -WorkingDirectory $strRepositoryRoot `
+        $strNativeCommand = 'untracked'
+        $hashtableUntrackedResult = Invoke-GitRaw `
+            -GitRecord $hashtableGitExecutable `
+            -WorkingDirectory $strRepositoryRoot `
             -ArgumentList @('ls-files', '--others', '--exclude-standard', '-z', '--')
-        if ($hashtableUntrackedResult.ExitCode -ne 0) {
-            $intNativeExit = $hashtableUntrackedResult.ExitCode
+        $listNativeChecks.Add([ordered]@{
+            Name = $strNativeCommand
+            ExitCode = $hashtableUntrackedResult.ExitCode
+            StdoutLength = $hashtableUntrackedResult.Stdout.Length
+            StderrLength = $hashtableUntrackedResult.StderrLength
+        })
+        $intNativeExit = $hashtableUntrackedResult.ExitCode
+        if ($intNativeExit -ne 0) {
             throw 'native-command'
         }
         $objUntrackedKeys = ConvertFrom-NulPathRecordStream -Bytes $hashtableUntrackedResult.Stdout
@@ -811,18 +1594,53 @@ try {
     }
 
     if ($Mode -in @('Staged', 'Both')) {
-        $hashtableStagedResult = Invoke-GitRaw -GitPath $strGitPath -WorkingDirectory $strRepositoryRoot `
-            -ArgumentList @('diff', '--cached', '--no-renames', '--name-only', '-z', '--')
-        if ($hashtableStagedResult.ExitCode -ne 0) {
-            $intNativeExit = $hashtableStagedResult.ExitCode
+        $strNativeCommand = 'staged'
+        $hashtableStagedResult = Invoke-GitRaw `
+            -GitRecord $hashtableGitExecutable `
+            -WorkingDirectory $strRepositoryRoot `
+            -ArgumentList @('diff', '--cached', '--no-ext-diff', '--no-textconv', '--no-renames', '--name-only', '-z', '--')
+        $listNativeChecks.Add([ordered]@{
+            Name = $strNativeCommand
+            ExitCode = $hashtableStagedResult.ExitCode
+            StdoutLength = $hashtableStagedResult.Stdout.Length
+            StderrLength = $hashtableStagedResult.StderrLength
+        })
+        $intNativeExit = $hashtableStagedResult.ExitCode
+        if ($intNativeExit -ne 0) {
             throw 'native-command'
         }
         $objStagedKeys = ConvertFrom-NulPathRecordStream -Bytes $hashtableStagedResult.Stdout
     }
 
+    $strNativeCommand = 'index-flags'
+    $hashtableIndexResult = Invoke-GitRaw `
+        -GitRecord $hashtableGitExecutable `
+        -WorkingDirectory $strRepositoryRoot `
+        -ArgumentList @('ls-files', '-v', '-z', '--')
+    $listNativeChecks.Add([ordered]@{
+        Name = $strNativeCommand
+        ExitCode = $hashtableIndexResult.ExitCode
+        StdoutLength = $hashtableIndexResult.Stdout.Length
+        StderrLength = $hashtableIndexResult.StderrLength
+    })
+    $intNativeExit = $hashtableIndexResult.ExitCode
+    if ($intNativeExit -ne 0) {
+        throw 'native-command'
+    }
+    $objIndexKeys = ConvertFrom-NulIndexRecordStream -Bytes $hashtableIndexResult.Stdout
+
     if ($RequireCleanWorkingAgainstIndex) {
-        $hashtableCleanResult = Invoke-GitRaw -GitPath $strGitPath -WorkingDirectory $strRepositoryRoot `
-            -ArgumentList @('diff', '--exit-code', '--no-renames', '--')
+        $strNativeCommand = 'working-index'
+        $hashtableCleanResult = Invoke-GitRaw `
+            -GitRecord $hashtableGitExecutable `
+            -WorkingDirectory $strRepositoryRoot `
+            -ArgumentList @('diff', '--quiet', '--exit-code', '--no-ext-diff', '--no-textconv', '--no-renames', '--')
+        $listNativeChecks.Add([ordered]@{
+            Name = $strNativeCommand
+            ExitCode = $hashtableCleanResult.ExitCode
+            StdoutLength = $hashtableCleanResult.Stdout.Length
+            StderrLength = $hashtableCleanResult.StderrLength
+        })
         $intNativeExit = $hashtableCleanResult.ExitCode
         if ($intNativeExit -eq 1) {
             throw 'working-index-difference'
@@ -832,6 +1650,19 @@ try {
         }
     }
 
+    $hashtableControlAfter = Get-GitControlSurfaceEvidence `
+        -AdministrativePathRecord $hashtableAdministrativePaths
+    $hashtableWorktreeAfter = Get-TreeEvidence `
+        -RootPath $strRepositoryRoot `
+        -ExcludedPath $hashtableAdministrativePaths.GitEntry
+    if ($hashtableControlBefore.Digest -cne $hashtableControlAfter.Digest) {
+        throw 'git-control-drift'
+    }
+    if ($hashtableWorktreeBefore.Digest -cne $hashtableWorktreeAfter.Digest) {
+        throw 'worktree-drift'
+    }
+    $boolEvidenceStable = $true
+
     $objActualKeys = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
     if ($Mode -in @('Working', 'Both')) {
         Add-KeySet -Target $objActualKeys -Source $objWorkingKeys
@@ -839,14 +1670,11 @@ try {
     if ($Mode -in @('Staged', 'Both')) {
         Add-KeySet -Target $objActualKeys -Source $objStagedKeys
     }
-
-    $intMissingCount = 0
     foreach ($strKey in $objExpectedKeys) {
         if (-not $objActualKeys.Contains($strKey)) {
             $intMissingCount++
         }
     }
-    $intUnexpectedCount = 0
     foreach ($strKey in $objActualKeys) {
         if (-not $objExpectedKeys.Contains($strKey)) {
             $intUnexpectedCount++
@@ -857,20 +1685,25 @@ try {
         $intExitCode = 2
     } else {
         $strCategory = 'none'
+        $strNativeOutcome = 'Success'
         $intExitCode = 0
     }
 } catch {
     $strNativeOutcome = $_.Exception.GetType().FullName
     if ($_.Exception.Message -in @(
         'invalid-version', 'unexpected-version', 'version-fixture-failure',
-        'invalid-repository-root', 'invalid-expected-path', 'malformed-records',
+        'invalid-repository-root', 'invalid-ordinary-file', 'invalid-expected-path',
+        'git-executable-resolution', 'git-executable-drift', 'malformed-records',
+        'malformed-index-records', 'unsafe-index-state', 'record-limit',
+        'repository-boundary', 'invalid-git-control', 'git-control-limit',
+        'worktree-link', 'worktree-limit', 'git-control-drift', 'worktree-drift',
         'native-command', 'native-output-limit', 'working-index-difference'
     )) {
         $strCategory = $_.Exception.Message
     }
-    if ($strCategory -eq 'malformed-records') {
+    if ($strCategory -in @('malformed-records', 'malformed-index-records')) {
         $intExitCode = 3
-    } elseif ($strCategory -eq 'native-command' -or $strCategory -eq 'native-output-limit') {
+    } elseif ($strCategory -in @('native-command', 'native-output-limit')) {
         $intExitCode = 4
     } elseif ($strCategory -eq 'working-index-difference') {
         $intExitCode = 2
@@ -888,14 +1721,27 @@ $hashtableResult = [ordered]@{
     Mode = $Mode
     Category = $strCategory
     NativeOutcome = $strNativeOutcome
+    NativeCommand = $strNativeCommand
     NativeExit = $intNativeExit
     ExpectedCount = $intExpectedCount
     ActualCount = $intActualCount
-    MissingCount = if ($strCategory -eq 'path-set-mismatch') { $intMissingCount } else { 0 }
-    UnexpectedCount = if ($strCategory -eq 'path-set-mismatch') { $intUnexpectedCount } else { 0 }
+    MissingCount = $intMissingCount
+    UnexpectedCount = $intUnexpectedCount
     WorkingCount = $objWorkingKeys.Count
     StagedCount = $objStagedKeys.Count
     UntrackedCount = $objUntrackedKeys.Count
+    IndexCount = $objIndexKeys.Count
+    GitExecutableLength = if ($null -eq $hashtableGitExecutable) { $null } else { $hashtableGitExecutable.Length }
+    GitExecutableSha256 = if ($null -eq $hashtableGitExecutable) { $null } else { $hashtableGitExecutable.Sha256 }
+    ControlSurfaceDigestBefore = if ($null -eq $hashtableControlBefore) { $null } else { $hashtableControlBefore.Digest }
+    ControlSurfaceDigestAfter = if ($null -eq $hashtableControlAfter) { $null } else { $hashtableControlAfter.Digest }
+    WorktreeDigestBefore = if ($null -eq $hashtableWorktreeBefore) { $null } else { $hashtableWorktreeBefore.Digest }
+    WorktreeDigestAfter = if ($null -eq $hashtableWorktreeAfter) { $null } else { $hashtableWorktreeAfter.Digest }
+    WorktreeEntryCount = if ($null -eq $hashtableWorktreeBefore) { 0 } else { $hashtableWorktreeBefore.EntryCount }
+    WorktreeFileCount = if ($null -eq $hashtableWorktreeBefore) { 0 } else { $hashtableWorktreeBefore.FileCount }
+    WorktreeByteCount = if ($null -eq $hashtableWorktreeBefore) { 0 } else { $hashtableWorktreeBefore.ByteCount }
+    EvidenceStable = $boolEvidenceStable
+    NativeChecks = $listNativeChecks.ToArray()
     ExitCode = $intExitCode
 }
 Write-VerifierResult -Result $hashtableResult

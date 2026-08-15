@@ -10,14 +10,14 @@ fixed destination. Serialization is UTF-8 without a BOM and normalizes CRLF
 and lone CR to LF at the final payload boundary.
 
 .NOTES
-Version: 1.0.20260813.0
+Version: 1.0.20260814.0
 #>
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strGeneratorVersion = '1.0.20260813.0'
-$script:strGeneratorResultSchema = 'PSStyleGuide.GeneratorResult.v1'
+$script:strGeneratorVersion = '1.0.20260814.0'
+$script:strGeneratorResultSchema = 'PSStyleGuide.GeneratorResult.v2'
 $script:objUtf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
 $script:objUtf8NoBom = New-Object System.Text.UTF8Encoding($false)
 $script:objPathComparison = if ($env:OS -eq 'Windows_NT') {
@@ -521,6 +521,122 @@ function Assert-OrdinaryPathComponent {
     if (($ExpectedType -eq 'Directory' -and -not $boolIsDirectory) -or
         ($ExpectedType -eq 'File' -and $boolIsDirectory)) {
         throw "nonordinary-path"
+    }
+}
+
+function Get-OrdinaryDestinationState {
+    # .SYNOPSIS
+    # Gets the permitted filesystem state of one fixed destination leaf.
+    #
+    # .DESCRIPTION
+    # Reads the leaf attributes without following a link. Returns Absent only
+    # for a missing leaf. Returns Existing only for an ordinary non-reparse
+    # file. Rejects a directory, link, reparse point, or other unexpected entry.
+    #
+    # .PARAMETER LiteralPath
+    # Absolute literal destination path to inspect. Wildcards are not expanded.
+    #
+    # .EXAMPLE
+    # $strState = Get-OrdinaryDestinationState -LiteralPath $strDestinationPath
+    #
+    # # Returns Existing for one ordinary file or Absent for a missing leaf.
+    #
+    # .EXAMPLE
+    # Get-OrdinaryDestinationState -LiteralPath $strLinkPath
+    #
+    # # Throws 'unexpected-destination' for a link or reparse point.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.String. Returns Existing or Absent. Throws
+    # 'unexpected-destination' for every other filesystem state. Access and
+    # metadata failures other than proved absence propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260814.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: LiteralPath
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath
+    )
+
+    try {
+        $objAttributes = [System.IO.File]::GetAttributes($LiteralPath)
+    } catch [System.IO.FileNotFoundException] {
+        return 'Absent'
+    } catch [System.IO.DirectoryNotFoundException] {
+        return 'Absent'
+    }
+
+    if (($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0 -or
+        ($objAttributes -band [System.IO.FileAttributes]::Directory) -ne 0) {
+        throw 'unexpected-destination'
+    }
+    return 'Existing'
+}
+
+function Test-FileSystemEntry {
+    # .SYNOPSIS
+    # Tests whether any filesystem entry occupies one literal path.
+    #
+    # .DESCRIPTION
+    # Reads attributes without following a link. Returns false only when the
+    # leaf or one parent is absent. Returns true for files, directories, links,
+    # and reparse points. Other access or metadata failures propagate.
+    #
+    # .PARAMETER LiteralPath
+    # Absolute literal path to inspect. Wildcards are not expanded.
+    #
+    # .EXAMPLE
+    # $boolOccupied = Test-FileSystemEntry -LiteralPath $strCandidatePath
+    #
+    # # Returns true when any entry occupies the candidate path.
+    #
+    # .EXAMPLE
+    # $boolOccupied = Test-FileSystemEntry -LiteralPath $strFreshPath
+    #
+    # # Returns false when the path is absent.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Boolean. True for an occupied path and false for proved absence.
+    # Access and metadata failures other than absence propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260814.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: LiteralPath
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath
+    )
+
+    try {
+        [void][System.IO.File]::GetAttributes($LiteralPath)
+        return $true
+    } catch [System.IO.FileNotFoundException] {
+        return $false
+    } catch [System.IO.DirectoryNotFoundException] {
+        return $false
     }
 }
 
@@ -1428,8 +1544,8 @@ function New-ArtifactRecord {
     #
     # .DESCRIPTION
     # Returns the fixed ordered record schema with the artifact identity and path,
-    # null measurement fields, false replacement evidence, initial temporary and
-    # cleanup dispositions, and a Pending status.
+    # null measurement fields, false publication evidence, initial temporary and
+    # cleanup dispositions, and a NotAttempted status.
     #
     # .PARAMETER ArtifactId
     # Internal artifact identifier stored in the record.
@@ -1440,12 +1556,12 @@ function New-ArtifactRecord {
     # .EXAMPLE
     # $hashtableRecord = New-ArtifactRecord -ArtifactId copilot -RepositoryPath 'copilot-instructions.md'
     #
-    # # Returns a Pending record with all measurement fields set to null.
+    # # Returns a NotAttempted record with all measurement fields set to null.
     #
     # .EXAMPLE
     # $hashtableRecord = New-ArtifactRecord -ArtifactId full -RepositoryPath 'STYLE_GUIDE_FULL.md'
     #
-    # # $hashtableRecord.ReplaceReturned is false and CleanupResult is 'NotRequired'.
+    # # $hashtableRecord.PublicationReturned is false and CleanupResult is 'NotRequired'.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
@@ -1460,7 +1576,7 @@ function New-ArtifactRecord {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 1.0.20260814.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1483,6 +1599,7 @@ function New-ArtifactRecord {
     return [ordered]@{
         ArtifactId = $ArtifactId
         Path = $RepositoryPath
+        OriginalState = 'Unknown'
         OriginalLength = $null
         OriginalSha256 = $null
         OriginalOrdinaryIdentity = $null
@@ -1492,10 +1609,12 @@ function New-ArtifactRecord {
         FinalLength = $null
         FinalSha256 = $null
         FinalOrdinaryIdentity = $null
-        ReplaceReturned = $false
+        FinalState = 'Unknown'
+        PublicationMethod = 'NotAttempted'
+        PublicationReturned = $false
         TemporaryDisposition = 'NotCreated'
         CleanupResult = 'NotRequired'
-        Status = 'Pending'
+        Status = 'NotAttempted'
     }
 }
 
@@ -1558,11 +1677,12 @@ function Write-StyleGuideArtifact {
     # Publishes one complete style-guide payload to its fixed destination.
     #
     # .DESCRIPTION
-    # Validates the authorized tracked destination and its ordinary identity,
-    # returns NoChange for identical bytes, or writes and verifies a unique sibling
-    # candidate before atomically replacing and remeasuring the destination. On
-    # a failure raised after the artifact record is initialized, it preserves
-    # phase and artifact evidence on the thrown exception.
+    # Validates the authorized index-tracked destination as absent or one
+    # ordinary file. Returns NoChange for identical bytes. Otherwise, creates,
+    # durably writes, closes, and verifies one unique sibling candidate. It
+    # revalidates all filesystem state before one File.Replace or File.Move call.
+    # It records bounded final evidence and never attempts rollback after the
+    # publication call returns.
     #
     # .PARAMETER ArtifactId
     # Authorized artifact identifier: copilot, powershell-instructions, chat, or full.
@@ -1597,7 +1717,7 @@ function Write-StyleGuideArtifact {
     # Success. After artifact-record initialization, any failure throws
     # System.InvalidOperationException whose Data contains ArtifactRecord and
     # Phase; the record status is Failed or ReplacementStateUncertain and retains
-    # cleanup and replacement evidence. Parameter binding, destination-map lookup,
+    # cleanup and publication evidence. Parameter binding, destination-map lookup,
     # and record-initialization failures propagate without those Data entries.
     #
     # .NOTES
@@ -1605,7 +1725,7 @@ function Write-StyleGuideArtifact {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 1.0.20260814.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1635,13 +1755,16 @@ function Write-StyleGuideArtifact {
 
     $strExpectedRepositoryPath = $DestinationMap[$ArtifactId]
     $hashtableRecord = New-ArtifactRecord -ArtifactId $ArtifactId -RepositoryPath $strExpectedRepositoryPath
+    $hashtableRecord.Status = 'Pending'
     $strTemporaryPath = $null
+    $strCandidateIdentity = $null
     $boolTemporaryIdentityProven = $false
+    $objCandidateStream = $null
     $strPhase = 'validate-destination'
 
     try {
         if (-not (Test-PathTextIsSafe -RawPath $RawDestinationPath)) {
-            throw "invalid-destination"
+            throw 'invalid-destination'
         }
         $strExpectedFullPath = [System.IO.Path]::GetFullPath(
             (Join-Path $RepositoryRoot ($strExpectedRepositoryPath -replace '/', [System.IO.Path]::DirectorySeparatorChar))
@@ -1649,31 +1772,39 @@ function Write-StyleGuideArtifact {
         $strDestinationPath = [System.IO.Path]::GetFullPath($RawDestinationPath)
         if (-not (Test-PathContainedByRoot -Root $RepositoryRoot -Candidate $strDestinationPath) -or
             -not $strDestinationPath.Equals($strExpectedFullPath, $script:objPathComparison)) {
-            throw "artifact-path-mismatch"
+            throw 'artifact-path-mismatch'
         }
-        $strDestinationPath = Assert-OrdinaryAbsolutePath -LiteralPath $strDestinationPath -ExpectedLeafType File
-        Assert-TrackedFile -RepositoryRoot $RepositoryRoot -RepositoryPath $strExpectedRepositoryPath
 
-        $hashtableRecord.OriginalLength = (New-Object System.IO.FileInfo($strDestinationPath)).Length
-        $hashtableRecord.OriginalSha256 = Get-FileSha256Hex -LiteralPath $strDestinationPath
-        $hashtableRecord.OriginalOrdinaryIdentity = Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath
         $strParentPath = [System.IO.Path]::GetDirectoryName($strDestinationPath)
-        [void](Assert-OrdinaryAbsolutePath -LiteralPath $strParentPath -ExpectedLeafType Directory)
+        $strParentPath = Assert-OrdinaryAbsolutePath -LiteralPath $strParentPath -ExpectedLeafType Directory
+        Assert-TrackedFile -RepositoryRoot $RepositoryRoot -RepositoryPath $strExpectedRepositoryPath
+        $hashtableRecord.OriginalState = Get-OrdinaryDestinationState -LiteralPath $strDestinationPath
+        if ($hashtableRecord.OriginalState -eq 'Existing') {
+            $hashtableRecord.OriginalLength = (New-Object System.IO.FileInfo($strDestinationPath)).Length
+            $hashtableRecord.OriginalSha256 = Get-FileSha256Hex -LiteralPath $strDestinationPath
+            $hashtableRecord.OriginalOrdinaryIdentity = Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath
+        }
 
         $hashtableRecord.CandidateLength = $CompletePayloadBytes.Length
         $hashtableRecord.CandidateSha256 = Get-Sha256Hex -Bytes $CompletePayloadBytes
-
-        if ($hashtableRecord.OriginalLength -eq $hashtableRecord.CandidateLength -and
+        if ($hashtableRecord.OriginalState -eq 'Existing' -and
+            $hashtableRecord.OriginalLength -eq $hashtableRecord.CandidateLength -and
             $hashtableRecord.OriginalSha256 -ceq $hashtableRecord.CandidateSha256) {
+            $hashtableRecord.FinalState = 'Existing'
             $hashtableRecord.FinalLength = $hashtableRecord.OriginalLength
             $hashtableRecord.FinalSha256 = $hashtableRecord.OriginalSha256
             $hashtableRecord.FinalOrdinaryIdentity = $hashtableRecord.OriginalOrdinaryIdentity
+            $hashtableRecord.PublicationMethod = 'NotRequired'
             $hashtableRecord.Status = 'NoChange'
             return $hashtableRecord
         }
 
+        if ($hashtableRecord.OriginalState -eq 'Existing') {
+            $strPhase = 'initialize-publication'
+            Initialize-AtomicFileReplacementType
+        }
+
         $strPhase = 'create-candidate'
-        $objCandidateStream = $null
         for ($intAttempt = 1; $intAttempt -le 16; $intAttempt++) {
             $strCandidateLeaf = '.psstyleguide-' + [guid]::NewGuid().ToString('N') + '.tmp'
             $strTemporaryPath = Join-Path $strParentPath $strCandidateLeaf
@@ -1687,113 +1818,181 @@ function Write-StyleGuideArtifact {
                 $hashtableRecord.TemporaryDisposition = 'Created'
                 break
             } catch [System.IO.IOException] {
-                if ($intAttempt -eq 16) {
+                $boolCollision = Test-FileSystemEntry -LiteralPath $strTemporaryPath
+                $strTemporaryPath = $null
+                if (-not $boolCollision) {
                     throw
+                }
+                if ($intAttempt -eq 16) {
+                    throw 'candidate-collision-limit'
                 }
             }
         }
         if ($null -eq $objCandidateStream) {
-            throw "candidate-create-failure"
+            throw 'candidate-create-failure'
         }
+        $objCandidateStream.Dispose()
+        $objCandidateStream = $null
 
+        $strCandidateFullPath = Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File
+        if (-not [System.IO.Path]::GetDirectoryName($strCandidateFullPath).Equals($strParentPath, $script:objPathComparison)) {
+            throw 'candidate-parent-mismatch'
+        }
+        $strCandidateIdentity = Get-OrdinaryFileIdentity -LiteralPath $strCandidateFullPath
+        $boolTemporaryIdentityProven = $true
+        $hashtableRecord.CandidateOrdinaryIdentity = $strCandidateIdentity
+
+        $strPhase = 'write-candidate'
+        $objCandidateStream = New-Object System.IO.FileStream(
+            $strCandidateFullPath,
+            [System.IO.FileMode]::Open,
+            [System.IO.FileAccess]::Write,
+            [System.IO.FileShare]::None
+        )
         try {
-            $strPhase = 'write-candidate'
             $objCandidateStream.Write($CompletePayloadBytes, 0, $CompletePayloadBytes.Length)
             $strPhase = 'flush-candidate'
             $objCandidateStream.Flush($true)
         } finally {
             $objCandidateStream.Dispose()
+            $objCandidateStream = $null
         }
 
         $strPhase = 'verify-candidate'
         $strCandidateFullPath = Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File
-        if (-not [System.IO.Path]::GetDirectoryName($strCandidateFullPath).Equals($strParentPath, $script:objPathComparison)) {
-            throw "candidate-parent-mismatch"
-        }
-        $strCandidateIdentity = Get-OrdinaryFileIdentity -LiteralPath $strCandidateFullPath
-        $boolTemporaryIdentityProven = $true
-        $hashtableRecord.CandidateOrdinaryIdentity = $strCandidateIdentity
-        $objCandidateInfo = New-Object System.IO.FileInfo($strCandidateFullPath)
-        if ($objCandidateInfo.Length -ne $CompletePayloadBytes.Length -or
-            (Get-FileSha256Hex -LiteralPath $strCandidateFullPath) -cne $hashtableRecord.CandidateSha256) {
-            throw "candidate-byte-mismatch"
+        if (-not [System.IO.Path]::GetDirectoryName($strCandidateFullPath).Equals($strParentPath, $script:objPathComparison) -or
+            (Get-OrdinaryFileIdentity -LiteralPath $strCandidateFullPath) -cne $strCandidateIdentity) {
+            throw 'candidate-identity-drift'
         }
         $arrCandidateBytes = [System.IO.File]::ReadAllBytes($strCandidateFullPath)
+        if ($arrCandidateBytes.Length -ne $CompletePayloadBytes.Length -or
+            (Get-FileSha256Hex -LiteralPath $strCandidateFullPath) -cne $hashtableRecord.CandidateSha256) {
+            throw 'candidate-byte-mismatch'
+        }
         if (($arrCandidateBytes.Length -ge 3 -and $arrCandidateBytes[0] -eq 0xEF -and
             $arrCandidateBytes[1] -eq 0xBB -and $arrCandidateBytes[2] -eq 0xBF) -or
-            $arrCandidateBytes -contains [byte]0x0D -or
-            $arrCandidateBytes.Length -eq 0 -or
+            $arrCandidateBytes -contains [byte]0x0D -or $arrCandidateBytes.Length -eq 0 -or
             $arrCandidateBytes[$arrCandidateBytes.Length - 1] -ne 0x0A) {
-            throw "candidate-serialization"
+            throw 'candidate-serialization'
         }
 
-        $strPhase = 'replace-destination'
+        $strPhase = 'revalidate-publication'
         [void](Assert-OrdinaryAbsolutePath -LiteralPath $strParentPath -ExpectedLeafType Directory)
-        [void](Assert-OrdinaryAbsolutePath -LiteralPath $strDestinationPath -ExpectedLeafType File)
-        if ((Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath) -cne
-            $hashtableRecord.OriginalOrdinaryIdentity) {
-            throw "destination-identity-drift"
+        $strCurrentDestinationState = Get-OrdinaryDestinationState -LiteralPath $strDestinationPath
+        if ($strCurrentDestinationState -cne $hashtableRecord.OriginalState) {
+            throw 'destination-state-drift'
         }
-        if ((Get-FileSha256Hex -LiteralPath $strDestinationPath) -cne $hashtableRecord.OriginalSha256) {
-            throw "destination-content-drift"
+        if ($strCurrentDestinationState -eq 'Existing') {
+            [void](Assert-OrdinaryAbsolutePath -LiteralPath $strDestinationPath -ExpectedLeafType File)
+            if ((Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath) -cne
+                $hashtableRecord.OriginalOrdinaryIdentity -or
+                (New-Object System.IO.FileInfo($strDestinationPath)).Length -ne $hashtableRecord.OriginalLength -or
+                (Get-FileSha256Hex -LiteralPath $strDestinationPath) -cne $hashtableRecord.OriginalSha256) {
+                throw 'destination-content-drift'
+            }
         }
-        if ((Get-OrdinaryFileIdentity -LiteralPath $strTemporaryPath) -cne $strCandidateIdentity) {
-            throw "candidate-identity-drift"
+        [void](Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File)
+        if ((Get-OrdinaryFileIdentity -LiteralPath $strTemporaryPath) -cne $strCandidateIdentity -or
+            (Get-FileSha256Hex -LiteralPath $strTemporaryPath) -cne $hashtableRecord.CandidateSha256) {
+            throw 'candidate-content-drift'
         }
 
-        Initialize-AtomicFileReplacementType
-        [PSStyleGuide.AtomicFileReplacement]::Replace($strTemporaryPath, $strDestinationPath)
-        $hashtableRecord.ReplaceReturned = $true
-        $hashtableRecord.TemporaryDisposition = 'ConsumedByReplace'
+        $strPhase = 'publish-destination'
+        if ($hashtableRecord.OriginalState -eq 'Existing') {
+            $hashtableRecord.PublicationMethod = 'File.Replace'
+            [PSStyleGuide.AtomicFileReplacement]::Replace($strTemporaryPath, $strDestinationPath)
+            $hashtableRecord.TemporaryDisposition = 'ConsumedByReplace'
+        } else {
+            $hashtableRecord.PublicationMethod = 'File.Move'
+            [System.IO.File]::Move($strTemporaryPath, $strDestinationPath)
+            $hashtableRecord.TemporaryDisposition = 'ConsumedByMove'
+        }
+        $hashtableRecord.PublicationReturned = $true
         $hashtableRecord.CleanupResult = 'NotRequired'
-        # Measure the destination rather than assert it. File.Replace throws on
-        # failure, so reaching here means it returned, but every other field in
-        # this record is proven; recording the candidate's values as the
-        # destination's would make the evidence a claim instead of a result. The
-        # replacement has already happened by this point, so a mismatch here is
-        # ReplacementStateUncertain rather than Failed.
-        $strPhase = 'verify-replacement'
-        if ([System.IO.File]::Exists($strTemporaryPath)) {
+
+        $strPhase = 'verify-publication'
+        if (Test-FileSystemEntry -LiteralPath $strTemporaryPath) {
             $hashtableRecord.TemporaryDisposition = 'RetainedForRecovery'
             $hashtableRecord.CleanupResult = 'NotAttempted'
-            $hashtableRecord.Status = 'ReplacementStateUncertain'
-            throw "candidate-not-consumed"
+            throw 'candidate-not-consumed'
+        }
+        $hashtableRecord.FinalState = Get-OrdinaryDestinationState -LiteralPath $strDestinationPath
+        if ($hashtableRecord.FinalState -cne 'Existing') {
+            throw 'final-state-drift'
         }
         [void](Assert-OrdinaryAbsolutePath -LiteralPath $strDestinationPath -ExpectedLeafType File)
-        # Record what was observed before comparing it. Drift is precisely the case
-        # where the observed destination state is the evidence needed to diagnose or
-        # recover, so comparing first and throwing would empty the record of the one
-        # thing it exists to carry.
+        $arrFinalBytes = [System.IO.File]::ReadAllBytes($strDestinationPath)
+        $hashtableRecord.FinalLength = $arrFinalBytes.Length
         $hashtableRecord.FinalSha256 = Get-FileSha256Hex -LiteralPath $strDestinationPath
-        $hashtableRecord.FinalLength = [System.IO.FileInfo]::new($strDestinationPath).Length
         $hashtableRecord.FinalOrdinaryIdentity = Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath
-        if ($hashtableRecord.FinalSha256 -cne $hashtableRecord.CandidateSha256) {
-            $hashtableRecord.Status = 'ReplacementStateUncertain'
-            throw "final-content-drift"
-        }
-        if ($hashtableRecord.FinalLength -ne $CompletePayloadBytes.Length) {
-            $hashtableRecord.Status = 'ReplacementStateUncertain'
-            throw "final-length-drift"
+        if ($hashtableRecord.FinalLength -ne $CompletePayloadBytes.Length -or
+            $hashtableRecord.FinalSha256 -cne $hashtableRecord.CandidateSha256 -or
+            ($arrFinalBytes.Length -ge 3 -and $arrFinalBytes[0] -eq 0xEF -and
+            $arrFinalBytes[1] -eq 0xBB -and $arrFinalBytes[2] -eq 0xBF) -or
+            $arrFinalBytes -contains [byte]0x0D -or $arrFinalBytes.Length -eq 0 -or
+            $arrFinalBytes[$arrFinalBytes.Length - 1] -ne 0x0A) {
+            throw 'final-byte-drift'
         }
         $hashtableRecord.Status = 'Success'
         return $hashtableRecord
     } catch {
         $objOriginalError = $_
-        if (-not $hashtableRecord.ReplaceReturned -and $null -ne $strTemporaryPath -and
-            [System.IO.File]::Exists($strTemporaryPath)) {
+        if ($null -ne $objCandidateStream) {
+            try {
+                $objCandidateStream.Dispose()
+            } catch {
+                $hashtableRecord.CleanupResult = 'Failed'
+            }
+            $objCandidateStream = $null
+        }
+
+        if ($hashtableRecord.PublicationReturned) {
+            $hashtableRecord.Status = 'ReplacementStateUncertain'
+        } elseif ($null -ne $strTemporaryPath -and (Test-FileSystemEntry -LiteralPath $strTemporaryPath)) {
             if ($boolTemporaryIdentityProven) {
                 try {
+                    [void](Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File)
+                    if ((Get-OrdinaryFileIdentity -LiteralPath $strTemporaryPath) -cne $strCandidateIdentity) {
+                        throw 'candidate-identity-drift'
+                    }
                     [System.IO.File]::Delete($strTemporaryPath)
+                    if (Test-FileSystemEntry -LiteralPath $strTemporaryPath) {
+                        throw 'candidate-cleanup-failure'
+                    }
                     $hashtableRecord.TemporaryDisposition = 'RemovedAfterFailure'
                     $hashtableRecord.CleanupResult = 'Success'
                 } catch {
                     $hashtableRecord.TemporaryDisposition = 'RetainedForRecovery'
                     $hashtableRecord.CleanupResult = 'Failed'
-                    $hashtableRecord.Status = 'ReplacementStateUncertain'
                 }
             } else {
                 $hashtableRecord.TemporaryDisposition = 'IdentityUnproven'
                 $hashtableRecord.CleanupResult = 'NotAttempted'
+            }
+        }
+
+        if (-not $hashtableRecord.PublicationReturned -and
+            $hashtableRecord.OriginalState -in @('Existing', 'Absent') -and
+            $hashtableRecord.TemporaryDisposition -cne 'NotCreated') {
+            $boolOriginalStateProven = $false
+            try {
+                $strFailureDestinationState = Get-OrdinaryDestinationState -LiteralPath $strDestinationPath
+                if ($hashtableRecord.OriginalState -eq 'Absent') {
+                    $boolOriginalStateProven = $strFailureDestinationState -eq 'Absent'
+                } elseif ($strFailureDestinationState -eq 'Existing') {
+                    $boolOriginalStateProven = (
+                        (Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath) -ceq
+                            $hashtableRecord.OriginalOrdinaryIdentity -and
+                        (New-Object System.IO.FileInfo($strDestinationPath)).Length -eq
+                            $hashtableRecord.OriginalLength -and
+                        (Get-FileSha256Hex -LiteralPath $strDestinationPath) -ceq
+                            $hashtableRecord.OriginalSha256
+                    )
+                }
+            } catch {
+                $boolOriginalStateProven = $false
+            }
+            if (-not $boolOriginalStateProven) {
                 $hashtableRecord.Status = 'ReplacementStateUncertain'
             }
         }
@@ -1858,7 +2057,22 @@ function Write-GeneratorResult {
     [Console]::Out.WriteLine(($Result | ConvertTo-Json -Depth 8 -Compress))
 }
 
+$hashtableSourceMap = [ordered]@{
+    guide = 'STYLE_GUIDE.md'
+    rationale = 'STYLE_GUIDE_RATIONALE.md'
+}
+$hashtableDestinationMap = [ordered]@{
+    copilot = 'copilot-instructions.md'
+    'powershell-instructions' = 'powershell.instructions.md'
+    chat = 'STYLE_GUIDE_CHAT.md'
+    full = 'STYLE_GUIDE_FULL.md'
+}
 $listArtifactRecords = New-Object 'System.Collections.Generic.List[object]'
+foreach ($strArtifactId in $hashtableDestinationMap.Keys) {
+    $listArtifactRecords.Add((New-ArtifactRecord `
+        -ArtifactId $strArtifactId `
+        -RepositoryPath $hashtableDestinationMap[$strArtifactId]))
+}
 $strOverall = 'Failed'
 $strResultPhase = 'initialize'
 $strResultCategory = 'tool-failure'
@@ -1880,17 +2094,6 @@ try {
     $strRepositoryRoot = Assert-OrdinaryAbsolutePath -LiteralPath (
         [System.IO.Path]::GetFullPath($strRepositoryRootCandidate)
     ) -ExpectedLeafType Directory
-
-    $hashtableSourceMap = [ordered]@{
-        guide = 'STYLE_GUIDE.md'
-        rationale = 'STYLE_GUIDE_RATIONALE.md'
-    }
-    $hashtableDestinationMap = [ordered]@{
-        copilot = 'copilot-instructions.md'
-        'powershell-instructions' = 'powershell.instructions.md'
-        chat = 'STYLE_GUIDE_CHAT.md'
-        full = 'STYLE_GUIDE_FULL.md'
-    }
 
     $hashtableIdentities = @{}
     $hashtableSourceBytes = @{}
@@ -1914,13 +2117,17 @@ try {
         if (-not (Test-PathContainedByRoot -Root $strRepositoryRoot -Candidate $strDestinationPath)) {
             throw "destination-containment"
         }
-        $strDestinationPath = Assert-OrdinaryAbsolutePath -LiteralPath $strDestinationPath -ExpectedLeafType File
+        $strDestinationParentPath = [System.IO.Path]::GetDirectoryName($strDestinationPath)
+        [void](Assert-OrdinaryAbsolutePath -LiteralPath $strDestinationParentPath -ExpectedLeafType Directory)
         Assert-TrackedFile -RepositoryRoot $strRepositoryRoot -RepositoryPath $strRepositoryPath
-        $strIdentity = Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath
-        if ($hashtableIdentities.ContainsKey($strIdentity)) {
-            throw "duplicate-path-identity"
+        $strDestinationState = Get-OrdinaryDestinationState -LiteralPath $strDestinationPath
+        if ($strDestinationState -eq 'Existing') {
+            $strIdentity = Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath
+            if ($hashtableIdentities.ContainsKey($strIdentity)) {
+                throw 'duplicate-path-identity'
+            }
+            $hashtableIdentities[$strIdentity] = $strRepositoryPath
         }
-        $hashtableIdentities[$strIdentity] = $strRepositoryPath
     }
 
     $strResultPhase = 'compute-complete-payloads'
@@ -1932,6 +2139,7 @@ try {
     }
 
     $strResultPhase = 'replace-artifacts'
+    $intArtifactIndex = 0
     foreach ($strArtifactId in $hashtableDestinationMap.Keys) {
         $strDestinationPath = [System.IO.Path]::GetFullPath(
             (Join-Path $strRepositoryRoot $hashtableDestinationMap[$strArtifactId])
@@ -1943,10 +2151,10 @@ try {
                 -CompletePayloadBytes $hashtablePayloads[$strArtifactId] `
                 -RepositoryRoot $strRepositoryRoot `
                 -DestinationMap $hashtableDestinationMap
-            $listArtifactRecords.Add($hashtableRecord)
+            $listArtifactRecords[$intArtifactIndex] = $hashtableRecord
         } catch {
             if ($_.Exception.Data.Contains('ArtifactRecord')) {
-                $listArtifactRecords.Add($_.Exception.Data['ArtifactRecord'])
+                $listArtifactRecords[$intArtifactIndex] = $_.Exception.Data['ArtifactRecord']
                 $strResultPhase = [string]$_.Exception.Data['Phase']
                 if ($_.Exception.Data['ArtifactRecord'].Status -eq 'ReplacementStateUncertain') {
                     $strOverall = 'ReplacementStateUncertain'
@@ -1958,6 +2166,7 @@ try {
             }
             throw
         }
+        $intArtifactIndex++
     }
 
     $boolAnyReplacement = @($listArtifactRecords | Where-Object { $_.Status -eq 'Success' }).Count -gt 0
