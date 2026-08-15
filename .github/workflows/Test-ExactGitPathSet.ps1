@@ -649,11 +649,14 @@ function Invoke-GitRaw {
     #     false) and Linux (filemode true);
     #   - strict stat validation (core.checkStat=default, core.trustctime=true), so
     #     a relaxed local setting cannot let a same-length content change with a
-    #     restored mtime read as clean through Git's cached stat;
-    #   - submodule changes ignored, so an initialized submodule's checked-out
-    #     commit is not part of the reads.
+    #     restored mtime read as clean through Git's cached stat.
     # info/exclude and info/attributes (repository-local, under the common Git
-    # directory) remain covered by Get-GitControlSurfaceEvidence.
+    # directory) remain covered by Get-GitControlSurfaceEvidence. Submodule
+    # ignoring is deliberately NOT a global config here: --ignore-submodules=all is
+    # passed per command only to the worktree-versus-index diffs (the working and
+    # clean reads), so a mutable submodule worktree state does not perturb them,
+    # while the staged read (git diff --cached) keeps submodule sensitivity and
+    # still reports a staged gitlink (index-versus-HEAD) change.
     $strNullDevice = if ($env:OS -eq 'Windows_NT') { 'NUL' } else { '/dev/null' }
     $objChildEnvironment['GIT_CONFIG_GLOBAL'] = $strNullDevice
     $objChildEnvironment['GIT_OPTIONAL_LOCKS'] = '0'
@@ -668,8 +671,7 @@ function Invoke-GitRaw {
         '-c', 'core.checkStat=default',
         '-c', 'core.trustctime=true',
         '-c', ('core.excludesFile=' + $strNullDevice),
-        '-c', ('core.attributesFile=' + $strNullDevice),
-        '-c', 'diff.ignoreSubmodules=all'
+        '-c', ('core.attributesFile=' + $strNullDevice)
     ) + $ArgumentList
     if ($null -ne $objStartInfo.PSObject.Properties['ArgumentList']) {
         foreach ($strArgument in $arrFixedArguments) {
@@ -1767,11 +1769,15 @@ try {
     # --exclude-standard set. Each input is a single file, so hashing them here
     # (before the reads) and again as the verifier's final evidence action brackets
     # the reads with atomic reads: a change across them raises git-control-drift.
-    # Tree-shaped inputs (loose refs, hooks, reftable, split-index backing files) and
-    # the live worktree cannot be bracketed atomically by any portable mechanism
-    # (git reads the tree in place), so a change to one during the final converged
-    # traversal remains the bounded, documented residual -- a concurrent second
-    # writer only, which single-actor CI does not have.
+    # This bracket, like every evidence pass, is itself a sequential read, so a
+    # single-file input changed after its own hash but before the pass completes --
+    # and any change to a tree-shaped input (loose refs, hooks, reftable, split-index
+    # backing files) or the live worktree, which git reads in place, during the final
+    # converged traversal -- is the irreducible residual: no portable mechanism reads
+    # a live multi-file surface atomically, and adding another recheck only moves the
+    # tail to that recheck (infinite regress). The residual is bounded to a concurrent
+    # second writer racing a sub-second window, which single-actor CI does not have;
+    # against accidental drift the convergence is conclusive.
     $strControlInputDigestBefore = Get-PathSetControlInputDigest `
         -AdministrativePathRecord $hashtableAdministrativePaths
 
@@ -1842,7 +1848,7 @@ try {
         $hashtableWorkingResult = Invoke-GitRaw `
             -GitRecord $hashtableGitExecutable `
             -WorkingDirectory $strRepositoryRoot `
-            -ArgumentList @('diff', '--no-ext-diff', '--no-textconv', '--no-renames', '--name-only', '-z', '--')
+            -ArgumentList @('diff', '--no-ext-diff', '--no-textconv', '--no-renames', '--ignore-submodules=all', '--name-only', '-z', '--')
         $listNativeChecks.Add([ordered]@{
             Name = $strNativeCommand
             ExitCode = $hashtableWorkingResult.ExitCode
@@ -1915,7 +1921,7 @@ try {
         $hashtableCleanResult = Invoke-GitRaw `
             -GitRecord $hashtableGitExecutable `
             -WorkingDirectory $strRepositoryRoot `
-            -ArgumentList @('diff', '--quiet', '--exit-code', '--no-ext-diff', '--no-textconv', '--no-renames', '--')
+            -ArgumentList @('diff', '--quiet', '--exit-code', '--no-ext-diff', '--no-textconv', '--no-renames', '--ignore-submodules=all', '--')
         $listNativeChecks.Add([ordered]@{
             Name = $strNativeCommand
             ExitCode = $hashtableCleanResult.ExitCode
