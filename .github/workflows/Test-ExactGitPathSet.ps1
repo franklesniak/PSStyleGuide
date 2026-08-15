@@ -637,11 +637,20 @@ function Invoke-GitRaw {
     }
     $objChildEnvironment['GIT_CONFIG_NOSYSTEM'] = '1'
     # Neutralize every ambient input the path-set reads would otherwise depend on,
-    # so the result is hermetic and host-symmetric: no system or global config, no
-    # external excludes file (the untracked read's core.excludesFile, which may
-    # point outside the repository), and a host-independent core.filemode so that a
-    # tracked file's executable bit cannot make the working and staged reads differ
-    # between Windows (filemode false) and Linux (filemode true).
+    # so the result is hermetic and host-symmetric. These -c overrides take the
+    # highest git config precedence, so they hold regardless of any value a local
+    # config file -- or a file it pulls in with include.path/includeIf -- sets:
+    #   - no system or global config;
+    #   - no external excludes file (the untracked read's core.excludesFile) and no
+    #     external attributes file (core.attributesFile), each of which may point
+    #     outside the repository;
+    #   - a host-independent core.filemode, so a tracked file's executable bit
+    #     cannot make the working and staged reads differ between Windows (filemode
+    #     false) and Linux (filemode true);
+    #   - submodule changes ignored, so an initialized submodule's checked-out
+    #     commit is not part of the reads.
+    # info/exclude and info/attributes (repository-local, under the common Git
+    # directory) remain covered by Get-GitControlSurfaceEvidence.
     $strNullDevice = if ($env:OS -eq 'Windows_NT') { 'NUL' } else { '/dev/null' }
     $objChildEnvironment['GIT_CONFIG_GLOBAL'] = $strNullDevice
     $objChildEnvironment['GIT_OPTIONAL_LOCKS'] = '0'
@@ -653,7 +662,9 @@ function Invoke-GitRaw {
         '-c', 'core.fsmonitor=false',
         '-c', 'core.untrackedCache=false',
         '-c', 'core.filemode=false',
-        '-c', ('core.excludesFile=' + $strNullDevice)
+        '-c', ('core.excludesFile=' + $strNullDevice),
+        '-c', ('core.attributesFile=' + $strNullDevice),
+        '-c', 'diff.ignoreSubmodules=all'
     ) + $ArgumentList
     if ($null -ne $objStartInfo.PSObject.Properties['ArgumentList']) {
         foreach ($strArgument in $arrFixedArguments) {
@@ -1063,7 +1074,11 @@ function Get-TreeEvidence {
     $longByteCount = 0L
     while ($objPending.Count -ne 0) {
         $strDirectory = $objPending.Pop()
-        $arrEntries = @([System.IO.Directory]::EnumerateFileSystemEntries($strDirectory) | Sort-Object -CaseSensitive)
+        # No ordering is applied to the enumeration. Every entry is recorded in
+        # $objMap, an ordinal SortedDictionary, so the framed digest and the
+        # counts are independent of enumeration order. A sort here would be dead
+        # work, and Sort-Object specifically would add culture-dependent semantics.
+        $arrEntries = @([System.IO.Directory]::EnumerateFileSystemEntries($strDirectory))
         foreach ($strEntry in $arrEntries) {
             $strFullEntry = [System.IO.Path]::GetFullPath($strEntry)
             if ($null -ne $strExcluded -and $strFullEntry.Equals($strExcluded, $script:objPathComparison)) {
@@ -1225,10 +1240,11 @@ function Get-GitControlSurfaceEvidence {
     #
     # .DESCRIPTION
     # Hashes the .git pointer when present, the applicable local configuration
-    # files, the staging index, info/exclude, HEAD, packed-refs, the loose refs
-    # tree, and ordinary bounded hook directory trees. Uses labeled components so
-    # absent and present state cannot collide. The refs tree excludes logs/
-    # (reflogs), a sibling of refs/, so benign reflog churn raises no drift.
+    # files, the staging index, info/exclude, info/attributes, HEAD, packed-refs,
+    # the commondir pointer, the loose refs tree, and ordinary bounded hook
+    # directory trees. Uses labeled components so absent and present state cannot
+    # collide. The refs tree excludes logs/ (reflogs), a sibling of refs/, so
+    # benign reflog churn raises no drift.
     #
     # .PARAMETER AdministrativePathRecord
     # Validated GitEntry, GitDirectory, and CommonDirectory path record.
@@ -1249,10 +1265,10 @@ function Get-GitControlSurfaceEvidence {
     # .OUTPUTS
     # System.Collections.Specialized.OrderedDictionary. Contains Digest,
     # ComponentCount, HookEntryCount, and HookByteCount. The Digest also covers
-    # the staging index, info/exclude, HEAD, packed-refs, and the loose refs tree,
-    # so concurrent drift of any path-set read input raises git-control-drift.
-    # Filesystem, ordinary path, size-bound, hashing, and parameter-binding
-    # failures propagate.
+    # the staging index, info/exclude, info/attributes, HEAD, packed-refs, the
+    # commondir pointer, and the loose refs tree, so concurrent drift of any
+    # path-set read input raises git-control-drift. Filesystem, ordinary path,
+    # size-bound, hashing, and parameter-binding failures propagate.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
@@ -1285,9 +1301,13 @@ function Get-GitControlSurfaceEvidence {
     # Local config, plus the single-file administrative inputs the path-set reads
     # depend on but the worktree tree evidence excludes: the staging index
     # (working/staged/index-flags reads), info/exclude (the untracked read's
-    # --exclude-standard set), and HEAD plus packed-refs (the staged read resolves
-    # HEAD against the index). The index and HEAD are per-worktree (GitDirectory);
-    # info/exclude and packed-refs are shared (CommonDirectory).
+    # --exclude-standard set), info/attributes (repository-local Git attributes
+    # that can change the working read via content normalization), HEAD plus
+    # packed-refs (the staged read resolves HEAD against the index), and the
+    # commondir pointer (which resolves the common Git directory for a linked
+    # worktree). The index, HEAD, and commondir pointer are per-worktree
+    # (GitDirectory); info/exclude, info/attributes, and packed-refs are shared
+    # (CommonDirectory).
     $arrBoundedFileSpecifications = @(
         @('common-config', (Join-Path $AdministrativePathRecord.CommonDirectory 'config')),
         @('common-config-worktree', (Join-Path $AdministrativePathRecord.CommonDirectory 'config.worktree')),
@@ -1296,7 +1316,9 @@ function Get-GitControlSurfaceEvidence {
         @('git-index', (Join-Path $AdministrativePathRecord.GitDirectory 'index')),
         @('git-head', (Join-Path $AdministrativePathRecord.GitDirectory 'HEAD')),
         @('info-exclude', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'exclude')),
-        @('packed-refs', (Join-Path $AdministrativePathRecord.CommonDirectory 'packed-refs'))
+        @('info-attributes', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'attributes')),
+        @('packed-refs', (Join-Path $AdministrativePathRecord.CommonDirectory 'packed-refs')),
+        @('commondir-pointer', (Join-Path $AdministrativePathRecord.GitDirectory 'commondir'))
     )
     foreach ($arrSpecification in $arrBoundedFileSpecifications) {
         $strLabel = [string]$arrSpecification[0]
