@@ -131,7 +131,7 @@
     "pathVerifier": {
       "path": "Test-ExactGitPathSet.ps1",
       "version": "1.0.20260814.0",
-      "sha256": "a3ffc64ae4a5ed8267d3824edad6628bbc953562008c586a808b213e9e24dc32"
+      "sha256": "de33548ba1688f3094b4ecfd58037be843dd00a8244b860fd35ec413c8bdaf6e"
     }
   },
   "caseCatalog": {
@@ -140,7 +140,7 @@
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "38475ff1ca618abe4d89e5f0da534dd32e2c8c337d47fccb1bb833795eb2e39e"
+    "sha256": "64b8bb97e36da6d9c3e529f87d59ea6677c2540b304a40a87054fbe704124442"
   },
   "actions": {
     "checkout": {
@@ -327,7 +327,7 @@
       { "id": "GF-DESTINATION", "status": "intentional difference", "observed": "PS uses powershell.instructions.md; Terraform uses terraform.instructions.md.", "rationale": "Repository-specific leaves differ while containment, link, alias, and replacement guarantees remain equal." },
       { "id": "GF-CONTENT", "status": "intentional difference", "observed": "Language-specific frontmatter and labels differ.", "rationale": "Repository payload identity differs; complete-payload ordering and failure strength remain equal." },
       { "id": "GF-SERIALIZATION", "status": "same", "observed": "Both require final CR normalization and BOM-less UTF-8.", "rationale": "The byte boundary is symmetric." },
-      { "id": "GF-WRITE", "status": "same", "observed": "CreateNew, Flush(true), verification, and one File.Replace with no fallback.", "rationale": "The transaction boundary is symmetric." },
+      { "id": "GF-WRITE", "status": "same", "observed": "CreateNew, Flush(true), verification, and one atomic publication rename with no fallback: File.Replace to an existing destination, File.Move to an absent one.", "rationale": "The transaction boundary is symmetric: publication is a single atomic rename with no fallback." },
       { "id": "GF-FAILURE", "status": "same", "observed": "Pre-replace cleanup and post-replace truth are explicit.", "rationale": "Neither contract claims cross-file atomicity or rollback." },
       { "id": "GF-HOSTS", "status": "same", "observed": "Windows PowerShell 5.1 and PowerShell 7 on Windows/Ubuntu are required.", "rationale": "Host equality and idempotence are symmetric." },
       { "id": "GF-VERSION", "status": "same", "observed": "The timeless four-component script-version profile is shared.", "rationale": "Grammar, expected identity, and authoring progression have equal strength." },
