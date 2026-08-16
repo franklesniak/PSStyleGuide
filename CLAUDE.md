@@ -2,7 +2,7 @@
 
 # Agent Instructions for Claude Code
 
-**Version:** 1.0.20260816.0
+**Version:** 1.0.20260816.1
 
 ## Metadata
 
@@ -39,10 +39,10 @@ Apply this process to **each** code-review comment, whichever reviewer authored 
 
 Review feedback has two co-equal surfaces. Inspect both on every round and in every whole-PR audit:
 
-1. **Inline review comments and threads** — diff-anchored comments exposed by pull-request review-comment and `reviewThreads` APIs. Enumerate this surface from the `reviewThreads` connection by resolution state (`isResolved == false`), which is head-independent. Do NOT enumerate it by filtering REST pull-request review comments on `commit_id` equality to a round head: `commit_id` is mutable — GitHub re-anchors it forward to a later commit whenever a subsequent commit is pushed on which the commented line still maps — so a `commit_id`-pinned filter silently drops a still-open inline comment whose line survived an intervening commit, including a fix commit you pushed earlier in the same round.
+1. **Inline review comments and threads** — diff-anchored comments exposed by pull-request review-comment and `reviewThreads` APIs. Enumerate this surface from the `reviewThreads` connection, which is head-independent; the complete set of that connection's threads — resolved and unresolved alike — is the inline inventory, and `isResolved == false` selects only the subset that is still open work, never narrowing the inventory itself. Do NOT enumerate it by filtering REST pull-request review comments on `commit_id` equality to a round head: `commit_id` is mutable — GitHub re-anchors it forward to a later commit whenever a subsequent commit is pushed on which the commented line still maps — so a `commit_id`-pinned filter silently drops a still-open inline comment whose line survived an intervening commit, including a fix commit you pushed earlier in the same round.
 2. **Review-submission bodies** — the complete `body` of every review object, including findings embedded in sections such as `<summary>Suppressed comments (N)</summary>`. A review-level sentence such as "generated no new comments" does not override findings elsewhere in that same body.
 
-For each review-body-only finding, assign the stable synthetic key `review:<review-id>:suppressed:<ordinal>` (or replace `suppressed` with the reviewer's section label). Record the review `commit_id`, path/line when given, and complete finding text. If a section declares a count, enumerate exactly that many findings. When a review body declares an ordinary inline count ("generated N comment(s)"), reconcile that N against the enumerated inline threads exactly as a declared section count is reconciled; an inline comment the body counts but the inventory does not enumerate is a fail-closed audit error, not a clean round. A count mismatch, malformed section, truncated body, or ambiguous boundary is a fail-closed audit error: do not declare the review or PR clean until the inventory is complete.
+For each review-body-only finding, assign the stable synthetic key `review:<review-id>:suppressed:<ordinal>` (or replace `suppressed` with the reviewer's section label). Record the review `commit_id`, path/line when given, and complete finding text. If a section declares a count, enumerate exactly that many findings. When a review body declares an ordinary inline count ("generated N comment(s)"), reconcile that N against the complete set of that review's inline threads — the full inventory of native thread IDs, counting resolved and unresolved threads alike, never the `isResolved == false` subset — exactly as a declared section count is reconciled; an inline comment the body counts but the complete inventory does not contain is a fail-closed audit error, not a clean round, and the `isResolved == false` subset determines only what work remains open. A count mismatch, malformed section, truncated body, or ambiguous boundary is a fail-closed audit error: do not declare the review or PR clean until the inventory is complete.
 
 "Handled" depends on the feedback surface:
 
