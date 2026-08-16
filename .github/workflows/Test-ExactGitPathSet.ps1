@@ -1547,7 +1547,8 @@ function Get-GitControlSurfaceEvidence {
         @('info-exclude', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'exclude')),
         @('info-attributes', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'attributes')),
         @('packed-refs', (Join-Path $AdministrativePathRecord.CommonDirectory 'packed-refs')),
-        @('commondir-pointer', (Join-Path $AdministrativePathRecord.GitDirectory 'commondir'))
+        @('commondir-pointer', (Join-Path $AdministrativePathRecord.GitDirectory 'commondir')),
+        @('objects-info-alternates', (Join-Path (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'objects') 'info') 'alternates'))
     )
     foreach ($arrSpecification in $arrBoundedFileSpecifications) {
         $strLabel = [string]$arrSpecification[0]
@@ -1757,7 +1758,8 @@ function Get-PathSetControlInputDigest {
         @('common-config-worktree', (Join-Path $AdministrativePathRecord.CommonDirectory 'config.worktree')),
         @('worktree-config', (Join-Path $AdministrativePathRecord.GitDirectory 'config')),
         @('worktree-config-worktree', (Join-Path $AdministrativePathRecord.GitDirectory 'config.worktree')),
-        @('commondir-pointer', (Join-Path $AdministrativePathRecord.GitDirectory 'commondir'))
+        @('commondir-pointer', (Join-Path $AdministrativePathRecord.GitDirectory 'commondir')),
+        @('objects-info-alternates', (Join-Path (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'objects') 'info') 'alternates'))
     )
     foreach ($arrSpecification in $arrSingleFileInputs) {
         $strLabel = [string]$arrSpecification[0]
@@ -2049,6 +2051,43 @@ try {
         throw 'repository-boundary'
     }
 
+    # Refuse a repository-local config that pulls in external files with include.path
+    # or includeIf, before any read and for every mode. Git expands those includes when
+    # it resolves configuration, and an included file -- outside every hashed control
+    # digest, since only .git/config itself is hashed, not the arbitrary paths it pulls
+    # in -- can add a read-relevant setting after a probe below observes none but before
+    # the read runs: a filter.<driver>.clean/.process that the working diff would run,
+    # or a remote.<name>.promisor that the staged diff would lazily fetch through. The
+    # refusal is unconditional (not scoped to the working reads) because a staged-only
+    # verification also expands includes and can be redirected to a promisor remote. No
+    # -c override disables include expansion, and the resolved targets (with includeIf
+    # conditions and nested includes) cannot be enumerated and snapshotted portably, so
+    # refuse (fail closed) when any include directive is present. The probe runs in the
+    # same neutralized environment as the reads, so system and global includes are
+    # already excluded; a fresh checkout's local config has none.
+    $strNativeCommand = 'include-config'
+    $hashtableIncludeResult = Invoke-GitRaw `
+        -GitRecord $hashtableGitExecutable `
+        -WorkingDirectory $strRepositoryRoot `
+        -ArgumentList @('config', '-z', '--name-only', '--get-regexp', '^include(\.|if\.)')
+    $listNativeChecks.Add([ordered]@{
+        Name = $strNativeCommand
+        ExitCode = $hashtableIncludeResult.ExitCode
+        StdoutLength = $hashtableIncludeResult.Stdout.Length
+        StderrLength = $hashtableIncludeResult.StderrLength
+    })
+    $intNativeExit = $hashtableIncludeResult.ExitCode
+    # 'git config --get-regexp' exits 1 when no key matches (the hermetic case, no local
+    # include directive) and 0 when at least one include/includeIf key is present. Any
+    # match means an unbracketed external include could inject a read-relevant setting,
+    # so refuse.
+    if ($intNativeExit -notin @(0, 1)) {
+        throw 'native-command'
+    }
+    if ($intNativeExit -eq 0) {
+        throw 'git-config-include-active'
+    }
+
     # Refuse a partial clone / promisor remote before any read. A partial clone marks
     # its remote with remote.<name>.promisor (and remote.<name>.partialclonefilter, and
     # on some versions extensions.partialClone), and Git will lazily fetch a missing
@@ -2084,41 +2123,6 @@ try {
     }
 
     if (($Mode -in @('Working', 'Both')) -or $RequireCleanWorkingAgainstIndex) {
-        # Before probing for an active filter driver, refuse a repository-local config
-        # that pulls in external files with include.path or includeIf. Git expands
-        # those includes when it resolves configuration, so an included file can add a
-        # filter.<driver>.clean or .process after the filter probe below observes none
-        # but before the working diff runs. That external file is outside every hashed
-        # control digest -- only .git/config itself is hashed, not the arbitrary paths
-        # it pulls in -- so the change would not be bracketed and the verifier could
-        # certify a stale path set. No -c override disables include expansion, and the
-        # resolved targets (with includeIf conditions and nested includes) cannot be
-        # enumerated and snapshotted portably, so refuse (fail closed) when any include
-        # directive is present. The probe runs in the same neutralized environment as
-        # the reads, so system and global includes are already excluded; a fresh
-        # checkout's local config has no include directive and never trips this.
-        $strNativeCommand = 'include-config'
-        $hashtableIncludeResult = Invoke-GitRaw `
-            -GitRecord $hashtableGitExecutable `
-            -WorkingDirectory $strRepositoryRoot `
-            -ArgumentList @('config', '-z', '--name-only', '--get-regexp', '^include(\.|if\.)')
-        $listNativeChecks.Add([ordered]@{
-            Name = $strNativeCommand
-            ExitCode = $hashtableIncludeResult.ExitCode
-            StdoutLength = $hashtableIncludeResult.Stdout.Length
-            StderrLength = $hashtableIncludeResult.StderrLength
-        })
-        $intNativeExit = $hashtableIncludeResult.ExitCode
-        # 'git config --get-regexp' exits 1 when no key matches (the hermetic case, no
-        # local include directive) and 0 when at least one include/includeIf key is
-        # present. Any match means an unbracketed external include could inject a
-        # filter after the filter probe, so refuse.
-        if ($intNativeExit -notin @(0, 1)) {
-            throw 'native-command'
-        }
-        if ($intNativeExit -eq 0) {
-            throw 'git-config-include-active'
-        }
         # A worktree-versus-index diff (the working and clean reads below) makes Git
         # run a clean or process filter driver for any path whose filter attribute
         # names a driver with a configured clean/process command. That driver is an
@@ -2209,7 +2213,11 @@ try {
         # unsound result. An ordinary clone has no alternates file and is
         # unaffected; the working read never traverses HEAD's tree objects, and CI
         # runs Mode Working and never reaches here. Modeled on the git-filter-active
-        # refusal above.
+        # refusal above. This pre-read refusal rejects an alternates file present at
+        # the check; a file created or populated after it but before the staged read is
+        # caught separately by the control brackets, because objects/info/alternates is
+        # now hashed as a control input in Get-GitControlSurfaceEvidence and
+        # Get-PathSetControlInputDigest, so a mid-window change trips git-control-drift.
         $strAlternatesPath = [System.IO.Path]::Combine(
             [string]$hashtableAdministrativePaths.CommonDirectory, 'objects', 'info', 'alternates')
         if ([System.IO.File]::Exists($strAlternatesPath)) {
