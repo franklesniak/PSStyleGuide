@@ -541,6 +541,11 @@ function Assert-OrdinaryPathComponent {
                 $strUnixMode[0] -eq 'c')) {
                 throw "nonordinary-path"
             }
+        } elseif ($env:OS -ne 'Windows_NT') {
+            # Non-Windows host that does not expose UnixMode (for example PowerShell
+            # 7.0): the type cannot be read, so fail closed rather than accept a
+            # potentially blocking special file.
+            throw "nonordinary-path"
         }
     }
 }
@@ -621,6 +626,11 @@ function Get-OrdinaryDestinationState {
             $strUnixMode[0] -eq 'c')) {
             throw 'unexpected-destination'
         }
+    } elseif ($env:OS -ne 'Windows_NT') {
+        # Non-Windows host that does not expose UnixMode (for example PowerShell 7.0):
+        # the type cannot be read, so fail closed rather than accept a potentially
+        # blocking special destination.
+        throw 'unexpected-destination'
     }
     return 'Existing'
 }

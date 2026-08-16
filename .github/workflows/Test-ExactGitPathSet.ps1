@@ -422,6 +422,90 @@ function Get-BoundedFileDigest {
     }
 }
 
+function Read-BoundedFileContent {
+    # .SYNOPSIS
+    # Reads at most a bounded number of bytes from one ordinary file.
+    #
+    # .DESCRIPTION
+    # Opens the literal file for shared reading and reads up to MaximumBytes bytes into
+    # a MaximumBytes+1 buffer. Throws the caller's limit category when the file holds
+    # more than MaximumBytes, without allocating or reading the whole file first, so a
+    # hostile or corrupted marker cannot force an unbounded allocation before a
+    # post-read size check.
+    #
+    # .PARAMETER LiteralPath
+    # Absolute literal file path to read. Wildcards are not expanded.
+    #
+    # .PARAMETER MaximumBytes
+    # Inclusive upper bound on the bytes returned. A larger file throws LimitCategory.
+    #
+    # .PARAMETER LimitCategory
+    # Error string thrown when the file holds more than MaximumBytes.
+    #
+    # .EXAMPLE
+    # $arrBytes = Read-BoundedFileContent -LiteralPath $strMarker -MaximumBytes 4096 -LimitCategory 'invalid-git-control'
+    #
+    # # Returns up to 4096 bytes, or throws 'invalid-git-control' for a larger file.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Byte[]. The file content, at most MaximumBytes long. Throws LimitCategory
+    # above MaximumBytes; file, stream, allocation, and parameter-binding failures
+    # propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260814.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: LiteralPath
+    #   Position 1: MaximumBytes
+    #   Position 2: LimitCategory
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [int]$MaximumBytes,
+
+        [Parameter(Mandatory = $true)]
+        [string]$LimitCategory
+    )
+
+    $objStream = New-Object System.IO.FileStream(
+        $LiteralPath,
+        [System.IO.FileMode]::Open,
+        [System.IO.FileAccess]::Read,
+        [System.IO.FileShare]::Read
+    )
+    try {
+        $arrBuffer = New-Object byte[] ($MaximumBytes + 1)
+        $intTotal = 0
+        while ($intTotal -lt $arrBuffer.Length) {
+            $intReadCount = $objStream.Read($arrBuffer, $intTotal, $arrBuffer.Length - $intTotal)
+            if ($intReadCount -le 0) {
+                break
+            }
+            $intTotal += $intReadCount
+        }
+        if ($intTotal -gt $MaximumBytes) {
+            throw $LimitCategory
+        }
+        $arrResult = New-Object byte[] $intTotal
+        [System.Array]::Copy($arrBuffer, 0, $arrResult, 0, $intTotal)
+        return ,$arrResult
+    } finally {
+        $objStream.Dispose()
+    }
+}
+
 function Assert-OrdinaryAbsoluteFile {
     # .SYNOPSIS
     # Resolves one absolute ordinary file and every directory ancestor.
@@ -490,8 +574,11 @@ function Assert-OrdinaryAbsoluteFile {
     # such as .git and commondir through this guard before hashing -- and opening a
     # FIFO blocks indefinitely instead of failing closed. PowerShell's UnixMode string
     # exposes the type in its first character; reject the explicit special types before
-    # any read. The check is a no-op where UnixMode is absent (Windows) and never fires
-    # on a regular file ('-').
+    # any read. On Windows there are no such entries and the property is absent, so the
+    # check is a no-op there ('-' and 'd' never fire). On a non-Windows host that does
+    # not expose UnixMode (for example PowerShell 7.0, before the property was added),
+    # the entry's type cannot be read at all, so fail closed rather than pass a
+    # potentially blocking special file.
     $objUnixModeProperty = $objFile.PSObject.Properties['UnixMode']
     if ($null -ne $objUnixModeProperty) {
         $strUnixMode = [string]$objUnixModeProperty.Value
@@ -500,6 +587,8 @@ function Assert-OrdinaryAbsoluteFile {
             $strUnixMode[0] -eq 'c')) {
             throw 'invalid-ordinary-file'
         }
+    } elseif ($env:OS -ne 'Windows_NT') {
+        throw 'invalid-ordinary-file'
     }
     $objDirectory = $objFile.Directory
     while ($null -ne $objDirectory) {
@@ -1305,10 +1394,12 @@ function Get-TreeEvidence {
                 # distinguish from a regular file, so a zero-length FIFO would receive
                 # the same evidence as a zero-byte regular file. PowerShell's UnixMode
                 # string exposes the type in its first character. Reject the explicit
-                # special types so a special entry cannot alias a regular file; the
-                # check is a no-op where UnixMode is absent (Windows, which has no such
-                # entries in an ordinary worktree) and never fires on a regular file
-                # ('-') or directory ('d').
+                # special types so a special entry cannot alias a regular file. On
+                # Windows there are no such entries and the property is absent, so the
+                # check is a no-op there. On a non-Windows host that does not expose
+                # UnixMode (for example PowerShell 7.0), the entry's type cannot be read,
+                # so fail closed rather than hash a potentially blocking special entry
+                # as if it were a regular file.
                 $objUnixModeProperty = $objFile.PSObject.Properties['UnixMode']
                 if ($null -ne $objUnixModeProperty) {
                     $strUnixMode = [string]$objUnixModeProperty.Value
@@ -1317,6 +1408,8 @@ function Get-TreeEvidence {
                         $strUnixMode[0] -eq 'c')) {
                         throw 'worktree-special-entry'
                     }
+                } elseif ($env:OS -ne 'Windows_NT') {
+                    throw 'worktree-special-entry'
                 }
                 if ($objFile.Length -eq 0) {
                     $strFileDigest = $script:strEmptyFileSha256
@@ -1416,8 +1509,12 @@ function Get-GitAdministrativePathRecord {
         $strGitDirectory = Assert-OrdinaryRepositoryRoot -LiteralPath $strGitEntry
     } else {
         $strGitEntry = Assert-OrdinaryAbsoluteFile -LiteralPath $strGitEntry
-        $arrGitEntryBytes = [System.IO.File]::ReadAllBytes($strGitEntry)
-        if ($arrGitEntryBytes.Length -eq 0 -or $arrGitEntryBytes.Length -gt 4096) {
+        # Enforce the 4 KiB ceiling during the read: a hostile or corrupted gitdir
+        # pointer could be arbitrarily large, and ReadAllBytes would allocate and read
+        # all of it before a post-read size check, a denial-of-service against the
+        # bounded-evidence contract.
+        $arrGitEntryBytes = Read-BoundedFileContent -LiteralPath $strGitEntry -MaximumBytes 4096 -LimitCategory 'invalid-git-control'
+        if ($arrGitEntryBytes.Length -eq 0) {
             throw 'invalid-git-control'
         }
         $strGitEntryText = $script:objUtf8Strict.GetString($arrGitEntryBytes).TrimEnd("`r", "`n")
@@ -1436,8 +1533,9 @@ function Get-GitAdministrativePathRecord {
     $strCommonMarker = Join-Path $strGitDirectory 'commondir'
     if ([System.IO.File]::Exists($strCommonMarker)) {
         $strCommonMarker = Assert-OrdinaryAbsoluteFile -LiteralPath $strCommonMarker
-        $arrCommonBytes = [System.IO.File]::ReadAllBytes($strCommonMarker)
-        if ($arrCommonBytes.Length -eq 0 -or $arrCommonBytes.Length -gt 4096) {
+        # Enforce the 4 KiB ceiling during the read, as for the gitdir pointer above.
+        $arrCommonBytes = Read-BoundedFileContent -LiteralPath $strCommonMarker -MaximumBytes 4096 -LimitCategory 'invalid-git-control'
+        if ($arrCommonBytes.Length -eq 0) {
             throw 'invalid-git-control'
         }
         $strCommonText = $script:objUtf8Strict.GetString($arrCommonBytes).TrimEnd("`r", "`n")
@@ -2065,11 +2163,15 @@ try {
     # refuse (fail closed) when any include directive is present. The probe runs in the
     # same neutralized environment as the reads, so system and global includes are
     # already excluded; a fresh checkout's local config has none.
+    # --no-includes stops Git from expanding (and thus opening) the include target
+    # while it reports the include.path/includeIf key from the local config. Without
+    # it, pointing include.path at a FIFO would make this very probe block forever on
+    # the untrusted external source instead of returning git-config-include-active.
     $strNativeCommand = 'include-config'
     $hashtableIncludeResult = Invoke-GitRaw `
         -GitRecord $hashtableGitExecutable `
         -WorkingDirectory $strRepositoryRoot `
-        -ArgumentList @('config', '-z', '--name-only', '--get-regexp', '^include(\.|if\.)')
+        -ArgumentList @('config', '--no-includes', '-z', '--name-only', '--get-regexp', '^include(\.|if\.)')
     $listNativeChecks.Add([ordered]@{
         Name = $strNativeCommand
         ExitCode = $hashtableIncludeResult.ExitCode
@@ -2101,11 +2203,17 @@ try {
     # promisor remote is configured. An ordinary clone has none. Modeled on the
     # git-alternates-active refusal, and unconditional because both the working and the
     # staged reads can trigger the fetch.
+    # Anchor the name regex to Git's actual promisor/partial-clone keys --
+    # remote.<name>.promisor, remote.<name>.partialclonefilter, and
+    # extensions.partialClone -- so an unrelated custom key such as foo.promisory does
+    # not false-match and refuse every mode. --no-includes keeps an external include
+    # from being expanded (opened) during this probe.
     $strNativeCommand = 'promisor-config'
     $hashtablePromisorResult = Invoke-GitRaw `
         -GitRecord $hashtableGitExecutable `
         -WorkingDirectory $strRepositoryRoot `
-        -ArgumentList @('config', '-z', '--name-only', '--get-regexp', 'promisor|partialclone')
+        -ArgumentList @('config', '--no-includes', '-z', '--name-only', '--get-regexp',
+            '^(remote\..*\.(promisor|partialclonefilter)|extensions\.partialclone)$')
     $listNativeChecks.Add([ordered]@{
         Name = $strNativeCommand
         ExitCode = $hashtablePromisorResult.ExitCode
@@ -2234,6 +2342,25 @@ try {
             if ((New-Object System.IO.FileInfo($strAlternatesPath)).Length -gt 0) {
                 throw 'git-alternates-active'
             }
+        }
+        # Reject an external object store reached through a symlinked objects directory.
+        # If CommonDirectory/objects is a reparse point (a symlink to a directory
+        # outside the repository), the staged read resolves HEAD's tree from that
+        # external store -- a third external-store route beyond the alternates file and
+        # a promisor remote. The objects directory is not one of the bracketed
+        # single-file control inputs, so its later removal or redirection would not trip
+        # git-control-drift; validate it here and refuse a reparse (or non-directory)
+        # object root before the staged read. An ordinary clone has a plain objects
+        # directory and is unaffected.
+        $strObjectsPath = [System.IO.Path]::GetFullPath(
+            (Join-Path $hashtableAdministrativePaths.CommonDirectory 'objects'))
+        if ([System.IO.Directory]::Exists($strObjectsPath)) {
+            $objObjectsInfo = New-Object System.IO.DirectoryInfo($strObjectsPath)
+            if (($objObjectsInfo.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+                throw 'git-object-store-symlink'
+            }
+        } elseif ([System.IO.File]::Exists($strObjectsPath)) {
+            throw 'git-object-store-symlink'
         }
         $strNativeCommand = 'staged'
         $hashtableStagedResult = Invoke-GitRaw `
@@ -2408,7 +2535,7 @@ try {
         'worktree-link', 'worktree-limit', 'worktree-special-entry',
         'git-control-drift', 'worktree-drift',
         'evidence-unstable', 'git-filter-active', 'git-alternates-active',
-        'git-config-include-active', 'git-promisor-remote',
+        'git-config-include-active', 'git-promisor-remote', 'git-object-store-symlink',
         'native-command', 'native-output-limit', 'working-index-difference'
     )) {
         $strCategory = $_.Exception.Message
