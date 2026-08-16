@@ -62,6 +62,11 @@ $script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v2'
 # native-command-timeout. Invoke-GitRaw exposes a per-call override so a test can drive a
 # short bound; nothing in normal operation lowers it.
 $script:intNativeCommandTimeoutMilliseconds = 120000
+# Byte ceiling for hashing the resolved Git executable during authentication. A real Git
+# binary is a few MiB, so 512 MiB is over a hundred times any legitimate size yet bounds the
+# incremental hash, so an oversized or continuously growing candidate produces a prompt
+# git-executable-limit failure instead of reading gigabytes before Git is ever started.
+$script:longGitExecutableMaximumBytes = 536870912
 $script:objUtf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
 # SHA-256 of the empty input, computed once. Get-TreeEvidence records this for every
 # zero-length regular file instead of allocating a fresh SHA256 instance and an empty
@@ -276,65 +281,6 @@ function Test-ScriptVersionParser {
                 throw
             }
         }
-    }
-}
-
-function Get-FileSha256Hex {
-    # .SYNOPSIS
-    # Gets the SHA-256 digest of one ordinary file.
-    #
-    # .DESCRIPTION
-    # Opens the literal file for shared reading, hashes its complete byte stream,
-    # and returns lowercase hexadecimal text without separators.
-    #
-    # .PARAMETER LiteralPath
-    # Absolute literal file path to hash. Wildcards are not expanded.
-    #
-    # .EXAMPLE
-    # $strDigest = Get-FileSha256Hex -LiteralPath $strGitPath
-    #
-    # # Returns the lowercase SHA-256 digest of the selected Git executable.
-    #
-    # .EXAMPLE
-    # Get-FileSha256Hex -LiteralPath $strMissingPath
-    #
-    # # Propagates the file-open failure for a missing path.
-    #
-    # .INPUTS
-    # None. You can't pipe objects to this function.
-    #
-    # .OUTPUTS
-    # System.String. The lowercase SHA-256 digest. File, stream, allocation, and
-    # parameter-binding failures propagate.
-    #
-    # .NOTES
-    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
-    # surface. Parameters, return shape, and positional contract may change
-    # without notice.
-    #
-    # Version: 1.0.20260814.0
-    #
-    # This function supports positional parameters
-    # (internal-caller contract only; subject to change):
-    #
-    #   Position 0: LiteralPath
-    param (
-        [Parameter(Mandatory = $true)]
-        [string]$LiteralPath
-    )
-
-    $objStream = New-Object System.IO.FileStream(
-        $LiteralPath,
-        [System.IO.FileMode]::Open,
-        [System.IO.FileAccess]::Read,
-        [System.IO.FileShare]::Read
-    )
-    $objSha256 = [System.Security.Cryptography.SHA256]::Create()
-    try {
-        return ([System.BitConverter]::ToString($objSha256.ComputeHash($objStream))).Replace('-', '').ToLowerInvariant()
-    } finally {
-        $objSha256.Dispose()
-        $objStream.Dispose()
     }
 }
 
@@ -762,7 +708,8 @@ function Get-GitExecutableRecord {
     return [ordered]@{
         Path = $strGitPath
         Length = (New-Object System.IO.FileInfo($strGitPath)).Length
-        Sha256 = Get-FileSha256Hex -LiteralPath $strGitPath
+        Sha256 = (Get-BoundedFileDigest -LiteralPath $strGitPath `
+            -MaximumBytes $script:longGitExecutableMaximumBytes -LimitCategory 'git-executable-limit').Digest
     }
 }
 
@@ -995,7 +942,9 @@ function Invoke-GitRaw {
     # exploitation needs write access to the resolved executable's directory,
     # which in CI is a root-owned system path the unprivileged job cannot write.
     if ((New-Object System.IO.FileInfo($strGitPath)).Length -ne [int64]$GitRecord.Length -or
-        (Get-FileSha256Hex -LiteralPath $strGitPath) -cne [string]$GitRecord.Sha256) {
+        (Get-BoundedFileDigest -LiteralPath $strGitPath `
+            -MaximumBytes $script:longGitExecutableMaximumBytes `
+            -LimitCategory 'git-executable-limit').Digest -cne [string]$GitRecord.Sha256) {
         throw 'git-executable-drift'
     }
 
@@ -2527,6 +2476,62 @@ try {
         }
     }
 
+    # The working, staged, and clean reads all resolve tracked content through the local
+    # object database: the staged read resolves HEAD's commit and tree, and a worktree-
+    # versus-index read (the working and the -RequireCleanWorkingAgainstIndex clean reads)
+    # reads an index blob object whenever a tracked file's stat no longer matches the index.
+    # That database may include an external store named by objects/info/alternates (for
+    # example a 'git clone --shared' repository) or a redirected objects directory, and on
+    # Unix a loose object or pack file that is a FIFO/socket/device would make a read block
+    # opening it. The object store sits outside the hashed control surface and the
+    # convergence bracket, so another process can redirect or remove it after a read while
+    # every control and worktree digest still converges, yielding a success whose path set no
+    # longer reproduces. It cannot be snapshotted portably, so refuse (fail closed) before any
+    # read when the comparison depends on an external or non-ordinary object store. An
+    # ordinary clone has no alternates file and a plain objects tree of ordinary files and is
+    # unaffected. objects/info/alternates is hashed as a control input in
+    # Get-GitControlSurfaceEvidence and Get-PathSetControlInputDigest, so a mid-window change
+    # to it trips git-control-drift.
+    $strAlternatesPath = [System.IO.Path]::Combine(
+        [string]$hashtableAdministrativePaths.CommonDirectory, 'objects', 'info', 'alternates')
+    if ([System.IO.File]::Exists($strAlternatesPath)) {
+        # Validate the alternates path as an ordinary regular file before reading its length.
+        # On Unix a FIFO/socket/device satisfies File.Exists and reports zero length, so the
+        # length test alone would bypass this refusal; a read would then open the FIFO and
+        # block forever waiting for a writer, even when every required object exists locally.
+        # Assert-OrdinaryAbsoluteFile inspects attributes and the UnixMode type without opening
+        # the path, so it rejects the special types (invalid-ordinary-file) and cannot itself
+        # hang; malformed administrative state then fails promptly instead of hanging.
+        [void](Assert-OrdinaryAbsoluteFile -LiteralPath $strAlternatesPath)
+        if ((New-Object System.IO.FileInfo($strAlternatesPath)).Length -gt 0) {
+            throw 'git-alternates-active'
+        }
+    }
+    # Reject an external or blocking object store. If CommonDirectory/objects -- or a child
+    # such as objects/pack, objects/<fanout>, or an individual pack/loose object -- is a
+    # reparse point to a location outside the repository, a read resolves objects from that
+    # external store (a route beyond the alternates file and a promisor remote); and on Unix a
+    # loose object or pack file that is a FIFO/socket/device would make a read block opening
+    # it. The objects tree is not bracketed by the control digests, so its later removal or
+    # redirection would not trip git-control-drift; validate it here and refuse a reparse or
+    # non-directory object root, and any reparse point or non-regular Unix entry beneath it,
+    # before any read. An ordinary clone has a plain objects tree of ordinary files and is
+    # unaffected. This is a one-time pre-read scan, so a special file substituted into the
+    # objects tree afterward cannot be caught here, and -- unlike the alternates file -- the
+    # objects tree is not a hashed control input; the Invoke-GitRaw native-command timeout
+    # bounds that residual window, converting the hang into a fail-closed native-command-timeout.
+    $strObjectsPath = [System.IO.Path]::GetFullPath(
+        (Join-Path $hashtableAdministrativePaths.CommonDirectory 'objects'))
+    if ([System.IO.Directory]::Exists($strObjectsPath)) {
+        $objObjectsInfo = New-Object System.IO.DirectoryInfo($strObjectsPath)
+        if (($objObjectsInfo.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+            throw 'git-object-store-nonordinary'
+        }
+        Assert-OrdinaryTreeUnder -RootPath $strObjectsPath -LimitCategory 'git-object-store-nonordinary'
+    } elseif ([System.IO.File]::Exists($strObjectsPath)) {
+        throw 'git-object-store-nonordinary'
+    }
+
     if ($Mode -in @('Working', 'Both')) {
         $strNativeCommand = 'working'
         $intNativeExit = $null
@@ -2567,69 +2572,6 @@ try {
     }
 
     if ($Mode -in @('Staged', 'Both')) {
-        # A staged read (index versus HEAD) resolves HEAD's commit and tree through
-        # the object database, which may include an external store named by
-        # objects/info/alternates (for example a 'git clone --shared' repository).
-        # That external store sits outside the hashed control surface and the
-        # convergence bracket, so another process can redirect or remove it after
-        # the staged read while every control and worktree digest still converges,
-        # yielding a success whose staged path set no longer reproduces. The store
-        # cannot be snapshotted portably, so refuse (fail closed) when the staged
-        # comparison depends on an external object store rather than return an
-        # unsound result. An ordinary clone has no alternates file and is
-        # unaffected; the working read never traverses HEAD's tree objects, and CI
-        # runs Mode Working and never reaches here. Modeled on the git-filter-active
-        # refusal above. This pre-read refusal rejects an alternates file present at
-        # the check; a file created or populated after it but before the staged read is
-        # caught separately by the control brackets, because objects/info/alternates is
-        # now hashed as a control input in Get-GitControlSurfaceEvidence and
-        # Get-PathSetControlInputDigest, so a mid-window change trips git-control-drift.
-        $strAlternatesPath = [System.IO.Path]::Combine(
-            [string]$hashtableAdministrativePaths.CommonDirectory, 'objects', 'info', 'alternates')
-        if ([System.IO.File]::Exists($strAlternatesPath)) {
-            # Validate the alternates path as an ordinary regular file before reading
-            # its length. On Unix a FIFO/socket/device satisfies File.Exists and
-            # reports zero length, so the length test alone would bypass this refusal;
-            # the staged git diff --cached would then open the FIFO and block forever
-            # waiting for a writer, even when every required object exists locally.
-            # Assert-OrdinaryAbsoluteFile inspects attributes and the UnixMode type
-            # without opening the path, so it rejects the special types
-            # (invalid-ordinary-file) and cannot itself hang; malformed administrative
-            # state then fails promptly instead of hanging the verifier.
-            [void](Assert-OrdinaryAbsoluteFile -LiteralPath $strAlternatesPath)
-            if ((New-Object System.IO.FileInfo($strAlternatesPath)).Length -gt 0) {
-                throw 'git-alternates-active'
-            }
-        }
-        # Reject an external or blocking object store. If CommonDirectory/objects -- or
-        # a child such as objects/pack, objects/<fanout>, or an individual pack/loose
-        # object -- is a reparse point to a location outside the repository, the staged
-        # read resolves HEAD's tree from that external store (a third external-store
-        # route beyond the alternates file and a promisor remote); and on Unix a loose
-        # object or pack file that is a FIFO/socket/device would make git diff --cached
-        # block opening it. The objects tree is not bracketed by the control digests, so
-        # its later removal or redirection would not trip git-control-drift; validate it
-        # here and refuse a reparse or non-directory object root, and any reparse point
-        # or non-regular Unix entry beneath it, before the staged read. An ordinary
-        # clone has a plain objects tree of ordinary files and is unaffected. This is a
-        # one-time pre-read scan, so a special file substituted into the objects tree
-        # after it but before the staged read cannot be caught here, and -- unlike the
-        # alternates file -- the objects tree is not a hashed control input, so that later
-        # change does not trip git-control-drift; it would instead block git diff --cached
-        # opening it. The Invoke-GitRaw native-command timeout bounds that residual window,
-        # converting the hang into a fail-closed native-command-timeout rather than an
-        # unbounded wait.
-        $strObjectsPath = [System.IO.Path]::GetFullPath(
-            (Join-Path $hashtableAdministrativePaths.CommonDirectory 'objects'))
-        if ([System.IO.Directory]::Exists($strObjectsPath)) {
-            $objObjectsInfo = New-Object System.IO.DirectoryInfo($strObjectsPath)
-            if (($objObjectsInfo.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
-                throw 'git-object-store-nonordinary'
-            }
-            Assert-OrdinaryTreeUnder -RootPath $strObjectsPath -LimitCategory 'git-object-store-nonordinary'
-        } elseif ([System.IO.File]::Exists($strObjectsPath)) {
-            throw 'git-object-store-nonordinary'
-        }
         $strNativeCommand = 'staged'
         $intNativeExit = $null
         $hashtableStagedResult = Invoke-GitRaw `
@@ -2737,6 +2679,78 @@ try {
     if ($hashtableWorktreeBefore.Digest -cne $hashtableWorktreeAfter.Digest) {
         throw 'worktree-drift'
     }
+    # Bracket the local object database around the path-set reads. Neither the worktree
+    # digest nor the control-surface digest records the loose/pack objects, so a required
+    # object removed or corrupted after a read -- HEAD's commit and tree objects for the
+    # staged read, or an index blob for a worktree-versus-index read of a stat-dirty file --
+    # would leave every sampled digest converged while a fresh comparison now fails or yields
+    # a different set. Repeat each performed read here and require the same path set, binding
+    # the object database to the same converged-tail residual as the bracketed inputs rather
+    # than leaving it unbracketed for the whole read window. A read that now exits non-zero,
+    # or whose path set differs, fails closed as object-store-drift; the residual tail after
+    # this repeat needs a concurrent second writer, which single-actor CI does not have.
+    if ($Mode -in @('Working', 'Both')) {
+        $strNativeCommand = 'working-repeat'
+        $intNativeExit = $null
+        $hashtableWorkingRepeat = Invoke-GitRaw `
+            -GitRecord $hashtableGitExecutable `
+            -WorkingDirectory $strRepositoryRoot `
+            -ArgumentList @('diff', '--no-ext-diff', '--no-textconv', '--no-renames', '--ignore-submodules=all', '--name-only', '-z', '--')
+        $listNativeChecks.Add([ordered]@{
+            Name = $strNativeCommand
+            ExitCode = $hashtableWorkingRepeat.ExitCode
+            StdoutLength = $hashtableWorkingRepeat.Stdout.Length
+            StderrLength = $hashtableWorkingRepeat.StderrLength
+        })
+        $intNativeExit = $hashtableWorkingRepeat.ExitCode
+        if ($intNativeExit -ne 0) {
+            throw 'object-store-drift'
+        }
+        $strNativeCommand = 'untracked-repeat'
+        $intNativeExit = $null
+        $hashtableUntrackedRepeat = Invoke-GitRaw `
+            -GitRecord $hashtableGitExecutable `
+            -WorkingDirectory $strRepositoryRoot `
+            -ArgumentList @('ls-files', '--others', '--exclude-standard', '-z', '--')
+        $listNativeChecks.Add([ordered]@{
+            Name = $strNativeCommand
+            ExitCode = $hashtableUntrackedRepeat.ExitCode
+            StdoutLength = $hashtableUntrackedRepeat.Stdout.Length
+            StderrLength = $hashtableUntrackedRepeat.StderrLength
+        })
+        $intNativeExit = $hashtableUntrackedRepeat.ExitCode
+        if ($intNativeExit -ne 0) {
+            throw 'object-store-drift'
+        }
+        $objWorkingRepeat = ConvertFrom-NulPathRecordStream -Bytes $hashtableWorkingRepeat.Stdout
+        Add-KeySet -Target $objWorkingRepeat -Source (
+            ConvertFrom-NulPathRecordStream -Bytes $hashtableUntrackedRepeat.Stdout)
+        if (-not $objWorkingRepeat.SetEquals($objWorkingKeys)) {
+            throw 'object-store-drift'
+        }
+    }
+    if ($Mode -in @('Staged', 'Both')) {
+        $strNativeCommand = 'staged-repeat'
+        $intNativeExit = $null
+        $hashtableStagedRepeat = Invoke-GitRaw `
+            -GitRecord $hashtableGitExecutable `
+            -WorkingDirectory $strRepositoryRoot `
+            -ArgumentList @('diff', '--cached', '--no-ext-diff', '--no-textconv', '--no-renames', '--ignore-submodules=none', '--name-only', '-z', '--')
+        $listNativeChecks.Add([ordered]@{
+            Name = $strNativeCommand
+            ExitCode = $hashtableStagedRepeat.ExitCode
+            StdoutLength = $hashtableStagedRepeat.Stdout.Length
+            StderrLength = $hashtableStagedRepeat.StderrLength
+        })
+        $intNativeExit = $hashtableStagedRepeat.ExitCode
+        if ($intNativeExit -ne 0) {
+            throw 'object-store-drift'
+        }
+        $objStagedRepeat = ConvertFrom-NulPathRecordStream -Bytes $hashtableStagedRepeat.Stdout
+        if (-not $objStagedRepeat.SetEquals($objStagedKeys)) {
+            throw 'object-store-drift'
+        }
+    }
     # Final atomic single-file control-input read -- the last evidence action. It
     # re-reads every single-file control input after the converged control traversal,
     # so a change to any one during that traversal's tail (which the aggregate
@@ -2800,11 +2814,12 @@ try {
     if ($_.Exception.Message -in @(
         'invalid-version', 'unexpected-version', 'version-fixture-failure',
         'invalid-repository-root', 'invalid-ordinary-file', 'invalid-expected-path',
-        'git-executable-resolution', 'git-executable-drift', 'malformed-records',
+        'git-executable-resolution', 'git-executable-drift', 'git-executable-limit',
+        'malformed-records',
         'malformed-index-records', 'unsafe-index-state', 'record-limit',
         'repository-boundary', 'invalid-git-control', 'git-control-limit',
         'worktree-link', 'worktree-limit', 'worktree-special-entry',
-        'git-control-drift', 'worktree-drift',
+        'git-control-drift', 'worktree-drift', 'object-store-drift',
         'evidence-unstable', 'git-filter-active', 'git-alternates-active',
         'git-config-include-active', 'git-promisor-remote', 'git-object-store-nonordinary',
         'native-command', 'native-output-limit', 'native-command-timeout',
