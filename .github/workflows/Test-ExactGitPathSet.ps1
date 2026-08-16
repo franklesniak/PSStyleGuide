@@ -566,13 +566,17 @@ function Assert-UnoccupiedControlSlot {
     # reports false from both and would be recorded as 'absent'. A concurrent writer
     # can then expose the link's target for a path-set read (for example the
     # untracked read of info/exclude) and hide it for the control sample, yielding
-    # stable evidence for an incorrectly classified control input. Callers invoke
-    # this only after File.Exists and Directory.Exists have both returned false. It
-    # enumerates the parent directory -- readdir lists a dangling symlink regardless
-    # of its target -- for an entry at the same leaf and, if one exists, fails closed
-    # with the caller's category, because the slot is occupied by a non-resolving
-    # reparse point or a special file rather than being absent. A truly absent slot
-    # (no such entry, or a missing parent) returns without throwing.
+    # stable evidence for an incorrectly classified control input. The occupying link
+    # can be the leaf itself or an ancestor directory of the slot (for example
+    # .git/info), whose own File.Exists and Directory.Exists both report false too.
+    # Callers invoke this only after File.Exists and Directory.Exists have both
+    # returned false. It walks up to the nearest ancestor that genuinely exists as a
+    # directory -- readdir lists a dangling symlink regardless of its target -- and if
+    # the first non-resolving component below that directory is present as an entry, it
+    # fails closed with the caller's category, because the chain is occupied by a
+    # non-resolving reparse point or special file rather than being absent. A truly
+    # absent slot (the component is missing from an existing ancestor directory, or no
+    # ancestor exists) returns without throwing.
     #
     # .PARAMETER LiteralPath
     # Absolute control-slot path whose File and Directory existence both returned
@@ -608,15 +612,31 @@ function Assert-UnoccupiedControlSlot {
         [string]$Category
     )
 
-    $strParent = [System.IO.Path]::GetDirectoryName($LiteralPath)
-    if ([string]::IsNullOrEmpty($strParent) -or -not [System.IO.Directory]::Exists($strParent)) {
-        return
-    }
-    $strLeaf = [System.IO.Path]::GetFileName($LiteralPath)
-    foreach ($strEntry in [System.IO.Directory]::EnumerateFileSystemEntries($strParent)) {
-        if ([string]::Equals([System.IO.Path]::GetFileName($strEntry), $strLeaf, $script:objPathComparison)) {
-            throw $Category
+    # Walk up to the nearest ancestor that genuinely exists as a directory. The
+    # first path component below it that does not resolve must be missing from that
+    # directory's entries for the slot to be truly absent; if it is present instead,
+    # it is a dangling symlink (or other non-resolving reparse point / special file)
+    # occupying the chain -- at the leaf, or at an ancestor such as .git/info itself,
+    # whose own File.Exists and Directory.Exists both report false -- so fail closed.
+    # readdir (EnumerateFileSystemEntries) lists such an entry regardless of whether
+    # its target resolves. The walk terminates at the validated Git directory, which
+    # exists, or at the filesystem root.
+    $strCurrent = $LiteralPath
+    while ($true) {
+        $strParent = [System.IO.Path]::GetDirectoryName($strCurrent)
+        if ([string]::IsNullOrEmpty($strParent)) {
+            return
         }
+        if ([System.IO.Directory]::Exists($strParent)) {
+            $strLeaf = [System.IO.Path]::GetFileName($strCurrent)
+            foreach ($strEntry in [System.IO.Directory]::EnumerateFileSystemEntries($strParent)) {
+                if ([string]::Equals([System.IO.Path]::GetFileName($strEntry), $strLeaf, $script:objPathComparison)) {
+                    throw $Category
+                }
+            }
+            return
+        }
+        $strCurrent = $strParent
     }
 }
 
@@ -2141,13 +2161,23 @@ function ConvertFrom-NulIndexRecordStream {
     # Validates raw NUL-delimited Git index flag and path records.
     #
     # .DESCRIPTION
-    # Requires each record to contain the safe cached marker `H`, one ASCII
-    # space, and one nonempty opaque path. Rejects assume-unchanged,
-    # skip-worktree, unmerged, removed, duplicate, malformed, and excessive
-    # records without decoding or printing path bytes.
+    # Requires each record to contain a flag tag, one ASCII space, and one
+    # nonempty opaque path. When AllowUnsafeFlags is not set (a working-tree or
+    # clean-working read, where assume-unchanged and skip-worktree can mask a
+    # change), only the safe cached marker `H` is accepted and any other tag is
+    # rejected as unsafe-index-state; when it is set (a staged-only read, whose
+    # cached index-versus-HEAD comparison those flags do not affect), every
+    # well-formed record contributes its path. Duplicate, malformed, and excessive
+    # records are always rejected, without decoding or printing path bytes.
     #
     # .PARAMETER Bytes
     # Complete raw output from `git ls-files -v -z`.
+    #
+    # .PARAMETER AllowUnsafeFlags
+    # Accept assume-unchanged, skip-worktree, and other non-`H` index flags instead
+    # of rejecting them. Set only for a staged-only read, whose index-versus-HEAD
+    # comparison those flags do not affect; leave unset whenever a working-tree or
+    # clean-working read is performed, so a masked working-tree change fails closed.
     #
     # .EXAMPLE
     # $objIndexKeys = ConvertFrom-NulIndexRecordStream -Bytes ([byte[]](0x48,0x20,0x61,0x00))
@@ -2157,7 +2187,8 @@ function ConvertFrom-NulIndexRecordStream {
     # .EXAMPLE
     # ConvertFrom-NulIndexRecordStream -Bytes ([byte[]](0x68,0x20,0x61,0x00))
     #
-    # # Throws 'unsafe-index-state' for an assume-unchanged marker.
+    # # Throws 'unsafe-index-state' for an assume-unchanged marker when
+    # # AllowUnsafeFlags is not set.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
@@ -2182,7 +2213,9 @@ function ConvertFrom-NulIndexRecordStream {
     param (
         [Parameter(Mandatory = $true)]
         [AllowEmptyCollection()]
-        [byte[]]$Bytes
+        [byte[]]$Bytes,
+
+        [switch]$AllowUnsafeFlags
     )
 
     $objKeys = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
@@ -2201,7 +2234,7 @@ function ConvertFrom-NulIndexRecordStream {
         if ($intLength -lt 3 -or $Bytes[$intStart + 1] -ne 0x20) {
             throw 'malformed-index-records'
         }
-        if ($Bytes[$intStart] -ne 0x48) {
+        if (-not $AllowUnsafeFlags -and $Bytes[$intStart] -ne 0x48) {
             throw 'unsafe-index-state'
         }
         # Base64-encode the record slice in place with the offset/length overload
@@ -2695,7 +2728,9 @@ try {
     if ($intNativeExit -ne 0) {
         throw 'native-command'
     }
-    $objIndexKeys = ConvertFrom-NulIndexRecordStream -Bytes $hashtableIndexResult.Stdout
+    $objIndexKeys = ConvertFrom-NulIndexRecordStream `
+        -Bytes $hashtableIndexResult.Stdout `
+        -AllowUnsafeFlags:($Mode -eq 'Staged' -and -not $RequireCleanWorkingAgainstIndex)
 
     if ($RequireCleanWorkingAgainstIndex) {
         $strNativeCommand = 'working-index'
