@@ -55,6 +55,20 @@ $ErrorActionPreference = 'Stop'
 $script:strVerifierVersion = '1.0.20260814.0'
 $script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v2'
 $script:objUtf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
+# SHA-256 of the empty input, computed once. Get-TreeEvidence records this for every
+# zero-length regular file instead of allocating a fresh SHA256 instance and an empty
+# byte[] per file (the digest of empty content is constant). The instance ComputeHash
+# API is used because the static SHA256.HashData is .NET 5+ only and absent on the
+# supported Windows PowerShell 5.1 host.
+$script:strEmptyFileSha256 = & {
+    $objEmptyDigest = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        ([System.BitConverter]::ToString(
+            $objEmptyDigest.ComputeHash((New-Object byte[] 0)))).Replace('-', '').ToLowerInvariant()
+    } finally {
+        $objEmptyDigest.Dispose()
+    }
+}
 $script:objPathComparison = if ($env:OS -eq 'Windows_NT') {
     [System.StringComparison]::OrdinalIgnoreCase
 } else {
@@ -1219,12 +1233,7 @@ function Get-TreeEvidence {
                     throw 'worktree-limit'
                 }
                 $strFileDigest = if ($objFile.Length -eq 0) {
-                    $objEmptySha = [System.Security.Cryptography.SHA256]::Create()
-                    try {
-                        ([System.BitConverter]::ToString($objEmptySha.ComputeHash((New-Object byte[] 0)))).Replace('-', '').ToLowerInvariant()
-                    } finally {
-                        $objEmptySha.Dispose()
-                    }
+                    $script:strEmptyFileSha256
                 } else {
                     Get-FileSha256Hex -LiteralPath $strFullEntry
                 }
@@ -1934,6 +1943,41 @@ try {
     }
 
     if (($Mode -in @('Working', 'Both')) -or $RequireCleanWorkingAgainstIndex) {
+        # Before probing for an active filter driver, refuse a repository-local config
+        # that pulls in external files with include.path or includeIf. Git expands
+        # those includes when it resolves configuration, so an included file can add a
+        # filter.<driver>.clean or .process after the filter probe below observes none
+        # but before the working diff runs. That external file is outside every hashed
+        # control digest -- only .git/config itself is hashed, not the arbitrary paths
+        # it pulls in -- so the change would not be bracketed and the verifier could
+        # certify a stale path set. No -c override disables include expansion, and the
+        # resolved targets (with includeIf conditions and nested includes) cannot be
+        # enumerated and snapshotted portably, so refuse (fail closed) when any include
+        # directive is present. The probe runs in the same neutralized environment as
+        # the reads, so system and global includes are already excluded; a fresh
+        # checkout's local config has no include directive and never trips this.
+        $strNativeCommand = 'include-config'
+        $hashtableIncludeResult = Invoke-GitRaw `
+            -GitRecord $hashtableGitExecutable `
+            -WorkingDirectory $strRepositoryRoot `
+            -ArgumentList @('config', '-z', '--name-only', '--get-regexp', '^include(\.|if\.)')
+        $listNativeChecks.Add([ordered]@{
+            Name = $strNativeCommand
+            ExitCode = $hashtableIncludeResult.ExitCode
+            StdoutLength = $hashtableIncludeResult.Stdout.Length
+            StderrLength = $hashtableIncludeResult.StderrLength
+        })
+        $intNativeExit = $hashtableIncludeResult.ExitCode
+        # 'git config --get-regexp' exits 1 when no key matches (the hermetic case, no
+        # local include directive) and 0 when at least one include/includeIf key is
+        # present. Any match means an unbracketed external include could inject a
+        # filter after the filter probe, so refuse.
+        if ($intNativeExit -notin @(0, 1)) {
+            throw 'native-command'
+        }
+        if ($intNativeExit -eq 0) {
+            throw 'git-config-include-active'
+        }
         # A worktree-versus-index diff (the working and clean reads below) makes Git
         # run a clean or process filter driver for any path whose filter attribute
         # names a driver with a configured clean/process command. That driver is an
@@ -2215,6 +2259,7 @@ try {
         'worktree-link', 'worktree-limit', 'worktree-special-entry',
         'git-control-drift', 'worktree-drift',
         'evidence-unstable', 'git-filter-active', 'git-alternates-active',
+        'git-config-include-active',
         'native-command', 'native-output-limit', 'working-index-difference'
     )) {
         $strCategory = $_.Exception.Message
