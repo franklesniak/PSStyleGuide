@@ -1488,6 +1488,16 @@ function Get-TreeEvidence {
     # .PARAMETER ExcludedPath
     # Optional exact absolute entry to exclude without traversal.
     #
+    # .PARAMETER LinkCategory
+    # Category thrown for a reparse point. Defaults to 'worktree-link'.
+    #
+    # .PARAMETER SpecialEntryCategory
+    # Category thrown for a Unix FIFO/socket/device, or a non-Windows host that cannot
+    # report the entry type. Defaults to 'worktree-special-entry'.
+    #
+    # .PARAMETER LimitCategory
+    # Category thrown for the entry-count or byte ceilings. Defaults to 'worktree-limit'.
+    #
     # .EXAMPLE
     # $hashtableTree = Get-TreeEvidence -RootPath $strRepositoryRoot -ExcludedPath $strGitEntry
     #
@@ -1503,9 +1513,9 @@ function Get-TreeEvidence {
     #
     # .OUTPUTS
     # System.Collections.Specialized.OrderedDictionary. Contains Digest,
-    # EntryCount, FileCount, and ByteCount. Throws 'worktree-link' or
-    # 'worktree-limit' for refused state. Filesystem and hashing failures
-    # propagate.
+    # EntryCount, FileCount, and ByteCount. Throws LinkCategory,
+    # SpecialEntryCategory, or LimitCategory for refused state (worktree
+    # categories by default). Filesystem and hashing failures propagate.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
@@ -1519,12 +1529,25 @@ function Get-TreeEvidence {
     #
     #   Position 0: RootPath
     #   Position 1: ExcludedPath
+    #
+    # LinkCategory, SpecialEntryCategory, and LimitCategory are named and default to the
+    # worktree categories; a control-surface caller overrides them so a failing .git tree
+    # reports a control-surface category instead of a worktree one.
     param (
         [Parameter(Mandatory = $true)]
         [string]$RootPath,
 
         [AllowNull()]
-        [string]$ExcludedPath
+        [string]$ExcludedPath,
+
+        [ValidateNotNullOrEmpty()]
+        [string]$LinkCategory = 'worktree-link',
+
+        [ValidateNotNullOrEmpty()]
+        [string]$SpecialEntryCategory = 'worktree-special-entry',
+
+        [ValidateNotNullOrEmpty()]
+        [string]$LimitCategory = 'worktree-limit'
     )
 
     $strRoot = Assert-OrdinaryRepositoryRoot -LiteralPath $RootPath
@@ -1560,7 +1583,7 @@ function Get-TreeEvidence {
             }
             $objAttributes = [System.IO.File]::GetAttributes($strFullEntry)
             if (($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
-                throw 'worktree-link'
+                throw $LinkCategory
             }
             $strRelativePath = $strFullEntry.Substring($strRoot.Length).TrimStart(
                 [System.IO.Path]::DirectorySeparatorChar,
@@ -1588,10 +1611,10 @@ function Get-TreeEvidence {
                     if ($strUnixMode.Length -gt 0 -and ($strUnixMode[0] -eq 'p' -or
                         $strUnixMode[0] -eq 's' -or $strUnixMode[0] -eq 'b' -or
                         $strUnixMode[0] -eq 'c')) {
-                        throw 'worktree-special-entry'
+                        throw $SpecialEntryCategory
                     }
                 } elseif ($env:OS -ne 'Windows_NT') {
-                    throw 'worktree-special-entry'
+                    throw $SpecialEntryCategory
                 }
                 if ($objFile.Length -eq 0) {
                     $strFileDigest = $script:strEmptyFileSha256
@@ -1606,13 +1629,13 @@ function Get-TreeEvidence {
                     # so the promised bounded worktree-limit failure holds.
                     $longAggregateRemaining = 1073741824 - $longByteCount
                     if ($longAggregateRemaining -lt 1) {
-                        throw 'worktree-limit'
+                        throw $LimitCategory
                     }
                     $longFileCeiling = [System.Math]::Min([long]67108864, $longAggregateRemaining)
                     $hashtableFileDigest = Get-BoundedFileDigest `
                         -LiteralPath $strFullEntry `
                         -MaximumBytes $longFileCeiling `
-                        -LimitCategory 'worktree-limit'
+                        -LimitCategory $LimitCategory
                     $longByteCount += $hashtableFileDigest.ByteCount
                     $strFileDigest = $hashtableFileDigest.Digest
                 }
@@ -1620,7 +1643,7 @@ function Get-TreeEvidence {
                 $intFileCount++
             }
             if ($objMap.Count -gt 100000) {
-                throw 'worktree-limit'
+                throw $LimitCategory
             }
         }
     }
@@ -1845,6 +1868,16 @@ function Get-GitControlSurfaceEvidence {
         }
     }
 
+    # The .git control trees below (hooks, shared and per-worktree loose refs, and shared
+    # and per-worktree reftable) are hashed by the same shared Get-TreeEvidence walker as
+    # the worktree, so a reparse point, special file, or over-limit tree must fail closed as
+    # a control-surface category, not a worktree one. These are the same categories the
+    # bounded control-file checks above already raise.
+    $hashtableControlTreeCategory = @{
+        LinkCategory = 'invalid-git-control'
+        SpecialEntryCategory = 'invalid-git-control'
+        LimitCategory = 'git-control-limit'
+    }
     $intHookEntryCount = 0
     $longHookByteCount = 0L
     $arrHookSpecifications = @(
@@ -1855,7 +1888,8 @@ function Get-GitControlSurfaceEvidence {
         $strLabel = [string]$arrSpecification[0]
         $strPath = [System.IO.Path]::GetFullPath([string]$arrSpecification[1])
         if ([System.IO.Directory]::Exists($strPath)) {
-            $hashtableHooks = Get-TreeEvidence -RootPath $strPath -ExcludedPath $null
+            $hashtableHooks = Get-TreeEvidence -RootPath $strPath -ExcludedPath $null `
+                @hashtableControlTreeCategory
             $objComponents[$strLabel] = $hashtableHooks.Digest
             $intHookEntryCount += $hashtableHooks.EntryCount
             $longHookByteCount += $hashtableHooks.ByteCount
@@ -1875,7 +1909,8 @@ function Get-GitControlSurfaceEvidence {
         (Join-Path $AdministrativePathRecord.CommonDirectory 'refs'))
     if ([System.IO.Directory]::Exists($strLooseRefsPath)) {
         $objComponents['loose-refs'] = (
-            Get-TreeEvidence -RootPath $strLooseRefsPath -ExcludedPath $null).Digest
+            Get-TreeEvidence -RootPath $strLooseRefsPath -ExcludedPath $null `
+                @hashtableControlTreeCategory).Digest
     } elseif ([System.IO.File]::Exists($strLooseRefsPath)) {
         throw 'invalid-git-control'
     } else {
@@ -1896,7 +1931,8 @@ function Get-GitControlSurfaceEvidence {
         (Join-Path $AdministrativePathRecord.GitDirectory 'refs'))
     if ([System.IO.Directory]::Exists($strWorktreeRefsPath)) {
         $objComponents['worktree-loose-refs'] = (
-            Get-TreeEvidence -RootPath $strWorktreeRefsPath -ExcludedPath $null).Digest
+            Get-TreeEvidence -RootPath $strWorktreeRefsPath -ExcludedPath $null `
+                @hashtableControlTreeCategory).Digest
     } elseif ([System.IO.File]::Exists($strWorktreeRefsPath)) {
         throw 'invalid-git-control'
     } else {
@@ -1913,7 +1949,8 @@ function Get-GitControlSurfaceEvidence {
         (Join-Path $AdministrativePathRecord.CommonDirectory 'reftable'))
     if ([System.IO.Directory]::Exists($strCommonReftablePath)) {
         $objComponents['common-reftable'] = (
-            Get-TreeEvidence -RootPath $strCommonReftablePath -ExcludedPath $null).Digest
+            Get-TreeEvidence -RootPath $strCommonReftablePath -ExcludedPath $null `
+                @hashtableControlTreeCategory).Digest
     } elseif ([System.IO.File]::Exists($strCommonReftablePath)) {
         throw 'invalid-git-control'
     } else {
@@ -1923,7 +1960,8 @@ function Get-GitControlSurfaceEvidence {
         (Join-Path $AdministrativePathRecord.GitDirectory 'reftable'))
     if ([System.IO.Directory]::Exists($strWorktreeReftablePath)) {
         $objComponents['worktree-reftable'] = (
-            Get-TreeEvidence -RootPath $strWorktreeReftablePath -ExcludedPath $null).Digest
+            Get-TreeEvidence -RootPath $strWorktreeReftablePath -ExcludedPath $null `
+                @hashtableControlTreeCategory).Digest
     } elseif ([System.IO.File]::Exists($strWorktreeReftablePath)) {
         throw 'invalid-git-control'
     } else {
@@ -2255,6 +2293,11 @@ function Write-VerifierResult {
 
 $strCategory = 'tool-failure'
 $strNativeOutcome = 'NotApplicable'
+# NativeCommand and NativeExit describe the in-flight native command together: name the
+# command when it begins and clear its exit until the command returns and the exit is
+# captured. A command that throws before it returns -- an Invoke-GitRaw Process.Start
+# failure, the 4 MiB output limit, or the native-command timeout -- then leaves NativeExit
+# null in the result instead of the previous command's exit.
 $strNativeCommand = 'NotApplicable'
 $intNativeExit = $null
 $objExpectedKeys = $null
@@ -2311,6 +2354,7 @@ try {
         -AdministrativePathRecord $hashtableAdministrativePaths
 
     $strNativeCommand = 'repository-root'
+    $intNativeExit = $null
     $hashtableRootResult = Invoke-GitRaw `
         -GitRecord $hashtableGitExecutable `
         -WorkingDirectory $strRepositoryRoot `
@@ -2350,6 +2394,7 @@ try {
     # it, pointing include.path at a FIFO would make this very probe block forever on
     # the untrusted external source instead of returning git-config-include-active.
     $strNativeCommand = 'include-config'
+    $intNativeExit = $null
     $hashtableIncludeResult = Invoke-GitRaw `
         -GitRecord $hashtableGitExecutable `
         -WorkingDirectory $strRepositoryRoot `
@@ -2394,6 +2439,7 @@ try {
     # repository can explicitly set remote.<name>.promisor=false to disable an
     # inherited promisor, which must not be treated as an active promisor remote.
     $strNativeCommand = 'promisor-config'
+    $intNativeExit = $null
     $hashtablePromisorResult = Invoke-GitRaw `
         -GitRecord $hashtableGitExecutable `
         -WorkingDirectory $strRepositoryRoot `
@@ -2454,6 +2500,7 @@ try {
         # drivers are already excluded and never trip it; only a repository-local
         # clean or process driver refuses.
         $strNativeCommand = 'filter-config'
+        $intNativeExit = $null
         $hashtableFilterResult = Invoke-GitRaw `
             -GitRecord $hashtableGitExecutable `
             -WorkingDirectory $strRepositoryRoot `
@@ -2482,6 +2529,7 @@ try {
 
     if ($Mode -in @('Working', 'Both')) {
         $strNativeCommand = 'working'
+        $intNativeExit = $null
         $hashtableWorkingResult = Invoke-GitRaw `
             -GitRecord $hashtableGitExecutable `
             -WorkingDirectory $strRepositoryRoot `
@@ -2499,6 +2547,7 @@ try {
         $objWorkingKeys = ConvertFrom-NulPathRecordStream -Bytes $hashtableWorkingResult.Stdout
 
         $strNativeCommand = 'untracked'
+        $intNativeExit = $null
         $hashtableUntrackedResult = Invoke-GitRaw `
             -GitRecord $hashtableGitExecutable `
             -WorkingDirectory $strRepositoryRoot `
@@ -2582,6 +2631,7 @@ try {
             throw 'git-object-store-nonordinary'
         }
         $strNativeCommand = 'staged'
+        $intNativeExit = $null
         $hashtableStagedResult = Invoke-GitRaw `
             -GitRecord $hashtableGitExecutable `
             -WorkingDirectory $strRepositoryRoot `
@@ -2600,6 +2650,7 @@ try {
     }
 
     $strNativeCommand = 'index-flags'
+    $intNativeExit = $null
     $hashtableIndexResult = Invoke-GitRaw `
         -GitRecord $hashtableGitExecutable `
         -WorkingDirectory $strRepositoryRoot `
@@ -2618,6 +2669,7 @@ try {
 
     if ($RequireCleanWorkingAgainstIndex) {
         $strNativeCommand = 'working-index'
+        $intNativeExit = $null
         $hashtableCleanResult = Invoke-GitRaw `
             -GitRecord $hashtableGitExecutable `
             -WorkingDirectory $strRepositoryRoot `

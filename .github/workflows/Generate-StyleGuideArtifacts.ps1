@@ -1840,6 +1840,24 @@ function Write-StyleGuideArtifact {
         if ($hashtableRecord.OriginalState -eq 'Existing' -and
             $hashtableRecord.OriginalLength -eq $hashtableRecord.CandidateLength -and
             $hashtableRecord.OriginalSha256 -ceq $hashtableRecord.CandidateSha256) {
+            # Revalidate the destination immediately before returning NoChange, exactly as
+            # the publication path re-proves it before the rename. OriginalState, length,
+            # hash, and identity were captured earlier (see above); re-prove them against
+            # the file now so a destination modified or replaced after that capture fails
+            # closed instead of being reported NoChange on stale evidence. OriginalState is
+            # 'Existing' here (the NoChange condition requires it), so after the state check
+            # the identity/length/hash re-read applies directly.
+            $strPhase = 'revalidate-nochange'
+            if ((Get-OrdinaryDestinationState -LiteralPath $strDestinationPath) -cne $hashtableRecord.OriginalState) {
+                throw 'destination-state-drift'
+            }
+            [void](Assert-OrdinaryAbsolutePath -LiteralPath $strDestinationPath -ExpectedLeafType File)
+            if ((Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath) -cne
+                $hashtableRecord.OriginalOrdinaryIdentity -or
+                (New-Object System.IO.FileInfo($strDestinationPath)).Length -ne $hashtableRecord.OriginalLength -or
+                (Get-FileSha256Hex -LiteralPath $strDestinationPath) -cne $hashtableRecord.OriginalSha256) {
+                throw 'destination-content-drift'
+            }
             $hashtableRecord.FinalState = 'Existing'
             $hashtableRecord.FinalLength = $hashtableRecord.OriginalLength
             $hashtableRecord.FinalSha256 = $hashtableRecord.OriginalSha256
