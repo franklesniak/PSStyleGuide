@@ -82,7 +82,13 @@ $script:strEmptyFileSha256 = & {
         $objEmptyDigest.Dispose()
     }
 }
-$script:objPathComparison = if ($env:OS -eq 'Windows_NT') {
+# Decide the host platform from the runtime, not from $env:OS, which any caller can set. On a
+# Unix host that exports OS=Windows_NT, an $env:OS-based check would pick the Windows null
+# device (a relative 'NUL' that resolves to a repository file), case-insensitive path
+# comparison, and would skip the UnixMode-absent fail-closed guard. OSVersion.Platform is
+# Win32NT on Windows and Unix on Linux/macOS on both .NET Framework and .NET.
+$script:boolHostIsWindows = [System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT
+$script:objPathComparison = if ($script:boolHostIsWindows) {
     [System.StringComparison]::OrdinalIgnoreCase
 } else {
     [System.StringComparison]::Ordinal
@@ -541,7 +547,7 @@ function Assert-OrdinaryTreeUnder {
                         $strUnixMode[0] -eq 'c')) {
                         throw $LimitCategory
                     }
-                } elseif ($env:OS -ne 'Windows_NT') {
+                } elseif (-not $script:boolHostIsWindows) {
                     throw $LimitCategory
                 }
             }
@@ -630,7 +636,7 @@ function Assert-OrdinaryAbsoluteFile {
             $strUnixMode[0] -eq 'c')) {
             throw 'invalid-ordinary-file'
         }
-    } elseif ($env:OS -ne 'Windows_NT') {
+    } elseif (-not $script:boolHostIsWindows) {
         throw 'invalid-ordinary-file'
     }
     $objDirectory = $objFile.Directory
@@ -986,7 +992,7 @@ function Invoke-GitRaw {
     # sensitivity and still reports a staged gitlink (index-versus-HEAD) change even
     # when a local config or a tracked .gitmodules sets submodule.<name>.ignore=all,
     # which would otherwise suppress that staged gitlink change.
-    $strNullDevice = if ($env:OS -eq 'Windows_NT') { 'NUL' } else { '/dev/null' }
+    $strNullDevice = if ($script:boolHostIsWindows) { 'NUL' } else { '/dev/null' }
     $objChildEnvironment['GIT_CONFIG_GLOBAL'] = $strNullDevice
     $objChildEnvironment['GIT_OPTIONAL_LOCKS'] = '0'
     $objChildEnvironment['GIT_TERMINAL_PROMPT'] = '0'
@@ -1562,7 +1568,7 @@ function Get-TreeEvidence {
                         $strUnixMode[0] -eq 'c')) {
                         throw $SpecialEntryCategory
                     }
-                } elseif ($env:OS -ne 'Windows_NT') {
+                } elseif (-not $script:boolHostIsWindows) {
                     throw $SpecialEntryCategory
                 }
                 if ($objFile.Length -eq 0) {
