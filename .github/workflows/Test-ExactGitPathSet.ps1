@@ -590,7 +590,8 @@ function Assert-UnoccupiedControlSlot {
     #
     # .OUTPUTS
     # None. Throws Category when the slot is occupied by a dangling symlink or other
-    # non-resolving entry. Path and access failures propagate.
+    # non-resolving entry, or 'git-control-limit' when the bounded ancestor scan
+    # exceeds its entry ceiling. Path and access failures propagate.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
@@ -621,6 +622,7 @@ function Assert-UnoccupiedControlSlot {
     # readdir (EnumerateFileSystemEntries) lists such an entry regardless of whether
     # its target resolves. The walk terminates at the validated Git directory, which
     # exists, or at the filesystem root.
+    $longScanned = 0
     $strCurrent = $LiteralPath
     while ($true) {
         $strParent = [System.IO.Path]::GetDirectoryName($strCurrent)
@@ -630,6 +632,15 @@ function Assert-UnoccupiedControlSlot {
         if ([System.IO.Directory]::Exists($strParent)) {
             $strLeaf = [System.IO.Path]::GetFileName($strCurrent)
             foreach ($strEntry in [System.IO.Directory]::EnumerateFileSystemEntries($strParent)) {
+                # Bound the scan: a genuinely absent leaf under an ancestor holding a
+                # hostile or accidental number of entries would otherwise traverse the
+                # whole directory. Fail closed with git-control-limit past the same
+                # ceiling Assert-OrdinaryTreeUnder uses, rather than stall. The counter
+                # is cumulative across the ancestor walk.
+                $longScanned++
+                if ($longScanned -gt 5000000) {
+                    throw 'git-control-limit'
+                }
                 if ([string]::Equals([System.IO.Path]::GetFileName($strEntry), $strLeaf, $script:objPathComparison)) {
                     throw $Category
                 }
@@ -1077,6 +1088,14 @@ function Invoke-GitRaw {
     #     (for example a tracked 'a' and an untracked 'A') is never collapsed on a
     #     case-sensitive host whose local config left core.ignoreCase true, which
     #     would otherwise hide the extra path from the untracked and working reads;
+    #   - a host-independent core.symlinks=true, so an indexed symlink replaced by an
+    #     ordinary file holding the link text is seen as a mode change (a reported
+    #     path) rather than collapsed to an equal regular file by a local
+    #     core.symlinks=false, which would hide the working-read change;
+    #   - host-independent line-ending handling (core.autocrlf=false, core.eol=lf), so
+    #     a local core.autocrlf=true cannot normalize CRLF worktree bytes to a matching
+    #     LF blob and hide a working-read change, and no host-dependent native EOL
+    #     leaks into a text-attributed comparison;
     #   - strict stat validation (core.checkStat=default, core.trustctime=true), so
     #     a relaxed local setting cannot let a same-length content change with a
     #     restored mtime read as clean through Git's cached stat.
@@ -1101,6 +1120,9 @@ function Invoke-GitRaw {
         '-c', 'core.untrackedCache=false',
         '-c', 'core.filemode=false',
         '-c', 'core.ignoreCase=false',
+        '-c', 'core.symlinks=true',
+        '-c', 'core.autocrlf=false',
+        '-c', 'core.eol=lf',
         '-c', 'core.checkStat=default',
         '-c', 'core.trustctime=true',
         '-c', ('core.excludesFile=' + $strNullDevice),
@@ -2402,9 +2424,20 @@ try {
     $hashtableAdministrativePaths = Get-GitAdministrativePathRecord -RepositoryRoot $strRepositoryRoot
     $hashtableControlBefore = Get-GitControlSurfaceEvidence `
         -AdministrativePathRecord $hashtableAdministrativePaths
-    $hashtableWorktreeBefore = Get-TreeEvidence `
-        -RootPath $strRepositoryRoot `
-        -ExcludedPath $hashtableAdministrativePaths.GitEntry
+    # The staged read (git diff --cached) is index-versus-HEAD and never consumes the
+    # worktree, so a staged-only verification must not scan or bracket it: an ordinary
+    # tracked symlink, or any worktree state exceeding the tree walker's limits, would
+    # otherwise refuse (worktree-link/worktree-limit) a read that does not depend on it.
+    # Gather and bracket the worktree evidence only when a working-tree or clean-working
+    # read is requested.
+    $boolWorktreeReadRequested = ($Mode -in @('Working', 'Both')) -or $RequireCleanWorkingAgainstIndex
+    $hashtableWorktreeBefore = if ($boolWorktreeReadRequested) {
+        Get-TreeEvidence `
+            -RootPath $strRepositoryRoot `
+            -ExcludedPath $hashtableAdministrativePaths.GitEntry
+    } else {
+        $null
+    }
     # Atomic single-file bracket for every single-file control input the path-set
     # reads consume (index, HEAD, info/exclude, info/attributes, packed-refs, config,
     # commondir). Get-GitControlSurfaceEvidence hashes each as one component of a
@@ -2778,20 +2811,30 @@ try {
     $intConvergenceLimit = 8
     $intConvergenceCount = 0
     $boolConverged = $false
-    $hashtableWorktreeAfter = Get-TreeEvidence `
-        -RootPath $strRepositoryRoot `
-        -ExcludedPath $hashtableAdministrativePaths.GitEntry
+    $hashtableWorktreeAfter = if ($boolWorktreeReadRequested) {
+        Get-TreeEvidence `
+            -RootPath $strRepositoryRoot `
+            -ExcludedPath $hashtableAdministrativePaths.GitEntry
+    } else {
+        $null
+    }
     $hashtableControlAfter = Get-GitControlSurfaceEvidence `
         -AdministrativePathRecord $hashtableAdministrativePaths
     while ($intConvergenceCount -lt $intConvergenceLimit) {
         $intConvergenceCount++
-        $hashtableWorktreeConfirm = Get-TreeEvidence `
-            -RootPath $strRepositoryRoot `
-            -ExcludedPath $hashtableAdministrativePaths.GitEntry
+        $hashtableWorktreeConfirm = if ($boolWorktreeReadRequested) {
+            Get-TreeEvidence `
+                -RootPath $strRepositoryRoot `
+                -ExcludedPath $hashtableAdministrativePaths.GitEntry
+        } else {
+            $null
+        }
         $hashtableControlConfirm = Get-GitControlSurfaceEvidence `
             -AdministrativePathRecord $hashtableAdministrativePaths
+        $boolWorktreeStable = (-not $boolWorktreeReadRequested) -or
+            ($hashtableWorktreeConfirm.Digest -ceq $hashtableWorktreeAfter.Digest)
         if ($hashtableControlConfirm.Digest -ceq $hashtableControlAfter.Digest -and
-            $hashtableWorktreeConfirm.Digest -ceq $hashtableWorktreeAfter.Digest) {
+            $boolWorktreeStable) {
             $boolConverged = $true
             break
         }
@@ -2804,7 +2847,8 @@ try {
     if ($hashtableControlBefore.Digest -cne $hashtableControlAfter.Digest) {
         throw 'git-control-drift'
     }
-    if ($hashtableWorktreeBefore.Digest -cne $hashtableWorktreeAfter.Digest) {
+    if ($boolWorktreeReadRequested -and
+        $hashtableWorktreeBefore.Digest -cne $hashtableWorktreeAfter.Digest) {
         throw 'worktree-drift'
     }
     # Bracket the local object database around the path-set reads. Neither the worktree
