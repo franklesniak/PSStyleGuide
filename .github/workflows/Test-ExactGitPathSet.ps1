@@ -26,7 +26,7 @@ Optional exact absolute path of the Git executable. When omitted, the script
 uses the module-qualified application resolver once before any Git invocation.
 
 .NOTES
-Version: 1.0.20260814.0
+Version: 1.0.20260816.0
 #>
 
 [CmdletBinding()]
@@ -52,7 +52,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strVerifierVersion = '1.0.20260814.0'
+$script:strVerifierVersion = '1.0.20260816.0'
 $script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v2'
 # Wall-clock ceiling for any single native Git invocation (Invoke-GitRaw). The path-set
 # reads are sub-second metadata queries, so this 120-second default is orders of magnitude
@@ -1010,7 +1010,7 @@ function Invoke-GitRaw {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 1.0.20260816.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1101,7 +1101,13 @@ function Invoke-GitRaw {
     #     leaks into a text-attributed comparison;
     #   - strict stat validation (core.checkStat=default, core.trustctime=true), so
     #     a relaxed local setting cannot let a same-length content change with a
-    #     restored mtime read as clean through Git's cached stat.
+    #     restored mtime read as clean through Git's cached stat;
+    #   - no replacement-ref object substitution (core.useReplaceRefs=false), so a
+    #     pre-existing refs/replace/* ref cannot rewrite the objects a diff reads and
+    #     hide a worktree-versus-index or index-versus-HEAD difference. Working mode
+    #     disables reference evidence, so refs/replace/* is neither hashed nor
+    #     neutralized there without this override; disabling it in the fixed prefix
+    #     closes that fail-open channel for every mode.
     # info/exclude and info/attributes (repository-local, under the common Git
     # directory) remain covered by Get-GitControlSurfaceEvidence. Submodule
     # ignoring is set per command, never as a global config: --ignore-submodules=all
@@ -1128,6 +1134,7 @@ function Invoke-GitRaw {
         '-c', 'core.eol=lf',
         '-c', 'core.checkStat=default',
         '-c', 'core.trustctime=true',
+        '-c', 'core.useReplaceRefs=false',
         '-c', ('core.excludesFile=' + $strNullDevice),
         '-c', ('core.attributesFile=' + $strNullDevice),
         '-c', ('diff.orderFile=' + $strNullDevice)
@@ -1407,6 +1414,104 @@ function ConvertTo-IgnoredExclusionPath {
             continue
         }
         $listPaths.Add([System.IO.Path]::GetFullPath((Join-Path $strRoot $strRelative)))
+    }
+    return ,$listPaths.ToArray()
+}
+
+function ConvertTo-SubmoduleExclusionPath {
+    # .SYNOPSIS
+    # Decodes git ls-files --stage -z output to initialized-submodule worktree-walk exclusions.
+    #
+    # .DESCRIPTION
+    # Validates the NUL framing with ConvertFrom-NulPathRecordStream (so a malformed or
+    # over-limit stream fails closed), then parses each NUL-delimited staged record
+    # (`<mode> SP <object> SP <stage> TAB <path>`), keeps only the gitlink entries (mode
+    # 160000), decodes each path as strict UTF-8, and resolves it to an absolute full path
+    # under the repository root. A record that is not strict UTF-8, or is missing the tab
+    # separator, is skipped rather than decoded: it is then simply not excluded, so the
+    # worktree walk processes it and fails closed exactly as before -- the safe direction.
+    # Only a gitlink whose worktree path exists as a directory (an initialized submodule)
+    # is returned; an uninitialized gitlink has no populated directory for the walk to
+    # descend into. The result is only an exclusion hint for the worktree tree walk; a
+    # wrong or missing entry never widens the computed path set, it only refuses in its
+    # place. The gitlink object id itself stays covered by the git-index control component.
+    #
+    # .PARAMETER Bytes
+    # Complete raw output from `git ls-files -z --stage`.
+    #
+    # .PARAMETER RepositoryRoot
+    # Absolute repository root the relative gitlink entries resolve against.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.String[]. Absolute full paths of the initialized submodule roots.
+    # Record-framing, record-limit, and filesystem failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260816.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: Bytes
+    #   Position 1: RepositoryRoot
+    param (
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [byte[]]$Bytes,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RepositoryRoot
+    )
+
+    # Reuse the hardened NUL-framing and 100,000-record ceiling. Its base64 keys are not
+    # used here; the call fails closed on a malformed or oversized stream.
+    [void](ConvertFrom-NulPathRecordStream -Bytes $Bytes)
+    $listPaths = New-Object 'System.Collections.Generic.List[string]'
+    if ($Bytes.Length -eq 0) {
+        return ,$listPaths.ToArray()
+    }
+    $strRoot = [System.IO.Path]::GetFullPath($RepositoryRoot)
+    $intRecordStart = 0
+    for ($intIndex = 0; $intIndex -lt $Bytes.Length; $intIndex++) {
+        if ($Bytes[$intIndex] -ne 0) {
+            continue
+        }
+        $intLength = $intIndex - $intRecordStart
+        $intRecordStart = $intIndex + 1
+        $strRecord = $null
+        try {
+            $strRecord = $script:objUtf8Strict.GetString($Bytes, ($intIndex - $intLength), $intLength)
+        } catch {
+            $strRecord = $null
+        }
+        if ([string]::IsNullOrEmpty($strRecord)) {
+            continue
+        }
+        # `git ls-files --stage` emits `<mode> SP <object> SP <stage> TAB <path>`. Only a
+        # gitlink (mode 160000) is a submodule; ordinary files (100644/100755) and symlinks
+        # (120000) are not. Split the metadata before the single tab and read the mode.
+        $intTabIndex = $strRecord.IndexOf("`t")
+        if ($intTabIndex -lt 0) {
+            continue
+        }
+        $arrMetaField = $strRecord.Substring(0, $intTabIndex).Split(' ')
+        $strRelative = $strRecord.Substring($intTabIndex + 1)
+        if ($arrMetaField.Count -lt 1 -or $arrMetaField[0] -cne '160000' -or $strRelative.Length -eq 0) {
+            continue
+        }
+        # An initialized submodule is populated as an ordinary directory the walk would
+        # descend into; an uninitialized gitlink has no such directory, so nothing to skip.
+        $strAbsolute = [System.IO.Path]::GetFullPath((Join-Path $strRoot $strRelative))
+        if ([System.IO.Directory]::Exists($strAbsolute)) {
+            $listPaths.Add($strAbsolute)
+        }
     }
     return ,$listPaths.ToArray()
 }
@@ -1958,21 +2063,320 @@ function Get-GitAdministrativePathRecord {
     }
 }
 
+function Get-BoundedControlFileComponent {
+    # .SYNOPSIS
+    # Gets the framed evidence component for one single-file Git control input.
+    #
+    # .DESCRIPTION
+    # Returns 'length:digest' for an ordinary regular file (rejecting a non-ordinary
+    # entry and enforcing the 4 MiB component bound during the read), throws
+    # 'invalid-git-control' when a directory occupies the slot, and returns 'absent'
+    # for a genuinely empty slot (after Assert-UnoccupiedControlSlot refuses a dangling
+    # symlink or other non-resolving occupant). This is the File.Exists / Directory.Exists
+    # / unoccupied classification the control-evidence loops apply to every single-file
+    # input, factored out so the coupled split-index snapshot hashes GitDirectory/index
+    # with byte-identical semantics.
+    #
+    # .PARAMETER LiteralPath
+    # Absolute literal control-input path to classify and hash.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.String. 'length:digest' for an ordinary file or 'absent' for an empty slot.
+    # Throws 'invalid-git-control' for a directory or dangling-symlink slot and
+    # 'git-control-limit' above the 4 MiB bound. Filesystem, hashing, and
+    # parameter-binding failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260816.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: LiteralPath
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath
+    )
+
+    $strPath = [System.IO.Path]::GetFullPath($LiteralPath)
+    if ([System.IO.File]::Exists($strPath)) {
+        [void](Assert-OrdinaryAbsoluteFile -LiteralPath $strPath)
+        $objInfo = New-Object System.IO.FileInfo($strPath)
+        return ([string]$objInfo.Length + ':' +
+            (Get-BoundedFileDigest -LiteralPath $strPath -MaximumBytes 4194304 -LimitCategory 'git-control-limit').Digest)
+    } elseif ([System.IO.Directory]::Exists($strPath)) {
+        throw 'invalid-git-control'
+    } else {
+        Assert-UnoccupiedControlSlot -LiteralPath $strPath -Category 'invalid-git-control'
+        return 'absent'
+    }
+}
+
+function Resolve-ActiveSharedIndexRecord {
+    # .SYNOPSIS
+    # Resolves and validates the active split-index backing path for one snapshot read.
+    #
+    # .DESCRIPTION
+    # Runs `git rev-parse --shared-index-path` (which reports the single backing the
+    # current index references, or empty when the repository is not in split-index mode),
+    # records the native command, and fails closed on a non-zero exit. Decodes the output
+    # as strict UTF-8, removes one trailing newline, and treats empty output as the
+    # not-split identity 'absent'. A non-empty value is validated before any file access:
+    # it must hold no NUL and no interior newline, be at most 4096 characters, resolve
+    # (relative to the repository root, so a `..` prefix is canonicalized) to a path whose
+    # parent equals GitDirectory under ordinal case-sensitive comparison, carry the exact
+    # canonical basename `sharedindex.<40-or-64-lowercase-hex>` matched ordinal,
+    # case-sensitive, and culture-invariant, and be an ordinary regular file. The
+    # structural checks (NUL, interior newline, over-length, out-of-root/wrong-parent, and
+    # wrong-basename) throw 'invalid-git-control'; the ordinary-file check delegates to
+    # Assert-OrdinaryAbsoluteFile, which throws 'invalid-ordinary-file' for a directory,
+    # reparse point, or Unix special file, exactly as every other control-file check does.
+    # The absolute canonical path is used only to open the file; the returned identity is
+    # the host-symmetric validated basename.
+    #
+    # .PARAMETER GitRecord
+    # Fixed Git executable record with Path, Length, and Sha256 evidence.
+    #
+    # .PARAMETER WorkingDirectory
+    # Repository root assigned to the resolver process and used as the join base for its
+    # relative output.
+    #
+    # .PARAMETER GitDirectory
+    # Validated absolute per-worktree Git directory the backing file must sit directly in.
+    #
+    # .PARAMETER NativeCommandList
+    # Native-command accounting list that receives one 'shared-index-path' record.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Collections.Specialized.OrderedDictionary. Contains Identity (the validated
+    # basename, or 'absent' when not in split-index mode) and AbsolutePath (the canonical
+    # path to open, or $null when absent). Throws 'native-command' on a non-zero resolver
+    # exit, 'native-output-limit' on over-limit output, 'invalid-git-control' for a
+    # malformed, out-of-root, wrong-parent, or wrong-basename value, and
+    # 'invalid-ordinary-file' for a non-ordinary backing (via Assert-OrdinaryAbsoluteFile).
+    # Native, decoding, filesystem, and parameter-binding failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260816.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: GitRecord
+    #   Position 1: WorkingDirectory
+    #   Position 2: GitDirectory
+    #   Position 3: NativeCommandList
+    param (
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IDictionary]$GitRecord,
+
+        [Parameter(Mandatory = $true)]
+        [string]$WorkingDirectory,
+
+        [Parameter(Mandatory = $true)]
+        [string]$GitDirectory,
+
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IList]$NativeCommandList
+    )
+
+    # Track the in-flight native command in the script-scoped diagnostic fields, the same
+    # way the main body brackets every Invoke-GitRaw, so a resolver failure reports
+    # 'shared-index-path' rather than the previous command's name.
+    $script:strNativeCommand = 'shared-index-path'
+    $script:intNativeExit = $null
+    $hashtableResolveResult = Invoke-GitRaw `
+        -GitRecord $GitRecord `
+        -WorkingDirectory $WorkingDirectory `
+        -ArgumentList @('rev-parse', '--shared-index-path')
+    $NativeCommandList.Add([ordered]@{
+        Name = 'shared-index-path'
+        ExitCode = $hashtableResolveResult.ExitCode
+        StdoutLength = $hashtableResolveResult.Stdout.Length
+        StderrLength = $hashtableResolveResult.StderrLength
+    })
+    $script:intNativeExit = $hashtableResolveResult.ExitCode
+    if ($hashtableResolveResult.ExitCode -ne 0) {
+        throw 'native-command'
+    }
+    $strResolved = $script:objUtf8Strict.GetString($hashtableResolveResult.Stdout)
+    if ($strResolved.EndsWith("`n")) {
+        $strResolved = $strResolved.Substring(0, $strResolved.Length - 1)
+    }
+    if ($strResolved.Length -eq 0) {
+        # Empty output is the documented not-split-index result; no backing to hash.
+        return [ordered]@{ Identity = 'absent'; AbsolutePath = $null }
+    }
+    if ($strResolved.IndexOf([char]0) -ge 0 -or
+        $strResolved.IndexOf("`n") -ge 0 -or
+        $strResolved.IndexOf("`r") -ge 0 -or
+        $strResolved.Length -gt 4096) {
+        throw 'invalid-git-control'
+    }
+    # Output is relative to the caller (the repository root), so join it to the root and
+    # canonicalize; GetFullPath resolves a separate-git-dir `..` prefix.
+    $strCanonical = [System.IO.Path]::GetFullPath((Join-Path $WorkingDirectory $strResolved))
+    $strParent = [System.IO.Path]::GetDirectoryName($strCanonical)
+    $strName = [System.IO.Path]::GetFileName($strCanonical)
+    if ([string]::IsNullOrEmpty($strParent) -or $strParent -cne $GitDirectory) {
+        throw 'invalid-git-control'
+    }
+    # The literal `sharedindex.` then exactly 40 (SHA-1) or 64 (SHA-256) lowercase-hex
+    # object-name digits and nothing else, matched ordinal, case-sensitive, and
+    # culture-invariant, so uppercase hex, a wrong-length name, a non-hex character, an
+    # empty object name, a wrong prefix, or an extra suffix (for example `.lock`) all fail.
+    if (-not [regex]::IsMatch(
+        $strName,
+        '^sharedindex\.(?:[0-9a-f]{40}|[0-9a-f]{64})$',
+        [System.Text.RegularExpressions.RegexOptions]::CultureInvariant)) {
+        throw 'invalid-git-control'
+    }
+    [void](Assert-OrdinaryAbsoluteFile -LiteralPath $strCanonical)
+    return [ordered]@{ Identity = $strName; AbsolutePath = $strCanonical }
+}
+
+function Get-SplitIndexBracketedEvidence {
+    # .SYNOPSIS
+    # Gets an internally consistent snapshot coupling the index and its active split-index backing.
+    #
+    # .DESCRIPTION
+    # Split-index mode stores the bulk of the index entries in a single
+    # GitDirectory/sharedindex.<oid> file the index `link` extension names; rewriting the
+    # backing rewrites the index, so the two always change together and a chimera (index
+    # from one instant, backing from another) is not a valid state. This snapshot brackets
+    # the pair: it hashes GitDirectory/index (index-before), resolves and validates the
+    # active backing (path-before), hashes only that backing, resolves and validates the
+    # backing again (path-after), hashes GitDirectory/index again (index-after), and
+    # returns the coupled git-index and shared-index components only when index-before
+    # equals index-after AND the two backing identities are equal. A change at any internal
+    # seam breaks one of those equalities and throws 'git-control-drift', so no torn sample
+    # is returned and the stale, unreferenced sharedindex.* files an all-prefix directory
+    # scan would hash are never opened. Two resolver invocations run per snapshot.
+    #
+    # .PARAMETER AdministrativePathRecord
+    # Validated GitEntry, GitDirectory, and CommonDirectory path record.
+    #
+    # .PARAMETER GitRecord
+    # Fixed Git executable record used for the two backing resolutions.
+    #
+    # .PARAMETER WorkingDirectory
+    # Repository root assigned to the resolver process and used as the join base.
+    #
+    # .PARAMETER NativeCommandList
+    # Native-command accounting list that receives the two 'shared-index-path' records.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Collections.Specialized.OrderedDictionary. Contains the coupled 'git-index'
+    # and 'shared-index' component values. Throws 'git-control-drift' on an intra-snapshot
+    # index or backing-identity inequality; resolver, validation, hashing, and filesystem
+    # failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260816.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: AdministrativePathRecord
+    #   Position 1: GitRecord
+    #   Position 2: WorkingDirectory
+    #   Position 3: NativeCommandList
+    param (
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IDictionary]$AdministrativePathRecord,
+
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IDictionary]$GitRecord,
+
+        [Parameter(Mandatory = $true)]
+        [string]$WorkingDirectory,
+
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IList]$NativeCommandList
+    )
+
+    $strGitDirectory = [string]$AdministrativePathRecord.GitDirectory
+    $strIndexPath = Join-Path $strGitDirectory 'index'
+    # 1. index-before
+    $strIndexBefore = Get-BoundedControlFileComponent -LiteralPath $strIndexPath
+    # 2-3. path-before: resolve and validate the one backing the index references.
+    $objPathBefore = Resolve-ActiveSharedIndexRecord `
+        -GitRecord $GitRecord `
+        -WorkingDirectory $WorkingDirectory `
+        -GitDirectory $strGitDirectory `
+        -NativeCommandList $NativeCommandList
+    # 4. Hash only the validated backing (host-symmetric basename, plus length and content).
+    $strSharedIndex = 'absent'
+    if ($null -ne $objPathBefore.AbsolutePath) {
+        $objBackingInfo = New-Object System.IO.FileInfo($objPathBefore.AbsolutePath)
+        $strSharedIndex = ($objPathBefore.Identity + ':' + [string]$objBackingInfo.Length + ':' +
+            (Get-BoundedFileDigest -LiteralPath $objPathBefore.AbsolutePath `
+                -MaximumBytes 4194304 -LimitCategory 'git-control-limit').Digest)
+    }
+    # 5. path-after: resolve and validate the backing again, independently.
+    $objPathAfter = Resolve-ActiveSharedIndexRecord `
+        -GitRecord $GitRecord `
+        -WorkingDirectory $WorkingDirectory `
+        -GitDirectory $strGitDirectory `
+        -NativeCommandList $NativeCommandList
+    # 6. index-after
+    $strIndexAfter = Get-BoundedControlFileComponent -LiteralPath $strIndexPath
+    # 7. Contribute the coupled components only when the snapshot is internally consistent:
+    # a switch at any internal seam changes the index (its link extension) or the resolved
+    # backing identity, so an unequal pair means the control surface moved mid-sample.
+    if ($strIndexBefore -cne $strIndexAfter -or
+        $objPathBefore.Identity -cne $objPathAfter.Identity) {
+        throw 'git-control-drift'
+    }
+    return [ordered]@{
+        'git-index' = $strIndexBefore
+        'shared-index' = $strSharedIndex
+    }
+}
+
 function Get-GitControlSurfaceEvidence {
     # .SYNOPSIS
     # Gets bounded evidence for repository-local Git configuration and references.
     #
     # .DESCRIPTION
     # Hashes the .git pointer when present, the applicable local configuration
-    # files, the staging index, split-index backing files, info/exclude,
-    # info/attributes, the commondir pointer, and -- only when
-    # IncludeReferenceEvidence is set -- the reference inputs HEAD, packed-refs, the
-    # shared and per-worktree loose refs trees, and the shared and per-worktree
-    # reftable backend trees. Uses labeled components so absent and present state
-    # cannot collide. The refs trees exclude logs/ (reflogs), a sibling of refs/, so
-    # benign reflog churn raises no drift. Repository hooks are not hashed: no
-    # verifier command runs a hook and core.fsmonitor is disabled, so hook contents
-    # cannot change the computed path set.
+    # files, the staging index coupled with the active split-index backing, the
+    # commondir pointer, the objects/info/alternates pointer, and -- only when
+    # SampleWorktreeControlInput is set -- info/exclude and info/attributes, and --
+    # only when IncludeReferenceEvidence is set -- the reference inputs HEAD,
+    # packed-refs, the shared and per-worktree loose refs trees, and the shared and
+    # per-worktree reftable backend trees. The per-worktree configuration hashed is
+    # the active GitDirectory/config.worktree (the file Git reads for this worktree),
+    # not the main worktree's CommonDirectory/config.worktree. The index and its one
+    # active split-index backing are sampled together by Get-SplitIndexBracketedEvidence,
+    # which resolves the backing with `git rev-parse --shared-index-path` and brackets
+    # the pair so no stale, unreferenced sharedindex.* file is hashed. info/exclude and
+    # info/attributes drive only the worktree reads, so a staged-only verification omits
+    # them. Uses labeled components so absent and present state cannot collide. The refs
+    # trees exclude logs/ (reflogs), a sibling of refs/, so benign reflog churn raises no
+    # drift. Repository hooks are not hashed: no verifier command runs a hook and
+    # core.fsmonitor is disabled, so hook contents cannot change the computed path set.
     #
     # .PARAMETER AdministrativePathRecord
     # Validated GitEntry, GitDirectory, and CommonDirectory path record.
@@ -1982,8 +2386,24 @@ function Get-GitControlSurfaceEvidence {
     # packed-refs, and the loose/reftable trees. A working-only read consumes none of
     # them, so it passes $false and a concurrent ref update raises no git-control-drift.
     #
+    # .PARAMETER SampleWorktreeControlInput
+    # When set (a working, untracked, or clean read), also samples info/exclude and
+    # info/attributes. A staged-only read consumes neither, so it passes $false and a
+    # nonordinary or concurrently changed info/exclude or info/attributes raises no
+    # refusal or git-control-drift for a read that never opens it.
+    #
+    # .PARAMETER GitRecord
+    # Fixed Git executable record used to resolve the active split-index backing.
+    #
+    # .PARAMETER WorkingDirectory
+    # Repository root assigned to the split-index resolver and used as its join base.
+    #
+    # .PARAMETER NativeCommandList
+    # Native-command accounting list that receives the split-index resolver records.
+    #
     # .EXAMPLE
-    # $hashtableControl = Get-GitControlSurfaceEvidence -AdministrativePathRecord $hashtableGitPath
+    # $hashtableControl = Get-GitControlSurfaceEvidence -AdministrativePathRecord $hashtableGitPath `
+    #     -GitRecord $hashtableGit -WorkingDirectory $strRoot -NativeCommandList $listNativeChecks
     #
     # # Returns one digest and bounded component counts.
     #
@@ -1997,30 +2417,46 @@ function Get-GitControlSurfaceEvidence {
     #
     # .OUTPUTS
     # System.Collections.Specialized.OrderedDictionary. Contains Digest and
-    # ComponentCount. The Digest covers the staging index, info/exclude,
-    # info/attributes, the commondir pointer, and -- when IncludeReferenceEvidence is
-    # set -- HEAD, packed-refs, and the shared and per-worktree loose refs trees, so
-    # concurrent drift of any consumed path-set read input raises git-control-drift.
-    # Filesystem, ordinary path,
-    # size-bound, hashing, and parameter-binding failures propagate.
+    # ComponentCount. The Digest covers the staging index coupled with its active
+    # split-index backing, the commondir pointer, the objects/info/alternates pointer,
+    # and -- when SampleWorktreeControlInput is set -- info/exclude and info/attributes,
+    # and -- when IncludeReferenceEvidence is set -- HEAD, packed-refs, and the shared
+    # and per-worktree loose refs trees, so concurrent drift of any consumed path-set
+    # read input raises git-control-drift. Filesystem, ordinary path, size-bound,
+    # hashing, native, and parameter-binding failures propagate.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 1.0.20260816.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
     #
     #   Position 0: AdministrativePathRecord
     #   Position 1: IncludeReferenceEvidence
+    #   Position 2: SampleWorktreeControlInput
+    #   Position 3: GitRecord
+    #   Position 4: WorkingDirectory
+    #   Position 5: NativeCommandList
     param (
         [Parameter(Mandatory = $true)]
         [System.Collections.IDictionary]$AdministrativePathRecord,
 
-        [bool]$IncludeReferenceEvidence = $true
+        [bool]$IncludeReferenceEvidence = $true,
+
+        [bool]$SampleWorktreeControlInput = $true,
+
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IDictionary]$GitRecord,
+
+        [Parameter(Mandatory = $true)]
+        [string]$WorkingDirectory,
+
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IList]$NativeCommandList
     )
 
     $objComponents = New-Object 'System.Collections.Generic.SortedDictionary[string,string]' `
@@ -2036,28 +2472,34 @@ function Get-GitControlSurfaceEvidence {
     }
 
     # Local config, plus the single-file administrative inputs the path-set reads
-    # depend on but the worktree tree evidence excludes: the staging index
-    # (working/staged/index-flags reads), info/exclude (the untracked read's
-    # --exclude-standard set), info/attributes (repository-local Git attributes
-    # that can change the working read via content normalization), and the
-    # commondir pointer (which resolves the common Git directory for a linked
-    # worktree). HEAD and packed-refs are reference inputs: the staged read resolves
-    # HEAD against the index, but a working-only read (worktree-versus-index plus an
-    # index-reading ls-files) consumes neither, so they are appended only when
-    # IncludeReferenceEvidence is set (a Staged or Both read). The index and commondir
-    # pointer are per-worktree (GitDirectory); info/exclude, info/attributes, and
-    # packed-refs are shared (CommonDirectory).
+    # depend on but the worktree tree evidence excludes. The active per-worktree
+    # configuration is GitDirectory/config.worktree (worktree-config-worktree); the main
+    # worktree's CommonDirectory/config.worktree is not hashed, because Git reads only the
+    # active worktree's file (for the main worktree GitDirectory equals CommonDirectory,
+    # so the active file is still covered). info/exclude (the untracked read's
+    # --exclude-standard set) and info/attributes (repository-local Git attributes that
+    # change the working read via content normalization) drive only the worktree reads,
+    # so they are appended only when SampleWorktreeControlInput is set. HEAD and
+    # packed-refs are reference inputs the staged read resolves HEAD against the index,
+    # so they are appended only when IncludeReferenceEvidence is set. The commondir
+    # pointer is per-worktree (GitDirectory); info/exclude, info/attributes, and
+    # packed-refs are shared (CommonDirectory). The staging index is not listed here: it
+    # is hashed coupled with its active split-index backing by
+    # Get-SplitIndexBracketedEvidence below.
     $arrBoundedFileSpecifications = @(
         @('common-config', (Join-Path $AdministrativePathRecord.CommonDirectory 'config')),
-        @('common-config-worktree', (Join-Path $AdministrativePathRecord.CommonDirectory 'config.worktree')),
         @('worktree-config', (Join-Path $AdministrativePathRecord.GitDirectory 'config')),
         @('worktree-config-worktree', (Join-Path $AdministrativePathRecord.GitDirectory 'config.worktree')),
-        @('git-index', (Join-Path $AdministrativePathRecord.GitDirectory 'index')),
-        @('info-exclude', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'exclude')),
-        @('info-attributes', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'attributes')),
         @('commondir-pointer', (Join-Path $AdministrativePathRecord.GitDirectory 'commondir')),
         @('objects-info-alternates', (Join-Path (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'objects') 'info') 'alternates'))
-    ) + $(if ($IncludeReferenceEvidence) {
+    ) + $(if ($SampleWorktreeControlInput) {
+        @(
+            @('info-exclude', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'exclude')),
+            @('info-attributes', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'attributes'))
+        )
+    } else {
+        @()
+    }) + $(if ($IncludeReferenceEvidence) {
         @(
             @('git-head', (Join-Path $AdministrativePathRecord.GitDirectory 'HEAD')),
             @('packed-refs', (Join-Path $AdministrativePathRecord.CommonDirectory 'packed-refs'))
@@ -2066,19 +2508,8 @@ function Get-GitControlSurfaceEvidence {
         @()
     })
     foreach ($arrSpecification in $arrBoundedFileSpecifications) {
-        $strLabel = [string]$arrSpecification[0]
-        $strPath = [System.IO.Path]::GetFullPath([string]$arrSpecification[1])
-        if ([System.IO.File]::Exists($strPath)) {
-            [void](Assert-OrdinaryAbsoluteFile -LiteralPath $strPath)
-            $objInfo = New-Object System.IO.FileInfo($strPath)
-            $objComponents[$strLabel] = ([string]$objInfo.Length + ':' +
-                (Get-BoundedFileDigest -LiteralPath $strPath -MaximumBytes 4194304 -LimitCategory 'git-control-limit').Digest)
-        } elseif ([System.IO.Directory]::Exists($strPath)) {
-            throw 'invalid-git-control'
-        } else {
-            Assert-UnoccupiedControlSlot -LiteralPath $strPath -Category 'invalid-git-control'
-            $objComponents[$strLabel] = 'absent'
-        }
+        $objComponents[[string]$arrSpecification[0]] = Get-BoundedControlFileComponent `
+            -LiteralPath ([string]$arrSpecification[1])
     }
 
     # The .git reference trees below (shared and per-worktree loose refs, and shared
@@ -2172,53 +2603,22 @@ function Get-GitControlSurfaceEvidence {
         }
     }
 
-    # Split-index backing files: with core.splitIndex, GitDirectory/index is a small
-    # file whose link extension references the bulk of the entries in
-    # GitDirectory/sharedindex.<hash>. The git-index component and the direct index
-    # bracket cover only GitDirectory/index, so a change to a backing file would go
-    # unseen. Hash every top-level sharedindex.* file (ordinal-framed); without a
-    # split index there are none (absent). Enumerate lazily rather than with
-    # Directory.GetFiles, which would materialize every top-level pathname before the
-    # filter runs, so a GitDirectory holding a hostile or accidental number of entries
-    # could exhaust memory. Bound the scan by an incremental entry ceiling and bound
-    # the hashed set by an aggregate-byte ceiling in addition to the per-file limit, so
-    # this component keeps the verifier's bounded-evidence contract.
-    $objSharedIndex = New-Object 'System.Collections.Generic.SortedDictionary[string,string]' `
-        ([System.StringComparer]::Ordinal)
-    if ([System.IO.Directory]::Exists($AdministrativePathRecord.GitDirectory)) {
-        $intSharedIndexScanned = 0
-        $longSharedIndexBytes = 0
-        foreach ($strSharedIndexFile in [System.IO.Directory]::EnumerateFiles($AdministrativePathRecord.GitDirectory)) {
-            $intSharedIndexScanned++
-            if ($intSharedIndexScanned -gt 100000) {
-                throw 'git-control-limit'
-            }
-            $strSharedIndexName = [System.IO.Path]::GetFileName($strSharedIndexFile)
-            if (-not $strSharedIndexName.StartsWith('sharedindex.', [System.StringComparison]::Ordinal)) {
-                continue
-            }
-            $strSharedIndexFull = [System.IO.Path]::GetFullPath(
-                (Assert-OrdinaryAbsoluteFile -LiteralPath $strSharedIndexFile))
-            $objSharedIndexInfo = New-Object System.IO.FileInfo($strSharedIndexFull)
-            $longSharedIndexRemaining = 1073741824 - $longSharedIndexBytes
-            if ($longSharedIndexRemaining -lt 1) {
-                throw 'git-control-limit'
-            }
-            $longSharedIndexCeiling = [System.Math]::Min([long]4194304, $longSharedIndexRemaining)
-            $hashtableSharedIndexDigest = Get-BoundedFileDigest `
-                -LiteralPath $strSharedIndexFull `
-                -MaximumBytes $longSharedIndexCeiling `
-                -LimitCategory 'git-control-limit'
-            $longSharedIndexBytes += $hashtableSharedIndexDigest.ByteCount
-            $objSharedIndex[$strSharedIndexName] = ([string]$objSharedIndexInfo.Length + ':' +
-                $hashtableSharedIndexDigest.Digest)
-        }
-    }
-    if ($objSharedIndex.Count -eq 0) {
-        $objComponents['shared-index'] = 'absent'
-    } else {
-        $objComponents['shared-index'] = Get-FramedStringMapDigest -StringMap $objSharedIndex
-    }
+    # The staging index and its one active split-index backing are coupled: with
+    # core.splitIndex, GitDirectory/index is a small file whose link extension names
+    # exactly one GitDirectory/sharedindex.<oid>, and Git opens only that one. Sample the
+    # pair as one internally consistent snapshot (index-before, resolved-and-validated
+    # backing, index-after, with an intra-snapshot equality gate) rather than hashing
+    # every sharedindex.* file in the directory, so a stale, unreferenced backing left
+    # after a rewrite is neither hashed nor able to raise false drift, and the backing
+    # hashed is always the one Git reads. The two resolver invocations are recorded in
+    # NativeCommandList.
+    $objSplitIndex = Get-SplitIndexBracketedEvidence `
+        -AdministrativePathRecord $AdministrativePathRecord `
+        -GitRecord $GitRecord `
+        -WorkingDirectory $WorkingDirectory `
+        -NativeCommandList $NativeCommandList
+    $objComponents['git-index'] = $objSplitIndex['git-index']
+    $objComponents['shared-index'] = $objSplitIndex['shared-index']
     return [ordered]@{
         Digest = Get-FramedStringMapDigest -StringMap $objComponents
         ComponentCount = $objComponents.Count
@@ -2231,15 +2631,20 @@ function Get-PathSetControlInputDigest {
     #
     # .DESCRIPTION
     # Hashes only the single-file administrative inputs the working, untracked, and
-    # staged reads consume -- the staging index, info/exclude, info/attributes, the
-    # applicable config files, the commondir pointer, and -- only when
-    # IncludeReferenceEvidence is set -- the reference inputs HEAD and packed-refs,
-    # into one ordinal-framed digest. Each is a single file, so each hash is atomic.
-    # Taken before the reads and again as the verifier's final evidence action, the
-    # two digests bracket the read window with atomic reads, closing the
-    # final-traversal tail that the aggregate control digest leaves for these inputs.
-    # Tree-shaped control inputs (loose refs, reftable, split-index backing files) and
-    # the live worktree cannot be bracketed this way and keep the convergence guarantee.
+    # staged reads consume -- the applicable config files, the commondir pointer, the
+    # objects/info/alternates pointer, and -- only when SampleWorktreeControlInput is
+    # set -- info/exclude and info/attributes, and -- only when IncludeReferenceEvidence
+    # is set -- the reference inputs HEAD and packed-refs -- together with the staging
+    # index coupled to its one active split-index backing, into one ordinal-framed
+    # digest. The active per-worktree configuration is GitDirectory/config.worktree; the
+    # main worktree's CommonDirectory/config.worktree is not hashed. Each config/pointer
+    # input is a single file, so each hash is atomic; the index and its active backing
+    # are sampled together by Get-SplitIndexBracketedEvidence, whose intra-snapshot gate
+    # keeps the coupled component internally consistent. Taken before the reads and again
+    # as the verifier's final evidence action, the two digests bracket the read window,
+    # closing the final-traversal tail that the aggregate control digest leaves for these
+    # inputs. Tree-shaped control inputs (loose refs, reftable) and the live worktree
+    # cannot be bracketed this way and keep the convergence guarantee.
     #
     # .PARAMETER AdministrativePathRecord
     # Validated GitEntry, GitDirectory, and CommonDirectory path record.
@@ -2248,45 +2653,82 @@ function Get-PathSetControlInputDigest {
     # When set (a Staged or Both read), also brackets the reference inputs HEAD and
     # packed-refs. A working-only read consumes neither, so it passes $false.
     #
+    # .PARAMETER SampleWorktreeControlInput
+    # When set (a working, untracked, or clean read), also brackets info/exclude and
+    # info/attributes. A staged-only read consumes neither, so it passes $false.
+    #
+    # .PARAMETER GitRecord
+    # Fixed Git executable record used to resolve the active split-index backing.
+    #
+    # .PARAMETER WorkingDirectory
+    # Repository root assigned to the split-index resolver and used as its join base.
+    #
+    # .PARAMETER NativeCommandList
+    # Native-command accounting list that receives the split-index resolver records.
+    #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
-    # System.String. One framed digest over the single-file control inputs.
-    # Filesystem and hashing failures propagate.
+    # System.String. One framed digest over the single-file control inputs and the
+    # coupled index/split-index snapshot. Filesystem, hashing, native, and
+    # parameter-binding failures propagate.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 1.0.20260816.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
     #
     #   Position 0: AdministrativePathRecord
     #   Position 1: IncludeReferenceEvidence
+    #   Position 2: SampleWorktreeControlInput
+    #   Position 3: GitRecord
+    #   Position 4: WorkingDirectory
+    #   Position 5: NativeCommandList
     param (
         [Parameter(Mandatory = $true)]
         [System.Collections.IDictionary]$AdministrativePathRecord,
 
-        [bool]$IncludeReferenceEvidence = $true
+        [bool]$IncludeReferenceEvidence = $true,
+
+        [bool]$SampleWorktreeControlInput = $true,
+
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IDictionary]$GitRecord,
+
+        [Parameter(Mandatory = $true)]
+        [string]$WorkingDirectory,
+
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IList]$NativeCommandList
     )
 
     $objInputs = New-Object 'System.Collections.Generic.SortedDictionary[string,string]' `
         ([System.StringComparer]::Ordinal)
+    # The staging index is not listed here: it is bracketed coupled with its active
+    # split-index backing below. The active per-worktree config is
+    # worktree-config-worktree (GitDirectory/config.worktree); info/exclude and
+    # info/attributes are appended only for a worktree read, HEAD and packed-refs only
+    # for a staged read, exactly as in Get-GitControlSurfaceEvidence.
     $arrSingleFileInputs = @(
-        @('git-index', (Join-Path $AdministrativePathRecord.GitDirectory 'index')),
-        @('info-exclude', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'exclude')),
-        @('info-attributes', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'attributes')),
         @('common-config', (Join-Path $AdministrativePathRecord.CommonDirectory 'config')),
-        @('common-config-worktree', (Join-Path $AdministrativePathRecord.CommonDirectory 'config.worktree')),
         @('worktree-config', (Join-Path $AdministrativePathRecord.GitDirectory 'config')),
         @('worktree-config-worktree', (Join-Path $AdministrativePathRecord.GitDirectory 'config.worktree')),
         @('commondir-pointer', (Join-Path $AdministrativePathRecord.GitDirectory 'commondir')),
         @('objects-info-alternates', (Join-Path (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'objects') 'info') 'alternates'))
-    ) + $(if ($IncludeReferenceEvidence) {
+    ) + $(if ($SampleWorktreeControlInput) {
+        @(
+            @('info-exclude', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'exclude')),
+            @('info-attributes', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'attributes'))
+        )
+    } else {
+        @()
+    }) + $(if ($IncludeReferenceEvidence) {
         @(
             @('git-head', (Join-Path $AdministrativePathRecord.GitDirectory 'HEAD')),
             @('packed-refs', (Join-Path $AdministrativePathRecord.CommonDirectory 'packed-refs'))
@@ -2295,25 +2737,22 @@ function Get-PathSetControlInputDigest {
         @()
     })
     foreach ($arrSpecification in $arrSingleFileInputs) {
-        $strLabel = [string]$arrSpecification[0]
-        $strPath = [System.IO.Path]::GetFullPath([string]$arrSpecification[1])
-        if ([System.IO.File]::Exists($strPath)) {
-            # Mirror Get-GitControlSurfaceEvidence: reject a non-ordinary (reparse/
-            # symlink) file so a concurrently substituted link cannot read outside
-            # the repository, and enforce the same 4 MiB component bound during the
-            # read so a file that grows after its length is sampled cannot be hashed
-            # without bound.
-            [void](Assert-OrdinaryAbsoluteFile -LiteralPath $strPath)
-            $objInfo = New-Object System.IO.FileInfo($strPath)
-            $objInputs[$strLabel] = ([string]$objInfo.Length + ':' +
-                (Get-BoundedFileDigest -LiteralPath $strPath -MaximumBytes 4194304 -LimitCategory 'git-control-limit').Digest)
-        } elseif ([System.IO.Directory]::Exists($strPath)) {
-            throw 'invalid-git-control'
-        } else {
-            Assert-UnoccupiedControlSlot -LiteralPath $strPath -Category 'invalid-git-control'
-            $objInputs[$strLabel] = 'absent'
-        }
+        # Get-BoundedControlFileComponent rejects a non-ordinary (reparse/symlink) file so
+        # a concurrently substituted link cannot read outside the repository, and enforces
+        # the same 4 MiB component bound during the read so a file that grows after its
+        # length is sampled cannot be hashed without bound.
+        $objInputs[[string]$arrSpecification[0]] = Get-BoundedControlFileComponent `
+            -LiteralPath ([string]$arrSpecification[1])
     }
+    # Couple the staging index with its one active split-index backing, bracketed so no
+    # stale, unreferenced sharedindex.* file perturbs the digest.
+    $objSplitIndex = Get-SplitIndexBracketedEvidence `
+        -AdministrativePathRecord $AdministrativePathRecord `
+        -GitRecord $GitRecord `
+        -WorkingDirectory $WorkingDirectory `
+        -NativeCommandList $NativeCommandList
+    $objInputs['git-index'] = $objSplitIndex['git-index']
+    $objInputs['shared-index'] = $objSplitIndex['shared-index']
     return Get-FramedStringMapDigest -StringMap $objInputs
 }
 
@@ -2556,6 +2995,110 @@ try {
     $objExpectedKeys = New-ExpectedPathKeySet -PathList $ExpectedPath
     $hashtableGitExecutable = Get-GitExecutableRecord -RequestedPath $GitExecutablePath
     $hashtableAdministrativePaths = Get-GitAdministrativePathRecord -RepositoryRoot $strRepositoryRoot
+
+    # Refuse a repository-local include.path/includeIf BEFORE any in-repository Git
+    # command, so a FIFO or malformed include target can never block or error the first
+    # in-repo command (the ignored enumeration, the rev-parse boundary check, or the
+    # split-index resolver) before this refusal runs. Git expands include directives while
+    # it reads configuration during repository setup for every in-repo command, and
+    # --no-includes on a `git config` subcommand does NOT stop that setup-time expansion,
+    # so detect includes WITHOUT repository discovery: read each configuration file Git
+    # consults for this worktree through an empty, neutral Git directory
+    # (git --git-dir=<neutral> config --file <path> --no-includes ...), which reports the
+    # include key WITHOUT expanding (opening) its target. No -c override disables include
+    # expansion and the resolved targets cannot be enumerated and snapshotted portably, so
+    # refuse (fail closed) on any include directive, for every mode. System and global
+    # config are already excluded by the neutralized Invoke-GitRaw environment; a fresh
+    # checkout's local config has no includes.
+    $strNeutralGitDirectory = [System.IO.Path]::Combine(
+        [System.IO.Path]::GetTempPath(),
+        ('exactgitpathset-neutral-' + [System.Guid]::NewGuid().ToString('N')))
+    [void][System.IO.Directory]::CreateDirectory($strNeutralGitDirectory)
+    try {
+        $strCommonConfigPath = [System.IO.Path]::GetFullPath(
+            (Join-Path $hashtableAdministrativePaths.CommonDirectory 'config'))
+        # extensions.worktreeConfig lives in the common config and decides whether Git
+        # reads GitDirectory/config.worktree. Read it the same neutral way so
+        # config.worktree is checked for includes exactly when Git would consult it.
+        $boolWorktreeConfigEnabled = $false
+        if ([System.IO.File]::Exists($strCommonConfigPath)) {
+            $strNativeCommand = 'worktree-config-extension'
+            $intNativeExit = $null
+            $hashtableWorktreeConfigResult = Invoke-GitRaw `
+                -GitRecord $hashtableGitExecutable `
+                -WorkingDirectory $strNeutralGitDirectory `
+                -ArgumentList @(('--git-dir=' + $strNeutralGitDirectory), 'config', '--file', $strCommonConfigPath,
+                    '--no-includes', '--type=bool', '--get', 'extensions.worktreeConfig')
+            $listNativeChecks.Add([ordered]@{
+                Name = $strNativeCommand
+                ExitCode = $hashtableWorktreeConfigResult.ExitCode
+                StdoutLength = $hashtableWorktreeConfigResult.Stdout.Length
+                StderrLength = $hashtableWorktreeConfigResult.StderrLength
+            })
+            $intNativeExit = $hashtableWorktreeConfigResult.ExitCode
+            # Exit 0 with a boolean value means the extension is present; exit 1 means the
+            # key is absent (the common case). Any other exit is malformed and fails closed.
+            if ($intNativeExit -notin @(0, 1)) {
+                throw 'native-command'
+            }
+            if ($intNativeExit -eq 0) {
+                $boolWorktreeConfigEnabled = (
+                    $script:objUtf8Strict.GetString($hashtableWorktreeConfigResult.Stdout).Trim() -ceq 'true')
+            }
+        }
+        # The distinct configuration files Git reads for this worktree. GitDirectory/config
+        # equals CommonDirectory/config for the main worktree and is usually absent for a
+        # linked worktree; GitDirectory/config.worktree is read only when
+        # extensions.worktreeConfig is enabled. A duplicate full path is probed once.
+        $listConfigFilePath = New-Object 'System.Collections.Generic.List[string]'
+        foreach ($strCandidateConfigPath in @(
+            $strCommonConfigPath,
+            [System.IO.Path]::GetFullPath((Join-Path $hashtableAdministrativePaths.GitDirectory 'config'))
+        )) {
+            if ([System.IO.File]::Exists($strCandidateConfigPath) -and
+                -not $listConfigFilePath.Contains($strCandidateConfigPath)) {
+                $listConfigFilePath.Add($strCandidateConfigPath)
+            }
+        }
+        if ($boolWorktreeConfigEnabled) {
+            $strWorktreeConfigFilePath = [System.IO.Path]::GetFullPath(
+                (Join-Path $hashtableAdministrativePaths.GitDirectory 'config.worktree'))
+            if ([System.IO.File]::Exists($strWorktreeConfigFilePath) -and
+                -not $listConfigFilePath.Contains($strWorktreeConfigFilePath)) {
+                $listConfigFilePath.Add($strWorktreeConfigFilePath)
+            }
+        }
+        foreach ($strConfigFilePath in $listConfigFilePath) {
+            $strNativeCommand = 'include-config'
+            $intNativeExit = $null
+            $hashtableIncludeResult = Invoke-GitRaw `
+                -GitRecord $hashtableGitExecutable `
+                -WorkingDirectory $strNeutralGitDirectory `
+                -ArgumentList @(('--git-dir=' + $strNeutralGitDirectory), 'config', '--file', $strConfigFilePath,
+                    '--no-includes', '-z', '--name-only', '--get-regexp', '^include(\.|if\.)')
+            $listNativeChecks.Add([ordered]@{
+                Name = $strNativeCommand
+                ExitCode = $hashtableIncludeResult.ExitCode
+                StdoutLength = $hashtableIncludeResult.Stdout.Length
+                StderrLength = $hashtableIncludeResult.StderrLength
+            })
+            $intNativeExit = $hashtableIncludeResult.ExitCode
+            # 'git config --get-regexp' exits 1 when no key matches (the hermetic case) and
+            # 0 when an include/includeIf key is present. Any match means an unbracketed
+            # external include could inject a read-relevant setting, so refuse.
+            if ($intNativeExit -notin @(0, 1)) {
+                throw 'native-command'
+            }
+            if ($intNativeExit -eq 0) {
+                throw 'git-config-include-active'
+            }
+        }
+    } finally {
+        if ([System.IO.Directory]::Exists($strNeutralGitDirectory)) {
+            [System.IO.Directory]::Delete($strNeutralGitDirectory, $true)
+        }
+    }
+
     # The staged read (git diff --cached) is index-versus-HEAD and never consumes the
     # worktree, so a staged-only verification must not scan or bracket it: an ordinary
     # tracked symlink, or any worktree state exceeding the tree walker's limits, would
@@ -2599,14 +3142,53 @@ try {
         $arrIgnoredExcludedPath = ConvertTo-IgnoredExclusionPath `
             -Bytes $hashtableIgnoredResult.Stdout -RepositoryRoot $strRepositoryRoot
     }
+    # Enumerate the initialized submodule roots once, before the reads, so the worktree
+    # walk omits them. An initialized submodule is an ordinary subdirectory holding a
+    # nested repository; the parent's reads never consume its internals (the working and
+    # clean diffs pass --ignore-submodules=all and ls-files --others does not report
+    # gitlink content), so a symlink, special file, or over-limit content inside it would
+    # otherwise refuse an otherwise clean parent verification. The gitlink object id stays
+    # covered by the git-index control component, so excluding the worktree directory does
+    # not hide a staged gitlink change. Only a worktree read walks the tree, so a
+    # staged-only read skips this.
+    $arrSubmoduleExcludedPath = @()
+    if ($boolWorktreeReadRequested) {
+        $strNativeCommand = 'gitlinks'
+        $intNativeExit = $null
+        $hashtableGitlinkResult = Invoke-GitRaw `
+            -GitRecord $hashtableGitExecutable `
+            -WorkingDirectory $strRepositoryRoot `
+            -ArgumentList @('ls-files', '-z', '--stage', '--')
+        $listNativeChecks.Add([ordered]@{
+            Name = $strNativeCommand
+            ExitCode = $hashtableGitlinkResult.ExitCode
+            StdoutLength = $hashtableGitlinkResult.Stdout.Length
+            StderrLength = $hashtableGitlinkResult.StderrLength
+        })
+        $intNativeExit = $hashtableGitlinkResult.ExitCode
+        if ($intNativeExit -ne 0) {
+            throw 'native-command'
+        }
+        $arrSubmoduleExcludedPath = ConvertTo-SubmoduleExclusionPath `
+            -Bytes $hashtableGitlinkResult.Stdout -RepositoryRoot $strRepositoryRoot
+    }
+    # The identical exclusion set (gitignored top-level entries plus initialized submodule
+    # roots) is reused across the before/after/confirm walks so the drift comparison stays
+    # apples-to-apples; a tree created mid-window is absent from the set and the later walk
+    # fails closed, the safe direction.
+    $arrWorktreeExcludedPath = @($arrIgnoredExcludedPath) + @($arrSubmoduleExcludedPath)
     $hashtableControlBefore = Get-GitControlSurfaceEvidence `
         -AdministrativePathRecord $hashtableAdministrativePaths `
-        -IncludeReferenceEvidence $boolIncludeReferenceEvidence
+        -IncludeReferenceEvidence $boolIncludeReferenceEvidence `
+        -SampleWorktreeControlInput $boolWorktreeReadRequested `
+        -GitRecord $hashtableGitExecutable `
+        -WorkingDirectory $strRepositoryRoot `
+        -NativeCommandList $listNativeChecks
     $hashtableWorktreeBefore = if ($boolWorktreeReadRequested) {
         Get-TreeEvidence `
             -RootPath $strRepositoryRoot `
             -ExcludedPath $hashtableAdministrativePaths.GitEntry `
-            -AdditionalExcludedPath $arrIgnoredExcludedPath
+            -AdditionalExcludedPath $arrWorktreeExcludedPath
     } else {
         $null
     }
@@ -2630,7 +3212,11 @@ try {
     # against accidental drift the convergence is conclusive.
     $strControlInputDigestBefore = Get-PathSetControlInputDigest `
         -AdministrativePathRecord $hashtableAdministrativePaths `
-        -IncludeReferenceEvidence $boolIncludeReferenceEvidence
+        -IncludeReferenceEvidence $boolIncludeReferenceEvidence `
+        -SampleWorktreeControlInput $boolWorktreeReadRequested `
+        -GitRecord $hashtableGitExecutable `
+        -WorkingDirectory $strRepositoryRoot `
+        -NativeCommandList $listNativeChecks
 
     $strNativeCommand = 'repository-root'
     $intNativeExit = $null
@@ -2652,48 +3238,6 @@ try {
     if ([System.Convert]::ToBase64String($hashtableRootResult.Stdout) -cne
         [System.Convert]::ToBase64String($arrRootExpected)) {
         throw 'repository-boundary'
-    }
-
-    # Refuse a repository-local config that pulls in external files with include.path
-    # or includeIf, before any read and for every mode. Git expands those includes when
-    # it resolves configuration, and an included file -- outside every hashed control
-    # digest, since only .git/config itself is hashed, not the arbitrary paths it pulls
-    # in -- can add a read-relevant setting after a probe below observes none but before
-    # the read runs: a filter.<driver>.clean/.process that the working diff would run,
-    # or a remote.<name>.promisor that the staged diff would lazily fetch through. The
-    # refusal is unconditional (not scoped to the working reads) because a staged-only
-    # verification also expands includes and can be redirected to a promisor remote. No
-    # -c override disables include expansion, and the resolved targets (with includeIf
-    # conditions and nested includes) cannot be enumerated and snapshotted portably, so
-    # refuse (fail closed) when any include directive is present. The probe runs in the
-    # same neutralized environment as the reads, so system and global includes are
-    # already excluded; a fresh checkout's local config has none.
-    # --no-includes stops Git from expanding (and thus opening) the include target
-    # while it reports the include.path/includeIf key from the local config. Without
-    # it, pointing include.path at a FIFO would make this very probe block forever on
-    # the untrusted external source instead of returning git-config-include-active.
-    $strNativeCommand = 'include-config'
-    $intNativeExit = $null
-    $hashtableIncludeResult = Invoke-GitRaw `
-        -GitRecord $hashtableGitExecutable `
-        -WorkingDirectory $strRepositoryRoot `
-        -ArgumentList @('config', '--no-includes', '-z', '--name-only', '--get-regexp', '^include(\.|if\.)')
-    $listNativeChecks.Add([ordered]@{
-        Name = $strNativeCommand
-        ExitCode = $hashtableIncludeResult.ExitCode
-        StdoutLength = $hashtableIncludeResult.Stdout.Length
-        StderrLength = $hashtableIncludeResult.StderrLength
-    })
-    $intNativeExit = $hashtableIncludeResult.ExitCode
-    # 'git config --get-regexp' exits 1 when no key matches (the hermetic case, no local
-    # include directive) and 0 when at least one include/includeIf key is present. Any
-    # match means an unbracketed external include could inject a read-relevant setting,
-    # so refuse.
-    if ($intNativeExit -notin @(0, 1)) {
-        throw 'native-command'
-    }
-    if ($intNativeExit -eq 0) {
-        throw 'git-config-include-active'
     }
 
     # Refuse a partial clone / promisor remote before any read. A partial clone marks
@@ -2988,26 +3532,34 @@ try {
         Get-TreeEvidence `
             -RootPath $strRepositoryRoot `
             -ExcludedPath $hashtableAdministrativePaths.GitEntry `
-            -AdditionalExcludedPath $arrIgnoredExcludedPath
+            -AdditionalExcludedPath $arrWorktreeExcludedPath
     } else {
         $null
     }
     $hashtableControlAfter = Get-GitControlSurfaceEvidence `
         -AdministrativePathRecord $hashtableAdministrativePaths `
-        -IncludeReferenceEvidence $boolIncludeReferenceEvidence
+        -IncludeReferenceEvidence $boolIncludeReferenceEvidence `
+        -SampleWorktreeControlInput $boolWorktreeReadRequested `
+        -GitRecord $hashtableGitExecutable `
+        -WorkingDirectory $strRepositoryRoot `
+        -NativeCommandList $listNativeChecks
     while ($intConvergenceCount -lt $intConvergenceLimit) {
         $intConvergenceCount++
         $hashtableWorktreeConfirm = if ($boolWorktreeReadRequested) {
             Get-TreeEvidence `
                 -RootPath $strRepositoryRoot `
                 -ExcludedPath $hashtableAdministrativePaths.GitEntry `
-                -AdditionalExcludedPath $arrIgnoredExcludedPath
+                -AdditionalExcludedPath $arrWorktreeExcludedPath
         } else {
             $null
         }
         $hashtableControlConfirm = Get-GitControlSurfaceEvidence `
             -AdministrativePathRecord $hashtableAdministrativePaths `
-            -IncludeReferenceEvidence $boolIncludeReferenceEvidence
+            -IncludeReferenceEvidence $boolIncludeReferenceEvidence `
+            -SampleWorktreeControlInput $boolWorktreeReadRequested `
+            -GitRecord $hashtableGitExecutable `
+            -WorkingDirectory $strRepositoryRoot `
+            -NativeCommandList $listNativeChecks
         $boolWorktreeStable = (-not $boolWorktreeReadRequested) -or
             ($hashtableWorktreeConfirm.Digest -ceq $hashtableWorktreeAfter.Digest)
         if ($hashtableControlConfirm.Digest -ceq $hashtableControlAfter.Digest -and
@@ -3108,7 +3660,11 @@ try {
     # inputs and the live worktree keep the convergence guarantee only.
     $strControlInputDigestFinal = Get-PathSetControlInputDigest `
         -AdministrativePathRecord $hashtableAdministrativePaths `
-        -IncludeReferenceEvidence $boolIncludeReferenceEvidence
+        -IncludeReferenceEvidence $boolIncludeReferenceEvidence `
+        -SampleWorktreeControlInput $boolWorktreeReadRequested `
+        -GitRecord $hashtableGitExecutable `
+        -WorkingDirectory $strRepositoryRoot `
+        -NativeCommandList $listNativeChecks
     if ($strControlInputDigestBefore -cne $strControlInputDigestFinal) {
         throw 'git-control-drift'
     }
