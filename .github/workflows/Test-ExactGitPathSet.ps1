@@ -1078,9 +1078,12 @@ function Invoke-GitRaw {
     # highest git config precedence, so they hold regardless of any value a local
     # config file -- or a file it pulls in with include.path/includeIf -- sets:
     #   - no system or global config;
-    #   - no external excludes file (the untracked read's core.excludesFile) and no
-    #     external attributes file (core.attributesFile), each of which may point
-    #     outside the repository;
+    #   - no external excludes file (the untracked read's core.excludesFile), no
+    #     external attributes file (core.attributesFile), and no diff order file
+    #     (diff.orderFile), each of which may point outside the repository; a
+    #     diff.orderFile set to a FIFO or other blocking path would otherwise make
+    #     every diff read open it and hang to the native-command timeout, and its
+    #     ordering is discarded by the HashSet parser regardless;
     #   - a host-independent core.filemode, so a tracked file's executable bit
     #     cannot make the working and staged reads differ between Windows (filemode
     #     false) and Linux (filemode true);
@@ -1126,7 +1129,8 @@ function Invoke-GitRaw {
         '-c', 'core.checkStat=default',
         '-c', 'core.trustctime=true',
         '-c', ('core.excludesFile=' + $strNullDevice),
-        '-c', ('core.attributesFile=' + $strNullDevice)
+        '-c', ('core.attributesFile=' + $strNullDevice),
+        '-c', ('diff.orderFile=' + $strNullDevice)
     ) + $ArgumentList
     if ($null -ne $objStartInfo.PSObject.Properties['ArgumentList']) {
         foreach ($strArgument in $arrFixedArguments) {
