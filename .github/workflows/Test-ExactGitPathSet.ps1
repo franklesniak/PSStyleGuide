@@ -54,6 +54,14 @@ $ErrorActionPreference = 'Stop'
 
 $script:strVerifierVersion = '1.0.20260814.0'
 $script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v2'
+# Wall-clock ceiling for any single native Git invocation (Invoke-GitRaw). The path-set
+# reads are sub-second metadata queries, so this 120-second default is orders of magnitude
+# above any legitimate run yet converts an otherwise unbounded hang -- for example a
+# 'git diff --cached' wedged opening a FIFO substituted into the object store between the
+# pre-read scan (Assert-OrdinaryTreeUnder) and the read -- into a prompt, fail-closed
+# native-command-timeout. Invoke-GitRaw exposes a per-call override so a test can drive a
+# short bound; nothing in normal operation lowers it.
+$script:intNativeCommandTimeoutMilliseconds = 120000
 $script:objUtf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
 # SHA-256 of the empty input, computed once. Get-TreeEvidence records this for every
 # zero-length regular file instead of allocating a fresh SHA256 instance and an empty
@@ -844,6 +852,61 @@ function ConvertTo-NativeArgumentString {
     return $listQuoted.ToArray() -join ' '
 }
 
+function Stop-NativeProcessTree {
+    # .SYNOPSIS
+    # Terminates a native child process and its descendants on every supported host.
+    #
+    # .DESCRIPTION
+    # Kills the process and its child tree, falling back to a single-process kill on a
+    # host that lacks the tree-kill overload. Process.Kill([bool] entireProcessTree) is
+    # .NET Core 3.0+ only; the supported Windows PowerShell 5.1 (.NET Framework) host does
+    # not expose it, so calling Kill($true) there would raise a MethodException. Probe for
+    # the overload and fall back to the parameterless Kill(), which every supported runtime
+    # exposes, so a bound is always enforced. A kill failure -- the child already exited, or
+    # a race -- is swallowed: termination is best-effort and the caller fails closed anyway.
+    #
+    # .PARAMETER Process
+    # Started native process whose tree must be terminated.
+    #
+    # .EXAMPLE
+    # Stop-NativeProcessTree -Process $objProcess
+    #
+    # # Terminates the process tree, or the single process on a host without the overload.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # None. Kill failures are swallowed; parameter-binding failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260816.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: Process
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseShouldProcessForStateChangingFunctions',
+        '',
+        Justification = 'Private best-effort terminator on a fail-closed cleanup path (output-limit or timeout); -WhatIf/-Confirm must never skip or prompt a resource-bound kill, so ShouldProcess does not apply.'
+    )]
+    param (
+        [Parameter(Mandatory = $true)]
+        [System.Diagnostics.Process]$Process
+    )
+
+    if ($null -ne $Process.GetType().GetMethod('Kill', [type[]]@([bool]))) {
+        try { $Process.Kill($true) } catch { $null = $_ }
+    } else {
+        try { $Process.Kill() } catch { $null = $_ }
+    }
+}
+
 function Invoke-GitRaw {
     # .SYNOPSIS
     # Invokes Git and captures its standard streams as raw bytes.
@@ -854,6 +917,9 @@ function Invoke-GitRaw {
     # fixed noninteractive configuration controls. Supplies arguments through
     # ArgumentList when available or compatible quoting otherwise. Closes input,
     # drains both output streams concurrently, and limits each stream to 4 MiB.
+    # Bounds the whole drain-and-exit wait by TimeoutMilliseconds, so a command
+    # that neither writes nor exits cannot hang the verifier: the child tree is
+    # terminated and 'native-command-timeout' is thrown.
     #
     # .PARAMETER GitRecord
     # Fixed Git executable record with Path, Length, and Sha256 evidence.
@@ -863,6 +929,10 @@ function Invoke-GitRaw {
     #
     # .PARAMETER ArgumentList
     # Ordered Git arguments passed without shell interpretation.
+    #
+    # .PARAMETER TimeoutMilliseconds
+    # Wall-clock ceiling for the drain-and-exit wait. Defaults to the script native-command
+    # timeout. On expiry the child tree is terminated and 'native-command-timeout' is thrown.
     #
     # .EXAMPLE
     # $hashtableResult = Invoke-GitRaw -GitRecord $hashtableGit -WorkingDirectory $strRoot -ArgumentList @('status', '--porcelain=v1', '-z')
@@ -881,9 +951,10 @@ function Invoke-GitRaw {
     # .OUTPUTS
     # System.Collections.Specialized.OrderedDictionary. Contains System.Int32
     # ExitCode, System.Byte[] Stdout, and System.Int32 StderrLength. Throws
-    # 'native-command' when Process.Start returns false and 'native-output-limit'
-    # for oversized output; parameter-binding, process, task, and I/O failures
-    # propagate.
+    # 'native-command' when Process.Start returns false, 'native-output-limit'
+    # for oversized output, and 'native-command-timeout' when the drain-and-exit
+    # wait exceeds TimeoutMilliseconds; parameter-binding, process, task, and I/O
+    # failures propagate.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
@@ -898,6 +969,7 @@ function Invoke-GitRaw {
     #   Position 0: GitRecord
     #   Position 1: WorkingDirectory
     #   Position 2: ArgumentList
+    #   Position 3: TimeoutMilliseconds (optional; defaults to the script native-command timeout)
     param (
         [Parameter(Mandatory = $true)]
         [System.Collections.IDictionary]$GitRecord,
@@ -906,7 +978,10 @@ function Invoke-GitRaw {
         [string]$WorkingDirectory,
 
         [Parameter(Mandatory = $true)]
-        [string[]]$ArgumentList
+        [string[]]$ArgumentList,
+
+        [ValidateRange(1, [int]::MaxValue)]
+        [int]$TimeoutMilliseconds = $script:intNativeCommandTimeoutMilliseconds
     )
 
     $strGitPath = Assert-OrdinaryAbsoluteFile -LiteralPath ([string]$GitRecord.Path)
@@ -1015,11 +1090,29 @@ function Invoke-GitRaw {
         $objStderrRead = $objStderrStream.ReadAsync($arrStderrChunk, 0, $intChunkSize)
         $boolStdoutDone = $false
         $boolStderrDone = $false
+        # Bound the drain by wall-clock time. A native command that neither writes nor
+        # exits -- for example a 'git diff --cached' wedged opening a FIFO substituted into
+        # the object store after the pre-read scan (Assert-OrdinaryTreeUnder) but before
+        # this read -- leaves both reads outstanding forever, so an unbounded WaitAny would
+        # block here and no closing evidence check would ever run. WaitAny with the
+        # remaining budget converts that indefinite hang into a prompt, fail-closed
+        # native-command-timeout: terminate the child tree and throw. This is a liveness
+        # backstop, not an atomicity guarantee -- it does not fuse the scan and the read
+        # into one operation; it bounds the time any single native command may run.
+        $objDrainStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
         while (-not ($boolStdoutDone -and $boolStderrDone)) {
+            $intRemainingMilliseconds = $TimeoutMilliseconds - [int]$objDrainStopwatch.ElapsedMilliseconds
+            if ($intRemainingMilliseconds -le 0) {
+                Stop-NativeProcessTree -Process $objProcess
+                throw 'native-command-timeout'
+            }
             $listPendingReads = New-Object 'System.Collections.Generic.List[System.Threading.Tasks.Task]'
             if (-not $boolStdoutDone) { $listPendingReads.Add($objStdoutRead) }
             if (-not $boolStderrDone) { $listPendingReads.Add($objStderrRead) }
-            [void][System.Threading.Tasks.Task]::WaitAny($listPendingReads.ToArray())
+            if ([System.Threading.Tasks.Task]::WaitAny($listPendingReads.ToArray(), $intRemainingMilliseconds) -lt 0) {
+                Stop-NativeProcessTree -Process $objProcess
+                throw 'native-command-timeout'
+            }
             if (-not $boolStdoutDone -and $objStdoutRead.IsCompleted) {
                 $intReadCount = $objStdoutRead.GetAwaiter().GetResult()
                 if ($intReadCount -le 0) {
@@ -1039,22 +1132,22 @@ function Invoke-GitRaw {
                 }
             }
             if ($objStdout.Length -gt 4194304 -or $objStderr.Length -gt 4194304) {
-                # Process.Kill(bool entireProcessTree) is .NET Core 3.0+ only; on the
-                # supported Windows PowerShell 5.1 (.NET Framework) host that overload
-                # is absent, so Kill($true) would raise a MethodException that this
-                # catch would silently discard, leaving the oversized child running
-                # (Dispose() in finally does not terminate it). Probe for the tree-kill
-                # overload and fall back to the parameterless Kill(), which every
-                # supported runtime exposes, so the resource bound is always enforced.
-                if ($null -ne $objProcess.GetType().GetMethod('Kill', [type[]]@([bool]))) {
-                    try { $objProcess.Kill($true) } catch { $null = $_ }
-                } else {
-                    try { $objProcess.Kill() } catch { $null = $_ }
-                }
+                # Terminate the oversized child (and its tree) so the resource bound is
+                # always enforced; Dispose() in finally does not terminate it.
+                Stop-NativeProcessTree -Process $objProcess
                 throw 'native-output-limit'
             }
         }
-        $objProcess.WaitForExit()
+        # Both streams reached EOF, so the child is exiting; still bound the exit wait by
+        # the remaining budget (floored so a child that just closed its streams gets a
+        # moment to finalize) rather than waiting unbounded on a pathological child that
+        # closes its pipes but never exits.
+        $intExitWaitMilliseconds = $TimeoutMilliseconds - [int]$objDrainStopwatch.ElapsedMilliseconds
+        if ($intExitWaitMilliseconds -lt 1000) { $intExitWaitMilliseconds = 1000 }
+        if (-not $objProcess.WaitForExit($intExitWaitMilliseconds)) {
+            Stop-NativeProcessTree -Process $objProcess
+            throw 'native-command-timeout'
+        }
         $intExitCode = $objProcess.ExitCode
         # Each sink is bounded to at most 4 MiB by the loop above, so these arrays are
         # never larger than that bound.
@@ -2469,7 +2562,14 @@ try {
         # its later removal or redirection would not trip git-control-drift; validate it
         # here and refuse a reparse or non-directory object root, and any reparse point
         # or non-regular Unix entry beneath it, before the staged read. An ordinary
-        # clone has a plain objects tree of ordinary files and is unaffected.
+        # clone has a plain objects tree of ordinary files and is unaffected. This is a
+        # one-time pre-read scan, so a special file substituted into the objects tree
+        # after it but before the staged read cannot be caught here, and -- unlike the
+        # alternates file -- the objects tree is not a hashed control input, so that later
+        # change does not trip git-control-drift; it would instead block git diff --cached
+        # opening it. The Invoke-GitRaw native-command timeout bounds that residual window,
+        # converting the hang into a fail-closed native-command-timeout rather than an
+        # unbounded wait.
         $strObjectsPath = [System.IO.Path]::GetFullPath(
             (Join-Path $hashtableAdministrativePaths.CommonDirectory 'objects'))
         if ([System.IO.Directory]::Exists($strObjectsPath)) {
@@ -2655,13 +2755,14 @@ try {
         'git-control-drift', 'worktree-drift',
         'evidence-unstable', 'git-filter-active', 'git-alternates-active',
         'git-config-include-active', 'git-promisor-remote', 'git-object-store-nonordinary',
-        'native-command', 'native-output-limit', 'working-index-difference'
+        'native-command', 'native-output-limit', 'native-command-timeout',
+        'working-index-difference'
     )) {
         $strCategory = $_.Exception.Message
     }
     if ($strCategory -in @('malformed-records', 'malformed-index-records')) {
         $intExitCode = 3
-    } elseif ($strCategory -in @('native-command', 'native-output-limit')) {
+    } elseif ($strCategory -in @('native-command', 'native-output-limit', 'native-command-timeout')) {
         $intExitCode = 4
     } elseif ($strCategory -eq 'working-index-difference') {
         $intExitCode = 2
