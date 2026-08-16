@@ -1674,9 +1674,12 @@ function Get-TreeEvidence {
     # # Returns bounded worktree digest and count evidence without reading .git.
     #
     # .EXAMPLE
-    # $hashtableHooks = Get-TreeEvidence -RootPath $strHooksPath -ExcludedPath $null
+    # $strRefsDigest = (Get-TreeEvidence -RootPath $strLooseRefsPath -ExcludedPath $null `
+    #     -LinkCategory 'invalid-git-control' -SpecialEntryCategory 'invalid-git-control' `
+    #     -LimitCategory 'git-control-limit').Digest
     #
-    # # Returns bounded evidence for all ordinary hook entries.
+    # # Returns a bounded digest for a .git reference tree, refusing a reparse point,
+    # # special file, or over-limit tree as a control-surface category.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
@@ -1987,7 +1990,7 @@ function Get-GitControlSurfaceEvidence {
     # .EXAMPLE
     # Get-GitControlSurfaceEvidence -AdministrativePathRecord $hashtableLinkedControl
     #
-    # # Throws when a configuration or hook entry is not ordinary.
+    # # Throws when a configuration entry is not ordinary.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
@@ -2618,7 +2621,7 @@ try {
     # the reads with atomic reads: a change across them raises git-control-drift.
     # This bracket, like every evidence pass, is itself a sequential read, so a
     # single-file input changed after its own hash but before the pass completes --
-    # and any change to a tree-shaped input (loose refs, hooks, reftable, split-index
+    # and any change to a tree-shaped input (loose refs, reftable, split-index
     # backing files) or the live worktree, which git reads in place, during the final
     # converged traversal -- is the irreducible residual: no portable mechanism reads
     # a live multi-file surface atomically, and adding another recheck only moves the
@@ -2967,7 +2970,7 @@ try {
     # surface last, so an administrative mutation during the (possibly long)
     # worktree scan changes control-after and is caught. A single control scan is
     # not an atomic snapshot: Get-GitControlSurfaceEvidence hashes the index early,
-    # then keeps traversing HEAD, refs, and hooks, so an index (or other component)
+    # then keeps traversing HEAD, refs, and reftable trees, so an index (or other component)
     # change after its own git-index hash but before that scan completes would leave
     # a stale control-after. Requiring two consecutive full (worktree, control)
     # samples to agree closes that intra-call gap: a change during one pass makes
