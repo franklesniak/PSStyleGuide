@@ -506,6 +506,77 @@ function Read-BoundedFileContent {
     }
 }
 
+function Assert-NoReparsePointUnder {
+    # .SYNOPSIS
+    # Rejects any reparse point (symlink or junction) anywhere below one directory.
+    #
+    # .DESCRIPTION
+    # Walks the tree under RootPath without following links: every entry is tested for
+    # the reparse-point attribute before a directory is descended, so a link is never
+    # traversed. Throws the caller's limit category on the first reparse point found,
+    # and on an anomalously large tree (a runaway backstop). RootPath itself is not
+    # tested; the caller tests the root before calling.
+    #
+    # .PARAMETER RootPath
+    # Absolute directory whose descendants must contain no reparse point.
+    #
+    # .PARAMETER LimitCategory
+    # Error string thrown when a reparse point (or the scan backstop) is hit.
+    #
+    # .EXAMPLE
+    # Assert-NoReparsePointUnder -RootPath $strObjectsPath -LimitCategory 'git-object-store-symlink'
+    #
+    # # Returns nothing when the tree is link-free; throws otherwise.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # None. Throws LimitCategory for a reparse point below RootPath or an
+    # over-limit scan. Enumeration, metadata, access, and parameter-binding failures
+    # propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260814.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: RootPath
+    #   Position 1: LimitCategory
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$RootPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$LimitCategory
+    )
+
+    $objPending = New-Object System.Collections.Stack
+    $objPending.Push($RootPath)
+    $longScanned = 0
+    while ($objPending.Count -gt 0) {
+        $strDirectory = [string]$objPending.Pop()
+        foreach ($strEntry in [System.IO.Directory]::EnumerateFileSystemEntries($strDirectory)) {
+            $longScanned++
+            if ($longScanned -gt 5000000) {
+                throw $LimitCategory
+            }
+            $objAttributes = [System.IO.File]::GetAttributes($strEntry)
+            if (($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+                throw $LimitCategory
+            }
+            if (($objAttributes -band [System.IO.FileAttributes]::Directory) -ne 0) {
+                $objPending.Push([string]$strEntry)
+            }
+        }
+    }
+}
+
 function Assert-OrdinaryAbsoluteFile {
     # .SYNOPSIS
     # Resolves one absolute ordinary file and every directory ancestor.
@@ -2207,12 +2278,15 @@ try {
     # remote.<name>.promisor, remote.<name>.partialclonefilter, and
     # extensions.partialClone -- so an unrelated custom key such as foo.promisory does
     # not false-match and refuse every mode. --no-includes keeps an external include
-    # from being expanded (opened) during this probe.
+    # from being expanded (opened) during this probe. The query returns key\nvalue
+    # records (no --name-only) so the boolean value is available: an ordinary
+    # repository can explicitly set remote.<name>.promisor=false to disable an
+    # inherited promisor, which must not be treated as an active promisor remote.
     $strNativeCommand = 'promisor-config'
     $hashtablePromisorResult = Invoke-GitRaw `
         -GitRecord $hashtableGitExecutable `
         -WorkingDirectory $strRepositoryRoot `
-        -ArgumentList @('config', '--no-includes', '-z', '--name-only', '--get-regexp',
+        -ArgumentList @('config', '--no-includes', '-z', '--get-regexp',
             '^(remote\..*\.(promisor|partialclonefilter)|extensions\.partialclone)$')
     $listNativeChecks.Add([ordered]@{
         Name = $strNativeCommand
@@ -2227,7 +2301,31 @@ try {
         throw 'native-command'
     }
     if ($intNativeExit -eq 0) {
-        throw 'git-promisor-remote'
+        # Records are key\nvalue, NUL-separated. Refuse on any partialclonefilter or
+        # extensions.partialClone key (their presence marks a partial clone) and on a
+        # remote.<name>.promisor whose value is boolean-true; honor an explicit false
+        # (Git's false booleans are false/no/off/0; a missing value is true).
+        $strPromisorText = $script:objUtf8Strict.GetString($hashtablePromisorResult.Stdout)
+        foreach ($strPromisorRecord in $strPromisorText.Split([char]0)) {
+            if ($strPromisorRecord.Length -eq 0) {
+                continue
+            }
+            $intNewlineIndex = $strPromisorRecord.IndexOf("`n")
+            if ($intNewlineIndex -lt 0) {
+                $strPromisorKey = $strPromisorRecord
+                $strPromisorValue = ''
+            } else {
+                $strPromisorKey = $strPromisorRecord.Substring(0, $intNewlineIndex)
+                $strPromisorValue = $strPromisorRecord.Substring($intNewlineIndex + 1)
+            }
+            if ($strPromisorKey -match '\.promisor$') {
+                if ($strPromisorValue.Trim().ToLowerInvariant() -notin @('false', 'no', 'off', '0')) {
+                    throw 'git-promisor-remote'
+                }
+            } else {
+                throw 'git-promisor-remote'
+            }
+        }
     }
 
     if (($Mode -in @('Working', 'Both')) -or $RequireCleanWorkingAgainstIndex) {
@@ -2343,15 +2441,16 @@ try {
                 throw 'git-alternates-active'
             }
         }
-        # Reject an external object store reached through a symlinked objects directory.
-        # If CommonDirectory/objects is a reparse point (a symlink to a directory
-        # outside the repository), the staged read resolves HEAD's tree from that
-        # external store -- a third external-store route beyond the alternates file and
-        # a promisor remote. The objects directory is not one of the bracketed
-        # single-file control inputs, so its later removal or redirection would not trip
-        # git-control-drift; validate it here and refuse a reparse (or non-directory)
-        # object root before the staged read. An ordinary clone has a plain objects
-        # directory and is unaffected.
+        # Reject an external object store reached through a symlinked objects directory
+        # or any symlinked entry below it. If CommonDirectory/objects -- or a child such
+        # as objects/pack, objects/<fanout>, or an individual pack/loose-object file --
+        # is a reparse point to a location outside the repository, the staged read
+        # resolves HEAD's tree from that external store, a third external-store route
+        # beyond the alternates file and a promisor remote. The objects tree is not
+        # bracketed by the control digests, so its later removal or redirection would not
+        # trip git-control-drift; validate it here and refuse a reparse (or non-directory)
+        # object root, and any reparse point beneath it, before the staged read. An
+        # ordinary clone has a plain objects tree and is unaffected.
         $strObjectsPath = [System.IO.Path]::GetFullPath(
             (Join-Path $hashtableAdministrativePaths.CommonDirectory 'objects'))
         if ([System.IO.Directory]::Exists($strObjectsPath)) {
@@ -2359,6 +2458,7 @@ try {
             if (($objObjectsInfo.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
                 throw 'git-object-store-symlink'
             }
+            Assert-NoReparsePointUnder -RootPath $strObjectsPath -LimitCategory 'git-object-store-symlink'
         } elseif ([System.IO.File]::Exists($strObjectsPath)) {
             throw 'git-object-store-symlink'
         }
