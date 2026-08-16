@@ -492,7 +492,7 @@ function Assert-OrdinaryPathComponent {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 1.0.20260814.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):

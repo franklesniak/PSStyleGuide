@@ -1996,9 +1996,20 @@ try {
         # refusal above.
         $strAlternatesPath = [System.IO.Path]::Combine(
             [string]$hashtableAdministrativePaths.CommonDirectory, 'objects', 'info', 'alternates')
-        if ([System.IO.File]::Exists($strAlternatesPath) -and
-            (New-Object System.IO.FileInfo($strAlternatesPath)).Length -gt 0) {
-            throw 'git-alternates-active'
+        if ([System.IO.File]::Exists($strAlternatesPath)) {
+            # Validate the alternates path as an ordinary regular file before reading
+            # its length. On Unix a FIFO/socket/device satisfies File.Exists and
+            # reports zero length, so the length test alone would bypass this refusal;
+            # the staged git diff --cached would then open the FIFO and block forever
+            # waiting for a writer, even when every required object exists locally.
+            # Assert-OrdinaryAbsoluteFile inspects attributes and the UnixMode type
+            # without opening the path, so it rejects the special types
+            # (invalid-ordinary-file) and cannot itself hang; malformed administrative
+            # state then fails promptly instead of hanging the verifier.
+            [void](Assert-OrdinaryAbsoluteFile -LiteralPath $strAlternatesPath)
+            if ((New-Object System.IO.FileInfo($strAlternatesPath)).Length -gt 0) {
+                throw 'git-alternates-active'
+            }
         }
         $strNativeCommand = 'staged'
         $hashtableStagedResult = Invoke-GitRaw `
