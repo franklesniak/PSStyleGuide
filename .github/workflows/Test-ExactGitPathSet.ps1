@@ -1073,6 +1073,10 @@ function Invoke-GitRaw {
     #   - a host-independent core.filemode, so a tracked file's executable bit
     #     cannot make the working and staged reads differ between Windows (filemode
     #     false) and Linux (filemode true);
+    #   - a host-independent core.ignoreCase=false, so a case-only path difference
+    #     (for example a tracked 'a' and an untracked 'A') is never collapsed on a
+    #     case-sensitive host whose local config left core.ignoreCase true, which
+    #     would otherwise hide the extra path from the untracked and working reads;
     #   - strict stat validation (core.checkStat=default, core.trustctime=true), so
     #     a relaxed local setting cannot let a same-length content change with a
     #     restored mtime read as clean through Git's cached stat.
@@ -1096,6 +1100,7 @@ function Invoke-GitRaw {
         '-c', 'core.fsmonitor=false',
         '-c', 'core.untrackedCache=false',
         '-c', 'core.filemode=false',
+        '-c', 'core.ignoreCase=false',
         '-c', 'core.checkStat=default',
         '-c', 'core.trustctime=true',
         '-c', ('core.excludesFile=' + $strNullDevice),
