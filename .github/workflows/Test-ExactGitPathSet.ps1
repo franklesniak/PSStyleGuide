@@ -342,8 +342,9 @@ function Assert-OrdinaryAbsoluteFile {
     #
     # .OUTPUTS
     # System.String. The normalized ordinary file path. Throws
-    # 'invalid-ordinary-file' for an invalid, missing, directory, or reparse
-    # entry. Path, metadata, access, and parameter-binding failures propagate.
+    # 'invalid-ordinary-file' for an invalid, missing, directory, reparse, or
+    # non-regular (Unix FIFO/socket/device) entry. Path, metadata, access, and
+    # parameter-binding failures propagate.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
@@ -375,6 +376,24 @@ function Assert-OrdinaryAbsoluteFile {
         ($objFile.Attributes -band [System.IO.FileAttributes]::Directory) -ne 0 -or
         ($objFile.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
         throw 'invalid-ordinary-file'
+    }
+    # On Unix a path that is neither a directory nor a reparse point can still be a
+    # FIFO, socket, or block/character device, which File attributes do not
+    # distinguish from a regular file. A caller then opens it -- Get-GitExecutableRecord
+    # hashes the Git executable, and the control-surface passes readable control files
+    # such as .git and commondir through this guard before hashing -- and opening a
+    # FIFO blocks indefinitely instead of failing closed. PowerShell's UnixMode string
+    # exposes the type in its first character; reject the explicit special types before
+    # any read. The check is a no-op where UnixMode is absent (Windows) and never fires
+    # on a regular file ('-').
+    $objUnixModeProperty = $objFile.PSObject.Properties['UnixMode']
+    if ($null -ne $objUnixModeProperty) {
+        $strUnixMode = [string]$objUnixModeProperty.Value
+        if ($strUnixMode.Length -gt 0 -and ($strUnixMode[0] -eq 'p' -or
+            $strUnixMode[0] -eq 's' -or $strUnixMode[0] -eq 'b' -or
+            $strUnixMode[0] -eq 'c')) {
+            throw 'invalid-ordinary-file'
+        }
     }
     $objDirectory = $objFile.Directory
     while ($null -ne $objDirectory) {
@@ -1492,11 +1511,22 @@ function Get-GitControlSurfaceEvidence {
     # GitDirectory/sharedindex.<hash>. The git-index component and the direct index
     # bracket cover only GitDirectory/index, so a change to a backing file would go
     # unseen. Hash every top-level sharedindex.* file (ordinal-framed); without a
-    # split index there are none (absent).
+    # split index there are none (absent). Enumerate lazily rather than with
+    # Directory.GetFiles, which would materialize every top-level pathname before the
+    # filter runs, so a GitDirectory holding a hostile or accidental number of entries
+    # could exhaust memory. Bound the scan by an incremental entry ceiling and bound
+    # the hashed set by an aggregate-byte ceiling in addition to the per-file limit, so
+    # this component keeps the verifier's bounded-evidence contract.
     $objSharedIndex = New-Object 'System.Collections.Generic.SortedDictionary[string,string]' `
         ([System.StringComparer]::Ordinal)
     if ([System.IO.Directory]::Exists($AdministrativePathRecord.GitDirectory)) {
-        foreach ($strSharedIndexFile in [System.IO.Directory]::GetFiles($AdministrativePathRecord.GitDirectory)) {
+        $intSharedIndexScanned = 0
+        $longSharedIndexBytes = 0
+        foreach ($strSharedIndexFile in [System.IO.Directory]::EnumerateFiles($AdministrativePathRecord.GitDirectory)) {
+            $intSharedIndexScanned++
+            if ($intSharedIndexScanned -gt 100000) {
+                throw 'git-control-limit'
+            }
             $strSharedIndexName = [System.IO.Path]::GetFileName($strSharedIndexFile)
             if (-not $strSharedIndexName.StartsWith('sharedindex.', [System.StringComparison]::Ordinal)) {
                 continue
@@ -1505,6 +1535,10 @@ function Get-GitControlSurfaceEvidence {
                 (Assert-OrdinaryAbsoluteFile -LiteralPath $strSharedIndexFile))
             $objSharedIndexInfo = New-Object System.IO.FileInfo($strSharedIndexFull)
             if ($objSharedIndexInfo.Length -gt 4194304) {
+                throw 'git-control-limit'
+            }
+            $longSharedIndexBytes += $objSharedIndexInfo.Length
+            if ($longSharedIndexBytes -gt 1073741824) {
                 throw 'git-control-limit'
             }
             $objSharedIndex[$strSharedIndexName] = ([string]$objSharedIndexInfo.Length + ':' +
