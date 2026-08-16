@@ -26,7 +26,7 @@ Optional exact absolute path of the Git executable. When omitted, the script
 uses the module-qualified application resolver once before any Git invocation.
 
 .NOTES
-Version: 1.0.20260816.0
+Version: 1.0.20260816.1
 #>
 
 [CmdletBinding()]
@@ -52,7 +52,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strVerifierVersion = '1.0.20260816.0'
+$script:strVerifierVersion = '1.0.20260816.1'
 $script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v2'
 # Wall-clock ceiling for any single native Git invocation (Invoke-GitRaw). The path-set
 # reads are sub-second metadata queries, so this 120-second default is orders of magnitude
@@ -933,7 +933,7 @@ function Stop-NativeProcessTree {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.0
+    # Version: 1.0.20260816.1
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1010,7 +1010,7 @@ function Invoke-GitRaw {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.0
+    # Version: 1.0.20260816.1
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1454,7 +1454,7 @@ function ConvertTo-SubmoduleExclusionPath {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.0
+    # Version: 1.0.20260816.1
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2094,7 +2094,7 @@ function Get-BoundedControlFileComponent {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.0
+    # Version: 1.0.20260816.1
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2171,7 +2171,7 @@ function Resolve-ActiveSharedIndexRecord {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.0
+    # Version: 1.0.20260816.1
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2293,7 +2293,7 @@ function Get-SplitIndexBracketedEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.0
+    # Version: 1.0.20260816.1
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2366,9 +2366,14 @@ function Get-GitControlSurfaceEvidence {
     # SampleWorktreeControlInput is set -- info/exclude and info/attributes, and --
     # only when IncludeReferenceEvidence is set -- the reference inputs HEAD,
     # packed-refs, the shared and per-worktree loose refs trees, and the shared and
-    # per-worktree reftable backend trees. The per-worktree configuration hashed is
-    # the active GitDirectory/config.worktree (the file Git reads for this worktree),
-    # not the main worktree's CommonDirectory/config.worktree. The index and its one
+    # per-worktree reftable backend trees. The active per-worktree configuration
+    # GitDirectory/config.worktree is hashed only when IncludeWorktreeConfigEvidence is
+    # set, because Git reads that file only when extensions.worktreeConfig is enabled; a
+    # repository with the extension unset or false never consults it, so sampling it would
+    # let a stale, oversized, or concurrently changed config.worktree refuse or drift a
+    # read that cannot depend on it. The main worktree's CommonDirectory/config.worktree is
+    # not hashed (for the main worktree GitDirectory equals CommonDirectory, so the active
+    # file is still covered). The index and its one
     # active split-index backing are sampled together by Get-SplitIndexBracketedEvidence,
     # which resolves the backing with `git rev-parse --shared-index-path` and brackets
     # the pair so no stale, unreferenced sharedindex.* file is hashed. info/exclude and
@@ -2391,6 +2396,15 @@ function Get-GitControlSurfaceEvidence {
     # info/attributes. A staged-only read consumes neither, so it passes $false and a
     # nonordinary or concurrently changed info/exclude or info/attributes raises no
     # refusal or git-control-drift for a read that never opens it.
+    #
+    # .PARAMETER IncludeWorktreeConfigEvidence
+    # When set, also samples the active GitDirectory/config.worktree. Git reads that file
+    # only when extensions.worktreeConfig is enabled, so the caller passes the already
+    # computed $boolWorktreeConfigEnabled: a repository with the extension unset or false
+    # passes $false and a nonordinary, oversized, or concurrently changed config.worktree
+    # raises no refusal or git-control-drift for a read that never consults it. The default
+    # is $true, the fail-closed direction, so a caller that omits it over-samples (a safe
+    # spurious refusal) rather than under-samples (a fail-open miss of a live file).
     #
     # .PARAMETER GitRecord
     # Fixed Git executable record used to resolve the active split-index backing.
@@ -2430,7 +2444,7 @@ function Get-GitControlSurfaceEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.0
+    # Version: 1.0.20260816.1
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2438,9 +2452,10 @@ function Get-GitControlSurfaceEvidence {
     #   Position 0: AdministrativePathRecord
     #   Position 1: IncludeReferenceEvidence
     #   Position 2: SampleWorktreeControlInput
-    #   Position 3: GitRecord
-    #   Position 4: WorkingDirectory
-    #   Position 5: NativeCommandList
+    #   Position 3: IncludeWorktreeConfigEvidence
+    #   Position 4: GitRecord
+    #   Position 5: WorkingDirectory
+    #   Position 6: NativeCommandList
     param (
         [Parameter(Mandatory = $true)]
         [System.Collections.IDictionary]$AdministrativePathRecord,
@@ -2448,6 +2463,8 @@ function Get-GitControlSurfaceEvidence {
         [bool]$IncludeReferenceEvidence = $true,
 
         [bool]$SampleWorktreeControlInput = $true,
+
+        [bool]$IncludeWorktreeConfigEvidence = $true,
 
         [Parameter(Mandatory = $true)]
         [System.Collections.IDictionary]$GitRecord,
@@ -2473,9 +2490,13 @@ function Get-GitControlSurfaceEvidence {
 
     # Local config, plus the single-file administrative inputs the path-set reads
     # depend on but the worktree tree evidence excludes. The active per-worktree
-    # configuration is GitDirectory/config.worktree (worktree-config-worktree); the main
-    # worktree's CommonDirectory/config.worktree is not hashed, because Git reads only the
-    # active worktree's file (for the main worktree GitDirectory equals CommonDirectory,
+    # configuration is GitDirectory/config.worktree (worktree-config-worktree); it is
+    # sampled only when IncludeWorktreeConfigEvidence is set (see the direct assignment
+    # after the loop below), because Git reads it only when extensions.worktreeConfig is
+    # enabled -- an unset or false extension never consults it, so hashing it could refuse
+    # or drift a read that cannot depend on it. The
+    # main worktree's CommonDirectory/config.worktree is not hashed, because Git reads only
+    # the active worktree's file (for the main worktree GitDirectory equals CommonDirectory,
     # so the active file is still covered). info/exclude (the untracked read's
     # --exclude-standard set) and info/attributes (repository-local Git attributes that
     # change the working read via content normalization) drive only the worktree reads,
@@ -2489,7 +2510,6 @@ function Get-GitControlSurfaceEvidence {
     $arrBoundedFileSpecifications = @(
         @('common-config', (Join-Path $AdministrativePathRecord.CommonDirectory 'config')),
         @('worktree-config', (Join-Path $AdministrativePathRecord.GitDirectory 'config')),
-        @('worktree-config-worktree', (Join-Path $AdministrativePathRecord.GitDirectory 'config.worktree')),
         @('commondir-pointer', (Join-Path $AdministrativePathRecord.GitDirectory 'commondir')),
         @('objects-info-alternates', (Join-Path (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'objects') 'info') 'alternates'))
     ) + $(if ($SampleWorktreeControlInput) {
@@ -2510,6 +2530,17 @@ function Get-GitControlSurfaceEvidence {
     foreach ($arrSpecification in $arrBoundedFileSpecifications) {
         $objComponents[[string]$arrSpecification[0]] = Get-BoundedControlFileComponent `
             -LiteralPath ([string]$arrSpecification[1])
+    }
+    # config.worktree is the one conditional single-file control input, so it is assigned to
+    # the component map directly rather than through a one-element $(if ...) append: the
+    # array-subexpression operator enumerates a single-element append and flattens the
+    # @('label', path) pair into two separate string specifications. Git reads config.worktree
+    # only when extensions.worktreeConfig is enabled, so IncludeWorktreeConfigEvidence gates
+    # it; a disabled repository never opens it, and sampling it would let a stale, oversized,
+    # or concurrently changed file refuse or drift a read that cannot depend on it.
+    if ($IncludeWorktreeConfigEvidence) {
+        $objComponents['worktree-config-worktree'] = Get-BoundedControlFileComponent `
+            -LiteralPath (Join-Path $AdministrativePathRecord.GitDirectory 'config.worktree')
     }
 
     # The .git reference trees below (shared and per-worktree loose refs, and shared
@@ -2636,8 +2667,11 @@ function Get-PathSetControlInputDigest {
     # set -- info/exclude and info/attributes, and -- only when IncludeReferenceEvidence
     # is set -- the reference inputs HEAD and packed-refs -- together with the staging
     # index coupled to its one active split-index backing, into one ordinal-framed
-    # digest. The active per-worktree configuration is GitDirectory/config.worktree; the
-    # main worktree's CommonDirectory/config.worktree is not hashed. Each config/pointer
+    # digest. The active per-worktree configuration GitDirectory/config.worktree is hashed
+    # only when IncludeWorktreeConfigEvidence is set, because Git reads it only when
+    # extensions.worktreeConfig is enabled; a repository with the extension unset or false
+    # never consults it. The main worktree's CommonDirectory/config.worktree is not hashed.
+    # Each config/pointer
     # input is a single file, so each hash is atomic; the index and its active backing
     # are sampled together by Get-SplitIndexBracketedEvidence, whose intra-snapshot gate
     # keeps the coupled component internally consistent. Taken before the reads and again
@@ -2656,6 +2690,12 @@ function Get-PathSetControlInputDigest {
     # .PARAMETER SampleWorktreeControlInput
     # When set (a working, untracked, or clean read), also brackets info/exclude and
     # info/attributes. A staged-only read consumes neither, so it passes $false.
+    #
+    # .PARAMETER IncludeWorktreeConfigEvidence
+    # When set, also brackets the active GitDirectory/config.worktree. Git reads that file
+    # only when extensions.worktreeConfig is enabled, so the caller passes the already
+    # computed $boolWorktreeConfigEnabled and a repository with the extension unset or false
+    # passes $false. The default is $true, the fail-closed direction.
     #
     # .PARAMETER GitRecord
     # Fixed Git executable record used to resolve the active split-index backing.
@@ -2679,7 +2719,7 @@ function Get-PathSetControlInputDigest {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.0
+    # Version: 1.0.20260816.1
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2687,9 +2727,10 @@ function Get-PathSetControlInputDigest {
     #   Position 0: AdministrativePathRecord
     #   Position 1: IncludeReferenceEvidence
     #   Position 2: SampleWorktreeControlInput
-    #   Position 3: GitRecord
-    #   Position 4: WorkingDirectory
-    #   Position 5: NativeCommandList
+    #   Position 3: IncludeWorktreeConfigEvidence
+    #   Position 4: GitRecord
+    #   Position 5: WorkingDirectory
+    #   Position 6: NativeCommandList
     param (
         [Parameter(Mandatory = $true)]
         [System.Collections.IDictionary]$AdministrativePathRecord,
@@ -2697,6 +2738,8 @@ function Get-PathSetControlInputDigest {
         [bool]$IncludeReferenceEvidence = $true,
 
         [bool]$SampleWorktreeControlInput = $true,
+
+        [bool]$IncludeWorktreeConfigEvidence = $true,
 
         [Parameter(Mandatory = $true)]
         [System.Collections.IDictionary]$GitRecord,
@@ -2712,13 +2755,14 @@ function Get-PathSetControlInputDigest {
         ([System.StringComparer]::Ordinal)
     # The staging index is not listed here: it is bracketed coupled with its active
     # split-index backing below. The active per-worktree config is
-    # worktree-config-worktree (GitDirectory/config.worktree); info/exclude and
-    # info/attributes are appended only for a worktree read, HEAD and packed-refs only
-    # for a staged read, exactly as in Get-GitControlSurfaceEvidence.
+    # worktree-config-worktree (GitDirectory/config.worktree), sampled only when
+    # IncludeWorktreeConfigEvidence is set (see the direct assignment after the loop below)
+    # because Git reads it only when extensions.worktreeConfig is enabled; info/exclude and
+    # info/attributes are appended only for a worktree read, HEAD and packed-refs only for a
+    # staged read, exactly as in Get-GitControlSurfaceEvidence.
     $arrSingleFileInputs = @(
         @('common-config', (Join-Path $AdministrativePathRecord.CommonDirectory 'config')),
         @('worktree-config', (Join-Path $AdministrativePathRecord.GitDirectory 'config')),
-        @('worktree-config-worktree', (Join-Path $AdministrativePathRecord.GitDirectory 'config.worktree')),
         @('commondir-pointer', (Join-Path $AdministrativePathRecord.GitDirectory 'commondir')),
         @('objects-info-alternates', (Join-Path (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'objects') 'info') 'alternates'))
     ) + $(if ($SampleWorktreeControlInput) {
@@ -2743,6 +2787,16 @@ function Get-PathSetControlInputDigest {
         # length is sampled cannot be hashed without bound.
         $objInputs[[string]$arrSpecification[0]] = Get-BoundedControlFileComponent `
             -LiteralPath ([string]$arrSpecification[1])
+    }
+    # config.worktree is the one conditional single-file control input, so it is assigned to
+    # the input map directly rather than through a one-element $(if ...) append: the
+    # array-subexpression operator enumerates a single-element append and flattens the
+    # @('label', path) pair into two separate string specifications. Git reads config.worktree
+    # only when extensions.worktreeConfig is enabled, so IncludeWorktreeConfigEvidence gates
+    # it exactly as in Get-GitControlSurfaceEvidence; a disabled repository never opens it.
+    if ($IncludeWorktreeConfigEvidence) {
+        $objInputs['worktree-config-worktree'] = Get-BoundedControlFileComponent `
+            -LiteralPath (Join-Path $AdministrativePathRecord.GitDirectory 'config.worktree')
     }
     # Couple the staging index with its one active split-index backing, bracketed so no
     # stale, unreferenced sharedindex.* file perturbs the digest.
@@ -3181,6 +3235,7 @@ try {
         -AdministrativePathRecord $hashtableAdministrativePaths `
         -IncludeReferenceEvidence $boolIncludeReferenceEvidence `
         -SampleWorktreeControlInput $boolWorktreeReadRequested `
+        -IncludeWorktreeConfigEvidence $boolWorktreeConfigEnabled `
         -GitRecord $hashtableGitExecutable `
         -WorkingDirectory $strRepositoryRoot `
         -NativeCommandList $listNativeChecks
@@ -3214,6 +3269,7 @@ try {
         -AdministrativePathRecord $hashtableAdministrativePaths `
         -IncludeReferenceEvidence $boolIncludeReferenceEvidence `
         -SampleWorktreeControlInput $boolWorktreeReadRequested `
+        -IncludeWorktreeConfigEvidence $boolWorktreeConfigEnabled `
         -GitRecord $hashtableGitExecutable `
         -WorkingDirectory $strRepositoryRoot `
         -NativeCommandList $listNativeChecks
@@ -3540,6 +3596,7 @@ try {
         -AdministrativePathRecord $hashtableAdministrativePaths `
         -IncludeReferenceEvidence $boolIncludeReferenceEvidence `
         -SampleWorktreeControlInput $boolWorktreeReadRequested `
+        -IncludeWorktreeConfigEvidence $boolWorktreeConfigEnabled `
         -GitRecord $hashtableGitExecutable `
         -WorkingDirectory $strRepositoryRoot `
         -NativeCommandList $listNativeChecks
@@ -3557,6 +3614,7 @@ try {
             -AdministrativePathRecord $hashtableAdministrativePaths `
             -IncludeReferenceEvidence $boolIncludeReferenceEvidence `
             -SampleWorktreeControlInput $boolWorktreeReadRequested `
+            -IncludeWorktreeConfigEvidence $boolWorktreeConfigEnabled `
             -GitRecord $hashtableGitExecutable `
             -WorkingDirectory $strRepositoryRoot `
             -NativeCommandList $listNativeChecks
@@ -3662,6 +3720,7 @@ try {
         -AdministrativePathRecord $hashtableAdministrativePaths `
         -IncludeReferenceEvidence $boolIncludeReferenceEvidence `
         -SampleWorktreeControlInput $boolWorktreeReadRequested `
+        -IncludeWorktreeConfigEvidence $boolWorktreeConfigEnabled `
         -GitRecord $hashtableGitExecutable `
         -WorkingDirectory $strRepositoryRoot `
         -NativeCommandList $listNativeChecks
