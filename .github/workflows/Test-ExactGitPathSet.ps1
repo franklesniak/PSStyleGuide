@@ -711,15 +711,49 @@ function Invoke-GitRaw {
             throw 'native-command'
         }
         $objProcess.StandardInput.Close()
-        $objStdoutTask = $objProcess.StandardOutput.BaseStream.CopyToAsync($objStdout)
-        $objStderrTask = $objProcess.StandardError.BaseStream.CopyToAsync($objStderr)
-        # Bound the drain instead of buffering the whole streams before the size
-        # check. If either sink crosses 4 MiB while the child is still writing,
-        # terminate the child (and its tree) and fail with native-output-limit, so a
-        # command that emits hundreds of megabytes cannot exhaust the verifier. The
-        # MemoryStream length getter reads a 64-bit field, so sampling it while
-        # CopyToAsync writes returns a valid (at worst slightly stale) length.
-        while (-not ($objStdoutTask.IsCompleted -and $objStderrTask.IsCompleted)) {
+        # Bound the drain at the source. Read stdout and stderr concurrently in fixed
+        # chunks and stop as soon as either sink would exceed 4 MiB, so a command that
+        # emits hundreds of megabytes -- even one that writes them and exits before any
+        # intermediate length could be sampled -- cannot fill the sinks: each sink
+        # holds at most 4 MiB plus one chunk before the bound is enforced. An earlier
+        # design used two unbounded CopyToAsync copies and polled their lengths, but a
+        # copy that completed between polls buffered the whole output before the check
+        # ran. Reading both streams concurrently (an async read outstanding on each)
+        # keeps the child from deadlocking by filling one pipe while the reader waits
+        # on the other. On crossing the bound, terminate the child (and its tree) and
+        # fail native-output-limit.
+        $objStdoutStream = $objProcess.StandardOutput.BaseStream
+        $objStderrStream = $objProcess.StandardError.BaseStream
+        $intChunkSize = 65536
+        $arrStdoutChunk = New-Object byte[] $intChunkSize
+        $arrStderrChunk = New-Object byte[] $intChunkSize
+        $objStdoutRead = $objStdoutStream.ReadAsync($arrStdoutChunk, 0, $intChunkSize)
+        $objStderrRead = $objStderrStream.ReadAsync($arrStderrChunk, 0, $intChunkSize)
+        $boolStdoutDone = $false
+        $boolStderrDone = $false
+        while (-not ($boolStdoutDone -and $boolStderrDone)) {
+            $listPendingReads = New-Object 'System.Collections.Generic.List[System.Threading.Tasks.Task]'
+            if (-not $boolStdoutDone) { $listPendingReads.Add($objStdoutRead) }
+            if (-not $boolStderrDone) { $listPendingReads.Add($objStderrRead) }
+            [void][System.Threading.Tasks.Task]::WaitAny($listPendingReads.ToArray())
+            if (-not $boolStdoutDone -and $objStdoutRead.IsCompleted) {
+                $intReadCount = $objStdoutRead.GetAwaiter().GetResult()
+                if ($intReadCount -le 0) {
+                    $boolStdoutDone = $true
+                } else {
+                    $objStdout.Write($arrStdoutChunk, 0, $intReadCount)
+                    $objStdoutRead = $objStdoutStream.ReadAsync($arrStdoutChunk, 0, $intChunkSize)
+                }
+            }
+            if (-not $boolStderrDone -and $objStderrRead.IsCompleted) {
+                $intReadCount = $objStderrRead.GetAwaiter().GetResult()
+                if ($intReadCount -le 0) {
+                    $boolStderrDone = $true
+                } else {
+                    $objStderr.Write($arrStderrChunk, 0, $intReadCount)
+                    $objStderrRead = $objStderrStream.ReadAsync($arrStderrChunk, 0, $intChunkSize)
+                }
+            }
             if ($objStdout.Length -gt 4194304 -or $objStderr.Length -gt 4194304) {
                 # Process.Kill(bool entireProcessTree) is .NET Core 3.0+ only; on the
                 # supported Windows PowerShell 5.1 (.NET Framework) host that overload
@@ -735,16 +769,13 @@ function Invoke-GitRaw {
                 }
                 throw 'native-output-limit'
             }
-            [void][System.Threading.Tasks.Task]::WaitAny(@($objStdoutTask, $objStderrTask), 25)
         }
         $objProcess.WaitForExit()
-        [System.Threading.Tasks.Task]::WaitAll(@($objStdoutTask, $objStderrTask))
         $intExitCode = $objProcess.ExitCode
+        # Each sink is bounded to at most 4 MiB by the loop above, so these arrays are
+        # never larger than that bound.
         $arrStdout = $objStdout.ToArray()
         $arrStderr = $objStderr.ToArray()
-        if ($arrStdout.Length -gt 4194304 -or $arrStderr.Length -gt 4194304) {
-            throw 'native-output-limit'
-        }
         return [ordered]@{
             ExitCode = $intExitCode
             Stdout = $arrStdout
