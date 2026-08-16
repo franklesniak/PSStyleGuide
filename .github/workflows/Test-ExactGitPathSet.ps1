@@ -330,6 +330,98 @@ function Get-FileSha256Hex {
     }
 }
 
+function Get-BoundedFileDigest {
+    # .SYNOPSIS
+    # Gets the SHA-256 digest and exact byte length of one ordinary file, enforcing a
+    # byte ceiling during the read.
+    #
+    # .DESCRIPTION
+    # Opens the literal file for shared reading and hashes it incrementally in fixed
+    # 64 KiB chunks. Stops and throws the caller's limit category as soon as the bytes
+    # read exceed the maximum, so a file that grows after its length was sampled -- or
+    # while it is being read -- cannot be read or hashed without bound. The digest is
+    # byte-identical to a single ComputeHash over the same content.
+    #
+    # .PARAMETER LiteralPath
+    # Absolute literal file path to hash. Wildcards are not expanded.
+    #
+    # .PARAMETER MaximumBytes
+    # Inclusive upper bound on the bytes read. Reading past it throws LimitCategory.
+    #
+    # .PARAMETER LimitCategory
+    # Error string thrown when the file's content exceeds MaximumBytes.
+    #
+    # .EXAMPLE
+    # $hashtable = Get-BoundedFileDigest -LiteralPath $strPath -MaximumBytes 4194304 -LimitCategory 'git-control-limit'
+    #
+    # # Returns Digest and ByteCount, or throws 'git-control-limit' above 4 MiB.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Collections.Specialized.OrderedDictionary with Digest (lowercase SHA-256)
+    # and ByteCount (Int64). Throws LimitCategory when the content exceeds
+    # MaximumBytes; file, stream, allocation, hashing, and parameter-binding failures
+    # propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260814.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: LiteralPath
+    #   Position 1: MaximumBytes
+    #   Position 2: LimitCategory
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [long]$MaximumBytes,
+
+        [Parameter(Mandatory = $true)]
+        [string]$LimitCategory
+    )
+
+    $objStream = New-Object System.IO.FileStream(
+        $LiteralPath,
+        [System.IO.FileMode]::Open,
+        [System.IO.FileAccess]::Read,
+        [System.IO.FileShare]::Read
+    )
+    $objSha256 = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $intChunkSize = 65536
+        $arrChunk = New-Object byte[] $intChunkSize
+        $longRead = 0
+        while ($true) {
+            $intReadCount = $objStream.Read($arrChunk, 0, $intChunkSize)
+            if ($intReadCount -le 0) {
+                break
+            }
+            $longRead += $intReadCount
+            if ($longRead -gt $MaximumBytes) {
+                throw $LimitCategory
+            }
+            [void]$objSha256.TransformBlock($arrChunk, 0, $intReadCount, $null, 0)
+        }
+        [void]$objSha256.TransformFinalBlock((New-Object byte[] 0), 0, 0)
+        return [ordered]@{
+            Digest = ([System.BitConverter]::ToString($objSha256.Hash)).Replace('-', '').ToLowerInvariant()
+            ByteCount = $longRead
+        }
+    } finally {
+        $objSha256.Dispose()
+        $objStream.Dispose()
+    }
+}
+
 function Assert-OrdinaryAbsoluteFile {
     # .SYNOPSIS
     # Resolves one absolute ordinary file and every directory ancestor.
@@ -867,9 +959,10 @@ function ConvertFrom-NulPathRecordStream {
         if ($intLength -le 0) {
             throw 'malformed-records'
         }
-        $arrRecord = New-Object byte[] $intLength
-        [System.Array]::Copy($Bytes, $intRecordStart, $arrRecord, 0, $intLength)
-        $strKey = [System.Convert]::ToBase64String($arrRecord)
+        # Base64-encode the record slice in place with the offset/length overload
+        # rather than copying it into a fresh byte[] first, which avoids a per-record
+        # allocation and copy across the up-to-100,000-record ceiling.
+        $strKey = [System.Convert]::ToBase64String($Bytes, $intRecordStart, $intLength)
         if (-not $objKeys.Add($strKey)) {
             throw 'malformed-records'
         }
@@ -1225,17 +1318,28 @@ function Get-TreeEvidence {
                         throw 'worktree-special-entry'
                     }
                 }
-                if ($objFile.Length -gt 67108864) {
-                    throw 'worktree-limit'
-                }
-                $longByteCount += $objFile.Length
-                if ($longByteCount -gt 1073741824) {
-                    throw 'worktree-limit'
-                }
-                $strFileDigest = if ($objFile.Length -eq 0) {
-                    $script:strEmptyFileSha256
+                if ($objFile.Length -eq 0) {
+                    $strFileDigest = $script:strEmptyFileSha256
                 } else {
-                    Get-FileSha256Hex -LiteralPath $strFullEntry
+                    # Enforce the per-file (64 MiB) and aggregate (1 GiB) ceilings during
+                    # the content read, not only against the sampled length. A concurrent
+                    # writer can grow a regular file after Length is read, and an unbounded
+                    # ComputeHash would then read it to the new end (gigabytes, or forever
+                    # against a writer that never stops) while $longByteCount kept the
+                    # earlier length. Cap each read at the smaller of the per-file ceiling
+                    # and the remaining aggregate budget, and credit the exact bytes read,
+                    # so the promised bounded worktree-limit failure holds.
+                    $longAggregateRemaining = 1073741824 - $longByteCount
+                    if ($longAggregateRemaining -lt 1) {
+                        throw 'worktree-limit'
+                    }
+                    $longFileCeiling = [System.Math]::Min([long]67108864, $longAggregateRemaining)
+                    $hashtableFileDigest = Get-BoundedFileDigest `
+                        -LiteralPath $strFullEntry `
+                        -MaximumBytes $longFileCeiling `
+                        -LimitCategory 'worktree-limit'
+                    $longByteCount += $hashtableFileDigest.ByteCount
+                    $strFileDigest = $hashtableFileDigest.Digest
                 }
                 $objMap['F:' + $strRelativePath] = ([string]$objFile.Length + ':' + $strFileDigest)
                 $intFileCount++
@@ -1417,7 +1521,7 @@ function Get-GitControlSurfaceEvidence {
     if ([System.IO.File]::Exists($strGitEntry)) {
         $objGitEntryInfo = New-Object System.IO.FileInfo((Assert-OrdinaryAbsoluteFile -LiteralPath $strGitEntry))
         $objComponents['git-entry'] = ([string]$objGitEntryInfo.Length + ':' +
-            (Get-FileSha256Hex -LiteralPath $strGitEntry))
+            (Get-BoundedFileDigest -LiteralPath $strGitEntry -MaximumBytes 4194304 -LimitCategory 'git-control-limit').Digest)
     } else {
         [void](Assert-OrdinaryRepositoryRoot -LiteralPath $strGitEntry)
         $objComponents['git-entry'] = 'directory'
@@ -1449,11 +1553,10 @@ function Get-GitControlSurfaceEvidence {
         $strLabel = [string]$arrSpecification[0]
         $strPath = [System.IO.Path]::GetFullPath([string]$arrSpecification[1])
         if ([System.IO.File]::Exists($strPath)) {
-            $objInfo = New-Object System.IO.FileInfo((Assert-OrdinaryAbsoluteFile -LiteralPath $strPath))
-            if ($objInfo.Length -gt 4194304) {
-                throw 'git-control-limit'
-            }
-            $objComponents[$strLabel] = ([string]$objInfo.Length + ':' + (Get-FileSha256Hex -LiteralPath $strPath))
+            [void](Assert-OrdinaryAbsoluteFile -LiteralPath $strPath)
+            $objInfo = New-Object System.IO.FileInfo($strPath)
+            $objComponents[$strLabel] = ([string]$objInfo.Length + ':' +
+                (Get-BoundedFileDigest -LiteralPath $strPath -MaximumBytes 4194304 -LimitCategory 'git-control-limit').Digest)
         } elseif ([System.IO.Directory]::Exists($strPath)) {
             throw 'invalid-git-control'
         } else {
@@ -1574,15 +1677,18 @@ function Get-GitControlSurfaceEvidence {
             $strSharedIndexFull = [System.IO.Path]::GetFullPath(
                 (Assert-OrdinaryAbsoluteFile -LiteralPath $strSharedIndexFile))
             $objSharedIndexInfo = New-Object System.IO.FileInfo($strSharedIndexFull)
-            if ($objSharedIndexInfo.Length -gt 4194304) {
+            $longSharedIndexRemaining = 1073741824 - $longSharedIndexBytes
+            if ($longSharedIndexRemaining -lt 1) {
                 throw 'git-control-limit'
             }
-            $longSharedIndexBytes += $objSharedIndexInfo.Length
-            if ($longSharedIndexBytes -gt 1073741824) {
-                throw 'git-control-limit'
-            }
+            $longSharedIndexCeiling = [System.Math]::Min([long]4194304, $longSharedIndexRemaining)
+            $hashtableSharedIndexDigest = Get-BoundedFileDigest `
+                -LiteralPath $strSharedIndexFull `
+                -MaximumBytes $longSharedIndexCeiling `
+                -LimitCategory 'git-control-limit'
+            $longSharedIndexBytes += $hashtableSharedIndexDigest.ByteCount
             $objSharedIndex[$strSharedIndexName] = ([string]$objSharedIndexInfo.Length + ':' +
-                (Get-FileSha256Hex -LiteralPath $strSharedIndexFull))
+                $hashtableSharedIndexDigest.Digest)
         }
     }
     if ($objSharedIndex.Count -eq 0) {
@@ -1659,13 +1765,13 @@ function Get-PathSetControlInputDigest {
         if ([System.IO.File]::Exists($strPath)) {
             # Mirror Get-GitControlSurfaceEvidence: reject a non-ordinary (reparse/
             # symlink) file so a concurrently substituted link cannot read outside
-            # the repository, and enforce the same 4 MiB component bound.
-            $objInfo = New-Object System.IO.FileInfo((Assert-OrdinaryAbsoluteFile -LiteralPath $strPath))
-            if ($objInfo.Length -gt 4194304) {
-                throw 'git-control-limit'
-            }
+            # the repository, and enforce the same 4 MiB component bound during the
+            # read so a file that grows after its length is sampled cannot be hashed
+            # without bound.
+            [void](Assert-OrdinaryAbsoluteFile -LiteralPath $strPath)
+            $objInfo = New-Object System.IO.FileInfo($strPath)
             $objInputs[$strLabel] = ([string]$objInfo.Length + ':' +
-                (Get-FileSha256Hex -LiteralPath $strPath))
+                (Get-BoundedFileDigest -LiteralPath $strPath -MaximumBytes 4194304 -LimitCategory 'git-control-limit').Digest)
         } elseif ([System.IO.Directory]::Exists($strPath)) {
             throw 'invalid-git-control'
         } else {
@@ -1743,9 +1849,10 @@ function ConvertFrom-NulIndexRecordStream {
         if ($Bytes[$intStart] -ne 0x48) {
             throw 'unsafe-index-state'
         }
-        $arrPath = New-Object byte[] ($intLength - 2)
-        [System.Array]::Copy($Bytes, $intStart + 2, $arrPath, 0, $arrPath.Length)
-        $strKey = [System.Convert]::ToBase64String($arrPath)
+        # Base64-encode the record slice in place with the offset/length overload
+        # rather than copying it into a fresh byte[] first, which avoids a per-record
+        # allocation and copy across the up-to-100,000-record ceiling.
+        $strKey = [System.Convert]::ToBase64String($Bytes, $intStart + 2, $intLength - 2)
         if (-not $objKeys.Add($strKey)) {
             throw 'malformed-index-records'
         }
@@ -1940,6 +2047,40 @@ try {
     if ([System.Convert]::ToBase64String($hashtableRootResult.Stdout) -cne
         [System.Convert]::ToBase64String($arrRootExpected)) {
         throw 'repository-boundary'
+    }
+
+    # Refuse a partial clone / promisor remote before any read. A partial clone marks
+    # its remote with remote.<name>.promisor (and remote.<name>.partialclonefilter, and
+    # on some versions extensions.partialClone), and Git will lazily fetch a missing
+    # object from that promisor remote on demand during a read -- resolving HEAD's tree
+    # for a staged diff, or an absent index blob for a working diff. That fetch runs an
+    # external transport (honoring remote.<name>.uploadpack, which can execute a
+    # configured wrapper), can reach the network or block, and draws on an object
+    # source that sits outside every hashed control digest, so a converged success could
+    # depend on an external store the snapshot cannot bracket. No -c override disables
+    # lazy fetching on every supported Git version, so refuse (fail closed) when a
+    # promisor remote is configured. An ordinary clone has none. Modeled on the
+    # git-alternates-active refusal, and unconditional because both the working and the
+    # staged reads can trigger the fetch.
+    $strNativeCommand = 'promisor-config'
+    $hashtablePromisorResult = Invoke-GitRaw `
+        -GitRecord $hashtableGitExecutable `
+        -WorkingDirectory $strRepositoryRoot `
+        -ArgumentList @('config', '-z', '--name-only', '--get-regexp', 'promisor|partialclone')
+    $listNativeChecks.Add([ordered]@{
+        Name = $strNativeCommand
+        ExitCode = $hashtablePromisorResult.ExitCode
+        StdoutLength = $hashtablePromisorResult.Stdout.Length
+        StderrLength = $hashtablePromisorResult.StderrLength
+    })
+    $intNativeExit = $hashtablePromisorResult.ExitCode
+    # 'git config --get-regexp' exits 1 when no key matches (the ordinary-clone case)
+    # and 0 when a promisor or partial-clone key is present.
+    if ($intNativeExit -notin @(0, 1)) {
+        throw 'native-command'
+    }
+    if ($intNativeExit -eq 0) {
+        throw 'git-promisor-remote'
     }
 
     if (($Mode -in @('Working', 'Both')) -or $RequireCleanWorkingAgainstIndex) {
@@ -2259,7 +2400,7 @@ try {
         'worktree-link', 'worktree-limit', 'worktree-special-entry',
         'git-control-drift', 'worktree-drift',
         'evidence-unstable', 'git-filter-active', 'git-alternates-active',
-        'git-config-include-active',
+        'git-config-include-active', 'git-promisor-remote',
         'native-command', 'native-output-limit', 'working-index-difference'
     )) {
         $strCategory = $_.Exception.Message
