@@ -555,6 +555,71 @@ function Assert-OrdinaryTreeUnder {
     }
 }
 
+function Assert-UnoccupiedControlSlot {
+    # .SYNOPSIS
+    # Confirms a Git control-surface slot is genuinely absent, not occupied by a
+    # dangling symlink or other non-resolving entry.
+    #
+    # .DESCRIPTION
+    # [System.IO.File]::Exists and [System.IO.Directory]::Exists both follow
+    # symlinks, so a dangling symlink -- a reparse point whose target is absent --
+    # reports false from both and would be recorded as 'absent'. A concurrent writer
+    # can then expose the link's target for a path-set read (for example the
+    # untracked read of info/exclude) and hide it for the control sample, yielding
+    # stable evidence for an incorrectly classified control input. Callers invoke
+    # this only after File.Exists and Directory.Exists have both returned false. It
+    # enumerates the parent directory -- readdir lists a dangling symlink regardless
+    # of its target -- for an entry at the same leaf and, if one exists, fails closed
+    # with the caller's category, because the slot is occupied by a non-resolving
+    # reparse point or a special file rather than being absent. A truly absent slot
+    # (no such entry, or a missing parent) returns without throwing.
+    #
+    # .PARAMETER LiteralPath
+    # Absolute control-slot path whose File and Directory existence both returned
+    # false.
+    #
+    # .PARAMETER Category
+    # Fail-closed category to throw when an occupying entry is found.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # None. Throws Category when the slot is occupied by a dangling symlink or other
+    # non-resolving entry. Path and access failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260814.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: LiteralPath
+    #   Position 1: Category
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Category
+    )
+
+    $strParent = [System.IO.Path]::GetDirectoryName($LiteralPath)
+    if ([string]::IsNullOrEmpty($strParent) -or -not [System.IO.Directory]::Exists($strParent)) {
+        return
+    }
+    $strLeaf = [System.IO.Path]::GetFileName($LiteralPath)
+    foreach ($strEntry in [System.IO.Directory]::EnumerateFileSystemEntries($strParent)) {
+        if ([string]::Equals([System.IO.Path]::GetFileName($strEntry), $strLeaf, $script:objPathComparison)) {
+            throw $Category
+        }
+    }
+}
+
 function Assert-OrdinaryAbsoluteFile {
     # .SYNOPSIS
     # Resolves one absolute ordinary file and every directory ancestor.
@@ -969,6 +1034,14 @@ function Invoke-GitRaw {
         }
     }
     $objChildEnvironment['GIT_CONFIG_NOSYSTEM'] = '1'
+    # Git reads the system attributes file ($(prefix)/etc/gitattributes) through a
+    # switch of its own, GIT_ATTR_NOSYSTEM; GIT_CONFIG_NOSYSTEM and the
+    # core.attributesFile override below do not cover it, because core.attributesFile
+    # is only the global attributes file. Without this a system attributes file could
+    # normalize content and change the working and untracked reads across hosts, or
+    # let a concurrently changed external file perturb a read. Disable it so the
+    # reads stay hermetic and host-symmetric.
+    $objChildEnvironment['GIT_ATTR_NOSYSTEM'] = '1'
     # Neutralize every ambient input the path-set reads would otherwise depend on,
     # so the result is hermetic and host-symmetric. These -c overrides take the
     # highest git config precedence, so they hold regardless of any value a local
@@ -1819,6 +1892,7 @@ function Get-GitControlSurfaceEvidence {
         } elseif ([System.IO.Directory]::Exists($strPath)) {
             throw 'invalid-git-control'
         } else {
+            Assert-UnoccupiedControlSlot -LiteralPath $strPath -Category 'invalid-git-control'
             $objComponents[$strLabel] = 'absent'
         }
     }
@@ -1851,6 +1925,7 @@ function Get-GitControlSurfaceEvidence {
         } elseif ([System.IO.File]::Exists($strPath)) {
             throw 'invalid-git-control'
         } else {
+            Assert-UnoccupiedControlSlot -LiteralPath $strPath -Category 'invalid-git-control'
             $objComponents[$strLabel] = 'absent'
         }
     }
@@ -1869,6 +1944,7 @@ function Get-GitControlSurfaceEvidence {
     } elseif ([System.IO.File]::Exists($strLooseRefsPath)) {
         throw 'invalid-git-control'
     } else {
+        Assert-UnoccupiedControlSlot -LiteralPath $strLooseRefsPath -Category 'invalid-git-control'
         $objComponents['loose-refs'] = 'absent'
     }
 
@@ -1891,6 +1967,7 @@ function Get-GitControlSurfaceEvidence {
     } elseif ([System.IO.File]::Exists($strWorktreeRefsPath)) {
         throw 'invalid-git-control'
     } else {
+        Assert-UnoccupiedControlSlot -LiteralPath $strWorktreeRefsPath -Category 'invalid-git-control'
         $objComponents['worktree-loose-refs'] = 'absent'
     }
 
@@ -1909,6 +1986,7 @@ function Get-GitControlSurfaceEvidence {
     } elseif ([System.IO.File]::Exists($strCommonReftablePath)) {
         throw 'invalid-git-control'
     } else {
+        Assert-UnoccupiedControlSlot -LiteralPath $strCommonReftablePath -Category 'invalid-git-control'
         $objComponents['common-reftable'] = 'absent'
     }
     $strWorktreeReftablePath = [System.IO.Path]::GetFullPath(
@@ -1920,6 +1998,7 @@ function Get-GitControlSurfaceEvidence {
     } elseif ([System.IO.File]::Exists($strWorktreeReftablePath)) {
         throw 'invalid-git-control'
     } else {
+        Assert-UnoccupiedControlSlot -LiteralPath $strWorktreeReftablePath -Category 'invalid-git-control'
         $objComponents['worktree-reftable'] = 'absent'
     }
 
@@ -2050,6 +2129,7 @@ function Get-PathSetControlInputDigest {
         } elseif ([System.IO.Directory]::Exists($strPath)) {
             throw 'invalid-git-control'
         } else {
+            Assert-UnoccupiedControlSlot -LiteralPath $strPath -Category 'invalid-git-control'
             $objInputs[$strLabel] = 'absent'
         }
     }
@@ -2536,6 +2616,8 @@ try {
         Assert-OrdinaryTreeUnder -RootPath $strObjectsPath -LimitCategory 'git-object-store-nonordinary'
     } elseif ([System.IO.File]::Exists($strObjectsPath)) {
         throw 'git-object-store-nonordinary'
+    } else {
+        Assert-UnoccupiedControlSlot -LiteralPath $strObjectsPath -Category 'git-object-store-nonordinary'
     }
 
     if ($Mode -in @('Working', 'Both')) {

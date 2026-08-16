@@ -126,12 +126,12 @@
     "generator": {
       "path": "Generate-StyleGuideArtifacts.ps1",
       "version": "1.0.20260814.0",
-      "sha256": "4cfe6df5e63930dc48b86dfd56c3271348918fc22cffe6e9517be9c9a8be04ca"
+      "sha256": "2e4b899f8961658ec7a4b8281d9c0a661c6524d05f86670c1e72ea0a39341a4a"
     },
     "pathVerifier": {
       "path": "Test-ExactGitPathSet.ps1",
       "version": "1.0.20260814.0",
-      "sha256": "ad0b7e04a3ff52b6257081013e970d48fc96840c7282c2c5e9c983758cda240d"
+      "sha256": "8116ec3b6a79104e17f31364a61246f935c619e4a431a515d7b64d07efc4f722"
     }
   },
   "caseCatalog": {
@@ -140,7 +140,7 @@
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "6e459cb091fe32ff1536e936a137d3181b790b8988da87349100fec1225dcb31"
+    "sha256": "0df3340a459bd1e001808511a78f1d2d63c8307b429caa8b03c79750d311b619"
   },
   "actions": {
     "checkout": {

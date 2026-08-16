@@ -20,7 +20,14 @@ $script:strGeneratorVersion = '1.0.20260814.0'
 $script:strGeneratorResultSchema = 'PSStyleGuide.GeneratorResult.v2'
 $script:objUtf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
 $script:objUtf8NoBom = New-Object System.Text.UTF8Encoding($false)
-$script:objPathComparison = if ($env:OS -eq 'Windows_NT') {
+# Derive the host platform once from the runtime rather than from $env:OS, a
+# caller-controlled environment variable. On a Unix host that exports
+# OS=Windows_NT, an $env:OS-based check would select case-insensitive path
+# comparison, skip the UnixMode-absent fail-closed guards below, and load the
+# Windows-only native file-identity type on a non-Windows host. OSVersion.Platform
+# is Win32NT on Windows and Unix on Linux/macOS on both .NET Framework and .NET.
+$script:boolHostIsWindows = [System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT
+$script:objPathComparison = if ($script:boolHostIsWindows) {
     [System.StringComparison]::OrdinalIgnoreCase
 } else {
     [System.StringComparison]::Ordinal
@@ -541,7 +548,7 @@ function Assert-OrdinaryPathComponent {
                 $strUnixMode[0] -eq 'c')) {
                 throw "nonordinary-path"
             }
-        } elseif ($env:OS -ne 'Windows_NT') {
+        } elseif (-not $script:boolHostIsWindows) {
             # Non-Windows host that does not expose UnixMode (for example PowerShell
             # 7.0): the type cannot be read, so fail closed rather than accept a
             # potentially blocking special file.
@@ -626,7 +633,7 @@ function Get-OrdinaryDestinationState {
             $strUnixMode[0] -eq 'c')) {
             throw 'unexpected-destination'
         }
-    } elseif ($env:OS -ne 'Windows_NT') {
+    } elseif (-not $script:boolHostIsWindows) {
         # Non-Windows host that does not expose UnixMode (for example PowerShell 7.0):
         # the type cannot be read, so fail closed rather than accept a potentially
         # blocking special destination.
@@ -868,7 +875,7 @@ function Initialize-WindowsFileIdentityType {
     # This function declares no parameters.
     param ()
 
-    if ($env:OS -ne 'Windows_NT' -or ('PSStyleGuide.NativeFileIdentity' -as [type])) {
+    if ((-not $script:boolHostIsWindows) -or ('PSStyleGuide.NativeFileIdentity' -as [type])) {
         return
     }
 
@@ -965,7 +972,7 @@ function Get-OrdinaryFileIdentity {
         [string]$LiteralPath
     )
 
-    if ($env:OS -eq 'Windows_NT') {
+    if ($script:boolHostIsWindows) {
         Initialize-WindowsFileIdentityType
         return [PSStyleGuide.NativeFileIdentity]::Read($LiteralPath)
     }
