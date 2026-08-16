@@ -1327,6 +1327,90 @@ function ConvertFrom-NulPathRecordStream {
     return ,$objKeys
 }
 
+function ConvertTo-IgnoredExclusionPath {
+    # .SYNOPSIS
+    # Decodes git ls-files ignored -z output to absolute worktree-walk exclusions.
+    #
+    # .DESCRIPTION
+    # Validates the NUL framing with ConvertFrom-NulPathRecordStream (so a malformed or
+    # over-limit stream fails closed), then decodes each NUL-delimited record as strict
+    # UTF-8, strips the trailing slash that --directory adds to a collapsed directory,
+    # and resolves it to an absolute full path under the repository root. A record that
+    # is not strict UTF-8 is skipped rather than decoded: it is then simply not excluded,
+    # so the worktree walk processes it and fails closed exactly as before -- the safe
+    # direction. The result is only an exclusion hint for the worktree tree walk; a wrong
+    # or missing entry never widens the computed path set, it only refuses in its place.
+    #
+    # .PARAMETER Bytes
+    # Complete raw output from
+    # `git ls-files --others --ignored --exclude-standard --directory -z`.
+    #
+    # .PARAMETER RepositoryRoot
+    # Absolute repository root the relative ignored entries resolve against.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.String[]. Absolute full paths of the gitignored top-level entries.
+    # Record-framing, record-limit, and filesystem failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260814.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: Bytes
+    #   Position 1: RepositoryRoot
+    param (
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [byte[]]$Bytes,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RepositoryRoot
+    )
+
+    # Reuse the hardened NUL-framing and 100,000-record ceiling. Its base64 keys are not
+    # used here; the call fails closed on a malformed or oversized stream.
+    [void](ConvertFrom-NulPathRecordStream -Bytes $Bytes)
+    $listPaths = New-Object 'System.Collections.Generic.List[string]'
+    if ($Bytes.Length -eq 0) {
+        return ,$listPaths.ToArray()
+    }
+    $strRoot = [System.IO.Path]::GetFullPath($RepositoryRoot)
+    $intRecordStart = 0
+    for ($intIndex = 0; $intIndex -lt $Bytes.Length; $intIndex++) {
+        if ($Bytes[$intIndex] -ne 0) {
+            continue
+        }
+        $intLength = $intIndex - $intRecordStart
+        $intRecordStart = $intIndex + 1
+        $strRelative = $null
+        try {
+            $strRelative = $script:objUtf8Strict.GetString($Bytes, ($intIndex - $intLength), $intLength)
+        } catch {
+            $strRelative = $null
+        }
+        if ([string]::IsNullOrEmpty($strRelative)) {
+            continue
+        }
+        # --directory collapses a fully-ignored directory to a single trailing-'/' entry
+        # (git always emits '/'); strip it so the path matches the walk's GetFullPath form.
+        $strRelative = $strRelative.TrimEnd('/')
+        if ($strRelative.Length -eq 0) {
+            continue
+        }
+        $listPaths.Add([System.IO.Path]::GetFullPath((Join-Path $strRoot $strRelative)))
+    }
+    return ,$listPaths.ToArray()
+}
+
 function New-ExpectedPathKeySet {
     # .SYNOPSIS
     # Builds opaque keys for the caller's expected repository paths.
@@ -1567,6 +1651,13 @@ function Get-TreeEvidence {
     # .PARAMETER ExcludedPath
     # Optional exact absolute entry to exclude without traversal.
     #
+    # .PARAMETER AdditionalExcludedPath
+    # Optional set of exact absolute entries to exclude without traversal, in addition
+    # to ExcludedPath. A worktree read passes the gitignored top-level entries here
+    # (enumerated once via git ls-files --others --ignored --directory) so the walk
+    # omits what the tracked working diff and the --exclude-standard untracked read
+    # already omit. Matched with the same ordinal path comparison the walk uses.
+    #
     # .PARAMETER LinkCategory
     # Category thrown for a reparse point. Defaults to 'worktree-link'.
     #
@@ -1608,6 +1699,7 @@ function Get-TreeEvidence {
     #
     #   Position 0: RootPath
     #   Position 1: ExcludedPath
+    #   Position 2: AdditionalExcludedPath
     #
     # LinkCategory, SpecialEntryCategory, and LimitCategory are named and default to the
     # worktree categories; a control-surface caller overrides them so a failing .git tree
@@ -1618,6 +1710,8 @@ function Get-TreeEvidence {
 
         [AllowNull()]
         [string]$ExcludedPath,
+
+        [string[]]$AdditionalExcludedPath = @(),
 
         [ValidateNotNullOrEmpty()]
         [string]$LinkCategory = 'worktree-link',
@@ -1634,6 +1728,21 @@ function Get-TreeEvidence {
         $null
     } else {
         [System.IO.Path]::GetFullPath($ExcludedPath)
+    }
+    # Full-path set of additional entries to skip without traversal (the gitignored
+    # top-level entries for a worktree read). Compared with the same ordinal path
+    # comparison the walk uses for ExcludedPath, so Windows case-insensitivity holds.
+    $objAdditionalExcludedComparer = if ($script:boolHostIsWindows) {
+        [System.StringComparer]::OrdinalIgnoreCase
+    } else {
+        [System.StringComparer]::Ordinal
+    }
+    $objAdditionalExcluded = New-Object 'System.Collections.Generic.HashSet[string]' `
+        ($objAdditionalExcludedComparer)
+    foreach ($strAdditionalExcludedEntry in $AdditionalExcludedPath) {
+        if (-not [string]::IsNullOrEmpty($strAdditionalExcludedEntry)) {
+            [void]$objAdditionalExcluded.Add([System.IO.Path]::GetFullPath($strAdditionalExcludedEntry))
+        }
     }
     $objMap = New-Object 'System.Collections.Generic.SortedDictionary[string,string]' `
         ([System.StringComparer]::Ordinal)
@@ -1658,6 +1767,9 @@ function Get-TreeEvidence {
         foreach ($strEntry in [System.IO.Directory]::EnumerateFileSystemEntries($strDirectory)) {
             $strFullEntry = [System.IO.Path]::GetFullPath($strEntry)
             if ($null -ne $strExcluded -and $strFullEntry.Equals($strExcluded, $script:objPathComparison)) {
+                continue
+            }
+            if ($objAdditionalExcluded.Count -ne 0 -and $objAdditionalExcluded.Contains($strFullEntry)) {
                 continue
             }
             $objAttributes = [System.IO.File]::GetAttributes($strFullEntry)
@@ -1845,19 +1957,27 @@ function Get-GitAdministrativePathRecord {
 
 function Get-GitControlSurfaceEvidence {
     # .SYNOPSIS
-    # Gets bounded evidence for repository-local Git configuration and hooks.
+    # Gets bounded evidence for repository-local Git configuration and references.
     #
     # .DESCRIPTION
     # Hashes the .git pointer when present, the applicable local configuration
     # files, the staging index, split-index backing files, info/exclude,
-    # info/attributes, HEAD, packed-refs, the commondir pointer, the shared and
-    # per-worktree loose refs trees, the shared and per-worktree reftable backend
-    # trees, and ordinary bounded hook directory trees. Uses labeled components so
-    # absent and present state cannot collide. The refs trees exclude logs/
-    # (reflogs), a sibling of refs/, so benign reflog churn raises no drift.
+    # info/attributes, the commondir pointer, and -- only when
+    # IncludeReferenceEvidence is set -- the reference inputs HEAD, packed-refs, the
+    # shared and per-worktree loose refs trees, and the shared and per-worktree
+    # reftable backend trees. Uses labeled components so absent and present state
+    # cannot collide. The refs trees exclude logs/ (reflogs), a sibling of refs/, so
+    # benign reflog churn raises no drift. Repository hooks are not hashed: no
+    # verifier command runs a hook and core.fsmonitor is disabled, so hook contents
+    # cannot change the computed path set.
     #
     # .PARAMETER AdministrativePathRecord
     # Validated GitEntry, GitDirectory, and CommonDirectory path record.
+    #
+    # .PARAMETER IncludeReferenceEvidence
+    # When set (a Staged or Both read), also samples the reference inputs HEAD,
+    # packed-refs, and the loose/reftable trees. A working-only read consumes none of
+    # them, so it passes $false and a concurrent ref update raises no git-control-drift.
     #
     # .EXAMPLE
     # $hashtableControl = Get-GitControlSurfaceEvidence -AdministrativePathRecord $hashtableGitPath
@@ -1873,11 +1993,11 @@ function Get-GitControlSurfaceEvidence {
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
-    # System.Collections.Specialized.OrderedDictionary. Contains Digest,
-    # ComponentCount, HookEntryCount, and HookByteCount. The Digest also covers
-    # the staging index, info/exclude, info/attributes, HEAD, packed-refs, the
-    # commondir pointer, and the shared and per-worktree loose refs trees, so
-    # concurrent drift of any path-set read input raises git-control-drift.
+    # System.Collections.Specialized.OrderedDictionary. Contains Digest and
+    # ComponentCount. The Digest covers the staging index, info/exclude,
+    # info/attributes, the commondir pointer, and -- when IncludeReferenceEvidence is
+    # set -- HEAD, packed-refs, and the shared and per-worktree loose refs trees, so
+    # concurrent drift of any consumed path-set read input raises git-control-drift.
     # Filesystem, ordinary path,
     # size-bound, hashing, and parameter-binding failures propagate.
     #
@@ -1892,9 +2012,12 @@ function Get-GitControlSurfaceEvidence {
     # (internal-caller contract only; subject to change):
     #
     #   Position 0: AdministrativePathRecord
+    #   Position 1: IncludeReferenceEvidence
     param (
         [Parameter(Mandatory = $true)]
-        [System.Collections.IDictionary]$AdministrativePathRecord
+        [System.Collections.IDictionary]$AdministrativePathRecord,
+
+        [bool]$IncludeReferenceEvidence = $true
     )
 
     $objComponents = New-Object 'System.Collections.Generic.SortedDictionary[string,string]' `
@@ -1913,25 +2036,32 @@ function Get-GitControlSurfaceEvidence {
     # depend on but the worktree tree evidence excludes: the staging index
     # (working/staged/index-flags reads), info/exclude (the untracked read's
     # --exclude-standard set), info/attributes (repository-local Git attributes
-    # that can change the working read via content normalization), HEAD plus
-    # packed-refs (the staged read resolves HEAD against the index), and the
+    # that can change the working read via content normalization), and the
     # commondir pointer (which resolves the common Git directory for a linked
-    # worktree). The index, HEAD, and commondir pointer are per-worktree
-    # (GitDirectory); info/exclude, info/attributes, and packed-refs are shared
-    # (CommonDirectory).
+    # worktree). HEAD and packed-refs are reference inputs: the staged read resolves
+    # HEAD against the index, but a working-only read (worktree-versus-index plus an
+    # index-reading ls-files) consumes neither, so they are appended only when
+    # IncludeReferenceEvidence is set (a Staged or Both read). The index and commondir
+    # pointer are per-worktree (GitDirectory); info/exclude, info/attributes, and
+    # packed-refs are shared (CommonDirectory).
     $arrBoundedFileSpecifications = @(
         @('common-config', (Join-Path $AdministrativePathRecord.CommonDirectory 'config')),
         @('common-config-worktree', (Join-Path $AdministrativePathRecord.CommonDirectory 'config.worktree')),
         @('worktree-config', (Join-Path $AdministrativePathRecord.GitDirectory 'config')),
         @('worktree-config-worktree', (Join-Path $AdministrativePathRecord.GitDirectory 'config.worktree')),
         @('git-index', (Join-Path $AdministrativePathRecord.GitDirectory 'index')),
-        @('git-head', (Join-Path $AdministrativePathRecord.GitDirectory 'HEAD')),
         @('info-exclude', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'exclude')),
         @('info-attributes', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'attributes')),
-        @('packed-refs', (Join-Path $AdministrativePathRecord.CommonDirectory 'packed-refs')),
         @('commondir-pointer', (Join-Path $AdministrativePathRecord.GitDirectory 'commondir')),
         @('objects-info-alternates', (Join-Path (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'objects') 'info') 'alternates'))
-    )
+    ) + $(if ($IncludeReferenceEvidence) {
+        @(
+            @('git-head', (Join-Path $AdministrativePathRecord.GitDirectory 'HEAD')),
+            @('packed-refs', (Join-Path $AdministrativePathRecord.CommonDirectory 'packed-refs'))
+        )
+    } else {
+        @()
+    })
     foreach ($arrSpecification in $arrBoundedFileSpecifications) {
         $strLabel = [string]$arrSpecification[0]
         $strPath = [System.IO.Path]::GetFullPath([string]$arrSpecification[1])
@@ -1948,109 +2078,95 @@ function Get-GitControlSurfaceEvidence {
         }
     }
 
-    # The .git control trees below (hooks, shared and per-worktree loose refs, and shared
+    # The .git reference trees below (shared and per-worktree loose refs, and shared
     # and per-worktree reftable) are hashed by the same shared Get-TreeEvidence walker as
     # the worktree, so a reparse point, special file, or over-limit tree must fail closed as
     # a control-surface category, not a worktree one. These are the same categories the
-    # bounded control-file checks above already raise.
+    # bounded control-file checks above already raise. Hooks are deliberately not hashed:
+    # no verifier command runs a repository hook, and core.fsmonitor (the only hook that
+    # could change a path-set read) is disabled on every invocation, so hook contents
+    # cannot change the computed path set; hashing them only refused a managed hook symlink.
     $hashtableControlTreeCategory = @{
         LinkCategory = 'invalid-git-control'
         SpecialEntryCategory = 'invalid-git-control'
         LimitCategory = 'git-control-limit'
     }
-    $intHookEntryCount = 0
-    $longHookByteCount = 0L
-    $arrHookSpecifications = @(
-        @('common-hooks', (Join-Path $AdministrativePathRecord.CommonDirectory 'hooks')),
-        @('worktree-hooks', (Join-Path $AdministrativePathRecord.GitDirectory 'hooks'))
-    )
-    foreach ($arrSpecification in $arrHookSpecifications) {
-        $strLabel = [string]$arrSpecification[0]
-        $strPath = [System.IO.Path]::GetFullPath([string]$arrSpecification[1])
-        if ([System.IO.Directory]::Exists($strPath)) {
-            $hashtableHooks = Get-TreeEvidence -RootPath $strPath -ExcludedPath $null `
-                @hashtableControlTreeCategory
-            $objComponents[$strLabel] = $hashtableHooks.Digest
-            $intHookEntryCount += $hashtableHooks.EntryCount
-            $longHookByteCount += $hashtableHooks.ByteCount
-        } elseif ([System.IO.File]::Exists($strPath)) {
+    # HEAD, packed-refs, and the loose/reftable trees below are reference inputs the
+    # staged read resolves HEAD against the index with. A working-only read consumes
+    # none of them, so a concurrent ref update must not raise git-control-drift for it;
+    # sample the reference trees only when IncludeReferenceEvidence is set.
+    if ($IncludeReferenceEvidence) {
+        # The staged read resolves HEAD against the index, so a concurrent move of the
+        # branch ref (commit, reset --soft, update-ref) changes the staged path set.
+        # Hash the shared loose refs tree so that drift is caught alongside HEAD and
+        # packed-refs above. logs/ (reflogs) is a sibling of refs/ and is deliberately
+        # not walked, so benign reflog churn raises no spurious drift.
+        $strLooseRefsPath = [System.IO.Path]::GetFullPath(
+            (Join-Path $AdministrativePathRecord.CommonDirectory 'refs'))
+        if ([System.IO.Directory]::Exists($strLooseRefsPath)) {
+            $objComponents['loose-refs'] = (
+                Get-TreeEvidence -RootPath $strLooseRefsPath -ExcludedPath $null `
+                    @hashtableControlTreeCategory).Digest
+        } elseif ([System.IO.File]::Exists($strLooseRefsPath)) {
             throw 'invalid-git-control'
         } else {
-            Assert-UnoccupiedControlSlot -LiteralPath $strPath -Category 'invalid-git-control'
-            $objComponents[$strLabel] = 'absent'
+            Assert-UnoccupiedControlSlot -LiteralPath $strLooseRefsPath -Category 'invalid-git-control'
+            $objComponents['loose-refs'] = 'absent'
         }
-    }
 
-    # The staged read resolves HEAD against the index, so a concurrent move of the
-    # branch ref (commit, reset --soft, update-ref) changes the staged path set.
-    # Hash the shared loose refs tree so that drift is caught alongside HEAD and
-    # packed-refs above. logs/ (reflogs) is a sibling of refs/ and is deliberately
-    # not walked, so benign reflog churn raises no spurious drift.
-    $strLooseRefsPath = [System.IO.Path]::GetFullPath(
-        (Join-Path $AdministrativePathRecord.CommonDirectory 'refs'))
-    if ([System.IO.Directory]::Exists($strLooseRefsPath)) {
-        $objComponents['loose-refs'] = (
-            Get-TreeEvidence -RootPath $strLooseRefsPath -ExcludedPath $null `
-                @hashtableControlTreeCategory).Digest
-    } elseif ([System.IO.File]::Exists($strLooseRefsPath)) {
-        throw 'invalid-git-control'
-    } else {
-        Assert-UnoccupiedControlSlot -LiteralPath $strLooseRefsPath -Category 'invalid-git-control'
-        $objComponents['loose-refs'] = 'absent'
-    }
+        # Per-worktree refs (refs/bisect, refs/worktree, refs/rewritten) are not shared:
+        # Git stores them under the worktree's own Git directory, outside the common
+        # refs tree hashed above. For a linked worktree GitDirectory differs from
+        # CommonDirectory, so a HEAD that points at a per-worktree ref (for example
+        # refs/worktree/*) resolves the staged read against GitDirectory/refs, which
+        # loose-refs above does not cover; moving that ref would otherwise leave both
+        # before/after digests equal. Hash GitDirectory/refs under a distinct label so
+        # per-worktree ref drift is caught. For the main worktree GitDirectory equals
+        # CommonDirectory, so this repeats the shared tree, which is inert. logs/ stays
+        # a sibling of refs/ and is not walked, so reflog churn raises no spurious drift.
+        $strWorktreeRefsPath = [System.IO.Path]::GetFullPath(
+            (Join-Path $AdministrativePathRecord.GitDirectory 'refs'))
+        if ([System.IO.Directory]::Exists($strWorktreeRefsPath)) {
+            $objComponents['worktree-loose-refs'] = (
+                Get-TreeEvidence -RootPath $strWorktreeRefsPath -ExcludedPath $null `
+                    @hashtableControlTreeCategory).Digest
+        } elseif ([System.IO.File]::Exists($strWorktreeRefsPath)) {
+            throw 'invalid-git-control'
+        } else {
+            Assert-UnoccupiedControlSlot -LiteralPath $strWorktreeRefsPath -Category 'invalid-git-control'
+            $objComponents['worktree-loose-refs'] = 'absent'
+        }
 
-    # Per-worktree refs (refs/bisect, refs/worktree, refs/rewritten) are not shared:
-    # Git stores them under the worktree's own Git directory, outside the common
-    # refs tree hashed above. For a linked worktree GitDirectory differs from
-    # CommonDirectory, so a HEAD that points at a per-worktree ref (for example
-    # refs/worktree/*) resolves the staged read against GitDirectory/refs, which
-    # loose-refs above does not cover; moving that ref would otherwise leave both
-    # before/after digests equal. Hash GitDirectory/refs under a distinct label so
-    # per-worktree ref drift is caught. For the main worktree GitDirectory equals
-    # CommonDirectory, so this repeats the shared tree, which is inert. logs/ stays
-    # a sibling of refs/ and is not walked, so reflog churn raises no spurious drift.
-    $strWorktreeRefsPath = [System.IO.Path]::GetFullPath(
-        (Join-Path $AdministrativePathRecord.GitDirectory 'refs'))
-    if ([System.IO.Directory]::Exists($strWorktreeRefsPath)) {
-        $objComponents['worktree-loose-refs'] = (
-            Get-TreeEvidence -RootPath $strWorktreeRefsPath -ExcludedPath $null `
-                @hashtableControlTreeCategory).Digest
-    } elseif ([System.IO.File]::Exists($strWorktreeRefsPath)) {
-        throw 'invalid-git-control'
-    } else {
-        Assert-UnoccupiedControlSlot -LiteralPath $strWorktreeRefsPath -Category 'invalid-git-control'
-        $objComponents['worktree-loose-refs'] = 'absent'
-    }
-
-    # Reftable reference backend: with extensions.refStorage=reftable, branch tips
-    # live under <dir>/reftable/ rather than the loose refs/ tree or packed-refs
-    # captured above, so a concurrent update-ref through that backend would change
-    # the staged read (HEAD resolved against the index) while the loose/packed
-    # components stayed equal. Hash the shared and per-worktree reftable trees;
-    # absent for the default files backend.
-    $strCommonReftablePath = [System.IO.Path]::GetFullPath(
-        (Join-Path $AdministrativePathRecord.CommonDirectory 'reftable'))
-    if ([System.IO.Directory]::Exists($strCommonReftablePath)) {
-        $objComponents['common-reftable'] = (
-            Get-TreeEvidence -RootPath $strCommonReftablePath -ExcludedPath $null `
-                @hashtableControlTreeCategory).Digest
-    } elseif ([System.IO.File]::Exists($strCommonReftablePath)) {
-        throw 'invalid-git-control'
-    } else {
-        Assert-UnoccupiedControlSlot -LiteralPath $strCommonReftablePath -Category 'invalid-git-control'
-        $objComponents['common-reftable'] = 'absent'
-    }
-    $strWorktreeReftablePath = [System.IO.Path]::GetFullPath(
-        (Join-Path $AdministrativePathRecord.GitDirectory 'reftable'))
-    if ([System.IO.Directory]::Exists($strWorktreeReftablePath)) {
-        $objComponents['worktree-reftable'] = (
-            Get-TreeEvidence -RootPath $strWorktreeReftablePath -ExcludedPath $null `
-                @hashtableControlTreeCategory).Digest
-    } elseif ([System.IO.File]::Exists($strWorktreeReftablePath)) {
-        throw 'invalid-git-control'
-    } else {
-        Assert-UnoccupiedControlSlot -LiteralPath $strWorktreeReftablePath -Category 'invalid-git-control'
-        $objComponents['worktree-reftable'] = 'absent'
+        # Reftable reference backend: with extensions.refStorage=reftable, branch tips
+        # live under <dir>/reftable/ rather than the loose refs/ tree or packed-refs
+        # captured above, so a concurrent update-ref through that backend would change
+        # the staged read (HEAD resolved against the index) while the loose/packed
+        # components stayed equal. Hash the shared and per-worktree reftable trees;
+        # absent for the default files backend.
+        $strCommonReftablePath = [System.IO.Path]::GetFullPath(
+            (Join-Path $AdministrativePathRecord.CommonDirectory 'reftable'))
+        if ([System.IO.Directory]::Exists($strCommonReftablePath)) {
+            $objComponents['common-reftable'] = (
+                Get-TreeEvidence -RootPath $strCommonReftablePath -ExcludedPath $null `
+                    @hashtableControlTreeCategory).Digest
+        } elseif ([System.IO.File]::Exists($strCommonReftablePath)) {
+            throw 'invalid-git-control'
+        } else {
+            Assert-UnoccupiedControlSlot -LiteralPath $strCommonReftablePath -Category 'invalid-git-control'
+            $objComponents['common-reftable'] = 'absent'
+        }
+        $strWorktreeReftablePath = [System.IO.Path]::GetFullPath(
+            (Join-Path $AdministrativePathRecord.GitDirectory 'reftable'))
+        if ([System.IO.Directory]::Exists($strWorktreeReftablePath)) {
+            $objComponents['worktree-reftable'] = (
+                Get-TreeEvidence -RootPath $strWorktreeReftablePath -ExcludedPath $null `
+                    @hashtableControlTreeCategory).Digest
+        } elseif ([System.IO.File]::Exists($strWorktreeReftablePath)) {
+            throw 'invalid-git-control'
+        } else {
+            Assert-UnoccupiedControlSlot -LiteralPath $strWorktreeReftablePath -Category 'invalid-git-control'
+            $objComponents['worktree-reftable'] = 'absent'
+        }
     }
 
     # Split-index backing files: with core.splitIndex, GitDirectory/index is a small
@@ -2103,8 +2219,6 @@ function Get-GitControlSurfaceEvidence {
     return [ordered]@{
         Digest = Get-FramedStringMapDigest -StringMap $objComponents
         ComponentCount = $objComponents.Count
-        HookEntryCount = $intHookEntryCount
-        HookByteCount = $longHookByteCount
     }
 }
 
@@ -2114,17 +2228,22 @@ function Get-PathSetControlInputDigest {
     #
     # .DESCRIPTION
     # Hashes only the single-file administrative inputs the working, untracked, and
-    # staged reads consume -- the staging index, HEAD, info/exclude, info/attributes,
-    # packed-refs, the applicable config files, and the commondir pointer -- into one
-    # ordinal-framed digest. Each is a single file, so each hash is atomic. Taken
-    # before the reads and again as the verifier's final evidence action, the two
-    # digests bracket the read window with atomic reads, closing the final-traversal
-    # tail that the aggregate control digest leaves for these inputs. Tree-shaped
-    # control inputs (loose refs, hooks, reftable, split-index backing files) and the
-    # live worktree cannot be bracketed this way and keep the convergence guarantee.
+    # staged reads consume -- the staging index, info/exclude, info/attributes, the
+    # applicable config files, the commondir pointer, and -- only when
+    # IncludeReferenceEvidence is set -- the reference inputs HEAD and packed-refs,
+    # into one ordinal-framed digest. Each is a single file, so each hash is atomic.
+    # Taken before the reads and again as the verifier's final evidence action, the
+    # two digests bracket the read window with atomic reads, closing the
+    # final-traversal tail that the aggregate control digest leaves for these inputs.
+    # Tree-shaped control inputs (loose refs, reftable, split-index backing files) and
+    # the live worktree cannot be bracketed this way and keep the convergence guarantee.
     #
     # .PARAMETER AdministrativePathRecord
     # Validated GitEntry, GitDirectory, and CommonDirectory path record.
+    #
+    # .PARAMETER IncludeReferenceEvidence
+    # When set (a Staged or Both read), also brackets the reference inputs HEAD and
+    # packed-refs. A working-only read consumes neither, so it passes $false.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
@@ -2144,26 +2263,34 @@ function Get-PathSetControlInputDigest {
     # (internal-caller contract only; subject to change):
     #
     #   Position 0: AdministrativePathRecord
+    #   Position 1: IncludeReferenceEvidence
     param (
         [Parameter(Mandatory = $true)]
-        [System.Collections.IDictionary]$AdministrativePathRecord
+        [System.Collections.IDictionary]$AdministrativePathRecord,
+
+        [bool]$IncludeReferenceEvidence = $true
     )
 
     $objInputs = New-Object 'System.Collections.Generic.SortedDictionary[string,string]' `
         ([System.StringComparer]::Ordinal)
     $arrSingleFileInputs = @(
         @('git-index', (Join-Path $AdministrativePathRecord.GitDirectory 'index')),
-        @('git-head', (Join-Path $AdministrativePathRecord.GitDirectory 'HEAD')),
         @('info-exclude', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'exclude')),
         @('info-attributes', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'attributes')),
-        @('packed-refs', (Join-Path $AdministrativePathRecord.CommonDirectory 'packed-refs')),
         @('common-config', (Join-Path $AdministrativePathRecord.CommonDirectory 'config')),
         @('common-config-worktree', (Join-Path $AdministrativePathRecord.CommonDirectory 'config.worktree')),
         @('worktree-config', (Join-Path $AdministrativePathRecord.GitDirectory 'config')),
         @('worktree-config-worktree', (Join-Path $AdministrativePathRecord.GitDirectory 'config.worktree')),
         @('commondir-pointer', (Join-Path $AdministrativePathRecord.GitDirectory 'commondir')),
         @('objects-info-alternates', (Join-Path (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'objects') 'info') 'alternates'))
-    )
+    ) + $(if ($IncludeReferenceEvidence) {
+        @(
+            @('git-head', (Join-Path $AdministrativePathRecord.GitDirectory 'HEAD')),
+            @('packed-refs', (Join-Path $AdministrativePathRecord.CommonDirectory 'packed-refs'))
+        )
+    } else {
+        @()
+    })
     foreach ($arrSpecification in $arrSingleFileInputs) {
         $strLabel = [string]$arrSpecification[0]
         $strPath = [System.IO.Path]::GetFullPath([string]$arrSpecification[1])
@@ -2426,8 +2553,6 @@ try {
     $objExpectedKeys = New-ExpectedPathKeySet -PathList $ExpectedPath
     $hashtableGitExecutable = Get-GitExecutableRecord -RequestedPath $GitExecutablePath
     $hashtableAdministrativePaths = Get-GitAdministrativePathRecord -RepositoryRoot $strRepositoryRoot
-    $hashtableControlBefore = Get-GitControlSurfaceEvidence `
-        -AdministrativePathRecord $hashtableAdministrativePaths
     # The staged read (git diff --cached) is index-versus-HEAD and never consumes the
     # worktree, so a staged-only verification must not scan or bracket it: an ordinary
     # tracked symlink, or any worktree state exceeding the tree walker's limits, would
@@ -2435,10 +2560,50 @@ try {
     # Gather and bracket the worktree evidence only when a working-tree or clean-working
     # read is requested.
     $boolWorktreeReadRequested = ($Mode -in @('Working', 'Both')) -or $RequireCleanWorkingAgainstIndex
+    # HEAD and the ref trees are consumed only by the staged read (git diff --cached
+    # resolves HEAD against the index); a working-only read is worktree-versus-index plus
+    # an index-reading ls-files, neither of which consumes a reference. Sample the
+    # reference evidence in the control brackets only for a staged read, so a concurrent
+    # ref update raises no git-control-drift for a working-only verification.
+    $boolIncludeReferenceEvidence = ($Mode -in @('Staged', 'Both'))
+    # Enumerate the gitignored top-level entries once, before the reads, so the worktree
+    # walk omits what the tracked working diff and the --exclude-standard untracked read
+    # already omit. An ignored tree (for example node_modules) that holds a symlink,
+    # special file, or over-limit content would otherwise refuse an empty working set.
+    # --directory collapses a fully-ignored directory to one trailing-slashed entry. The
+    # identical set is reused across the before/after/confirm walks so the drift
+    # comparison stays apples-to-apples; a new ignored tree created mid-window is not in
+    # the set and the later walk fails closed, the safe direction. Only a worktree read
+    # walks the tree, so a staged-only read skips this.
+    $arrIgnoredExcludedPath = @()
+    if ($boolWorktreeReadRequested) {
+        $strNativeCommand = 'ignored'
+        $intNativeExit = $null
+        $hashtableIgnoredResult = Invoke-GitRaw `
+            -GitRecord $hashtableGitExecutable `
+            -WorkingDirectory $strRepositoryRoot `
+            -ArgumentList @('ls-files', '--others', '--ignored', '--exclude-standard', '--directory', '-z', '--')
+        $listNativeChecks.Add([ordered]@{
+            Name = $strNativeCommand
+            ExitCode = $hashtableIgnoredResult.ExitCode
+            StdoutLength = $hashtableIgnoredResult.Stdout.Length
+            StderrLength = $hashtableIgnoredResult.StderrLength
+        })
+        $intNativeExit = $hashtableIgnoredResult.ExitCode
+        if ($intNativeExit -ne 0) {
+            throw 'native-command'
+        }
+        $arrIgnoredExcludedPath = ConvertTo-IgnoredExclusionPath `
+            -Bytes $hashtableIgnoredResult.Stdout -RepositoryRoot $strRepositoryRoot
+    }
+    $hashtableControlBefore = Get-GitControlSurfaceEvidence `
+        -AdministrativePathRecord $hashtableAdministrativePaths `
+        -IncludeReferenceEvidence $boolIncludeReferenceEvidence
     $hashtableWorktreeBefore = if ($boolWorktreeReadRequested) {
         Get-TreeEvidence `
             -RootPath $strRepositoryRoot `
-            -ExcludedPath $hashtableAdministrativePaths.GitEntry
+            -ExcludedPath $hashtableAdministrativePaths.GitEntry `
+            -AdditionalExcludedPath $arrIgnoredExcludedPath
     } else {
         $null
     }
@@ -2461,7 +2626,8 @@ try {
     # second writer racing a sub-second window, which single-actor CI does not have;
     # against accidental drift the convergence is conclusive.
     $strControlInputDigestBefore = Get-PathSetControlInputDigest `
-        -AdministrativePathRecord $hashtableAdministrativePaths
+        -AdministrativePathRecord $hashtableAdministrativePaths `
+        -IncludeReferenceEvidence $boolIncludeReferenceEvidence
 
     $strNativeCommand = 'repository-root'
     $intNativeExit = $null
@@ -2818,23 +2984,27 @@ try {
     $hashtableWorktreeAfter = if ($boolWorktreeReadRequested) {
         Get-TreeEvidence `
             -RootPath $strRepositoryRoot `
-            -ExcludedPath $hashtableAdministrativePaths.GitEntry
+            -ExcludedPath $hashtableAdministrativePaths.GitEntry `
+            -AdditionalExcludedPath $arrIgnoredExcludedPath
     } else {
         $null
     }
     $hashtableControlAfter = Get-GitControlSurfaceEvidence `
-        -AdministrativePathRecord $hashtableAdministrativePaths
+        -AdministrativePathRecord $hashtableAdministrativePaths `
+        -IncludeReferenceEvidence $boolIncludeReferenceEvidence
     while ($intConvergenceCount -lt $intConvergenceLimit) {
         $intConvergenceCount++
         $hashtableWorktreeConfirm = if ($boolWorktreeReadRequested) {
             Get-TreeEvidence `
                 -RootPath $strRepositoryRoot `
-                -ExcludedPath $hashtableAdministrativePaths.GitEntry
+                -ExcludedPath $hashtableAdministrativePaths.GitEntry `
+                -AdditionalExcludedPath $arrIgnoredExcludedPath
         } else {
             $null
         }
         $hashtableControlConfirm = Get-GitControlSurfaceEvidence `
-            -AdministrativePathRecord $hashtableAdministrativePaths
+            -AdministrativePathRecord $hashtableAdministrativePaths `
+            -IncludeReferenceEvidence $boolIncludeReferenceEvidence
         $boolWorktreeStable = (-not $boolWorktreeReadRequested) -or
             ($hashtableWorktreeConfirm.Digest -ceq $hashtableWorktreeAfter.Digest)
         if ($hashtableControlConfirm.Digest -ceq $hashtableControlAfter.Digest -and
@@ -2934,7 +3104,8 @@ try {
     # after this read is post-return state that no verifier can observe; tree-shaped
     # inputs and the live worktree keep the convergence guarantee only.
     $strControlInputDigestFinal = Get-PathSetControlInputDigest `
-        -AdministrativePathRecord $hashtableAdministrativePaths
+        -AdministrativePathRecord $hashtableAdministrativePaths `
+        -IncludeReferenceEvidence $boolIncludeReferenceEvidence
     if ($strControlInputDigestBefore -cne $strControlInputDigestFinal) {
         throw 'git-control-drift'
     }

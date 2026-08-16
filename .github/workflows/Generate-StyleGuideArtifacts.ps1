@@ -2019,10 +2019,23 @@ function Write-StyleGuideArtifact {
             throw 'final-state-drift'
         }
         [void](Assert-OrdinaryAbsolutePath -LiteralPath $strDestinationPath -ExpectedLeafType File)
+        # Bind the measured bytes to a single destination identity across the read.
+        # A second writer that replaces the destination between the byte read and the
+        # identity read would otherwise pair the correct candidate bytes with the
+        # replacement's identity, and every comparison below would still pass. Capture
+        # the identity before and after the read and require them to match; a change
+        # across the read fails closed. Publication already returned, so the catch
+        # reports ReplacementStateUncertain. A change before the byte read alters the
+        # bytes and is caught below as final-byte-drift; a change strictly after the
+        # second identity read is the accepted publication residual documented above.
+        $strFinalIdentityBeforeRead = Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath
         $arrFinalBytes = [System.IO.File]::ReadAllBytes($strDestinationPath)
         $hashtableRecord.FinalLength = $arrFinalBytes.Length
         $hashtableRecord.FinalSha256 = Get-Sha256Hex -Bytes $arrFinalBytes
         $hashtableRecord.FinalOrdinaryIdentity = Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath
+        if ($strFinalIdentityBeforeRead -cne $hashtableRecord.FinalOrdinaryIdentity) {
+            throw 'final-identity-drift'
+        }
         if ($hashtableRecord.FinalLength -ne $CompletePayloadBytes.Length -or
             $hashtableRecord.FinalSha256 -cne $hashtableRecord.CandidateSha256 -or
             ($arrFinalBytes.Length -ge 3 -and $arrFinalBytes[0] -eq 0xEF -and

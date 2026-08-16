@@ -75,7 +75,7 @@ jobs:
               'STYLE_GUIDE_CHAT.md',
               'STYLE_GUIDE_FULL.md'
           )
-          & git diff --exit-code --quiet --no-ext-diff --no-textconv -- $arrArtifactPaths
+          & git -c core.fsmonitor=false -c diff.orderFile=/dev/null diff --exit-code --quiet --no-ext-diff --no-textconv -- $arrArtifactPaths
           $intDiffExit = $LASTEXITCODE
           if ($intDiffExit -eq 1) {
               throw 'Generated artifact drift was detected.'
