@@ -506,33 +506,38 @@ function Read-BoundedFileContent {
     }
 }
 
-function Assert-NoReparsePointUnder {
+function Assert-OrdinaryTreeUnder {
     # .SYNOPSIS
-    # Rejects any reparse point (symlink or junction) anywhere below one directory.
+    # Rejects any non-ordinary entry -- a reparse point or a non-regular Unix file --
+    # anywhere below one directory.
     #
     # .DESCRIPTION
     # Walks the tree under RootPath without following links: every entry is tested for
     # the reparse-point attribute before a directory is descended, so a link is never
-    # traversed. Throws the caller's limit category on the first reparse point found,
-    # and on an anomalously large tree (a runaway backstop). RootPath itself is not
-    # tested; the caller tests the root before calling.
+    # traversed. A non-directory, non-reparse entry that is a Unix FIFO, socket, or
+    # device (which Git would open and block on) is also rejected through the UnixMode
+    # string, and a non-Windows host that cannot report the type fails closed. Throws
+    # the caller's limit category on the first offending entry, and on an anomalously
+    # large tree (a runaway backstop). RootPath itself is not tested; the caller tests
+    # the root before calling.
     #
     # .PARAMETER RootPath
-    # Absolute directory whose descendants must contain no reparse point.
+    # Absolute directory whose descendants must all be ordinary files or directories.
     #
     # .PARAMETER LimitCategory
-    # Error string thrown when a reparse point (or the scan backstop) is hit.
+    # Error string thrown for a reparse point, a special Unix entry, an unreadable
+    # type on a non-Windows host, or the scan backstop.
     #
     # .EXAMPLE
-    # Assert-NoReparsePointUnder -RootPath $strObjectsPath -LimitCategory 'git-object-store-symlink'
+    # Assert-OrdinaryTreeUnder -RootPath $strObjectsPath -LimitCategory 'git-object-store-nonordinary'
     #
-    # # Returns nothing when the tree is link-free; throws otherwise.
+    # # Returns nothing when the tree is ordinary; throws otherwise.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
-    # None. Throws LimitCategory for a reparse point below RootPath or an
+    # None. Throws LimitCategory for a non-ordinary entry below RootPath or an
     # over-limit scan. Enumeration, metadata, access, and parameter-binding failures
     # propagate.
     #
@@ -572,6 +577,19 @@ function Assert-NoReparsePointUnder {
             }
             if (($objAttributes -band [System.IO.FileAttributes]::Directory) -ne 0) {
                 $objPending.Push([string]$strEntry)
+            } else {
+                $objEntryInfo = New-Object System.IO.FileInfo($strEntry)
+                $objUnixModeProperty = $objEntryInfo.PSObject.Properties['UnixMode']
+                if ($null -ne $objUnixModeProperty) {
+                    $strUnixMode = [string]$objUnixModeProperty.Value
+                    if ($strUnixMode.Length -gt 0 -and ($strUnixMode[0] -eq 'p' -or
+                        $strUnixMode[0] -eq 's' -or $strUnixMode[0] -eq 'b' -or
+                        $strUnixMode[0] -eq 'c')) {
+                        throw $LimitCategory
+                    }
+                } elseif ($env:OS -ne 'Windows_NT') {
+                    throw $LimitCategory
+                }
             }
         }
     }
@@ -2441,26 +2459,27 @@ try {
                 throw 'git-alternates-active'
             }
         }
-        # Reject an external object store reached through a symlinked objects directory
-        # or any symlinked entry below it. If CommonDirectory/objects -- or a child such
-        # as objects/pack, objects/<fanout>, or an individual pack/loose-object file --
-        # is a reparse point to a location outside the repository, the staged read
-        # resolves HEAD's tree from that external store, a third external-store route
-        # beyond the alternates file and a promisor remote. The objects tree is not
-        # bracketed by the control digests, so its later removal or redirection would not
-        # trip git-control-drift; validate it here and refuse a reparse (or non-directory)
-        # object root, and any reparse point beneath it, before the staged read. An
-        # ordinary clone has a plain objects tree and is unaffected.
+        # Reject an external or blocking object store. If CommonDirectory/objects -- or
+        # a child such as objects/pack, objects/<fanout>, or an individual pack/loose
+        # object -- is a reparse point to a location outside the repository, the staged
+        # read resolves HEAD's tree from that external store (a third external-store
+        # route beyond the alternates file and a promisor remote); and on Unix a loose
+        # object or pack file that is a FIFO/socket/device would make git diff --cached
+        # block opening it. The objects tree is not bracketed by the control digests, so
+        # its later removal or redirection would not trip git-control-drift; validate it
+        # here and refuse a reparse or non-directory object root, and any reparse point
+        # or non-regular Unix entry beneath it, before the staged read. An ordinary
+        # clone has a plain objects tree of ordinary files and is unaffected.
         $strObjectsPath = [System.IO.Path]::GetFullPath(
             (Join-Path $hashtableAdministrativePaths.CommonDirectory 'objects'))
         if ([System.IO.Directory]::Exists($strObjectsPath)) {
             $objObjectsInfo = New-Object System.IO.DirectoryInfo($strObjectsPath)
             if (($objObjectsInfo.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
-                throw 'git-object-store-symlink'
+                throw 'git-object-store-nonordinary'
             }
-            Assert-NoReparsePointUnder -RootPath $strObjectsPath -LimitCategory 'git-object-store-symlink'
+            Assert-OrdinaryTreeUnder -RootPath $strObjectsPath -LimitCategory 'git-object-store-nonordinary'
         } elseif ([System.IO.File]::Exists($strObjectsPath)) {
-            throw 'git-object-store-symlink'
+            throw 'git-object-store-nonordinary'
         }
         $strNativeCommand = 'staged'
         $hashtableStagedResult = Invoke-GitRaw `
@@ -2635,7 +2654,7 @@ try {
         'worktree-link', 'worktree-limit', 'worktree-special-entry',
         'git-control-drift', 'worktree-drift',
         'evidence-unstable', 'git-filter-active', 'git-alternates-active',
-        'git-config-include-active', 'git-promisor-remote', 'git-object-store-symlink',
+        'git-config-include-active', 'git-promisor-remote', 'git-object-store-nonordinary',
         'native-command', 'native-output-limit', 'working-index-difference'
     )) {
         $strCategory = $_.Exception.Message
