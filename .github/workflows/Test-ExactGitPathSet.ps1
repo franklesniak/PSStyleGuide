@@ -26,7 +26,7 @@ Optional exact absolute path of the Git executable. When omitted, the script
 uses the module-qualified application resolver once before any Git invocation.
 
 .NOTES
-Version: 1.0.20260816.1
+Version: 1.0.20260816.2
 #>
 
 [CmdletBinding()]
@@ -52,7 +52,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strVerifierVersion = '1.0.20260816.1'
+$script:strVerifierVersion = '1.0.20260816.2'
 $script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v2'
 # Wall-clock ceiling for any single native Git invocation (Invoke-GitRaw). The path-set
 # reads are sub-second metadata queries, so this 120-second default is orders of magnitude
@@ -933,7 +933,7 @@ function Stop-NativeProcessTree {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.1
+    # Version: 1.0.20260816.2
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1010,7 +1010,7 @@ function Invoke-GitRaw {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.1
+    # Version: 1.0.20260816.2
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1454,7 +1454,7 @@ function ConvertTo-SubmoduleExclusionPath {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.1
+    # Version: 1.0.20260816.2
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2094,7 +2094,7 @@ function Get-BoundedControlFileComponent {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.1
+    # Version: 1.0.20260816.2
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2171,7 +2171,7 @@ function Resolve-ActiveSharedIndexRecord {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.1
+    # Version: 1.0.20260816.2
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2293,7 +2293,7 @@ function Get-SplitIndexBracketedEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.1
+    # Version: 1.0.20260816.2
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2444,7 +2444,7 @@ function Get-GitControlSurfaceEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.1
+    # Version: 1.0.20260816.2
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2488,8 +2488,16 @@ function Get-GitControlSurfaceEvidence {
         $objComponents['git-entry'] = 'directory'
     }
 
-    # Local config, plus the single-file administrative inputs the path-set reads
-    # depend on but the worktree tree evidence excludes. The active per-worktree
+    # Repository-local config, plus the single-file administrative inputs the path-set
+    # reads depend on but the worktree tree evidence excludes. Only CommonDirectory/config
+    # (common-config) is the repository-local configuration Git actually reads: Git resolves
+    # it from $GIT_COMMON_DIR/config, and for the main worktree GitDirectory equals
+    # CommonDirectory, so common-config covers it in both the main and the linked worktree.
+    # GitDirectory/config is deliberately not sampled -- Git never reads $GIT_DIR/config for a
+    # linked worktree, so hashing that inactive slot would let a stale symlink, oversized
+    # file, or concurrent edit there refuse or drift a read that cannot depend on it (the same
+    # class as the dropped common-config-worktree in C4 and the gated config.worktree in C7).
+    # The active per-worktree
     # configuration is GitDirectory/config.worktree (worktree-config-worktree); it is
     # sampled only when IncludeWorktreeConfigEvidence is set (see the direct assignment
     # after the loop below), because Git reads it only when extensions.worktreeConfig is
@@ -2509,7 +2517,6 @@ function Get-GitControlSurfaceEvidence {
     # Get-SplitIndexBracketedEvidence below.
     $arrBoundedFileSpecifications = @(
         @('common-config', (Join-Path $AdministrativePathRecord.CommonDirectory 'config')),
-        @('worktree-config', (Join-Path $AdministrativePathRecord.GitDirectory 'config')),
         @('commondir-pointer', (Join-Path $AdministrativePathRecord.GitDirectory 'commondir')),
         @('objects-info-alternates', (Join-Path (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'objects') 'info') 'alternates'))
     ) + $(if ($SampleWorktreeControlInput) {
@@ -2719,7 +2726,7 @@ function Get-PathSetControlInputDigest {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.1
+    # Version: 1.0.20260816.2
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2754,7 +2761,11 @@ function Get-PathSetControlInputDigest {
     $objInputs = New-Object 'System.Collections.Generic.SortedDictionary[string,string]' `
         ([System.StringComparer]::Ordinal)
     # The staging index is not listed here: it is bracketed coupled with its active
-    # split-index backing below. The active per-worktree config is
+    # split-index backing below. Only CommonDirectory/config (common-config) is the
+    # repository-local configuration Git reads; GitDirectory/config is deliberately not
+    # sampled, because Git never reads $GIT_DIR/config for a linked worktree and for the main
+    # worktree it equals CommonDirectory/config, so common-config already covers it (F1, the
+    # same class as C4/C7). The active per-worktree config is
     # worktree-config-worktree (GitDirectory/config.worktree), sampled only when
     # IncludeWorktreeConfigEvidence is set (see the direct assignment after the loop below)
     # because Git reads it only when extensions.worktreeConfig is enabled; info/exclude and
@@ -2762,7 +2773,6 @@ function Get-PathSetControlInputDigest {
     # staged read, exactly as in Get-GitControlSurfaceEvidence.
     $arrSingleFileInputs = @(
         @('common-config', (Join-Path $AdministrativePathRecord.CommonDirectory 'config')),
-        @('worktree-config', (Join-Path $AdministrativePathRecord.GitDirectory 'config')),
         @('commondir-pointer', (Join-Path $AdministrativePathRecord.GitDirectory 'commondir')),
         @('objects-info-alternates', (Join-Path (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'objects') 'info') 'alternates'))
     ) + $(if ($SampleWorktreeControlInput) {
