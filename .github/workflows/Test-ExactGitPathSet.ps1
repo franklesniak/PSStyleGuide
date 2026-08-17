@@ -26,7 +26,7 @@ Optional exact absolute path of the Git executable. When omitted, the script
 uses the module-qualified application resolver once before any Git invocation.
 
 .NOTES
-Version: 1.0.20260816.2
+Version: 1.0.20260816.3
 #>
 
 [CmdletBinding()]
@@ -52,7 +52,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strVerifierVersion = '1.0.20260816.2'
+$script:strVerifierVersion = '1.0.20260816.3'
 $script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v2'
 # Wall-clock ceiling for any single native Git invocation (Invoke-GitRaw). The path-set
 # reads are sub-second metadata queries, so this 120-second default is orders of magnitude
@@ -933,7 +933,7 @@ function Stop-NativeProcessTree {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.2
+    # Version: 1.0.20260816.3
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1010,7 +1010,7 @@ function Invoke-GitRaw {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.2
+    # Version: 1.0.20260816.3
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1454,7 +1454,7 @@ function ConvertTo-SubmoduleExclusionPath {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.2
+    # Version: 1.0.20260816.3
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2094,7 +2094,7 @@ function Get-BoundedControlFileComponent {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.2
+    # Version: 1.0.20260816.3
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2171,7 +2171,7 @@ function Resolve-ActiveSharedIndexRecord {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.2
+    # Version: 1.0.20260816.3
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2293,7 +2293,7 @@ function Get-SplitIndexBracketedEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.2
+    # Version: 1.0.20260816.3
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2355,6 +2355,120 @@ function Get-SplitIndexBracketedEvidence {
     }
 }
 
+function Get-HeadResolvedReferenceComponent {
+    # .SYNOPSIS
+    # Gets the object name HEAD resolves to, the sole reference-evidence value.
+    #
+    # .DESCRIPTION
+    # The staged read (git diff --cached) compares the index against the commit HEAD
+    # resolves to and consumes no other reference. This helper brackets exactly that
+    # object: it runs `git rev-parse --verify --quiet HEAD` through Invoke-GitRaw and
+    # returns the resolved object name. git rev-parse resolves HEAD through the loose,
+    # packed, and reftable back-ends, through per-worktree refs, and through symbolic-ref
+    # chains, so this one storage-agnostic value replaces hashing the whole loose refs
+    # tree, packed-refs, and the reftable trees, and is invariant to unrelated-ref churn
+    # the staged read never consumes. The command is recorded under the native-command
+    # name 'head-object'. Fail-closed handling:
+    #   - Invoke-GitRaw itself throws native-command (Process.Start failure),
+    #     native-output-limit (over the 4 MiB stream bound), or native-command-timeout;
+    #     those propagate unchanged, so a broken or hung Git refuses the read.
+    #   - a non-zero exit with empty output is the documented --verify --quiet result for
+    #     an unborn or otherwise unresolvable HEAD; it returns 'unresolved', matching git
+    #     diff --cached comparing against the empty tree so the staged read still succeeds.
+    #   - a non-zero exit that still wrote output is undocumented and throws
+    #     invalid-git-control.
+    #   - a zero exit whose output, after one trailing newline is stripped, is not exactly
+    #     40 (SHA-1) or 64 (SHA-256) lowercase-hex digits -- including empty, over-length,
+    #     mixed-case, non-hex, or an embedded NUL/CR/LF -- throws invalid-git-control.
+    # A change of the resolved object between the before and after control-surface reads
+    # the caller brackets is caught as git-control-drift by that existing comparison,
+    # exactly as for every other component; this helper reads once per bracket.
+    #
+    # .PARAMETER GitRecord
+    # Fixed Git executable record with Path, Length, and Sha256 evidence.
+    #
+    # .PARAMETER WorkingDirectory
+    # Repository root assigned to the rev-parse process.
+    #
+    # .PARAMETER NativeCommandList
+    # Native-command accounting list that receives one 'head-object' record.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.String. The lowercase 40- or 64-hex object name HEAD resolves to, or
+    # 'unresolved' for an unborn or unresolvable HEAD. Throws 'invalid-git-control' for a
+    # zero-exit malformed value or a non-zero exit that wrote output; native, decoding,
+    # and parameter-binding failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260816.3
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: GitRecord
+    #   Position 1: WorkingDirectory
+    #   Position 2: NativeCommandList
+    param (
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IDictionary]$GitRecord,
+
+        [Parameter(Mandatory = $true)]
+        [string]$WorkingDirectory,
+
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IList]$NativeCommandList
+    )
+
+    # Track the in-flight native command in the script-scoped diagnostic fields, the same
+    # way the main body brackets every Invoke-GitRaw, so a failure here reports
+    # 'head-object' rather than the previous command's name.
+    $script:strNativeCommand = 'head-object'
+    $script:intNativeExit = $null
+    $hashtableHeadResult = Invoke-GitRaw `
+        -GitRecord $GitRecord `
+        -WorkingDirectory $WorkingDirectory `
+        -ArgumentList @('rev-parse', '--verify', '--quiet', 'HEAD')
+    $NativeCommandList.Add([ordered]@{
+        Name = 'head-object'
+        ExitCode = $hashtableHeadResult.ExitCode
+        StdoutLength = $hashtableHeadResult.Stdout.Length
+        StderrLength = $hashtableHeadResult.StderrLength
+    })
+    $script:intNativeExit = $hashtableHeadResult.ExitCode
+    $strResolved = $script:objUtf8Strict.GetString($hashtableHeadResult.Stdout)
+    if ($strResolved.EndsWith("`n")) {
+        $strResolved = $strResolved.Substring(0, $strResolved.Length - 1)
+    }
+    if ($hashtableHeadResult.ExitCode -ne 0) {
+        # --verify --quiet exits non-zero and writes nothing for an unborn or otherwise
+        # unresolvable HEAD; git diff --cached then compares against the empty tree, so the
+        # staged read still succeeds and must not refuse. A non-zero exit that nonetheless
+        # wrote output is undocumented and fails closed.
+        if ($strResolved.Length -ne 0) {
+            throw 'invalid-git-control'
+        }
+        return 'unresolved'
+    }
+    # A zero exit must yield exactly one lowercase-hex object name (40 SHA-1 or 64 SHA-256)
+    # and nothing else, matched ordinal and culture-invariant, so uppercase hex, a
+    # wrong-length value, a non-hex character, an empty value, or an embedded NUL/CR/LF all
+    # fail closed as invalid-git-control.
+    if (-not [regex]::IsMatch(
+        $strResolved,
+        '^(?:[0-9a-f]{40}|[0-9a-f]{64})$',
+        [System.Text.RegularExpressions.RegexOptions]::CultureInvariant)) {
+        throw 'invalid-git-control'
+    }
+    return $strResolved
+}
+
 function Get-GitControlSurfaceEvidence {
     # .SYNOPSIS
     # Gets bounded evidence for repository-local Git configuration and references.
@@ -2364,9 +2478,9 @@ function Get-GitControlSurfaceEvidence {
     # files, the staging index coupled with the active split-index backing, the
     # commondir pointer, the objects/info/alternates pointer, and -- only when
     # SampleWorktreeControlInput is set -- info/exclude and info/attributes, and --
-    # only when IncludeReferenceEvidence is set -- the reference inputs HEAD,
-    # packed-refs, the shared and per-worktree loose refs trees, and the shared and
-    # per-worktree reftable backend trees. The active per-worktree configuration
+    # only when IncludeReferenceEvidence is set -- the reference inputs HEAD and the
+    # object HEAD resolves to (git rev-parse --verify --quiet HEAD via
+    # Get-HeadResolvedReferenceComponent). The active per-worktree configuration
     # GitDirectory/config.worktree is hashed only when IncludeWorktreeConfigEvidence is
     # set, because Git reads that file only when extensions.worktreeConfig is enabled; a
     # repository with the extension unset or false never consults it, so sampling it would
@@ -2378,18 +2492,18 @@ function Get-GitControlSurfaceEvidence {
     # which resolves the backing with `git rev-parse --shared-index-path` and brackets
     # the pair so no stale, unreferenced sharedindex.* file is hashed. info/exclude and
     # info/attributes drive only the worktree reads, so a staged-only verification omits
-    # them. Uses labeled components so absent and present state cannot collide. The refs
-    # trees exclude logs/ (reflogs), a sibling of refs/, so benign reflog churn raises no
-    # drift. Repository hooks are not hashed: no verifier command runs a hook and
+    # them. Uses labeled components so absent and present state cannot collide. The
+    # resolved-HEAD component reads whichever ref back-end holds HEAD, so unrelated refs
+    # and reflogs never enter it. Repository hooks are not hashed: no verifier command runs a hook and
     # core.fsmonitor is disabled, so hook contents cannot change the computed path set.
     #
     # .PARAMETER AdministrativePathRecord
     # Validated GitEntry, GitDirectory, and CommonDirectory path record.
     #
     # .PARAMETER IncludeReferenceEvidence
-    # When set (a Staged or Both read), also samples the reference inputs HEAD,
-    # packed-refs, and the loose/reftable trees. A working-only read consumes none of
-    # them, so it passes $false and a concurrent ref update raises no git-control-drift.
+    # When set (a Staged or Both read), also samples the reference inputs HEAD and the
+    # object HEAD resolves to. A working-only read consumes neither, so it passes $false
+    # and a concurrent ref update raises no git-control-drift.
     #
     # .PARAMETER SampleWorktreeControlInput
     # When set (a working, untracked, or clean read), also samples info/exclude and
@@ -2434,8 +2548,8 @@ function Get-GitControlSurfaceEvidence {
     # ComponentCount. The Digest covers the staging index coupled with its active
     # split-index backing, the commondir pointer, the objects/info/alternates pointer,
     # and -- when SampleWorktreeControlInput is set -- info/exclude and info/attributes,
-    # and -- when IncludeReferenceEvidence is set -- HEAD, packed-refs, and the shared
-    # and per-worktree loose refs trees, so concurrent drift of any consumed path-set
+    # and -- when IncludeReferenceEvidence is set -- HEAD and the object HEAD resolves
+    # to, so concurrent drift of any consumed path-set
     # read input raises git-control-drift. Filesystem, ordinary path, size-bound,
     # hashing, native, and parameter-binding failures propagate.
     #
@@ -2444,7 +2558,7 @@ function Get-GitControlSurfaceEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.2
+    # Version: 1.0.20260816.3
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2508,13 +2622,13 @@ function Get-GitControlSurfaceEvidence {
     # so the active file is still covered). info/exclude (the untracked read's
     # --exclude-standard set) and info/attributes (repository-local Git attributes that
     # change the working read via content normalization) drive only the worktree reads,
-    # so they are appended only when SampleWorktreeControlInput is set. HEAD and
-    # packed-refs are reference inputs the staged read resolves HEAD against the index,
-    # so they are appended only when IncludeReferenceEvidence is set. The commondir
-    # pointer is per-worktree (GitDirectory); info/exclude, info/attributes, and
-    # packed-refs are shared (CommonDirectory). The staging index is not listed here: it
-    # is hashed coupled with its active split-index backing by
-    # Get-SplitIndexBracketedEvidence below.
+    # so they are appended only when SampleWorktreeControlInput is set. The reference
+    # inputs the staged read consumes -- HEAD itself and the object HEAD resolves to -- are
+    # not listed here: they are added in the dedicated reference-evidence block below, only
+    # when IncludeReferenceEvidence is set. The commondir pointer is per-worktree
+    # (GitDirectory); info/exclude and info/attributes are shared (CommonDirectory). The
+    # staging index is not listed here: it is hashed coupled with its active split-index
+    # backing by Get-SplitIndexBracketedEvidence below.
     $arrBoundedFileSpecifications = @(
         @('common-config', (Join-Path $AdministrativePathRecord.CommonDirectory 'config')),
         @('commondir-pointer', (Join-Path $AdministrativePathRecord.GitDirectory 'commondir')),
@@ -2523,13 +2637,6 @@ function Get-GitControlSurfaceEvidence {
         @(
             @('info-exclude', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'exclude')),
             @('info-attributes', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'attributes'))
-        )
-    } else {
-        @()
-    }) + $(if ($IncludeReferenceEvidence) {
-        @(
-            @('git-head', (Join-Path $AdministrativePathRecord.GitDirectory 'HEAD')),
-            @('packed-refs', (Join-Path $AdministrativePathRecord.CommonDirectory 'packed-refs'))
         )
     } else {
         @()
@@ -2550,95 +2657,28 @@ function Get-GitControlSurfaceEvidence {
             -LiteralPath (Join-Path $AdministrativePathRecord.GitDirectory 'config.worktree')
     }
 
-    # The .git reference trees below (shared and per-worktree loose refs, and shared
-    # and per-worktree reftable) are hashed by the same shared Get-TreeEvidence walker as
-    # the worktree, so a reparse point, special file, or over-limit tree must fail closed as
-    # a control-surface category, not a worktree one. These are the same categories the
-    # bounded control-file checks above already raise. Hooks are deliberately not hashed:
-    # no verifier command runs a repository hook, and core.fsmonitor (the only hook that
-    # could change a path-set read) is disabled on every invocation, so hook contents
-    # cannot change the computed path set; hashing them only refused a managed hook symlink.
-    $hashtableControlTreeCategory = @{
-        LinkCategory = 'invalid-git-control'
-        SpecialEntryCategory = 'invalid-git-control'
-        LimitCategory = 'git-control-limit'
-    }
-    # HEAD, packed-refs, and the loose/reftable trees below are reference inputs the
-    # staged read resolves HEAD against the index with. A working-only read consumes
-    # none of them, so a concurrent ref update must not raise git-control-drift for it;
-    # sample the reference trees only when IncludeReferenceEvidence is set.
+    # HEAD's resolved object is the one reference input the staged read consumes: git
+    # diff --cached compares the index against the commit HEAD resolves to and reads no
+    # other ref. When IncludeReferenceEvidence is set, hash HEAD itself (git-head, so a
+    # retarget of its symref target or a detached OID text is caught) and bracket the
+    # object HEAD resolves to (head-resolved). git rev-parse resolves HEAD through the
+    # loose, packed, and reftable back-ends, through per-worktree refs, and through symref
+    # chains, so head-resolved replaces hashing the whole loose refs tree, packed-refs, and
+    # the reftable trees with one storage-agnostic value that is invariant to unrelated-ref
+    # churn the staged read never consumes, yet still changes when the object HEAD resolves
+    # to moves. An unborn or unresolvable HEAD yields 'unresolved', matching git diff
+    # --cached against the empty tree. A working-only read consumes neither, so it passes
+    # $false and a concurrent ref update raises no git-control-drift for it. A change of
+    # either value across the caller's before/after control bracket raises git-control-drift.
+    # Repository hooks are not hashed: no verifier command runs a hook and core.fsmonitor is
+    # disabled, so hook contents cannot change the computed path set.
     if ($IncludeReferenceEvidence) {
-        # The staged read resolves HEAD against the index, so a concurrent move of the
-        # branch ref (commit, reset --soft, update-ref) changes the staged path set.
-        # Hash the shared loose refs tree so that drift is caught alongside HEAD and
-        # packed-refs above. logs/ (reflogs) is a sibling of refs/ and is deliberately
-        # not walked, so benign reflog churn raises no spurious drift.
-        $strLooseRefsPath = [System.IO.Path]::GetFullPath(
-            (Join-Path $AdministrativePathRecord.CommonDirectory 'refs'))
-        if ([System.IO.Directory]::Exists($strLooseRefsPath)) {
-            $objComponents['loose-refs'] = (
-                Get-TreeEvidence -RootPath $strLooseRefsPath -ExcludedPath $null `
-                    @hashtableControlTreeCategory).Digest
-        } elseif ([System.IO.File]::Exists($strLooseRefsPath)) {
-            throw 'invalid-git-control'
-        } else {
-            Assert-UnoccupiedControlSlot -LiteralPath $strLooseRefsPath -Category 'invalid-git-control'
-            $objComponents['loose-refs'] = 'absent'
-        }
-
-        # Per-worktree refs (refs/bisect, refs/worktree, refs/rewritten) are not shared:
-        # Git stores them under the worktree's own Git directory, outside the common
-        # refs tree hashed above. For a linked worktree GitDirectory differs from
-        # CommonDirectory, so a HEAD that points at a per-worktree ref (for example
-        # refs/worktree/*) resolves the staged read against GitDirectory/refs, which
-        # loose-refs above does not cover; moving that ref would otherwise leave both
-        # before/after digests equal. Hash GitDirectory/refs under a distinct label so
-        # per-worktree ref drift is caught. For the main worktree GitDirectory equals
-        # CommonDirectory, so this repeats the shared tree, which is inert. logs/ stays
-        # a sibling of refs/ and is not walked, so reflog churn raises no spurious drift.
-        $strWorktreeRefsPath = [System.IO.Path]::GetFullPath(
-            (Join-Path $AdministrativePathRecord.GitDirectory 'refs'))
-        if ([System.IO.Directory]::Exists($strWorktreeRefsPath)) {
-            $objComponents['worktree-loose-refs'] = (
-                Get-TreeEvidence -RootPath $strWorktreeRefsPath -ExcludedPath $null `
-                    @hashtableControlTreeCategory).Digest
-        } elseif ([System.IO.File]::Exists($strWorktreeRefsPath)) {
-            throw 'invalid-git-control'
-        } else {
-            Assert-UnoccupiedControlSlot -LiteralPath $strWorktreeRefsPath -Category 'invalid-git-control'
-            $objComponents['worktree-loose-refs'] = 'absent'
-        }
-
-        # Reftable reference backend: with extensions.refStorage=reftable, branch tips
-        # live under <dir>/reftable/ rather than the loose refs/ tree or packed-refs
-        # captured above, so a concurrent update-ref through that backend would change
-        # the staged read (HEAD resolved against the index) while the loose/packed
-        # components stayed equal. Hash the shared and per-worktree reftable trees;
-        # absent for the default files backend.
-        $strCommonReftablePath = [System.IO.Path]::GetFullPath(
-            (Join-Path $AdministrativePathRecord.CommonDirectory 'reftable'))
-        if ([System.IO.Directory]::Exists($strCommonReftablePath)) {
-            $objComponents['common-reftable'] = (
-                Get-TreeEvidence -RootPath $strCommonReftablePath -ExcludedPath $null `
-                    @hashtableControlTreeCategory).Digest
-        } elseif ([System.IO.File]::Exists($strCommonReftablePath)) {
-            throw 'invalid-git-control'
-        } else {
-            Assert-UnoccupiedControlSlot -LiteralPath $strCommonReftablePath -Category 'invalid-git-control'
-            $objComponents['common-reftable'] = 'absent'
-        }
-        $strWorktreeReftablePath = [System.IO.Path]::GetFullPath(
-            (Join-Path $AdministrativePathRecord.GitDirectory 'reftable'))
-        if ([System.IO.Directory]::Exists($strWorktreeReftablePath)) {
-            $objComponents['worktree-reftable'] = (
-                Get-TreeEvidence -RootPath $strWorktreeReftablePath -ExcludedPath $null `
-                    @hashtableControlTreeCategory).Digest
-        } elseif ([System.IO.File]::Exists($strWorktreeReftablePath)) {
-            throw 'invalid-git-control'
-        } else {
-            Assert-UnoccupiedControlSlot -LiteralPath $strWorktreeReftablePath -Category 'invalid-git-control'
-            $objComponents['worktree-reftable'] = 'absent'
-        }
+        $objComponents['git-head'] = Get-BoundedControlFileComponent `
+            -LiteralPath (Join-Path $AdministrativePathRecord.GitDirectory 'HEAD')
+        $objComponents['head-resolved'] = Get-HeadResolvedReferenceComponent `
+            -GitRecord $GitRecord `
+            -WorkingDirectory $WorkingDirectory `
+            -NativeCommandList $NativeCommandList
     }
 
     # The staging index and its one active split-index backing are coupled: with
@@ -2672,7 +2712,7 @@ function Get-PathSetControlInputDigest {
     # staged reads consume -- the applicable config files, the commondir pointer, the
     # objects/info/alternates pointer, and -- only when SampleWorktreeControlInput is
     # set -- info/exclude and info/attributes, and -- only when IncludeReferenceEvidence
-    # is set -- the reference inputs HEAD and packed-refs -- together with the staging
+    # is set -- the reference inputs HEAD and the object HEAD resolves to -- together with the staging
     # index coupled to its one active split-index backing, into one ordinal-framed
     # digest. The active per-worktree configuration GitDirectory/config.worktree is hashed
     # only when IncludeWorktreeConfigEvidence is set, because Git reads it only when
@@ -2684,15 +2724,15 @@ function Get-PathSetControlInputDigest {
     # keeps the coupled component internally consistent. Taken before the reads and again
     # as the verifier's final evidence action, the two digests bracket the read window,
     # closing the final-traversal tail that the aggregate control digest leaves for these
-    # inputs. Tree-shaped control inputs (loose refs, reftable) and the live worktree
-    # cannot be bracketed this way and keep the convergence guarantee.
+    # inputs. The live worktree cannot be bracketed this way and keep the convergence
+    # guarantee.
     #
     # .PARAMETER AdministrativePathRecord
     # Validated GitEntry, GitDirectory, and CommonDirectory path record.
     #
     # .PARAMETER IncludeReferenceEvidence
-    # When set (a Staged or Both read), also brackets the reference inputs HEAD and
-    # packed-refs. A working-only read consumes neither, so it passes $false.
+    # When set (a Staged or Both read), also brackets the reference inputs HEAD and the
+    # object HEAD resolves to. A working-only read consumes neither, so it passes $false.
     #
     # .PARAMETER SampleWorktreeControlInput
     # When set (a working, untracked, or clean read), also brackets info/exclude and
@@ -2726,7 +2766,7 @@ function Get-PathSetControlInputDigest {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.2
+    # Version: 1.0.20260816.3
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2769,8 +2809,9 @@ function Get-PathSetControlInputDigest {
     # worktree-config-worktree (GitDirectory/config.worktree), sampled only when
     # IncludeWorktreeConfigEvidence is set (see the direct assignment after the loop below)
     # because Git reads it only when extensions.worktreeConfig is enabled; info/exclude and
-    # info/attributes are appended only for a worktree read, HEAD and packed-refs only for a
-    # staged read, exactly as in Get-GitControlSurfaceEvidence.
+    # info/attributes are appended only for a worktree read. HEAD and the object HEAD
+    # resolves to are added in the dedicated reference-evidence block after the loop, only
+    # for a staged read, exactly as in Get-GitControlSurfaceEvidence.
     $arrSingleFileInputs = @(
         @('common-config', (Join-Path $AdministrativePathRecord.CommonDirectory 'config')),
         @('commondir-pointer', (Join-Path $AdministrativePathRecord.GitDirectory 'commondir')),
@@ -2779,13 +2820,6 @@ function Get-PathSetControlInputDigest {
         @(
             @('info-exclude', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'exclude')),
             @('info-attributes', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'attributes'))
-        )
-    } else {
-        @()
-    }) + $(if ($IncludeReferenceEvidence) {
-        @(
-            @('git-head', (Join-Path $AdministrativePathRecord.GitDirectory 'HEAD')),
-            @('packed-refs', (Join-Path $AdministrativePathRecord.CommonDirectory 'packed-refs'))
         )
     } else {
         @()
@@ -2807,6 +2841,21 @@ function Get-PathSetControlInputDigest {
     if ($IncludeWorktreeConfigEvidence) {
         $objInputs['worktree-config-worktree'] = Get-BoundedControlFileComponent `
             -LiteralPath (Join-Path $AdministrativePathRecord.GitDirectory 'config.worktree')
+    }
+    # The reference inputs the staged read consumes: HEAD itself (git-head) and the object
+    # HEAD resolves to (head-resolved, git rev-parse --verify --quiet HEAD via
+    # Get-HeadResolvedReferenceComponent). rev-parse resolves HEAD through every ref
+    # back-end and symref chain, so head-resolved is invariant to unrelated-ref churn the
+    # staged read never consumes yet changes when the object HEAD resolves to moves; an
+    # unborn or unresolvable HEAD yields 'unresolved'. Added only for a staged read,
+    # exactly as in Get-GitControlSurfaceEvidence.
+    if ($IncludeReferenceEvidence) {
+        $objInputs['git-head'] = Get-BoundedControlFileComponent `
+            -LiteralPath (Join-Path $AdministrativePathRecord.GitDirectory 'HEAD')
+        $objInputs['head-resolved'] = Get-HeadResolvedReferenceComponent `
+            -GitRecord $GitRecord `
+            -WorkingDirectory $WorkingDirectory `
+            -NativeCommandList $NativeCommandList
     }
     # Couple the staging index with its one active split-index backing, bracketed so no
     # stale, unreferenced sharedindex.* file perturbs the digest.
@@ -3258,7 +3307,7 @@ try {
         $null
     }
     # Atomic single-file bracket for every single-file control input the path-set
-    # reads consume (index, HEAD, info/exclude, info/attributes, packed-refs, config,
+    # reads consume (index, HEAD, head-resolved, info/exclude, info/attributes, config,
     # commondir). Get-GitControlSurfaceEvidence hashes each as one component of a
     # multi-file traversal, so a change to any one during that traversal's own tail
     # (after that component is hashed, before the scan completes) can leave the
@@ -3268,8 +3317,8 @@ try {
     # the reads with atomic reads: a change across them raises git-control-drift.
     # This bracket, like every evidence pass, is itself a sequential read, so a
     # single-file input changed after its own hash but before the pass completes --
-    # and any change to a tree-shaped input (loose refs, reftable, split-index
-    # backing files) or the live worktree, which git reads in place, during the final
+    # and any change to a tree-shaped input (the split-index backing files) or the
+    # live worktree, which git reads in place, during the final
     # converged traversal -- is the irreducible residual: no portable mechanism reads
     # a live multi-file surface atomically, and adding another recheck only moves the
     # tail to that recheck (infinite regress). The residual is bounded to a concurrent
@@ -3580,7 +3629,7 @@ try {
     # surface last, so an administrative mutation during the (possibly long)
     # worktree scan changes control-after and is caught. A single control scan is
     # not an atomic snapshot: Get-GitControlSurfaceEvidence hashes the index early,
-    # then keeps traversing HEAD, refs, and reftable trees, so an index (or other component)
+    # then keeps traversing HEAD and the object HEAD resolves to, so an index (or other component)
     # change after its own git-index hash but before that scan completes would leave
     # a stale control-after. Requiring two consecutive full (worktree, control)
     # samples to agree closes that intra-call gap: a change during one pass makes
