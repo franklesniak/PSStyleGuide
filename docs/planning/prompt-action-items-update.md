@@ -80,7 +80,7 @@ Separate the following into discrete tasks whenever they apply:
 - explicitly commencing implementation of that issue;
 - implementing the change;
 - creating or updating the PR;
-- running the Anthropic Claude Code review loop;
+- running the Codex review loop in a fresh subagent;
 - running an independent final quality check in a fresh coding-agent session;
 - making a human or administrator decision;
 - changing repository settings after exact authorization;
@@ -139,7 +139,7 @@ Do not shorten, summarize, or generalize existing task content merely to control
 For every existing or future implementation PR covered by the plan, preserve the discrete lifecycle:
 
 1. candidate implementation;
-2. Anthropic Claude Code review loop;
+2. Codex review loop in a fresh `gpt-5.6-sol` subagent with `xhigh` reasoning;
 3. independent final quality check by a fresh coding agent;
 4. rerun of the review loop and quality check if reviewable repository bytes change;
 5. merge only after both gates apply to the same final head and tree;
@@ -150,6 +150,8 @@ For every existing or future implementation PR covered by the plan, preserve the
 10. fixed-point closure.
 
 Each applicable review-loop and quality-check task must retain all existing safeguards concerning current-head reviewer evidence, review-thread and comment pagination, unfinished-work and deferral audits, issue-requirement verification, PR-description verification, dependency verification, validation, and prohibition on merge.
+
+Each review-loop task must identify the local Codex subagent as the executor and `chatgpt-codex-connector` as a separate remote reviewer. It must instruct the subagent to use the repository's applicable `AGENTS.md`. If the target repository has no `AGENTS.md`, it must explicitly tell Codex to read the root `CLAUDE.md` as compatibility workflow instructions and state that the filename does not change the executor. It must request the remote reviewer with an exact `@codex review` PR comment and treat that trigger comment as neither a finding nor an instruction to the local executor. Use the native Codex subagent interface. Permit headless `codex exec --json` only as an explicit fallback when native subagents are unavailable and the task defines equivalent monitoring and safety controls.
 
 Do not allow an unreviewed repair, metadata correction that invalidates evidence, stale review, or head change to bypass a required gate.
 
