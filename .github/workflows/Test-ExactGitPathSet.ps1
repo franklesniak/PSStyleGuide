@@ -26,7 +26,7 @@ Optional exact absolute path of the Git executable. When omitted, the script
 uses the module-qualified application resolver once before any Git invocation.
 
 .NOTES
-Version: 1.0.20260818.0
+Version: 1.0.20260818.1
 #>
 
 [CmdletBinding()]
@@ -52,7 +52,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strVerifierVersion = '1.0.20260818.0'
+$script:strVerifierVersion = '1.0.20260818.1'
 $script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v2'
 # Wall-clock ceiling for any single native Git invocation (Invoke-GitRaw). The path-set
 # reads are sub-second metadata queries, so this 120-second default is orders of magnitude
@@ -318,7 +318,7 @@ function Test-WorktreeDirectoryIdentityEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.0
+    # Version: 1.0.20260818.1
     #
     # This function declares no parameters.
     param ()
@@ -338,22 +338,26 @@ function Test-WorktreeDirectoryIdentityEvidence {
 
         # Worktree digest with only the file-bearing directory present.
         $strWorktreeFileOnly = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
-                -WorktreeClassification -TrackedRelativePath $objEmptyTracked).Digest
+                -WorktreeClassification -TrackedRelativePath $objEmptyTracked `
+                -AncestorBoundary $strFixtureRoot).Digest
 
         # Add an empty untracked directory. The worktree digest MUST NOT change, because
         # Git path-set streams report no empty directory, so the walk omits its identity.
         [void][System.IO.Directory]::CreateDirectory($strEmptyDirectory)
         $strWorktreeWithEmpty = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
-                -WorktreeClassification -TrackedRelativePath $objEmptyTracked).Digest
+                -WorktreeClassification -TrackedRelativePath $objEmptyTracked `
+                -AncestorBoundary $strFixtureRoot).Digest
         if ($strWorktreeFileOnly -cne $strWorktreeWithEmpty) {
             throw 'worktree-directory-fixture-failure'
         }
 
         # The control surface records the same directory as identity, so its digest MUST
         # change when the empty directory is present and then removed.
-        $strControlWithEmpty = [string](Get-TreeEvidence -RootPath $strFixtureRoot).Digest
+        $strControlWithEmpty = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -AncestorBoundary $strFixtureRoot).Digest
         [System.IO.Directory]::Delete($strEmptyDirectory)
-        $strControlFileOnly = [string](Get-TreeEvidence -RootPath $strFixtureRoot).Digest
+        $strControlFileOnly = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -AncestorBoundary $strFixtureRoot).Digest
         if ($strControlWithEmpty -ceq $strControlFileOnly) {
             throw 'worktree-directory-fixture-failure'
         }
@@ -362,13 +366,317 @@ function Test-WorktreeDirectoryIdentityEvidence {
         # file inside it MUST change the worktree digest.
         [System.IO.File]::Delete($strLeafFile)
         $strWorktreeNoFile = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
-                -WorktreeClassification -TrackedRelativePath $objEmptyTracked).Digest
+                -WorktreeClassification -TrackedRelativePath $objEmptyTracked `
+                -AncestorBoundary $strFixtureRoot).Digest
         if ($strWorktreeFileOnly -ceq $strWorktreeNoFile) {
             throw 'worktree-directory-fixture-failure'
         }
     } finally {
         if ([System.IO.Directory]::Exists($strFixtureRoot)) {
             [System.IO.Directory]::Delete($strFixtureRoot, $true)
+        }
+    }
+}
+
+function Test-IgnoredControlFileEvidence {
+    # .SYNOPSIS
+    # Confirms an ignored .gitignore or .gitattributes stays evidence-relevant while other
+    # ignored content is excluded.
+    #
+    # .DESCRIPTION
+    # Builds a temporary tree that holds a .gitignore, a .gitattributes, and one unrelated
+    # file, names all three as ignored-exclusion entries, and checks three facts through
+    # Get-TreeEvidence (G1): a change to the unrelated ignored file does not change the
+    # worktree digest, a change to the ignored .gitignore does, and a change to the ignored
+    # .gitattributes does. Git reads both control files even when the ignored enumeration
+    # lists them, so both must stay in the worktree evidence.
+    #
+    # .EXAMPLE
+    # Test-IgnoredControlFileEvidence
+    #
+    # # Produces no output when every fixture behaves as expected.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # None. Throws 'ignored-control-file-fixture-failure' when a fixture behaves
+    # unexpectedly. Filesystem and hashing failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260818.1
+    #
+    # This function declares no parameters.
+    param ()
+
+    $strFixtureRoot = [System.IO.Path]::Combine(
+        [System.IO.Path]::GetTempPath(),
+        ('exactgitpathset-g1-' + [System.Guid]::NewGuid().ToString('N')))
+    $objEmptyTracked = New-Object 'System.Collections.Generic.HashSet[string]' `
+        ([System.StringComparer]::Ordinal)
+    [void][System.IO.Directory]::CreateDirectory($strFixtureRoot)
+    try {
+        $strGitignore = Join-Path $strFixtureRoot '.gitignore'
+        $strGitattributes = Join-Path $strFixtureRoot '.gitattributes'
+        $strUnrelated = Join-Path $strFixtureRoot 'ignored.bin'
+        [System.IO.File]::WriteAllText($strGitignore, "ignored.bin`n")
+        [System.IO.File]::WriteAllText($strGitattributes, "*.bin binary`n")
+        [System.IO.File]::WriteAllText($strUnrelated, 'one')
+        # All three are named as ignored-exclusion entries, exactly as the worktree read passes
+        # the git ls-files --others --ignored output into AdditionalExcludedPath.
+        $arrExcluded = @($strGitignore, $strGitattributes, $strUnrelated)
+
+        $strBaseline = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -AdditionalExcludedPath $arrExcluded -WorktreeClassification `
+                -TrackedRelativePath $objEmptyTracked -AncestorBoundary $strFixtureRoot).Digest
+
+        # A change to the unrelated ignored file MUST NOT change the digest: it stays excluded.
+        [System.IO.File]::WriteAllText($strUnrelated, 'two-different-length')
+        $strAfterUnrelated = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -AdditionalExcludedPath $arrExcluded -WorktreeClassification `
+                -TrackedRelativePath $objEmptyTracked -AncestorBoundary $strFixtureRoot).Digest
+        if ($strBaseline -cne $strAfterUnrelated) {
+            throw 'ignored-control-file-fixture-failure'
+        }
+
+        # A change to the ignored .gitignore MUST change the digest: Git reads it, so it stays
+        # evidence-relevant even though it is named as ignored.
+        [System.IO.File]::WriteAllText($strGitignore, "ignored.bin`nextra`n")
+        $strAfterGitignore = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -AdditionalExcludedPath $arrExcluded -WorktreeClassification `
+                -TrackedRelativePath $objEmptyTracked -AncestorBoundary $strFixtureRoot).Digest
+        if ($strBaseline -ceq $strAfterGitignore) {
+            throw 'ignored-control-file-fixture-failure'
+        }
+
+        # Restore the .gitignore, then a change to the ignored .gitattributes MUST change the
+        # digest for the same reason.
+        [System.IO.File]::WriteAllText($strGitignore, "ignored.bin`n")
+        [System.IO.File]::WriteAllText($strGitattributes, "*.bin -text`n")
+        $strAfterGitattributes = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -AdditionalExcludedPath $arrExcluded -WorktreeClassification `
+                -TrackedRelativePath $objEmptyTracked -AncestorBoundary $strFixtureRoot).Digest
+        if ($strBaseline -ceq $strAfterGitattributes) {
+            throw 'ignored-control-file-fixture-failure'
+        }
+    } finally {
+        if ([System.IO.Directory]::Exists($strFixtureRoot)) {
+            [System.IO.Directory]::Delete($strFixtureRoot, $true)
+        }
+    }
+}
+
+function Test-EmbeddedRepositoryBoundaryEvidence {
+    # .SYNOPSIS
+    # Confirms an untracked embedded repository keeps its Git-reported root evidence but is
+    # not traversed into its .git internals.
+    #
+    # .DESCRIPTION
+    # Builds a temporary tree with a nested directory that itself holds a .git directory (an
+    # untracked embedded repository), then checks four facts through Get-TreeEvidence (G2):
+    # the embedded repository contributes exactly one entry and no hashed file; adding files
+    # under its .git does not change the worktree digest or the entry count; adding a file
+    # directly under the nested root does not change the digest either, because Git never
+    # descends past the boundary; and removing the .git marker turns the directory into an
+    # ordinary traversed directory, which does change the digest.
+    #
+    # .EXAMPLE
+    # Test-EmbeddedRepositoryBoundaryEvidence
+    #
+    # # Produces no output when every fixture behaves as expected.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # None. Throws 'embedded-repository-fixture-failure' when a fixture behaves
+    # unexpectedly. Filesystem and hashing failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260818.1
+    #
+    # This function declares no parameters.
+    param ()
+
+    $strFixtureRoot = [System.IO.Path]::Combine(
+        [System.IO.Path]::GetTempPath(),
+        ('exactgitpathset-g2-' + [System.Guid]::NewGuid().ToString('N')))
+    $objEmptyTracked = New-Object 'System.Collections.Generic.HashSet[string]' `
+        ([System.StringComparer]::Ordinal)
+    [void][System.IO.Directory]::CreateDirectory($strFixtureRoot)
+    try {
+        $strNested = Join-Path $strFixtureRoot 'nested'
+        $strNestedGit = Join-Path $strNested '.git'
+        [void][System.IO.Directory]::CreateDirectory($strNestedGit)
+        [System.IO.File]::WriteAllText((Join-Path $strNestedGit 'HEAD'), "ref: refs/heads/main`n")
+        [System.IO.File]::WriteAllText((Join-Path $strNested 'file.txt'), 'inner')
+
+        $objBoundary = Get-TreeEvidence -RootPath $strFixtureRoot -WorktreeClassification `
+            -TrackedRelativePath $objEmptyTracked -AncestorBoundary $strFixtureRoot
+        $strBoundaryDigest = [string]$objBoundary.Digest
+
+        # The embedded repository contributes exactly one entry (nested) and no hashed file.
+        if ([int]$objBoundary.EntryCount -ne 1 -or [int]$objBoundary.FileCount -ne 0) {
+            throw 'embedded-repository-fixture-failure'
+        }
+
+        # Adding files under nested/.git MUST NOT change the digest or the entry count.
+        [System.IO.File]::WriteAllText((Join-Path $strNestedGit 'config'), "[core]`n")
+        [System.IO.File]::WriteAllText((Join-Path $strNestedGit 'index'), 'x')
+        $objAfterInternals = Get-TreeEvidence -RootPath $strFixtureRoot -WorktreeClassification `
+            -TrackedRelativePath $objEmptyTracked -AncestorBoundary $strFixtureRoot
+        if ($strBoundaryDigest -cne [string]$objAfterInternals.Digest -or
+            [int]$objAfterInternals.EntryCount -ne 1) {
+            throw 'embedded-repository-fixture-failure'
+        }
+
+        # Adding a file directly under the nested root MUST NOT change the digest, because the
+        # boundary is not traversed.
+        [System.IO.File]::WriteAllText((Join-Path $strNested 'second.txt'), 'inner2')
+        $objAfterInner = Get-TreeEvidence -RootPath $strFixtureRoot -WorktreeClassification `
+            -TrackedRelativePath $objEmptyTracked -AncestorBoundary $strFixtureRoot
+        if ($strBoundaryDigest -cne [string]$objAfterInner.Digest) {
+            throw 'embedded-repository-fixture-failure'
+        }
+
+        # Removing the .git marker turns nested into an ordinary traversed directory, so its
+        # files now appear as name-only entries and the digest changes.
+        [System.IO.Directory]::Delete($strNestedGit, $true)
+        $objAfterUnmarked = Get-TreeEvidence -RootPath $strFixtureRoot -WorktreeClassification `
+            -TrackedRelativePath $objEmptyTracked -AncestorBoundary $strFixtureRoot
+        if ($strBoundaryDigest -ceq [string]$objAfterUnmarked.Digest) {
+            throw 'embedded-repository-fixture-failure'
+        }
+    } finally {
+        if ([System.IO.Directory]::Exists($strFixtureRoot)) {
+            [System.IO.Directory]::Delete($strFixtureRoot, $true)
+        }
+    }
+}
+
+function Test-AncestorBoundaryValidation {
+    # .SYNOPSIS
+    # Confirms the AncestorBoundary parameter stops the root-validation walk at a validated
+    # ancestor and does not inspect a reparse ancestor above it.
+    #
+    # .DESCRIPTION
+    # Creates a reparse-point directory without administrator rights (a junction on Windows, a
+    # symbolic link on Unix) and checks three facts (G3): a fixture whose ancestor is the
+    # reparse point is rejected with invalid-repository-root when no boundary is given (the
+    # macOS /var and custom TMPDIR case); the same fixture is accepted when the boundary is the
+    # fixture leaf, because the reparse ancestor is not inspected; and a reparse-point leaf is
+    # still rejected even with a boundary, so the boundary does not disable leaf validation.
+    #
+    # .EXAMPLE
+    # Test-AncestorBoundaryValidation
+    #
+    # # Produces no output when every fixture behaves as expected.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # None. Throws 'ancestor-boundary-fixture-failure' when a fixture behaves unexpectedly.
+    # Filesystem and link-creation failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260818.1
+    #
+    # This function declares no parameters.
+    param ()
+
+    $strBase = [System.IO.Path]::Combine(
+        [System.IO.Path]::GetTempPath(),
+        ('exactgitpathset-boundary-' + [System.Guid]::NewGuid().ToString('N')))
+    [void][System.IO.Directory]::CreateDirectory($strBase)
+    $strAncestorLink = $null
+    $strLeafLink = $null
+    try {
+        $strAncestorTarget = Join-Path $strBase 'ancestor-target'
+        $strLeafTarget = Join-Path $strBase 'leaf-target'
+        $strAncestorLink = Join-Path $strBase 'ancestor-link'
+        $strLeafLink = Join-Path $strBase 'leaf-link'
+        [void][System.IO.Directory]::CreateDirectory($strAncestorTarget)
+        [void][System.IO.Directory]::CreateDirectory($strLeafTarget)
+        # Create a reparse-point directory without administrator rights: a junction on Windows,
+        # a symbolic link on Unix. PowerShell 6+ names the target -Target; 5.1 names it -Value.
+        $boolModernPowerShell = $PSVersionTable.PSVersion.Major -ge 6
+        $strLinkKind = if ($script:boolHostIsWindows) { 'Junction' } else { 'SymbolicLink' }
+        foreach ($objLinkSpec in @(
+                @{ Link = $strAncestorLink; Target = $strAncestorTarget },
+                @{ Link = $strLeafLink; Target = $strLeafTarget })) {
+            if ($boolModernPowerShell) {
+                [void](New-Item -ItemType $strLinkKind -Path $objLinkSpec.Link `
+                        -Target $objLinkSpec.Target -ErrorAction Stop)
+            } else {
+                [void](New-Item -ItemType $strLinkKind -Path $objLinkSpec.Link `
+                        -Value $objLinkSpec.Target -ErrorAction Stop)
+            }
+        }
+        $strLeafUnderReparse = Join-Path $strAncestorLink 'leaf'
+        [void][System.IO.Directory]::CreateDirectory($strLeafUnderReparse)
+
+        # Without a boundary the reparse ancestor is inspected and rejected.
+        $boolRejectedWithoutBoundary = $false
+        try {
+            [void](Assert-OrdinaryRepositoryRoot -LiteralPath $strLeafUnderReparse)
+        } catch {
+            if ([string]$_.Exception.Message -ceq 'invalid-repository-root') {
+                $boolRejectedWithoutBoundary = $true
+            } else {
+                throw
+            }
+        }
+        if (-not $boolRejectedWithoutBoundary) {
+            throw 'ancestor-boundary-fixture-failure'
+        }
+
+        # With the boundary at the leaf the reparse ancestor is not inspected, so a valid leaf
+        # is accepted.
+        $strValidated = [string](Assert-OrdinaryRepositoryRoot -LiteralPath $strLeafUnderReparse `
+                -AncestorBoundary $strLeafUnderReparse)
+        if ($strValidated.Length -eq 0) {
+            throw 'ancestor-boundary-fixture-failure'
+        }
+
+        # A reparse-point leaf is still rejected even with a boundary: the boundary stops the
+        # upward walk but still validates the leaf itself.
+        $boolRejectedReparseLeaf = $false
+        try {
+            [void](Assert-OrdinaryRepositoryRoot -LiteralPath $strLeafLink `
+                    -AncestorBoundary $strLeafLink)
+        } catch {
+            if ([string]$_.Exception.Message -ceq 'invalid-repository-root') {
+                $boolRejectedReparseLeaf = $true
+            } else {
+                throw
+            }
+        }
+        if (-not $boolRejectedReparseLeaf) {
+            throw 'ancestor-boundary-fixture-failure'
+        }
+    } finally {
+        # Remove the reparse points without following them, then the base tree.
+        foreach ($strLinkToRemove in @($strAncestorLink, $strLeafLink)) {
+            if (-not [string]::IsNullOrEmpty($strLinkToRemove) -and
+                [System.IO.Directory]::Exists($strLinkToRemove)) {
+                [System.IO.Directory]::Delete($strLinkToRemove, $false)
+            }
+        }
+        if ([System.IO.Directory]::Exists($strBase)) {
+            [System.IO.Directory]::Delete($strBase, $true)
         }
     }
 }
@@ -1793,10 +2101,20 @@ function Assert-OrdinaryRepositoryRoot {
     # .DESCRIPTION
     # Requires rooted path text, normalizes it to a full path, and walks from the
     # leaf through every ancestor. Each component must exist as a non-reparse
-    # directory.
+    # directory. An optional AncestorBoundary stops the walk at a caller-validated
+    # ancestor, so an ancestor above that boundary is never inspected.
     #
     # .PARAMETER LiteralPath
     # Absolute literal worktree-root path to normalize and validate.
+    #
+    # .PARAMETER AncestorBoundary
+    # Optional absolute ancestor the caller has already validated as an ordinary directory.
+    # When supplied, the walk validates every component from the leaf up to and including
+    # this boundary and then stops, rather than walking to the filesystem root, so a reparse
+    # or otherwise non-ordinary directory above the boundary (for example a symlinked /var or
+    # a custom TMPDIR) cannot reject the leaf. A boundary that is not on the leaf's ancestor
+    # chain fails closed. When omitted, the walk reaches the filesystem root exactly as
+    # before.
     #
     # .EXAMPLE
     # $strRoot = Assert-OrdinaryRepositoryRoot -LiteralPath (Resolve-Path '.').Path
@@ -1814,24 +2132,30 @@ function Assert-OrdinaryRepositoryRoot {
     # .OUTPUTS
     # System.String. The normalized full repository path. Throws
     # 'invalid-repository-root' for a relative path or when DirectoryInfo.Exists
-    # returns false, including absorbed access/filesystem errors, and for a
-    # non-directory or reparse component. Parameter-binding, path-normalization,
-    # and metadata failures after existence is established propagate.
+    # returns false, including absorbed access/filesystem errors, for a
+    # non-directory or reparse component, and for an AncestorBoundary that is not on the
+    # leaf's ancestor chain. Parameter-binding, path-normalization, and metadata failures
+    # after existence is established propagate.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 1.0.20260818.1
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
     #
     #   Position 0: LiteralPath
+    #
+    # AncestorBoundary is named, not positional.
     param (
         [Parameter(Mandatory = $true)]
-        [string]$LiteralPath
+        [string]$LiteralPath,
+
+        [AllowNull()]
+        [string]$AncestorBoundary
     )
 
     if (-not [System.IO.Path]::IsPathRooted($LiteralPath)) {
@@ -1843,14 +2167,38 @@ function Assert-OrdinaryRepositoryRoot {
         }
     }
     $strFullPath = [System.IO.Path]::GetFullPath($LiteralPath)
+    # Optional ancestor boundary: a caller that has already validated an ordinary ancestor
+    # (for example a self-test that created its fixture root under the temporary directory)
+    # passes it here so the walk validates every component from the leaf up to and including
+    # the boundary and then stops, rather than walking to the filesystem root. An ancestor
+    # above the boundary is never inspected, so a reparse or otherwise non-ordinary ancestor
+    # (a symlinked /var, a custom TMPDIR) cannot reject an otherwise valid leaf. A boundary
+    # that is not on the leaf's ancestor chain is a caller error and fails closed.
+    $strBoundaryFull = $null
+    if (-not [string]::IsNullOrEmpty($AncestorBoundary)) {
+        if (-not [System.IO.Path]::IsPathRooted($AncestorBoundary)) {
+            throw 'invalid-repository-root'
+        }
+        $strBoundaryFull = [System.IO.Path]::GetFullPath($AncestorBoundary)
+    }
     $objCurrent = New-Object System.IO.DirectoryInfo($strFullPath)
+    $boolBoundaryReached = $false
     while ($null -ne $objCurrent) {
         if (-not $objCurrent.Exists -or
             ($objCurrent.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0 -or
             ($objCurrent.Attributes -band [System.IO.FileAttributes]::Directory) -eq 0) {
             throw 'invalid-repository-root'
         }
+        if ($null -ne $strBoundaryFull -and
+            [System.IO.Path]::GetFullPath($objCurrent.FullName).Equals(
+                $strBoundaryFull, $script:objPathComparison)) {
+            $boolBoundaryReached = $true
+            break
+        }
         $objCurrent = $objCurrent.Parent
+    }
+    if ($null -ne $strBoundaryFull -and -not $boolBoundaryReached) {
+        throw 'invalid-repository-root'
     }
     return $strFullPath
 }
@@ -1957,6 +2305,14 @@ function Get-TreeEvidence {
     # non-directory entry is hashed, a directory keeps its 'D:' key, and a reparse point or
     # special entry is refused, exactly as before.
     #
+    # An untracked .gitignore or .gitattributes stays evidence-relevant even when the caller
+    # lists it in AdditionalExcludedPath: the ignored enumeration can report a control file
+    # that Git still reads, so a regular control file is never dropped by that exclusion and
+    # is hashed like any control input. An untracked embedded Git repository (a subdirectory
+    # that itself holds a .git entry) is recorded by name and existence only and is not
+    # traversed, so the walk neither hashes, counts, nor drifts on its .git internals; Git
+    # reports such a repository as a single untracked path and never descends into it.
+    #
     # .PARAMETER RootPath
     # Absolute ordinary directory root to inspect.
     #
@@ -1994,6 +2350,14 @@ function Get-TreeEvidence {
     # whether a non-directory, non-reparse entry is hashed (tracked) or recorded by name and
     # existence only (untracked).
     #
+    # .PARAMETER AncestorBoundary
+    # Optional absolute ancestor the caller has already validated as an ordinary directory,
+    # forwarded to Assert-OrdinaryRepositoryRoot. A self-test that builds its fixture under
+    # the temporary directory passes the fixture root here, so the root-validation walk stops
+    # at that root and never inspects the temporary-directory ancestry (a symlinked /var or a
+    # custom TMPDIR). The production callers pass the repository root and its .git subtrees
+    # with no boundary, so those keep full-ancestry validation.
+    #
     # .EXAMPLE
     # $hashtableTree = Get-TreeEvidence -RootPath $strRepositoryRoot -ExcludedPath $strGitEntry
     #
@@ -2021,7 +2385,7 @@ function Get-TreeEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.0
+    # Version: 1.0.20260818.1
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2059,10 +2423,13 @@ function Get-TreeEvidence {
 
         [switch]$WorktreeClassification,
 
-        [System.Collections.Generic.HashSet[string]]$TrackedRelativePath
+        [System.Collections.Generic.HashSet[string]]$TrackedRelativePath,
+
+        [AllowNull()]
+        [string]$AncestorBoundary
     )
 
-    $strRoot = Assert-OrdinaryRepositoryRoot -LiteralPath $RootPath
+    $strRoot = Assert-OrdinaryRepositoryRoot -LiteralPath $RootPath -AncestorBoundary $AncestorBoundary
     $strExcluded = if ([string]::IsNullOrEmpty($ExcludedPath)) {
         $null
     } else {
@@ -2109,31 +2476,40 @@ function Get-TreeEvidence {
             if ($null -ne $strExcluded -and $strFullEntry.Equals($strExcluded, $script:objPathComparison)) {
                 continue
             }
-            if ($objAdditionalExcluded.Count -ne 0 -and $objAdditionalExcluded.Contains($strFullEntry)) {
-                continue
-            }
             $objAttributes = [System.IO.File]::GetAttributes($strFullEntry)
-            $strRelativePath = $strFullEntry.Substring($strRoot.Length).TrimStart(
-                [System.IO.Path]::DirectorySeparatorChar,
-                [System.IO.Path]::AltDirectorySeparatorChar
-            ).Replace([System.IO.Path]::DirectorySeparatorChar, '/')
+            $boolReparseEntry = ($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0
+            $boolDirectoryEntry = ($objAttributes -band [System.IO.FileAttributes]::Directory) -ne 0
             # Worktree classification (E2): an untracked .gitignore or .gitattributes is a Git
             # control input, not ordinary payload. Git reads the worktree .gitignore for the
             # --exclude-standard untracked set and the worktree .gitattributes for the working
             # diff, tracked or not and in any walked directory, so its bytes decide what a
-            # path-set read reports. Detect it by basename under the host case rule so the
-            # untracked branch below leaves it for the hashing branch. A reparse-point instance
-            # is already recorded name-only above, matching Git's refusal to follow a symlinked
-            # control file.
+            # path-set read reports. Detect a regular (non-reparse, non-directory) instance by
+            # basename under the host case rule so the untracked branch below leaves it for the
+            # hashing branch, and so the ignored-exclusion skip below never drops it. Git
+            # refuses to follow a symlinked control file, so a reparse-point instance is not a
+            # control input and is recorded name-only below.
             $boolUntrackedControlFile = $false
-            if ($WorktreeClassification) {
+            if ($WorktreeClassification -and -not $boolReparseEntry -and -not $boolDirectoryEntry) {
                 $strEntryName = [System.IO.Path]::GetFileName($strFullEntry)
                 if ($strEntryName.Equals('.gitignore', $script:objPathComparison) -or
                     $strEntryName.Equals('.gitattributes', $script:objPathComparison)) {
                     $boolUntrackedControlFile = $true
                 }
             }
-            if (($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+            # G1: the ignored-exclusion set (git ls-files --others --ignored --directory) can
+            # list an ignored .gitignore or .gitattributes that Git still reads as a control
+            # input, so a regular control file is never skipped here; it stays evidence-relevant
+            # through the hashing branch (E2). Every other ignored top-level entry and every
+            # initialized submodule root is skipped without traversal, exactly as before.
+            if ($objAdditionalExcluded.Count -ne 0 -and -not $boolUntrackedControlFile -and
+                $objAdditionalExcluded.Contains($strFullEntry)) {
+                continue
+            }
+            $strRelativePath = $strFullEntry.Substring($strRoot.Length).TrimStart(
+                [System.IO.Path]::DirectorySeparatorChar,
+                [System.IO.Path]::AltDirectorySeparatorChar
+            ).Replace([System.IO.Path]::DirectorySeparatorChar, '/')
+            if ($boolReparseEntry) {
                 if ($WorktreeClassification) {
                     # Worktree classification (F4): record a reparse point (a symbolic link,
                     # or any other reparse point) by name and existence only -- the same key
@@ -2152,17 +2528,42 @@ function Get-TreeEvidence {
                     # .git reference tree is still refused, exactly as before.
                     throw $LinkCategory
                 }
-            } elseif (($objAttributes -band [System.IO.FileAttributes]::Directory) -ne 0) {
+            } elseif ($boolDirectoryEntry) {
                 # Worktree classification (F4): traverse every directory but omit its identity
                 # key. Git path-set streams (git ls-files, git diff) report only files and never
                 # an empty directory, so recording a 'D:' key would let an empty untracked
                 # directory that no path-set read reports change the worktree digest and perturb
                 # convergence. The control-surface walk keeps the 'D:' key, because a .git
                 # reference tree's directory shape is part of the hashed control surface.
-                if (-not $WorktreeClassification) {
+                if ($WorktreeClassification) {
+                    # G2: an untracked embedded Git repository is a directory that itself holds a
+                    # .git entry. Git reports it as one untracked path (for example nested/) and
+                    # never descends into it, so the worktree reads never consume its internals.
+                    # Record the Git-reported root by name and existence only -- the same
+                    # name-only key an untracked file receives -- and do not traverse it, so the
+                    # walk neither hashes, counts, nor drifts on its .git internals and cannot
+                    # raise a false worktree-limit from a large nested repository. An initialized
+                    # submodule is a gitlink already excluded before this point, so only a
+                    # non-submodule embedded repository reaches here.
+                    $strNestedGitPath = [System.IO.Path]::Combine($strFullEntry, '.git')
+                    $boolEmbeddedRepository = $false
+                    try {
+                        [void][System.IO.File]::GetAttributes($strNestedGitPath)
+                        $boolEmbeddedRepository = $true
+                    } catch [System.IO.FileNotFoundException] {
+                        $boolEmbeddedRepository = $false
+                    } catch [System.IO.DirectoryNotFoundException] {
+                        $boolEmbeddedRepository = $false
+                    }
+                    if ($boolEmbeddedRepository) {
+                        $objMap['F:' + $strRelativePath] = ''
+                    } else {
+                        $objPending.Push($strFullEntry)
+                    }
+                } else {
                     $objMap['D:' + $strRelativePath] = ''
+                    $objPending.Push($strFullEntry)
                 }
-                $objPending.Push($strFullEntry)
             } elseif ($WorktreeClassification -and -not $boolUntrackedControlFile -and
                 -not $TrackedRelativePath.Contains($strRelativePath)) {
                 # Worktree classification (F3): an untracked ordinary file -- and not an
@@ -3557,6 +3958,9 @@ $intExitCode = 1
 try {
     Test-ScriptVersionParser
     Test-WorktreeDirectoryIdentityEvidence
+    Test-IgnoredControlFileEvidence
+    Test-EmbeddedRepositoryBoundaryEvidence
+    Test-AncestorBoundaryValidation
     $strSelfPath = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot 'Test-ExactGitPathSet.ps1'))
     $strSelfText = $script:objUtf8Strict.GetString([System.IO.File]::ReadAllBytes($strSelfPath))
     [void](Get-ScriptVersionRecord -ScriptText $strSelfText -ExpectedVersion $script:strVerifierVersion)

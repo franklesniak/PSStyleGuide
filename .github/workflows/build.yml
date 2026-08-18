@@ -61,7 +61,7 @@ jobs:
           $objResult = $arrResult[0] | ConvertFrom-Json
           if ($intGeneratorExit -ne 0 -or
               $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2' -or
-              $objResult.GeneratorVersion -cne '1.0.20260814.0' -or
+              $objResult.GeneratorVersion -cne '1.0.20260818.0' -or
               $objResult.Overall -notin @('Success', 'NoChange')) {
               throw "Artifact generation failed with native exit $intGeneratorExit."
           }
@@ -116,7 +116,7 @@ jobs:
           $objPathSetResult = $arrPathSetResult[0] | ConvertFrom-Json
           if ($intPathSetExit -ne 0 -or
               $objPathSetResult.Schema -cne 'PSStyleGuide.ExactGitPathSetResult.v2' -or
-              $objPathSetResult.VerifierVersion -cne '1.0.20260818.0' -or
+              $objPathSetResult.VerifierVersion -cne '1.0.20260818.1' -or
               -not $objPathSetResult.Success) {
               throw ("Exact-path verification did not confirm an empty working " +
                   "set: exit=$intPathSetExit success=$($objPathSetResult.Success) " +

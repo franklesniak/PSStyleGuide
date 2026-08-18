@@ -10,13 +10,13 @@ fixed destination. Serialization is UTF-8 without a BOM and normalizes CRLF
 and lone CR to LF at the final payload boundary.
 
 .NOTES
-Version: 1.0.20260814.0
+Version: 1.0.20260818.0
 #>
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strGeneratorVersion = '1.0.20260814.0'
+$script:strGeneratorVersion = '1.0.20260818.0'
 $script:strGeneratorResultSchema = 'PSStyleGuide.GeneratorResult.v2'
 $script:objUtf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
 $script:objUtf8NoBom = New-Object System.Text.UTF8Encoding($false)
@@ -499,7 +499,7 @@ function Assert-OrdinaryPathComponent {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 1.0.20260818.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -534,10 +534,11 @@ function Assert-OrdinaryPathComponent {
     # device carries neither the Directory nor ReparsePoint attribute, so the
     # checks above accept it, yet a later read of the validated path
     # (Get-FileSha256Hex or ReadAllBytes on the candidate) would block forever on a
-    # FIFO. Reject the non-regular Unix types through the UnixMode string, matching
-    # the Get-TreeEvidence guard; the check is a no-op where UnixMode is absent
-    # (Windows) and never fires on a regular file ('-'). Directory components skip
-    # it because a special entry can never satisfy the Directory attribute above.
+    # FIFO. Reject the non-regular Unix types through the UnixMode string, matching the
+    # Get-TreeEvidence special-entry guard in the sibling Test-ExactGitPathSet.ps1 verifier;
+    # the check is a no-op where UnixMode is absent (Windows) and never fires on a regular
+    # file ('-'). Directory components skip it because a special entry can never satisfy the
+    # Directory attribute above.
     if ($ExpectedType -eq 'File') {
         $objFileComponentInfo = New-Object System.IO.FileInfo($LiteralPath)
         $objUnixModeProperty = $objFileComponentInfo.PSObject.Properties['UnixMode']
@@ -592,7 +593,7 @@ function Get-OrdinaryDestinationState {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 1.0.20260818.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -623,7 +624,8 @@ function Get-OrdinaryDestinationState {
     # the type through PowerShell's UnixMode string (StrictMode-safe via
     # PSObject.Properties); the check is a no-op where UnixMode is absent (Windows,
     # which has no such entries in the filesystem namespace) and never fires on a
-    # regular file ('-'). This mirrors the Get-TreeEvidence special-entry guard.
+    # regular file ('-'). This mirrors the Get-TreeEvidence special-entry guard in the
+    # sibling Test-ExactGitPathSet.ps1 verifier.
     $objLeafInfo = New-Object System.IO.FileInfo($LiteralPath)
     $objUnixModeProperty = $objLeafInfo.PSObject.Properties['UnixMode']
     if ($null -ne $objUnixModeProperty) {
