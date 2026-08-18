@@ -26,7 +26,7 @@ Optional exact absolute path of the Git executable. When omitted, the script
 uses the module-qualified application resolver once before any Git invocation.
 
 .NOTES
-Version: 1.0.20260818.5
+Version: 1.0.20260818.6
 #>
 
 [CmdletBinding()]
@@ -52,7 +52,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strVerifierVersion = '1.0.20260818.5'
+$script:strVerifierVersion = '1.0.20260818.6'
 $script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v2'
 # Bound each normally sub-second Git read. This fails closed if a special-file race hangs
 # a read; Invoke-GitRaw exposes an override for tests.
@@ -368,12 +368,12 @@ function Test-IgnoredControlFileEvidence {
     # ignored content is excluded.
     #
     # .DESCRIPTION
-    # Builds a temporary tree that holds a .gitignore, a .gitattributes, and one unrelated
-    # file, names all three as ignored-exclusion entries, and checks three facts through
-    # Get-TreeEvidence (G1): a change to the unrelated ignored file does not change the
-    # worktree digest, a change to the ignored .gitignore does, and a change to the ignored
-    # .gitattributes does. Git reads both control files even when the ignored enumeration
-    # lists them, so both must stay in the worktree evidence.
+    # Builds a temporary tree that holds one tracked file, a .gitignore, a .gitattributes,
+    # and one unrelated file. It names the three untracked files as ignored-exclusion entries
+    # and checks three facts through Get-TreeEvidence (G1): a change to the unrelated ignored
+    # file does not change the worktree digest, a change to the ignored .gitignore does, and a
+    # change to the applicable ignored .gitattributes does. Git reads both control files even
+    # when the ignored enumeration lists them, so both must stay in the worktree evidence.
     #
     # .EXAMPLE
     # Test-IgnoredControlFileEvidence
@@ -392,7 +392,7 @@ function Test-IgnoredControlFileEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.1
+    # Version: 1.0.20260818.2
     #
     # This function declares no parameters.
     param ()
@@ -400,29 +400,32 @@ function Test-IgnoredControlFileEvidence {
     $strFixtureRoot = [System.IO.Path]::Combine(
         [System.IO.Path]::GetTempPath(),
         ('exactgitpathset-g1-' + [System.Guid]::NewGuid().ToString('N')))
-    $objEmptyTracked = New-Object 'System.Collections.Generic.HashSet[string]' `
+    $objTracked = New-Object 'System.Collections.Generic.HashSet[string]' `
         ([System.StringComparer]::Ordinal)
+    [void]$objTracked.Add('tracked.bin')
     [void][System.IO.Directory]::CreateDirectory($strFixtureRoot)
     try {
         $strGitignore = Join-Path $strFixtureRoot '.gitignore'
         $strGitattributes = Join-Path $strFixtureRoot '.gitattributes'
         $strUnrelated = Join-Path $strFixtureRoot 'ignored.bin'
+        $strTracked = Join-Path $strFixtureRoot 'tracked.bin'
         [System.IO.File]::WriteAllText($strGitignore, "ignored.bin`n")
         [System.IO.File]::WriteAllText($strGitattributes, "*.bin binary`n")
         [System.IO.File]::WriteAllText($strUnrelated, 'one')
+        [System.IO.File]::WriteAllText($strTracked, 'tracked')
         # All three are named as ignored-exclusion entries, exactly as the worktree read passes
         # the git ls-files --others --ignored output into AdditionalExcludedPath.
         $arrExcluded = @($strGitignore, $strGitattributes, $strUnrelated)
 
         $strBaseline = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
                 -AdditionalExcludedPath $arrExcluded -WorktreeClassification `
-                -TrackedRelativePath $objEmptyTracked -AncestorBoundary $strFixtureRoot).Digest
+                -TrackedRelativePath $objTracked -AncestorBoundary $strFixtureRoot).Digest
 
         # A change to the unrelated ignored file MUST NOT change the digest: it stays excluded.
         [System.IO.File]::WriteAllText($strUnrelated, 'two-different-length')
         $strAfterUnrelated = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
                 -AdditionalExcludedPath $arrExcluded -WorktreeClassification `
-                -TrackedRelativePath $objEmptyTracked -AncestorBoundary $strFixtureRoot).Digest
+                -TrackedRelativePath $objTracked -AncestorBoundary $strFixtureRoot).Digest
         if ($strBaseline -cne $strAfterUnrelated) {
             throw 'ignored-control-file-fixture-failure'
         }
@@ -432,7 +435,7 @@ function Test-IgnoredControlFileEvidence {
         [System.IO.File]::WriteAllText($strGitignore, "ignored.bin`nextra`n")
         $strAfterGitignore = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
                 -AdditionalExcludedPath $arrExcluded -WorktreeClassification `
-                -TrackedRelativePath $objEmptyTracked -AncestorBoundary $strFixtureRoot).Digest
+                -TrackedRelativePath $objTracked -AncestorBoundary $strFixtureRoot).Digest
         if ($strBaseline -ceq $strAfterGitignore) {
             throw 'ignored-control-file-fixture-failure'
         }
@@ -443,7 +446,7 @@ function Test-IgnoredControlFileEvidence {
         [System.IO.File]::WriteAllText($strGitattributes, "*.bin -text`n")
         $strAfterGitattributes = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
                 -AdditionalExcludedPath $arrExcluded -WorktreeClassification `
-                -TrackedRelativePath $objEmptyTracked -AncestorBoundary $strFixtureRoot).Digest
+                -TrackedRelativePath $objTracked -AncestorBoundary $strFixtureRoot).Digest
         if ($strBaseline -ceq $strAfterGitattributes) {
             throw 'ignored-control-file-fixture-failure'
         }
@@ -824,14 +827,15 @@ function Test-PromisorRemoteEvidence {
 
 function Test-TrackedOnlyWorktreeEvidence {
     # .SYNOPSIS
-    # Confirms tracked/control-only worktree evidence ignores untracked churn while tracked
-    # and control changes stay evidence-relevant.
+    # Confirms worktree evidence ignores irrelevant untracked content while tracked and
+    # applicable control changes stay evidence-relevant.
     #
     # .DESCRIPTION
-    # Builds a temporary tree and checks Get-TreeEvidence under worktree classification. With
-    # OmitUntrackedEvidence set, an added untracked file does not change the worktree digest,
-    # while a tracked-file edit and applicable .gitattributes both change it. Without the
-    # switch, the same untracked file does change the digest, so Working/Both behavior is intact.
+    # Builds a temporary tree and checks Get-TreeEvidence under worktree classification. In
+    # tracked/control-only mode, an added untracked file does not change the worktree digest,
+    # while a tracked-file edit and applicable .gitattributes both change it. In full worktree
+    # mode, an untracked name stays relevant, but .gitattributes content outside every
+    # tracked-path ancestor does not. Applicable .gitattributes content stays relevant.
     #
     # .EXAMPLE
     # Test-TrackedOnlyWorktreeEvidence
@@ -850,7 +854,7 @@ function Test-TrackedOnlyWorktreeEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.0
+    # Version: 1.0.20260818.1
     #
     # This function declares no parameters.
     param ()
@@ -912,7 +916,8 @@ function Test-TrackedOnlyWorktreeEvidence {
         }
         [System.IO.File]::Delete($strIgnoreFile)
 
-        # An attributes file outside every tracked-path ancestor is also irrelevant.
+        # An attributes file outside every tracked-path ancestor is irrelevant in both
+        # tracked/control-only mode and full Working/Both mode.
         $strNoiseDirectory = Join-Path $strFixtureRoot 'noise'
         [void][System.IO.Directory]::CreateDirectory($strNoiseDirectory)
         $strNoiseAttributes = Join-Path $strNoiseDirectory '.gitattributes'
@@ -925,6 +930,16 @@ function Test-TrackedOnlyWorktreeEvidence {
                 -WorktreeClassification -TrackedRelativePath $objTracked `
                 -OmitUntrackedEvidence -AncestorBoundary $strFixtureRoot).Digest
         if ($strNoiseBefore -cne $strNoiseAfter) {
+            throw 'tracked-only-worktree-fixture-failure'
+        }
+        $strFullNoiseBefore = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -WorktreeClassification -TrackedRelativePath $objTracked `
+                -AncestorBoundary $strFixtureRoot).Digest
+        [System.IO.File]::WriteAllText($strNoiseAttributes, '* text=auto')
+        $strFullNoiseAfter = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -WorktreeClassification -TrackedRelativePath $objTracked `
+                -AncestorBoundary $strFixtureRoot).Digest
+        if ($strFullNoiseBefore -cne $strFullNoiseAfter) {
             throw 'tracked-only-worktree-fixture-failure'
         }
 
@@ -961,6 +976,22 @@ function Test-TrackedOnlyWorktreeEvidence {
                 -WorktreeClassification -TrackedRelativePath $objTracked `
                 -OmitUntrackedEvidence -AncestorBoundary $strFixtureRoot).Digest
         if ($strOmitControlBefore -ceq $strOmitControlAfter) {
+            throw 'tracked-only-worktree-fixture-failure'
+        }
+
+        # Once the same directory contains a tracked descendant, its attributes content is
+        # applicable and MUST change full Working/Both evidence.
+        $strNoiseTrackedFile = Join-Path $strNoiseDirectory 'tracked.txt'
+        [System.IO.File]::WriteAllText($strNoiseTrackedFile, 'tracked-noise-v1')
+        [void]$objTracked.Add('noise/tracked.txt')
+        $strFullApplicableBefore = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -WorktreeClassification -TrackedRelativePath $objTracked `
+                -AncestorBoundary $strFixtureRoot).Digest
+        [System.IO.File]::WriteAllText($strNoiseAttributes, '* -text')
+        $strFullApplicableAfter = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -WorktreeClassification -TrackedRelativePath $objTracked `
+                -AncestorBoundary $strFixtureRoot).Digest
+        if ($strFullApplicableBefore -ceq $strFullApplicableAfter) {
             throw 'tracked-only-worktree-fixture-failure'
         }
     } finally {
@@ -2763,11 +2794,12 @@ function Get-TreeEvidence {
     # length above 1 GiB. Optionally excludes one exact child entry.
     #
     # With WorktreeClassification set (the worktree callers), the walk hashes and byte-limits a
-    # tracked ordinary file (named by TrackedRelativePath) and an untracked .gitignore or
-    # .gitattributes control input; it records every other untracked ordinary file and every
-    # reparse point by name and existence only (sharing one key, so a type change raises no
-    # drift), traverses a directory without a 'D:' identity key, and records an untracked embedded
-    # Git repository name-only without traversing it. With OmitUntrackedEvidence also set (the
+    # tracked ordinary file (named by TrackedRelativePath), an untracked .gitignore, and an
+    # untracked .gitattributes control input that is in a tracked-path ancestor directory; it
+    # records every other untracked ordinary file and every reparse point by name and existence
+    # only (sharing one key, so a type change raises no drift), traverses a directory without a
+    # 'D:' identity key, and records an untracked embedded Git repository name-only without
+    # traversing it. With OmitUntrackedEvidence also set (the
     # staged-plus-clean-only caller), it further omits untracked entries and directories that are
     # not ancestors of tracked paths. It keeps tracked entries and applicable .gitattributes, but
     # not ignore inputs, so the evidence matches the plain worktree-versus-index comparison. Without the
@@ -2803,11 +2835,11 @@ function Get-TreeEvidence {
     # self-test lowers it, to prove the counting without the production count of entries.
     #
     # .PARAMETER WorktreeClassification
-    # Switches the walk into worktree-classification mode: hash and byte-limit only the
-    # tracked ordinary files named by TrackedRelativePath; record an untracked ordinary
-    # file or any reparse point by name and existence only, without throwing. Off by
-    # default, so a .git control-surface caller keeps the original refuse-and-hash-all
-    # behavior.
+    # Switches the walk into worktree-classification mode: hash and byte-limit the tracked
+    # ordinary files named by TrackedRelativePath and applicable untracked control files;
+    # record any other untracked ordinary file or any reparse point by name and existence
+    # only, without throwing. Off by default, so a .git control-surface caller keeps the
+    # original refuse-and-hash-all behavior.
     #
     # .PARAMETER TrackedRelativePath
     # Set of tracked repository-relative paths ('/'-separated, matching the walk's relative
@@ -2927,7 +2959,7 @@ function Get-TreeEvidence {
             [void]$objAdditionalExcluded.Add([System.IO.Path]::GetFullPath($strAdditionalExcludedEntry))
         }
     }
-    if ($OmitUntrackedEvidence) {
+    if ($WorktreeClassification) {
         $objTrackedDirectory = New-Object 'System.Collections.Generic.HashSet[string]' `
             ($TrackedRelativePath.Comparer)
         foreach ($strTrackedPath in $TrackedRelativePath) {
@@ -2947,6 +2979,10 @@ function Get-TreeEvidence {
     $longByteCount = 0L
     while ($objPending.Count -ne 0) {
         $strDirectory = $objPending.Pop()
+        $strRelativeDirectory = $strDirectory.Substring($strRoot.Length).TrimStart(
+            [System.IO.Path]::DirectorySeparatorChar,
+            [System.IO.Path]::AltDirectorySeparatorChar
+        ).Replace([System.IO.Path]::DirectorySeparatorChar, '/')
         # No ordering is applied to the enumeration. Every entry is recorded in
         # $objMap, an ordinal SortedDictionary, so the framed digest and the
         # counts are independent of enumeration order. A sort here would be dead
@@ -2967,17 +3003,23 @@ function Get-TreeEvidence {
             $objAttributes = [System.IO.File]::GetAttributes($strFullEntry)
             $boolReparseEntry = ($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0
             $boolDirectoryEntry = ($objAttributes -band [System.IO.FileAttributes]::Directory) -ne 0
-            # Full worktree reads consume .gitignore and .gitattributes. Clean-only reads consume
-            # only applicable .gitattributes. Detect a regular instance by
-            # basename under the host case rule so the untracked branch below leaves it for the
-            # hashing branch, and so the ignored-exclusion skip below never drops it. Git
-            # refuses to follow a symlinked control file, so a reparse-point instance is not a
-            # control input and is recorded name-only below.
+            # Full worktree reads consume .gitignore and applicable .gitattributes. Clean-only
+            # reads consume only applicable .gitattributes. An attributes file is applicable at
+            # the root when any tracked path exists, or below the root when its directory is a
+            # tracked-path ancestor. Detect a regular instance by basename under the host case
+            # rule so the untracked branch below leaves it for the hashing branch, and so the
+            # ignored-exclusion skip below never drops it. Git refuses to follow a symlinked
+            # control file, so a reparse-point instance is not a control input and is recorded
+            # name-only below.
             $boolUntrackedControlFile = $false
             if ($WorktreeClassification -and -not $boolReparseEntry -and -not $boolDirectoryEntry) {
                 $strEntryName = [System.IO.Path]::GetFileName($strFullEntry)
-                if (($strEntryName.Equals('.gitattributes', $script:objPathComparison) -and
-                        (-not $OmitUntrackedEvidence -or $TrackedRelativePath.Count -ne 0)) -or
+                $boolApplicableAttributesFile = $strEntryName.Equals(
+                    '.gitattributes', $script:objPathComparison) -and
+                    $TrackedRelativePath.Count -ne 0 -and
+                    ([string]::IsNullOrEmpty($strRelativeDirectory) -or
+                        $objTrackedDirectory.Contains($strRelativeDirectory))
+                if ($boolApplicableAttributesFile -or
                     (-not $OmitUntrackedEvidence -and
                         $strEntryName.Equals('.gitignore', $script:objPathComparison))) {
                     $boolUntrackedControlFile = $true
