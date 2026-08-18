@@ -26,7 +26,7 @@ Optional exact absolute path of the Git executable. When omitted, the script
 uses the module-qualified application resolver once before any Git invocation.
 
 .NOTES
-Version: 1.0.20260818.3
+Version: 1.0.20260818.4
 #>
 
 [CmdletBinding()]
@@ -52,7 +52,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strVerifierVersion = '1.0.20260818.3'
+$script:strVerifierVersion = '1.0.20260818.4'
 $script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v2'
 # Wall-clock ceiling for any single native Git invocation (Invoke-GitRaw). The path-set
 # reads are sub-second metadata queries, so this 120-second default is orders of magnitude
@@ -846,7 +846,7 @@ function Test-TrackedOnlyWorktreeEvidence {
     # .DESCRIPTION
     # Builds a temporary tree and checks Get-TreeEvidence under worktree classification. With
     # OmitUntrackedEvidence set, an added untracked file does not change the worktree digest,
-    # while a tracked-file edit and an added untracked .gitattributes both change it. Without the
+    # while a tracked-file edit and applicable .gitattributes both change it. Without the
     # switch, the same untracked file does change the digest, so Working/Both behavior is intact.
     #
     # .EXAMPLE
@@ -876,6 +876,8 @@ function Test-TrackedOnlyWorktreeEvidence {
         ('exactgitpathset-h2-' + [System.Guid]::NewGuid().ToString('N')))
     $objTracked = New-Object 'System.Collections.Generic.HashSet[string]' `
         ([System.StringComparer]::Ordinal)
+    $objEmptyTracked = New-Object 'System.Collections.Generic.HashSet[string]' `
+        ([System.StringComparer]::Ordinal)
     [void]$objTracked.Add('tracked.txt')
     [void][System.IO.Directory]::CreateDirectory($strFixtureRoot)
     try {
@@ -883,6 +885,20 @@ function Test-TrackedOnlyWorktreeEvidence {
         $strUntrackedFile = Join-Path $strFixtureRoot 'untracked.tmp'
         $strAttributesFile = Join-Path $strFixtureRoot '.gitattributes'
         [System.IO.File]::WriteAllText($strTrackedFile, 'tracked-v1')
+
+        # With no indexed path, no path can inherit root attributes.
+        [System.IO.File]::WriteAllText($strAttributesFile, '* text')
+        $strEmptyAttributesBefore = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -WorktreeClassification -TrackedRelativePath $objEmptyTracked `
+                -OmitUntrackedEvidence -AncestorBoundary $strFixtureRoot).Digest
+        [System.IO.File]::WriteAllText($strAttributesFile, '* -text')
+        $strEmptyAttributesAfter = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -WorktreeClassification -TrackedRelativePath $objEmptyTracked `
+                -OmitUntrackedEvidence -AncestorBoundary $strFixtureRoot).Digest
+        if ($strEmptyAttributesBefore -cne $strEmptyAttributesAfter) {
+            throw 'tracked-only-worktree-fixture-failure'
+        }
+        [System.IO.File]::Delete($strAttributesFile)
 
         # Tracked-only baseline: one tracked file, no untracked entry.
         $strOmitBaseline = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
@@ -895,6 +911,36 @@ function Test-TrackedOnlyWorktreeEvidence {
                 -WorktreeClassification -TrackedRelativePath $objTracked `
                 -OmitUntrackedEvidence -AncestorBoundary $strFixtureRoot).Digest
         if ($strOmitBaseline -cne $strOmitWithUntracked) {
+            throw 'tracked-only-worktree-fixture-failure'
+        }
+        # Clean-only evidence does not consume ignore rules.
+        $strIgnoreFile = Join-Path $strFixtureRoot '.gitignore'
+        [System.IO.File]::WriteAllText($strIgnoreFile, 'one')
+        $strIgnoreBefore = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -WorktreeClassification -TrackedRelativePath $objTracked `
+                -OmitUntrackedEvidence -AncestorBoundary $strFixtureRoot).Digest
+        [System.IO.File]::WriteAllText($strIgnoreFile, 'two-longer')
+        $strIgnoreAfter = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -WorktreeClassification -TrackedRelativePath $objTracked `
+                -OmitUntrackedEvidence -AncestorBoundary $strFixtureRoot).Digest
+        if ($strIgnoreBefore -cne $strIgnoreAfter) {
+            throw 'tracked-only-worktree-fixture-failure'
+        }
+        [System.IO.File]::Delete($strIgnoreFile)
+
+        # An attributes file outside every tracked-path ancestor is also irrelevant.
+        $strNoiseDirectory = Join-Path $strFixtureRoot 'noise'
+        [void][System.IO.Directory]::CreateDirectory($strNoiseDirectory)
+        $strNoiseAttributes = Join-Path $strNoiseDirectory '.gitattributes'
+        [System.IO.File]::WriteAllText($strNoiseAttributes, '* text')
+        $strNoiseBefore = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -WorktreeClassification -TrackedRelativePath $objTracked `
+                -OmitUntrackedEvidence -AncestorBoundary $strFixtureRoot).Digest
+        [System.IO.File]::WriteAllText($strNoiseAttributes, '* -text')
+        $strNoiseAfter = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -WorktreeClassification -TrackedRelativePath $objTracked `
+                -OmitUntrackedEvidence -AncestorBoundary $strFixtureRoot).Digest
+        if ($strNoiseBefore -cne $strNoiseAfter) {
             throw 'tracked-only-worktree-fixture-failure'
         }
 
@@ -1003,8 +1049,7 @@ function Test-NativeExitResetInvariant {
 
 function Test-TrackedOnlyEntryCeiling {
     # .SYNOPSIS
-    # Confirms the entry ceiling (H4) exempts the untracked entries OmitUntrackedEvidence omits,
-    # yet still counts a traversed directory (the F4 empty-directory bound).
+    # Confirms tracked-only evidence counts only tracked entries and their directory ancestors.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - not part of the public API surface.
@@ -1015,10 +1060,11 @@ function Test-TrackedOnlyEntryCeiling {
     $strRoot = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(),
         ('exactgitpathset-h4-' + [System.Guid]::NewGuid().ToString('N')))
     $objTracked = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
-    [void]$objTracked.Add('t')
+    [void]$objTracked.Add('tracked/a/b/t')
     [void][System.IO.Directory]::CreateDirectory($strRoot)
     try {
-        [System.IO.File]::WriteAllText((Join-Path $strRoot 't'), 'v1')
+        [void][System.IO.Directory]::CreateDirectory((Join-Path $strRoot 'tracked/a/b'))
+        [System.IO.File]::WriteAllText((Join-Path $strRoot 'tracked/a/b/t'), 'v1')
         $strBase = [string](Get-TreeEvidence -RootPath $strRoot -WorktreeClassification `
                 -TrackedRelativePath $objTracked -OmitUntrackedEvidence -MaximumEntryCount 4 `
                 -AncestorBoundary $strRoot).Digest
@@ -1030,7 +1076,14 @@ function Test-TrackedOnlyEntryCeiling {
                 -AncestorBoundary $strRoot).Digest
         if ($strBase -cne $strOmit) { throw 'tracked-only-entry-ceiling-fixture-failure' }
         for ($i = 0; $i -lt 40; $i++) { [void][System.IO.Directory]::CreateDirectory((Join-Path $strRoot "d$i")) }
-        # F4: a traversed directory always counts, so empty directories above the ceiling throw.
+        # Untracked directory trees are outside the clean comparison and do not count.
+        $strWithDirectories = [string](Get-TreeEvidence -RootPath $strRoot -WorktreeClassification `
+                -TrackedRelativePath $objTracked -OmitUntrackedEvidence -MaximumEntryCount 4 `
+                -AncestorBoundary $strRoot).Digest
+        if ($strBase -cne $strWithDirectories) { throw 'tracked-only-entry-ceiling-fixture-failure' }
+        # A second tracked file exceeds the four-entry bound: three ancestors and two files.
+        [void]$objTracked.Add('tracked/a/b/t2')
+        [System.IO.File]::WriteAllText((Join-Path $strRoot 'tracked/a/b/t2'), 'v2')
         $boolThrew = $false
         try {
             [void](Get-TreeEvidence -RootPath $strRoot -WorktreeClassification -TrackedRelativePath `
@@ -2702,10 +2755,9 @@ function Get-TreeEvidence {
     # reparse point by name and existence only (sharing one key, so a type change raises no
     # drift), traverses a directory without a 'D:' identity key, and records an untracked embedded
     # Git repository name-only without traversing it. With OmitUntrackedEvidence also set (the
-    # staged-plus-clean-only caller), it further omits an untracked ordinary file, reparse point,
-    # or embedded repository from the digest and, per H4, from the entry-count ceiling, so
-    # unrelated untracked population raises neither worktree drift nor worktree-limit; a tracked
-    # entry, an untracked control file, and every traversed directory stay counted. Without the
+    # staged-plus-clean-only caller), it further omits untracked entries and directories that are
+    # not ancestors of tracked paths. It keeps tracked entries and applicable .gitattributes, but
+    # not ignore inputs, so the evidence matches the plain worktree-versus-index comparison. Without the
     # switch (a .git control-surface tree) every non-directory entry is hashed, a directory keeps
     # its 'D:' key, and a reparse or special entry is refused. See the parameter notes below.
     #
@@ -2753,8 +2805,8 @@ function Get-TreeEvidence {
     #
     # .PARAMETER OmitUntrackedEvidence
     # Switches the walk into tracked/control-only evidence mode. It omits an untracked ordinary
-    # file, reparse point, or embedded repository from the digest and from the entry-count ceiling
-    # (H4); a tracked entry, an untracked control file, and every traversed directory stay counted.
+    # entry from the digest and count, and skips a directory that is not a tracked-path ancestor.
+    # Tracked entries, their ancestors, and applicable .gitattributes stay counted.
     # Off by default and ignored unless WorktreeClassification is set.
     #
     # .PARAMETER AncestorBoundary
@@ -2792,7 +2844,7 @@ function Get-TreeEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.3
+    # Version: 1.0.20260818.4
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2862,6 +2914,17 @@ function Get-TreeEvidence {
             [void]$objAdditionalExcluded.Add([System.IO.Path]::GetFullPath($strAdditionalExcludedEntry))
         }
     }
+    if ($OmitUntrackedEvidence) {
+        $objTrackedDirectory = New-Object 'System.Collections.Generic.HashSet[string]' `
+            ($TrackedRelativePath.Comparer)
+        foreach ($strTrackedPath in $TrackedRelativePath) {
+            $intSeparator = $strTrackedPath.IndexOf('/')
+            while ($intSeparator -gt 0) {
+                [void]$objTrackedDirectory.Add($strTrackedPath.Substring(0, $intSeparator))
+                $intSeparator = $strTrackedPath.IndexOf('/', $intSeparator + 1)
+            }
+        }
+    }
     $objMap = New-Object 'System.Collections.Generic.SortedDictionary[string,string]' `
         ([System.StringComparer]::Ordinal)
     $objPending = New-Object 'System.Collections.Generic.Stack[string]'
@@ -2891,11 +2954,8 @@ function Get-TreeEvidence {
             $objAttributes = [System.IO.File]::GetAttributes($strFullEntry)
             $boolReparseEntry = ($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0
             $boolDirectoryEntry = ($objAttributes -band [System.IO.FileAttributes]::Directory) -ne 0
-            # Worktree classification (E2): an untracked .gitignore or .gitattributes is a Git
-            # control input, not ordinary payload. Git reads the worktree .gitignore for the
-            # --exclude-standard untracked set and the worktree .gitattributes for the working
-            # diff, tracked or not and in any walked directory, so its bytes decide what a
-            # path-set read reports. Detect a regular (non-reparse, non-directory) instance by
+            # Full worktree reads consume .gitignore and .gitattributes. Clean-only reads consume
+            # only applicable .gitattributes. Detect a regular instance by
             # basename under the host case rule so the untracked branch below leaves it for the
             # hashing branch, and so the ignored-exclusion skip below never drops it. Git
             # refuses to follow a symlinked control file, so a reparse-point instance is not a
@@ -2903,16 +2963,15 @@ function Get-TreeEvidence {
             $boolUntrackedControlFile = $false
             if ($WorktreeClassification -and -not $boolReparseEntry -and -not $boolDirectoryEntry) {
                 $strEntryName = [System.IO.Path]::GetFileName($strFullEntry)
-                if ($strEntryName.Equals('.gitignore', $script:objPathComparison) -or
-                    $strEntryName.Equals('.gitattributes', $script:objPathComparison)) {
+                if (($strEntryName.Equals('.gitattributes', $script:objPathComparison) -and
+                        (-not $OmitUntrackedEvidence -or $TrackedRelativePath.Count -ne 0)) -or
+                    (-not $OmitUntrackedEvidence -and
+                        $strEntryName.Equals('.gitignore', $script:objPathComparison))) {
                     $boolUntrackedControlFile = $true
                 }
             }
-            # G1: the ignored-exclusion set (git ls-files --others --ignored --directory) can
-            # list an ignored .gitignore or .gitattributes that Git still reads as a control
-            # input, so a regular control file is never skipped here; it stays evidence-relevant
-            # through the hashing branch (E2). Every other ignored top-level entry and every
-            # initialized submodule root is skipped without traversal, exactly as before.
+            # A full read keeps control files evidence-relevant even when the ignored-exclusion
+            # set lists them. Other ignored entries and initialized submodules are skipped.
             if ($objAdditionalExcluded.Count -ne 0 -and -not $boolUntrackedControlFile -and
                 $objAdditionalExcluded.Contains($strFullEntry)) {
                 continue
@@ -2956,7 +3015,10 @@ function Get-TreeEvidence {
                 # directory that no path-set read reports change the worktree digest and perturb
                 # convergence. The control-surface walk keeps the 'D:' key, because a .git
                 # reference tree's directory shape is part of the hashed control surface.
-                if ($WorktreeClassification) {
+                if ($OmitUntrackedEvidence -and
+                    -not $objTrackedDirectory.Contains($strRelativePath)) {
+                    $boolEntryCounted = $false
+                } elseif ($WorktreeClassification) {
                     # G2: an untracked embedded Git repository is a directory that itself holds a
                     # .git entry. Git reports it as one untracked path (for example nested/) and
                     # never descends into it, so the worktree reads never consume its internals.
@@ -2991,8 +3053,8 @@ function Get-TreeEvidence {
                 }
             } elseif ($WorktreeClassification -and -not $boolUntrackedControlFile -and
                 -not $TrackedRelativePath.Contains($strRelativePath)) {
-                # Worktree classification (F3): an untracked ordinary file -- and not an
-                # untracked .gitignore or .gitattributes, which the control-input test above
+                # Worktree classification (F3): an untracked ordinary file -- and not a
+                # control file, which the control-input test above
                 # routed to the hashing branch (E2). Record its name and existence only -- the
                 # same key a worktree reparse point receives above. Do not open it, probe its
                 # Unix type, hash it, or apply the content byte limits: no path-set read consumes
@@ -3008,11 +3070,11 @@ function Get-TreeEvidence {
                     $objMap['F:' + $strRelativePath] = ''
                 } else { $boolEntryCounted = $false }
             } else {
-                # A tracked ordinary file, an untracked .gitignore or .gitattributes (E2), or
+                # A tracked ordinary file, an applicable untracked control file, or
                 # any file when worktree classification is off (a .git control-surface tree):
                 # hash the content and apply the per-file and aggregate byte limits, because git
                 # diff reads a tracked file's content when it compares the worktree against the
-                # index, and Git reads an untracked .gitignore/.gitattributes as a control input.
+                # index, and Git reads applicable worktree control files.
                 $objFile = New-Object System.IO.FileInfo($strFullEntry)
                 # On Unix an entry that is neither a directory nor a reparse point can
                 # still be a FIFO, socket, or device, which File attributes do not
@@ -3735,91 +3797,55 @@ function Get-GitControlSurfaceEvidence {
     # Gets bounded evidence for repository-local Git configuration and references.
     #
     # .DESCRIPTION
-    # Hashes the .git pointer when present, the applicable local configuration
-    # files, the staging index coupled with the active split-index backing, the
-    # commondir pointer, the objects/info/alternates pointer, and -- only when
-    # SampleWorktreeControlInput is set -- info/exclude and info/attributes, and --
-    # only when IncludeReferenceEvidence is set -- the reference inputs HEAD and the
-    # object HEAD resolves to (git rev-parse --verify --quiet HEAD via
-    # Get-HeadResolvedReferenceComponent). The active per-worktree configuration
-    # GitDirectory/config.worktree is hashed only when IncludeWorktreeConfigEvidence is
-    # set, because Git reads that file only when extensions.worktreeConfig is enabled; a
-    # repository with the extension unset or false never consults it, so sampling it would
-    # let a stale, oversized, or concurrently changed config.worktree refuse or drift a
-    # read that cannot depend on it. The main worktree's CommonDirectory/config.worktree is
-    # not hashed (for the main worktree GitDirectory equals CommonDirectory, so the active
-    # file is still covered). The index and its one
-    # active split-index backing are sampled together by Get-SplitIndexBracketedEvidence,
-    # which resolves the backing with `git rev-parse --shared-index-path` and brackets
-    # the pair so no stale, unreferenced sharedindex.* file is hashed. info/exclude and
-    # info/attributes drive only the worktree reads, so a staged-only verification omits
-    # them. Uses labeled components so absent and present state cannot collide. The
-    # resolved-HEAD component reads whichever ref back-end holds HEAD, so unrelated refs
-    # and reflogs never enter it. Repository hooks are not hashed: no verifier command runs a hook and
-    # core.fsmonitor is disabled, so hook contents cannot change the computed path set.
+    # Hashes the repository-local inputs consumed by the requested path-set reads. The
+    # evidence covers configuration, administrative pointers, the index and active
+    # split-index backing, selected info files, and selected reference inputs. Boolean
+    # parameters keep evidence aligned with the reads that the caller runs.
     #
     # .PARAMETER AdministrativePathRecord
     # Validated GitEntry, GitDirectory, and CommonDirectory path record.
     #
     # .PARAMETER IncludeReferenceEvidence
-    # When set (a Staged or Both read), also samples the reference inputs HEAD and the
-    # object HEAD resolves to. A working-only read consumes neither, so it passes $false
-    # and a concurrent ref update raises no git-control-drift.
+    # Includes HEAD and its resolved object for a staged read.
     #
     # .PARAMETER SampleWorktreeControlInput
-    # When set (a working, untracked, or clean read), also samples info/exclude and
-    # info/attributes. A staged-only read consumes neither, so it passes $false and a
-    # nonordinary or concurrently changed info/exclude or info/attributes raises no
-    # refusal or git-control-drift for a read that never opens it.
+    # Includes info/attributes for a worktree comparison.
+    #
+    # .PARAMETER SampleUntrackedControlInput
+    # Includes info/exclude for an untracked-path enumeration.
     #
     # .PARAMETER IncludeWorktreeConfigEvidence
-    # When set, also samples the active GitDirectory/config.worktree. Git reads that file
-    # only when extensions.worktreeConfig is enabled, so the caller passes the already
-    # computed $boolWorktreeConfigEnabled: a repository with the extension unset or false
-    # passes $false and a nonordinary, oversized, or concurrently changed config.worktree
-    # raises no refusal or git-control-drift for a read that never consults it. The default
-    # is $true, the fail-closed direction, so a caller that omits it over-samples (a safe
-    # spurious refusal) rather than under-samples (a fail-open miss of a live file).
+    # Includes GitDirectory/config.worktree when the extension enables it.
     #
     # .PARAMETER GitRecord
     # Fixed Git executable record used to resolve the active split-index backing.
     #
     # .PARAMETER WorkingDirectory
-    # Repository root assigned to the split-index resolver and used as its join base.
+    # Repository root used for native Git commands and relative paths.
     #
     # .PARAMETER NativeCommandList
-    # Native-command accounting list that receives the split-index resolver records.
+    # Native-command accounting list that receives split-index resolver records.
     #
     # .EXAMPLE
-    # $hashtableControl = Get-GitControlSurfaceEvidence -AdministrativePathRecord $hashtableGitPath `
-    #     -GitRecord $hashtableGit -WorkingDirectory $strRoot -NativeCommandList $listNativeChecks
+    # $hashtableEvidence = Get-GitControlSurfaceEvidence `
+    #     -AdministrativePathRecord $hashtableGitPath -GitRecord $hashtableGit `
+    #     -WorkingDirectory $strRoot -NativeCommandList $listNativeChecks
     #
-    # # Returns one digest and bounded component counts.
-    #
-    # .EXAMPLE
-    # Get-GitControlSurfaceEvidence -AdministrativePathRecord $hashtableLinkedControl
-    #
-    # # Throws when a configuration entry is not ordinary.
+    # # Returns one digest and its bounded component count.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
     # System.Collections.Specialized.OrderedDictionary. Contains Digest and
-    # ComponentCount. The Digest covers the staging index coupled with its active
-    # split-index backing, the commondir pointer, the objects/info/alternates pointer,
-    # and -- when SampleWorktreeControlInput is set -- info/exclude and info/attributes,
-    # and -- when IncludeReferenceEvidence is set -- HEAD and the object HEAD resolves
-    # to, so concurrent drift of any consumed path-set
-    # read input raises git-control-drift. Filesystem, ordinary path, size-bound,
-    # hashing, native, and parameter-binding failures propagate.
+    # ComponentCount. Filesystem, hashing, native, and binding failures propagate.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260817.0
+    # Version: 1.0.20260818.4
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -3827,10 +3853,11 @@ function Get-GitControlSurfaceEvidence {
     #   Position 0: AdministrativePathRecord
     #   Position 1: IncludeReferenceEvidence
     #   Position 2: SampleWorktreeControlInput
-    #   Position 3: IncludeWorktreeConfigEvidence
-    #   Position 4: GitRecord
-    #   Position 5: WorkingDirectory
-    #   Position 6: NativeCommandList
+    #   Position 3: SampleUntrackedControlInput
+    #   Position 4: IncludeWorktreeConfigEvidence
+    #   Position 5: GitRecord
+    #   Position 6: WorkingDirectory
+    #   Position 7: NativeCommandList
     param (
         [Parameter(Mandatory = $true)]
         [System.Collections.IDictionary]$AdministrativePathRecord,
@@ -3838,6 +3865,8 @@ function Get-GitControlSurfaceEvidence {
         [bool]$IncludeReferenceEvidence = $true,
 
         [bool]$SampleWorktreeControlInput = $true,
+
+        [bool]$SampleUntrackedControlInput = $true,
 
         [bool]$IncludeWorktreeConfigEvidence = $true,
 
@@ -3883,7 +3912,8 @@ function Get-GitControlSurfaceEvidence {
     # so the active file is still covered). info/exclude (the untracked read's
     # --exclude-standard set) and info/attributes (repository-local Git attributes that
     # change the working read via content normalization) drive only the worktree reads,
-    # so they are appended only when SampleWorktreeControlInput is set. The reference
+    # so attributes are gated by SampleWorktreeControlInput and excludes by
+    # SampleUntrackedControlInput. The reference
     # inputs the staged read consumes -- HEAD itself and the object HEAD resolves to -- are
     # not listed here: they are added in the dedicated reference-evidence block below, only
     # when IncludeReferenceEvidence is set. The commondir pointer is per-worktree
@@ -3903,17 +3933,18 @@ function Get-GitControlSurfaceEvidence {
     $arrBoundedFileSpecifications = @(
         @('commondir-pointer', (Join-Path $AdministrativePathRecord.GitDirectory 'commondir')),
         @('objects-info-alternates', (Join-Path (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'objects') 'info') 'alternates'))
-    ) + $(if ($SampleWorktreeControlInput) {
-        @(
-            @('info-exclude', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'exclude')),
-            @('info-attributes', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'attributes'))
-        )
-    } else {
-        @()
-    })
+    )
     foreach ($arrSpecification in $arrBoundedFileSpecifications) {
         $objComponents[[string]$arrSpecification[0]] = Get-BoundedControlFileComponent `
             -LiteralPath ([string]$arrSpecification[1])
+    }
+    if ($SampleWorktreeControlInput) {
+        $objComponents['info-attributes'] = Get-BoundedControlFileComponent `
+            -LiteralPath (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'attributes')
+    }
+    if ($SampleUntrackedControlInput) {
+        $objComponents['info-exclude'] = Get-BoundedControlFileComponent `
+            -LiteralPath (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'exclude')
     }
     # config.worktree is the one conditional single-file control input, so it is assigned to
     # the component map directly rather than through a one-element $(if ...) append: the
@@ -3981,65 +4012,54 @@ function Get-PathSetControlInputDigest {
     # Digests the single-file control inputs the path-set reads depend on.
     #
     # .DESCRIPTION
-    # Hashes only the single-file administrative inputs the working, untracked, and
-    # staged reads consume -- the applicable config files, the commondir pointer, the
-    # objects/info/alternates pointer, and -- only when SampleWorktreeControlInput is
-    # set -- info/exclude and info/attributes, and -- only when IncludeReferenceEvidence
-    # is set -- the reference inputs HEAD and the object HEAD resolves to -- together with the staging
-    # index coupled to its one active split-index backing, into one ordinal-framed
-    # digest. The active per-worktree configuration GitDirectory/config.worktree is hashed
-    # only when IncludeWorktreeConfigEvidence is set, because Git reads it only when
-    # extensions.worktreeConfig is enabled; a repository with the extension unset or false
-    # never consults it. The main worktree's CommonDirectory/config.worktree is not hashed.
-    # Each config/pointer
-    # input is a single file, so each hash is atomic; the index and its active backing
-    # are sampled together by Get-SplitIndexBracketedEvidence, whose intra-snapshot gate
-    # keeps the coupled component internally consistent. Taken before the reads and again
-    # as the verifier's final evidence action, the two digests bracket the read window,
-    # closing the final-traversal tail that the aggregate control digest leaves for these
-    # inputs. The live worktree cannot be bracketed this way and keep the convergence
-    # guarantee.
+    # Hashes the bounded single-file administrative inputs consumed by the requested
+    # path-set reads. It couples the index with its active split-index backing and can
+    # include worktree, untracked, worktree-config, and reference inputs. Before and
+    # after calls bracket the native-read window and detect control-input drift.
     #
     # .PARAMETER AdministrativePathRecord
     # Validated GitEntry, GitDirectory, and CommonDirectory path record.
     #
     # .PARAMETER IncludeReferenceEvidence
-    # When set (a Staged or Both read), also brackets the reference inputs HEAD and the
-    # object HEAD resolves to. A working-only read consumes neither, so it passes $false.
+    # Includes HEAD and its resolved object for a staged read.
     #
     # .PARAMETER SampleWorktreeControlInput
-    # When set (a working, untracked, or clean read), also brackets info/exclude and
-    # info/attributes. A staged-only read consumes neither, so it passes $false.
+    # Includes info/attributes for a worktree comparison.
+    #
+    # .PARAMETER SampleUntrackedControlInput
+    # Includes info/exclude for an untracked-path enumeration.
     #
     # .PARAMETER IncludeWorktreeConfigEvidence
-    # When set, also brackets the active GitDirectory/config.worktree. Git reads that file
-    # only when extensions.worktreeConfig is enabled, so the caller passes the already
-    # computed $boolWorktreeConfigEnabled and a repository with the extension unset or false
-    # passes $false. The default is $true, the fail-closed direction.
+    # Includes GitDirectory/config.worktree when the extension enables it.
     #
     # .PARAMETER GitRecord
     # Fixed Git executable record used to resolve the active split-index backing.
     #
     # .PARAMETER WorkingDirectory
-    # Repository root assigned to the split-index resolver and used as its join base.
+    # Repository root used for native Git commands and relative paths.
     #
     # .PARAMETER NativeCommandList
-    # Native-command accounting list that receives the split-index resolver records.
+    # Native-command accounting list that receives split-index resolver records.
+    #
+    # .EXAMPLE
+    # $strDigest = Get-PathSetControlInputDigest `
+    #     -AdministrativePathRecord $hashtableGitPath -GitRecord $hashtableGit `
+    #     -WorkingDirectory $strRoot -NativeCommandList $listNativeChecks
+    #
+    # # Returns one framed SHA-256 digest.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
-    # System.String. One framed digest over the single-file control inputs and the
-    # coupled index/split-index snapshot. Filesystem, hashing, native, and
-    # parameter-binding failures propagate.
+    # System.String. One framed digest. Filesystem, hashing, native, and binding
+    # failures propagate.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
-    # surface. Parameters, return shape, and positional contract may change
-    # without notice.
+    # surface. Parameters and positional contract may change without notice.
     #
-    # Version: 1.0.20260817.0
+    # Version: 1.0.20260818.4
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -4047,10 +4067,11 @@ function Get-PathSetControlInputDigest {
     #   Position 0: AdministrativePathRecord
     #   Position 1: IncludeReferenceEvidence
     #   Position 2: SampleWorktreeControlInput
-    #   Position 3: IncludeWorktreeConfigEvidence
-    #   Position 4: GitRecord
-    #   Position 5: WorkingDirectory
-    #   Position 6: NativeCommandList
+    #   Position 3: SampleUntrackedControlInput
+    #   Position 4: IncludeWorktreeConfigEvidence
+    #   Position 5: GitRecord
+    #   Position 6: WorkingDirectory
+    #   Position 7: NativeCommandList
     param (
         [Parameter(Mandatory = $true)]
         [System.Collections.IDictionary]$AdministrativePathRecord,
@@ -4058,6 +4079,8 @@ function Get-PathSetControlInputDigest {
         [bool]$IncludeReferenceEvidence = $true,
 
         [bool]$SampleWorktreeControlInput = $true,
+
+        [bool]$SampleUntrackedControlInput = $true,
 
         [bool]$IncludeWorktreeConfigEvidence = $true,
 
@@ -4081,8 +4104,8 @@ function Get-PathSetControlInputDigest {
     # same class as C4/C7). The active per-worktree config is
     # worktree-config-worktree (GitDirectory/config.worktree), sampled only when
     # IncludeWorktreeConfigEvidence is set (see the direct assignment after the loop below)
-    # because Git reads it only when extensions.worktreeConfig is enabled; info/exclude and
-    # info/attributes are appended only for a worktree read. HEAD and the object HEAD
+    # because Git reads it only when extensions.worktreeConfig is enabled. info/attributes
+    # follows a worktree comparison; info/exclude follows only untracked enumeration. HEAD and the object HEAD
     # resolves to are added in the dedicated reference-evidence block after the loop, only
     # for a staged read, exactly as in Get-GitControlSurfaceEvidence.
     # common-config is bracketed by its EFFECTIVE entries (Get-EffectiveConfigComponent),
@@ -4098,14 +4121,7 @@ function Get-PathSetControlInputDigest {
     $arrSingleFileInputs = @(
         @('commondir-pointer', (Join-Path $AdministrativePathRecord.GitDirectory 'commondir')),
         @('objects-info-alternates', (Join-Path (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'objects') 'info') 'alternates'))
-    ) + $(if ($SampleWorktreeControlInput) {
-        @(
-            @('info-exclude', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'exclude')),
-            @('info-attributes', (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'attributes'))
-        )
-    } else {
-        @()
-    })
+    )
     foreach ($arrSpecification in $arrSingleFileInputs) {
         # Get-BoundedControlFileComponent rejects a non-ordinary (reparse/symlink) file so
         # a concurrently substituted link cannot read outside the repository, and enforces
@@ -4113,6 +4129,14 @@ function Get-PathSetControlInputDigest {
         # length is sampled cannot be hashed without bound.
         $objInputs[[string]$arrSpecification[0]] = Get-BoundedControlFileComponent `
             -LiteralPath ([string]$arrSpecification[1])
+    }
+    if ($SampleWorktreeControlInput) {
+        $objInputs['info-attributes'] = Get-BoundedControlFileComponent `
+            -LiteralPath (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'attributes')
+    }
+    if ($SampleUntrackedControlInput) {
+        $objInputs['info-exclude'] = Get-BoundedControlFileComponent `
+            -LiteralPath (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'info') 'exclude')
     }
     # config.worktree is the one conditional single-file control input, so it is assigned to
     # the input map directly rather than through a one-element $(if ...) append: the
@@ -4536,7 +4560,8 @@ try {
     # otherwise refuse (worktree-link/worktree-limit) a read that does not depend on it.
     # Gather and bracket the worktree evidence only when a working-tree or clean-working
     # read is requested.
-    $boolWorktreeReadRequested = ($Mode -in @('Working', 'Both')) -or $RequireCleanWorkingAgainstIndex
+    $boolFullWorktreeReadRequested = $Mode -in @('Working', 'Both')
+    $boolWorktreeReadRequested = $boolFullWorktreeReadRequested -or $RequireCleanWorkingAgainstIndex
     # HEAD and the ref trees are consumed only by the staged read (git diff --cached
     # resolves HEAD against the index); a working-only read is worktree-versus-index plus
     # an index-reading ls-files, neither of which consumes a reference. Sample the
@@ -4550,10 +4575,10 @@ try {
     # --directory collapses a fully-ignored directory to one trailing-slashed entry. The
     # identical set is reused across the before/after/confirm walks so the drift
     # comparison stays apples-to-apples; a new ignored tree created mid-window is not in
-    # the set and the later walk fails closed, the safe direction. Only a worktree read
-    # walks the tree, so a staged-only read skips this.
+    # the set and the later walk fails closed, the safe direction. Only Working and Both
+    # enumerate ignored paths; staged clean-only evidence skips them.
     $arrIgnoredExcludedPath = @()
-    if ($boolWorktreeReadRequested) {
+    if ($boolFullWorktreeReadRequested) {
         $strNativeCommand = 'ignored'
         $intNativeExit = $null
         $hashtableIgnoredResult = Invoke-GitRaw `
@@ -4622,6 +4647,7 @@ try {
         -AdministrativePathRecord $hashtableAdministrativePaths `
         -IncludeReferenceEvidence $boolIncludeReferenceEvidence `
         -SampleWorktreeControlInput $boolWorktreeReadRequested `
+        -SampleUntrackedControlInput $boolFullWorktreeReadRequested `
         -IncludeWorktreeConfigEvidence $boolWorktreeConfigEnabled `
         -GitRecord $hashtableGitExecutable `
         -WorkingDirectory $strRepositoryRoot `
@@ -4659,6 +4685,7 @@ try {
         -AdministrativePathRecord $hashtableAdministrativePaths `
         -IncludeReferenceEvidence $boolIncludeReferenceEvidence `
         -SampleWorktreeControlInput $boolWorktreeReadRequested `
+        -SampleUntrackedControlInput $boolFullWorktreeReadRequested `
         -IncludeWorktreeConfigEvidence $boolWorktreeConfigEnabled `
         -GitRecord $hashtableGitExecutable `
         -WorkingDirectory $strRepositoryRoot `
@@ -5070,6 +5097,7 @@ try {
         -AdministrativePathRecord $hashtableAdministrativePaths `
         -IncludeReferenceEvidence $boolIncludeReferenceEvidence `
         -SampleWorktreeControlInput $boolWorktreeReadRequested `
+        -SampleUntrackedControlInput $boolFullWorktreeReadRequested `
         -IncludeWorktreeConfigEvidence $boolWorktreeConfigEnabled `
         -GitRecord $hashtableGitExecutable `
         -WorkingDirectory $strRepositoryRoot `
@@ -5091,6 +5119,7 @@ try {
             -AdministrativePathRecord $hashtableAdministrativePaths `
             -IncludeReferenceEvidence $boolIncludeReferenceEvidence `
             -SampleWorktreeControlInput $boolWorktreeReadRequested `
+            -SampleUntrackedControlInput $boolFullWorktreeReadRequested `
             -IncludeWorktreeConfigEvidence $boolWorktreeConfigEnabled `
             -GitRecord $hashtableGitExecutable `
             -WorkingDirectory $strRepositoryRoot `
@@ -5187,6 +5216,27 @@ try {
             throw 'object-store-drift'
         }
     }
+    if ($Mode -eq 'Staged' -and $RequireCleanWorkingAgainstIndex) {
+        $strNativeCommand = 'working-index-repeat'
+        $intNativeExit = $null
+        $hashtableCleanRepeat = Invoke-GitRaw `
+            -GitRecord $hashtableGitExecutable `
+            -WorkingDirectory $strRepositoryRoot `
+            -ArgumentList @('diff', '--quiet', '--exit-code', '--no-ext-diff', '--no-textconv', '--no-renames', '--ignore-submodules=all', '--')
+        $listNativeChecks.Add([ordered]@{
+            Name = $strNativeCommand
+            ExitCode = $hashtableCleanRepeat.ExitCode
+            StdoutLength = $hashtableCleanRepeat.Stdout.Length
+            StderrLength = $hashtableCleanRepeat.StderrLength
+        })
+        $intNativeExit = $hashtableCleanRepeat.ExitCode
+        if ($intNativeExit -eq 1) {
+            throw 'working-index-difference'
+        }
+        if ($intNativeExit -ne 0) {
+            throw 'object-store-drift'
+        }
+    }
     # Final atomic single-file control-input read -- the last evidence action. It
     # re-reads every single-file control input after the converged control traversal,
     # so a change to any one during that traversal's tail (which the aggregate
@@ -5197,6 +5247,7 @@ try {
         -AdministrativePathRecord $hashtableAdministrativePaths `
         -IncludeReferenceEvidence $boolIncludeReferenceEvidence `
         -SampleWorktreeControlInput $boolWorktreeReadRequested `
+        -SampleUntrackedControlInput $boolFullWorktreeReadRequested `
         -IncludeWorktreeConfigEvidence $boolWorktreeConfigEnabled `
         -GitRecord $hashtableGitExecutable `
         -WorkingDirectory $strRepositoryRoot `
