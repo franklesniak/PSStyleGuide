@@ -1859,14 +1859,16 @@ function Get-TreeEvidence {
     # length above 1 GiB. Optionally excludes one exact child entry.
     #
     # With WorktreeClassification set (the worktree callers), the walk hashes and
-    # byte-limits only tracked ordinary files, named by TrackedRelativePath. An
-    # untracked ordinary file, and every reparse point (symbolic link), is recorded by
-    # name and existence only -- no open, no hash, no byte limit, no Unix-type probe,
-    # and, for a reparse point, no throw -- because no path-set read consumes that
-    # content. Untracked files and reparse points share one name-only key, so a type
-    # change that keeps the path does not raise a false worktree-drift. Without the
-    # switch (a .git control-surface tree), every non-directory entry is hashed and a
-    # reparse point or special entry is refused, exactly as before.
+    # byte-limits tracked ordinary files, named by TrackedRelativePath, and an untracked
+    # .gitignore or .gitattributes, whose bytes Git reads as a control input for the
+    # --exclude-standard untracked set and the working diff. Every other untracked ordinary
+    # file, and every reparse point (symbolic link), is recorded by name and existence only
+    # -- no open, no hash, no byte limit, no Unix-type probe, and, for a reparse point, no
+    # throw -- because no path-set read consumes that payload content. An ordinary untracked
+    # file and a reparse point share one name-only key, so a type change that keeps the path
+    # does not raise a false worktree-drift. Without the switch (a .git control-surface tree),
+    # every non-directory entry is hashed and a reparse point or special entry is refused,
+    # exactly as before.
     #
     # .PARAMETER RootPath
     # Absolute ordinary directory root to inspect.
@@ -2027,6 +2029,22 @@ function Get-TreeEvidence {
                 [System.IO.Path]::DirectorySeparatorChar,
                 [System.IO.Path]::AltDirectorySeparatorChar
             ).Replace([System.IO.Path]::DirectorySeparatorChar, '/')
+            # Worktree classification (E2): an untracked .gitignore or .gitattributes is a Git
+            # control input, not ordinary payload. Git reads the worktree .gitignore for the
+            # --exclude-standard untracked set and the worktree .gitattributes for the working
+            # diff, tracked or not and in any walked directory, so its bytes decide what a
+            # path-set read reports. Detect it by basename under the host case rule so the
+            # untracked branch below leaves it for the hashing branch. A reparse-point instance
+            # is already recorded name-only above, matching Git's refusal to follow a symlinked
+            # control file.
+            $boolUntrackedControlFile = $false
+            if ($WorktreeClassification) {
+                $strEntryName = [System.IO.Path]::GetFileName($strFullEntry)
+                if ($strEntryName.Equals('.gitignore', $script:objPathComparison) -or
+                    $strEntryName.Equals('.gitattributes', $script:objPathComparison)) {
+                    $boolUntrackedControlFile = $true
+                }
+            }
             if (($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
                 if ($WorktreeClassification) {
                     # Worktree classification (F4): record a reparse point (a symbolic link,
@@ -2049,21 +2067,25 @@ function Get-TreeEvidence {
             } elseif (($objAttributes -band [System.IO.FileAttributes]::Directory) -ne 0) {
                 $objMap['D:' + $strRelativePath] = ''
                 $objPending.Push($strFullEntry)
-            } elseif ($WorktreeClassification -and -not $TrackedRelativePath.Contains($strRelativePath)) {
-                # Worktree classification (F3): an untracked ordinary file. Record its name
-                # and existence only -- the same key a worktree reparse point receives above.
-                # Do not open it, probe its Unix type, hash it, or apply the content byte
-                # limits: no path-set read consumes untracked content (git ls-files --others
-                # reports only its name), so hashing it would raise a false worktree-limit or,
-                # on content-only churn, a false worktree-drift that no computed-set change
-                # can justify. An untracked FIFO/socket/device likewise needs no content-type
-                # refusal here, because it is never opened.
+            } elseif ($WorktreeClassification -and -not $boolUntrackedControlFile -and
+                -not $TrackedRelativePath.Contains($strRelativePath)) {
+                # Worktree classification (F3): an untracked ordinary file -- and not an
+                # untracked .gitignore or .gitattributes, which the control-input test above
+                # routed to the hashing branch (E2). Record its name and existence only -- the
+                # same key a worktree reparse point receives above. Do not open it, probe its
+                # Unix type, hash it, or apply the content byte limits: no path-set read consumes
+                # untracked payload content (git ls-files --others reports only its name), so
+                # hashing it would raise a false worktree-limit or, on content-only churn, a
+                # false worktree-drift that no computed-set change can justify. An untracked
+                # FIFO/socket/device likewise needs no content-type refusal here, because it is
+                # never opened.
                 $objMap['F:' + $strRelativePath] = ''
             } else {
-                # A tracked ordinary file, or any file when worktree classification is off (a
-                # .git control-surface tree): hash the content and apply the per-file and
-                # aggregate byte limits, because git diff does read this content when it
-                # compares the worktree against the index.
+                # A tracked ordinary file, an untracked .gitignore or .gitattributes (E2), or
+                # any file when worktree classification is off (a .git control-surface tree):
+                # hash the content and apply the per-file and aggregate byte limits, because git
+                # diff reads a tracked file's content when it compares the worktree against the
+                # index, and Git reads an untracked .gitignore/.gitattributes as a control input.
                 $objFile = New-Object System.IO.FileInfo($strFullEntry)
                 # On Unix an entry that is neither a directory nor a reparse point can
                 # still be a FIFO, socket, or device, which File attributes do not
@@ -3204,8 +3226,11 @@ function ConvertFrom-NulIndexRecordStream {
     # change), only the safe cached marker `H` is accepted and any other tag is
     # rejected as unsafe-index-state; when it is set (a staged-only read, whose
     # cached index-versus-HEAD comparison those flags do not affect), every
-    # well-formed record contributes its path. Duplicate, malformed, and excessive
-    # records are always rejected, without decoding or printing path bytes.
+    # well-formed record contributes its path. A duplicate path is rejected as
+    # malformed-index-records only when AllowUnsafeFlags is not set; when it is set, a
+    # path that Git lists once per unmerged stage (stage 1, stage 2, and stage 3)
+    # collapses into one key instead. A malformed frame and an excessive count are always
+    # rejected, without decoding or printing path bytes.
     #
     # .PARAMETER Bytes
     # Complete raw output from `git ls-files -v -z`.
@@ -3278,7 +3303,13 @@ function ConvertFrom-NulIndexRecordStream {
         # rather than copying it into a fresh byte[] first, which avoids a per-record
         # allocation and copy across the up-to-100,000-record ceiling.
         $strKey = [System.Convert]::ToBase64String($Bytes, $intStart + 2, $intLength - 2)
-        if (-not $objKeys.Add($strKey)) {
+        # An unmerged path is listed once per conflict stage (stage 1, stage 2, and stage 3),
+        # so `git ls-files -v -z` repeats its path key. That repeat is legitimate only when
+        # AllowUnsafeFlags is set (a staged-only read); the repeated key then collapses into
+        # the set with no throw. Whenever AllowUnsafeFlags is not set, only the safe cached
+        # `H` marker reaches here, so a repeated path can only be a malformed stream and stays
+        # refused. The 100,000-distinct-path ceiling below is unchanged either way.
+        if (-not $objKeys.Add($strKey) -and -not $AllowUnsafeFlags) {
             throw 'malformed-index-records'
         }
         if ($objKeys.Count -gt 100000) {
@@ -3839,18 +3870,22 @@ try {
                 }
             }
         }
-        # For each capable driver, ask Git whether any tracked path selects it. The 'attr'
-        # pathspec magic evaluates the repository's own .gitattributes (and info/attributes),
-        # so this is Git's exact per-path filter selection, not a re-implementation. Empty
-        # output means no tracked path carries filter=<name>, so the driver is dormant and is
-        # allowed. Any returned path, or a non-zero exit that leaves the driver's status
-        # undeterminable, refuses (fail closed) as git-filter-active.
+        # For each capable driver, ask Git which tracked paths select it and read each
+        # selected entry's index mode. The 'attr' pathspec magic evaluates the repository's
+        # own .gitattributes (and info/attributes), so this is Git's exact per-path filter
+        # selection, not a re-implementation, and --stage adds the index mode. A clean/process
+        # conversion filter runs only for a regular blob (100644/100755); Git never streams a
+        # symlink (120000) or gitlink (160000) entry through a filter. So an empty selection, or
+        # a selection whose every entry is a symlink or gitlink, leaves the driver dormant for
+        # the worktree diff and is allowed. A regular blob entry, any other mode, a malformed
+        # frame, or a non-zero exit that leaves the driver's status undeterminable, refuses
+        # (fail closed) as git-filter-active.
         foreach ($strFilterDriverName in $listCapableFilterDriver) {
             $strNativeCommand = 'filter-select'
             $hashtableFilterSelectResult = Invoke-GitRaw `
                 -GitRecord $hashtableGitExecutable `
                 -WorkingDirectory $strRepositoryRoot `
-                -ArgumentList @('ls-files', '-z', '--', (':(attr:filter=' + $strFilterDriverName + ')'))
+                -ArgumentList @('ls-files', '-z', '--stage', '--', (':(attr:filter=' + $strFilterDriverName + ')'))
             $listNativeChecks.Add([ordered]@{
                 Name = $strNativeCommand
                 ExitCode = $hashtableFilterSelectResult.ExitCode
@@ -3861,8 +3896,40 @@ try {
             if ($intNativeExit -ne 0) {
                 throw 'git-filter-active'
             }
-            if ($hashtableFilterSelectResult.Stdout.Length -gt 0) {
-                throw 'git-filter-active'
+            # Classify every selected entry by its index mode. git ls-files --stage prints
+            # `<mode> SP <object> SP <stage> TAB <path>`, so the leading ASCII field before the
+            # first space is the mode. Read only that field; never decode the path bytes. Allow
+            # only a symlink (120000) or gitlink (160000) entry. Refuse a regular blob, any other
+            # mode, or a malformed frame as git-filter-active. An unmerged path yields one record
+            # per stage, and each stage is classified on its own, so a regular blob at any stage
+            # refuses.
+            $arrSelectedBytes = $hashtableFilterSelectResult.Stdout
+            if ($arrSelectedBytes.Length -gt 0) {
+                if ($arrSelectedBytes[$arrSelectedBytes.Length - 1] -ne 0) {
+                    throw 'git-filter-active'
+                }
+                $intSelectStart = 0
+                for ($intSelectIndex = 0; $intSelectIndex -lt $arrSelectedBytes.Length; $intSelectIndex++) {
+                    if ($arrSelectedBytes[$intSelectIndex] -ne 0) {
+                        continue
+                    }
+                    $intModeEnd = -1
+                    for ($intModeScan = $intSelectStart; $intModeScan -lt $intSelectIndex; $intModeScan++) {
+                        if ($arrSelectedBytes[$intModeScan] -eq 0x20) {
+                            $intModeEnd = $intModeScan
+                            break
+                        }
+                    }
+                    if ($intModeEnd -le $intSelectStart) {
+                        throw 'git-filter-active'
+                    }
+                    $strSelectedMode = [System.Text.Encoding]::ASCII.GetString(
+                        $arrSelectedBytes, $intSelectStart, $intModeEnd - $intSelectStart)
+                    if ($strSelectedMode -cne '120000' -and $strSelectedMode -cne '160000') {
+                        throw 'git-filter-active'
+                    }
+                    $intSelectStart = $intSelectIndex + 1
+                }
             }
         }
     }
