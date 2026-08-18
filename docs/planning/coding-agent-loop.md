@@ -110,6 +110,8 @@ Treat the controller as reusable production code. Before launch, exercise the re
 
 Exercise each new focused precheck through its exact command line before launch, not only through parser or controller tests. Give the helper a harness self-test that proves zero-, one-, and many-item cases can reach their semantic assertions; in PowerShell, test parameter binding for an intentionally empty collection explicitly. A precheck command that cannot represent every expected result cardinality invalidates the launch package even if its source parses and its nonempty fixture passes.
 
+Execute every reused validation wrapper against the current pinned branch and head before launch, and assert that its structured result reports those exact identities. A matching helper hash is insufficient when the helper embeds a head, tree, branch, path, or receipt schema from an earlier round. Prefer parameterized reusable wrappers over task-specific embedded identities; reject a package whose validation command can only prove a prior head.
+
 If the runtime supports a persistent goal primitive, create or resume one goal for the entire plan. The filesystem tracker and verified repository/GitHub state remain authoritative after compaction; conversational memory and executor reports do not.
 
 ## Durable orchestration tracker
