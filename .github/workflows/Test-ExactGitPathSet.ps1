@@ -26,7 +26,7 @@ Optional exact absolute path of the Git executable. When omitted, the script
 uses the module-qualified application resolver once before any Git invocation.
 
 .NOTES
-Version: 1.0.20260818.1
+Version: 1.0.20260818.2
 #>
 
 [CmdletBinding()]
@@ -52,7 +52,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strVerifierVersion = '1.0.20260818.1'
+$script:strVerifierVersion = '1.0.20260818.2'
 $script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v2'
 # Wall-clock ceiling for any single native Git invocation (Invoke-GitRaw). The path-set
 # reads are sub-second metadata queries, so this 120-second default is orders of magnitude
@@ -678,6 +678,326 @@ function Test-AncestorBoundaryValidation {
         if ([System.IO.Directory]::Exists($strBase)) {
             [System.IO.Directory]::Delete($strBase, $true)
         }
+    }
+}
+
+function Test-PromisorRemoteActive {
+    # .SYNOPSIS
+    # Decides whether a promisor/partial-clone config query proves an active promisor remote.
+    #
+    # .DESCRIPTION
+    # Parses the NUL-delimited key-newline-value records that
+    # 'git config -z --get-regexp' returns for the promisor, partialclonefilter, and
+    # extensions.partialClone keys. Collapses duplicate remote.<name>.promisor definitions to
+    # each remote's effective last value, the way Git resolves a boolean (the last value wins).
+    # Returns true for extensions.partialClone, for a remote whose effective promisor value is
+    # not an explicit Git false, and for a valueless, empty, or malformed value (fail closed).
+    # Treats a remote.<name>.partialclonefilter as inert.
+    #
+    # .PARAMETER PromisorRecordBytes
+    # Raw stdout bytes of the promisor config query. A NUL separates records; a newline
+    # separates each record's key from its value.
+    #
+    # .EXAMPLE
+    # $boolActive = Test-PromisorRemoteActive -PromisorRecordBytes $hashtablePromisorResult.Stdout
+    #
+    # # Returns false for an ordinary clone whose only promisor value is an explicit false.
+    #
+    # .EXAMPLE
+    # $boolActive = Test-PromisorRemoteActive -PromisorRecordBytes $arrDuplicateTrueThenFalse
+    #
+    # # Returns false when a later promisor=false supersedes an earlier promisor=true.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Boolean. True when an active promisor or partial-clone marker remains, false for
+    # an ordinary repository. Strict UTF-8 decoding and allocation failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260818.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: PromisorRecordBytes
+    param (
+        [Parameter(Mandatory = $true)]
+        [byte[]]$PromisorRecordBytes
+    )
+
+    $strPromisorText = $script:objUtf8Strict.GetString($PromisorRecordBytes)
+    $objPromisorLastValue = New-Object 'System.Collections.Generic.Dictionary[string,string]' `
+        ([System.StringComparer]::Ordinal)
+    $listPromisorKeyOrder = New-Object 'System.Collections.Generic.List[string]'
+    $boolExtensionsPartialClone = $false
+    foreach ($strPromisorRecord in $strPromisorText.Split([char]0)) {
+        if ($strPromisorRecord.Length -eq 0) {
+            continue
+        }
+        $intNewlineIndex = $strPromisorRecord.IndexOf("`n")
+        if ($intNewlineIndex -lt 0) {
+            $strPromisorKey = $strPromisorRecord
+            $strPromisorValue = ''
+        } else {
+            $strPromisorKey = $strPromisorRecord.Substring(0, $intNewlineIndex)
+            $strPromisorValue = $strPromisorRecord.Substring($intNewlineIndex + 1)
+        }
+        if ($strPromisorKey -match '\.promisor$') {
+            # Keep only each remote's last value; Git resolves a boolean config to the last
+            # value, so an appended promisor=false supersedes an earlier promisor=true.
+            if (-not $objPromisorLastValue.ContainsKey($strPromisorKey)) {
+                [void]$listPromisorKeyOrder.Add($strPromisorKey)
+            }
+            $objPromisorLastValue[$strPromisorKey] = $strPromisorValue
+        } elseif ($strPromisorKey -ceq 'extensions.partialclone') {
+            # extensions.partialClone is an independent partial-clone marker; refuse on presence.
+            $boolExtensionsPartialClone = $true
+        }
+        # Every other matched key (remote.<name>.partialclonefilter) is an inert filter.
+    }
+    if ($boolExtensionsPartialClone) {
+        return $true
+    }
+    foreach ($strPromisorKey in $listPromisorKeyOrder) {
+        # Fail closed on a valueless, empty, or malformed value; only an explicit Git false
+        # (false/no/off/0) marks the remote's promisor as disabled.
+        if ($objPromisorLastValue[$strPromisorKey].Trim().ToLowerInvariant() -notin @(
+                'false', 'no', 'off', '0')) {
+            return $true
+        }
+    }
+    return $false
+}
+
+function Test-PromisorRemoteEvidence {
+    # .SYNOPSIS
+    # Exercises the promisor decision against duplicate-ordering and malformed fixtures.
+    #
+    # .DESCRIPTION
+    # Confirms Test-PromisorRemoteActive collapses duplicate remote.<name>.promisor definitions
+    # to the effective last value, honors an explicit false, refuses a truthy, valueless, or
+    # malformed value, refuses extensions.partialClone, and treats a partialclonefilter as inert.
+    #
+    # .EXAMPLE
+    # Test-PromisorRemoteEvidence
+    #
+    # # Produces no output when every promisor fixture returns its expected decision.
+    #
+    # .EXAMPLE
+    # [void](Test-PromisorRemoteEvidence)
+    #
+    # # Re-runs the fixed promisor self-test and discards its intentionally empty output.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # None. Throws 'promisor-fixture-failure' when a fixture returns an unexpected decision.
+    # Encoding and allocation failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260818.0
+    #
+    # This function declares no parameters.
+    param ()
+
+    $strNul = [string][char]0
+    $strLf = [string][char]10
+    $arrCase = @(
+        @{ Active = $false; Text = 'remote.origin.promisor' + $strLf + 'false' + $strNul },
+        @{ Active = $true; Text = 'remote.origin.promisor' + $strLf + 'true' + $strNul },
+        @{ Active = $false; Text = 'remote.origin.promisor' + $strLf + 'true' + $strNul +
+            'remote.origin.promisor' + $strLf + 'false' + $strNul },
+        @{ Active = $true; Text = 'remote.origin.promisor' + $strLf + 'false' + $strNul +
+            'remote.origin.promisor' + $strLf + 'true' + $strNul },
+        @{ Active = $true; Text = 'remote.origin.promisor' + $strLf + 'maybe' + $strNul },
+        @{ Active = $true; Text = 'remote.origin.promisor' + $strNul },
+        @{ Active = $true; Text = 'extensions.partialclone' + $strLf + 'origin' + $strNul },
+        @{ Active = $false; Text = 'remote.origin.partialclonefilter' + $strLf + 'blob:none' + $strNul },
+        @{ Active = $false; Text = 'remote.origin.partialclonefilter' + $strLf + 'blob:none' + $strNul +
+            'remote.origin.promisor' + $strLf + 'false' + $strNul },
+        @{ Active = $true; Text = 'remote.a.promisor' + $strLf + 'false' + $strNul +
+            'remote.b.promisor' + $strLf + 'true' + $strNul }
+    )
+    foreach ($hashtableCase in $arrCase) {
+        $arrBytes = $script:objUtf8Strict.GetBytes([string]$hashtableCase.Text)
+        $boolActive = Test-PromisorRemoteActive -PromisorRecordBytes $arrBytes
+        if ($boolActive -ne [bool]$hashtableCase.Active) {
+            throw 'promisor-fixture-failure'
+        }
+    }
+}
+
+function Test-TrackedOnlyWorktreeEvidence {
+    # .SYNOPSIS
+    # Confirms tracked/control-only worktree evidence ignores untracked churn while tracked
+    # and control changes stay evidence-relevant.
+    #
+    # .DESCRIPTION
+    # Builds a temporary tree and checks Get-TreeEvidence under worktree classification. With
+    # OmitUntrackedEvidence set, an added untracked file does not change the worktree digest,
+    # while a tracked-file edit and an added untracked .gitattributes both change it. Without the
+    # switch, the same untracked file does change the digest, so Working/Both behavior is intact.
+    #
+    # .EXAMPLE
+    # Test-TrackedOnlyWorktreeEvidence
+    #
+    # # Produces no output when every fixture behaves as expected.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # None. Throws 'tracked-only-worktree-fixture-failure' when a fixture behaves unexpectedly.
+    # Filesystem and hashing failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260818.0
+    #
+    # This function declares no parameters.
+    param ()
+
+    $strFixtureRoot = [System.IO.Path]::Combine(
+        [System.IO.Path]::GetTempPath(),
+        ('exactgitpathset-h2-' + [System.Guid]::NewGuid().ToString('N')))
+    $objTracked = New-Object 'System.Collections.Generic.HashSet[string]' `
+        ([System.StringComparer]::Ordinal)
+    [void]$objTracked.Add('tracked.txt')
+    [void][System.IO.Directory]::CreateDirectory($strFixtureRoot)
+    try {
+        $strTrackedFile = Join-Path $strFixtureRoot 'tracked.txt'
+        $strUntrackedFile = Join-Path $strFixtureRoot 'untracked.tmp'
+        $strAttributesFile = Join-Path $strFixtureRoot '.gitattributes'
+        [System.IO.File]::WriteAllText($strTrackedFile, 'tracked-v1')
+
+        # Tracked-only baseline: one tracked file, no untracked entry.
+        $strOmitBaseline = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -WorktreeClassification -TrackedRelativePath $objTracked `
+                -OmitUntrackedEvidence -AncestorBoundary $strFixtureRoot).Digest
+
+        # Add an untracked file. Tracked-only evidence MUST ignore untracked population.
+        [System.IO.File]::WriteAllText($strUntrackedFile, 'noise')
+        $strOmitWithUntracked = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -WorktreeClassification -TrackedRelativePath $objTracked `
+                -OmitUntrackedEvidence -AncestorBoundary $strFixtureRoot).Digest
+        if ($strOmitBaseline -cne $strOmitWithUntracked) {
+            throw 'tracked-only-worktree-fixture-failure'
+        }
+
+        # The default worktree mode records the untracked file, so removing it MUST change the
+        # digest. This proves Working/Both untracked semantics are unchanged.
+        $strDefaultWithUntracked = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -WorktreeClassification -TrackedRelativePath $objTracked `
+                -AncestorBoundary $strFixtureRoot).Digest
+        [System.IO.File]::Delete($strUntrackedFile)
+        $strDefaultNoUntracked = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -WorktreeClassification -TrackedRelativePath $objTracked `
+                -AncestorBoundary $strFixtureRoot).Digest
+        if ($strDefaultWithUntracked -ceq $strDefaultNoUntracked) {
+            throw 'tracked-only-worktree-fixture-failure'
+        }
+
+        # A tracked-file edit stays evidence-relevant in tracked-only mode.
+        [System.IO.File]::WriteAllText($strTrackedFile, 'tracked-v2-longer')
+        $strOmitTrackedChanged = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -WorktreeClassification -TrackedRelativePath $objTracked `
+                -OmitUntrackedEvidence -AncestorBoundary $strFixtureRoot).Digest
+        if ($strOmitBaseline -ceq $strOmitTrackedChanged) {
+            throw 'tracked-only-worktree-fixture-failure'
+        }
+
+        # An untracked control file (.gitattributes) stays evidence-relevant in tracked-only
+        # mode. Restore the tracked file first so the control file is the only difference.
+        [System.IO.File]::WriteAllText($strTrackedFile, 'tracked-v1')
+        $strOmitControlBefore = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -WorktreeClassification -TrackedRelativePath $objTracked `
+                -OmitUntrackedEvidence -AncestorBoundary $strFixtureRoot).Digest
+        [System.IO.File]::WriteAllText($strAttributesFile, '* text=auto')
+        $strOmitControlAfter = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -WorktreeClassification -TrackedRelativePath $objTracked `
+                -OmitUntrackedEvidence -AncestorBoundary $strFixtureRoot).Digest
+        if ($strOmitControlBefore -ceq $strOmitControlAfter) {
+            throw 'tracked-only-worktree-fixture-failure'
+        }
+    } finally {
+        if ([System.IO.Directory]::Exists($strFixtureRoot)) {
+            [System.IO.Directory]::Delete($strFixtureRoot, $true)
+        }
+    }
+}
+
+function Test-NativeExitResetInvariant {
+    # .SYNOPSIS
+    # Confirms every main-body native-command site clears its exit before the guarded call.
+    #
+    # .DESCRIPTION
+    # Reads the verifier's own source text and checks the in-flight native-command diagnostic
+    # invariant at every main-body command site. After each native-command-name assignment, the
+    # first following native-exit assignment must clear the exit to null, so a native call that
+    # throws before it returns leaves the reported exit null instead of the prior command's exit.
+    # The command-site search text is built from fragments so this self-test does not match its
+    # own source.
+    #
+    # .EXAMPLE
+    # Test-NativeExitResetInvariant
+    #
+    # # Produces no output when every native-command site clears the exit before its call.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # None. Throws 'native-exit-invariant-fixture-failure' when a site does not clear the exit
+    # before its call, or when no sites are found. Filesystem failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260818.0
+    #
+    # This function declares no parameters.
+    param ()
+
+    $strSelfPath = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot 'Test-ExactGitPathSet.ps1'))
+    $strSelfText = $script:objUtf8Strict.GetString([System.IO.File]::ReadAllBytes($strSelfPath))
+    $strCommandNeedle = '$' + 'strNativeCommand = ' + [char]39
+    $strExitNeedle = '$' + 'intNativeExit ='
+    $strResetNeedle = '$' + 'intNativeExit = ' + '$' + 'null'
+    $intSiteCount = 0
+    $intSearchFrom = 0
+    while ($true) {
+        $intCommandIndex = $strSelfText.IndexOf(
+            $strCommandNeedle, $intSearchFrom, [System.StringComparison]::Ordinal)
+        if ($intCommandIndex -lt 0) {
+            break
+        }
+        $intSiteCount++
+        $intExitIndex = $strSelfText.IndexOf(
+            $strExitNeedle, $intCommandIndex, [System.StringComparison]::Ordinal)
+        if ($intExitIndex -lt 0 -or -not $strSelfText.Substring($intExitIndex).StartsWith(
+                $strResetNeedle, [System.StringComparison]::Ordinal)) {
+            throw 'native-exit-invariant-fixture-failure'
+        }
+        $intSearchFrom = $intCommandIndex + $strCommandNeedle.Length
+    }
+    if ($intSiteCount -lt 10) {
+        throw 'native-exit-invariant-fixture-failure'
     }
 }
 
@@ -2305,6 +2625,14 @@ function Get-TreeEvidence {
     # non-directory entry is hashed, a directory keeps its 'D:' key, and a reparse point or
     # special entry is refused, exactly as before.
     #
+    # With OmitUntrackedEvidence also set (the staged-plus-clean-only caller), the walk still
+    # traverses and counts every entry against the ceilings, but it omits an untracked ordinary
+    # file, an untracked reparse point, and an untracked embedded repository from the digest. A
+    # tracked file, a tracked reparse point, and an untracked .gitignore or .gitattributes stay
+    # evidence-relevant, so a tracked or control change still drives worktree drift while
+    # unrelated untracked population or churn does not. Off by default and ignored unless
+    # WorktreeClassification is set.
+    #
     # An untracked .gitignore or .gitattributes stays evidence-relevant even when the caller
     # lists it in AdditionalExcludedPath: the ignored enumeration can report a control file
     # that Git still reads, so a regular control file is never dropped by that exclusion and
@@ -2350,6 +2678,14 @@ function Get-TreeEvidence {
     # whether a non-directory, non-reparse entry is hashed (tracked) or recorded by name and
     # existence only (untracked).
     #
+    # .PARAMETER OmitUntrackedEvidence
+    # Switches the walk into tracked/control-only evidence mode for the staged-plus-clean-only
+    # caller. The walk still traverses and counts every entry, but it omits an untracked ordinary
+    # file, an untracked reparse point, and an untracked embedded repository from the digest, so
+    # unrelated untracked population or churn does not raise worktree drift. A tracked entry and
+    # an untracked control file stay evidence-relevant. Off by default and ignored unless
+    # WorktreeClassification is set.
+    #
     # .PARAMETER AncestorBoundary
     # Optional absolute ancestor the caller has already validated as an ordinary directory,
     # forwarded to Assert-OrdinaryRepositoryRoot. A self-test that builds its fixture under
@@ -2385,7 +2721,7 @@ function Get-TreeEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.1
+    # Version: 1.0.20260818.2
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2422,6 +2758,8 @@ function Get-TreeEvidence {
         [string]$LimitCategory = 'worktree-limit',
 
         [switch]$WorktreeClassification,
+
+        [switch]$OmitUntrackedEvidence,
 
         [System.Collections.Generic.HashSet[string]]$TrackedRelativePath,
 
@@ -2522,7 +2860,14 @@ function Get-TreeEvidence {
                     # untracked-file key means a type change that keeps the path (a link
                     # replaced by a regular file, or the reverse) does not raise a false
                     # worktree-drift.
-                    $objMap['F:' + $strRelativePath] = ''
+                    #
+                    # H2: in tracked/control-only mode, omit an untracked reparse point (one not
+                    # in the tracked set) from the digest. Keep a tracked reparse point, so
+                    # tracked-symlink evidence is unchanged.
+                    if (-not ($OmitUntrackedEvidence -and
+                            -not $TrackedRelativePath.Contains($strRelativePath))) {
+                        $objMap['F:' + $strRelativePath] = ''
+                    }
                 } else {
                     # Control-surface tree (worktree classification off): a reparse point in a
                     # .git reference tree is still refused, exactly as before.
@@ -2556,7 +2901,11 @@ function Get-TreeEvidence {
                         $boolEmbeddedRepository = $false
                     }
                     if ($boolEmbeddedRepository) {
-                        $objMap['F:' + $strRelativePath] = ''
+                        # H2: in tracked/control-only mode, omit an untracked embedded
+                        # repository from the digest; it is never a tracked entry.
+                        if (-not $OmitUntrackedEvidence) {
+                            $objMap['F:' + $strRelativePath] = ''
+                        }
                     } else {
                         $objPending.Push($strFullEntry)
                     }
@@ -2576,7 +2925,12 @@ function Get-TreeEvidence {
                 # false worktree-drift that no computed-set change can justify. An untracked
                 # FIFO/socket/device likewise needs no content-type refusal here, because it is
                 # never opened.
-                $objMap['F:' + $strRelativePath] = ''
+                #
+                # H2: in tracked/control-only mode, omit an untracked ordinary file from the
+                # digest. The walk still counts it against the entry ceiling below.
+                if (-not $OmitUntrackedEvidence) {
+                    $objMap['F:' + $strRelativePath] = ''
+                }
             } else {
                 # A tracked ordinary file, an untracked .gitignore or .gitattributes (E2), or
                 # any file when worktree classification is off (a .git control-surface tree):
@@ -3961,6 +4315,9 @@ try {
     Test-IgnoredControlFileEvidence
     Test-EmbeddedRepositoryBoundaryEvidence
     Test-AncestorBoundaryValidation
+    Test-PromisorRemoteEvidence
+    Test-TrackedOnlyWorktreeEvidence
+    Test-NativeExitResetInvariant
     $strSelfPath = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot 'Test-ExactGitPathSet.ps1'))
     $strSelfText = $script:objUtf8Strict.GetString([System.IO.File]::ReadAllBytes($strSelfPath))
     [void](Get-ScriptVersionRecord -ScriptText $strSelfText -ExpectedVersion $script:strVerifierVersion)
@@ -4190,7 +4547,8 @@ try {
             -ExcludedPath $hashtableAdministrativePaths.GitEntry `
             -AdditionalExcludedPath $arrWorktreeExcludedPath `
             -WorktreeClassification `
-            -TrackedRelativePath $objTrackedRelativePath
+            -TrackedRelativePath $objTrackedRelativePath `
+            -OmitUntrackedEvidence:(-not ($Mode -in @('Working', 'Both')))
     } else {
         $null
     }
@@ -4284,41 +4642,15 @@ try {
         throw 'native-command'
     }
     if ($intNativeExit -eq 0) {
-        # Records are key\nvalue, NUL-separated. Refuse on extensions.partialClone (the
-        # repository's independent partial-clone marker) and on a remote.<name>.promisor whose
-        # value is boolean-true; honor an explicit false (Git's false booleans are
-        # false/no/off/0; a missing value is true). A remote.<name>.partialclonefilter is inert
-        # without an active promisor for its remote, so a retained filter alongside
-        # promisor=false is an ordinary remote and is not refused.
-        $strPromisorText = $script:objUtf8Strict.GetString($hashtablePromisorResult.Stdout)
-        foreach ($strPromisorRecord in $strPromisorText.Split([char]0)) {
-            if ($strPromisorRecord.Length -eq 0) {
-                continue
-            }
-            $intNewlineIndex = $strPromisorRecord.IndexOf("`n")
-            if ($intNewlineIndex -lt 0) {
-                $strPromisorKey = $strPromisorRecord
-                $strPromisorValue = ''
-            } else {
-                $strPromisorKey = $strPromisorRecord.Substring(0, $intNewlineIndex)
-                $strPromisorValue = $strPromisorRecord.Substring($intNewlineIndex + 1)
-            }
-            if ($strPromisorKey -match '\.promisor$') {
-                if ($strPromisorValue.Trim().ToLowerInvariant() -notin @('false', 'no', 'off', '0')) {
-                    throw 'git-promisor-remote'
-                }
-            } elseif ($strPromisorKey -ceq 'extensions.partialclone') {
-                # extensions.partialClone names the repository's promisor remote and is an
-                # independent partial-clone marker, so refuse it. A retained
-                # remote.<name>.partialclonefilter only records the filter used for a promisor
-                # remote and is inert without an active promisor for the same remote; the
-                # .promisor branch above already refuses an active promisor, so a filter left
-                # alongside promisor=false is an ordinary remote and is not refused.
-                # Classification is by key suffix, not a parsed remote name: a key ending in
-                # .promisor is a promisor key, the exact key extensions.partialclone is the
-                # extension, and every other matched key is an inert filter.
-                throw 'git-promisor-remote'
-            }
+        # Records are key\nvalue, NUL-separated. Test-PromisorRemoteActive collapses duplicate
+        # remote.<name>.promisor definitions to each remote's effective last value (Git resolves
+        # a boolean to the last value), refuses extensions.partialClone unconditionally, treats a
+        # remote.<name>.partialclonefilter as inert, and fails closed on a valueless, empty, or
+        # malformed value. An ordinary clone that sets remote.<name>.promisor=false to disable an
+        # inherited promisor is therefore not refused, even when an earlier promisor=true is
+        # superseded by a later promisor=false in the same record stream.
+        if (Test-PromisorRemoteActive -PromisorRecordBytes $hashtablePromisorResult.Stdout) {
+            throw 'git-promisor-remote'
         }
     }
 
@@ -4465,6 +4797,7 @@ try {
         # (fail closed) as git-filter-active.
         foreach ($strFilterDriverName in $listCapableFilterDriver) {
             $strNativeCommand = 'filter-select'
+            $intNativeExit = $null
             $hashtableFilterSelectResult = Invoke-GitRaw `
                 -GitRecord $hashtableGitExecutable `
                 -WorkingDirectory $strRepositoryRoot `
@@ -4643,7 +4976,8 @@ try {
             -ExcludedPath $hashtableAdministrativePaths.GitEntry `
             -AdditionalExcludedPath $arrWorktreeExcludedPath `
             -WorktreeClassification `
-            -TrackedRelativePath $objTrackedRelativePath
+            -TrackedRelativePath $objTrackedRelativePath `
+            -OmitUntrackedEvidence:(-not ($Mode -in @('Working', 'Both')))
     } else {
         $null
     }
@@ -4663,7 +4997,8 @@ try {
                 -ExcludedPath $hashtableAdministrativePaths.GitEntry `
                 -AdditionalExcludedPath $arrWorktreeExcludedPath `
                 -WorktreeClassification `
-                -TrackedRelativePath $objTrackedRelativePath
+                -TrackedRelativePath $objTrackedRelativePath `
+                -OmitUntrackedEvidence:(-not ($Mode -in @('Working', 'Both')))
         } else {
             $null
         }
