@@ -26,7 +26,7 @@ Optional exact absolute path of the Git executable. When omitted, the script
 uses the module-qualified application resolver once before any Git invocation.
 
 .NOTES
-Version: 1.0.20260818.4
+Version: 1.0.20260818.5
 #>
 
 [CmdletBinding()]
@@ -52,27 +52,15 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strVerifierVersion = '1.0.20260818.4'
+$script:strVerifierVersion = '1.0.20260818.5'
 $script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v2'
-# Wall-clock ceiling for any single native Git invocation (Invoke-GitRaw). The path-set
-# reads are sub-second metadata queries, so this 120-second default is orders of magnitude
-# above any legitimate run yet converts an otherwise unbounded hang -- for example a
-# 'git diff --cached' wedged opening a FIFO substituted into the object store between the
-# pre-read scan (Assert-OrdinaryTreeUnder) and the read -- into a prompt, fail-closed
-# native-command-timeout. Invoke-GitRaw exposes a per-call override so a test can drive a
-# short bound; nothing in normal operation lowers it.
+# Bound each normally sub-second Git read. This fails closed if a special-file race hangs
+# a read; Invoke-GitRaw exposes an override for tests.
 $script:intNativeCommandTimeoutMilliseconds = 120000
-# Byte ceiling for hashing the resolved Git executable during authentication. A real Git
-# binary is a few MiB, so 512 MiB is over a hundred times any legitimate size yet bounds the
-# incremental hash, so an oversized or continuously growing candidate produces a prompt
-# git-executable-limit failure instead of reading gigabytes before Git is ever started.
+# Bound Git executable authentication well above ordinary binary sizes.
 $script:longGitExecutableMaximumBytes = 536870912
 $script:objUtf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
-# SHA-256 of the empty input, computed once. Get-TreeEvidence records this for every
-# zero-length regular file instead of allocating a fresh SHA256 instance and an empty
-# byte[] per file (the digest of empty content is constant). The instance ComputeHash
-# API is used because the static SHA256.HashData is .NET 5+ only and absent on the
-# supported Windows PowerShell 5.1 host.
+# Reuse the empty-input digest; SHA256.HashData is unavailable in Windows PowerShell 5.1.
 $script:strEmptyFileSha256 = & {
     $objEmptyDigest = [System.Security.Cryptography.SHA256]::Create()
     try {
@@ -82,11 +70,7 @@ $script:strEmptyFileSha256 = & {
         $objEmptyDigest.Dispose()
     }
 }
-# Decide the host platform from the runtime, not from $env:OS, which any caller can set. On a
-# Unix host that exports OS=Windows_NT, an $env:OS-based check would pick the Windows null
-# device (a relative 'NUL' that resolves to a repository file), case-insensitive path
-# comparison, and would skip the UnixMode-absent fail-closed guard. OSVersion.Platform is
-# Win32NT on Windows and Unix on Linux/macOS on both .NET Framework and .NET.
+# Use runtime platform evidence; caller-controlled $env:OS can select unsafe host semantics.
 $script:boolHostIsWindows = [System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT
 $script:objPathComparison = if ($script:boolHostIsWindows) {
     [System.StringComparison]::OrdinalIgnoreCase
@@ -1051,10 +1035,30 @@ function Test-TrackedOnlyEntryCeiling {
     # .SYNOPSIS
     # Confirms tracked-only evidence counts only tracked entries and their directory ancestors.
     #
-    # .NOTES
-    # PRIVATE/INTERNAL HELPER - not part of the public API surface.
+    # .DESCRIPTION
+    # Builds a bounded temporary tree and confirms untracked files and directories do not
+    # consume the tracked-only entry ceiling, while an added tracked file does.
     #
-    # Version: 1.0.20260818.0
+    # .EXAMPLE
+    # Test-TrackedOnlyEntryCeiling
+    #
+    # # Produces no output when tracked-only ceiling accounting behaves as expected.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # None. Throws 'tracked-only-entry-ceiling-fixture-failure' when a fixture behaves
+    # unexpectedly. Filesystem and hashing failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260818.1
+    #
+    # This function declares no parameters.
     param ()
 
     $strRoot = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(),
@@ -1104,13 +1108,29 @@ function Test-EffectiveConfigNativeExitReset {
     # Confirms Get-EffectiveConfigComponent sets the script-scoped diagnostic fields before its
     # native call (H5), so a throw before the call returns reports effective-config and a null exit.
     #
+    # .DESCRIPTION
+    # Forces Get-EffectiveConfigComponent to fail before Git starts and confirms the diagnostic
+    # command name and null exit replace stale values from a prior native command.
+    #
+    # .EXAMPLE
+    # Test-EffectiveConfigNativeExitReset
+    #
+    # # Produces no output when the diagnostic fields are reset before the native call.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
     # .OUTPUTS
     # None. Throws 'effective-config-diagnostic-fixture-failure' when the fields are not set first.
     #
     # .NOTES
-    # PRIVATE/INTERNAL HELPER - not part of the public API surface.
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
     #
-    # Version: 1.0.20260818.0
+    # Version: 1.0.20260818.1
+    #
+    # This function declares no parameters.
     param ()
 
     $strSaved = $script:strNativeCommand
@@ -1448,6 +1468,11 @@ function Assert-UnoccupiedControlSlot {
     # .PARAMETER Category
     # Fail-closed category to throw when an occupying entry is found.
     #
+    # .EXAMPLE
+    # Assert-UnoccupiedControlSlot -LiteralPath $strInfoExclude -Category 'invalid-git-control'
+    #
+    # # Produces no output for an empty slot; throws the category for an occupying entry.
+    #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
@@ -1461,7 +1486,7 @@ function Assert-UnoccupiedControlSlot {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 1.0.20260818.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1827,8 +1852,9 @@ function Invoke-GitRaw {
     # Revalidates the fixed Git executable and starts it without a shell. Builds
     # a child environment that removes every inherited GIT_* variable and sets
     # fixed noninteractive configuration controls. Supplies arguments through
-    # ArgumentList when available or compatible quoting otherwise. Closes input,
-    # drains both output streams concurrently, and limits each stream to 4 MiB.
+    # ArgumentList when available or compatible quoting otherwise. Writes optional
+    # raw standard input while it drains both output streams concurrently, and
+    # limits each output stream to 4 MiB.
     # Bounds the whole drain-and-exit wait by TimeoutMilliseconds, so a command
     # that neither writes nor exits cannot hang the verifier: the child tree is
     # terminated and 'native-command-timeout' is thrown.
@@ -1845,6 +1871,11 @@ function Invoke-GitRaw {
     # .PARAMETER TimeoutMilliseconds
     # Wall-clock ceiling for the drain-and-exit wait. Defaults to the script native-command
     # timeout. On expiry the child tree is terminated and 'native-command-timeout' is thrown.
+    #
+    # .PARAMETER StandardInputBytes
+    # Optional bytes written unchanged to standard input. The write runs concurrently with the
+    # bounded output drains and is covered by TimeoutMilliseconds. When omitted, standard input
+    # is closed immediately.
     #
     # .EXAMPLE
     # $hashtableResult = Invoke-GitRaw -GitRecord $hashtableGit -WorkingDirectory $strRoot -ArgumentList @('status', '--porcelain=v1', '-z')
@@ -1873,7 +1904,7 @@ function Invoke-GitRaw {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.3
+    # Version: 1.0.20260818.4
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1882,6 +1913,7 @@ function Invoke-GitRaw {
     #   Position 1: WorkingDirectory
     #   Position 2: ArgumentList
     #   Position 3: TimeoutMilliseconds (optional; defaults to the script native-command timeout)
+    #   Position 4: StandardInputBytes (optional; defaults to null)
     param (
         [Parameter(Mandatory = $true)]
         [System.Collections.IDictionary]$GitRecord,
@@ -1893,19 +1925,16 @@ function Invoke-GitRaw {
         [string[]]$ArgumentList,
 
         [ValidateRange(1, [int]::MaxValue)]
-        [int]$TimeoutMilliseconds = $script:intNativeCommandTimeoutMilliseconds
+        [int]$TimeoutMilliseconds = $script:intNativeCommandTimeoutMilliseconds,
+
+        [AllowNull()]
+        [byte[]]$StandardInputBytes = $null
     )
 
     $strGitPath = Assert-OrdinaryAbsoluteFile -LiteralPath ([string]$GitRecord.Path)
-    # Accepted, bounded residual: this length and SHA-256 check authenticates the
-    # executable bytes, but nothing holds the file between the check and the
-    # Process.Start call below, so a within-call time-of-check-to-time-of-use
-    # window remains. No portable mechanism closes it -- on the Linux CI that runs
-    # this verifier, .NET share modes are advisory and do not stop another
-    # principal from replacing or renaming the path, and Unix rename/unlink are
-    # not governed by file locks. The per-call re-hash bounds cross-call drift;
-    # exploitation needs write access to the resolved executable's directory,
-    # which in CI is a root-owned system path the unprivileged job cannot write.
+    # Accepted residual: the re-hash authenticates Git for each call but cannot hold the
+    # path through Process.Start. Exploitation requires write access to Git's directory;
+    # the CI executable is in a root-owned directory.
     if ((New-Object System.IO.FileInfo($strGitPath)).Length -ne [int64]$GitRecord.Length -or
         (Get-BoundedFileDigest -LiteralPath $strGitPath `
             -MaximumBytes $script:longGitExecutableMaximumBytes `
@@ -1928,58 +1957,13 @@ function Invoke-GitRaw {
         }
     }
     $objChildEnvironment['GIT_CONFIG_NOSYSTEM'] = '1'
-    # Git reads the system attributes file ($(prefix)/etc/gitattributes) through a
-    # switch of its own, GIT_ATTR_NOSYSTEM; GIT_CONFIG_NOSYSTEM and the
-    # core.attributesFile override below do not cover it, because core.attributesFile
-    # is only the global attributes file. Without this a system attributes file could
-    # normalize content and change the working and untracked reads across hosts, or
-    # let a concurrently changed external file perturb a read. Disable it so the
-    # reads stay hermetic and host-symmetric.
+    # GIT_ATTR_NOSYSTEM separately excludes $(prefix)/etc/gitattributes; the config
+    # controls below cover only system/global config and the global attributes file.
     $objChildEnvironment['GIT_ATTR_NOSYSTEM'] = '1'
-    # Neutralize every ambient input the path-set reads would otherwise depend on,
-    # so the result is hermetic and host-symmetric. These -c overrides take the
-    # highest git config precedence, so they hold regardless of any value a local
-    # config file -- or a file it pulls in with include.path/includeIf -- sets:
-    #   - no system or global config;
-    #   - no external excludes file (the untracked read's core.excludesFile), no
-    #     external attributes file (core.attributesFile), and no diff order file
-    #     (diff.orderFile), each of which may point outside the repository; a
-    #     diff.orderFile set to a FIFO or other blocking path would otherwise make
-    #     every diff read open it and hang to the native-command timeout, and its
-    #     ordering is discarded by the HashSet parser regardless;
-    #   - a host-independent core.filemode, so a tracked file's executable bit
-    #     cannot make the working and staged reads differ between Windows (filemode
-    #     false) and Linux (filemode true);
-    #   - a host-independent core.ignoreCase=false, so a case-only path difference
-    #     (for example a tracked 'a' and an untracked 'A') is never collapsed on a
-    #     case-sensitive host whose local config left core.ignoreCase true, which
-    #     would otherwise hide the extra path from the untracked and working reads;
-    #   - a host-independent core.symlinks=true, so an indexed symlink replaced by an
-    #     ordinary file holding the link text is seen as a mode change (a reported
-    #     path) rather than collapsed to an equal regular file by a local
-    #     core.symlinks=false, which would hide the working-read change;
-    #   - host-independent line-ending handling (core.autocrlf=false, core.eol=lf), so
-    #     a local core.autocrlf=true cannot normalize CRLF worktree bytes to a matching
-    #     LF blob and hide a working-read change, and no host-dependent native EOL
-    #     leaks into a text-attributed comparison;
-    #   - strict stat validation (core.checkStat=default, core.trustctime=true), so
-    #     a relaxed local setting cannot let a same-length content change with a
-    #     restored mtime read as clean through Git's cached stat;
-    #   - no replacement-ref object substitution (core.useReplaceRefs=false), so a
-    #     pre-existing refs/replace/* ref cannot rewrite the objects a diff reads and
-    #     hide a worktree-versus-index or index-versus-HEAD difference. Working mode
-    #     disables reference evidence, so refs/replace/* is neither hashed nor
-    #     neutralized there without this override; disabling it in the fixed prefix
-    #     closes that fail-open channel for every mode.
-    # info/exclude and info/attributes (repository-local, under the common Git
-    # directory) remain covered by Get-GitControlSurfaceEvidence. Submodule
-    # ignoring is set per command, never as a global config: --ignore-submodules=all
-    # is passed to the worktree-versus-index diffs (the working and clean reads), so a
-    # mutable submodule worktree state does not perturb them, while the staged read
-    # (git diff --cached) passes --ignore-submodules=none so it keeps submodule
-    # sensitivity and still reports a staged gitlink (index-versus-HEAD) change even
-    # when a local config or a tracked .gitmodules sets submodule.<name>.ignore=all,
-    # which would otherwise suppress that staged gitlink change.
+    # Highest-precedence fixed config makes reads host-symmetric: no external exclude,
+    # attribute, or order files; fixed filemode, case, symlink, EOL, and stat behavior;
+    # and no replacement refs. Repository-local info/exclude and info/attributes stay
+    # in the hashed control surface. Each diff sets its required submodule policy.
     $strNullDevice = if ($script:boolHostIsWindows) { 'NUL' } else { '/dev/null' }
     $objChildEnvironment['GIT_CONFIG_GLOBAL'] = $strNullDevice
     $objChildEnvironment['GIT_OPTIONAL_LOCKS'] = '0'
@@ -2018,7 +2002,14 @@ function Invoke-GitRaw {
         if (-not $objProcess.Start()) {
             throw 'native-command'
         }
-        $objProcess.StandardInput.Close()
+        $objStandardInputWrite = $null
+        $boolStandardInputDone = $null -eq $StandardInputBytes
+        if ($boolStandardInputDone) {
+            $objProcess.StandardInput.Close()
+        } else {
+            $objStandardInputWrite = $objProcess.StandardInput.BaseStream.WriteAsync(
+                $StandardInputBytes, 0, $StandardInputBytes.Length)
+        }
         # Bound the drain at the source. Read stdout and stderr concurrently in fixed
         # chunks and stop as soon as either sink would exceed 4 MiB, so a command that
         # emits hundreds of megabytes -- even one that writes them and exits before any
@@ -2049,18 +2040,24 @@ function Invoke-GitRaw {
         # backstop, not an atomicity guarantee -- it does not fuse the scan and the read
         # into one operation; it bounds the time any single native command may run.
         $objDrainStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
-        while (-not ($boolStdoutDone -and $boolStderrDone)) {
+        while (-not ($boolStandardInputDone -and $boolStdoutDone -and $boolStderrDone)) {
             $intRemainingMilliseconds = $TimeoutMilliseconds - [int]$objDrainStopwatch.ElapsedMilliseconds
             if ($intRemainingMilliseconds -le 0) {
                 Stop-NativeProcessTree -Process $objProcess
                 throw 'native-command-timeout'
             }
             $listPendingReads = New-Object 'System.Collections.Generic.List[System.Threading.Tasks.Task]'
+            if (-not $boolStandardInputDone) { $listPendingReads.Add($objStandardInputWrite) }
             if (-not $boolStdoutDone) { $listPendingReads.Add($objStdoutRead) }
             if (-not $boolStderrDone) { $listPendingReads.Add($objStderrRead) }
             if ([System.Threading.Tasks.Task]::WaitAny($listPendingReads.ToArray(), $intRemainingMilliseconds) -lt 0) {
                 Stop-NativeProcessTree -Process $objProcess
                 throw 'native-command-timeout'
+            }
+            if (-not $boolStandardInputDone -and $objStandardInputWrite.IsCompleted) {
+                [void]($objStandardInputWrite.GetAwaiter().GetResult())
+                $objProcess.StandardInput.Close()
+                $boolStandardInputDone = $true
             }
             if (-not $boolStdoutDone -and $objStdoutRead.IsCompleted) {
                 $intReadCount = $objStdoutRead.GetAwaiter().GetResult()
@@ -2108,6 +2105,7 @@ function Invoke-GitRaw {
             StderrLength = $arrStderr.Length
         }
     } finally {
+        try { $objProcess.StandardInput.Close() } catch { $null = $_ }
         $objStdout.Dispose()
         $objStderr.Dispose()
         $objProcess.Dispose()
@@ -2218,6 +2216,11 @@ function ConvertTo-IgnoredExclusionPath {
     # .PARAMETER RepositoryRoot
     # Absolute repository root the relative ignored entries resolve against.
     #
+    # .EXAMPLE
+    # $arrPath = ConvertTo-IgnoredExclusionPath -Bytes $arrIgnored -RepositoryRoot $strRoot
+    #
+    # # Returns the absolute exclusions represented by the raw ignored-path records.
+    #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
@@ -2230,7 +2233,7 @@ function ConvertTo-IgnoredExclusionPath {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 1.0.20260818.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2305,6 +2308,11 @@ function ConvertTo-SubmoduleExclusionPath {
     # .PARAMETER RepositoryRoot
     # Absolute repository root the relative gitlink entries resolve against.
     #
+    # .EXAMPLE
+    # $arrPath = ConvertTo-SubmoduleExclusionPath -Bytes $arrStage -RepositoryRoot $strRoot
+    #
+    # # Returns the absolute initialized-submodule roots represented by stage records.
+    #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
@@ -2317,7 +2325,7 @@ function ConvertTo-SubmoduleExclusionPath {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.3
+    # Version: 1.0.20260818.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2406,6 +2414,11 @@ function ConvertTo-TrackedRelativePathSet {
     # .PARAMETER Bytes
     # Complete raw output from `git ls-files -z --stage`.
     #
+    # .EXAMPLE
+    # $objTracked = ConvertTo-TrackedRelativePathSet -Bytes $arrTracked
+    #
+    # # Returns the tracked relative paths using host-appropriate path comparison.
+    #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
@@ -2419,7 +2432,7 @@ function ConvertTo-TrackedRelativePathSet {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260817.0
+    # Version: 1.0.20260818.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -3269,6 +3282,11 @@ function Get-BoundedControlFileComponent {
     # .PARAMETER LiteralPath
     # Absolute literal control-input path to classify and hash.
     #
+    # .EXAMPLE
+    # $strComponent = Get-BoundedControlFileComponent -LiteralPath $strPackedRefs
+    #
+    # # Returns 'absent' or the bounded file's length and digest.
+    #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
@@ -3283,7 +3301,7 @@ function Get-BoundedControlFileComponent {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.3
+    # Version: 1.0.20260818.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -3344,6 +3362,12 @@ function Get-EffectiveConfigComponent {
     # .PARAMETER NativeCommandList
     # Native-command accounting list that receives one 'effective-config' record per read.
     #
+    # .EXAMPLE
+    # $strComponent = Get-EffectiveConfigComponent -LiteralPath $strConfig `
+    #     -GitRecord $hashtableGit -WorkingDirectory $strRoot -NativeCommandList $listChecks
+    #
+    # # Returns 'absent' or the digest of the effective local configuration records.
+    #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
@@ -3359,7 +3383,7 @@ function Get-EffectiveConfigComponent {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.0
+    # Version: 1.0.20260818.1
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -3477,6 +3501,12 @@ function Resolve-ActiveSharedIndexRecord {
     # .PARAMETER NativeCommandList
     # Native-command accounting list that receives one 'shared-index-path' record.
     #
+    # .EXAMPLE
+    # $hashtableShared = Resolve-ActiveSharedIndexRecord -GitRecord $hashtableGit `
+    #     -WorkingDirectory $strRoot -GitDirectory $strGitDirectory -NativeCommandList $listChecks
+    #
+    # # Returns the validated backing identity and absolute path, or an absent record.
+    #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
@@ -3494,7 +3524,7 @@ function Resolve-ActiveSharedIndexRecord {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.3
+    # Version: 1.0.20260818.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -3602,6 +3632,12 @@ function Get-SplitIndexBracketedEvidence {
     # .PARAMETER NativeCommandList
     # Native-command accounting list that receives the two 'shared-index-path' records.
     #
+    # .EXAMPLE
+    # $hashtableIndex = Get-SplitIndexBracketedEvidence -AdministrativePathRecord $hashtablePath `
+    #     -GitRecord $hashtableGit -WorkingDirectory $strRoot -NativeCommandList $listChecks
+    #
+    # # Returns coupled index evidence only when both bracket samples agree.
+    #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
@@ -3616,7 +3652,7 @@ function Get-SplitIndexBracketedEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.3
+    # Version: 1.0.20260818.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -3716,6 +3752,12 @@ function Get-HeadResolvedReferenceComponent {
     # .PARAMETER NativeCommandList
     # Native-command accounting list that receives one 'head-object' record.
     #
+    # .EXAMPLE
+    # $strHead = Get-HeadResolvedReferenceComponent -GitRecord $hashtableGit `
+    #     -WorkingDirectory $strRoot -NativeCommandList $listChecks
+    #
+    # # Returns the validated object name or 'unresolved' for an unborn HEAD.
+    #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
@@ -3730,7 +3772,7 @@ function Get-HeadResolvedReferenceComponent {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.3
+    # Version: 1.0.20260818.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -4057,9 +4099,10 @@ function Get-PathSetControlInputDigest {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
-    # surface. Parameters and positional contract may change without notice.
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
     #
-    # Version: 1.0.20260818.4
+    # Version: 1.0.20260818.5
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -4436,20 +4479,9 @@ try {
     $hashtableGitExecutable = Get-GitExecutableRecord -RequestedPath $GitExecutablePath
     $hashtableAdministrativePaths = Get-GitAdministrativePathRecord -RepositoryRoot $strRepositoryRoot
 
-    # Refuse a repository-local include.path/includeIf BEFORE any in-repository Git
-    # command, so a FIFO or malformed include target can never block or error the first
-    # in-repo command (the ignored enumeration, the rev-parse boundary check, or the
-    # split-index resolver) before this refusal runs. Git expands include directives while
-    # it reads configuration during repository setup for every in-repo command, and
-    # --no-includes on a `git config` subcommand does NOT stop that setup-time expansion,
-    # so detect includes WITHOUT repository discovery: read each configuration file Git
-    # consults for this worktree through an empty, neutral Git directory
-    # (git --git-dir=<neutral> config --file <path> --no-includes ...), which reports the
-    # include key WITHOUT expanding (opening) its target. No -c override disables include
-    # expansion and the resolved targets cannot be enumerated and snapshotted portably, so
-    # refuse (fail closed) on any include directive, for every mode. System and global
-    # config are already excluded by the neutralized Invoke-GitRaw environment; a fresh
-    # checkout's local config has no includes.
+    # Refuse local includes before repository discovery because Git expands them during setup,
+    # even for a config subcommand with --no-includes. Probe fixed config files through a
+    # neutral Git directory, which reports include keys without opening their targets.
     $strNeutralGitDirectory = [System.IO.Path]::Combine(
         [System.IO.Path]::GetTempPath(),
         ('exactgitpathset-neutral-' + [System.Guid]::NewGuid().ToString('N')))
@@ -4491,17 +4523,8 @@ try {
                     $script:objUtf8Strict.GetString($hashtableWorktreeConfigResult.Stdout).Trim() -ceq 'true')
             }
         }
-        # The distinct configuration files Git reads for this worktree. Only the common
-        # config (CommonDirectory/config) seeds the scan: Git resolves the repository-local
-        # config from $GIT_COMMON_DIR/config, and for the main worktree GitDirectory equals
-        # CommonDirectory, so the common config covers it in both the main and the linked
-        # worktree. GitDirectory/config is deliberately not scanned -- Git never reads
-        # $GIT_DIR/config for a linked worktree, so an include directive there cannot inject a
-        # read-relevant setting yet would otherwise raise a false git-config-include-active;
-        # this matches the control-input digest, which for the same reason does not sample
-        # GitDirectory/config (F1, the same dependency scope as C4/C7). GitDirectory/config.worktree
-        # is read only when extensions.worktreeConfig is enabled. A duplicate full path is
-        # probed once.
+        # Probe the common config and, when enabled, per-worktree config. Linked worktrees do
+        # not read GitDirectory/config; scanning it would create false include refusals.
         $listConfigFilePath = New-Object 'System.Collections.Generic.List[string]'
         foreach ($strCandidateConfigPath in @(
             $strCommonConfigPath
@@ -4713,27 +4736,9 @@ try {
         throw 'repository-boundary'
     }
 
-    # Refuse a partial clone / promisor remote before any read. A partial clone marks
-    # its remote with remote.<name>.promisor (and remote.<name>.partialclonefilter, and
-    # on some versions extensions.partialClone), and Git will lazily fetch a missing
-    # object from that promisor remote on demand during a read -- resolving HEAD's tree
-    # for a staged diff, or an absent index blob for a working diff. That fetch runs an
-    # external transport (honoring remote.<name>.uploadpack, which can execute a
-    # configured wrapper), can reach the network or block, and draws on an object
-    # source that sits outside every hashed control digest, so a converged success could
-    # depend on an external store the snapshot cannot bracket. No -c override disables
-    # lazy fetching on every supported Git version, so refuse (fail closed) when a
-    # promisor remote is configured. An ordinary clone has none. Modeled on the
-    # git-alternates-active refusal, and unconditional because both the working and the
-    # staged reads can trigger the fetch.
-    # Anchor the name regex to Git's actual promisor/partial-clone keys --
-    # remote.<name>.promisor, remote.<name>.partialclonefilter, and
-    # extensions.partialClone -- so an unrelated custom key such as foo.promisory does
-    # not false-match and refuse every mode. --no-includes keeps an external include
-    # from being expanded (opened) during this probe. The query returns key\nvalue
-    # records (no --name-only) so the boolean value is available: an ordinary
-    # repository can explicitly set remote.<name>.promisor=false to disable an
-    # inherited promisor, which must not be treated as an active promisor remote.
+    # Refuse active partial-clone/promisor metadata before any read: a lazy fetch can run
+    # an external transport and consume an unbracketed object source. Query only Git's
+    # exact keys, without includes, and retain values so an effective false is allowed.
     $strNativeCommand = 'promisor-config'
     $intNativeExit = $null
     $hashtablePromisorResult = Invoke-GitRaw `
@@ -4754,72 +4759,27 @@ try {
         throw 'native-command'
     }
     if ($intNativeExit -eq 0) {
-        # Records are key\nvalue, NUL-separated. Test-PromisorRemoteActive collapses duplicate
-        # remote.<name>.promisor definitions to each remote's effective last value (Git resolves
-        # a boolean to the last value), refuses extensions.partialClone unconditionally, treats a
-        # remote.<name>.partialclonefilter as inert, and fails closed on a valueless, empty, or
-        # malformed value. An ordinary clone that sets remote.<name>.promisor=false to disable an
-        # inherited promisor is therefore not refused, even when an earlier promisor=true is
-        # superseded by a later promisor=false in the same record stream.
+        # The helper applies last-value-wins booleans and fails closed on malformed records.
         if (Test-PromisorRemoteActive -PromisorRecordBytes $hashtablePromisorResult.Stdout) {
             throw 'git-promisor-remote'
         }
     }
 
-    # F2: this alternates/object-store preflight runs before the filter-driver attr pathspec
-    # query below, as well as before the working, staged, and clean reads. The attr query
-    # (git ls-files --stage -- ':(attr:filter=...)') evaluates .gitattributes and can resolve a
-    # tracked .gitattributes blob from the object store when the worktree copy is absent, so it
-    # too can open an alternates-backed or special/FIFO object and block; validating the store
-    # ordinary here refuses such a store promptly with the accurate category instead of hanging
-    # the attr query or misreporting it as git-filter-active.
-    #
-    # The working, staged, and clean reads all resolve tracked content through the local
-    # object database: the staged read resolves HEAD's commit and tree, and a worktree-
-    # versus-index read (the working and the -RequireCleanWorkingAgainstIndex clean reads)
-    # reads an index blob object whenever a tracked file's stat no longer matches the index.
-    # That database may include an external store named by objects/info/alternates (for
-    # example a 'git clone --shared' repository) or a redirected objects directory, and on
-    # Unix a loose object or pack file that is a FIFO/socket/device would make a read block
-    # opening it. The object store sits outside the hashed control surface and the
-    # convergence bracket, so another process can redirect or remove it after a read while
-    # every control and worktree digest still converges, yielding a success whose path set no
-    # longer reproduces. It cannot be snapshotted portably, so refuse (fail closed) before any
-    # read when the comparison depends on an external or non-ordinary object store. An
-    # ordinary clone has no alternates file and a plain objects tree of ordinary files and is
-    # unaffected. objects/info/alternates is hashed as a control input in
-    # Get-GitControlSurfaceEvidence and Get-PathSetControlInputDigest, so a mid-window change
-    # to it trips git-control-drift.
+    # The attribute, working, staged, and clean reads can resolve local objects. External
+    # alternates and redirected object stores are outside the convergence bracket, so refuse
+    # them before any read. The alternates file itself remains in both control digests.
     $strAlternatesPath = [System.IO.Path]::Combine(
         [string]$hashtableAdministrativePaths.CommonDirectory, 'objects', 'info', 'alternates')
     if ([System.IO.File]::Exists($strAlternatesPath)) {
-        # Validate the alternates path as an ordinary regular file before reading its length.
-        # On Unix a FIFO/socket/device satisfies File.Exists and reports zero length, so the
-        # length test alone would bypass this refusal; a read would then open the FIFO and
-        # block forever waiting for a writer, even when every required object exists locally.
-        # Assert-OrdinaryAbsoluteFile inspects attributes and the UnixMode type without opening
-        # the path, so it rejects the special types (invalid-ordinary-file) and cannot itself
-        # hang; malformed administrative state then fails promptly instead of hanging.
+        # Validate without opening first; File.Exists can be true for a blocking Unix FIFO.
         [void](Assert-OrdinaryAbsoluteFile -LiteralPath $strAlternatesPath)
         if ((New-Object System.IO.FileInfo($strAlternatesPath)).Length -gt 0) {
             throw 'git-alternates-active'
         }
     }
-    # Reject an external or redirected object store, but allow a Unix special-file object. If
-    # CommonDirectory/objects -- or a child such as objects/pack, objects/<fanout>, or an
-    # individual pack/loose object -- is a reparse point to a location outside the repository,
-    # a read resolves objects from that external store (a route beyond the alternates file and
-    # a promisor remote) and succeeds silently, which no timeout can catch, so the reparse-point
-    # refusal stays. The objects tree is not bracketed by the control digests, so its later
-    # removal or redirection would not trip git-control-drift; validate it here and refuse a
-    # reparse or non-directory object root, and any reparse point beneath it, before any read.
-    # A Unix special file (FIFO/socket/device) beneath objects is NOT refused here
-    # (-AllowUnixSpecialFile): it can harm a read only when the read opens it, and such a read
-    # blocks to the Invoke-GitRaw native-command timeout, or fails zlib inflation and returns
-    # native-command -- both fail-closed, and exactly the backstop already relied on for a
-    # special file substituted after this one-time pre-read scan. An unreferenced special-file
-    # object that no command opens is therefore not a reason to refuse an otherwise correct
-    # repository. An ordinary clone has a plain objects tree of ordinary files and is unaffected.
+    # Reject a reparse or non-directory object tree. An unreferenced Unix special file below
+    # objects is allowed; if Git opens it, the native timeout or Git's read failure closes the
+    # operation. This avoids rejecting harmless unreferenced entries.
     $strObjectsPath = [System.IO.Path]::GetFullPath(
         (Join-Path $hashtableAdministrativePaths.CommonDirectory 'objects'))
     if ([System.IO.Directory]::Exists($strObjectsPath)) {
@@ -4835,25 +4795,9 @@ try {
     }
 
     if (($Mode -in @('Working', 'Both')) -or $RequireCleanWorkingAgainstIndex) {
-        # A worktree-versus-index diff (the working and clean reads below) makes Git run a
-        # clean or long-running process filter driver for a path whose 'filter' attribute
-        # names a driver with a configured clean/process command. That driver is an external
-        # program, outside the hashed evidence, so its output -- and thus the read -- can
-        # change while the config that names it, the attributes that assign it, the index, and
-        # both evidence digests all stay equal. '--no-textconv' disables only diff textconv,
-        # not clean/process, and no config or command-line override neutralizes an arbitrarily
-        # named driver assigned by an in-tree .gitattributes.
-        #
-        # A driver runs only for a path whose 'filter' attribute selects it, so a configured
-        # but dormant driver (for example filter.lfs.clean/.process with no tracked path
-        # carrying filter=lfs) cannot affect any compared path. Probe the repository-local
-        # filter config, collect the capable drivers (those with a clean or process command),
-        # and ask Git through its own attribute engine whether any tracked path selects each
-        # one. Refuse (fail closed) only for an active driver -- or one that cannot be proved
-        # dormant -- and allow a dormant driver. The probe and the per-driver query run in the
-        # same neutralized environment as the reads (no system or global config), so a
-        # developer's global Git LFS drivers are already excluded and never trip it; only a
-        # repository-local clean or process driver that a tracked path selects refuses.
+        # A worktree diff can run a selected clean/process filter; --no-textconv does not
+        # disable it. Probe neutralized repository-local config and Git's attribute engine.
+        # Refuse an active or indeterminate capable driver, but allow a dormant one.
         $strNativeCommand = 'filter-config'
         $intNativeExit = $null
         $hashtableFilterResult = Invoke-GitRaw `
@@ -4897,45 +4841,162 @@ try {
                 }
             }
         }
-        # For each capable driver, ask Git which tracked paths select it and read each
-        # selected entry's index mode. The 'attr' pathspec magic evaluates the repository's
-        # own .gitattributes (and info/attributes), so this is Git's exact per-path filter
-        # selection, not a re-implementation, and --stage adds the index mode. A clean/process
-        # conversion filter runs only for a regular blob (100644/100755); Git never streams a
-        # symlink (120000) or gitlink (160000) entry through a filter. So an empty selection, or
-        # a selection whose every entry is a symlink or gitlink, leaves the driver dormant for
-        # the worktree diff and is allowed. A regular blob entry, any other mode, a malformed
-        # frame, or a non-zero exit that leaves the driver's status undeterminable, refuses
-        # (fail closed) as git-filter-active.
-        foreach ($strFilterDriverName in $listCapableFilterDriver) {
-            $strNativeCommand = 'filter-select'
+        # Never insert a repository-derived driver name into pathspec grammar. Build one
+        # raw, unique pathname stream from the already-validated staged records, and mark a
+        # path filterable when any index stage is not a symlink or gitlink.
+        if ($listCapableFilterDriver.Count -gt 0) {
+            $objTrackedPathKey = New-Object 'System.Collections.Generic.HashSet[string]' `
+                ([System.StringComparer]::Ordinal)
+            $objFilterablePathKey = New-Object 'System.Collections.Generic.HashSet[string]' `
+                ([System.StringComparer]::Ordinal)
+            $objAttributeInput = New-Object System.IO.MemoryStream
+            try {
+                $arrStageBytes = $hashtableGitlinkResult.Stdout
+                $intStageStart = 0
+                for ($intStageIndex = 0; $intStageIndex -lt $arrStageBytes.Length; $intStageIndex++) {
+                    if ($arrStageBytes[$intStageIndex] -ne 0) {
+                        continue
+                    }
+                    $intModeEnd = -1
+                    $intTabIndex = -1
+                    for ($intStageScan = $intStageStart; $intStageScan -lt $intStageIndex; $intStageScan++) {
+                        if ($intModeEnd -lt 0 -and $arrStageBytes[$intStageScan] -eq 0x20) {
+                            $intModeEnd = $intStageScan
+                        }
+                        if ($arrStageBytes[$intStageScan] -eq 0x09) {
+                            $intTabIndex = $intStageScan
+                            break
+                        }
+                    }
+                    if ($intModeEnd -le $intStageStart -or $intTabIndex -le $intModeEnd -or
+                        $intTabIndex + 1 -ge $intStageIndex) {
+                        throw 'git-filter-active'
+                    }
+                    $intPathStart = $intTabIndex + 1
+                    $intPathLength = $intStageIndex - $intPathStart
+                    $strPathKey = [System.Convert]::ToBase64String(
+                        $arrStageBytes, $intPathStart, $intPathLength)
+                    if ($objTrackedPathKey.Add($strPathKey)) {
+                        $objAttributeInput.Write($arrStageBytes, $intPathStart, $intPathLength)
+                        $objAttributeInput.WriteByte(0)
+                    }
+                    $strSelectedMode = [System.Text.Encoding]::ASCII.GetString(
+                        $arrStageBytes, $intStageStart, $intModeEnd - $intStageStart)
+                    if ($strSelectedMode -cne '120000' -and $strSelectedMode -cne '160000') {
+                        [void]$objFilterablePathKey.Add($strPathKey)
+                    }
+                    $intStageStart = $intStageIndex + 1
+                }
+                if ($intStageStart -ne $arrStageBytes.Length) {
+                    throw 'git-filter-active'
+                }
+                $arrAttributeInputBytes = $objAttributeInput.ToArray()
+            } finally {
+                $objAttributeInput.Dispose()
+            }
+
+            # check-attr -z returns raw path/attribute/info triples and accepts raw NUL paths.
+            # Exclude its ambiguous state words from byte matching; fixed pathspecs below
+            # distinguish each state from an equal literal string value.
+            $objCapableFilterValueKey = New-Object 'System.Collections.Generic.HashSet[string]' `
+                ([System.StringComparer]::Ordinal)
+            $listAmbiguousFilterDriver = New-Object 'System.Collections.Generic.List[string]'
+            foreach ($strFilterDriverName in $listCapableFilterDriver) {
+                if ($strFilterDriverName -cin @('set', 'unset', 'unspecified')) {
+                    $listAmbiguousFilterDriver.Add($strFilterDriverName)
+                } else {
+                    [void]$objCapableFilterValueKey.Add([System.Convert]::ToBase64String(
+                            $script:objUtf8Strict.GetBytes($strFilterDriverName)))
+                }
+            }
+            $strNativeCommand = 'filter-attributes'
             $intNativeExit = $null
-            $hashtableFilterSelectResult = Invoke-GitRaw `
+            $hashtableFilterAttributeResult = Invoke-GitRaw `
                 -GitRecord $hashtableGitExecutable `
                 -WorkingDirectory $strRepositoryRoot `
-                -ArgumentList @('ls-files', '-z', '--stage', '--', (':(attr:filter=' + $strFilterDriverName + ')'))
+                -ArgumentList @('check-attr', '-z', '--stdin', 'filter') `
+                -StandardInputBytes $arrAttributeInputBytes
             $listNativeChecks.Add([ordered]@{
                 Name = $strNativeCommand
-                ExitCode = $hashtableFilterSelectResult.ExitCode
-                StdoutLength = $hashtableFilterSelectResult.Stdout.Length
-                StderrLength = $hashtableFilterSelectResult.StderrLength
+                ExitCode = $hashtableFilterAttributeResult.ExitCode
+                StdoutLength = $hashtableFilterAttributeResult.Stdout.Length
+                StderrLength = $hashtableFilterAttributeResult.StderrLength
             })
-            $intNativeExit = $hashtableFilterSelectResult.ExitCode
+            $intNativeExit = $hashtableFilterAttributeResult.ExitCode
             if ($intNativeExit -ne 0) {
                 throw 'git-filter-active'
             }
-            # Classify every selected entry by its index mode. git ls-files --stage prints
-            # `<mode> SP <object> SP <stage> TAB <path>`, so the leading ASCII field before the
-            # first space is the mode. Read only that field; never decode the path bytes. Allow
-            # only a symlink (120000) or gitlink (160000) entry. Refuse a regular blob, any other
-            # mode, or a malformed frame as git-filter-active. An unmerged path yields one record
-            # per stage, and each stage is classified on its own, so a regular blob at any stage
-            # refuses.
-            $arrSelectedBytes = $hashtableFilterSelectResult.Stdout
-            if ($arrSelectedBytes.Length -gt 0) {
-                if ($arrSelectedBytes[$arrSelectedBytes.Length - 1] -ne 0) {
+
+            $arrAttributeBytes = $hashtableFilterAttributeResult.Stdout
+            $objObservedAttributePathKey = New-Object 'System.Collections.Generic.HashSet[string]' `
+                ([System.StringComparer]::Ordinal)
+            $strFilterAttributeKey = [System.Convert]::ToBase64String(
+                [System.Text.Encoding]::ASCII.GetBytes('filter'))
+            $intAttributeField = 0
+            $intAttributeStart = 0
+            $strAttributePathKey = $null
+            for ($intAttributeIndex = 0; $intAttributeIndex -lt $arrAttributeBytes.Length;
+                $intAttributeIndex++) {
+                if ($arrAttributeBytes[$intAttributeIndex] -ne 0) {
+                    continue
+                }
+                $intAttributeLength = $intAttributeIndex - $intAttributeStart
+                $strAttributeFieldKey = [System.Convert]::ToBase64String(
+                    $arrAttributeBytes, $intAttributeStart, $intAttributeLength)
+                switch ($intAttributeField % 3) {
+                    0 {
+                        if ($intAttributeLength -eq 0 -or
+                            -not $objTrackedPathKey.Contains($strAttributeFieldKey) -or
+                            -not $objObservedAttributePathKey.Add($strAttributeFieldKey)) {
+                            throw 'git-filter-active'
+                        }
+                        $strAttributePathKey = $strAttributeFieldKey
+                    }
+                    1 {
+                        if ($strAttributeFieldKey -cne $strFilterAttributeKey) {
+                            throw 'git-filter-active'
+                        }
+                    }
+                    2 {
+                        if ($objFilterablePathKey.Contains($strAttributePathKey) -and
+                            $objCapableFilterValueKey.Contains($strAttributeFieldKey)) {
+                            throw 'git-filter-active'
+                        }
+                    }
+                }
+                $intAttributeField++
+                $intAttributeStart = $intAttributeIndex + 1
+            }
+            if ($intAttributeStart -ne $arrAttributeBytes.Length -or $intAttributeField % 3 -ne 0 -or
+                $objObservedAttributePathKey.Count -ne $objTrackedPathKey.Count) {
+                throw 'git-filter-active'
+            }
+
+            # Git renders the states set/unset/unspecified exactly like equal string values.
+            # Use only these three source-authored, grammar-safe pathspecs to disambiguate.
+            foreach ($strFilterDriverName in $listAmbiguousFilterDriver) {
+                $strAmbiguousPathspec = switch ($strFilterDriverName) {
+                    'set' { ':(attr:filter=set)' }
+                    'unset' { ':(attr:filter=unset)' }
+                    'unspecified' { ':(attr:filter=unspecified)' }
+                }
+                $strNativeCommand = 'filter-state-word'
+                $intNativeExit = $null
+                $hashtableFilterSelectResult = Invoke-GitRaw `
+                    -GitRecord $hashtableGitExecutable `
+                    -WorkingDirectory $strRepositoryRoot `
+                    -ArgumentList @('ls-files', '-z', '--stage', '--', $strAmbiguousPathspec)
+                $listNativeChecks.Add([ordered]@{
+                    Name = $strNativeCommand
+                    ExitCode = $hashtableFilterSelectResult.ExitCode
+                    StdoutLength = $hashtableFilterSelectResult.Stdout.Length
+                    StderrLength = $hashtableFilterSelectResult.StderrLength
+                })
+                $intNativeExit = $hashtableFilterSelectResult.ExitCode
+                if ($intNativeExit -ne 0) {
                     throw 'git-filter-active'
                 }
+                $arrSelectedBytes = $hashtableFilterSelectResult.Stdout
                 $intSelectStart = 0
                 for ($intSelectIndex = 0; $intSelectIndex -lt $arrSelectedBytes.Length; $intSelectIndex++) {
                     if ($arrSelectedBytes[$intSelectIndex] -ne 0) {
@@ -4957,6 +5018,9 @@ try {
                         throw 'git-filter-active'
                     }
                     $intSelectStart = $intSelectIndex + 1
+                }
+                if ($intSelectStart -ne $arrSelectedBytes.Length) {
+                    throw 'git-filter-active'
                 }
             }
         }
