@@ -40,8 +40,11 @@ For each material finding, put a small semantic acceptance predicate in the mani
 
 Keep the launcher and telemetry runner finding-agnostic. Derive observable public mutations and other finding-specific values from the manifest. A validate-only mode must parse the real manifest and construct the complete process start configuration. It must stop immediately before it creates evidence files or starts Claude. It must not return early from a code path that bypasses launch construction.
 
+Keep one versioned, finding-agnostic controller and one task-level full validator. A new review round should normally add only a manifest, a focused prompt, decision destinations, declarative semantic predicates, and any genuinely new focused fixture. Do not copy or rewrite the controller, settings, launcher, or full validator for each finding. Add controller code only when a preflight proves that the existing declarative schema cannot express a required safety property; test that capability once, then reuse it in later rounds.
+
 Launch Claude Code with structured stream output, hook events, and a local debug file when the installed CLI supports them. Use a unique create-new evidence path for each invocation. Keep these artifacts outside Git. Record these times and counters:
 
+- Round-package preparation start and end, including time spent on manifest construction, controller/preflight tests, and launch validation before the Claude process starts.
 - Process start and exit.
 - First stream event and first tool call.
 - Each tool start and end.
@@ -50,6 +53,8 @@ Launch Claude Code with structured stream output, hook events, and a local debug
 - Tool, result, hook, denial, and retry counts.
 - API retry counts by status class, including rate-limit responses and retry-after delay when reported.
 - Native exit code, timeout state, hard-stop state, and evidence-file byte counts and hashes.
+
+Treat package-preparation time as a first-class latency budget. If a routine round takes more than five minutes before process start, stop adding bespoke machinery and identify which reusable controller or manifest capability is missing. Record the reason and amortize the repair by making that capability generic. Do not hide setup time by starting the Claude timer only after a long package build.
 
 Assign a stable logical label to every exact command in the manifest. When Claude starts an allowed command, record both the tool name and that manifest label in the event log and status sidecar. Count validation attempts and their pass or fail results separately from permission denials and other tool errors. Do not infer that the final gate passed merely because an unlabeled `Bash` call returned exit code 0.
 
