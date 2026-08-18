@@ -26,7 +26,7 @@ Optional exact absolute path of the Git executable. When omitted, the script
 uses the module-qualified application resolver once before any Git invocation.
 
 .NOTES
-Version: 1.0.20260816.3
+Version: 1.0.20260817.0
 #>
 
 [CmdletBinding()]
@@ -52,7 +52,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strVerifierVersion = '1.0.20260816.3'
+$script:strVerifierVersion = '1.0.20260817.0'
 $script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v2'
 # Wall-clock ceiling for any single native Git invocation (Invoke-GitRaw). The path-set
 # reads are sub-second metadata queries, so this 120-second default is orders of magnitude
@@ -1516,6 +1516,102 @@ function ConvertTo-SubmoduleExclusionPath {
     return ,$listPaths.ToArray()
 }
 
+function ConvertTo-TrackedRelativePathSet {
+    # .SYNOPSIS
+    # Decodes git ls-files --stage -z output to the set of tracked repository-relative paths.
+    #
+    # .DESCRIPTION
+    # Validates the NUL framing with ConvertFrom-NulPathRecordStream (so a malformed or
+    # over-limit stream fails closed), then parses each NUL-delimited staged record
+    # (`<mode> SP <object> SP <stage> TAB <path>`) and decodes the path after the single tab
+    # as strict UTF-8. Returns every tracked repository-relative path in a HashSet whose
+    # comparer matches the host filesystem's case sensitivity (OrdinalIgnoreCase on Windows,
+    # Ordinal elsewhere) -- the same case rule the worktree walk applies to its other path
+    # comparisons. A worktree walk classifies a non-directory, non-reparse entry with this
+    # set: a tracked path is hashed and byte-limited, and an untracked path is recorded by
+    # name and existence only. The '/'-separated ls-files paths already match the
+    # '/'-normalized relative paths the walk produces, so membership is a direct set test.
+    #
+    # A record that is not strict UTF-8, or is missing the tab separator, is skipped rather
+    # than decoded: its path is then absent from the set and the walk treats the on-disk
+    # entry as untracked. That only relaxes a secondary drift bracket -- the authoritative
+    # working and working-repeat reads still bracket the computed path set -- so skipping an
+    # exotic name is the safe direction. Every staged record is a tracked path, so, unlike
+    # the submodule-exclusion parse, the mode is not inspected; an unmerged path emits
+    # several stage records and the HashSet keeps one entry per path.
+    #
+    # .PARAMETER Bytes
+    # Complete raw output from `git ls-files -z --stage`.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.Collections.Generic.HashSet[string]. The tracked repository-relative paths,
+    # compared with the host filesystem's case sensitivity. Record-framing and record-limit
+    # failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260817.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: Bytes
+    param (
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [byte[]]$Bytes
+    )
+
+    # Reuse the hardened NUL-framing and 100,000-record ceiling. Its base64 keys are not
+    # used here; the call fails closed on a malformed or oversized stream.
+    [void](ConvertFrom-NulPathRecordStream -Bytes $Bytes)
+    $objComparer = if ($script:boolHostIsWindows) {
+        [System.StringComparer]::OrdinalIgnoreCase
+    } else {
+        [System.StringComparer]::Ordinal
+    }
+    $objTracked = New-Object 'System.Collections.Generic.HashSet[string]' ($objComparer)
+    if ($Bytes.Length -eq 0) {
+        return ,$objTracked
+    }
+    $intRecordStart = 0
+    for ($intIndex = 0; $intIndex -lt $Bytes.Length; $intIndex++) {
+        if ($Bytes[$intIndex] -ne 0) {
+            continue
+        }
+        $intLength = $intIndex - $intRecordStart
+        $intRecordStart = $intIndex + 1
+        $strRecord = $null
+        try {
+            $strRecord = $script:objUtf8Strict.GetString($Bytes, ($intIndex - $intLength), $intLength)
+        } catch {
+            $strRecord = $null
+        }
+        if ([string]::IsNullOrEmpty($strRecord)) {
+            continue
+        }
+        # `git ls-files --stage` emits `<mode> SP <object> SP <stage> TAB <path>`. Every
+        # staged record is a tracked path, so -- unlike the submodule-exclusion parse -- the
+        # mode is not inspected here; only the path after the single tab is taken.
+        $intTabIndex = $strRecord.IndexOf("`t")
+        if ($intTabIndex -lt 0) {
+            continue
+        }
+        $strRelative = $strRecord.Substring($intTabIndex + 1)
+        if ($strRelative.Length -eq 0) {
+            continue
+        }
+        [void]$objTracked.Add($strRelative)
+    }
+    return ,$objTracked
+}
+
 function New-ExpectedPathKeySet {
     # .SYNOPSIS
     # Builds opaque keys for the caller's expected repository paths.
@@ -1750,6 +1846,16 @@ function Get-TreeEvidence {
     # Rejects more than 100,000 entries, one file above 64 MiB, or total file
     # length above 1 GiB. Optionally excludes one exact child entry.
     #
+    # With WorktreeClassification set (the worktree callers), the walk hashes and
+    # byte-limits only tracked ordinary files, named by TrackedRelativePath. An
+    # untracked ordinary file, and every reparse point (symbolic link), is recorded by
+    # name and existence only -- no open, no hash, no byte limit, no Unix-type probe,
+    # and, for a reparse point, no throw -- because no path-set read consumes that
+    # content. Untracked files and reparse points share one name-only key, so a type
+    # change that keeps the path does not raise a false worktree-drift. Without the
+    # switch (a .git control-surface tree), every non-directory entry is hashed and a
+    # reparse point or special entry is refused, exactly as before.
+    #
     # .PARAMETER RootPath
     # Absolute ordinary directory root to inspect.
     #
@@ -1772,6 +1878,20 @@ function Get-TreeEvidence {
     #
     # .PARAMETER LimitCategory
     # Category thrown for the entry-count or byte ceilings. Defaults to 'worktree-limit'.
+    #
+    # .PARAMETER WorktreeClassification
+    # Switches the walk into worktree-classification mode: hash and byte-limit only the
+    # tracked ordinary files named by TrackedRelativePath; record an untracked ordinary
+    # file or any reparse point by name and existence only, without throwing. Off by
+    # default, so a .git control-surface caller keeps the original refuse-and-hash-all
+    # behavior.
+    #
+    # .PARAMETER TrackedRelativePath
+    # Set of tracked repository-relative paths ('/'-separated, matching the walk's relative
+    # keys), built once by the caller from the pre-walk git ls-files -z --stage output.
+    # Required when WorktreeClassification is set; ignored otherwise. Membership decides
+    # whether a non-directory, non-reparse entry is hashed (tracked) or recorded by name and
+    # existence only (untracked).
     #
     # .EXAMPLE
     # $hashtableTree = Get-TreeEvidence -RootPath $strRepositoryRoot -ExcludedPath $strGitEntry
@@ -1800,7 +1920,7 @@ function Get-TreeEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 1.0.20260817.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1811,14 +1931,20 @@ function Get-TreeEvidence {
     #
     # LinkCategory, SpecialEntryCategory, and LimitCategory are named and default to the
     # worktree categories; a control-surface caller overrides them so a failing .git tree
-    # reports a control-surface category instead of a worktree one.
+    # reports a control-surface category instead of a worktree one. WorktreeClassification
+    # and TrackedRelativePath are named as well; the worktree callers set them to hash only
+    # tracked ordinary files. PositionalBinding is disabled, so only Positions 0-2 bind
+    # positionally and every other parameter binds by name.
+    [CmdletBinding(PositionalBinding = $false)]
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, Position = 0)]
         [string]$RootPath,
 
+        [Parameter(Position = 1)]
         [AllowNull()]
         [string]$ExcludedPath,
 
+        [Parameter(Position = 2)]
         [string[]]$AdditionalExcludedPath = @(),
 
         [ValidateNotNullOrEmpty()]
@@ -1828,7 +1954,11 @@ function Get-TreeEvidence {
         [string]$SpecialEntryCategory = 'worktree-special-entry',
 
         [ValidateNotNullOrEmpty()]
-        [string]$LimitCategory = 'worktree-limit'
+        [string]$LimitCategory = 'worktree-limit',
+
+        [switch]$WorktreeClassification,
+
+        [System.Collections.Generic.HashSet[string]]$TrackedRelativePath
     )
 
     $strRoot = Assert-OrdinaryRepositoryRoot -LiteralPath $RootPath
@@ -1881,17 +2011,47 @@ function Get-TreeEvidence {
                 continue
             }
             $objAttributes = [System.IO.File]::GetAttributes($strFullEntry)
-            if (($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
-                throw $LinkCategory
-            }
             $strRelativePath = $strFullEntry.Substring($strRoot.Length).TrimStart(
                 [System.IO.Path]::DirectorySeparatorChar,
                 [System.IO.Path]::AltDirectorySeparatorChar
             ).Replace([System.IO.Path]::DirectorySeparatorChar, '/')
-            if (($objAttributes -band [System.IO.FileAttributes]::Directory) -ne 0) {
+            if (($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+                if ($WorktreeClassification) {
+                    # Worktree classification (F4): record a reparse point (a symbolic link,
+                    # or any other reparse point) by name and existence only -- the same key
+                    # an untracked ordinary file receives below. Do not throw, follow the
+                    # link, read its target, or descend into it. Git stores a tracked symlink
+                    # as a mode-120000 blob it never dereferences, and a clean tracked symlink
+                    # appears in neither worktree read, so name-and-existence evidence is
+                    # sufficient; a tracked link's target stays bracketed by the working and
+                    # working-repeat reads and the git-index control digest. Sharing the
+                    # untracked-file key means a type change that keeps the path (a link
+                    # replaced by a regular file, or the reverse) does not raise a false
+                    # worktree-drift.
+                    $objMap['F:' + $strRelativePath] = ''
+                } else {
+                    # Control-surface tree (worktree classification off): a reparse point in a
+                    # .git reference tree is still refused, exactly as before.
+                    throw $LinkCategory
+                }
+            } elseif (($objAttributes -band [System.IO.FileAttributes]::Directory) -ne 0) {
                 $objMap['D:' + $strRelativePath] = ''
                 $objPending.Push($strFullEntry)
+            } elseif ($WorktreeClassification -and -not $TrackedRelativePath.Contains($strRelativePath)) {
+                # Worktree classification (F3): an untracked ordinary file. Record its name
+                # and existence only -- the same key a worktree reparse point receives above.
+                # Do not open it, probe its Unix type, hash it, or apply the content byte
+                # limits: no path-set read consumes untracked content (git ls-files --others
+                # reports only its name), so hashing it would raise a false worktree-limit or,
+                # on content-only churn, a false worktree-drift that no computed-set change
+                # can justify. An untracked FIFO/socket/device likewise needs no content-type
+                # refusal here, because it is never opened.
+                $objMap['F:' + $strRelativePath] = ''
             } else {
+                # A tracked ordinary file, or any file when worktree classification is off (a
+                # .git control-surface tree): hash the content and apply the per-file and
+                # aggregate byte limits, because git diff does read this content when it
+                # compares the worktree against the index.
                 $objFile = New-Object System.IO.FileInfo($strFullEntry)
                 # On Unix an entry that is neither a directory nor a reparse point can
                 # still be a FIFO, socket, or device, which File attributes do not
@@ -3265,6 +3425,10 @@ try {
     # not hide a staged gitlink change. Only a worktree read walks the tree, so a
     # staged-only read skips this.
     $arrSubmoduleExcludedPath = @()
+    # The tracked repository-relative path set (F3) is derived once, below, from the same
+    # gitlinks git ls-files --stage output; it stays $null for a staged-only read that does
+    # not walk the worktree, and the worktree walks are the only consumers.
+    $objTrackedRelativePath = $null
     if ($boolWorktreeReadRequested) {
         $strNativeCommand = 'gitlinks'
         $intNativeExit = $null
@@ -3284,6 +3448,12 @@ try {
         }
         $arrSubmoduleExcludedPath = ConvertTo-SubmoduleExclusionPath `
             -Bytes $hashtableGitlinkResult.Stdout -RepositoryRoot $strRepositoryRoot
+        # F3: build the tracked repository-relative path set one time from the same
+        # git ls-files --stage output (no extra Git read). The before/after/confirm worktree
+        # walks share it, so each hashes and byte-limits only tracked ordinary files while an
+        # untracked ordinary file is recorded by name and existence only; its content -- which
+        # no path-set read consumes -- then cannot raise a false worktree-limit or drift.
+        $objTrackedRelativePath = ConvertTo-TrackedRelativePathSet -Bytes $hashtableGitlinkResult.Stdout
     }
     # The identical exclusion set (gitignored top-level entries plus initialized submodule
     # roots) is reused across the before/after/confirm walks so the drift comparison stays
@@ -3302,7 +3472,9 @@ try {
         Get-TreeEvidence `
             -RootPath $strRepositoryRoot `
             -ExcludedPath $hashtableAdministrativePaths.GitEntry `
-            -AdditionalExcludedPath $arrWorktreeExcludedPath
+            -AdditionalExcludedPath $arrWorktreeExcludedPath `
+            -WorktreeClassification `
+            -TrackedRelativePath $objTrackedRelativePath
     } else {
         $null
     }
@@ -3424,19 +3596,25 @@ try {
     }
 
     if (($Mode -in @('Working', 'Both')) -or $RequireCleanWorkingAgainstIndex) {
-        # A worktree-versus-index diff (the working and clean reads below) makes Git
-        # run a clean or process filter driver for any path whose filter attribute
-        # names a driver with a configured clean/process command. That driver is an
-        # external program, outside the hashed evidence, so its output -- and thus
-        # the read -- can change while the config that names it, the attributes that
-        # assign it, the index, and both evidence digests all stay equal.
-        # '--no-textconv' disables only diff textconv, not clean/process, and no
-        # config or command-line override neutralizes an arbitrarily named driver
-        # assigned by an in-tree .gitattributes. Refuse (fail closed) when such a
-        # driver is configured. The probe runs in the same neutralized environment
-        # as the reads (no system or global config), so a developer's global Git LFS
-        # drivers are already excluded and never trip it; only a repository-local
-        # clean or process driver refuses.
+        # A worktree-versus-index diff (the working and clean reads below) makes Git run a
+        # clean or long-running process filter driver for a path whose 'filter' attribute
+        # names a driver with a configured clean/process command. That driver is an external
+        # program, outside the hashed evidence, so its output -- and thus the read -- can
+        # change while the config that names it, the attributes that assign it, the index, and
+        # both evidence digests all stay equal. '--no-textconv' disables only diff textconv,
+        # not clean/process, and no config or command-line override neutralizes an arbitrarily
+        # named driver assigned by an in-tree .gitattributes.
+        #
+        # A driver runs only for a path whose 'filter' attribute selects it, so a configured
+        # but dormant driver (for example filter.lfs.clean/.process with no tracked path
+        # carrying filter=lfs) cannot affect any compared path. Probe the repository-local
+        # filter config, collect the capable drivers (those with a clean or process command),
+        # and ask Git through its own attribute engine whether any tracked path selects each
+        # one. Refuse (fail closed) only for an active driver -- or one that cannot be proved
+        # dormant -- and allow a dormant driver. The probe and the per-driver query run in the
+        # same neutralized environment as the reads (no system or global config), so a
+        # developer's global Git LFS drivers are already excluded and never trip it; only a
+        # repository-local clean or process driver that a tracked path selects refuses.
         $strNativeCommand = 'filter-config'
         $intNativeExit = $null
         $hashtableFilterResult = Invoke-GitRaw `
@@ -3455,12 +3633,55 @@ try {
         if ($intNativeExit -notin @(0, 1)) {
             throw 'native-command'
         }
+        # Collect the capable drivers: those whose config keys include a clean or a process
+        # command. Strip the 'filter.' prefix and the '.clean'/'.process' suffix so a dotted
+        # driver name (filter.my.tool.clean -> my.tool) stays intact. A driver with only, for
+        # example, a .smudge or .required key cannot transform a diff read and is skipped.
+        $listCapableFilterDriver = New-Object 'System.Collections.Generic.List[string]'
+        $objCapableFilterSeen = New-Object 'System.Collections.Generic.HashSet[string]' `
+            ([System.StringComparer]::Ordinal)
         if ($intNativeExit -eq 0) {
             $strFilterKeyText = $script:objUtf8Strict.GetString($hashtableFilterResult.Stdout)
             foreach ($strFilterKey in $strFilterKeyText.Split([char]0)) {
-                if ($strFilterKey.Length -gt 0 -and $strFilterKey -imatch '\.(clean|process)$') {
-                    throw 'git-filter-active'
+                if ($strFilterKey.Length -eq 0) {
+                    continue
                 }
+                $strFilterDriverName = $null
+                if ($strFilterKey -imatch '^filter\.(.+)\.clean$') {
+                    $strFilterDriverName = $matches[1]
+                } elseif ($strFilterKey -imatch '^filter\.(.+)\.process$') {
+                    $strFilterDriverName = $matches[1]
+                }
+                if ($null -ne $strFilterDriverName -and $strFilterDriverName.Length -gt 0 -and
+                    $objCapableFilterSeen.Add($strFilterDriverName)) {
+                    $listCapableFilterDriver.Add($strFilterDriverName)
+                }
+            }
+        }
+        # For each capable driver, ask Git whether any tracked path selects it. The 'attr'
+        # pathspec magic evaluates the repository's own .gitattributes (and info/attributes),
+        # so this is Git's exact per-path filter selection, not a re-implementation. Empty
+        # output means no tracked path carries filter=<name>, so the driver is dormant and is
+        # allowed. Any returned path, or a non-zero exit that leaves the driver's status
+        # undeterminable, refuses (fail closed) as git-filter-active.
+        foreach ($strFilterDriverName in $listCapableFilterDriver) {
+            $strNativeCommand = 'filter-select'
+            $hashtableFilterSelectResult = Invoke-GitRaw `
+                -GitRecord $hashtableGitExecutable `
+                -WorkingDirectory $strRepositoryRoot `
+                -ArgumentList @('ls-files', '-z', '--', (':(attr:filter=' + $strFilterDriverName + ')'))
+            $listNativeChecks.Add([ordered]@{
+                Name = $strNativeCommand
+                ExitCode = $hashtableFilterSelectResult.ExitCode
+                StdoutLength = $hashtableFilterSelectResult.Stdout.Length
+                StderrLength = $hashtableFilterSelectResult.StderrLength
+            })
+            $intNativeExit = $hashtableFilterSelectResult.ExitCode
+            if ($intNativeExit -ne 0) {
+                throw 'git-filter-active'
+            }
+            if ($hashtableFilterSelectResult.Stdout.Length -gt 0) {
+                throw 'git-filter-active'
             }
         }
     }
@@ -3647,7 +3868,9 @@ try {
         Get-TreeEvidence `
             -RootPath $strRepositoryRoot `
             -ExcludedPath $hashtableAdministrativePaths.GitEntry `
-            -AdditionalExcludedPath $arrWorktreeExcludedPath
+            -AdditionalExcludedPath $arrWorktreeExcludedPath `
+            -WorktreeClassification `
+            -TrackedRelativePath $objTrackedRelativePath
     } else {
         $null
     }
@@ -3665,7 +3888,9 @@ try {
             Get-TreeEvidence `
                 -RootPath $strRepositoryRoot `
                 -ExcludedPath $hashtableAdministrativePaths.GitEntry `
-                -AdditionalExcludedPath $arrWorktreeExcludedPath
+                -AdditionalExcludedPath $arrWorktreeExcludedPath `
+                -WorktreeClassification `
+                -TrackedRelativePath $objTrackedRelativePath
         } else {
             $null
         }
