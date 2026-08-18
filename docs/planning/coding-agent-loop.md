@@ -118,6 +118,8 @@ Exercise each new focused precheck through its exact command line before launch,
 
 Execute every reused validation wrapper against the current pinned branch and head before launch, and assert that its structured result reports those exact identities. A matching helper hash is insufficient when the helper embeds a head, tree, branch, path, or receipt schema from an earlier round. Prefer parameterized reusable wrappers over task-specific embedded identities; reject a package whose validation command can only prove a prior head.
 
+Compare a reused validator's allowed tracked paths with the manifest's complete mutation closure before launch. Exercise the validator with a disposable changed-path set that contains every allowed path, not only a clean worktree, and prove that it accepts the full set and rejects one extra path. A clean-boundary execution cannot prove that an expanded implementation scope is valid.
+
 If the runtime supports a persistent goal primitive, create or resume one goal for the entire plan. The filesystem tracker and verified repository/GitHub state remain authoritative after compaction; conversational memory and executor reports do not.
 
 ## Durable orchestration tracker
