@@ -39,8 +39,14 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $strPowerShellPath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
-          if (-not [System.IO.File]::Exists($strPowerShellPath)) {
+          try {
+              $strPowerShellPath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
+          } catch {
+              # Any MainModule resolution failure falls through to the deterministic guard below.
+              $strPowerShellPath = $null
+          }
+          if ([string]::IsNullOrEmpty($strPowerShellPath) -or
+              -not [System.IO.File]::Exists($strPowerShellPath)) {
               throw 'The current PowerShell executable could not be resolved.'
           }
           $arrResult = @(& $strPowerShellPath `
@@ -65,8 +71,14 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $strPowerShellPath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
-          if (-not [System.IO.File]::Exists($strPowerShellPath)) {
+          try {
+              $strPowerShellPath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
+          } catch {
+              # Any MainModule resolution failure falls through to the deterministic guard below.
+              $strPowerShellPath = $null
+          }
+          if ([string]::IsNullOrEmpty($strPowerShellPath) -or
+              -not [System.IO.File]::Exists($strPowerShellPath)) {
               throw 'The current PowerShell executable could not be resolved.'
           }
           $arrArtifactPaths = @(
