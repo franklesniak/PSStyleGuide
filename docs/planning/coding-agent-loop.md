@@ -136,6 +136,16 @@ Compare a reused validator's allowed tracked paths with the manifest's complete 
 
 If the runtime supports a persistent goal primitive, create or resume one goal for the entire plan. The filesystem tracker and verified repository/GitHub state remain authoritative after compaction; conversational memory and executor reports do not.
 
+## Codex observability and control
+
+Use the native Codex subagent interface when the task dispatch rule requires a Codex executor. Record the canonical agent ID or task name, requested and resolved model, reasoning effort, start time, completion time, and terminal status. Require checkpoints after analysis, the first tracked edit, validation, and any public mutation. Inspect the available agent-status or thread interface at least every 60 seconds while work is active. Record the current phase, elapsed time, last checkpoint, quiet interval, and any blocked reason. A live subagent with no new checkpoint during model reasoning is not a hung process by itself. Interrupt it only for an explicit stop condition, an unauthorized mutation, an identity change, a repeated defect that meets the task's kill rule, or evidence that the executor cannot make progress.
+
+If the native subagent interface is unavailable and the task explicitly permits a headless Codex CLI fallback, first inspect `codex --help` and `codex exec --help` and construct the invocation from the installed interface. Use JSON Lines event output, such as `codex exec --json`, when supported. Keep standard output and standard error separate, preserve the native exit code, and capture the final agent message separately when the installed CLI supports that option. Record thread and turn starts and completions, command executions, file changes, tool calls, web searches, plan updates, errors, token usage, first and last event times, the longest quiet interval, and retry or failure state. Write a content-minimized status sidecar after each event and at least every 15 seconds while the process is active.
+
+Apply the least privilege that permits the task. A bypass-approvals or danger-full-access option may be used only when the user authorized it and the host environment supplies the required external isolation. Permission bypass is not a speed or inference-tier setting. Do not record complete prompts, hidden reasoning, credentials, tokens, cookies, unrelated tool output, or private state in telemetry. Store raw JSONL, standard error, and final-message evidence outside Git; put only summarized metrics, hashes, and paths in the orchestration tracker.
+
+For either Codex interface, use the task manifest and terminal result schema already required by this prompt. After the final validation passes, require the executor to return the small terminal result and stop. Attribute preparation, model, tool, validation, retry, quiet, and post-gate time separately so that a slow run can be diagnosed without guessing.
+
 ## Durable orchestration tracker
 
 Create or resume `TEMP-coding-agent-loop-state.json` in the PSStyleGuide repository root. Do not commit it. Use safe structured-file updates: write a complete candidate, parse it successfully, and replace the tracker without leaving invalid JSON. Preserve prior run history when the plan hash changes.
@@ -199,7 +209,7 @@ Give the executor:
 - The executor's retry context, if any, in a separately labeled section that does not weaken or replace the task.
 - A required final report containing task number, `COMPLETED`, `IN_PROGRESS`, `FAILED`, or `BLOCKED`; files and external objects changed; exact identities; commands and exit codes; evidence URLs; validation results; remaining risks; and the exact `Complete when` proof.
 
-For a Codex task, spawn the fresh `gpt-5.6-sol`/`xhigh` executor and wait for its final result. For a Claude review-loop task, invoke Claude Code non-interactively with the verified Opus 4.8 / maximum-reasoning configuration and an exact task prompt, use the observability controls above, monitor it to completion, and capture its native exit code. Do not run another executor while it is active.
+For a Codex task, spawn the fresh `gpt-5.6-sol`/`xhigh` executor, use the Codex observability controls above, and wait for its final result. For a Claude review-loop task, invoke Claude Code non-interactively with the verified Opus 4.8 / maximum-reasoning configuration and an exact task prompt, use the Claude Code observability controls above, monitor it to completion, and capture its native exit code. Do not run another executor while it is active.
 
 The parent does not perform the task's substantive implementation. The parent can maintain the tracker, extract and hash prompts, inspect artifacts and diffs, query GitHub, run independent validation, and decide whether to complete, continue, retry, or block the task.
 
