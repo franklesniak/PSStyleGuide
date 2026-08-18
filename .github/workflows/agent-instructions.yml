@@ -1,0 +1,41 @@
+name: Agent Instruction Validation
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions: {}
+
+jobs:
+  validate_agent_instructions:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        id: checkout_repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ github.sha }}
+          token: ${{ github.token }}
+          persist-credentials: false
+          clean: true
+          fetch-depth: 1
+          fetch-tags: false
+          show-progress: true
+          lfs: false
+          submodules: false
+          set-safe-directory: true
+          allow-unsafe-pr-checkout: false
+
+      - name: Verify agent instruction capacity and parity
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          & ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest

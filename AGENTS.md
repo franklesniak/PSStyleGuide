@@ -2,7 +2,7 @@
 
 # Agent Instructions for Codex
 
-**Version:** 1.0.20260818.0
+**Version:** 1.0.20260818.1
 
 ## Metadata
 
@@ -19,7 +19,7 @@ The authoritative source of truth for the repository's documentation-authoring r
 
 ## Codex execution model and interfaces
 
-- **Instruction scope.** Codex loads `AGENTS.md` by directory scope. Treat this root file as active for the repository. Obey any more-specific `AGENTS.md` that applies to a file. Do not spend context re-reading an instruction file that the runtime already supplied unless its exact bytes are material to the task.
+- **Instruction scope.** Local Codex builds its instruction chain once per run from global guidance and the project root through the launch working directory; it does not promise on-demand loading from deeper directories. Treat this root file as active. Before editing below a deeper directory, use bounded discovery to find and obey any more-specific `AGENTS.md` that the runtime did not already supply. The remote GitHub reviewer applies the closest applicable `AGENTS.md` to each changed file. If an active instruction file changes, start a new Codex run before relying on the new bytes. Do not re-read an instruction file that the runtime already supplied unless its exact bytes are material to the task.
 - **Local agent versus remote reviewer.** The local Codex agent and its subagents implement and orchestrate work. The GitHub account `chatgpt-codex-connector` is a separate remote reviewer. A PR comment whose entire body is `@codex review` is a trigger for that remote reviewer; it is not a finding or an instruction to the local agent.
 - **Repository tools.** Use `rg` for bounded discovery, `apply_patch` for deliberate file edits, and non-interactive shell commands for focused validation. Preserve unrelated tracked and untracked work. Keep one writer per worktree. Before delegation or mutation, pin the repository, branch, head commit, tree, allowed paths, and exact expected public actions.
 - **GitHub tools.** Prefer the connected GitHub interface for PR metadata and flat comment reads. Use authenticated `gh api graphql` when thread identity, resolution state, pagination, review-submission bodies, or inline context matters. Reconcile every public mutation with an authenticated read before treating it as complete.
