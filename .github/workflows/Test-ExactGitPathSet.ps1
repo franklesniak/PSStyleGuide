@@ -26,7 +26,7 @@ Optional exact absolute path of the Git executable. When omitted, the script
 uses the module-qualified application resolver once before any Git invocation.
 
 .NOTES
-Version: 1.0.20260817.0
+Version: 1.0.20260818.0
 #>
 
 [CmdletBinding()]
@@ -52,7 +52,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strVerifierVersion = '1.0.20260817.0'
+$script:strVerifierVersion = '1.0.20260818.0'
 $script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v2'
 # Wall-clock ceiling for any single native Git invocation (Invoke-GitRaw). The path-set
 # reads are sub-second metadata queries, so this 120-second default is orders of magnitude
@@ -286,6 +286,89 @@ function Test-ScriptVersionParser {
             if ($_.Exception.Message -cne 'invalid-version') {
                 throw
             }
+        }
+    }
+}
+
+function Test-WorktreeDirectoryIdentityEvidence {
+    # .SYNOPSIS
+    # Confirms worktree classification omits directory identity while the control
+    # surface retains it.
+    #
+    # .DESCRIPTION
+    # Builds a temporary tree and checks three facts through Get-TreeEvidence: an
+    # empty untracked directory does not change the worktree digest (F4), the same
+    # directory does change the control-surface digest, and a file inside a traversed
+    # directory is still recorded in the worktree digest so traversal is preserved.
+    #
+    # .EXAMPLE
+    # Test-WorktreeDirectoryIdentityEvidence
+    #
+    # # Produces no output when every fixture behaves as expected.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # None. Throws 'worktree-directory-fixture-failure' when a fixture behaves
+    # unexpectedly. Filesystem and hashing failures propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260818.0
+    #
+    # This function declares no parameters.
+    param ()
+
+    $strFixtureRoot = [System.IO.Path]::Combine(
+        [System.IO.Path]::GetTempPath(),
+        ('exactgitpathset-f4-' + [System.Guid]::NewGuid().ToString('N')))
+    $objEmptyTracked = New-Object 'System.Collections.Generic.HashSet[string]' `
+        ([System.StringComparer]::Ordinal)
+    [void][System.IO.Directory]::CreateDirectory($strFixtureRoot)
+    try {
+        $strFullDirectory = Join-Path $strFixtureRoot 'full'
+        $strLeafFile = Join-Path $strFullDirectory 'leaf.txt'
+        [void][System.IO.Directory]::CreateDirectory($strFullDirectory)
+        [System.IO.File]::WriteAllText($strLeafFile, 'leaf')
+        $strEmptyDirectory = Join-Path $strFixtureRoot 'empty'
+
+        # Worktree digest with only the file-bearing directory present.
+        $strWorktreeFileOnly = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -WorktreeClassification -TrackedRelativePath $objEmptyTracked).Digest
+
+        # Add an empty untracked directory. The worktree digest MUST NOT change, because
+        # Git path-set streams report no empty directory, so the walk omits its identity.
+        [void][System.IO.Directory]::CreateDirectory($strEmptyDirectory)
+        $strWorktreeWithEmpty = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -WorktreeClassification -TrackedRelativePath $objEmptyTracked).Digest
+        if ($strWorktreeFileOnly -cne $strWorktreeWithEmpty) {
+            throw 'worktree-directory-fixture-failure'
+        }
+
+        # The control surface records the same directory as identity, so its digest MUST
+        # change when the empty directory is present and then removed.
+        $strControlWithEmpty = [string](Get-TreeEvidence -RootPath $strFixtureRoot).Digest
+        [System.IO.Directory]::Delete($strEmptyDirectory)
+        $strControlFileOnly = [string](Get-TreeEvidence -RootPath $strFixtureRoot).Digest
+        if ($strControlWithEmpty -ceq $strControlFileOnly) {
+            throw 'worktree-directory-fixture-failure'
+        }
+
+        # The directory is still traversed under worktree classification, so removing the
+        # file inside it MUST change the worktree digest.
+        [System.IO.File]::Delete($strLeafFile)
+        $strWorktreeNoFile = [string](Get-TreeEvidence -RootPath $strFixtureRoot `
+                -WorktreeClassification -TrackedRelativePath $objEmptyTracked).Digest
+        if ($strWorktreeFileOnly -ceq $strWorktreeNoFile) {
+            throw 'worktree-directory-fixture-failure'
+        }
+    } finally {
+        if ([System.IO.Directory]::Exists($strFixtureRoot)) {
+            [System.IO.Directory]::Delete($strFixtureRoot, $true)
         }
     }
 }
@@ -1866,9 +1949,13 @@ function Get-TreeEvidence {
     # -- no open, no hash, no byte limit, no Unix-type probe, and, for a reparse point, no
     # throw -- because no path-set read consumes that payload content. An ordinary untracked
     # file and a reparse point share one name-only key, so a type change that keeps the path
-    # does not raise a false worktree-drift. Without the switch (a .git control-surface tree),
-    # every non-directory entry is hashed and a reparse point or special entry is refused,
-    # exactly as before.
+    # does not raise a false worktree-drift. A directory is traversed either way, but its
+    # identity ('D:' key) is recorded only without the switch: Git path-set streams report no
+    # empty directory, so the worktree walk omits directory identity and an empty untracked
+    # directory cannot perturb worktree convergence, while an independent entry count still
+    # bounds the traversal. Without the switch (a .git control-surface tree), every
+    # non-directory entry is hashed, a directory keeps its 'D:' key, and a reparse point or
+    # special entry is refused, exactly as before.
     #
     # .PARAMETER RootPath
     # Absolute ordinary directory root to inspect.
@@ -1934,7 +2021,7 @@ function Get-TreeEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260817.0
+    # Version: 1.0.20260818.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2001,6 +2088,7 @@ function Get-TreeEvidence {
     $objPending = New-Object 'System.Collections.Generic.Stack[string]'
     $objPending.Push($strRoot)
     $intFileCount = 0
+    $intEntryCount = 0
     $longByteCount = 0L
     while ($objPending.Count -ne 0) {
         $strDirectory = $objPending.Pop()
@@ -2065,7 +2153,15 @@ function Get-TreeEvidence {
                     throw $LinkCategory
                 }
             } elseif (($objAttributes -band [System.IO.FileAttributes]::Directory) -ne 0) {
-                $objMap['D:' + $strRelativePath] = ''
+                # Worktree classification (F4): traverse every directory but omit its identity
+                # key. Git path-set streams (git ls-files, git diff) report only files and never
+                # an empty directory, so recording a 'D:' key would let an empty untracked
+                # directory that no path-set read reports change the worktree digest and perturb
+                # convergence. The control-surface walk keeps the 'D:' key, because a .git
+                # reference tree's directory shape is part of the hashed control surface.
+                if (-not $WorktreeClassification) {
+                    $objMap['D:' + $strRelativePath] = ''
+                }
                 $objPending.Push($strFullEntry)
             } elseif ($WorktreeClassification -and -not $boolUntrackedControlFile -and
                 -not $TrackedRelativePath.Contains($strRelativePath)) {
@@ -2135,7 +2231,12 @@ function Get-TreeEvidence {
                 $objMap['F:' + $strRelativePath] = ([string]$objFile.Length + ':' + $strFileDigest)
                 $intFileCount++
             }
-            if ($objMap.Count -gt 100000) {
+            # F4: bound total traversal on an independent entry counter, not $objMap.Count.
+            # The worktree walk omits a 'D:' identity key for every directory (above), so the
+            # map no longer counts directories; counting each visited entry here keeps the
+            # 100,000-entry ceiling on a pathological empty-directory tree.
+            $intEntryCount++
+            if ($intEntryCount -gt 100000) {
                 throw $LimitCategory
             }
         }
@@ -3455,6 +3556,7 @@ $intExitCode = 1
 
 try {
     Test-ScriptVersionParser
+    Test-WorktreeDirectoryIdentityEvidence
     $strSelfPath = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot 'Test-ExactGitPathSet.ps1'))
     $strSelfText = $script:objUtf8Strict.GetString([System.IO.File]::ReadAllBytes($strSelfPath))
     [void](Get-ScriptVersionRecord -ScriptText $strSelfText -ExpectedVersion $script:strVerifierVersion)
@@ -3490,6 +3592,11 @@ try {
         # config.worktree is checked for includes exactly when Git would consult it.
         $boolWorktreeConfigEnabled = $false
         if ([System.IO.File]::Exists($strCommonConfigPath)) {
+            # F3: refuse a non-ordinary common config (a FIFO/socket/device satisfies
+            # File.Exists) before 'git config --file' opens it, because opening a FIFO blocks
+            # until a writer appears. Assert-OrdinaryAbsoluteFile inspects attributes and the
+            # UnixMode type without opening the path, matching Get-EffectiveConfigComponent.
+            [void](Assert-OrdinaryAbsoluteFile -LiteralPath $strCommonConfigPath)
             $strNativeCommand = 'worktree-config-extension'
             $intNativeExit = $null
             $hashtableWorktreeConfigResult = Invoke-GitRaw `
@@ -3543,6 +3650,10 @@ try {
             }
         }
         foreach ($strConfigFilePath in $listConfigFilePath) {
+            # F3: refuse a non-ordinary config file (a FIFO/socket/device satisfies File.Exists)
+            # immediately before 'git config --file' opens it, so a special file swapped in after
+            # the list was built cannot block the read. Matches Get-EffectiveConfigComponent.
+            [void](Assert-OrdinaryAbsoluteFile -LiteralPath $strConfigFilePath)
             $strNativeCommand = 'include-config'
             $intNativeExit = $null
             $hashtableIncludeResult = Invoke-GitRaw `
@@ -3807,6 +3918,74 @@ try {
         }
     }
 
+    # F2: this alternates/object-store preflight runs before the filter-driver attr pathspec
+    # query below, as well as before the working, staged, and clean reads. The attr query
+    # (git ls-files --stage -- ':(attr:filter=...)') evaluates .gitattributes and can resolve a
+    # tracked .gitattributes blob from the object store when the worktree copy is absent, so it
+    # too can open an alternates-backed or special/FIFO object and block; validating the store
+    # ordinary here refuses such a store promptly with the accurate category instead of hanging
+    # the attr query or misreporting it as git-filter-active.
+    #
+    # The working, staged, and clean reads all resolve tracked content through the local
+    # object database: the staged read resolves HEAD's commit and tree, and a worktree-
+    # versus-index read (the working and the -RequireCleanWorkingAgainstIndex clean reads)
+    # reads an index blob object whenever a tracked file's stat no longer matches the index.
+    # That database may include an external store named by objects/info/alternates (for
+    # example a 'git clone --shared' repository) or a redirected objects directory, and on
+    # Unix a loose object or pack file that is a FIFO/socket/device would make a read block
+    # opening it. The object store sits outside the hashed control surface and the
+    # convergence bracket, so another process can redirect or remove it after a read while
+    # every control and worktree digest still converges, yielding a success whose path set no
+    # longer reproduces. It cannot be snapshotted portably, so refuse (fail closed) before any
+    # read when the comparison depends on an external or non-ordinary object store. An
+    # ordinary clone has no alternates file and a plain objects tree of ordinary files and is
+    # unaffected. objects/info/alternates is hashed as a control input in
+    # Get-GitControlSurfaceEvidence and Get-PathSetControlInputDigest, so a mid-window change
+    # to it trips git-control-drift.
+    $strAlternatesPath = [System.IO.Path]::Combine(
+        [string]$hashtableAdministrativePaths.CommonDirectory, 'objects', 'info', 'alternates')
+    if ([System.IO.File]::Exists($strAlternatesPath)) {
+        # Validate the alternates path as an ordinary regular file before reading its length.
+        # On Unix a FIFO/socket/device satisfies File.Exists and reports zero length, so the
+        # length test alone would bypass this refusal; a read would then open the FIFO and
+        # block forever waiting for a writer, even when every required object exists locally.
+        # Assert-OrdinaryAbsoluteFile inspects attributes and the UnixMode type without opening
+        # the path, so it rejects the special types (invalid-ordinary-file) and cannot itself
+        # hang; malformed administrative state then fails promptly instead of hanging.
+        [void](Assert-OrdinaryAbsoluteFile -LiteralPath $strAlternatesPath)
+        if ((New-Object System.IO.FileInfo($strAlternatesPath)).Length -gt 0) {
+            throw 'git-alternates-active'
+        }
+    }
+    # Reject an external or redirected object store, but allow a Unix special-file object. If
+    # CommonDirectory/objects -- or a child such as objects/pack, objects/<fanout>, or an
+    # individual pack/loose object -- is a reparse point to a location outside the repository,
+    # a read resolves objects from that external store (a route beyond the alternates file and
+    # a promisor remote) and succeeds silently, which no timeout can catch, so the reparse-point
+    # refusal stays. The objects tree is not bracketed by the control digests, so its later
+    # removal or redirection would not trip git-control-drift; validate it here and refuse a
+    # reparse or non-directory object root, and any reparse point beneath it, before any read.
+    # A Unix special file (FIFO/socket/device) beneath objects is NOT refused here
+    # (-AllowUnixSpecialFile): it can harm a read only when the read opens it, and such a read
+    # blocks to the Invoke-GitRaw native-command timeout, or fails zlib inflation and returns
+    # native-command -- both fail-closed, and exactly the backstop already relied on for a
+    # special file substituted after this one-time pre-read scan. An unreferenced special-file
+    # object that no command opens is therefore not a reason to refuse an otherwise correct
+    # repository. An ordinary clone has a plain objects tree of ordinary files and is unaffected.
+    $strObjectsPath = [System.IO.Path]::GetFullPath(
+        (Join-Path $hashtableAdministrativePaths.CommonDirectory 'objects'))
+    if ([System.IO.Directory]::Exists($strObjectsPath)) {
+        $objObjectsInfo = New-Object System.IO.DirectoryInfo($strObjectsPath)
+        if (($objObjectsInfo.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+            throw 'git-object-store-nonordinary'
+        }
+        Assert-OrdinaryTreeUnder -RootPath $strObjectsPath -LimitCategory 'git-object-store-nonordinary' -AllowUnixSpecialFile
+    } elseif ([System.IO.File]::Exists($strObjectsPath)) {
+        throw 'git-object-store-nonordinary'
+    } else {
+        Assert-UnoccupiedControlSlot -LiteralPath $strObjectsPath -Category 'git-object-store-nonordinary'
+    }
+
     if (($Mode -in @('Working', 'Both')) -or $RequireCleanWorkingAgainstIndex) {
         # A worktree-versus-index diff (the working and clean reads below) makes Git run a
         # clean or long-running process filter driver for a path whose 'filter' attribute
@@ -3932,66 +4111,6 @@ try {
                 }
             }
         }
-    }
-
-    # The working, staged, and clean reads all resolve tracked content through the local
-    # object database: the staged read resolves HEAD's commit and tree, and a worktree-
-    # versus-index read (the working and the -RequireCleanWorkingAgainstIndex clean reads)
-    # reads an index blob object whenever a tracked file's stat no longer matches the index.
-    # That database may include an external store named by objects/info/alternates (for
-    # example a 'git clone --shared' repository) or a redirected objects directory, and on
-    # Unix a loose object or pack file that is a FIFO/socket/device would make a read block
-    # opening it. The object store sits outside the hashed control surface and the
-    # convergence bracket, so another process can redirect or remove it after a read while
-    # every control and worktree digest still converges, yielding a success whose path set no
-    # longer reproduces. It cannot be snapshotted portably, so refuse (fail closed) before any
-    # read when the comparison depends on an external or non-ordinary object store. An
-    # ordinary clone has no alternates file and a plain objects tree of ordinary files and is
-    # unaffected. objects/info/alternates is hashed as a control input in
-    # Get-GitControlSurfaceEvidence and Get-PathSetControlInputDigest, so a mid-window change
-    # to it trips git-control-drift.
-    $strAlternatesPath = [System.IO.Path]::Combine(
-        [string]$hashtableAdministrativePaths.CommonDirectory, 'objects', 'info', 'alternates')
-    if ([System.IO.File]::Exists($strAlternatesPath)) {
-        # Validate the alternates path as an ordinary regular file before reading its length.
-        # On Unix a FIFO/socket/device satisfies File.Exists and reports zero length, so the
-        # length test alone would bypass this refusal; a read would then open the FIFO and
-        # block forever waiting for a writer, even when every required object exists locally.
-        # Assert-OrdinaryAbsoluteFile inspects attributes and the UnixMode type without opening
-        # the path, so it rejects the special types (invalid-ordinary-file) and cannot itself
-        # hang; malformed administrative state then fails promptly instead of hanging.
-        [void](Assert-OrdinaryAbsoluteFile -LiteralPath $strAlternatesPath)
-        if ((New-Object System.IO.FileInfo($strAlternatesPath)).Length -gt 0) {
-            throw 'git-alternates-active'
-        }
-    }
-    # Reject an external or redirected object store, but allow a Unix special-file object. If
-    # CommonDirectory/objects -- or a child such as objects/pack, objects/<fanout>, or an
-    # individual pack/loose object -- is a reparse point to a location outside the repository,
-    # a read resolves objects from that external store (a route beyond the alternates file and
-    # a promisor remote) and succeeds silently, which no timeout can catch, so the reparse-point
-    # refusal stays. The objects tree is not bracketed by the control digests, so its later
-    # removal or redirection would not trip git-control-drift; validate it here and refuse a
-    # reparse or non-directory object root, and any reparse point beneath it, before any read.
-    # A Unix special file (FIFO/socket/device) beneath objects is NOT refused here
-    # (-AllowUnixSpecialFile): it can harm a read only when the read opens it, and such a read
-    # blocks to the Invoke-GitRaw native-command timeout, or fails zlib inflation and returns
-    # native-command -- both fail-closed, and exactly the backstop already relied on for a
-    # special file substituted after this one-time pre-read scan. An unreferenced special-file
-    # object that no command opens is therefore not a reason to refuse an otherwise correct
-    # repository. An ordinary clone has a plain objects tree of ordinary files and is unaffected.
-    $strObjectsPath = [System.IO.Path]::GetFullPath(
-        (Join-Path $hashtableAdministrativePaths.CommonDirectory 'objects'))
-    if ([System.IO.Directory]::Exists($strObjectsPath)) {
-        $objObjectsInfo = New-Object System.IO.DirectoryInfo($strObjectsPath)
-        if (($objObjectsInfo.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
-            throw 'git-object-store-nonordinary'
-        }
-        Assert-OrdinaryTreeUnder -RootPath $strObjectsPath -LimitCategory 'git-object-store-nonordinary' -AllowUnixSpecialFile
-    } elseif ([System.IO.File]::Exists($strObjectsPath)) {
-        throw 'git-object-store-nonordinary'
-    } else {
-        Assert-UnoccupiedControlSlot -LiteralPath $strObjectsPath -Category 'git-object-store-nonordinary'
     }
 
     if ($Mode -in @('Working', 'Both')) {
@@ -4312,6 +4431,7 @@ try {
     $strNativeOutcome = $_.Exception.GetType().FullName
     if ($_.Exception.Message -in @(
         'invalid-version', 'unexpected-version', 'version-fixture-failure',
+        'worktree-directory-fixture-failure',
         'invalid-repository-root', 'invalid-ordinary-file', 'invalid-expected-path',
         'git-executable-resolution', 'git-executable-drift', 'git-executable-limit',
         'malformed-records',
