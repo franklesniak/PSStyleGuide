@@ -96,6 +96,8 @@ If an approved change affects generated or self-referential identity metadata, p
 
 Treat the controller as reusable production code. Before launch, exercise the real hook entry point with table-driven payloads for each lifecycle boundary: before any reply, after each receipt, after all receipts but before the first tracked edit, after the first tracked edit, and before validation. Assert the exact allow, recoverable-deny, or hard-stop outcome and prove that a probe did not execute its requested mutation. Include language-specific namespace and case-collision checks when the controller language can alias names that look distinct.
 
+Exercise each new focused precheck through its exact command line before launch, not only through parser or controller tests. Give the helper a harness self-test that proves zero-, one-, and many-item cases can reach their semantic assertions; in PowerShell, test parameter binding for an intentionally empty collection explicitly. A precheck command that cannot represent every expected result cardinality invalidates the launch package even if its source parses and its nonempty fixture passes.
+
 If the runtime supports a persistent goal primitive, create or resume one goal for the entire plan. The filesystem tracker and verified repository/GitHub state remain authoritative after compaction; conversational memory and executor reports do not.
 
 ## Durable orchestration tracker
