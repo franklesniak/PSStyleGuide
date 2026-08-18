@@ -26,7 +26,7 @@ Optional exact absolute path of the Git executable. When omitted, the script
 uses the module-qualified application resolver once before any Git invocation.
 
 .NOTES
-Version: 1.0.20260818.2
+Version: 1.0.20260818.3
 #>
 
 [CmdletBinding()]
@@ -52,7 +52,7 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strVerifierVersion = '1.0.20260818.2'
+$script:strVerifierVersion = '1.0.20260818.3'
 $script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v2'
 # Wall-clock ceiling for any single native Git invocation (Invoke-GitRaw). The path-set
 # reads are sub-second metadata queries, so this 120-second default is orders of magnitude
@@ -998,6 +998,93 @@ function Test-NativeExitResetInvariant {
     }
     if ($intSiteCount -lt 10) {
         throw 'native-exit-invariant-fixture-failure'
+    }
+}
+
+function Test-TrackedOnlyEntryCeiling {
+    # .SYNOPSIS
+    # Confirms the entry ceiling (H4) exempts the untracked entries OmitUntrackedEvidence omits,
+    # yet still counts a traversed directory (the F4 empty-directory bound).
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - not part of the public API surface.
+    #
+    # Version: 1.0.20260818.0
+    param ()
+
+    $strRoot = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(),
+        ('exactgitpathset-h4-' + [System.Guid]::NewGuid().ToString('N')))
+    $objTracked = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+    [void]$objTracked.Add('t')
+    [void][System.IO.Directory]::CreateDirectory($strRoot)
+    try {
+        [System.IO.File]::WriteAllText((Join-Path $strRoot 't'), 'v1')
+        $strBase = [string](Get-TreeEvidence -RootPath $strRoot -WorktreeClassification `
+                -TrackedRelativePath $objTracked -OmitUntrackedEvidence -MaximumEntryCount 4 `
+                -AncestorBoundary $strRoot).Digest
+        for ($i = 0; $i -lt 40; $i++) { [System.IO.File]::WriteAllText((Join-Path $strRoot "u$i"), 'x') }
+        # H4: untracked population above the ceiling is neither counted (no throw) nor recorded
+        # (digest unchanged) in tracked/control-only mode.
+        $strOmit = [string](Get-TreeEvidence -RootPath $strRoot -WorktreeClassification `
+                -TrackedRelativePath $objTracked -OmitUntrackedEvidence -MaximumEntryCount 4 `
+                -AncestorBoundary $strRoot).Digest
+        if ($strBase -cne $strOmit) { throw 'tracked-only-entry-ceiling-fixture-failure' }
+        for ($i = 0; $i -lt 40; $i++) { [void][System.IO.Directory]::CreateDirectory((Join-Path $strRoot "d$i")) }
+        # F4: a traversed directory always counts, so empty directories above the ceiling throw.
+        $boolThrew = $false
+        try {
+            [void](Get-TreeEvidence -RootPath $strRoot -WorktreeClassification -TrackedRelativePath `
+                    $objTracked -OmitUntrackedEvidence -MaximumEntryCount 4 -LimitCategory 'h4-ceiling' `
+                    -AncestorBoundary $strRoot)
+        } catch {
+            if ([string]$_.Exception.Message -cne 'h4-ceiling') { throw }
+            $boolThrew = $true
+        }
+        if (-not $boolThrew) { throw 'tracked-only-entry-ceiling-fixture-failure' }
+    } finally {
+        if ([System.IO.Directory]::Exists($strRoot)) { [System.IO.Directory]::Delete($strRoot, $true) }
+    }
+}
+
+function Test-EffectiveConfigNativeExitReset {
+    # .SYNOPSIS
+    # Confirms Get-EffectiveConfigComponent sets the script-scoped diagnostic fields before its
+    # native call (H5), so a throw before the call returns reports effective-config and a null exit.
+    #
+    # .OUTPUTS
+    # None. Throws 'effective-config-diagnostic-fixture-failure' when the fields are not set first.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - not part of the public API surface.
+    #
+    # Version: 1.0.20260818.0
+    param ()
+
+    $strSaved = $script:strNativeCommand
+    $intSaved = $script:intNativeExit
+    $strConfig = [System.IO.Path]::Combine([System.IO.Path]::GetTempPath(),
+        ('exactgitpathset-h5-' + [System.Guid]::NewGuid().ToString('N')))
+    try {
+        [System.IO.File]::WriteAllText($strConfig, "[core]`n`tbare = false`n")
+        $objChecks = New-Object 'System.Collections.Generic.List[object]'
+        # Simulate a stale prior main-body command, so a missing reset would stay observable, then
+        # force Invoke-GitRaw to throw with a GitRecord whose executable path does not exist.
+        $script:strNativeCommand = 'sentinel-prior'
+        $script:intNativeExit = 4242
+        $boolThrew = $false
+        try {
+            [void](Get-EffectiveConfigComponent -LiteralPath $strConfig `
+                    -GitRecord ([ordered]@{ Path = ($strConfig + '.missing'); Length = 0L; Sha256 = '' }) `
+                    -WorkingDirectory ([System.IO.Path]::GetTempPath()) -NativeCommandList $objChecks)
+        } catch { $boolThrew = $true }
+        if (-not $boolThrew -or $script:strNativeCommand -cne 'effective-config' -or
+            $null -ne $script:intNativeExit) {
+            throw 'effective-config-diagnostic-fixture-failure'
+        }
+    } finally {
+        $script:strNativeCommand = $strSaved
+        $script:intNativeExit = $intSaved
+        if ([System.IO.File]::Exists($strConfig)) { [System.IO.File]::Delete($strConfig) }
     }
 }
 
@@ -2609,37 +2696,18 @@ function Get-TreeEvidence {
     # Rejects more than 100,000 entries, one file above 64 MiB, or total file
     # length above 1 GiB. Optionally excludes one exact child entry.
     #
-    # With WorktreeClassification set (the worktree callers), the walk hashes and
-    # byte-limits tracked ordinary files, named by TrackedRelativePath, and an untracked
-    # .gitignore or .gitattributes, whose bytes Git reads as a control input for the
-    # --exclude-standard untracked set and the working diff. Every other untracked ordinary
-    # file, and every reparse point (symbolic link), is recorded by name and existence only
-    # -- no open, no hash, no byte limit, no Unix-type probe, and, for a reparse point, no
-    # throw -- because no path-set read consumes that payload content. An ordinary untracked
-    # file and a reparse point share one name-only key, so a type change that keeps the path
-    # does not raise a false worktree-drift. A directory is traversed either way, but its
-    # identity ('D:' key) is recorded only without the switch: Git path-set streams report no
-    # empty directory, so the worktree walk omits directory identity and an empty untracked
-    # directory cannot perturb worktree convergence, while an independent entry count still
-    # bounds the traversal. Without the switch (a .git control-surface tree), every
-    # non-directory entry is hashed, a directory keeps its 'D:' key, and a reparse point or
-    # special entry is refused, exactly as before.
-    #
-    # With OmitUntrackedEvidence also set (the staged-plus-clean-only caller), the walk still
-    # traverses and counts every entry against the ceilings, but it omits an untracked ordinary
-    # file, an untracked reparse point, and an untracked embedded repository from the digest. A
-    # tracked file, a tracked reparse point, and an untracked .gitignore or .gitattributes stay
-    # evidence-relevant, so a tracked or control change still drives worktree drift while
-    # unrelated untracked population or churn does not. Off by default and ignored unless
-    # WorktreeClassification is set.
-    #
-    # An untracked .gitignore or .gitattributes stays evidence-relevant even when the caller
-    # lists it in AdditionalExcludedPath: the ignored enumeration can report a control file
-    # that Git still reads, so a regular control file is never dropped by that exclusion and
-    # is hashed like any control input. An untracked embedded Git repository (a subdirectory
-    # that itself holds a .git entry) is recorded by name and existence only and is not
-    # traversed, so the walk neither hashes, counts, nor drifts on its .git internals; Git
-    # reports such a repository as a single untracked path and never descends into it.
+    # With WorktreeClassification set (the worktree callers), the walk hashes and byte-limits a
+    # tracked ordinary file (named by TrackedRelativePath) and an untracked .gitignore or
+    # .gitattributes control input; it records every other untracked ordinary file and every
+    # reparse point by name and existence only (sharing one key, so a type change raises no
+    # drift), traverses a directory without a 'D:' identity key, and records an untracked embedded
+    # Git repository name-only without traversing it. With OmitUntrackedEvidence also set (the
+    # staged-plus-clean-only caller), it further omits an untracked ordinary file, reparse point,
+    # or embedded repository from the digest and, per H4, from the entry-count ceiling, so
+    # unrelated untracked population raises neither worktree drift nor worktree-limit; a tracked
+    # entry, an untracked control file, and every traversed directory stay counted. Without the
+    # switch (a .git control-surface tree) every non-directory entry is hashed, a directory keeps
+    # its 'D:' key, and a reparse or special entry is refused. See the parameter notes below.
     #
     # .PARAMETER RootPath
     # Absolute ordinary directory root to inspect.
@@ -2664,6 +2732,11 @@ function Get-TreeEvidence {
     # .PARAMETER LimitCategory
     # Category thrown for the entry-count or byte ceilings. Defaults to 'worktree-limit'.
     #
+    # .PARAMETER MaximumEntryCount
+    # Ceiling for the counted-entry total. Defaults to 100000. Every recorded relevant entry and
+    # every traversed directory counts; an omitted irrelevant untracked entry does not (H4). Only a
+    # self-test lowers it, to prove the counting without the production count of entries.
+    #
     # .PARAMETER WorktreeClassification
     # Switches the walk into worktree-classification mode: hash and byte-limit only the
     # tracked ordinary files named by TrackedRelativePath; record an untracked ordinary
@@ -2679,12 +2752,10 @@ function Get-TreeEvidence {
     # existence only (untracked).
     #
     # .PARAMETER OmitUntrackedEvidence
-    # Switches the walk into tracked/control-only evidence mode for the staged-plus-clean-only
-    # caller. The walk still traverses and counts every entry, but it omits an untracked ordinary
-    # file, an untracked reparse point, and an untracked embedded repository from the digest, so
-    # unrelated untracked population or churn does not raise worktree drift. A tracked entry and
-    # an untracked control file stay evidence-relevant. Off by default and ignored unless
-    # WorktreeClassification is set.
+    # Switches the walk into tracked/control-only evidence mode. It omits an untracked ordinary
+    # file, reparse point, or embedded repository from the digest and from the entry-count ceiling
+    # (H4); a tracked entry, an untracked control file, and every traversed directory stay counted.
+    # Off by default and ignored unless WorktreeClassification is set.
     #
     # .PARAMETER AncestorBoundary
     # Optional absolute ancestor the caller has already validated as an ordinary directory,
@@ -2721,7 +2792,7 @@ function Get-TreeEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.2
+    # Version: 1.0.20260818.3
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2756,6 +2827,9 @@ function Get-TreeEvidence {
 
         [ValidateNotNullOrEmpty()]
         [string]$LimitCategory = 'worktree-limit',
+
+        [ValidateRange(1, [int]::MaxValue)]
+        [int]$MaximumEntryCount = 100000,
 
         [switch]$WorktreeClassification,
 
@@ -2847,6 +2921,8 @@ function Get-TreeEvidence {
                 [System.IO.Path]::DirectorySeparatorChar,
                 [System.IO.Path]::AltDirectorySeparatorChar
             ).Replace([System.IO.Path]::DirectorySeparatorChar, '/')
+            # H4: an omitted irrelevant untracked entry clears this below so it does not count.
+            $boolEntryCounted = $true
             if ($boolReparseEntry) {
                 if ($WorktreeClassification) {
                     # Worktree classification (F4): record a reparse point (a symbolic link,
@@ -2867,7 +2943,7 @@ function Get-TreeEvidence {
                     if (-not ($OmitUntrackedEvidence -and
                             -not $TrackedRelativePath.Contains($strRelativePath))) {
                         $objMap['F:' + $strRelativePath] = ''
-                    }
+                    } else { $boolEntryCounted = $false }
                 } else {
                     # Control-surface tree (worktree classification off): a reparse point in a
                     # .git reference tree is still refused, exactly as before.
@@ -2905,7 +2981,7 @@ function Get-TreeEvidence {
                         # repository from the digest; it is never a tracked entry.
                         if (-not $OmitUntrackedEvidence) {
                             $objMap['F:' + $strRelativePath] = ''
-                        }
+                        } else { $boolEntryCounted = $false }
                     } else {
                         $objPending.Push($strFullEntry)
                     }
@@ -2926,11 +3002,11 @@ function Get-TreeEvidence {
                 # FIFO/socket/device likewise needs no content-type refusal here, because it is
                 # never opened.
                 #
-                # H2: in tracked/control-only mode, omit an untracked ordinary file from the
-                # digest. The walk still counts it against the entry ceiling below.
+                # H2: omit an untracked ordinary file from the digest. H4: omit it from the entry
+                # ceiling too, so unrelated untracked population cannot raise worktree-limit.
                 if (-not $OmitUntrackedEvidence) {
                     $objMap['F:' + $strRelativePath] = ''
-                }
+                } else { $boolEntryCounted = $false }
             } else {
                 # A tracked ordinary file, an untracked .gitignore or .gitattributes (E2), or
                 # any file when worktree classification is off (a .git control-surface tree):
@@ -2986,13 +3062,14 @@ function Get-TreeEvidence {
                 $objMap['F:' + $strRelativePath] = ([string]$objFile.Length + ':' + $strFileDigest)
                 $intFileCount++
             }
-            # F4: bound total traversal on an independent entry counter, not $objMap.Count.
-            # The worktree walk omits a 'D:' identity key for every directory (above), so the
-            # map no longer counts directories; counting each visited entry here keeps the
-            # 100,000-entry ceiling on a pathological empty-directory tree.
-            $intEntryCount++
-            if ($intEntryCount -gt 100000) {
-                throw $LimitCategory
+            # F4/H4: bound traversal on an independent counter (a worktree directory has no 'D:'
+            # key). A traversed directory and a recorded relevant entry count; an omitted irrelevant
+            # untracked entry does not, so unrelated untracked population no longer raises the limit.
+            if ($boolEntryCounted) {
+                $intEntryCount++
+                if ($intEntryCount -gt $MaximumEntryCount) {
+                    throw $LimitCategory
+                }
             }
         }
     }
@@ -3220,7 +3297,7 @@ function Get-EffectiveConfigComponent {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260817.0
+    # Version: 1.0.20260818.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -3255,6 +3332,11 @@ function Get-EffectiveConfigComponent {
     if ((New-Object System.IO.FileInfo($strPath)).Length -gt 4194304) {
         throw 'git-control-limit'
     }
+    # H5: track the in-flight native command in the script-scoped diagnostic fields before the
+    # call (as Resolve-ActiveSharedIndexRecord and Get-HeadResolvedReferenceComponent do), so a
+    # throw before it returns reports 'effective-config' with a null exit, not the prior command.
+    $script:strNativeCommand = 'effective-config'
+    $script:intNativeExit = $null
     $hashtableConfigResult = Invoke-GitRaw `
         -GitRecord $GitRecord `
         -WorkingDirectory $WorkingDirectory `
@@ -3265,6 +3347,7 @@ function Get-EffectiveConfigComponent {
         StdoutLength = $hashtableConfigResult.Stdout.Length
         StderrLength = $hashtableConfigResult.StderrLength
     })
+    $script:intNativeExit = $hashtableConfigResult.ExitCode
     # Exit 0 lists entries; exit 1 means the file holds no entries (empty or comment-only);
     # any other exit is malformed and fails closed.
     if ($hashtableConfigResult.ExitCode -notin @(0, 1)) {
@@ -4317,7 +4400,9 @@ try {
     Test-AncestorBoundaryValidation
     Test-PromisorRemoteEvidence
     Test-TrackedOnlyWorktreeEvidence
+    Test-TrackedOnlyEntryCeiling
     Test-NativeExitResetInvariant
+    Test-EffectiveConfigNativeExitReset
     $strSelfPath = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot 'Test-ExactGitPathSet.ps1'))
     $strSelfText = $script:objUtf8Strict.GetString([System.IO.File]::ReadAllBytes($strSelfPath))
     [void](Get-ScriptVersionRecord -ScriptText $strSelfText -ExpectedVersion $script:strVerifierVersion)
