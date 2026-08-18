@@ -64,6 +64,8 @@ Do not impose an arbitrary minimum byte count, word count, or token count on a d
 
 Keep the launcher and telemetry runner finding-agnostic. Derive observable public mutations and other finding-specific values from the manifest. A validate-only mode must parse the real manifest and construct the complete process start configuration. It must stop immediately before it creates evidence files or starts Claude. It must not return early from a code path that bypasses launch construction.
 
+Use that same decision-controller schema for a metadata-only review finding, such as a stale pull-request body. Let Claude produce the validated decision and exact current-to-expected replacement windows, then let the parent apply and reconcile the authorized public mutation. Do not build a body-specific controller merely because the selected action changes no tracked file.
+
 Keep one versioned, finding-agnostic controller and one task-level full validator. A new review round should normally add only a manifest, a focused prompt, decision destinations, declarative semantic predicates, and any genuinely new focused fixture. Do not copy or rewrite the controller, settings, launcher, or full validator for each finding. Add controller code only when a preflight proves that the existing declarative schema cannot express a required safety property; test that capability once, then reuse it in later rounds.
 
 Launch Claude Code with structured stream output, hook events, and a local debug file when the installed CLI supports them. Use a unique create-new evidence path for each invocation. Keep these artifacts outside Git. Record these times and counters:
