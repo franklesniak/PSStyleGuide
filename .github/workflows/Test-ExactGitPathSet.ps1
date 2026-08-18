@@ -474,12 +474,15 @@ function Assert-OrdinaryTreeUnder {
     # .DESCRIPTION
     # Walks the tree under RootPath without following links: every entry is tested for
     # the reparse-point attribute before a directory is descended, so a link is never
-    # traversed. A non-directory, non-reparse entry that is a Unix FIFO, socket, or
-    # device (which Git would open and block on) is also rejected through the UnixMode
-    # string, and a non-Windows host that cannot report the type fails closed. Throws
-    # the caller's limit category on the first offending entry, and on an anomalously
-    # large tree (a runaway backstop). RootPath itself is not tested; the caller tests
-    # the root before calling.
+    # traversed. By default a non-directory, non-reparse entry that is a Unix FIFO, socket,
+    # or device (which Git would open and block on) is also rejected through the UnixMode
+    # string, and a non-Windows host that cannot report the type fails closed. With
+    # -AllowUnixSpecialFile the walk still refuses a reparse point and still enforces the
+    # runaway backstop, but permits a Unix special file, because the caller relies on the
+    # Invoke-GitRaw native-command timeout (or a zlib-inflate failure) to fail closed on such
+    # a file only when a read actually opens it. Throws the caller's limit category on the
+    # first offending entry, and on an anomalously large tree (a runaway backstop). RootPath
+    # itself is not tested; the caller tests the root before calling.
     #
     # .PARAMETER RootPath
     # Absolute directory whose descendants must all be ordinary files or directories.
@@ -487,6 +490,13 @@ function Assert-OrdinaryTreeUnder {
     # .PARAMETER LimitCategory
     # Error string thrown for a reparse point, a special Unix entry, an unreadable
     # type on a non-Windows host, or the scan backstop.
+    #
+    # .PARAMETER AllowUnixSpecialFile
+    # When set, do not reject a Unix FIFO, socket, or device below RootPath, and do not fail
+    # closed on a non-Windows host that cannot report the entry type. The reparse-point and
+    # runaway-backstop refusals stay unconditional. The object-store guard passes this,
+    # because a special-file object harms a read only when the read opens it, and that read
+    # fails closed through native-command-timeout or a native-command inflate failure.
     #
     # .EXAMPLE
     # Assert-OrdinaryTreeUnder -RootPath $strObjectsPath -LimitCategory 'git-object-store-nonordinary'
@@ -506,7 +516,7 @@ function Assert-OrdinaryTreeUnder {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 1.0.20260817.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -518,7 +528,9 @@ function Assert-OrdinaryTreeUnder {
         [string]$RootPath,
 
         [Parameter(Mandatory = $true)]
-        [string]$LimitCategory
+        [string]$LimitCategory,
+
+        [switch]$AllowUnixSpecialFile
     )
 
     $objPending = New-Object System.Collections.Stack
@@ -537,7 +549,7 @@ function Assert-OrdinaryTreeUnder {
             }
             if (($objAttributes -band [System.IO.FileAttributes]::Directory) -ne 0) {
                 $objPending.Push([string]$strEntry)
-            } else {
+            } elseif (-not $AllowUnixSpecialFile) {
                 $objEntryInfo = New-Object System.IO.FileInfo($strEntry)
                 $objUnixModeProperty = $objEntryInfo.PSObject.Properties['UnixMode']
                 if ($null -ne $objUnixModeProperty) {
@@ -2279,6 +2291,134 @@ function Get-BoundedControlFileComponent {
     }
 }
 
+function Get-EffectiveConfigComponent {
+    # .SYNOPSIS
+    # Gets the framed evidence component for one repository-local Git configuration file,
+    # omitting only the proven path-irrelevant user.name and user.email.
+    #
+    # .DESCRIPTION
+    # Classifies the slot exactly as Get-BoundedControlFileComponent does -- a directory
+    # throws 'invalid-git-control', a genuinely empty slot returns 'absent' (after
+    # Assert-UnoccupiedControlSlot refuses a dangling symlink), and an ordinary regular file is
+    # validated (Assert-OrdinaryAbsoluteFile) and 4 MiB-bounded before it is read. For an
+    # ordinary file it lists the file's own entries through Git's own parser
+    # (git config --file <path> --no-includes -z --list), removes only the two proven
+    # path-irrelevant keys user.name and user.email, and frames the remaining records -- in
+    # Git's listed order, so a multi-valued key keeps its order -- with Get-FramedStringMapDigest.
+    # Every other key, including a key this verifier does not recognize, is retained by default,
+    # so a concurrent authorship edit (user.name/user.email) inside a control bracket cannot
+    # raise a false git-control-drift while any read-relevant configuration race still does. This
+    # is a default-include denylist, never an allowlist: a key is dropped only by being named
+    # here, so an unknown or future path-relevant key is never dropped by omission. --file reads
+    # only that one file (not the merged, system, or global config, which Invoke-GitRaw also
+    # neutralizes); --no-includes does not open (interpret) an include target -- the include.*
+    # key itself still lists and stays in the digest, and an active include is refused separately
+    # by the include preflight before any read, so an external include cannot inject a setting.
+    #
+    # .PARAMETER LiteralPath
+    # Absolute literal configuration-file path to classify and digest.
+    #
+    # .PARAMETER GitRecord
+    # Fixed Git executable record used to run the neutralized enumeration.
+    #
+    # .PARAMETER WorkingDirectory
+    # Working directory assigned to the enumeration process.
+    #
+    # .PARAMETER NativeCommandList
+    # Native-command accounting list that receives one 'effective-config' record per read.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # System.String. 'effective:<count>:<digest>' for an ordinary file or 'absent' for an empty
+    # slot. Throws 'invalid-git-control' for a directory or dangling-symlink slot,
+    # 'git-control-limit' above the 4 MiB bound, and 'native-command' on a malformed
+    # enumeration. Filesystem, hashing, native, decoding, and parameter-binding failures
+    # propagate.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Version: 1.0.20260817.0
+    #
+    # This function supports positional parameters
+    # (internal-caller contract only; subject to change):
+    #
+    #   Position 0: LiteralPath
+    #   Position 1: GitRecord
+    #   Position 2: WorkingDirectory
+    #   Position 3: NativeCommandList
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IDictionary]$GitRecord,
+
+        [Parameter(Mandatory = $true)]
+        [string]$WorkingDirectory,
+
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IList]$NativeCommandList
+    )
+
+    $strPath = [System.IO.Path]::GetFullPath($LiteralPath)
+    if ([System.IO.Directory]::Exists($strPath)) {
+        throw 'invalid-git-control'
+    }
+    if (-not [System.IO.File]::Exists($strPath)) {
+        Assert-UnoccupiedControlSlot -LiteralPath $strPath -Category 'invalid-git-control'
+        return 'absent'
+    }
+    [void](Assert-OrdinaryAbsoluteFile -LiteralPath $strPath)
+    if ((New-Object System.IO.FileInfo($strPath)).Length -gt 4194304) {
+        throw 'git-control-limit'
+    }
+    $hashtableConfigResult = Invoke-GitRaw `
+        -GitRecord $GitRecord `
+        -WorkingDirectory $WorkingDirectory `
+        -ArgumentList @('config', '--file', $strPath, '--no-includes', '-z', '--list')
+    $NativeCommandList.Add([ordered]@{
+        Name = 'effective-config'
+        ExitCode = $hashtableConfigResult.ExitCode
+        StdoutLength = $hashtableConfigResult.Stdout.Length
+        StderrLength = $hashtableConfigResult.StderrLength
+    })
+    # Exit 0 lists entries; exit 1 means the file holds no entries (empty or comment-only);
+    # any other exit is malformed and fails closed.
+    if ($hashtableConfigResult.ExitCode -notin @(0, 1)) {
+        throw 'native-command'
+    }
+    $objEffectiveEntries = New-Object System.Collections.Specialized.OrderedDictionary
+    if ($hashtableConfigResult.ExitCode -eq 0) {
+        # Records are key\nvalue, NUL-separated, exactly like the promisor probe. Keys are
+        # already lowercased by Git, so the ordinal match on user.name/user.email is exact.
+        $strConfigText = $script:objUtf8Strict.GetString($hashtableConfigResult.Stdout)
+        $intEffectiveIndex = 0
+        foreach ($strConfigRecord in $strConfigText.Split([char]0)) {
+            if ($strConfigRecord.Length -eq 0) {
+                continue
+            }
+            $intNewlineIndex = $strConfigRecord.IndexOf("`n")
+            $strConfigKey = if ($intNewlineIndex -lt 0) {
+                $strConfigRecord
+            } else {
+                $strConfigRecord.Substring(0, $intNewlineIndex)
+            }
+            if ($strConfigKey -ceq 'user.name' -or $strConfigKey -ceq 'user.email') {
+                continue
+            }
+            $objEffectiveEntries[[string]$intEffectiveIndex] = $strConfigRecord
+            $intEffectiveIndex++
+        }
+    }
+    return 'effective:' + $objEffectiveEntries.Count + ':' +
+        (Get-FramedStringMapDigest -StringMap $objEffectiveEntries)
+}
+
 function Resolve-ActiveSharedIndexRecord {
     # .SYNOPSIS
     # Resolves and validates the active split-index backing path for one snapshot read.
@@ -2718,7 +2858,7 @@ function Get-GitControlSurfaceEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.3
+    # Version: 1.0.20260817.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2789,8 +2929,17 @@ function Get-GitControlSurfaceEvidence {
     # (GitDirectory); info/exclude and info/attributes are shared (CommonDirectory). The
     # staging index is not listed here: it is hashed coupled with its active split-index
     # backing by Get-SplitIndexBracketedEvidence below.
+    # common-config is bracketed by its EFFECTIVE entries (Get-EffectiveConfigComponent),
+    # which omit only the proven path-irrelevant user.name and user.email and retain every
+    # other and every unknown key by default, so a concurrent authorship edit cannot raise a
+    # false git-control-drift while any read-relevant configuration race still does. It is
+    # assigned directly rather than through the whole-file loop below.
+    $objComponents['common-config'] = Get-EffectiveConfigComponent `
+        -LiteralPath (Join-Path $AdministrativePathRecord.CommonDirectory 'config') `
+        -GitRecord $GitRecord `
+        -WorkingDirectory $WorkingDirectory `
+        -NativeCommandList $NativeCommandList
     $arrBoundedFileSpecifications = @(
-        @('common-config', (Join-Path $AdministrativePathRecord.CommonDirectory 'config')),
         @('commondir-pointer', (Join-Path $AdministrativePathRecord.GitDirectory 'commondir')),
         @('objects-info-alternates', (Join-Path (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'objects') 'info') 'alternates'))
     ) + $(if ($SampleWorktreeControlInput) {
@@ -2813,8 +2962,11 @@ function Get-GitControlSurfaceEvidence {
     # it; a disabled repository never opens it, and sampling it would let a stale, oversized,
     # or concurrently changed file refuse or drift a read that cannot depend on it.
     if ($IncludeWorktreeConfigEvidence) {
-        $objComponents['worktree-config-worktree'] = Get-BoundedControlFileComponent `
-            -LiteralPath (Join-Path $AdministrativePathRecord.GitDirectory 'config.worktree')
+        $objComponents['worktree-config-worktree'] = Get-EffectiveConfigComponent `
+            -LiteralPath (Join-Path $AdministrativePathRecord.GitDirectory 'config.worktree') `
+            -GitRecord $GitRecord `
+            -WorkingDirectory $WorkingDirectory `
+            -NativeCommandList $NativeCommandList
     }
 
     # HEAD's resolved object is the one reference input the staged read consumes: git
@@ -2926,7 +3078,7 @@ function Get-PathSetControlInputDigest {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.3
+    # Version: 1.0.20260817.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2972,8 +3124,17 @@ function Get-PathSetControlInputDigest {
     # info/attributes are appended only for a worktree read. HEAD and the object HEAD
     # resolves to are added in the dedicated reference-evidence block after the loop, only
     # for a staged read, exactly as in Get-GitControlSurfaceEvidence.
+    # common-config is bracketed by its EFFECTIVE entries (Get-EffectiveConfigComponent),
+    # which omit only the proven path-irrelevant user.name and user.email and retain every
+    # other and every unknown key by default, so a concurrent authorship edit cannot raise a
+    # false git-control-drift while any read-relevant configuration race still does. It is
+    # assigned directly rather than through the whole-file loop below.
+    $objInputs['common-config'] = Get-EffectiveConfigComponent `
+        -LiteralPath (Join-Path $AdministrativePathRecord.CommonDirectory 'config') `
+        -GitRecord $GitRecord `
+        -WorkingDirectory $WorkingDirectory `
+        -NativeCommandList $NativeCommandList
     $arrSingleFileInputs = @(
-        @('common-config', (Join-Path $AdministrativePathRecord.CommonDirectory 'config')),
         @('commondir-pointer', (Join-Path $AdministrativePathRecord.GitDirectory 'commondir')),
         @('objects-info-alternates', (Join-Path (Join-Path (Join-Path $AdministrativePathRecord.CommonDirectory 'objects') 'info') 'alternates'))
     ) + $(if ($SampleWorktreeControlInput) {
@@ -2999,8 +3160,11 @@ function Get-PathSetControlInputDigest {
     # only when extensions.worktreeConfig is enabled, so IncludeWorktreeConfigEvidence gates
     # it exactly as in Get-GitControlSurfaceEvidence; a disabled repository never opens it.
     if ($IncludeWorktreeConfigEvidence) {
-        $objInputs['worktree-config-worktree'] = Get-BoundedControlFileComponent `
-            -LiteralPath (Join-Path $AdministrativePathRecord.GitDirectory 'config.worktree')
+        $objInputs['worktree-config-worktree'] = Get-EffectiveConfigComponent `
+            -LiteralPath (Join-Path $AdministrativePathRecord.GitDirectory 'config.worktree') `
+            -GitRecord $GitRecord `
+            -WorkingDirectory $WorkingDirectory `
+            -NativeCommandList $NativeCommandList
     }
     # The reference inputs the staged read consumes: HEAD itself (git-head) and the object
     # HEAD resolves to (head-resolved, git rev-parse --verify --quiet HEAD via
@@ -3319,14 +3483,20 @@ try {
                     $script:objUtf8Strict.GetString($hashtableWorktreeConfigResult.Stdout).Trim() -ceq 'true')
             }
         }
-        # The distinct configuration files Git reads for this worktree. GitDirectory/config
-        # equals CommonDirectory/config for the main worktree and is usually absent for a
-        # linked worktree; GitDirectory/config.worktree is read only when
-        # extensions.worktreeConfig is enabled. A duplicate full path is probed once.
+        # The distinct configuration files Git reads for this worktree. Only the common
+        # config (CommonDirectory/config) seeds the scan: Git resolves the repository-local
+        # config from $GIT_COMMON_DIR/config, and for the main worktree GitDirectory equals
+        # CommonDirectory, so the common config covers it in both the main and the linked
+        # worktree. GitDirectory/config is deliberately not scanned -- Git never reads
+        # $GIT_DIR/config for a linked worktree, so an include directive there cannot inject a
+        # read-relevant setting yet would otherwise raise a false git-config-include-active;
+        # this matches the control-input digest, which for the same reason does not sample
+        # GitDirectory/config (F1, the same dependency scope as C4/C7). GitDirectory/config.worktree
+        # is read only when extensions.worktreeConfig is enabled. A duplicate full path is
+        # probed once.
         $listConfigFilePath = New-Object 'System.Collections.Generic.List[string]'
         foreach ($strCandidateConfigPath in @(
-            $strCommonConfigPath,
-            [System.IO.Path]::GetFullPath((Join-Path $hashtableAdministrativePaths.GitDirectory 'config'))
+            $strCommonConfigPath
         )) {
             if ([System.IO.File]::Exists($strCandidateConfigPath) -and
                 -not $listConfigFilePath.Contains($strCandidateConfigPath)) {
@@ -3568,10 +3738,12 @@ try {
         throw 'native-command'
     }
     if ($intNativeExit -eq 0) {
-        # Records are key\nvalue, NUL-separated. Refuse on any partialclonefilter or
-        # extensions.partialClone key (their presence marks a partial clone) and on a
-        # remote.<name>.promisor whose value is boolean-true; honor an explicit false
-        # (Git's false booleans are false/no/off/0; a missing value is true).
+        # Records are key\nvalue, NUL-separated. Refuse on extensions.partialClone (the
+        # repository's independent partial-clone marker) and on a remote.<name>.promisor whose
+        # value is boolean-true; honor an explicit false (Git's false booleans are
+        # false/no/off/0; a missing value is true). A remote.<name>.partialclonefilter is inert
+        # without an active promisor for its remote, so a retained filter alongside
+        # promisor=false is an ordinary remote and is not refused.
         $strPromisorText = $script:objUtf8Strict.GetString($hashtablePromisorResult.Stdout)
         foreach ($strPromisorRecord in $strPromisorText.Split([char]0)) {
             if ($strPromisorRecord.Length -eq 0) {
@@ -3589,7 +3761,16 @@ try {
                 if ($strPromisorValue.Trim().ToLowerInvariant() -notin @('false', 'no', 'off', '0')) {
                     throw 'git-promisor-remote'
                 }
-            } else {
+            } elseif ($strPromisorKey -ceq 'extensions.partialclone') {
+                # extensions.partialClone names the repository's promisor remote and is an
+                # independent partial-clone marker, so refuse it. A retained
+                # remote.<name>.partialclonefilter only records the filter used for a promisor
+                # remote and is inert without an active promisor for the same remote; the
+                # .promisor branch above already refuses an active promisor, so a filter left
+                # alongside promisor=false is an ordinary remote and is not refused.
+                # Classification is by key suffix, not a parsed remote name: a key ending in
+                # .promisor is a promisor key, the exact key extensions.partialclone is the
+                # extension, and every other matched key is an inert filter.
                 throw 'git-promisor-remote'
             }
         }
@@ -3717,19 +3898,21 @@ try {
             throw 'git-alternates-active'
         }
     }
-    # Reject an external or blocking object store. If CommonDirectory/objects -- or a child
-    # such as objects/pack, objects/<fanout>, or an individual pack/loose object -- is a
-    # reparse point to a location outside the repository, a read resolves objects from that
-    # external store (a route beyond the alternates file and a promisor remote); and on Unix a
-    # loose object or pack file that is a FIFO/socket/device would make a read block opening
-    # it. The objects tree is not bracketed by the control digests, so its later removal or
-    # redirection would not trip git-control-drift; validate it here and refuse a reparse or
-    # non-directory object root, and any reparse point or non-regular Unix entry beneath it,
-    # before any read. An ordinary clone has a plain objects tree of ordinary files and is
-    # unaffected. This is a one-time pre-read scan, so a special file substituted into the
-    # objects tree afterward cannot be caught here, and -- unlike the alternates file -- the
-    # objects tree is not a hashed control input; the Invoke-GitRaw native-command timeout
-    # bounds that residual window, converting the hang into a fail-closed native-command-timeout.
+    # Reject an external or redirected object store, but allow a Unix special-file object. If
+    # CommonDirectory/objects -- or a child such as objects/pack, objects/<fanout>, or an
+    # individual pack/loose object -- is a reparse point to a location outside the repository,
+    # a read resolves objects from that external store (a route beyond the alternates file and
+    # a promisor remote) and succeeds silently, which no timeout can catch, so the reparse-point
+    # refusal stays. The objects tree is not bracketed by the control digests, so its later
+    # removal or redirection would not trip git-control-drift; validate it here and refuse a
+    # reparse or non-directory object root, and any reparse point beneath it, before any read.
+    # A Unix special file (FIFO/socket/device) beneath objects is NOT refused here
+    # (-AllowUnixSpecialFile): it can harm a read only when the read opens it, and such a read
+    # blocks to the Invoke-GitRaw native-command timeout, or fails zlib inflation and returns
+    # native-command -- both fail-closed, and exactly the backstop already relied on for a
+    # special file substituted after this one-time pre-read scan. An unreferenced special-file
+    # object that no command opens is therefore not a reason to refuse an otherwise correct
+    # repository. An ordinary clone has a plain objects tree of ordinary files and is unaffected.
     $strObjectsPath = [System.IO.Path]::GetFullPath(
         (Join-Path $hashtableAdministrativePaths.CommonDirectory 'objects'))
     if ([System.IO.Directory]::Exists($strObjectsPath)) {
@@ -3737,7 +3920,7 @@ try {
         if (($objObjectsInfo.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
             throw 'git-object-store-nonordinary'
         }
-        Assert-OrdinaryTreeUnder -RootPath $strObjectsPath -LimitCategory 'git-object-store-nonordinary'
+        Assert-OrdinaryTreeUnder -RootPath $strObjectsPath -LimitCategory 'git-object-store-nonordinary' -AllowUnixSpecialFile
     } elseif ([System.IO.File]::Exists($strObjectsPath)) {
         throw 'git-object-store-nonordinary'
     } else {
