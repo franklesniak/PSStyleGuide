@@ -1,0 +1,2 @@
+# Preserve enough project-instruction capacity for the complete review workflow.
+project_doc_max_bytes = 65536

@@ -39,8 +39,14 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $strPowerShellPath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
-          if (-not [System.IO.File]::Exists($strPowerShellPath)) {
+          try {
+              $strPowerShellPath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
+          } catch {
+              # Any MainModule resolution failure falls through to the deterministic guard below.
+              $strPowerShellPath = $null
+          }
+          if ([string]::IsNullOrEmpty($strPowerShellPath) -or
+              -not [System.IO.File]::Exists($strPowerShellPath)) {
               throw 'The current PowerShell executable could not be resolved.'
           }
           $arrResult = @(& $strPowerShellPath `
@@ -54,8 +60,8 @@ jobs:
           }
           $objResult = $arrResult[0] | ConvertFrom-Json
           if ($intGeneratorExit -ne 0 -or
-              $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v1' -or
-              $objResult.GeneratorVersion -cne '1.0.20260813.0' -or
+              $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2' -or
+              $objResult.GeneratorVersion -cne '1.0.20260818.0' -or
               $objResult.Overall -notin @('Success', 'NoChange')) {
               throw "Artifact generation failed with native exit $intGeneratorExit."
           }
@@ -65,13 +71,23 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          try {
+              $strPowerShellPath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
+          } catch {
+              # Any MainModule resolution failure falls through to the deterministic guard below.
+              $strPowerShellPath = $null
+          }
+          if ([string]::IsNullOrEmpty($strPowerShellPath) -or
+              -not [System.IO.File]::Exists($strPowerShellPath)) {
+              throw 'The current PowerShell executable could not be resolved.'
+          }
           $arrArtifactPaths = @(
               'copilot-instructions.md',
               'powershell.instructions.md',
               'STYLE_GUIDE_CHAT.md',
               'STYLE_GUIDE_FULL.md'
           )
-          & git diff --exit-code --quiet --no-ext-diff --no-textconv -- $arrArtifactPaths
+          & git -c core.fsmonitor=false -c diff.orderFile=/dev/null diff --exit-code --quiet --no-ext-diff --no-textconv -- $arrArtifactPaths
           $intDiffExit = $LASTEXITCODE
           if ($intDiffExit -eq 1) {
               throw 'Generated artifact drift was detected.'
@@ -79,13 +95,35 @@ jobs:
           if ($intDiffExit -ne 0) {
               throw "git diff failed with native exit $intDiffExit."
           }
-          & ./.github/workflows/Test-ExactGitPathSet.ps1 `
+          $strVerifierCommand = @'
+          & './.github/workflows/Test-ExactGitPathSet.ps1' `
               -RepositoryRoot $env:GITHUB_WORKSPACE `
               -ExpectedPath @() `
               -Mode Working
+          '@
+          $strEncodedVerifierCommand = [System.Convert]::ToBase64String(
+              [System.Text.Encoding]::Unicode.GetBytes($strVerifierCommand)
+          )
+          $arrPathSetResult = @(& $strPowerShellPath `
+              -NoLogo `
+              -NoProfile `
+              -NonInteractive `
+              -EncodedCommand $strEncodedVerifierCommand)
           $intPathSetExit = $LASTEXITCODE
-          if ($intPathSetExit -ne 0) {
-              throw "The working path set was not empty; verifier exit $intPathSetExit."
+          if ($arrPathSetResult.Count -ne 1) {
+              throw 'The exact-path verifier returned an unexpected output shape.'
+          }
+          $objPathSetResult = $arrPathSetResult[0] | ConvertFrom-Json
+          if ($intPathSetExit -ne 0 -or
+              $objPathSetResult.Schema -cne 'PSStyleGuide.ExactGitPathSetResult.v2' -or
+              $objPathSetResult.VerifierVersion -cne '1.0.20260818.6' -or
+              -not $objPathSetResult.Success) {
+              throw ("Exact-path verification did not confirm an empty working " +
+                  "set: exit=$intPathSetExit success=$($objPathSetResult.Success) " +
+                  "category=$($objPathSetResult.Category) " +
+                  "nativeCommand=$($objPathSetResult.NativeCommand) " +
+                  "schema=$($objPathSetResult.Schema) " +
+                  "version=$($objPathSetResult.VerifierVersion).")
           }
 
       - name: Create failure diagnostics

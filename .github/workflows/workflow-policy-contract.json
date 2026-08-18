@@ -125,13 +125,13 @@
   "scriptVersions": {
     "generator": {
       "path": "Generate-StyleGuideArtifacts.ps1",
-      "version": "1.0.20260813.0",
-      "sha256": "179398728a8b8a04f40201f8fa7a98a09f1f45b3157cbe08607acf659415dd62"
+      "version": "1.0.20260818.0",
+      "sha256": "48d0516935fbb6a0ce2b7aa7229078696630b00b1f1c2806502493c1cc598af1"
     },
     "pathVerifier": {
       "path": "Test-ExactGitPathSet.ps1",
-      "version": "1.0.20260813.0",
-      "sha256": "e7b48ba94917c7440a4e084b559a931fcb480e331e33230cff543fbed3f1c46a"
+      "version": "1.0.20260818.6",
+      "sha256": "783221149ed5e2ece0f9654fde7bd0d09ab793a2e63d104fd239fa0ebd7853d6"
     }
   },
   "caseCatalog": {
@@ -140,7 +140,7 @@
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "6be3ea50b872fdbc4a3b7754c01b681a8cb21dbe846df20925252493015711d2"
+    "sha256": "68fbd92f8ca66304290b5f1f604fe6c49798b5ad38ece3ece367813fe1590686"
   },
   "actions": {
     "checkout": {
@@ -233,8 +233,8 @@
             "permissions": { "contents": "read" },
             "steps": [
               { "kind": "action", "role": "build.verify_generated_artifacts.checkout_repository", "name": "Checkout repository", "id": "checkout_repository", "action": "checkout" },
-              { "kind": "run", "role": "build.verify_generated_artifacts.generate_style_guide_artifacts", "name": "Generate style guide artifacts", "id": "generate_style_guide_artifacts", "shell": "pwsh", "runSha256": "86cc7298521b587e835fd4611b391588196338ccfd97206bfa15f768f1735aef" },
-              { "kind": "run", "role": "build.verify_generated_artifacts.verify_generated_artifact_drift", "name": "Verify generated artifact drift", "id": "verify_generated_artifact_drift", "shell": "pwsh", "runSha256": "11af88f59f622acb61606ee82be47b63ed2b7b37b383b5d003575effabdde42a" },
+              { "kind": "run", "role": "build.verify_generated_artifacts.generate_style_guide_artifacts", "name": "Generate style guide artifacts", "id": "generate_style_guide_artifacts", "shell": "pwsh", "runSha256": "d7e4241bb71771ab9278196c6431aca1ec01cd0d15e5e5c27288ea4c9e805e40" },
+              { "kind": "run", "role": "build.verify_generated_artifacts.verify_generated_artifact_drift", "name": "Verify generated artifact drift", "id": "verify_generated_artifact_drift", "shell": "pwsh", "runSha256": "1d9f923ca35ed8408c71f7c0a1fff213d438e8620e0ba502318a91c61961ed97" },
               { "kind": "run", "role": "build.verify_generated_artifacts.create_failure_diagnostics", "name": "Create failure diagnostics", "id": "create_failure_diagnostics", "shell": "pwsh", "if": "${{ failure() && !cancelled() }}", "continueOnError": true, "runSha256": "c7ffffe2913b4fe43d733a7ba918b39b84903efb4822089393458d54d520ec45" },
               { "kind": "action", "role": "build.verify_generated_artifacts.upload_failure_diagnostics", "name": "Upload failure diagnostics", "id": "upload_failure_diagnostics", "action": "uploadArtifact", "if": "${{ failure() && !cancelled() }}", "continueOnError": true }
             ]
@@ -327,7 +327,7 @@
       { "id": "GF-DESTINATION", "status": "intentional difference", "observed": "PS uses powershell.instructions.md; Terraform uses terraform.instructions.md.", "rationale": "Repository-specific leaves differ while containment, link, alias, and replacement guarantees remain equal." },
       { "id": "GF-CONTENT", "status": "intentional difference", "observed": "Language-specific frontmatter and labels differ.", "rationale": "Repository payload identity differs; complete-payload ordering and failure strength remain equal." },
       { "id": "GF-SERIALIZATION", "status": "same", "observed": "Both require final CR normalization and BOM-less UTF-8.", "rationale": "The byte boundary is symmetric." },
-      { "id": "GF-WRITE", "status": "same", "observed": "CreateNew, Flush(true), verification, and one File.Replace with no fallback.", "rationale": "The transaction boundary is symmetric." },
+      { "id": "GF-WRITE", "status": "same", "observed": "CreateNew, Flush(true), verification, and one atomic publication rename with no fallback: File.Replace to an existing destination, File.Move to an absent one.", "rationale": "The transaction boundary is symmetric: publication is a single atomic rename with no fallback." },
       { "id": "GF-FAILURE", "status": "same", "observed": "Pre-replace cleanup and post-replace truth are explicit.", "rationale": "Neither contract claims cross-file atomicity or rollback." },
       { "id": "GF-HOSTS", "status": "same", "observed": "Windows PowerShell 5.1 and PowerShell 7 on Windows/Ubuntu are required.", "rationale": "Host equality and idempotence are symmetric." },
       { "id": "GF-VERSION", "status": "same", "observed": "The timeless four-component script-version profile is shared.", "rationale": "Grammar, expected identity, and authoring progression have equal strength." },

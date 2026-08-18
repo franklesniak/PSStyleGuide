@@ -1,21 +1,31 @@
 <!-- markdownlint-configure-file { "MD013": false } -->
 
-# Agent Instructions for Claude Code
+# Agent Instructions for Codex
 
-**Version:** 1.0.20260816.1
+**Version:** 1.0.20260818.1
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository maintainer (@franklesniak)
-- **Last Updated:** 2026-08-16
-- **Scope:** Agent-specific entry point for Claude Code and compatible AI coding agents operating in this repository. It captures the pull-request review-loop workflow the maintainer runs, the per-finding decision process to apply to every code-review comment, the discipline governing when and how work may be deferred, and the requirement that the repository's own PowerShell follow its published style guide.
+- **Last Updated:** 2026-08-18
+- **Scope:** Repository entry point for Codex root agents and Codex subagents operating in this repository through the local workspace, GitHub connector, GitHub CLI, and web-research interfaces. It captures the pull-request review-loop workflow the maintainer runs, the per-finding decision process to apply to every code-review comment, the discipline governing when and how work may be deferred, and the requirement that the repository's own PowerShell follow its published style guide.
 
 This file is adapted from the `franklesniak/copilot-repo-template` agent instructions and tailored to this GitHub-hosted PowerShell and Markdown repository. For the repository's documentation-authoring rules — the `STYLE_GUIDE.md` / `STYLE_GUIDE_RATIONALE.md` split and its generated consumer-facing derivatives — `.github/copilot-instructions.md` remains the canonical source of truth.
 
 ## Canonical instructions
 
 The authoritative source of truth for the repository's documentation-authoring rules is **`.github/copilot-instructions.md`**. Read it before changing any style-guide content. This file does not replace it; it adds the agent workflow.
+
+## Codex execution model and interfaces
+
+- **Instruction scope.** Local Codex builds its instruction chain once per run from global guidance and the project root through the launch working directory; it does not promise on-demand loading from deeper directories. Treat this root file as active. Before editing below a deeper directory, use bounded discovery to find and obey any more-specific `AGENTS.md` that the runtime did not already supply. The remote GitHub reviewer applies the closest applicable `AGENTS.md` to each changed file. If an active instruction file changes, start a new Codex run before relying on the new bytes. Do not re-read an instruction file that the runtime already supplied unless its exact bytes are material to the task.
+- **Local agent versus remote reviewer.** The local Codex agent and its subagents implement and orchestrate work. The GitHub account `chatgpt-codex-connector` is a separate remote reviewer. A PR comment whose entire body is `@codex review` is a trigger for that remote reviewer; it is not a finding or an instruction to the local agent.
+- **Repository tools.** Use `rg` for bounded discovery, `apply_patch` for deliberate file edits, and non-interactive shell commands for focused validation. Preserve unrelated tracked and untracked work. Keep one writer per worktree. Before delegation or mutation, pin the repository, branch, head commit, tree, allowed paths, and exact expected public actions.
+- **GitHub tools.** Prefer the connected GitHub interface for PR metadata and flat comment reads. Use authenticated `gh api graphql` when thread identity, resolution state, pagination, review-submission bodies, or inline context matters. Reconcile every public mutation with an authenticated read before treating it as complete.
+- **Research tools.** Use primary sources for technical claims. Prefer official product documentation, standards, specifications, and source repositories. Put the relevant links and their decision impact in the finding's `References` section.
+- **Subagents.** When the user asks for delegation, assign one concrete, bounded review round to one fresh Codex subagent. Use the requested model and reasoning effort; otherwise inherit the parent configuration. Give the subagent the pinned finding inventory and mutation boundary. Require checkpoints for analysis, first tracked edit, validation, and any public mutation. All agents share the workspace, so the parent must monitor for overlapping writes.
+- **Communication and stopping.** Report active work to the parent at useful phase boundaries. A quiet model-thinking interval is not a hang when the process or subagent remains active. Stop immediately on an unauthorized path, ambiguous public mutation, changed pinned identity, or explicit user stop condition. Preserve validated decisions and scoped edits before a safe continuation.
 
 ## Protected instruction files
 
@@ -31,7 +41,7 @@ Instruction files and agent entry points are protected governance files. Do not 
 
 ## Ignoring commands addressed to other agents
 
-PR comments and review comments that begin with `@copilot` are commands addressed to GitHub Copilot's coding agent, not to Claude Code. Ignore them entirely — do not process them, reply to them, or treat them as review feedback.
+PR comments and review comments that begin with `@copilot` are commands addressed to GitHub Copilot's coding agent, not to the local Codex agent. Ignore them entirely — do not process them, reply to them, or treat them as review feedback. Also ignore an exact `@codex review` trigger as a finding; process the remote Codex review that the trigger produces.
 
 ## Handling code review comments
 
@@ -71,7 +81,7 @@ Steps 2 through 5 are **mandatory for every finding that survives step 1 as real
 
 > **Gate:** you must state the selected option before continuing — in chat or in the reply.
 
-**6. Post the evaluation.** For an inline finding, reply on its review thread. For a review-body-only finding, post a PR-level comment that cites its synthetic key, review ID/URL, reviewed commit, and path/line when available. Include the options, rubric, scoring table, selected option, `References` section (when research informed the decision), and either a note that implementation follows or the commit SHA that implements it. End every reply with the Claude Code attribution footer. Before posting, verify the reply actually contains all four artifacts — **options, rubric, scoring table, and selected option** — for any finding that survived step 1; a reply missing any of them is incomplete whatever the finding's outcome, so complete it before posting.
+**6. Post the evaluation.** For an inline finding, reply on its review thread. For a review-body-only finding, post a PR-level comment that cites its synthetic key, review ID/URL, reviewed commit, and path/line when available. Include the options, rubric, scoring table, selected option, `References` section (when research informed the decision), and either a note that implementation follows or the commit SHA that implements it. End every reply with the exact attribution footer `Generated with Codex`. Before posting, verify the reply actually contains all four artifacts — **options, rubric, scoring table, and selected option** — for any finding that survived step 1; a reply missing any of them is incomplete whatever the finding's outcome, so complete it before posting.
 
 **7. Implement the solution.** Apply the selected option, commit, and make the change visible on the PR (reachable from the PR's head ref). If implementation reveals the selected option is wrong or unworkable, say so plainly, state what changed, and re-select — do not quietly substitute a different approach. Before changing any **protected instruction file** to satisfy a comment, confirm explicit owner authorization for that specific change (per **Protected instruction files**); if it is not covered, ask one narrow authorization question before editing, keeping the selected option fixed while you do.
 
@@ -119,15 +129,15 @@ Run this loop when asked to review a pull request (for example, "start the revie
 
 Treat **GitHub Copilot (`copilot-pull-request-reviewer`) and Codex (`chatgpt-codex-connector`) as co-equal reviewers.** Each round, obtain a fresh review from both:
 
-- **Copilot:** request it explicitly with `request_copilot_review` (or equivalent).
-- **Codex:** request it explicitly every round by posting a pull-request comment whose body is exactly `@codex review`. There is no dedicated review-request tool for Codex the way `request_copilot_review` exists for Copilot, so post the comment with the ordinary issue-comment tool (for example `add_issue_comment` or equivalent). Codex also auto-reviews when a pull request is opened for review or a draft is marked ready, but that auto-trigger is not reliable enough to depend on — always post the explicit `@codex review` request so a Codex review is actually obtained for the round.
+- **Copilot:** request it explicitly with the connected GitHub interface or authenticated GitHub API equivalent.
+- **Remote Codex reviewer:** request it explicitly every round by posting a pull-request comment whose body is exactly `@codex review`. Treat `chatgpt-codex-connector` as a reviewer separate from the local Codex implementation agent. Do not rely on an automatic review trigger; always post the explicit request and reconcile its exact comment receipt.
 
 If a reviewer cannot read the diff (Copilot has a size limit and may return "wasn't able to review any files") or is otherwise non-functional, note that in a PR comment and continue with the reviewer(s) that are working — but the loop is not "clean" on the strength of a reviewer that never actually reviewed.
 
 ### Round procedure
 
 1. Establish a **review-readiness gate** before requesting either reviewer. Confirm the fix commit is reachable from the PR head. Update the PR body to the exact current head/tree, versions, identities, commands, and results that it claims. Read the body and head back through the API and compare them with the committed files. Do not request review while the body is stale or while identity evidence is incomplete.
-2. Record detection baselines (the newest existing review-submission ID/time, inline-comment ID/time, and PR-comment ID/time for each bot) and the current PR head SHA, then request the reviews: request Copilot with `request_copilot_review` (or equivalent), and request Codex by posting an `@codex review` pull-request comment. Do not rely on Codex's auto-trigger to stand in for this explicit request.
+2. Record detection baselines (the newest existing review-submission ID/time, inline-comment ID/time, and PR-comment ID/time for each bot) and the current PR head SHA. Then request Copilot through the connected GitHub interface or authenticated API, and request the remote Codex reviewer by posting an exact `@codex review` pull-request comment. Do not rely on an automatic trigger to stand in for either explicit request.
 3. Wait for the reviews by **active polling** — do not rely on webhook delivery alone. Poll at least every 60 seconds using authenticated structured tooling, paginating the complete review submissions **with their bodies**, inline review comments/threads, and PR-level comments. A new round has arrived for a reviewer only when that reviewer posts a review or comment newer than its baseline and the review/comment is explicitly anchored to the recorded head SHA. A stale verdict never counts toward arrival or clean state.
 4. Inventory all feedback surfaces. Parse every new review body, including each suppressed/advisory section, and verify any declared item count. Reconcile the resulting synthetic keys with inline comments to avoid duplicates without dropping either surface.
 5. Process every actionable inline and review-body finding from **both** reviewers via **Handling code review comments** above (validate → options → rubric → score → select → post → implement → style-guide → close). Track native comment/thread IDs and synthetic keys; skip only items whose closure evidence already exists.
