@@ -28,6 +28,63 @@ Use a fresh executor for each numbered task and each retry or continuation:
 
 Before the first Claude Code task, run a read-only capability check such as `claude --help` and determine the installed CLI's exact non-interactive flags for Opus 4.8 and maximum reasoning. Record the command and resolved model configuration without recording secrets. If the exact required model or reasoning level is unavailable, stop and report the blocker. Do not silently fall back.
 
+## Claude Code observability and control
+
+Use one sequential Claude Code session for one review round. Let that session process the round's findings in order. Do not start a new session for each finding unless a hard stop, a valid continuation boundary, or an unexpected identity change requires a fresh invocation.
+
+Keep the analysis and implementation phases in that same live process. Use controller lifecycle gates to require all decision artifacts before the first tracked edit, and require local validation before any public mutation. Do not end a healthy analysis-only process merely to relaunch Claude with the same head, findings, and context for implementation. If a safety stop makes a continuation necessary, pin the validated decisions and give the continuation only the remaining work.
+
+Before each Claude Code invocation, create a small declarative manifest. It must state the exact repository, branch, head commit, allowed paths, allowed commands, expected review-thread and comment identities, allowed public mutations, checks, and completion receipt. Resolve values before launch. Do not make Claude discover values that the parent already knows.
+
+For each material finding, put a small semantic acceptance predicate in the manifest and enforce it before implementation. Derive the predicate from the reviewer's claimed failure and the validated feedback, not from document shape alone. For example, if a concurrency finding proves that an unrelated configuration key can change during a check, the selected option must tolerate that change or explicitly eliminate the concurrency window. Do not accept `status quo`, deferment, or a cosmetic-only change when the analysis confirms the finding is real unless the decision artifact contains specific evidence that the predicate is already satisfied. Keep structural checks for required options, rubric, scores, and selection, but do not treat them as proof that the selected option addresses the finding.
+
+Keep the launcher and telemetry runner finding-agnostic. Derive observable public mutations and other finding-specific values from the manifest. A validate-only mode must parse the real manifest and construct the complete process start configuration. It must stop immediately before it creates evidence files or starts Claude. It must not return early from a code path that bypasses launch construction.
+
+Launch Claude Code with structured stream output, hook events, and a local debug file when the installed CLI supports them. Use a unique create-new evidence path for each invocation. Keep these artifacts outside Git. Record these times and counters:
+
+- Process start and exit.
+- First stream event and first tool call.
+- Each tool start and end.
+- First authorized public mutation.
+- Last stream event and longest quiet interval.
+- Tool, result, hook, denial, and retry counts.
+- API retry counts by status class, including rate-limit responses and retry-after delay when reported.
+- Native exit code, timeout state, hard-stop state, and evidence-file byte counts and hashes.
+
+Assign a stable logical label to every exact command in the manifest. When Claude starts an allowed command, record both the tool name and that manifest label in the event log and status sidecar. Count validation attempts and their pass or fail results separately from permission denials and other tool errors. Do not infer that the final gate passed merely because an unlabeled `Bash` call returned exit code 0.
+
+Declare validation prerequisites and enforce their order in the controller. When a deterministic identity calculator, generator refresh, syntax check, or focused precheck must precede the full validator, deny an early full-validation request without executing it and state the missing prerequisite label. Run the full validator only after those cheaper prerequisites pass for the current tracked bytes. Invalidate their receipts when a later edit changes a covered path. Do not spend a full validation attempt to discover a deterministic identity update that the manifest already declares.
+
+In the final timing summary, separate model time, tool time, hook/controller time, validation time, and the interval after the last required validation passed. When the CLI reports usage, also record summarized input, output, thinking, cache-read, and cache-creation token counts, service tier, speed, fast-mode state, fast-mode disabled reason, and cost. Accept the documented result shape and compatible CLI variants that nest tier or speed under `usage`; do not silently record an empty value because one supported version moves a field. These metrics can identify inference latency, repeated context processing, and post-gate narration as distinct bottlenecks without recording prompt or response content.
+
+Record whether the request used standard or fast inference. A faster premium tier does not weaken maximum reasoning, but it can change cost, access requirements, rate limits, and prompt-cache compatibility. Do not enable it unless the installed Claude Code path supports it and the user explicitly authorizes the added cost. Never substitute permission bypass for an inference-speed setting.
+
+Write a small status sidecar after each event and at least every 15 seconds while the process is active. The status must show the process ID, session ID when available, phase, current tool, elapsed time, last-event time, quiet time, counters, and a content-minimized blocked reason. Write a final timing summary even after a timeout or hard stop. Put only summarized metrics and hashes in the orchestration tracker. Do not put complete prompts, tool results, debug logs, credentials, tokens, cookies, or private state in the tracker.
+
+When the structured stream reports a `system` / `api_retry` event, set the status phase to `api-retry`. Record its status class, attempt, maximum retries, and `retry_delay_ms`; use the debug stream only as a compatibility fallback. Distinguish the measured delay between a failed response and the next request from the latency of the later successful request. Do not attribute the full successful-response latency to rate-limit backoff. A live rate-limit backoff is not a model-thinking phase and is not a hung process. Clear the retry phase when a later request is dispatched, then classify that request as model or server response latency until a response or tool event proves progress.
+
+Define a manifest-specific terminal result schema. After the last required validation and identity check pass, instruct Claude to emit that small structured result immediately and end the turn. The result must name the validated head, changed paths, validation labels, and remaining public actions. Do not request a polished narrative after the terminal gate. Treat any post-gate tool call or prolonged post-gate reasoning as observable overhead that needs an explicit task reason; do not silently accept it as required work.
+
+Parse each stream line as structured data before applying a stop rule. Treat a controller marker as a hard stop only when a blocking hook response or a failed tool result carries that marker. Never kill Claude because an ordinary successful tool result contains the marker text. Kill the exact Claude process immediately after a real controller hard stop or timeout, and record the event that caused the stop.
+
+Separate a denied tool request from a hard stop. A default-deny controller can return a recoverable denial when it blocks an unexecuted inspection request or an unallowlisted command, so Claude can use an approved tool instead. Reserve the hard-stop marker for execution-identity failures, scope or integrity violations, unauthorized write or public-mutation attempts, ambiguous mutation outcomes, and invalid success evidence. A recoverable denial must never weaken the allowlist or execute the rejected request.
+
+Treat an out-of-repository `Read`, `Glob`, or `Grep` request as a recoverable denial when the PreToolUse hook proves that it blocked the request before execution. Keep an out-of-scope write, an unproved inspection outcome, or an execution-identity mismatch as a hard stop. Do not discard a long-running session merely because Claude requested a user-memory or tool-state file that the controller safely refused to expose.
+
+For an authorized GitHub mutation, validate the native API response against the exact expected object and write a create-new, read-only receipt. Treat that response and receipt as the immediate idempotency boundary. Perform a separate authenticated reconciliation read. Do not repeat a non-idempotent mutation only because an immediate read is stale or because the response is JSON text inside a tool's `stdout` field.
+
+Record an authorized public-mutation request separately from a receipt-proved mutation. A request that a PreToolUse hook blocks is not a mutation. A successful API response without its expected receipt is ambiguous until reconciliation; do not label it as either proved success or proved non-execution.
+
+After a safe stop, preserve any complete, validated analysis or decision artifact. Pin its byte identity in the next manifest, prevent silent rewrites, and resume from that durable boundary. Do not spend another Claude invocation repeating analysis whose exact output is already validated and applicable to the unchanged review comment and head.
+
+Keep prompts small. Do not require Claude to read the controller source. Do not require an explicit read of an instruction file that Claude Code already loaded into its context. Give Claude the manifest path, the exact finding context, the required decision process, and the allowed next action. Use focused validation during analysis and a full task-local validation only after reviewable bytes change or before the gate closes.
+
+When a finding spans a large file, add small, line-anchored context windows to the manifest or continuation prompt. Pin them to the expected head and identify the symbols or commands that make each window relevant. Include the exact test entry points and generated-contract locations that the change can affect. Require Claude to verify the live anchors before editing, but do not make it rediscover every relevant region by reading the full file in chunks.
+
+If an approved change affects generated or self-referential identity metadata, put the required calculator or refresh operation in the manifest as an exact command with a pinned helper identity. Prefer a read-only calculator that emits structured evidence. Prove that it does not change tracked bytes, then let Claude use the reported values through approved edits. Do not force Claude to guess a digest, search for an unallowlisted helper, or restart only because the fixed-point calculation was absent from the initial allowlist.
+
+Treat the controller as reusable production code. Before launch, exercise the real hook entry point with table-driven payloads for each lifecycle boundary: before any reply, after each receipt, after all receipts but before the first tracked edit, after the first tracked edit, and before validation. Assert the exact allow, recoverable-deny, or hard-stop outcome and prove that a probe did not execute its requested mutation. Include language-specific namespace and case-collision checks when the controller language can alias names that look distinct.
+
 If the runtime supports a persistent goal primitive, create or resume one goal for the entire plan. The filesystem tracker and verified repository/GitHub state remain authoritative after compaction; conversational memory and executor reports do not.
 
 ## Durable orchestration tracker
@@ -93,7 +150,7 @@ Give the executor:
 - The executor's retry context, if any, in a separately labeled section that does not weaken or replace the task.
 - A required final report containing task number, `COMPLETED`, `IN_PROGRESS`, `FAILED`, or `BLOCKED`; files and external objects changed; exact identities; commands and exit codes; evidence URLs; validation results; remaining risks; and the exact `Complete when` proof.
 
-For a Codex task, spawn the fresh `gpt-5.6-sol`/`xhigh` executor and wait for its final result. For a Claude review-loop task, invoke Claude Code non-interactively with the verified Opus 4.8 / maximum-reasoning configuration and an exact task prompt, monitor it to completion, and capture its native exit code. Do not run another executor while it is active.
+For a Codex task, spawn the fresh `gpt-5.6-sol`/`xhigh` executor and wait for its final result. For a Claude review-loop task, invoke Claude Code non-interactively with the verified Opus 4.8 / maximum-reasoning configuration and an exact task prompt, use the observability controls above, monitor it to completion, and capture its native exit code. Do not run another executor while it is active.
 
 The parent does not perform the task's substantive implementation. The parent can maintain the tracker, extract and hash prompts, inspect artifacts and diffs, query GitHub, run independent validation, and decide whether to complete, continue, retry, or block the task.
 
