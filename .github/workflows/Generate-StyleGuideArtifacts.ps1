@@ -872,7 +872,7 @@ function Initialize-WindowsFileIdentityType {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 1.0.20260818.0
     #
     # This function declares no parameters.
     param ()
@@ -963,7 +963,7 @@ function Get-OrdinaryFileIdentity {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 1.0.20260818.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1784,7 +1784,7 @@ function Write-StyleGuideArtifact {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 1.0.20260818.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
