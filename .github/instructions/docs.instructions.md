@@ -7,7 +7,7 @@ description: "Documentation standards:  contract-first, traceable, drift-resista
 
 # Documentation Writing Style
 
-**Version:** 1.6.20260821.0
+**Version:** 1.6.20260821.1
 
 ## Metadata
 
@@ -60,7 +60,7 @@ This repository classifies documents into two tiers based on their primary audie
 
 The metadata header block is **REQUIRED** for documents whose primary purpose is governance, specification, instruction, process, runbook, or ADR-style design rationale. Tier 1 covers, for example:
 
-- Repository-level instruction files such as `.github/copilot-instructions.md` and files matching `.github/instructions/*.instructions.md`.
+- Repository-level instruction files matching `.github/instructions/*.instructions.md`. The repository's `.github/copilot-instructions.md` remains governed instruction content but is an explicit exception to the visible metadata-header requirement and MUST remain listed explicitly as `RequiresMetadata = $false` in the validator catalog.
 - Root agent entry-point files such as `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.hermes.md`, and future equivalents.
 - Cursor project rules matching `.cursor/rules/*.mdc`.
 - ADR-style or formal design-decision records, regardless of where they live (`.github/`, `docs/`, or another documented ADR/design-decision location).
@@ -209,7 +209,7 @@ Compliant (explicitly scoped pre-change reference):
 
 #### Reproducible source citations
 
-When committed Markdown documentation, including analysis write-ups, research notes, review artifacts, and other durable Markdown records, cites sources or evidence, it **MUST** cite only sources another reader can inspect or reproduce from repository contents or clearly linked public references. This is the Markdown-specific application of the [Repository Self-Containment](../copilot-instructions.md#repository-self-containment) rule, not a separate source-of-truth rule.
+When committed Markdown documentation, including analysis write-ups, research notes, review artifacts, and other durable Markdown records, cites sources or evidence, it **MUST** cite only sources another reader can inspect or reproduce from repository contents or clearly linked public references. This subsection makes the repository's self-containment requirement concrete for Markdown citations; it does not create a separate source-of-truth rule.
 
 When citing sources or evidence, Markdown authors **MUST NOT** use machine-local or ephemeral filesystem paths outside the repository, including temporary caches, agent work directories, per-host checkout directories, or tool cache paths. Authors **MUST NOT** use internal-only session/tool routes, including agent-internal skill names, session-scoped MCP resources, local connector aliases, or other non-public helper routes, as authoritative sources or evidence. Instead, cite stable sources such as repo-relative paths to committed files, canonical public documentation, or upstream repository references, following this file's existing link conventions.
 

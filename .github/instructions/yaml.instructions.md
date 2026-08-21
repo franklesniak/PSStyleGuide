@@ -7,7 +7,7 @@ description: "YAML authoring standards: explicit, conservative, schema-backed, a
 
 # YAML Writing Style
 
-**Version:** 1.6.20260821.5
+**Version:** 1.6.20260821.6
 
 ## Metadata
 
@@ -15,7 +15,7 @@ description: "YAML authoring standards: explicit, conservative, schema-backed, a
 - **Owner:** Repository Maintainers
 - **Last Updated:** 2026-08-21
 - **Scope:** Defines authoring standards for all YAML files in this repository, including GitHub Actions workflows, Azure Pipelines YAML, pre-commit configuration, linter configuration, and any other human-authored YAML configuration. Does not cover JSON files (covered by the companion JSON guide, if present) or generated YAML artifacts that are owned by another tool's serializer.
-- **Related:** [Repository Copilot Instructions](../copilot-instructions.md), [`.gitattributes` Rules](./gitattributes.instructions.md)
+- **Related:** [Repository Copilot Instructions](../copilot-instructions.md), [Repository Git Attributes](../../.gitattributes), [Pre-commit Configuration](../../.pre-commit-config.yaml)
 
 ## Purpose and Scope
 
@@ -61,7 +61,7 @@ To keep YAML safe to edit, easy to diff, and portable across parsers, this repos
 - Indentation **MUST** be exactly **2 spaces** per level. Tabs **MUST NOT** appear in YAML files.
 - Block style **MUST** be the default for mappings and sequences. Flow style (`{key: value}`, `[a, b, c]`) **MAY** be used only for short, obviously-bounded inline values where block style would be visually disruptive.
 - Document separators (`---`, `...`) **SHOULD NOT** appear in single-document files. Multi-document YAML files **MAY** use `---` separators when the consumer requires multi-document input (for example, Kubernetes manifest bundles) or when the file format mandates a leading `---`.
-- Files **SHOULD NOT** contain trailing whitespace and **SHOULD** end with a single newline. Line-ending, BOM, EOF newline, and trailing-whitespace policy at the Git layer is owned by [`.gitattributes` Rules](./gitattributes.instructions.md); this guide does not duplicate or contradict it.
+- Files **SHOULD NOT** contain trailing whitespace and **SHOULD** end with a single newline. The root [`.gitattributes`](../../.gitattributes) file normalizes tracked text to LF, while the repository's active EOF-newline and trailing-whitespace checks are defined by the [pre-commit configuration](../../.pre-commit-config.yaml). YAML files **MUST** use UTF-8 without a byte-order mark (BOM).
 
 ## Quoting Rules
 
