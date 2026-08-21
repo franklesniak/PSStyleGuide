@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD013 -->
 # Agent Instructions for OpenAI Codex CLI
 
-**Version:** 1.5.20260821.0
+**Version:** 1.5.20260821.1
 
 ## Metadata
 
@@ -123,7 +123,6 @@ Steps 3 through 5 are mandatory for every finding that step 2 confirms is real, 
 These terms apply to the review-comment workflow below and defer to the canonical **Protected Instruction Files** rule in [`.github/copilot-instructions.md`](.github/copilot-instructions.md):
 
 - **Protected instruction file:** Any file covered by the canonical Protected Instruction Files rule, including `.github/copilot-instructions.md`, the root agent entry points (`.hermes.md`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`), files under `.github/instructions/`, and files under `.cursor/rules/`.
-- **Protected security-critical file:** A non-instruction file that the canonical **Protected Security-Critical Files** rule in [`.github/copilot-instructions.md`](.github/copilot-instructions.md) designates, currently `.devcontainer/features/hardened-devcontainer/finalize-toolchain.sh`. It receives the same authorization gate as a protected instruction file, except that a change derived from this review-comment adjudication process carries the owner's standing authorization, so an active review loop does not stall on it.
 - **Explicit protected-file authorization:** A direct maintainer or owner instruction in the current task authorizing the specific protected instruction-file change, either by naming the file or by clearly bounding the protected-file change set. The following are not sufficient on their own: a PR existing, a review comment existing, a generic "address the feedback" request, a reusable prompt, an automated review loop or active review workflow, or generic branch-placement authorization.
 - **Already in the PR's scope:** The protected file appears in the PR's changed-files list or diff against its base branch before the review-driven edit under consideration. This is relevant context, not authorization.
 - **Newly introduced protected file:** A protected file the PR did not modify before the review-driven edit. Introducing one exceeds any authorization scoped to the PR's existing changes and requires the narrow authorization question in step 7.

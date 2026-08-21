@@ -3,6 +3,8 @@ name: Copilot setup steps
 on:
   workflow_dispatch:
   push:
+    branches:
+      - "**"
     paths:
       - .github/workflows/copilot-setup-steps.yml
       - .github/workflows/package.json
