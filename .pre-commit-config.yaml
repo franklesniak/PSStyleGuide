@@ -1,0 +1,88 @@
+# Pre-commit configuration for PSStyleGuide.
+#
+# Remote hooks validate the repository's JSON, YAML, workflow, whitespace, and
+# line-ending contracts. The local hook runs the repository-owned instruction
+# validator without downloading or executing a proposed dependency.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: "v6.0.0"
+    hooks:
+      - id: check-json
+        files: >-
+          (?x)^(
+            package(-lock)?\.json|
+            \.github/workflows/package(-lock)?\.json|
+            \.github/workflows/(style-guide-candidate-cases|workflow-policy-cases|workflow-policy-contract)\.json
+          )$
+      - id: check-yaml
+        files: >-
+          (?x)^(
+            \.pre-commit-config\.yaml|
+            \.github/dependabot\.yml|
+            \.github/workflows/.*\.ya?ml
+          )$
+      - id: end-of-file-fixer
+        files: >-
+          (?x)^(
+            \.codex/config\.toml|
+            (AGENTS|CLAUDE)\.md|
+            package(-lock)?\.json|
+            \.pre-commit-config\.yaml|
+            \.github/copilot-instructions\.md|
+            \.github/instructions/.*\.instructions\.md|
+            \.github/workflows/.*\.(mjs|ps1|ya?ml)
+          )$
+      - id: trailing-whitespace
+        args:
+          - --markdown-linebreak-ext=md
+        files: >-
+          (?x)^(
+            \.codex/config\.toml|
+            (AGENTS|CLAUDE)\.md|
+            package(-lock)?\.json|
+            \.pre-commit-config\.yaml|
+            \.github/copilot-instructions\.md|
+            \.github/instructions/.*\.instructions\.md|
+            \.github/workflows/.*\.(mjs|ps1|ya?ml)
+          )$
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: "v1.38.0"
+    hooks:
+      - id: yamllint
+        args:
+          - --config-data
+          - |
+            extends: default
+            rules:
+              line-length:
+                level: warning
+              truthy:
+                check-keys: false
+        files: >-
+          ^(\.pre-commit-config\.yaml|\.github/dependabot\.yml|\.github/workflows/.*\.ya?ml)$
+
+  - repo: https://github.com/rhysd/actionlint
+    rev: "v1.7.12"
+    hooks:
+      - id: actionlint
+        files: ^\.github/workflows/.*\.ya?ml$
+
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: "0.37.4"
+    hooks:
+      - id: check-dependabot
+        files: ^\.github/dependabot\.yml$
+      - id: check-github-workflows
+        files: ^\.github/workflows/.*\.ya?ml$
+
+  - repo: local
+    hooks:
+      - id: agent-instruction-contract
+        name: agent instruction contract and mutation tests
+        entry: >-
+          pwsh -NoLogo -NoProfile -NonInteractive -File
+          .github/workflows/Test-AgentInstructions.ps1 -SelfTest
+        language: system
+        pass_filenames: false
+        always_run: true
