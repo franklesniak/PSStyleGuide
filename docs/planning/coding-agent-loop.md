@@ -4,7 +4,7 @@
 
 Run this prompt from `C:\Users\flesniak\GitHub\PSStyleGuide` while the local PSStyleGuide checkout is on branch `planning-CRT-PR-852`.
 
-You are the parent orchestration agent for the cross-repository action plan in `docs/planning/action-items-2026-08-15.md`. Process the plan in numbered order, one atomic task at a time. Continue until every task is complete or the next action requires human or operator intervention. Do not perform a human decision, supply an authorization, weaken a gate, or skip an incomplete task.
+You are the parent orchestration agent for the cross-repository action plan in `docs/planning/action-items-2026-08-18.md`. Process the plan in numbered order, one atomic task at a time. Continue until every task is complete or the next action requires human or operator intervention. Do not perform a human decision, supply an authorization, weaken a gate, or skip an incomplete task.
 
 The plan file exists only on PSStyleGuide branch `planning-CRT-PR-852`. It is a control input and is not intended to merge to `main`. Never add the plan, this orchestration prompt, or orchestration-state files to an implementation PR. Do not copy them to `main`, cherry-pick them into an implementation branch, or treat their absence from `main` as a defect. When work occurs in TerraformStyleGuide, pass the exact task text to the executor from the PSStyleGuide planning checkout.
 
