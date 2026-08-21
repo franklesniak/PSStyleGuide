@@ -246,6 +246,14 @@ FileSystem-provider-qualified absolute strings. Obtain one deterministic
 provider-internal path, normalize once, compare ordinal-ignore-case on Windows
 and ordinal elsewhere, and use separator-aware equality/descendant tests.
 
+Every exact-cardinality filesystem scan for `N` entries stops after
+`N + 1` results and retains no more than those results. A leaf-absence scan
+consumes one enumeration to completion without accumulating the completed
+sequence. It stops early on a matching, unreadable, or unclassifiable entry.
+Cleanup or ownership uncertainty retains state. Production paths do not use
+`Directory.GetFileSystemEntries`, `.ToArray()`, `.ToList()`, or another
+operation that first materializes the complete result.
+
 Require checkout and trusted roots to be existing ordinary directories and
 mutually non-overlapping. Download/candidate paths are strict descendants of
 the trusted root and outside checkout. Lexically inspect every existing
@@ -499,6 +507,37 @@ exception stack, environment, archive contents, or secrets. A separate bounded
 run envelope may record UTC start/end and tool/catalog hashes without changing
 per-case equality.
 
+## Harness-only implementation proof
+
+The separate normative manifest `PS-P1A-HARNESS-PROOFS-v1` has exactly one
+row. It proves an implementation property that has no different public result,
+so it does not add a row to the 110-row functional case catalog.
+
+The proof row has the closed schema:
+
+```text
+Id SemanticCase Applicability ProductionBoundary
+Control Perturbation ExpectedStatus ExpectedPhase ExpectedPostcondition
+```
+
+| ID | `SemanticCase` | Applicability | Exact control and perturbation | Singular proof oracle |
+| --- | --- | --- | --- | --- |
+| `PS-P1A-H-01` | `harness.resource.bounded-cardinality-enumeration` | Windows PowerShell 5.1 on Windows; PowerShell 7 on Windows; PowerShell 7 on Ubuntu | Parse the exact supplied helper and context-manager command trees. Derive one temporary traced copy from the exact source and prove an exact-count check for `N` advances its source at most `N + 1` times. Derive one temporary mutant that eagerly materializes that source; the static proof must reject it before execution. | pass/status 0/`harness-proof` only when the exact-source syntax tree is valid, the traced bound is `N + 1` or less, the eager mutant is rejected, and the positive control preserves the original production result and filesystem postcondition |
+
+The harness records the exact source commit, blob IDs, SHA-256 values,
+deterministic source-to-copy transformation identity, temporary-copy hashes,
+parser errors, trace count, and final filesystem state. It removes the
+temporary proof copies after results are sealed. A proof copy never becomes a
+production entry point. Production scripts gain no test switch or environment
+backdoor.
+
+Exactly three proof results exist, one on each required runtime cell. Startup
+validates the manifest version, closed schema, literal one-ID set, semantic key,
+applicability, and expected `(ID,runtime)` pairs. Completion rejects a missing,
+duplicate, unknown, skipped, orphaned, or multiply emitted proof result. It
+retains the manifest version, canonical expanded SHA-256, expected/result
+counts, and per-runtime totals.
+
 ## Reciprocal P1A↔T1A comparison
 
 At implementation start and before merge compare exact landed PSStyleGuide and
@@ -513,6 +552,11 @@ Join on `SemanticCase` plus optional variant; classify PS-only/T-only cases.
 Record exact evidence and `same`, `intentional difference`, or `blocker`.
 Manifest filenames may differ intentionally; unexplained security/failure
 differences block merge.
+
+Map `PS-P1A-H-01` to T1A's bounded-enumeration proof. Classify T1A's
+pre-journal competing-writer proof as an intentional model difference because
+P1A explicitly excludes a competing untrusted writer. This classification does
+not weaken P1A's exact-count or absence-scan resource bound.
 
 ## Validation
 
@@ -529,6 +573,8 @@ Static and dynamic checks prove:
 - context/journal/result ordered schemas and every mutation are rejected;
 - terminal repeats perform zero filesystem/native calls;
 - one held archive stream and exact validation/extraction order are observed;
+- every exact-count scan retains at most `N + 1` entries, every absence scan
+  uses one nonaccumulating stream, and the eager mutant is rejected;
 - every catalog case executes once on its declared runtime set;
 - expected production rejections with matching actual diagnostics count as
   harness pass, while missing/duplicate/unexpected/status/diagnostic/skip/total
@@ -561,6 +607,9 @@ commit, and not required by the production harness.
 - [ ] The authoritative catalog contains exactly 110 unique physical namespaced
       rows/profiles and
       semantic keys, with exact case×runtime results and honest skips.
+- [ ] `PS-P1A-HARNESS-PROOFS-v1` contains exactly one row and three runtime
+      results; the bounded-enumeration proof passes its control and trace and
+      rejects eager materialization.
 - [ ] Expected/actual production outcomes and diagnostics are distinct from
       harness pass/fail/skip judgment.
 - [ ] Supplied helper/context scripts are fixed trusted HEAD/index/no-filter
@@ -576,8 +625,9 @@ commit, and not required by the production harness.
 Give P1B permanent P1A issue/PR URLs, reviewed head/base, merge method, landed
 commit/tree, all three script versions/hashes, catalog schema/version/hash,
 exact public function/result schemas, trusted-script Git identity proof,
-per-runtime JSONL/run evidence, primitive probes, cleanup/zero-call proof,
-final path-set proof, and P1A↔T1A matrix. P1B compares these landed identities
+per-runtime JSONL/run evidence, harness-proof manifest/hash/results, primitive
+probes, cleanup/zero-call proof, final path-set proof, and P1A↔T1A matrix. P1B
+compares these landed identities
 with its assumptions before activating anything.
 
 ## Non-goals
