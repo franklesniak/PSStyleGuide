@@ -42,7 +42,7 @@
 # This validator keeps explicit backtick continuations so that large
 # named-parameter mutation calls remain auditable one argument per line.
 # Private helpers have focused examples. The -SelfTest suite covers edge cases.
-# Version: 1.2.20260821.22
+# Version: 1.2.20260822.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -2080,6 +2080,60 @@ function ConvertTo-MetadataComparisonText {
     }
 
     return $listNormalizedLines -join "`n"
+}
+
+function Test-GovernedInstructionPath {
+    # .SYNOPSIS
+    # Tests whether a repository-relative path is a governed instruction.
+    #
+    # .DESCRIPTION
+    # Matches the closed set of governed root paths and the supported recursive
+    # instruction-file families with ordinal, case-sensitive semantics.
+    #
+    # .PARAMETER RepositoryRelativePath
+    # The repository-relative path to classify.
+    #
+    # .PARAMETER GovernedRootPaths
+    # The exact governed root paths.
+    #
+    # .EXAMPLE
+    # Test-GovernedInstructionPath -RepositoryRelativePath 'tools/CLAUDE.md' `
+    #     -GovernedRootPaths @('AGENTS.md', 'CLAUDE.md')
+    #
+    # # Returns true for the documented nested Claude instruction surface.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [bool] True when the path belongs to a governed instruction family.
+    #
+    # .NOTES
+    # Private helper; no positional parameters. Version: 1.0.20260822.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $RepositoryRelativePath,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $GovernedRootPaths
+    )
+
+    return (
+        $GovernedRootPaths -ccontains $RepositoryRelativePath -or
+        $RepositoryRelativePath -cmatch `
+            '^(?:[^/]+/)*AGENTS(?:\.override)?\.md$' -or
+        $RepositoryRelativePath -cmatch `
+            '^(?:[^/]+/)*CLAUDE\.md$' -or
+        $RepositoryRelativePath -cmatch `
+            '^\.github/instructions/[^/]+\.instructions\.md$' -or
+        $RepositoryRelativePath -cmatch `
+            '^\.cursor/rules/[^/]+\.mdc$' -or
+        $RepositoryRelativePath -cmatch `
+            '^\.claude/rules/(?:[^/]+/)*[^/]+\.md$'
+    )
 }
 
 function Get-GovernedInstructionInventoryFailure {
@@ -4190,20 +4244,18 @@ if ($LASTEXITCODE -ne 0) {
     throw 'Could not enumerate tracked files for the governed instruction inventory.'
 }
 $arrGovernedRootPaths = @(
+    '.hermes.md',
     'AGENTS.md',
     'CLAUDE.md',
+    'GEMINI.md',
     '.github/copilot-instructions.md'
 )
 $arrTrackedGovernedInstructionPaths = @(
     $arrTrackedRepositoryPaths |
         Where-Object {
-            $strTrackedPath = [string] $_
-            $arrGovernedRootPaths -ccontains $strTrackedPath -or
-            $strTrackedPath -cmatch `
-                '^(?:[^/]+/)*AGENTS(?:\.override)?\.md$' -or
-            $strTrackedPath -cmatch `
-                '^\.github/instructions/[^/]+\.instructions\.md$' -or
-            $strTrackedPath -cmatch '^\.cursor/rules/[^/]+\.mdc$'
+            Test-GovernedInstructionPath `
+                -RepositoryRelativePath ([string] $_) `
+                -GovernedRootPaths $arrGovernedRootPaths
         }
 )
 $arrGovernedInstructionInventoryFailures = @(
@@ -4530,30 +4582,53 @@ if ($SelfTest) {
         throw 'The governed-instruction inventory mutation did not fail closed.'
     }
 
-    $arrUncatalogedCodexInstructionPaths = @(
+    if ($arrTrackedGovernedInstructionPaths -cnotcontains 'CLAUDE.md' -or
+        @($arrGovernedInstructionDocuments.Path) -cnotcontains 'CLAUDE.md') {
+        throw 'The supported root CLAUDE.md instruction is not cataloged.'
+    }
+
+    $arrUncatalogedGovernedInstructionPaths = @(
+        '.hermes.md',
+        'GEMINI.md',
         'tools/AGENTS.md',
         'AGENTS.override.md',
-        'tools/AGENTS.override.md'
+        'tools/AGENTS.override.md',
+        '.claude/CLAUDE.md',
+        'tools/CLAUDE.md',
+        '.claude/rules/base.md',
+        '.claude/rules/frontend/base.md'
     )
-    foreach ($strUncatalogedCodexInstructionPath in $arrUncatalogedCodexInstructionPaths) {
-        $arrCodexInstructionInventoryFailures = @(
+    foreach (
+        $strUncatalogedGovernedInstructionPath in
+            $arrUncatalogedGovernedInstructionPaths
+    ) {
+        if (-not (Test-GovernedInstructionPath `
+                    -RepositoryRelativePath $strUncatalogedGovernedInstructionPath `
+                    -GovernedRootPaths $arrGovernedRootPaths)) {
+            throw (
+                'The governed-instruction selector omitted a documented surface: ' +
+                $strUncatalogedGovernedInstructionPath
+            )
+        }
+
+        $arrGovernedInstructionInventoryFailures = @(
             Get-GovernedInstructionInventoryFailure `
                 -CatalogPaths @($arrGovernedInstructionDocuments.Path) `
                 -TrackedPaths @(
                     $arrTrackedGovernedInstructionPaths +
-                        $strUncatalogedCodexInstructionPath
+                        $strUncatalogedGovernedInstructionPath
                 )
         )
-        $strExpectedCodexInstructionFailure =
+        $strExpectedGovernedInstructionFailure =
             'Tracked governed instruction is missing from the catalog: ' +
-            $strUncatalogedCodexInstructionPath
+            $strUncatalogedGovernedInstructionPath
         if (-not (
-                $arrCodexInstructionInventoryFailures -ccontains `
-                    $strExpectedCodexInstructionFailure
+                $arrGovernedInstructionInventoryFailures -ccontains `
+                    $strExpectedGovernedInstructionFailure
             )) {
             throw (
-                'The uncataloged Codex instruction mutation did not fail closed: ' +
-                $strUncatalogedCodexInstructionPath
+                'The uncataloged governed instruction mutation did not fail closed: ' +
+                $strUncatalogedGovernedInstructionPath
             )
         }
     }
@@ -5960,24 +6035,45 @@ if ($SelfTest) {
                     '^      - "\*\*"\r?\n$') {
                 throw 'The push agent-validation trigger must cover all branches and exclude tags.'
             }
-        }
-        $objPathFilterMatch = [regex]::Match(
-            $objTriggerMatch.Groups['Body'].Value,
-            '(?ms)^    paths:\r?\n(?<Paths>(?:      - [^\r\n]+\r?\n)+)'
-        )
-        if (-not $objPathFilterMatch.Success) {
-            throw "Could not parse the $strTrigger agent-validation path filter."
-        }
-        foreach ($strAttributePath in $script:arrCheckoutAttributePaths) {
-            if (-not [regex]::IsMatch(
-                    $objPathFilterMatch.Groups['Paths'].Value,
-                    "(?m)^      - $([regex]::Escape($strAttributePath))\r?$"
+
+            $objPathFilterMatch = [regex]::Match(
+                $objTriggerMatch.Groups['Body'].Value,
+                '(?ms)^    paths:\r?\n(?<Paths>(?:      - [^\r\n]+\r?\n)+)'
+            )
+            if (-not $objPathFilterMatch.Success) {
+                throw 'Could not parse the push agent-validation path filter.'
+            }
+            foreach ($strAttributePath in $script:arrCheckoutAttributePaths) {
+                if (-not [regex]::IsMatch(
+                        $objPathFilterMatch.Groups['Paths'].Value,
+                        "(?m)^      - $([regex]::Escape($strAttributePath))\r?$"
+                    )) {
+                    throw "Push does not cover checkout attribute path $strAttributePath."
+                }
+                if ($script:arrTrustRootPaths -cnotcontains $strAttributePath) {
+                    throw "The trust-root gate omits checkout attribute path $strAttributePath."
+                }
+            }
+            foreach ($strClaudeInstructionPattern in @(
+                    "'**/CLAUDE.md'",
+                    "'.claude/rules/**/*.md'"
                 )) {
-                throw "$strTrigger does not cover checkout attribute path $strAttributePath."
+                if (-not [regex]::IsMatch(
+                        $objPathFilterMatch.Groups['Paths'].Value,
+                        "(?m)^      - $([regex]::Escape(
+                                    $strClaudeInstructionPattern
+                                ))\r?$"
+                    )) {
+                    throw (
+                        'Push does not cover Claude instruction path pattern ' +
+                        $strClaudeInstructionPattern
+                    )
+                }
             }
-            if ($script:arrTrustRootPaths -cnotcontains $strAttributePath) {
-                throw "The trust-root gate omits checkout attribute path $strAttributePath."
-            }
+        }
+        elseif ($objTriggerMatch.Groups['Body'].Value -cmatch
+            '(?m)^    paths(?:-ignore)?:') {
+            throw 'pull_request_target must not use a paths or paths-ignore filter.'
         }
     }
 

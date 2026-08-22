@@ -21,33 +21,13 @@ on:
       - .npmrc
       - '**/AGENTS.md'
       - '**/AGENTS.override.md'
-      - CLAUDE.md
+      - '**/CLAUDE.md'
+      - '.claude/rules/**/*.md'
       - GEMINI.md
       - npm-shrinkwrap.json
       - package-lock.json
       - package.json
   pull_request_target:
-    paths:
-      - .gitattributes
-      - .github/.gitattributes
-      - .github/workflows/.gitattributes
-      - .codex/config.toml
-      - .cursor/rules/*.mdc
-      - .github/copilot-instructions.md
-      - .github/instructions/*.instructions.md
-      - .github/instructions/docs.instructions.md
-      - .github/workflows/agent-instructions.yml
-      - .github/workflows/Test-AgentInstructionParserManifest.mjs
-      - .github/workflows/Test-AgentInstructions.ps1
-      - .hermes.md
-      - .npmrc
-      - '**/AGENTS.md'
-      - '**/AGENTS.override.md'
-      - CLAUDE.md
-      - GEMINI.md
-      - npm-shrinkwrap.json
-      - package-lock.json
-      - package.json
 
 permissions:
   contents: read

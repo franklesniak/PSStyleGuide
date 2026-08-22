@@ -7,13 +7,13 @@ description: "Documentation standards:  contract-first, traceable, drift-resista
 
 # Documentation Writing Style
 
-**Version:** 1.6.20260821.1
+**Version:** 1.6.20260822.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-08-21
+- **Last Updated:** 2026-08-22
 - **Scope:** Defines documentation standards for Markdown (`**/*.md`) and Cursor Markdown rule (`**/*.mdc`) files in this repository, including specs, design docs, runbooks, ADRs, instruction files, and developer documentation. Does not cover code comments or inline documentation in source files.
 - **Related:** [Repository Copilot Instructions](../copilot-instructions.md)
 
@@ -37,20 +37,18 @@ This file governs all Markdown (`**/*.md`) and Cursor Markdown rule (`**/*.mdc`)
 
 ## Documentation Taxonomy
 
-- **Product spec:** `docs/spec/` (requirements + design; the source of truth)
-- **Developer docs:** `docs/` (how to build, test, extend)
-- **Operational docs / runbooks:** `docs/runbooks/` (diagnosis, remediation, safe operations)
-- **Architecture Decision Records (ADRs):** `docs/adr/` (durable decisions)
+- **Normative PowerShell style:** `STYLE_GUIDE.md` (required rules and examples)
+- **PowerShell style rationale:** `STYLE_GUIDE_RATIONALE.md` (rationale and trade-offs)
+- **Developer documentation:** `docs/` (how to build, test, extend, and operate)
+- **Decision records:** `docs/decisions/` (durable repository decisions)
 
-If you introduce a new **top-level documentation category** (a bucket that represents a distinct kind of doc, such as specs vs. runbooks vs. ADRs), it MUST be added to this taxonomy section. Purely **organizational subdirectories under an existing category** (for example, grouping related developer docs under `docs/<topic>/`) are a filing convention, MUST NOT be treated as new top-level categories, and MUST NOT trigger an update to this section. When in doubt, prefer treating a new directory as a subdirectory of an existing category unless it represents a fundamentally different kind of document.
+If you introduce a new **top-level documentation category** (a bucket that represents a distinct kind of document), it MUST be added to this taxonomy section. Purely **organizational subdirectories under an existing category** (for example, grouping related developer docs under `docs/<topic>/`) are a filing convention, MUST NOT be treated as new top-level categories, and MUST NOT trigger an update to this section. When in doubt, prefer treating a new directory as a subdirectory of an existing category unless it represents a fundamentally different kind of document.
 
-> **Customize for your project:** The taxonomy categories shown above are recommendations, not requirements. Projects SHOULD update this taxonomy to reflect their actual documentation structure. Categories MAY be added, removed, or renamed as appropriate for the project's needs.
+This taxonomy is specific to PSStyleGuide and MUST be updated when the repository's documentation ownership or tracked structure changes.
 
 ## Canonical Source of Truth
 
-Projects SHOULD define a canonical specification document (e.g., `docs/spec/requirements.md`) that serves as the authoritative reference for system behavior and requirements. If a canonical spec is defined, all other documentation (design docs, runbooks, README, etc.) MUST align with it.
-
-> **Customize for your project:** The location and structure of your canonical specification is project-specific. Common patterns include `docs/spec/requirements.md`, `docs/SPEC.md`, or similar. Choose a location that fits your project's documentation organization and update this guidance accordingly.
+`STYLE_GUIDE.md` is the authoritative source for normative PowerShell style requirements. `STYLE_GUIDE_RATIONALE.md` owns the rationale and trade-offs for those requirements and MUST remain aligned with the normative guide. Developer documentation under `docs/` and durable decisions under `docs/decisions/` MUST link to these sources rather than redefine conflicting PowerShell style requirements.
 
 ## Metadata Header Block Policy (Tiered by Audience)
 
@@ -132,7 +130,7 @@ A non-normative historical artifact is a Markdown file committed to preserve pro
 - **Note placement.** The explanatory note MUST appear immediately after the H1, or, when the file intentionally carries the metadata header block, immediately after that block. This follows the placement model above. Markdown files SHOULD still include the repository-standard `<!-- markdownlint-disable MD013 -->` portability directive described in **Markdown Conventions**.
 - **Optional metadata.** The file SHOULD NOT carry the metadata header block without a concrete consumer for that metadata, and SHOULD NOT carry a standalone `**Version:**` line unless a concrete consumer and synchronization convention are documented. When the metadata header block is intentionally present, authors MUST follow the placement and synchronization rules above, which govern any `**Version:**` line carried alongside it. A `**Version:**` line carried without the metadata header block has no `Last Updated` field to synchronize against and instead follows the documented synchronization convention recorded for that standalone line. Authors MUST NOT invent new metadata `Status` values such as `Historical`; use only the values allowed by the Tier 1 metadata policy.
 - **Preserved content fencing.** Authors SHOULD preserve prompts, transcripts, and excerpts inside fenced `text` code blocks. Authors MAY use a `markdown` fence only when rendering and linting the preserved Markdown, including the repository's nested-Markdown check, is intentional. If the preserved content contains triple-backtick fences, authors MUST use a longer outer backtick fence. Authors MUST NOT switch to tilde fences because this repository's markdownlint configuration enforces backtick fences.
-- **Fencing rationale.** Fenced code blocks keep preserved content from being parsed as live headings or directives. For an artifact under `docs/`, fenced code blocks also prevent the repo-local `check-prohibited-placeholders` pre-commit hook from flagging quoted `TODO:`, `TBD`, or `FIXME` text, because that hook skips fenced examples. Block quotes and other rendered quote forms are not equivalent for that exemption.
+- **Fencing rationale.** Fenced code blocks keep preserved content from being parsed as live headings or directives. For an artifact under `docs/`, fenced code blocks also distinguish quoted `TODO:`, `TBD`, or `FIXME` examples from active normative text during manual authoring and review. Block quotes and other rendered quote forms are not equivalent because they can still read as live requirements.
 - **Related sources.** The file SHOULD link to canonical repository documents or inspectable public sources it relates to when they exist, such as the specification, ADR, issue, public upstream source, or quoted source it was used to produce or review. These references MUST follow the existing reproducible-source and repository self-containment rules. Required interpretation MUST NOT depend on machine-local paths, agent session routes, private repositories, internal-only resources, or any other non-public resource.
 - **Scope limit.** This classification MUST NOT be used as a carve-out for active prompt or cookbook guides, runbooks, process docs, specifications, ADRs, or reusable operator guidance. Classify those documents by their current content under the ordinary Tier 1 and Tier 2 policy.
 - **Safety.** Historical provenance MUST NOT override existing safety rules. Authors MUST NOT commit secrets, credentials, private-only context, personal data that should not be published, or source material that cannot be safely or lawfully included.
@@ -193,18 +191,18 @@ Compliant (explicitly scoped pre-change reference):
 
 - Use fenced code blocks with language tags.
 - Avoid trailing whitespace; keep blank lines truly blank.
-- Prefer relative links within the repo (e.g., `docs/spec/requirements.md`). **Exception:** Markdown links inside `.github/ISSUE_TEMPLATE/*.yml` issue-form `value:` blocks (e.g., `bug_report.yml`), the `url:` values inside `.github/ISSUE_TEMPLATE/config.yml`'s `contact_links` entries, and links inside `.github/pull_request_template.md` MUST use absolute `https://github.com/OWNER/REPO/...` URLs — `https://github.com/OWNER/REPO/blob/HEAD/<path>` for repo-internal **file** targets and `https://github.com/OWNER/REPO/<other-path>` for non-file repo-internal targets such as the GitHub Security tab (`/security`), Discussions (`/discussions`), or Issues (`/issues`). See **Issue and PR templates** below.
+- Prefer relative links within the repo (e.g., `docs/decisions/0001-accept-in-repository-trust-root.md`). **Exception:** Markdown links inside `.github/ISSUE_TEMPLATE/*.yml` issue-form `value:` blocks (e.g., `bug_report.yml`), the `url:` values inside `.github/ISSUE_TEMPLATE/config.yml`'s `contact_links` entries, and links inside `.github/pull_request_template.md` MUST use absolute `https://github.com/OWNER/REPO/...` URLs — `https://github.com/OWNER/REPO/blob/HEAD/<path>` for repo-internal **file** targets and `https://github.com/OWNER/REPO/<other-path>` for non-file repo-internal targets such as the GitHub Security tab (`/security`), Discussions (`/discussions`), or Issues (`/issues`). See **Issue and PR templates** below.
 - Avoid raw URLs in prose; use descriptive link text when possible.
 - Markdown files in this repository SHOULD include `<!-- markdownlint-disable MD013 -->` immediately after any YAML front matter (or at the very top of the file if there is no front matter), and **before any other content**, including badges, links, the H1 heading, and any prose. A single optional blank line MAY appear between the front matter terminator (`---`) and the directive for readability; blank lines are not "content" for this rule.
   - Placement matters: markdownlint's inline `<!-- markdownlint-disable RULE -->` directive only suppresses the rule for content that follows it. Placing the directive after badges or other long lines leaves those lines unprotected when the file is processed with default markdownlint settings outside this repo.
-  - This intentionally duplicates the repo-wide `"MD013": false` setting in `.markdownlint.jsonc`.
+  - This intentionally duplicates the repo-wide `"MD013": false` setting in `.github/workflows/.markdownlint.jsonc`.
   - This is a deliberate **portability convention** for cases where a file is read or processed outside this repository, for example:
     - sent to an external LLM for analysis or editing
     - viewed by a tool that applies default markdownlint settings
     - imported into another project
   - The per-file directive helps ensure the file is interpreted with the same expectation that long lines (URLs, code samples, single-line paragraphs, tables) are acceptable.
-  - Per-file `<!-- markdownlint-disable RULE -->` directives MUST NOT contradict the configuration in `.markdownlint.jsonc`; their purpose is portability, not local override.
-  - When a contributor wants an additional rule disabled, update `.markdownlint.jsonc` first. Per-file directives are only for mirroring repo-wide configuration where default enforcement would harm portability.
+  - Per-file `<!-- markdownlint-disable RULE -->` directives MUST NOT contradict the configuration in `.github/workflows/.markdownlint.jsonc`; their purpose is portability, not local override.
+  - When a contributor wants an additional rule disabled, update `.github/workflows/.markdownlint.jsonc` first. Per-file directives are only for mirroring repo-wide configuration where default enforcement would harm portability.
 - Code-fence info strings MUST contain only a single language tag (e.g., `powershell`, `text`, `json`, `bash`). Do NOT embed file paths, URLs, or other metadata in the info string (for example, `powershell name=src/Foo.ps1 url=https://...#L1-L9` is not allowed). To cite the source of a code excerpt, place a line of the form ``Source: [`relative/path` (lines <start>-<end>)](relative/path#L<start>-L<end>).`` in prose immediately above the fence (for example, ``Source: [`src/Foo.ps1` (lines 1-9)](src/Foo.ps1#L1-L9).``). This keeps the language tag standard, preserves syntax highlighting across Markdown renderers, and reinforces the existing rule to avoid raw URLs in prose.
 
 #### Reproducible source citations
@@ -219,7 +217,7 @@ Where a claim rests on a local check, describe the check generically and reprodu
 
 #### Fenced code blocks inside list items
 
-When a bullet item includes a fenced code block followed by continuation prose that should render as part of the same bullet, the fence **and** the continuation prose **MUST** both be indented to the column after the bullet marker. For this repository's unordered `-` bullets, that is 2 spaces after the marker (markdownlint's MD007 default, which is not overridden in `.markdownlint.jsonc`). Within this pattern, blank lines between the bullet text, fence, and continuation prose **SHOULD** remain truly blank. Mixing an unindented fence with an indented continuation paragraph **MUST NOT** occur, because CommonMark-style renderers can end the list item at the unindented fence and then treat the continuation paragraph as a disconnected block.
+When a bullet item includes a fenced code block followed by continuation prose that should render as part of the same bullet, the fence **and** the continuation prose **MUST** both be indented to the column after the bullet marker. For this repository's unordered `-` bullets, that is 2 spaces after the marker (markdownlint's MD007 default, which is not overridden in `.github/workflows/.markdownlint.jsonc`). Within this pattern, blank lines between the bullet text, fence, and continuation prose **SHOULD** remain truly blank. Mixing an unindented fence with an indented continuation paragraph **MUST NOT** occur, because CommonMark-style renderers can end the list item at the unindented fence and then treat the continuation paragraph as a disconnected block.
 
 When no continuation prose follows the fence before the next sibling bullet or section, a fenced code block that is intended as a standalone example associated with the preceding bullet **MAY** be left at 0 indent. This preserves the existing repository convention used in standalone style-guide examples. To make the fence render as part of the bullet item, use the 2-space-indented pattern (per the MUST rule above).
 
@@ -319,13 +317,14 @@ The safer boundary is the whole comment line, so the substituted result is meani
 <!-- Support contact configured -->
 ```
 
-## ADR Standards
+## Decision Record Standards
 
-ADRs exist to prevent re-litigating decisions.
+Decision records exist to prevent re-litigating decisions.
 
-- File naming pattern: `docs/adr/ADR-0001-short-title.md`
-- ADRs MUST include:
-  - **Status:** Proposed | Accepted | Superseded | Deprecated
+- File naming pattern: `docs/decisions/NNNN-short-title.md`
+- Decision records MUST include:
+  - The Tier 1 **Status**, **Owner**, **Last Updated**, and **Scope** metadata fields.
+  - A separate narrative decision status or history, such as Proposed, Accepted, Superseded, or Deprecated.
   - **Context**
   - **Decision**
   - **Consequences:** positive and negative
@@ -438,7 +437,7 @@ Before merging, verify:
   - An explicit `**Assumption:**` labeled entry.
   - A cross-reference to another requirement or section that defines the value.
   This rule applies to unresolved requirements/specification content only. It does not ban legitimate template-substitution placeholders, didactic examples, migration notes, or code-comment TODO examples elsewhere in the repository.
-- Markdown files under `docs/**` are additionally checked by the repo-local `check-prohibited-placeholders` pre-commit hook for case-insensitive `TBD`, `TODO:`, `FIXME`, `XXX`, `to be determined`, and `(default ... to be determined)` placeholder forms. Remediate flagged lines with a measurable value, an explicit `**Open Question:**` entry, an explicit `**Assumption:**` entry, or a cross-reference to another requirement. The hook intentionally allows fenced examples, HTML comments, `CHANGELOG*.md` files, and a same-line `<!-- ALLOW-TBD: <reason> -->` marker when a brief suppression justification is necessary.
+- Authors and reviewers MUST manually inspect Markdown under `docs/**` for unresolved placeholder forms, including case-insensitive `TBD`, `TODO:`, `FIXME`, `XXX`, `to be determined`, and `(default ... to be determined)`. Remediate normative occurrences with a measurable value, an explicit `**Open Question:**` entry, an explicit `**Assumption:**` entry, or a cross-reference to another requirement. Fenced examples, HTML comments, changelog history, and clearly labeled didactic examples are allowed only when context makes clear that they are not unresolved repository requirements.
 - Contradictory statements between the spec and other docs
 - Vague guarantees without measurable definitions
 - Unowned open questions ("someone should figure out…")

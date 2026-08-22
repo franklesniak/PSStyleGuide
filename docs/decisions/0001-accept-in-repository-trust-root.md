@@ -1,5 +1,12 @@
 # Decision 0001: Accept the in-repository trust root for pull-request policy checks
 
+## Metadata
+
+- **Status:** Active
+- **Owner:** Repository Maintainers
+- **Last Updated:** 2026-08-22
+- **Scope:** Records the accepted in-repository trust-root limitation, its consequences, and the conditions that require reconsideration. Does not claim that the limitation is absent.
+
 ## Status
 
 Accepted on 2026-08-01 by Frank Lesniak, PSStyleGuide repository owner.
