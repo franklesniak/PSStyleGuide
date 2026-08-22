@@ -10,10 +10,9 @@ on:
       - .github/.gitattributes
       - .github/workflows/.gitattributes
       - .codex/config.toml
-      - .cursor/rules/*.mdc
+      - .cursor/rules/**/*.mdc
       - .github/copilot-instructions.md
-      - .github/instructions/*.instructions.md
-      - .github/instructions/docs.instructions.md
+      - .github/instructions/**/*.instructions.md
       - .github/workflows/agent-instructions.yml
       - .github/workflows/Test-AgentInstructionParserManifest.mjs
       - .github/workflows/Test-AgentInstructions.ps1
@@ -75,21 +74,19 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           set -euo pipefail
           [[ "${PR_HEAD_SHA}" =~ ^[0-9a-f]{40}$ ]]
-          [[ "${PR_NUMBER}" =~ ^[1-9][0-9]*$ ]]
           authorization="$(printf 'x-access-token:%s' "${GITHUB_TOKEN}" | base64 -w 0)"
           # An unexpected non-fast-forward local ref must fail closed.
           GIT_CONFIG_COUNT=1 \
             GIT_CONFIG_KEY_0="http.${GITHUB_SERVER_URL}/.extraheader" \
             GIT_CONFIG_VALUE_0="Authorization: Basic ${authorization}" \
             git fetch --no-tags --no-recurse-submodules origin \
-              "refs/pull/${PR_NUMBER}/head:refs/remotes/pull/${PR_NUMBER}/head"
+              "${PR_HEAD_SHA}:refs/remotes/event/pr-head"
           unset authorization
           fetched_head="$(git rev-parse --verify \
-            "refs/remotes/pull/${PR_NUMBER}/head^{commit}")"
+            'refs/remotes/event/pr-head^{commit}')"
           test "${fetched_head}" = "${PR_HEAD_SHA}"
           git diff --quiet --no-ext-diff
           git diff --cached --quiet --no-ext-diff

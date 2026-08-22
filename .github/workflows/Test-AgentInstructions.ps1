@@ -2128,9 +2128,9 @@ function Test-GovernedInstructionPath {
         $RepositoryRelativePath -cmatch `
             '^(?:[^/]+/)*CLAUDE\.md$' -or
         $RepositoryRelativePath -cmatch `
-            '^\.github/instructions/[^/]+\.instructions\.md$' -or
+            '^\.github/instructions/(?:[^/]+/)*[^/]+\.instructions\.md$' -or
         $RepositoryRelativePath -cmatch `
-            '^\.cursor/rules/[^/]+\.mdc$' -or
+            '^\.cursor/rules/(?:[^/]+/)*[^/]+\.mdc$' -or
         $RepositoryRelativePath -cmatch `
             '^\.claude/rules/(?:[^/]+/)*[^/]+\.md$'
     )
@@ -4568,26 +4568,16 @@ if ($SelfTest) {
         }
     }
 
-    $strFutureInstructionPath = '.github/instructions/future.instructions.md'
-    $arrInventoryMutationFailures = @(
-        Get-GovernedInstructionInventoryFailure `
-            -CatalogPaths @($arrGovernedInstructionDocuments.Path) `
-            -TrackedPaths @(
-                $arrTrackedGovernedInstructionPaths + $strFutureInstructionPath
-            )
-    )
-    $strExpectedInventoryFailure =
-        "Tracked governed instruction is missing from the catalog: $strFutureInstructionPath"
-    if (-not ($arrInventoryMutationFailures -ccontains $strExpectedInventoryFailure)) {
-        throw 'The governed-instruction inventory mutation did not fail closed.'
-    }
-
     if ($arrTrackedGovernedInstructionPaths -cnotcontains 'CLAUDE.md' -or
         @($arrGovernedInstructionDocuments.Path) -cnotcontains 'CLAUDE.md') {
         throw 'The supported root CLAUDE.md instruction is not cataloged.'
     }
 
     $arrUncatalogedGovernedInstructionPaths = @(
+        '.github/instructions/future.instructions.md',
+        '.github/instructions/team/future.instructions.md',
+        '.cursor/rules/future.mdc',
+        '.cursor/rules/team/future.mdc',
         '.hermes.md',
         'GEMINI.md',
         'tools/AGENTS.md',
@@ -6007,15 +5997,17 @@ if ($SelfTest) {
     if (-not $objProposedHeadFetch.Success) {
         throw 'Could not parse the proposed-head fetch command.'
     }
-    if ($objProposedHeadFetch.Groups['Command'].Value -notmatch
-        '"refs/pull/\$\{PR_NUMBER\}/head:refs/remotes/pull/\$\{PR_NUMBER\}/head"') {
-        throw 'The proposed-head fetch does not use the required local destination.'
+    $strProposedHeadFetchCommand = $objProposedHeadFetch.Groups['Command'].Value
+    if ($strProposedHeadFetchCommand -notmatch
+        '"\$\{PR_HEAD_SHA\}:refs/remotes/event/pr-head"') {
+        throw 'The proposed-head fetch does not use the immutable event revision.'
     }
-    if ($objProposedHeadFetch.Groups['Command'].Value -match
-            '"\+refs/pull/' -or
-        $objProposedHeadFetch.Groups['Command'].Value -match
-            '(?m)(^|\s)--force(\s|$)') {
-        throw 'The proposed-head fetch force-updates its local destination.'
+    if ($strProposedHeadFetchCommand -match
+            'refs/pull/\$\{PR_NUMBER\}/head' -or
+        $strProposedHeadFetchCommand -match
+            '(?m)(^|\s)--force(\s|$)' -or
+        $strProposedHeadFetchCommand -match '"\+[^" ]+:') {
+        throw 'The proposed-head fetch uses a mutable or forcing source.'
     }
     foreach ($strTrigger in @('push', 'pull_request_target')) {
         $objTriggerMatch = [regex]::Match(
@@ -6054,19 +6046,21 @@ if ($SelfTest) {
                     throw "The trust-root gate omits checkout attribute path $strAttributePath."
                 }
             }
-            foreach ($strClaudeInstructionPattern in @(
+            foreach ($strInstructionPattern in @(
+                    '.github/instructions/**/*.instructions.md',
+                    '.cursor/rules/**/*.mdc',
                     "'**/CLAUDE.md'",
                     "'.claude/rules/**/*.md'"
                 )) {
                 if (-not [regex]::IsMatch(
                         $objPathFilterMatch.Groups['Paths'].Value,
                         "(?m)^      - $([regex]::Escape(
-                                    $strClaudeInstructionPattern
+                                    $strInstructionPattern
                                 ))\r?$"
                     )) {
                     throw (
-                        'Push does not cover Claude instruction path pattern ' +
-                        $strClaudeInstructionPattern
+                        'Push does not cover recursive instruction path pattern ' +
+                        $strInstructionPattern
                     )
                 }
             }
