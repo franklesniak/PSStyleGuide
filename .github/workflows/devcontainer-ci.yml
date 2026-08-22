@@ -24,7 +24,6 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
-      EXPECTED_REF: ${{ github.ref }}
       EXPECTED_REPOSITORY: ${{ github.repository }}
       EXPECTED_REVISION: ${{ github.sha }}
     steps:
@@ -33,7 +32,6 @@ jobs:
         run: |
           set -euo pipefail
           [[ "${EXPECTED_REPOSITORY}" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]
-          [[ "${EXPECTED_REF}" =~ ^refs/[A-Za-z0-9_./-]+$ ]]
           [[ "${EXPECTED_REVISION}" =~ ^[0-9a-f]{40}$ ]]
 
           readonly checkout_root="${RUNNER_TEMP}/psstyleguide-devcontainer-boundary"
@@ -46,7 +44,7 @@ jobs:
             -c credential.helper= \
             -c core.askPass= \
             fetch --no-tags --no-recurse-submodules --depth=1 origin \
-            "${EXPECTED_REF}:refs/remotes/event/target"
+            "${EXPECTED_REVISION}:refs/remotes/event/target"
 
           readonly fetched_revision="$(
             /usr/bin/git -C "${checkout_root}" rev-parse --verify \

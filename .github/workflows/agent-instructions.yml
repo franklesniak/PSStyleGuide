@@ -19,7 +19,8 @@ on:
       - .github/workflows/Test-AgentInstructions.ps1
       - .hermes.md
       - .npmrc
-      - AGENTS.md
+      - '**/AGENTS.md'
+      - '**/AGENTS.override.md'
       - CLAUDE.md
       - GEMINI.md
       - npm-shrinkwrap.json
@@ -40,7 +41,8 @@ on:
       - .github/workflows/Test-AgentInstructions.ps1
       - .hermes.md
       - .npmrc
-      - AGENTS.md
+      - '**/AGENTS.md'
+      - '**/AGENTS.override.md'
       - CLAUDE.md
       - GEMINI.md
       - npm-shrinkwrap.json

@@ -4200,6 +4200,8 @@ $arrTrackedGovernedInstructionPaths = @(
             $strTrackedPath = [string] $_
             $arrGovernedRootPaths -ccontains $strTrackedPath -or
             $strTrackedPath -cmatch `
+                '^(?:[^/]+/)*AGENTS(?:\.override)?\.md$' -or
+            $strTrackedPath -cmatch `
                 '^\.github/instructions/[^/]+\.instructions\.md$' -or
             $strTrackedPath -cmatch '^\.cursor/rules/[^/]+\.mdc$'
         }
@@ -4526,6 +4528,34 @@ if ($SelfTest) {
         "Tracked governed instruction is missing from the catalog: $strFutureInstructionPath"
     if (-not ($arrInventoryMutationFailures -ccontains $strExpectedInventoryFailure)) {
         throw 'The governed-instruction inventory mutation did not fail closed.'
+    }
+
+    $arrUncatalogedCodexInstructionPaths = @(
+        'tools/AGENTS.md',
+        'AGENTS.override.md',
+        'tools/AGENTS.override.md'
+    )
+    foreach ($strUncatalogedCodexInstructionPath in $arrUncatalogedCodexInstructionPaths) {
+        $arrCodexInstructionInventoryFailures = @(
+            Get-GovernedInstructionInventoryFailure `
+                -CatalogPaths @($arrGovernedInstructionDocuments.Path) `
+                -TrackedPaths @(
+                    $arrTrackedGovernedInstructionPaths +
+                        $strUncatalogedCodexInstructionPath
+                )
+        )
+        $strExpectedCodexInstructionFailure =
+            'Tracked governed instruction is missing from the catalog: ' +
+            $strUncatalogedCodexInstructionPath
+        if (-not (
+                $arrCodexInstructionInventoryFailures -ccontains `
+                    $strExpectedCodexInstructionFailure
+            )) {
+            throw (
+                'The uncataloged Codex instruction mutation did not fail closed: ' +
+                $strUncatalogedCodexInstructionPath
+            )
+        }
     }
 
     $arrRequiredFieldNames = @('Status', 'Owner', 'Scope')
