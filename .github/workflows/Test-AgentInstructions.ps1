@@ -42,7 +42,7 @@
 # This validator keeps explicit backtick continuations so that large
 # named-parameter mutation calls remain auditable one argument per line.
 # Private helpers have focused examples. The -SelfTest suite covers edge cases.
-# Version: 1.2.20260822.0
+# Version: 1.3.20260823.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -73,7 +73,7 @@ $intClaudeMaximumInputBytes = 131072
 $intCodexConfigMaximumInputBytes = 65536
 $intDocsInstructionsMaximumInputBytes = 131072
 $intInstructionDocumentMaximumInputBytes = 131072
-$intValidatorMaximumInputBytes = 311296
+$intValidatorMaximumInputBytes = 327680
 $intMetadataMaximumParents = 64
 $strMetadataRangePolicyMarker = 'metadata-range-transition-policy-v1'
 $script:objValidationUtcNow = [DateTimeOffset]::UtcNow
@@ -201,6 +201,18 @@ $script:strOnlyGenuineDeferredWork = 'Only genuine deferred work requires a GitH
 $script:arrObsoleteDeferralLiterals = @(
     'If this comment''s outcome is anything other than a fix **completed in this PR**'
 )
+$script:arrProhibitedDocumentationClaimLiterals = @(
+    '.github/workflows/check-placeholders.yml',
+    '.github/ISSUE_TEMPLATE/',
+    '.github/pull_request_template.md',
+    'comment block at the top of `CONTRIBUTING.md`'
+)
+$script:arrDocumentationClaimOwnerPaths = @(
+    '.github/instructions/docs.instructions.md',
+    '.github/workflows/Test-AgentInstructions.ps1'
+)
+$script:strClaudeImportFailure =
+    'CLAUDE.md must not contain active @path imports.'
 
 #region Private helper functions
 
@@ -1865,6 +1877,130 @@ function ConvertTo-OperativeMarkdownText {
     return (Get-OperativeMarkdownContext -Content $Content).Text
 }
 
+function Get-ActiveClaudeImportReference {
+    # .SYNOPSIS
+    # Gets active Claude file-import references from operative Markdown prose.
+    #
+    # .DESCRIPTION
+    # Inspects parser-derived prose only. Fenced code, indented code, inline code,
+    # comments, and raw HTML are excluded before import matching.
+    #
+    # .PARAMETER MarkdownContext
+    # The validated operative Markdown context to inspect.
+    #
+    # .EXAMPLE
+    # Get-ActiveClaudeImportReference -MarkdownContext $objClaudeContext
+    #
+    # # Returns each active import target, including extensionless file names.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [string] Each active Claude import target.
+    #
+    # .NOTES
+    # Private helper; no positional parameters. Version: 1.0.20260823.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [pscustomobject] $MarkdownContext
+    )
+
+    $strImportPattern =
+        '(?m)(?<!\S)@(?<Target>(?!(?:claude|codex)(?=$|\s))[^\s<>]+)' +
+        '(?=$|\s)'
+    foreach ($objProseBlock in $MarkdownContext.ProseBlocks) {
+        foreach ($objMatch in [regex]::Matches(
+                $objProseBlock.Text,
+                $strImportPattern
+            )) {
+            Write-Output $objMatch.Groups['Target'].Value
+        }
+    }
+}
+
+function Get-ClaudeImportFailure {
+    # .SYNOPSIS
+    # Finds an active import in one governed Claude instruction document.
+    #
+    # .PARAMETER Name
+    # The repository-relative governed CLAUDE.md path.
+    #
+    # .PARAMETER MarkdownContext
+    # The validated operative Markdown context to inspect.
+    #
+    # .EXAMPLE
+    # Get-ClaudeImportFailure -Name 'tools/CLAUDE.md' `
+    #     -MarkdownContext $objClaudeContext
+    #
+    # # Returns the path-specific failure when an active import exists.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [string] The path-specific active-import failure.
+    #
+    # .NOTES
+    # Private helper; no positional parameters. Version: 1.0.20260823.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $Name,
+
+        [Parameter(Mandatory)]
+        [pscustomobject] $MarkdownContext
+    )
+
+    if (@(Get-ActiveClaudeImportReference `
+                -MarkdownContext $MarkdownContext).Count -gt 0) {
+        Write-Output "$Name must not contain active @path imports."
+    }
+}
+
+function Get-NestedClaudeImportFailure {
+    # .SYNOPSIS
+    # Finds active imports in cataloged nested Claude instruction documents.
+    #
+    # .PARAMETER DocumentContexts
+    # The cataloged governed-document contexts to inspect.
+    #
+    # .EXAMPLE
+    # Get-NestedClaudeImportFailure -DocumentContexts $listGovernedDocumentContexts
+    #
+    # # Returns a path-specific failure for each affected nested CLAUDE.md.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [string] Each path-specific active-import failure.
+    #
+    # .NOTES
+    # Private helper; no positional parameters. Version: 1.0.20260823.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [object[]] $DocumentContexts
+    )
+
+    foreach ($objDocumentContext in $DocumentContexts) {
+        if ($objDocumentContext.Path -ceq 'CLAUDE.md' -or
+            $objDocumentContext.Path -cnotmatch '(?:^|/)CLAUDE\.md$') {
+            continue
+        }
+        $objNestedClaudeContext = Get-OperativeMarkdownContext `
+            -Content $objDocumentContext.Content
+        Write-Output @(Get-ClaudeImportFailure `
+                -Name $objDocumentContext.Path `
+                -MarkdownContext $objNestedClaudeContext)
+    }
+}
+
 function Get-MarkdownLevelTwoSectionContext {
     # .SYNOPSIS
     # Gets one level-two Markdown section.
@@ -2215,6 +2351,72 @@ function Get-GovernedInstructionInventoryFailure {
             Write-Output (
                 'Governed instruction catalog path is not tracked at the validation ' +
                 "revision: $strCatalogPath"
+            )
+        }
+    }
+}
+
+function Get-DocumentationClaimFailure {
+    # .SYNOPSIS
+    # Finds false repository-specific documentation source claims.
+    #
+    # .DESCRIPTION
+    # Rejects known absent placeholder-tooling claims and proves that each named
+    # owner retained by the PSStyleGuide URL policy is tracked at the exact input
+    # revision.
+    #
+    # .PARAMETER Content
+    # The documentation instruction content to inspect.
+    #
+    # .PARAMETER TrackedPaths
+    # The exact input revision's tracked repository paths.
+    #
+    # .EXAMPLE
+    # Get-DocumentationClaimFailure -Content $strDocs -TrackedPaths $arrPaths
+    #
+    # # Returns one string for each false or unowned repository claim.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [string] One record for each documentation claim failure.
+    #
+    # .NOTES
+    # Private helper; no positional parameters. Version: 1.0.20260823.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $Content,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $TrackedPaths
+    )
+
+    foreach ($strLiteral in $script:arrProhibitedDocumentationClaimLiterals) {
+        if ($Content.Contains($strLiteral, [System.StringComparison]::Ordinal)) {
+            Write-Output (
+                'Documentation instructions name an absent repository-specific ' +
+                "source or enforcement claim: $strLiteral"
+            )
+        }
+    }
+
+    $objMarkdownContext = Get-OperativeMarkdownContext -Content $Content
+    $arrVisibleCodeSpans = [string[]]@($objMarkdownContext.ProseBlocks.Code)
+    foreach ($strOwnerPath in $script:arrDocumentationClaimOwnerPaths) {
+        if ($arrVisibleCodeSpans -cnotcontains $strOwnerPath) {
+            Write-Output (
+                'Documentation instructions are missing the named claim owner: ' +
+                $strOwnerPath
+            )
+        }
+        if ($TrackedPaths -cnotcontains $strOwnerPath) {
+            Write-Output (
+                'Documentation claim owner is not tracked at the validation ' +
+                "revision: $strOwnerPath"
             )
         }
     }
@@ -3661,6 +3863,11 @@ function Get-AgentInstructionFailure {
     $objClaudeReviewContext = Get-MarkdownLevelTwoSectionContext `
         -MarkdownContext $objClaudeMarkdownContext `
         -Heading 'Handling Code Review Comments'
+    foreach ($strImportFailure in @(Get-ClaudeImportFailure `
+            -Name 'CLAUDE.md' `
+            -MarkdownContext $objClaudeMarkdownContext)) {
+        Write-Output $strImportFailure
+    }
     $arrDocuments = @(
         [pscustomobject]@{
             Name = 'AGENTS.md'
@@ -4433,6 +4640,11 @@ $arrRepositoryFailures = @(Get-AgentInstructionFailure `
         -AgentsContent $strAgentsContent `
         -ClaudeContent $strClaudeContent `
         -CodexConfigContent $strCodexConfigContent)
+$arrRepositoryFailures += @(Get-DocumentationClaimFailure `
+        -Content $strDocsInstructionsContent `
+        -TrackedPaths $arrTrackedRepositoryPaths)
+$arrRepositoryFailures += @(Get-NestedClaudeImportFailure `
+        -DocumentContexts @($listGovernedDocumentContexts))
 foreach ($objDocumentContext in $listGovernedDocumentContexts) {
     if (-not $objDocumentContext.RequiresMetadata) {
         continue
@@ -4483,6 +4695,103 @@ Write-Output 'Agent-instruction contract passed.'
 
 if ($SelfTest) {
     #region Mutation self-tests
+
+    $arrDocumentationClaimFailures = @(Get-DocumentationClaimFailure `
+            -Content $strDocsInstructionsContent `
+            -TrackedPaths $arrTrackedRepositoryPaths)
+    if ($arrDocumentationClaimFailures.Count -ne 0) {
+        throw (
+            'The documentation claim baseline failed validation: ' +
+            ($arrDocumentationClaimFailures -join '; ')
+        )
+    }
+    foreach ($strOwnerPath in $script:arrDocumentationClaimOwnerPaths) {
+        $arrMissingOwnerFailures = @(Get-DocumentationClaimFailure `
+                -Content $strDocsInstructionsContent `
+                -TrackedPaths @(
+                    $arrTrackedRepositoryPaths |
+                        Where-Object { $_ -cne $strOwnerPath }
+                ))
+        $strExpectedOwnerFailure =
+            'Documentation claim owner is not tracked at the validation ' +
+            "revision: $strOwnerPath"
+        if ($arrMissingOwnerFailures -cnotcontains $strExpectedOwnerFailure) {
+            throw "A missing documentation claim owner did not fail closed: $strOwnerPath"
+        }
+    }
+    $strFalseDocumentationClaimMutation = $strDocsInstructionsContent +
+        [Environment]::NewLine + [Environment]::NewLine +
+        'The absent `.github/workflows/check-placeholders.yml` enforces this rule.'
+    $arrFalseDocumentationClaimFailures = @(Get-DocumentationClaimFailure `
+            -Content $strFalseDocumentationClaimMutation `
+            -TrackedPaths $arrTrackedRepositoryPaths)
+    if (-not ($arrFalseDocumentationClaimFailures -match [regex]::Escape(
+                'Documentation instructions name an absent repository-specific source'
+            ))) {
+        throw 'A false documentation enforcement claim did not fail closed.'
+    }
+
+    $arrClaudeImportMutations = @(
+        [pscustomobject]@{ Name = 'relative import'; Text = '@docs/claude-policy.md' },
+        [pscustomobject]@{ Name = 'absolute import'; Text = '@/etc/claude-policy.md' },
+        [pscustomobject]@{ Name = 'home import'; Text = '@~/claude-policy.md' },
+        [pscustomobject]@{ Name = 'traversal import'; Text = '@../claude-policy.md' },
+        [pscustomobject]@{ Name = 'single-file import'; Text = '@policy.md' },
+        [pscustomobject]@{ Name = 'extensionless bare import'; Text = '@README' },
+        [pscustomobject]@{
+            Name = 'recursive and multiple imports'
+            Text = "@docs/recursive/CLAUDE.md`n@docs/second-policy.md"
+        }
+    )
+    foreach ($objImportMutation in $arrClaudeImportMutations) {
+        Assert-MutationRejected `
+            -Name "Claude $($objImportMutation.Name)" `
+            -AgentsContent $strAgentsContent `
+            -ClaudeContent (
+                $strClaudeContent + [Environment]::NewLine +
+                $objImportMutation.Text
+            ) `
+            -CodexConfigContent $strCodexConfigContent `
+            -ExpectedFailure $script:strClaudeImportFailure
+    }
+
+    $arrNestedClaudeImportFailures = @(Get-NestedClaudeImportFailure `
+            -DocumentContexts @(
+                [pscustomobject]@{
+                    Path = 'tools/CLAUDE.md'
+                    Content = '@README'
+                }
+            ))
+    if ($arrNestedClaudeImportFailures -cnotcontains `
+        'tools/CLAUDE.md must not contain active @path imports.') {
+        throw 'A nested governed CLAUDE.md extensionless import did not fail closed.'
+    }
+
+    $arrAcceptedClaudeImportLikeFixtures = @(
+        [pscustomobject]@{
+            Name = 'Claude import-like inline code'
+            Text = '`@docs/claude-policy.md`'
+        },
+        [pscustomobject]@{
+            Name = 'Claude import-like fenced code'
+            Text = '```text' + [Environment]::NewLine +
+                '@docs/claude-policy.md' + [Environment]::NewLine + '```'
+        },
+        [pscustomobject]@{
+            Name = 'ordinary Claude and Codex mentions'
+            Text = "@claude resume review loop`n`n@codex review"
+        }
+    )
+    foreach ($objAcceptedFixture in $arrAcceptedClaudeImportLikeFixtures) {
+        Assert-FixtureAccepted `
+            -Name $objAcceptedFixture.Name `
+            -AgentsContent $strAgentsContent `
+            -ClaudeContent (
+                $strClaudeContent + [Environment]::NewLine +
+                $objAcceptedFixture.Text
+            ) `
+            -CodexConfigContent $strCodexConfigContent
+    }
 
     $strDocsStaleMetadataMutation = $strDocsInstructionsContent +
         [Environment]::NewLine + [Environment]::NewLine +

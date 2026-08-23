@@ -1,13 +1,13 @@
 <!-- markdownlint-disable MD013 -->
 # Agent Instructions for Claude Code
 
-**Version:** 1.8.20260822.0
+**Version:** 1.8.20260823.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository maintainer (@franklesniak)
-- **Last Updated:** 2026-08-22
+- **Last Updated:** 2026-08-23
 - **Scope:** Agent-specific entry point for Claude Code and compatible AI coding agents operating in PSStyleGuide. Mirrors a minimal inline summary of the highest-priority shared rules; `.github/copilot-instructions.md` remains the canonical documentation-authoring source of truth.
 <!-- template-sync: begin markdown-reference-only -->
 - **Related:** [Repository Copilot Instructions](.github/copilot-instructions.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
@@ -30,6 +30,8 @@ Instruction files and style guides are protected governance files. Do not create
 If a style-guide update appears warranted but has not been explicitly authorized, propose it separately and wait for approval before editing protected instruction files.
 
 During downstream template adoption and stack selection, perform non-protected cleanup first, record the protected instruction-file edits needed to remove references to deleted tools or stacks, obtain explicit maintainer authorization, then update `.github/copilot-instructions.md`, remaining root agent files, and relevant `.github/instructions/*.instructions.md` files. Bump `Last Updated` and `Version` metadata where present, and avoid temporary migration wording in durable governance docs.
+
+Project `CLAUDE.md` files MUST NOT use active `@path` imports. Keep required instruction text inside governed documents. Import-like text inside inline code or fenced code blocks is not active. Ordinary `@claude` and `@codex` command mentions are not imports.
 
 ## Essential Repository Summary
 

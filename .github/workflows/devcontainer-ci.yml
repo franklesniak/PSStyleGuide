@@ -34,6 +34,31 @@ jobs:
           [[ "${EXPECTED_REPOSITORY}" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]
           [[ "${EXPECTED_REVISION}" =~ ^[0-9a-f]{40}$ ]]
 
+          has_devcontainer_entry() {
+            local candidate_path
+            while IFS= read -r candidate_path; do
+              case "${candidate_path}" in
+                .devcontainer|.devcontainer/*|.devcontainer.json)
+                  return 0
+                  ;;
+              esac
+            done
+            return 1
+          }
+
+          has_devcontainer_entry <<< '.devcontainer' || {
+            printf '%s\n' 'Directory boundary fixture was not rejected.' >&2
+            exit 1
+          }
+          has_devcontainer_entry <<< '.devcontainer.json' || {
+            printf '%s\n' 'Root-file boundary fixture was not rejected.' >&2
+            exit 1
+          }
+          if has_devcontainer_entry <<< '.env'; then
+            printf '%s\n' 'Unrelated dot-file boundary fixture was rejected.' >&2
+            exit 1
+          fi
+
           readonly checkout_root="${RUNNER_TEMP}/psstyleguide-devcontainer-boundary"
           test ! -e "${checkout_root}"
           /usr/bin/mkdir -m 0700 -- "${checkout_root}"
@@ -56,11 +81,11 @@ jobs:
               '^(credential\.|http\..*\.extraheader)' || true
           )"
 
-          readonly devcontainer_entry="$(
-            /usr/bin/git -C "${checkout_root}" ls-tree \
-              "${fetched_revision}" -- .devcontainer
+          readonly devcontainer_entries="$(
+            /usr/bin/git -C "${checkout_root}" ls-tree --name-only \
+              "${fetched_revision}" -- .devcontainer .devcontainer.json
           )"
-          if [[ -n "${devcontainer_entry}" ]]; then
+          if has_devcontainer_entry <<< "${devcontainer_entries}"; then
             printf '%s\n' \
               'PSStyleGuide has no authorized devcontainer contract.' >&2
             exit 1

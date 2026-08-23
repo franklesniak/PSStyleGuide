@@ -7,13 +7,13 @@ description: "Documentation standards:  contract-first, traceable, drift-resista
 
 # Documentation Writing Style
 
-**Version:** 1.6.20260822.0
+**Version:** 1.6.20260823.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-08-22
+- **Last Updated:** 2026-08-23
 - **Scope:** Defines documentation standards for Markdown (`**/*.md`) and Cursor Markdown rule (`**/*.mdc`) files in this repository, including specs, design docs, runbooks, ADRs, instruction files, and developer documentation. Does not cover code comments or inline documentation in source files.
 - **Related:** [Repository Copilot Instructions](../copilot-instructions.md)
 
@@ -82,7 +82,7 @@ The metadata header block is **NOT REQUIRED** for documents whose primary purpos
 
 - Top-level community-health files such as `README.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md`.
 - End-user onboarding, configuration, customization, and prompt/cookbook guides intended for repository consumers, whether downstream of a template or direct users of this repository.
-- PR and issue templates such as `.github/pull_request_template.md` and files under `.github/ISSUE_TEMPLATE/`.
+- Repository-hosted request templates, when a project tracks them.
 - Starter-content READMEs intended for downstream copy/paste, such as those matching `templates/**/README.md`, unless the README's content itself meets the Tier 1 content criteria above.
 
 > **Precedence: Tier 1 wins on content.** Content classification is primary; file location and filename are secondary. A file is Tier 1 when its content is governance, specification, instruction, ADR-style, runbook, or process documentation, even when it lives under `docs/**`, `templates/**`, or is named `README.md`. Conversely, location alone does not promote a file to Tier 1 if the content is purely end-user-oriented. When location and content disagree, the audit must record the chosen tier and rationale in prose.
@@ -191,7 +191,7 @@ Compliant (explicitly scoped pre-change reference):
 
 - Use fenced code blocks with language tags.
 - Avoid trailing whitespace; keep blank lines truly blank.
-- Prefer relative links within the repo (e.g., `docs/decisions/0001-accept-in-repository-trust-root.md`). **Exception:** Markdown links inside `.github/ISSUE_TEMPLATE/*.yml` issue-form `value:` blocks (e.g., `bug_report.yml`), the `url:` values inside `.github/ISSUE_TEMPLATE/config.yml`'s `contact_links` entries, and links inside `.github/pull_request_template.md` MUST use absolute `https://github.com/OWNER/REPO/...` URLs — `https://github.com/OWNER/REPO/blob/HEAD/<path>` for repo-internal **file** targets and `https://github.com/OWNER/REPO/<other-path>` for non-file repo-internal targets such as the GitHub Security tab (`/security`), Discussions (`/discussions`), or Issues (`/issues`). See **Issue and PR templates** below.
+- Prefer relative links within the repo (e.g., `docs/decisions/0001-accept-in-repository-trust-root.md`).
 - Avoid raw URLs in prose; use descriptive link text when possible.
 - Markdown files in this repository SHOULD include `<!-- markdownlint-disable MD013 -->` immediately after any YAML front matter (or at the very top of the file if there is no front matter), and **before any other content**, including badges, links, the H1 heading, and any prose. A single optional blank line MAY appear between the front matter terminator (`---`) and the directive for readability; blank lines are not "content" for this rule.
   - Placement matters: markdownlint's inline `<!-- markdownlint-disable RULE -->` directive only suppresses the rule for content that follows it. Placing the directive after badges or other long lines leaves those lines unprotected when the file is processed with default markdownlint settings outside this repo.
@@ -259,39 +259,15 @@ Note: A renderer can end the list item at the unindented fence and render the co
 
 This template ships maintainer-facing scripts, onboarding steps, and verification commands intended for cross-platform use. macOS and BSD-family defaults for `grep` and `sed` differ from GNU tools, so a command that works on a Linux CI runner can fail on a maintainer's macOS workstation. The third-party-tool guidance above applies even when an example is intended only for maintainers, because maintainers also work across macOS, Windows, WSL, Git Bash, and minimal Linux environments.
 
-#### Issue and PR templates
+#### Repository URL and placeholder safety
 
-This is an explicit carve-out from the "Prefer relative links" rule above. Issue forms (`.github/ISSUE_TEMPLATE/*.yml`, including `config.yml`) and the PR template (`.github/pull_request_template.md`) are not rendered from their own file paths. Three distinct failure modes apply:
+PSStyleGuide does not track request-template files or a placeholder-check workflow. Documentation MUST NOT attribute a live convention or enforcement guarantee to an absent repository source.
 
-- Issue-form `value:` Markdown blocks (for example, in `bug_report.yml`) are rendered at `/{owner}/{repo}/issues/new?...`. Relative paths resolve against that rendering URL, not the source file path, and reliably 404. For example, `[SECURITY.md](blob/HEAD/SECURITY.md)` resolves to `/{owner}/{repo}/issues/blob/HEAD/SECURITY.md` (404), and `[Security tab](security)` resolves to `/{owner}/{repo}/issues/security` (404).
-- PR-template Markdown bodies (`.github/pull_request_template.md`) are rendered at `/{owner}/{repo}/pull/<n>`. Properly-constructed relative paths such as `../blob/HEAD/<file>` *do* resolve correctly on GitHub.com PR pages (they walk up one segment from `/pull/<n>` and land on `/{owner}/{repo}/blob/HEAD/<file>`). However, sibling-style relative forms such as `blob/HEAD/<file>` (without `../`) resolve to `/{owner}/{repo}/pull/blob/HEAD/<file>` and 404, and even working relative forms remain unreliable across non-GitHub.com renderers, GitHub Mobile, email notifications, and copied/quoted content. Requiring absolute URLs here keeps the PR template robust across all of those surfaces.
-- `.github/ISSUE_TEMPLATE/config.yml`'s `contact_links` `url:` fields are **not** Markdown links — they are URL fields that GitHub validates at form-load time and rejects outright when given a relative path; only absolute URLs render in the issue chooser.
-
-For the issue-form `value:` and PR-template cases, relative forms are additionally unreliable across non-GitHub.com renderers, GitHub Mobile, email notifications, and copied/quoted content.
-
-- Markdown links inside `.github/ISSUE_TEMPLATE/*.yml` issue-form `value:` blocks (for example, in `bug_report.yml`) and inside `.github/pull_request_template.md`, as well as the `url:` values inside `.github/ISSUE_TEMPLATE/config.yml`'s `contact_links` entries, that point to repo-internal files (for example, `SECURITY.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `README.md`) **MUST** use full absolute URLs of the form `https://github.com/OWNER/REPO/blob/HEAD/<path>`. The `OWNER/REPO` placeholder follows this template's placeholder convention (see the comment block at the top of `CONTRIBUTING.md`) and is enforced by `.github/workflows/check-placeholders.yml` **if the downstream repository keeps that workflow**. The workflow is optional and may be removed once placeholders are substituted, so authors and adopters MUST NOT rely on it as an unconditional CI guardrail. The `github.com` host is the assumed default; **GHES adopters MUST replace `github.com` with their GHES host** (e.g., `github.company.com`). The host substitution is not enforced by CI today (even when `.github/workflows/check-placeholders.yml` is kept, it only validates `OWNER/REPO`), so each affected file SHOULD include a brief inline comment reminding adopters of the host substitution, mirroring the convention already used in `.github/ISSUE_TEMPLATE/config.yml`.
-- Repo-internal references that are not file paths (for example, the GitHub Security tab) **MUST** likewise use absolute URLs, such as `https://github.com/OWNER/REPO/security`. The same `github.com` host assumption applies.
-- Relative paths such as `../blob/HEAD/<file>`, `blob/HEAD/<file>`, `./<file>`, or bare relative refs such as `(security)` **MUST NOT** be used in those files. Rationale: in issue-form `value:` blocks rendered at `/{owner}/{repo}/issues/new?...`, a link like `[SECURITY.md](blob/HEAD/SECURITY.md)` resolves to `/{owner}/{repo}/issues/blob/HEAD/SECURITY.md` (404), and `[Security tab](security)` resolves to `/{owner}/{repo}/issues/security` (404). In `config.yml` `contact_links` `url:` fields, GitHub itself rejects relative values at form-load time because the field is parsed as a URL rather than as Markdown. In `.github/pull_request_template.md` rendered at `/{owner}/{repo}/pull/<n>`, a parent-relative form such as `[contributing guidelines](../blob/HEAD/CONTRIBUTING.md)` does resolve correctly on GitHub.com PR pages, but a sibling-relative form such as `[contributing guidelines](blob/HEAD/CONTRIBUTING.md)` resolves to `/{owner}/{repo}/pull/blob/HEAD/CONTRIBUTING.md` (404), and even working relative forms remain unreliable across non-GitHub.com renderers, GitHub Mobile, email notifications, and copied/quoted content; requiring absolute URLs avoids both pitfalls.
-- Use `blob/HEAD` rather than `blob/main` so the URL works regardless of the repository's default branch name.
-- This rule applies only to the files listed above. Tree-rendered Markdown such as `README.md`, `CONTRIBUTING.md`, and files under `docs/**` continue to follow the default "prefer relative links" guidance.
-- The literal `https://github.com/OWNER/REPO/...` example URL is permitted to appear in didactic prose inside style-guide and design-decision files (`.github/instructions/**`, `.github/copilot-instructions.md`, and the template design-decision document under `.github/`); section [6] of `.github/workflows/check-placeholders.yml` skips those files specifically so that adopters are not forced to edit instructional/historical prose to satisfy placeholder CI. Section [6] also skips the workflow file itself (`.github/workflows/check-placeholders.yml`) to avoid self-referential matches against the literal URL embedded in its own grep patterns. The recursive scan in section [6] only enumerates `*.md`, `*.yml`, and `*.yaml` files (`find .github -type f \( -name "*.yml" -o -name "*.yaml" -o -name "*.md" \)`); other file types under `.github/` (for example, `.github/CODEOWNERS` or scripts) are not scanned by section [6] and are covered, where applicable, by other dedicated phases of the workflow rather than the recursive URL scan. Any other Markdown or YAML file under `.github/` (i.e., not `.github/instructions/**`, not `.github/copilot-instructions.md`, not the template design-decision document under `.github/`, and not `.github/workflows/check-placeholders.yml`) that contains the literal `https://github.com/OWNER/REPO` substring outside a single-line HTML comment (in Markdown) or a YAML comment line (in YAML) is treated as a live template placeholder and **MUST** be customized by adopters. (Section [6] of the placeholder workflow filters single-line HTML comments in Markdown and YAML comment lines in YAML before matching, so a single-line HTML comment such as `<!-- https://github.com/OWNER/REPO/... -->` will not by itself cause CI to fail; authors **SHOULD NOT** rely on that filter to ship live template URLs disguised as comments.)
-- Retained issue-form YAML guidance SHOULD restate this rule rather than relying on this Markdown guide, so downstream repositories may remove either style guide independently without losing the guidance for retained file types.
-
-#### Adopter-substitution `OWNER/REPO` placeholders in Markdown documentation
-
-When maintaining this repository as a template, Markdown files that intentionally ship with unresolved `https://github.com/...` URLs for adopters to customize **MUST** use the literal `OWNER/REPO` placeholder convention. Common shapes include `https://github.com/OWNER/REPO.git`, `https://github.com/OWNER/REPO/issues`, `https://github.com/OWNER/REPO/security`, and `https://github.com/OWNER/REPO/blob/HEAD/<path>`. Authors **MUST NOT** introduce alternative live-substitution styles such as `<owner>/<repo>`, `<OWNER>/<REPO>`, or `your-org/your-repo` for those unresolved template placeholders.
-
-This convention applies most visibly in template scaffolding files that ship with this repository — community-health files (`SECURITY.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `README.md`), setup guides, optional-configuration guidance, reusable prompt guides, and any other repository-root Markdown that ships placeholder URLs for downstream substitution. A single literal placeholder form keeps the bulk find-and-replace scripts in the new-repository setup guide reliable and keeps the optional `.github/workflows/check-placeholders.yml` workflow's coverage predictable.
-
-Downstream repositories that have adopted this template **SHOULD** replace `OWNER/REPO` with their real owner/repository name, or remove the placeholder-bearing content if it no longer applies. This is a template-placeholder convention, not a requirement that ordinary downstream documentation keep `OWNER/REPO` placeholders in its finished docs.
-
-This is a placeholder-convention rule only. It does not require converting normal tree-rendered Markdown links to absolute GitHub URLs; repo-internal links in tree-rendered Markdown should continue to prefer relative links unless an existing carve-out (such as the **Issue and PR templates** subsection above) or a concrete rendering requirement makes an absolute URL necessary.
-
-**Scope clarifications:**
-
-- Didactic example text inside style-guide and design-decision files (`.github/instructions/**`, `.github/copilot-instructions.md`, and the template design-decision document under `.github/`) **MAY** use alternative placeholder forms when describing the convention rather than creating a live substitution target.
-- Generic GitHub Actions references in `uses:` lines and the adjacent navigation-aid comments under `.github/workflows/` use `<owner>/<repo>` as a metasyntactic placeholder for arbitrary upstream action repositories (e.g., `actions/checkout`) and are **not** template-adopter substitutions; they are unaffected by this rule.
-- Illustrative post-substitution examples in adoption-guide prose, such as `your-org/your-repo`, `your-username/your-repo`, or `YOUR-USERNAME/your-repo-name`, are values a reader might type **after** substitution and are not live unresolved template placeholders; they are unaffected by this rule.
+- Tracked Markdown SHOULD use relative links for repository-internal targets.
+- When a durable document requires an absolute PSStyleGuide link, the link MUST use `https://github.com/franklesniak/PSStyleGuide/` and MUST identify a real target.
+- The literal example `https://github.com/OWNER/REPO/...` MAY appear only as clearly labeled didactic text in an inline code span or fenced code block. It MUST NOT appear as a live unresolved link target.
+- Placeholder text in copyable shell examples MUST remain literal and safe. The shell rules below prohibit command-substitution metacharacters in such placeholder text.
+- `.github/instructions/docs.instructions.md` owns these documentation rules. `.github/workflows/Test-AgentInstructions.ps1` validates these named owners at the exact input revision and rejects stale repository-specific source or enforcement claims.
 
 #### Template-substitution marker boundaries and replacement surfaces
 
