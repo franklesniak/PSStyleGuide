@@ -761,7 +761,7 @@ One authenticated `PS_PR78_PR_READY` record contains `{{PS_PR78_PORT_PR_URL}}`, 
 
 One accurate PS candidate PR exposes the exact Task 4 head/tree and complete issue scope, initial checks are truthfully recorded, and no review-loop, quality, merge, handoff, or closure action occurred.
 
-## Task 6 — run the Codex review loop on the PS PR #78 port PR
+## Task 6 — run the Copilot-and-Codex review loop on the PS PR #78 port PR
 
 > **Execution class: Coding agent executable.**
 
@@ -795,7 +795,7 @@ Only values enclosed in double braces are variables. Replace each variable with 
 
 ### Objective
 
-Run the complete local Codex and separate remote Codex review loop on the PS PR. Repair validated in-scope findings and repeat on every changed head. Do not perform the independent quality gate, merge, close an issue, publish a landed handoff, or change settings.
+Run a complete local Codex audit and the GitHub Copilot and remote Codex code reviews on the PS PR. Repair validated in-scope findings and repeat all three review actions on every changed head. Do not perform the independent quality gate, merge, close an issue, publish a landed handoff, or change settings.
 
 ### Execution controls
 
@@ -864,12 +864,12 @@ Git blob equality across repositories is byte equality. Also compute SHA-256 ove
 - Treat imported privileged workflows, parser manifests, agent documents, hooks, attributes, and runtime selectors as one security contract. Validate trust-root and transition behavior before accepting the candidate.
 - Do not weaken the PS #162 no-publication boundary or pre-implement later source-plan work. If overlap is unavoidable, stop and obtain a new ordering decision.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
-Copy this complete prompt into a fresh native Codex subagent. The local subagent is the executor. `chatgpt-codex-connector` is a separate remote reviewer.
+Copy this complete prompt into a fresh native Codex subagent. The local subagent is the executor. GitHub Copilot and `chatgpt-codex-connector` are separate, required code reviewers.
 
 ~~~text
-You are the local Codex review-loop executor for repository `franklesniak/PSStyleGuide`, pull request `{{PS_PR78_PORT_PR_URL}}`, and governing issue `{{PS_PR78_PORT_ISSUE_URL}}`.
+You are the local Copilot-and-Codex review-loop executor for repository `franklesniak/PSStyleGuide`, pull request `{{PS_PR78_PORT_PR_URL}}`, and governing issue `{{PS_PR78_PORT_ISSUE_URL}}`.
 
 Use model `gpt-5.6-sol` with `xhigh` reasoning in a fresh native Codex subagent. Use the native Codex subagent interface. Use headless `codex exec --json` only when native subagents are unavailable. For that fallback, create a bounded JSON event log, monitor every exit and tool error, preserve the same repository and authorization boundaries, do not run unattended beyond the repository's configured 8-round or 6-hour cycle limit, and stop on ambiguous state. Do not change the executor identity because a compatibility file is named `CLAUDE.md`.
 
@@ -881,11 +881,11 @@ Run the repository's complete applicable validation from a clean state. Include 
 
 For each finding, reproduce or refute it with repository evidence. If valid, list reasonable options, create a finding-specific weighted rubric, score all options, implement only the selected in-scope repair, and validate it. Keep decision analysis in `TEMP-*` files. Before any push, fetch the exact current PR head without force, inspect the complete outgoing range, verify allowed paths, ancestry, tree, and a clean worktree, then use an explicit non-force update. Read back the exact head and tree.
 
-After the local audit is clean on the current head, post one PR conversation comment whose entire body is exactly `@codex review`. This requests the separate `chatgpt-codex-connector` remote review. The trigger is not a finding. Wait for a remote result that explicitly applies to the current head. Re-query all review surfaces with complete pagination. Reconcile each remote finding, review-body declaration, inline thread, synthetic key, and deferral.
+After the local audit is clean on the current head, record separate GitHub Copilot and remote Codex baselines. Request GitHub Copilot through the authenticated pull-request review-request API with reviewer login `copilot-pull-request-reviewer[bot]`. Post one PR conversation comment whose entire body is exactly `@codex review` to request the separate `chatgpt-codex-connector` review. The trigger is not a finding. Wait for a new review from each reviewer that explicitly applies to the current head. Re-query all review surfaces with complete pagination. Reconcile each review body, finding, inline thread, synthetic key, declared count, and deferral from both reviewers.
 
-If any reviewable repository byte changes, if the PR body or issue metadata changes in a way that invalidates evidence, or if the head changes for any reason, discard the prior terminal claim and repeat the complete local and remote loop on the new head. Do not carry a clean result across heads. Do not merge, enable auto-merge, close the issue, publish a landed handoff, or start a cross-repository comparison.
+If any reviewable repository byte changes, if the PR body or issue metadata changes in a way that invalidates evidence, or if the head changes for any reason, discard the prior terminal claim. Repeat the complete local audit. Explicitly re-request GitHub Copilot and remote Codex on the new head. Do not carry a clean result across heads. Do not merge, enable auto-merge, close the issue, publish a landed handoff, or start a cross-repository comparison.
 
-Return `TERMINALLY_CLEAN` only when the local executor and `chatgpt-codex-connector` are clean on the same current head SHA and tree, every thread and synthetic finding is closed, all required checks and validations have truthful terminal results, the issue and PR descriptions are accurate, no unfinished work or illegitimate deferral remains, and the exact review receipt is public and readable. Otherwise return `REVIEW_BLOCKED` with the exact blocker and the required return path: Task 4 for implementation bytes or Task 5 for PR-only metadata, followed by a new Task 6 instance.
+Return `TERMINALLY_CLEAN` only when the local audit, GitHub Copilot review, and `chatgpt-codex-connector` review are clean on the same current head SHA and tree. Every thread and synthetic finding must be closed. All required checks and validations must have truthful terminal results. The issue and PR descriptions must be accurate. No unfinished work or illegitimate deferral can remain. The exact review receipts must be public and readable. Otherwise, return `REVIEW_BLOCKED` with the exact blocker and the required return path: Task 4 for implementation bytes or Task 5 for PR-only metadata, followed by a new Task 6 instance.
 ~~~
 
 ### Procedure
@@ -898,7 +898,7 @@ Return `TERMINALLY_CLEAN` only when the local executor and `chatgpt-codex-connec
 
 ### Validation and evidence
 
-Require native-subagent executor evidence or the fully controlled headless fallback, `gpt-5.6-sol` with `xhigh`, applicable instruction-file evidence, complete pagination, local and remote clean results on one head/tree, every issue requirement and parity row checked, all validations and checks truthful, zero unresolved thread/finding/deferral, accurate PR metadata, and no merge.
+Require native-subagent executor evidence or the fully controlled headless fallback, `gpt-5.6-sol` with `xhigh`, applicable instruction-file evidence, complete pagination, a clean local audit, clean GitHub Copilot and remote Codex reviews on one head/tree, every issue requirement and parity row checked, all validations and checks truthful, zero unresolved thread/finding/deferral, accurate PR metadata, and no merge.
 
 ### Stop and escalation conditions
 
@@ -906,11 +906,11 @@ Stop without starting a successor if an input object is unavailable, a ref or bo
 
 ### Exact output
 
-One authenticated `PS_PR78_TERMINALLY_CLEAN` record contains the final head/tree, local subagent identity, remote `chatgpt-codex-connector` receipt, exact `@codex review` trigger URL, rounds, complete inventories, decisions, repairs, validations, checks, deferral audit, and proof that no merge occurred.
+One authenticated `PS_PR78_TERMINALLY_CLEAN` record contains the final head/tree, local subagent identity, GitHub Copilot review ID and commit, remote `chatgpt-codex-connector` receipt, exact `@codex review` trigger URL, rounds, complete inventories, decisions, repairs, validations, checks, deferral audit, and proof that no merge occurred.
 
 ### Complete when
 
-Both reviewers are terminally clean on the same current PS head and tree, every finding and deferral is closed or legitimately tracked, all required validation is truthful, and the PR remains unmerged.
+The local audit, GitHub Copilot review, and remote Codex review are terminally clean on the same current PS head and tree. Every finding and deferral is closed or legitimately tracked. All required validation is truthful, and the PR remains unmerged.
 
 ## Task 7 — run the independent final quality check on the PS PR #78 port PR
 
@@ -1016,7 +1016,7 @@ Git blob equality across repositories is byte equality. Also compute SHA-256 ove
 
 ### Independent final quality-check prompt
 
-Copy this complete prompt into a fresh coding-agent session that did not implement the change and did not run the Codex review loop.
+Copy this complete prompt into a fresh coding-agent session that did not implement the change and did not run the Copilot-and-Codex review loop.
 
 ~~~text
 You are the independent final quality checker for repository `franklesniak/PSStyleGuide`, pull request `{{PS_PR78_PORT_PR_URL}}`, and governing issue `{{PS_PR78_PORT_ISSUE_URL}}`. You are not the implementation or review-loop executor.
@@ -1029,7 +1029,7 @@ Independently audit the entire diff and all governing-issue requirements. Verify
 
 Run the full applicable repository validation from a clean state. Include the complete agent-instruction and mutation suite, manifest validator, workflow/YAML validation, Markdown lint, repository hooks or pre-commit, package and lock consistency, trust-root/security tests, `git diff --check`, and raw-byte Git-blob/SHA-256 comparisons. Record commands, runtimes, native exit codes, and exact outputs. Do not repair, push, comment, change PR metadata, merge, enable auto-merge, close an issue, or publish a handoff in this task.
 
-Return `PASS` only when all evidence applies to the exact same final head and tree as the review receipt. If any repository byte, head, issue requirement, PR description, evidence-bearing metadata, review state, or required check changes, return `FAIL — EVIDENCE_INVALIDATED`; require the operator to use Task 4 or Task 5 as applicable, then new Tasks 6 and 7 instances, rerun the full local and remote Codex review loop, and then run a new independent quality check. If a defect exists without a byte change, return `FAIL` with exact evidence and the same return path. Do not merge.
+Return `PASS` only when all evidence applies to the exact same final head and tree as the review receipt. If any repository byte, head, issue requirement, PR description, evidence-bearing metadata, review state, or required check changes, return `FAIL — EVIDENCE_INVALIDATED`; require the operator to use Task 4 or Task 5 as applicable, then new Tasks 6 and 7 instances, rerun the full local audit and Copilot-and-Codex review loop, and then run a new independent quality check. If a defect exists without a byte change, return `FAIL` with exact evidence and the same return path. Do not merge.
 ~~~
 
 ### Procedure
@@ -1092,7 +1092,7 @@ Only values enclosed in double braces are variables. Replace each variable with 
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 6 | `FS` | The complete Codex review loop is terminally clean on the gated head/tree. |
+| Task 6 | `FS` | The complete Copilot-and-Codex review loop is terminally clean on the gated head/tree. |
 | Task 7 | `FS` | The independent final quality check passes on the same gated head/tree. |
 
 ### Objective
@@ -1949,7 +1949,7 @@ One `TF_PR78_PR_READY` record contains the PR identity/base/head/tree/body/commi
 
 One accurate Terraform candidate PR exposes the exact gated candidate, or the conformant branch is skipped; no review, quality, merge, handoff, or closure action occurred.
 
-## Task 15 — run the Codex review loop on the Terraform PR #78 port PR
+## Task 15 — run the Copilot-and-Codex review loop on the Terraform PR #78 port PR
 
 > **Execution class: Coding agent executable.**
 
@@ -1982,7 +1982,7 @@ Only values enclosed in double braces are variables. Replace each variable with 
 
 ### Objective
 
-On the repair-required branch, run the complete local/remote Codex loop and repeat on every changed head. On the conformant branch, propagate the skip. Do not quality-check, merge, close, hand off, or change settings.
+On the repair-required branch, run a complete local Codex audit and the GitHub Copilot and remote Codex code reviews. Repeat all three review actions on every changed head. On the conformant branch, propagate the skip. Do not quality-check, merge, close, hand off, or change settings.
 
 ### Execution controls
 
@@ -2051,12 +2051,12 @@ Git blob equality across repositories is byte equality. Also compute SHA-256 ove
 - Treat privileged workflow, instruction, parser, hook, attribute, runtime, package, and lock changes as one security contract.
 - A PS exception is not automatically applicable. Re-run the exception pressure test against Terraform.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
-Copy this complete prompt into a fresh native Codex subagent. The local subagent is the executor. `chatgpt-codex-connector` is a separate remote reviewer.
+Copy this complete prompt into a fresh native Codex subagent. The local subagent is the executor. GitHub Copilot and `chatgpt-codex-connector` are separate, required code reviewers.
 
 ~~~text
-You are the local Codex review-loop executor for repository `franklesniak/TerraformStyleGuide`, pull request `{{TF_PR78_PORT_PR_URL}}`, and governing issue `{{TF_PR78_PORT_ISSUE_URL}}`.
+You are the local Copilot-and-Codex review-loop executor for repository `franklesniak/TerraformStyleGuide`, pull request `{{TF_PR78_PORT_PR_URL}}`, and governing issue `{{TF_PR78_PORT_ISSUE_URL}}`.
 
 Use model `gpt-5.6-sol` with `xhigh` reasoning in a fresh native Codex subagent. Use the native Codex subagent interface. Use headless `codex exec --json` only when native subagents are unavailable. For that fallback, create a bounded JSON event log, monitor every exit and tool error, preserve the same repository and authorization boundaries, do not run unattended beyond the repository's configured 8-round or 6-hour cycle limit, and stop on ambiguous state. Do not change the executor identity because a compatibility file is named `CLAUDE.md`.
 
@@ -2068,11 +2068,11 @@ Run the repository's complete applicable validation from a clean state. Include 
 
 For each finding, reproduce or refute it with repository evidence. If valid, list reasonable options, create a finding-specific weighted rubric, score all options, implement only the selected in-scope repair, and validate it. Keep decision analysis in `TEMP-*` files. Before any push, fetch the exact current PR head without force, inspect the complete outgoing range, verify allowed paths, ancestry, tree, and a clean worktree, then use an explicit non-force update. Read back the exact head and tree.
 
-After the local audit is clean on the current head, post one PR conversation comment whose entire body is exactly `@codex review`. This requests the separate `chatgpt-codex-connector` remote review. The trigger is not a finding. Wait for a remote result that explicitly applies to the current head. Re-query all review surfaces with complete pagination. Reconcile each remote finding, review-body declaration, inline thread, synthetic key, and deferral.
+After the local audit is clean on the current head, record separate GitHub Copilot and remote Codex baselines. Request GitHub Copilot through the authenticated pull-request review-request API with reviewer login `copilot-pull-request-reviewer[bot]`. Post one PR conversation comment whose entire body is exactly `@codex review` to request the separate `chatgpt-codex-connector` review. The trigger is not a finding. Wait for a new review from each reviewer that explicitly applies to the current head. Re-query all review surfaces with complete pagination. Reconcile each review body, finding, inline thread, synthetic key, declared count, and deferral from both reviewers.
 
-If any reviewable repository byte changes, if the PR body or issue metadata changes in a way that invalidates evidence, or if the head changes for any reason, discard the prior terminal claim and repeat the complete local and remote loop on the new head. Do not carry a clean result across heads. Do not merge, enable auto-merge, close the issue, publish a landed handoff, or start a cross-repository comparison.
+If any reviewable repository byte changes, if the PR body or issue metadata changes in a way that invalidates evidence, or if the head changes for any reason, discard the prior terminal claim. Repeat the complete local audit. Explicitly re-request GitHub Copilot and remote Codex on the new head. Do not carry a clean result across heads. Do not merge, enable auto-merge, close the issue, publish a landed handoff, or start a cross-repository comparison.
 
-Return `TERMINALLY_CLEAN` only when the local executor and `chatgpt-codex-connector` are clean on the same current head SHA and tree, every thread and synthetic finding is closed, all required checks and validations have truthful terminal results, the issue and PR descriptions are accurate, no unfinished work or illegitimate deferral remains, and the exact review receipt is public and readable. Otherwise return `REVIEW_BLOCKED` with the exact blocker and the required return path: Task 13 for bytes or Task 14 for PR-only metadata, followed by a new Task 15 instance.
+Return `TERMINALLY_CLEAN` only when the local audit, GitHub Copilot review, and `chatgpt-codex-connector` review are clean on the same current head SHA and tree. Every thread and synthetic finding must be closed. All required checks and validations must have truthful terminal results. The issue and PR descriptions must be accurate. No unfinished work or illegitimate deferral can remain. The exact review receipts must be public and readable. Otherwise, return `REVIEW_BLOCKED` with the exact blocker and the required return path: Task 13 for bytes or Task 14 for PR-only metadata, followed by a new Task 15 instance.
 ~~~
 
 ### Procedure
@@ -2085,7 +2085,7 @@ Return `TERMINALLY_CLEAN` only when the local executor and `chatgpt-codex-connec
 
 ### Validation and evidence
 
-Require correct conditional handling; on repair, native subagent or controlled fallback, required model/effort, applicable instructions, complete pagination, both reviewers clean on one head/tree, complete issue/parity/deferral/check validation, and no merge; on skip, exact current evidence.
+Require correct conditional handling. On repair, require a native subagent or controlled fallback, the required model and effort, applicable instructions, complete pagination, a clean local audit, clean GitHub Copilot and remote Codex reviews on one head/tree, complete issue/parity/deferral/check validation, and no merge. On skip, require exact current evidence.
 
 ### Stop and escalation conditions
 
@@ -2093,11 +2093,11 @@ Stop without starting a successor if an input object is unavailable, a ref or bo
 
 ### Exact output
 
-One `TF_PR78_TERMINALLY_CLEAN` record contains final head/tree and complete local/remote evidence, or one exact conformant skip; no quality or merge action occurred.
+One `TF_PR78_TERMINALLY_CLEAN` record contains the final head/tree, the local audit evidence, the GitHub Copilot review ID and commit, and the remote Codex review receipt, or one exact conformant skip. No quality or merge action occurred.
 
 ### Complete when
 
-Both reviewers are terminally clean on the same Terraform head/tree, or the conformant branch is skipped; no unresolved work or successor action remains in this leaf.
+The local audit, GitHub Copilot review, and remote Codex review are terminally clean on the same Terraform head/tree, or the conformant branch is skipped. No unresolved work or successor action remains in this leaf.
 
 ## Task 16 — run the independent final quality check on the Terraform PR #78 port PR
 
@@ -2203,7 +2203,7 @@ Git blob equality across repositories is byte equality. Also compute SHA-256 ove
 
 ### Independent final quality-check prompt
 
-Copy this complete prompt into a fresh coding-agent session that did not implement the change and did not run the Codex review loop.
+Copy this complete prompt into a fresh coding-agent session that did not implement the change and did not run the Copilot-and-Codex review loop.
 
 ~~~text
 You are the independent final quality checker for repository `franklesniak/TerraformStyleGuide`, pull request `{{TF_PR78_PORT_PR_URL}}`, and governing issue `{{TF_PR78_PORT_ISSUE_URL}}`. You are not the implementation or review-loop executor.
@@ -2216,7 +2216,7 @@ Independently audit the entire diff and all governing-issue requirements. Verify
 
 Run the full applicable repository validation from a clean state. Include the complete agent-instruction and mutation suite, manifest validator, workflow/YAML validation, Markdown lint, repository hooks or pre-commit, package and lock consistency, trust-root/security tests, `git diff --check`, and raw-byte Git-blob/SHA-256 comparisons. Record commands, runtimes, native exit codes, and exact outputs. Do not repair, push, comment, change PR metadata, merge, enable auto-merge, close an issue, or publish a handoff in this task.
 
-Return `PASS` only when all evidence applies to the exact same final head and tree as the review receipt. If any repository byte, head, issue requirement, PR description, evidence-bearing metadata, review state, or required check changes, return `FAIL — EVIDENCE_INVALIDATED`; require the operator to use Task 13 or Task 14 as applicable, then new Tasks 15 and 16 instances, rerun the full local and remote Codex review loop, and then run a new independent quality check. If a defect exists without a byte change, return `FAIL` with exact evidence and the same return path. Do not merge.
+Return `PASS` only when all evidence applies to the exact same final head and tree as the review receipt. If any repository byte, head, issue requirement, PR description, evidence-bearing metadata, review state, or required check changes, return `FAIL — EVIDENCE_INVALIDATED`; require the operator to use Task 13 or Task 14 as applicable, then new Tasks 15 and 16 instances, rerun the full local audit and Copilot-and-Codex review loop, and then run a new independent quality check. If a defect exists without a byte change, return `FAIL` with exact evidence and the same return path. Do not merge.
 ~~~
 
 ### Procedure
@@ -3134,7 +3134,7 @@ One `PR78_SELECTED_REPAIR_PR_READY` record contains target/base/PR/head/tree/bod
 
 One exact selected-target PR exposes the authorized candidate, or the fixed-point branch is skipped; no review or successor action occurred.
 
-## Task 24 — run the Codex review loop on one selected-target PR #78 fixed-point repair PR
+## Task 24 — run the Copilot-and-Codex review loop on one selected-target PR #78 fixed-point repair PR
 
 > **Execution class: Coding agent executable.**
 
@@ -3167,7 +3167,7 @@ Only values enclosed in double braces are variables. Replace each variable with 
 
 ### Objective
 
-On the repair branch, run the complete local/remote Codex loop and repeat after every evidence change. On the fixed-point branch, propagate the skip. Do not quality-check, merge, hand off, close, or change settings.
+On the repair branch, run a complete local Codex audit and the GitHub Copilot and remote Codex code reviews. Repeat all three review actions after every evidence change. On the fixed-point branch, propagate the skip. Do not quality-check, merge, hand off, close, or change settings.
 
 ### Execution controls
 
@@ -3233,12 +3233,12 @@ Git blob equality across repositories is byte equality. Also compute SHA-256 ove
 
 Change only the exact blocker path set selected by the latest comparison. Use the strongest reviewed common bytes and preserve proved target exceptions. A research-misc repair must be isolated from PID 1 application behavior and must prepare a stacked candidate for the verified governance base. A PS or Terraform repair must preserve unrelated planned work.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
-Copy this complete prompt into a fresh native Codex subagent. The local subagent is the executor. `chatgpt-codex-connector` is a separate remote reviewer.
+Copy this complete prompt into a fresh native Codex subagent. The local subagent is the executor. GitHub Copilot and `chatgpt-codex-connector` are separate, required code reviewers.
 
 ~~~text
-You are the local Codex review-loop executor for repository `{{PR78_SELECTED_REPAIR_REPOSITORY}}`, pull request `{{PR78_SELECTED_REPAIR_PR_URL}}`, and governing issue `{{PR78_SELECTED_REPAIR_ISSUE_URL}}`.
+You are the local Copilot-and-Codex review-loop executor for repository `{{PR78_SELECTED_REPAIR_REPOSITORY}}`, pull request `{{PR78_SELECTED_REPAIR_PR_URL}}`, and governing issue `{{PR78_SELECTED_REPAIR_ISSUE_URL}}`.
 
 Use model `gpt-5.6-sol` with `xhigh` reasoning in a fresh native Codex subagent. Use the native Codex subagent interface. Use headless `codex exec --json` only when native subagents are unavailable. For that fallback, create a bounded JSON event log, monitor every exit and tool error, preserve the same repository and authorization boundaries, do not run unattended beyond the repository's configured 8-round or 6-hour cycle limit, and stop on ambiguous state. Do not change the executor identity because a compatibility file is named `CLAUDE.md`.
 
@@ -3250,11 +3250,11 @@ Run the repository's complete applicable validation from a clean state. Include 
 
 For each finding, reproduce or refute it with repository evidence. If valid, list reasonable options, create a finding-specific weighted rubric, score all options, implement only the selected in-scope repair, and validate it. Keep decision analysis in `TEMP-*` files. Before any push, fetch the exact current PR head without force, inspect the complete outgoing range, verify allowed paths, ancestry, tree, and a clean worktree, then use an explicit non-force update. Read back the exact head and tree.
 
-After the local audit is clean on the current head, post one PR conversation comment whose entire body is exactly `@codex review`. This requests the separate `chatgpt-codex-connector` remote review. The trigger is not a finding. Wait for a remote result that explicitly applies to the current head. Re-query all review surfaces with complete pagination. Reconcile each remote finding, review-body declaration, inline thread, synthetic key, and deferral.
+After the local audit is clean on the current head, record separate GitHub Copilot and remote Codex baselines. Request GitHub Copilot through the authenticated pull-request review-request API with reviewer login `copilot-pull-request-reviewer[bot]`. Post one PR conversation comment whose entire body is exactly `@codex review` to request the separate `chatgpt-codex-connector` review. The trigger is not a finding. Wait for a new review from each reviewer that explicitly applies to the current head. Re-query all review surfaces with complete pagination. Reconcile each review body, finding, inline thread, synthetic key, declared count, and deferral from both reviewers.
 
-If any reviewable repository byte changes, if the PR body or issue metadata changes in a way that invalidates evidence, or if the head changes for any reason, discard the prior terminal claim and repeat the complete local and remote loop on the new head. Do not carry a clean result across heads. Do not merge, enable auto-merge, close the issue, publish a landed handoff, or start a cross-repository comparison.
+If any reviewable repository byte changes, if the PR body or issue metadata changes in a way that invalidates evidence, or if the head changes for any reason, discard the prior terminal claim. Repeat the complete local audit. Explicitly re-request GitHub Copilot and remote Codex on the new head. Do not carry a clean result across heads. Do not merge, enable auto-merge, close the issue, publish a landed handoff, or start a cross-repository comparison.
 
-Return `TERMINALLY_CLEAN` only when the local executor and `chatgpt-codex-connector` are clean on the same current head SHA and tree, every thread and synthetic finding is closed, all required checks and validations have truthful terminal results, the issue and PR descriptions are accurate, no unfinished work or illegitimate deferral remains, and the exact review receipt is public and readable. Otherwise return `REVIEW_BLOCKED` with the exact blocker and the required return path: Task 22 for bytes or Task 23 for PR-only metadata, followed by a new Task 24 instance in the same loop.
+Return `TERMINALLY_CLEAN` only when the local audit, GitHub Copilot review, and `chatgpt-codex-connector` review are clean on the same current head SHA and tree. Every thread and synthetic finding must be closed. All required checks and validations must have truthful terminal results. The issue and PR descriptions must be accurate. No unfinished work or illegitimate deferral can remain. The exact review receipts must be public and readable. Otherwise, return `REVIEW_BLOCKED` with the exact blocker and the required return path: Task 22 for bytes or Task 23 for PR-only metadata, followed by a new Task 24 instance in the same loop.
 ~~~
 
 ### Procedure
@@ -3267,7 +3267,7 @@ Return `TERMINALLY_CLEAN` only when the local executor and `chatgpt-codex-connec
 
 ### Validation and evidence
 
-Require correct conditional handling; on repair, required model/effort/native executor or controlled fallback, applicable instructions, complete pagination, local and remote clean on one head/tree, all blocker/issue/parity/check/deferral evidence, and no merge; on skip, exact state.
+Require correct conditional handling. On repair, require the required model and effort, a native executor or controlled fallback, applicable instructions, complete pagination, a clean local audit, clean GitHub Copilot and remote Codex reviews on one head/tree, all blocker/issue/parity/check/deferral evidence, and no merge. On skip, require exact state.
 
 ### Stop and escalation conditions
 
@@ -3275,11 +3275,11 @@ Stop without starting a successor if an input object is unavailable, a ref or bo
 
 ### Exact output
 
-One `PR78_SELECTED_REPAIR_TERMINALLY_CLEAN` record contains complete local/remote exact-head evidence and loop identity, or one exact skip.
+One `PR78_SELECTED_REPAIR_TERMINALLY_CLEAN` record contains exact-head local audit evidence, the GitHub Copilot review ID and commit, the remote Codex review receipt, and the loop identity, or one exact skip.
 
 ### Complete when
 
-Both reviewers are clean on the same selected-target head/tree, or the fixed-point branch is skipped; no unresolved work or successor action occurred.
+The local audit, GitHub Copilot review, and remote Codex review are clean on the same selected-target head/tree, or the fixed-point branch is skipped. No unresolved work or successor action occurred.
 
 ## Task 25 — run the independent final quality check on one selected-target PR #78 repair PR
 
@@ -3382,7 +3382,7 @@ Change only the exact blocker path set selected by the latest comparison. Use th
 
 ### Independent final quality-check prompt
 
-Copy this complete prompt into a fresh coding-agent session that did not implement the change and did not run the Codex review loop.
+Copy this complete prompt into a fresh coding-agent session that did not implement the change and did not run the Copilot-and-Codex review loop.
 
 ~~~text
 You are the independent final quality checker for repository `{{PR78_SELECTED_REPAIR_REPOSITORY}}`, pull request `{{PR78_SELECTED_REPAIR_PR_URL}}`, and governing issue `{{PR78_SELECTED_REPAIR_ISSUE_URL}}`. You are not the implementation or review-loop executor.
@@ -3395,7 +3395,7 @@ Independently audit the entire diff and all governing-issue requirements. Verify
 
 Run the full applicable repository validation from a clean state. Include the complete agent-instruction and mutation suite, manifest validator, workflow/YAML validation, Markdown lint, repository hooks or pre-commit, package and lock consistency, trust-root/security tests, `git diff --check`, and raw-byte Git-blob/SHA-256 comparisons. Record commands, runtimes, native exit codes, and exact outputs. Do not repair, push, comment, change PR metadata, merge, enable auto-merge, close an issue, or publish a handoff in this task.
 
-Return `PASS` only when all evidence applies to the exact same final head and tree as the review receipt. If any repository byte, head, issue requirement, PR description, evidence-bearing metadata, review state, or required check changes, return `FAIL — EVIDENCE_INVALIDATED`; require the operator to use Task 22 or Task 23 as applicable, then new Tasks 24 and 25 instances in the same loop, rerun the full local and remote Codex review loop, and then run a new independent quality check. If a defect exists without a byte change, return `FAIL` with exact evidence and the same return path. Do not merge.
+Return `PASS` only when all evidence applies to the exact same final head and tree as the review receipt. If any repository byte, head, issue requirement, PR description, evidence-bearing metadata, review state, or required check changes, return `FAIL — EVIDENCE_INVALIDATED`; require the operator to use Task 22 or Task 23 as applicable, then new Tasks 24 and 25 instances in the same loop, rerun the full local audit and Copilot-and-Codex review loop, and then run a new independent quality check. If a defect exists without a byte change, return `FAIL` with exact evidence and the same return path. Do not merge.
 ~~~
 
 ### Procedure
@@ -4182,7 +4182,7 @@ Explicitly commence only the implementation governed by implement PS PR-body ide
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -4262,7 +4262,7 @@ Implement and locally validate implement PS PR-body identity synchronization wit
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -4345,7 +4345,7 @@ Create or update only the focused candidate PR for implement PS PR-body identity
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -4376,7 +4376,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -4394,7 +4394,7 @@ The PS #168 candidate PR exists with complete initial validation and an accurate
 
 The PS #168 candidate PR exists with complete initial validation and an accurate PR body.
 
-## Task 35 — run the Codex review loop on the PS #168 PR
+## Task 35 — run the Copilot-and-Codex review loop on the PS #168 PR
 
 > **Execution class: Coding agent executable.**
 >
@@ -4430,7 +4430,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Complete only this leaf action: run the Codex review loop on the PS #168 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
+Complete only this leaf action: run the Copilot-and-Codex review loop on the PS #168 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
 
 ### Execution controls
 
@@ -4438,7 +4438,7 @@ Complete only this leaf action: run the Codex review loop on the PS #168 PR. Pro
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -4448,9 +4448,9 @@ Complete only this leaf action: run the Codex review loop on the PS #168 PR. Pro
 
 ### Procedure
 
-Run the task-local Codex review-loop prompt below against the PS #168 PR. Do not merge. If the loop changes bytes, rerun the Task 34 validation and continue on the new head.
+Run the task-local Copilot-and-Codex review-loop prompt below against the PS #168 PR. Do not merge. If the loop changes bytes, rerun the Task 34 validation and continue on the new head.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`:
 
@@ -4525,7 +4525,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 35 | `FS` | The Codex review loop is terminally clean. |
+| Task 35 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
 
 ### Objective
 
@@ -4537,7 +4537,7 @@ Complete only this leaf action: run the independent final quality check on the P
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -4551,7 +4551,7 @@ Run the task-local independent final PR quality-check prompt below against the P
 
 ### Independent final PR quality-check prompt
 
-Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Codex review loop is terminally clean:
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Copilot-and-Codex review loop is terminally clean:
 
 ~~~text
 Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
@@ -4560,7 +4560,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -4571,7 +4571,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -4635,7 +4635,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -4648,7 +4648,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -4718,7 +4718,7 @@ Publish the permanent implementation handoff using only the actual landed commit
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -4788,7 +4788,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -4944,7 +4944,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -5016,7 +5016,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -5088,7 +5088,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -5226,7 +5226,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -5250,7 +5250,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -5268,7 +5268,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 44 — run the Codex review loop on the focused repair PR for the PR-body identity synchronization cycle in Terraform
+## Task 44 — run the Copilot-and-Codex review loop on the focused repair PR for the PR-body identity synchronization cycle in Terraform
 
 > **Execution class: Coding agent executable.**
 >
@@ -5303,7 +5303,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -5311,7 +5311,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -5326,7 +5326,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 44 for the new head before Task 45. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -5410,7 +5410,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -5422,7 +5422,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 44 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 43's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 44 for the new head, and then repeat Task 45 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -5434,7 +5434,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -5445,7 +5445,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -5508,7 +5508,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -5521,7 +5521,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -5590,7 +5590,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -5669,7 +5669,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -5822,7 +5822,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -5894,7 +5894,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -5966,7 +5966,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -6105,7 +6105,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -6129,7 +6129,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -6147,7 +6147,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 53 — run the Codex review loop on the focused repair PR for the PR-body identity synchronization cycle in PS
+## Task 53 — run the Copilot-and-Codex review loop on the focused repair PR for the PR-body identity synchronization cycle in PS
 
 > **Execution class: Coding agent executable.**
 >
@@ -6182,7 +6182,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -6190,7 +6190,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -6205,7 +6205,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 53 for the new head before Task 54. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -6289,7 +6289,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -6301,7 +6301,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 53 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 52's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 53 for the new head, and then repeat Task 54 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -6313,7 +6313,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -6324,7 +6324,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -6387,7 +6387,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -6400,7 +6400,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -6469,7 +6469,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -6549,7 +6549,7 @@ Perform one reciprocal recheck and emit `FIXED_POINT_READY` or the exact next `R
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -6686,7 +6686,7 @@ Publish only the permanent fixed-point or issue-closure record. Do not compare, 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -6767,7 +6767,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -7002,7 +7002,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -7082,7 +7082,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -7229,7 +7229,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -7261,7 +7261,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -7279,7 +7279,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, for the current issue-ready branch.
 
-## Task 64 — run the Codex review loop on the PS #169 PR
+## Task 64 — run the Copilot-and-Codex review loop on the PS #169 PR
 
 > **Execution class: Coding agent executable.**
 >
@@ -7314,7 +7314,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -7322,7 +7322,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -7337,7 +7337,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 64 for the new head before Task 65. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -7421,7 +7421,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -7433,7 +7433,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 64 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 63's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 64 for the new head, and then repeat Task 65 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -7445,7 +7445,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -7456,7 +7456,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -7519,7 +7519,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -7532,7 +7532,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -7601,7 +7601,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -7833,7 +7833,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -7913,7 +7913,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -8060,7 +8060,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -8092,7 +8092,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -8110,7 +8110,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, for the current issue-ready branch.
 
-## Task 73 — run the Codex review loop on the PS #170 PR
+## Task 73 — run the Copilot-and-Codex review loop on the PS #170 PR
 
 > **Execution class: Coding agent executable.**
 >
@@ -8145,7 +8145,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -8153,7 +8153,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -8168,7 +8168,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 73 for the new head before Task 74. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -8252,7 +8252,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -8264,7 +8264,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 73 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 72's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 73 for the new head, and then repeat Task 74 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -8276,7 +8276,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -8287,7 +8287,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -8350,7 +8350,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -8363,7 +8363,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -8432,7 +8432,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -8664,7 +8664,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -8744,7 +8744,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -8891,7 +8891,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -8923,7 +8923,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -8941,7 +8941,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, for the current issue-ready branch.
 
-## Task 82 — run the Codex review loop on the PS #171 PR
+## Task 82 — run the Copilot-and-Codex review loop on the PS #171 PR
 
 > **Execution class: Coding agent executable.**
 >
@@ -8976,7 +8976,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -8984,7 +8984,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -8999,7 +8999,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 82 for the new head before Task 83. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -9083,7 +9083,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -9095,7 +9095,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 82 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 81's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 82 for the new head, and then repeat Task 83 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -9107,7 +9107,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -9118,7 +9118,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -9181,7 +9181,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -9194,7 +9194,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -9263,7 +9263,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -9359,7 +9359,7 @@ Perform one reciprocal recheck and emit `FIXED_POINT_READY` or the exact next `R
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -9496,7 +9496,7 @@ Publish only the permanent fixed-point or issue-closure record. Do not compare, 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -9575,7 +9575,7 @@ Explicitly commence only the implementation governed by implement PS workflow is
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -9691,7 +9691,7 @@ Implement and locally validate implement PS workflow isolation and policy conver
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -9855,7 +9855,7 @@ Create or update only the focused candidate PR for implement PS workflow isolati
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -9967,7 +9967,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -9985,7 +9985,7 @@ The PS #162 candidate PR exists with complete initial validation and an accurate
 
 The PS #162 candidate PR exists with complete initial validation and an accurate PR body.
 
-## Task 91 — run the Codex review loop on the PS #162 PR
+## Task 91 — run the Copilot-and-Codex review loop on the PS #162 PR
 
 > **Execution class: Coding agent executable.**
 >
@@ -10021,7 +10021,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Complete only this leaf action: run the Codex review loop on the PS #162 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
+Complete only this leaf action: run the Copilot-and-Codex review loop on the PS #162 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
 
 ### Execution controls
 
@@ -10029,7 +10029,7 @@ Complete only this leaf action: run the Codex review loop on the PS #162 PR. Pro
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -10039,9 +10039,9 @@ Complete only this leaf action: run the Codex review loop on the PS #162 PR. Pro
 
 ### Procedure
 
-Run the task-local Codex review-loop prompt below against the PS #162 PR. Do not merge. If the loop changes bytes, rerun the Task 90 validation and continue on the new head.
+Run the task-local Copilot-and-Codex review-loop prompt below against the PS #162 PR. Do not merge. If the loop changes bytes, rerun the Task 90 validation and continue on the new head.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`:
 
@@ -10116,7 +10116,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 91 | `FS` | The Codex review loop is terminally clean. |
+| Task 91 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
 
 ### Objective
 
@@ -10128,7 +10128,7 @@ Complete only this leaf action: run the independent final quality check on the P
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -10142,7 +10142,7 @@ Run the task-local independent final PR quality-check prompt below against the P
 
 ### Independent final PR quality-check prompt
 
-Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Codex review loop is terminally clean:
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Copilot-and-Codex review loop is terminally clean:
 
 ~~~text
 Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
@@ -10151,7 +10151,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -10162,7 +10162,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -10226,7 +10226,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -10239,7 +10239,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -10309,7 +10309,7 @@ Publish the permanent implementation handoff using only the actual landed commit
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -10379,7 +10379,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -10535,7 +10535,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -10607,7 +10607,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -10679,7 +10679,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -10817,7 +10817,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -10841,7 +10841,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -10859,7 +10859,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 100 — run the Codex review loop on the focused repair PR for cycle 3 in Terraform
+## Task 100 — run the Copilot-and-Codex review loop on the focused repair PR for cycle 3 in Terraform
 
 > **Execution class: Coding agent executable.**
 >
@@ -10894,7 +10894,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -10902,7 +10902,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -10917,7 +10917,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 100 for the new head before Task 101. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -11001,7 +11001,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -11013,7 +11013,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 100 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 99's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 100 for the new head, and then repeat Task 101 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -11025,7 +11025,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -11036,7 +11036,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -11099,7 +11099,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -11112,7 +11112,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -11181,7 +11181,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -11260,7 +11260,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -11413,7 +11413,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -11485,7 +11485,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -11557,7 +11557,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -11696,7 +11696,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -11720,7 +11720,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -11738,7 +11738,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 109 — run the Codex review loop on the focused repair PR for cycle 3 in PS
+## Task 109 — run the Copilot-and-Codex review loop on the focused repair PR for cycle 3 in PS
 
 > **Execution class: Coding agent executable.**
 >
@@ -11773,7 +11773,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -11781,7 +11781,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -11796,7 +11796,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 109 for the new head before Task 110. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -11880,7 +11880,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -11892,7 +11892,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 109 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 108's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 109 for the new head, and then repeat Task 110 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -11904,7 +11904,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -11915,7 +11915,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -11978,7 +11978,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -11991,7 +11991,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -12060,7 +12060,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -12140,7 +12140,7 @@ Perform one reciprocal recheck and emit `FIXED_POINT_READY` or the exact next `R
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -12277,7 +12277,7 @@ Publish only the permanent fixed-point or issue-closure record. Do not compare, 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -12348,7 +12348,7 @@ Complete only this leaf action: post the initial three-cycle handoff. Produce th
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -12417,7 +12417,7 @@ Update only the existing PS #158 issue record with the final landed workflow-pol
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -12495,7 +12495,7 @@ Explicitly commence only the implementation governed by implement the PS read-on
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -12566,7 +12566,7 @@ Implement and locally validate implement the PS read-only supply-freeze recorder
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -12687,7 +12687,7 @@ Create or update only the focused candidate PR for implement the PS read-only su
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -12753,7 +12753,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -12771,7 +12771,7 @@ The PS #158 candidate PR exists with complete initial validation and an accurate
 
 The PS #158 candidate PR exists with complete initial validation and an accurate PR body.
 
-## Task 120 — run the Codex review loop on the PS #158 PR
+## Task 120 — run the Copilot-and-Codex review loop on the PS #158 PR
 
 > **Execution class: Coding agent executable.**
 >
@@ -12807,7 +12807,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Complete only this leaf action: run the Codex review loop on the PS #158 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
+Complete only this leaf action: run the Copilot-and-Codex review loop on the PS #158 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
 
 ### Execution controls
 
@@ -12815,7 +12815,7 @@ Complete only this leaf action: run the Codex review loop on the PS #158 PR. Pro
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -12825,9 +12825,9 @@ Complete only this leaf action: run the Codex review loop on the PS #158 PR. Pro
 
 ### Procedure
 
-Run the task-local Codex review-loop prompt below against the PS #158 PR. Do not merge. If the loop changes bytes, rerun the Task 119 validation.
+Run the task-local Copilot-and-Codex review-loop prompt below against the PS #158 PR. Do not merge. If the loop changes bytes, rerun the Task 119 validation.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`:
 
@@ -12902,7 +12902,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 120 | `FS` | The Codex review loop is terminally clean. |
+| Task 120 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
 
 ### Objective
 
@@ -12914,7 +12914,7 @@ Complete only this leaf action: run the independent final quality check on the P
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -12928,7 +12928,7 @@ Run the task-local independent final PR quality-check prompt below. Require PS #
 
 ### Independent final PR quality-check prompt
 
-Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Codex review loop is terminally clean:
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Copilot-and-Codex review loop is terminally clean:
 
 ~~~text
 Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
@@ -12937,7 +12937,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -12948,7 +12948,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -13012,7 +13012,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -13025,7 +13025,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -13095,7 +13095,7 @@ Publish the permanent implementation handoff using only the actual landed commit
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -13165,7 +13165,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -13321,7 +13321,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -13393,7 +13393,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -13465,7 +13465,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -13603,7 +13603,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -13627,7 +13627,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -13645,7 +13645,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 129 — run the Codex review loop on the focused repair PR for cycle 4 in Terraform
+## Task 129 — run the Copilot-and-Codex review loop on the focused repair PR for cycle 4 in Terraform
 
 > **Execution class: Coding agent executable.**
 >
@@ -13680,7 +13680,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -13688,7 +13688,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -13703,7 +13703,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 129 for the new head before Task 130. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -13787,7 +13787,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -13799,7 +13799,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 129 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 128's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 129 for the new head, and then repeat Task 130 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -13811,7 +13811,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -13822,7 +13822,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -13885,7 +13885,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -13898,7 +13898,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -13967,7 +13967,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -14046,7 +14046,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -14199,7 +14199,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -14271,7 +14271,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -14343,7 +14343,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -14482,7 +14482,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -14506,7 +14506,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -14524,7 +14524,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 138 — run the Codex review loop on the focused repair PR for cycle 4 in PS
+## Task 138 — run the Copilot-and-Codex review loop on the focused repair PR for cycle 4 in PS
 
 > **Execution class: Coding agent executable.**
 >
@@ -14559,7 +14559,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -14567,7 +14567,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -14582,7 +14582,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 138 for the new head before Task 139. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -14666,7 +14666,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -14678,7 +14678,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 138 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 137's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 138 for the new head, and then repeat Task 139 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -14690,7 +14690,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -14701,7 +14701,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -14764,7 +14764,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -14777,7 +14777,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -14846,7 +14846,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -14926,7 +14926,7 @@ Perform one reciprocal recheck and emit `FIXED_POINT_READY` or the exact next `R
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -15063,7 +15063,7 @@ Publish only the permanent fixed-point or issue-closure record. Do not compare, 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -15135,7 +15135,7 @@ Complete only this leaf action: close the PS foundation umbrella. Produce the ex
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -15210,7 +15210,7 @@ Explicitly commence only the implementation governed by implement the PS Claude 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -15287,7 +15287,7 @@ Implement and locally validate implement the PS Claude review-loop command witho
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -15419,7 +15419,7 @@ Create or update only the focused candidate PR for implement the PS Claude revie
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -15490,7 +15490,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -15508,7 +15508,7 @@ The PS #163 candidate PR exists with complete initial validation and an accurate
 
 The PS #163 candidate PR exists with complete initial validation and an accurate PR body.
 
-## Task 148 — run the Codex review loop on the PS #163 PR
+## Task 148 — run the Copilot-and-Codex review loop on the PS #163 PR
 
 > **Execution class: Coding agent executable.**
 >
@@ -15544,7 +15544,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Complete only this leaf action: run the Codex review loop on the PS #163 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
+Complete only this leaf action: run the Copilot-and-Codex review loop on the PS #163 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
 
 ### Execution controls
 
@@ -15552,7 +15552,7 @@ Complete only this leaf action: run the Codex review loop on the PS #163 PR. Pro
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -15562,9 +15562,9 @@ Complete only this leaf action: run the Codex review loop on the PS #163 PR. Pro
 
 ### Procedure
 
-Run the task-local Codex review-loop prompt below against the PS #163 PR. Do not merge. If the loop changes bytes, rerun the Task 147 validation.
+Run the task-local Copilot-and-Codex review-loop prompt below against the PS #163 PR. Do not merge. If the loop changes bytes, rerun the Task 147 validation.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`:
 
@@ -15639,7 +15639,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 148 | `FS` | The Codex review loop is terminally clean. |
+| Task 148 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
 
 ### Objective
 
@@ -15651,7 +15651,7 @@ Complete only this leaf action: run the independent final quality check on the P
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -15665,7 +15665,7 @@ Run the task-local independent final PR quality-check prompt below. Require PS #
 
 ### Independent final PR quality-check prompt
 
-Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Codex review loop is terminally clean:
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Copilot-and-Codex review loop is terminally clean:
 
 ~~~text
 Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
@@ -15674,7 +15674,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -15685,7 +15685,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -15749,7 +15749,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -15762,7 +15762,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -15832,7 +15832,7 @@ Publish the permanent implementation handoff using only the actual landed commit
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -15902,7 +15902,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -16058,7 +16058,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -16130,7 +16130,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -16202,7 +16202,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -16340,7 +16340,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -16364,7 +16364,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -16382,7 +16382,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 157 — run the Codex review loop on the focused repair PR for cycle 5 in Terraform
+## Task 157 — run the Copilot-and-Codex review loop on the focused repair PR for cycle 5 in Terraform
 
 > **Execution class: Coding agent executable.**
 >
@@ -16417,7 +16417,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -16425,7 +16425,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -16440,7 +16440,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 157 for the new head before Task 158. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -16524,7 +16524,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -16536,7 +16536,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 157 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 156's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 157 for the new head, and then repeat Task 158 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -16548,7 +16548,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -16559,7 +16559,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -16622,7 +16622,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -16635,7 +16635,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -16704,7 +16704,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -16783,7 +16783,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -16936,7 +16936,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -17008,7 +17008,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -17080,7 +17080,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -17219,7 +17219,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -17243,7 +17243,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -17261,7 +17261,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 166 — run the Codex review loop on the focused repair PR for cycle 5 in PS
+## Task 166 — run the Copilot-and-Codex review loop on the focused repair PR for cycle 5 in PS
 
 > **Execution class: Coding agent executable.**
 >
@@ -17296,7 +17296,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -17304,7 +17304,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -17319,7 +17319,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 166 for the new head before Task 167. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -17403,7 +17403,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -17415,7 +17415,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 166 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 165's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 166 for the new head, and then repeat Task 167 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -17427,7 +17427,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -17438,7 +17438,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -17501,7 +17501,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -17514,7 +17514,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -17583,7 +17583,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -17663,7 +17663,7 @@ Perform one reciprocal recheck and emit `FIXED_POINT_READY` or the exact next `R
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -17800,7 +17800,7 @@ Publish only the permanent fixed-point or issue-closure record. Do not compare, 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -17872,7 +17872,7 @@ Complete only this leaf action: close the Terraform initial-convergence tracker.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -17956,7 +17956,7 @@ Explicitly commence only the implementation governed by implement Terraform #21 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -18038,7 +18038,7 @@ Implement and locally validate implement Terraform #21 from the landed PS P1A so
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -18124,7 +18124,7 @@ Create or update only the focused candidate PR for implement Terraform #21 from 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -18157,7 +18157,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -18175,7 +18175,7 @@ The Terraform #21 candidate PR exists with complete initial validation and an ac
 
 The Terraform #21 candidate PR exists with complete initial validation and an accurate PR body. Keep #21 open.
 
-## Task 176 — run the Codex review loop on the Terraform #21 PR
+## Task 176 — run the Copilot-and-Codex review loop on the Terraform #21 PR
 
 > **Execution class: Coding agent executable.**
 >
@@ -18211,7 +18211,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Complete only this leaf action: run the Codex review loop on the Terraform #21 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
+Complete only this leaf action: run the Copilot-and-Codex review loop on the Terraform #21 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
 
 ### Execution controls
 
@@ -18219,7 +18219,7 @@ Complete only this leaf action: run the Codex review loop on the Terraform #21 P
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -18229,9 +18229,9 @@ Complete only this leaf action: run the Codex review loop on the Terraform #21 P
 
 ### Procedure
 
-Run the task-local Codex review-loop prompt below in TerraformStyleGuide against the Terraform #21 PR. Apply that repository's current root `AGENTS.md` instructions, or read its root `CLAUDE.md` as compatibility workflow instructions when `AGENTS.md` is absent. Do not merge. If the loop changes bytes, rerun the Task 175 validation.
+Run the task-local Copilot-and-Codex review-loop prompt below in TerraformStyleGuide against the Terraform #21 PR. Apply that repository's current root `AGENTS.md` instructions, or read its root `CLAUDE.md` as compatibility workflow instructions when `AGENTS.md` is absent. Do not merge. If the loop changes bytes, rerun the Task 175 validation.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`:
 
@@ -18306,7 +18306,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 176 | `FS` | The Codex review loop is terminally clean. |
+| Task 176 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
 
 ### Objective
 
@@ -18318,7 +18318,7 @@ Complete only this leaf action: run the independent final quality check on the T
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -18332,7 +18332,7 @@ Run the task-local independent final PR quality-check prompt below. Require all 
 
 ### Independent final PR quality-check prompt
 
-Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Codex review loop is terminally clean:
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Copilot-and-Codex review loop is terminally clean:
 
 ~~~text
 Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
@@ -18341,7 +18341,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -18352,7 +18352,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -18416,7 +18416,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -18429,7 +18429,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -18499,7 +18499,7 @@ Publish the permanent implementation handoff using only the actual landed commit
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -18570,7 +18570,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -18732,7 +18732,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -18804,7 +18804,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -18876,7 +18876,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -19015,7 +19015,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -19039,7 +19039,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -19057,7 +19057,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 185 — run the Codex review loop on the focused repair PR for Terraform #21 in PS
+## Task 185 — run the Copilot-and-Codex review loop on the focused repair PR for Terraform #21 in PS
 
 > **Execution class: Coding agent executable.**
 >
@@ -19093,7 +19093,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -19101,7 +19101,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -19116,7 +19116,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 185 for the new head before Task 186. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -19201,7 +19201,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -19213,7 +19213,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 185 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 184's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 185 for the new head, and then repeat Task 186 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -19225,7 +19225,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -19236,7 +19236,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -19300,7 +19300,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -19313,7 +19313,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -19383,7 +19383,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -19454,7 +19454,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -19606,7 +19606,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -19678,7 +19678,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -19750,7 +19750,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -19886,7 +19886,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -19910,7 +19910,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -19928,7 +19928,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 194 — run the Codex review loop on the focused repair PR for the final Terraform recheck
+## Task 194 — run the Copilot-and-Codex review loop on the focused repair PR for the final Terraform recheck
 
 > **Execution class: Coding agent executable.**
 >
@@ -19963,7 +19963,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -19971,7 +19971,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -19986,7 +19986,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 194 for the new head before Task 195. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -20070,7 +20070,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -20082,7 +20082,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 194 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 193's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 194 for the new head, and then repeat Task 195 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -20094,7 +20094,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -20105,7 +20105,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -20168,7 +20168,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -20181,7 +20181,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -20250,7 +20250,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -20330,7 +20330,7 @@ Perform one reciprocal recheck and emit `FIXED_POINT_READY` or the exact next `R
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -20464,7 +20464,7 @@ Publish only the permanent fixed-point or issue-closure record. Do not compare, 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -20580,7 +20580,7 @@ Each applicable row occurs exactly once. Record both repository URLs and commits
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -20665,7 +20665,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -20681,7 +20681,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 | Task 202 | Create or update one focused issue in the behind repository. Pin the other repository's landed commit and source blobs. |
 | Task 203 | Issue creation does not start implementation. Start only after issue setup and a free implementation slot. |
 | Task 201 | Keep both repositories self-contained. Do not combine unrelated fixes or change settings without exact authorization. |
-| Task 205 | Prepare one focused repair PR. Run the candidate, Codex review-loop, independent final quality-check, and merge actions as discrete lifecycle steps. |
+| Task 205 | Prepare one focused repair PR. Run the candidate, Copilot-and-Codex review-loop, independent final quality-check, and merge actions as discrete lifecycle steps. |
 | Task 210 | Compare the landed repair in the other repository. Post a pinned no-change record or run the same four discrete steps for one focused reciprocal repair. |
 | Task 201 | Run the reverse comparison. Stop for a new decision process if a row changes direction twice. |
 | Task 211 | Close the cycle only when every common row is `same`, all intentional differences have complete evidence, and no blocker remains. |
@@ -20836,7 +20836,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -20908,7 +20908,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -20980,7 +20980,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -21123,7 +21123,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -21147,7 +21147,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -21165,7 +21165,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 206 — run the Codex review loop on the focused repair PR for one untracked-blocker reciprocal cycle
+## Task 206 — run the Copilot-and-Codex review loop on the focused repair PR for one untracked-blocker reciprocal cycle
 
 > **Execution class: Coding agent executable.**
 >
@@ -21200,7 +21200,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -21208,7 +21208,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -21223,7 +21223,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 206 for the new head before Task 207. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -21307,7 +21307,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -21319,7 +21319,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 206 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 205's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 206 for the new head, and then repeat Task 207 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -21331,7 +21331,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -21342,7 +21342,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -21405,7 +21405,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -21418,7 +21418,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -21487,7 +21487,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -21567,7 +21567,7 @@ Perform one reciprocal recheck and emit `FIXED_POINT_READY` or the exact next `R
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -21708,7 +21708,7 @@ Publish only the permanent fixed-point or issue-closure record. Do not compare, 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -21833,7 +21833,7 @@ Each applicable row occurs exactly once. Record both repository URLs and commits
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -21911,7 +21911,7 @@ Explicitly commence only the implementation governed by prepare the PS P1B write
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -21980,7 +21980,7 @@ Implement and locally validate prepare the PS P1B writer candidate and decision 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -22058,7 +22058,7 @@ Create or update only the focused candidate PR for prepare the PS P1B writer can
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -22078,7 +22078,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -22154,7 +22154,7 @@ Complete only this leaf action: prepare read-only PS #152 settings evidence. Pro
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -22187,7 +22187,7 @@ PS #152 contains a complete, current, read-only evidence package that an owner c
 
 PS #152 contains a complete, current, read-only evidence package that an owner can approve or reject without guessing.
 
-## Task 217 — run the Codex review loop on the PS #147 PR
+## Task 217 — run the Copilot-and-Codex review loop on the PS #147 PR
 
 > **Execution class: Coding agent executable.**
 >
@@ -22233,7 +22233,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Complete only this leaf action: run the Codex review loop on the PS #147 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
+Complete only this leaf action: run the Copilot-and-Codex review loop on the PS #147 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
 
 ### Execution controls
 
@@ -22241,7 +22241,7 @@ Complete only this leaf action: run the Codex review loop on the PS #147 PR. Pro
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -22251,9 +22251,9 @@ Complete only this leaf action: run the Codex review loop on the PS #147 PR. Pro
 
 ### Procedure
 
-Run the task-local Codex review-loop prompt below against the PS #147 PR. Do not merge or change repository settings. If the loop changes bytes or the writer design, rerun the applicable Task 215 validation and refresh Task 216 settings evidence before the next round.
+Run the task-local Copilot-and-Codex review-loop prompt below against the PS #147 PR. Do not merge or change repository settings. If the loop changes bytes or the writer design, rerun the applicable Task 215 validation and refresh Task 216 settings evidence before the next round.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`:
 
@@ -22329,7 +22329,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 217 | `FS` | The Codex review loop is terminally clean. |
+| Task 217 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
 
 ### Objective
 
@@ -22341,7 +22341,7 @@ Complete only this leaf action: run the independent final quality check on the P
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -22355,7 +22355,7 @@ Run the task-local independent final PR quality-check prompt below. Require full
 
 ### Independent final PR quality-check prompt
 
-Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Codex review loop is terminally clean:
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Copilot-and-Codex review loop is terminally clean:
 
 ~~~text
 Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
@@ -22364,7 +22364,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -22375,7 +22375,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -22456,7 +22456,7 @@ Complete only this leaf action: approve or reject the P1B authority decisions. P
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -22534,7 +22534,7 @@ Complete only this leaf action: prove and activate the approved PS #152 settings
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -22617,7 +22617,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -22637,7 +22637,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -22707,7 +22707,7 @@ Publish the permanent implementation handoff using only the actual landed commit
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -22836,7 +22836,7 @@ Each applicable row occurs exactly once. Record both repository URLs and commits
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -22915,7 +22915,7 @@ Explicitly commence only the implementation governed by implement Terraform #22.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -22984,7 +22984,7 @@ Implement and locally validate implement Terraform #22 without creating or updat
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -23102,7 +23102,7 @@ Create or update only the focused candidate PR for implement Terraform #22; do n
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -23168,7 +23168,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -23186,7 +23186,7 @@ The Terraform #22 candidate PR exists with complete source, destination, validat
 
 The Terraform #22 candidate PR exists with complete source, destination, validation, settings, and audit evidence.
 
-## Task 227 — run the Codex review loop on the Terraform #22 PR
+## Task 227 — run the Copilot-and-Codex review loop on the Terraform #22 PR
 
 > **Execution class: Coding agent executable.**
 >
@@ -23222,7 +23222,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Complete only this leaf action: run the Codex review loop on the Terraform #22 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
+Complete only this leaf action: run the Copilot-and-Codex review loop on the Terraform #22 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
 
 ### Task-local common-foundation contract
 
@@ -23275,7 +23275,7 @@ Each applicable row occurs exactly once. Record both repository URLs and commits
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -23285,9 +23285,9 @@ Each applicable row occurs exactly once. Record both repository URLs and commits
 
 ### Procedure
 
-Run the task-local Codex review-loop prompt below in TerraformStyleGuide. Do not merge or change settings without exact authorization. If bytes change, rerun Task 226 validation and refresh the reciprocal matrix.
+Run the task-local Copilot-and-Codex review-loop prompt below in TerraformStyleGuide. Do not merge or change settings without exact authorization. If bytes change, rerun Task 226 validation and refresh the reciprocal matrix.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`:
 
@@ -23362,7 +23362,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 227 | `FS` | The Codex review loop is terminally clean. |
+| Task 227 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
 
 ### Objective
 
@@ -23374,7 +23374,7 @@ Complete only this leaf action: run the independent final quality check on the T
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -23388,7 +23388,7 @@ Run the task-local independent final PR quality-check prompt below. Require comp
 
 ### Independent final PR quality-check prompt
 
-Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Codex review loop is terminally clean:
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Copilot-and-Codex review loop is terminally clean:
 
 ~~~text
 Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
@@ -23397,7 +23397,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -23408,7 +23408,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -23472,7 +23472,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -23485,7 +23485,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -23555,7 +23555,7 @@ Publish the permanent implementation handoff using only the actual landed commit
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -23625,7 +23625,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -23778,7 +23778,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -23850,7 +23850,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -23922,7 +23922,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -24061,7 +24061,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -24085,7 +24085,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -24103,7 +24103,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 236 — run the Codex review loop on the focused repair PR for T1B in PS
+## Task 236 — run the Copilot-and-Codex review loop on the focused repair PR for T1B in PS
 
 > **Execution class: Coding agent executable.**
 >
@@ -24138,7 +24138,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -24146,7 +24146,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -24161,7 +24161,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 236 for the new head before Task 237. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -24245,7 +24245,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -24257,7 +24257,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 236 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 235's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 236 for the new head, and then repeat Task 237 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -24269,7 +24269,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -24280,7 +24280,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -24343,7 +24343,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -24356,7 +24356,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -24425,7 +24425,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -24496,7 +24496,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -24643,7 +24643,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -24715,7 +24715,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -24787,7 +24787,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -24923,7 +24923,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -24947,7 +24947,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -24965,7 +24965,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 245 — run the Codex review loop on the focused repair PR for the final Terraform T1B recheck
+## Task 245 — run the Copilot-and-Codex review loop on the focused repair PR for the final Terraform T1B recheck
 
 > **Execution class: Coding agent executable.**
 >
@@ -25000,7 +25000,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -25008,7 +25008,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -25023,7 +25023,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 245 for the new head before Task 246. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -25107,7 +25107,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -25119,7 +25119,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 245 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 244's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 245 for the new head, and then repeat Task 246 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -25131,7 +25131,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -25142,7 +25142,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -25205,7 +25205,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -25218,7 +25218,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -25287,7 +25287,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -25367,7 +25367,7 @@ Perform one reciprocal recheck and emit `FIXED_POINT_READY` or the exact next `R
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -25501,7 +25501,7 @@ Publish only the permanent fixed-point or issue-closure record. Do not compare, 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -25573,7 +25573,7 @@ Explicitly commence only the implementation governed by implement PS #148. Do no
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -25642,7 +25642,7 @@ Implement and locally validate implement PS #148 without creating or updating a 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -25715,7 +25715,7 @@ Create or update only the focused candidate PR for implement PS #148; do not run
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -25735,7 +25735,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -25753,7 +25753,7 @@ The PS #148 candidate PR exists with all required identities, initial validation
 
 The PS #148 candidate PR exists with all required identities, initial validation, and issue-contract evidence.
 
-## Task 254 — run the Codex review loop on the PS #148 PR
+## Task 254 — run the Copilot-and-Codex review loop on the PS #148 PR
 
 > **Execution class: Coding agent executable.**
 >
@@ -25789,7 +25789,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Complete only this leaf action: run the Codex review loop on the PS #148 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
+Complete only this leaf action: run the Copilot-and-Codex review loop on the PS #148 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
 
 ### Execution controls
 
@@ -25797,7 +25797,7 @@ Complete only this leaf action: run the Codex review loop on the PS #148 PR. Pro
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -25807,9 +25807,9 @@ Complete only this leaf action: run the Codex review loop on the PS #148 PR. Pro
 
 ### Procedure
 
-Run the task-local Codex review-loop prompt below against the PS #148 PR. Do not merge. If bytes change, rerun Task 253 validation.
+Run the task-local Copilot-and-Codex review-loop prompt below against the PS #148 PR. Do not merge. If bytes change, rerun Task 253 validation.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`:
 
@@ -25884,7 +25884,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 254 | `FS` | The Codex review loop is terminally clean. |
+| Task 254 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
 
 ### Objective
 
@@ -25896,7 +25896,7 @@ Complete only this leaf action: run the independent final quality check on the P
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -25910,7 +25910,7 @@ Run the task-local independent final PR quality-check prompt below. Require comp
 
 ### Independent final PR quality-check prompt
 
-Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Codex review loop is terminally clean:
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Copilot-and-Codex review loop is terminally clean:
 
 ~~~text
 Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
@@ -25919,7 +25919,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -25930,7 +25930,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -25994,7 +25994,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -26007,7 +26007,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -26077,7 +26077,7 @@ Publish the permanent implementation handoff using only the actual landed commit
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -26148,7 +26148,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -26304,7 +26304,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -26376,7 +26376,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -26448,7 +26448,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -26586,7 +26586,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -26610,7 +26610,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -26628,7 +26628,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 263 — run the Codex review loop on the focused repair PR for PS #148 in Terraform
+## Task 263 — run the Copilot-and-Codex review loop on the focused repair PR for PS #148 in Terraform
 
 > **Execution class: Coding agent executable.**
 >
@@ -26664,7 +26664,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -26672,7 +26672,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -26687,7 +26687,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 263 for the new head before Task 264. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -26772,7 +26772,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -26784,7 +26784,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 263 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 262's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 263 for the new head, and then repeat Task 264 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -26796,7 +26796,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -26807,7 +26807,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -26871,7 +26871,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -26884,7 +26884,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -26954,7 +26954,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -27026,7 +27026,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -27179,7 +27179,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -27251,7 +27251,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -27323,7 +27323,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -27462,7 +27462,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -27486,7 +27486,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -27504,7 +27504,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 272 — run the Codex review loop on the focused repair PR for the PS #148 cycle
+## Task 272 — run the Copilot-and-Codex review loop on the focused repair PR for the PS #148 cycle
 
 > **Execution class: Coding agent executable.**
 >
@@ -27540,7 +27540,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -27548,7 +27548,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -27563,7 +27563,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 272 for the new head before Task 273. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -27648,7 +27648,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -27660,7 +27660,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 272 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 271's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 272 for the new head, and then repeat Task 273 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -27672,7 +27672,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -27683,7 +27683,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -27747,7 +27747,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -27760,7 +27760,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -27830,7 +27830,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -27911,7 +27911,7 @@ Perform one reciprocal recheck and emit `FIXED_POINT_READY` or the exact next `R
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -28049,7 +28049,7 @@ Publish only the permanent fixed-point or issue-closure record. Do not compare, 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -28130,7 +28130,7 @@ Explicitly commence only the implementation governed by implement Terraform #23.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -28199,7 +28199,7 @@ Implement and locally validate implement Terraform #23 without creating or updat
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -28273,7 +28273,7 @@ Create or update only the focused candidate PR for implement Terraform #23; do n
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -28293,7 +28293,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -28311,7 +28311,7 @@ The Terraform #23 candidate PR exists with complete initial identity, validation
 
 The Terraform #23 candidate PR exists with complete initial identity, validation, failure, recovery, and evidence records.
 
-## Task 281 — run the Codex review loop on the Terraform #23 PR
+## Task 281 — run the Copilot-and-Codex review loop on the Terraform #23 PR
 
 > **Execution class: Coding agent executable.**
 >
@@ -28347,7 +28347,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Complete only this leaf action: run the Codex review loop on the Terraform #23 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
+Complete only this leaf action: run the Copilot-and-Codex review loop on the Terraform #23 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
 
 ### Execution controls
 
@@ -28355,7 +28355,7 @@ Complete only this leaf action: run the Codex review loop on the Terraform #23 P
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -28365,9 +28365,9 @@ Complete only this leaf action: run the Codex review loop on the Terraform #23 P
 
 ### Procedure
 
-Run the task-local Codex review-loop prompt below in TerraformStyleGuide. Do not merge. If bytes change, rerun Task 280 validation.
+Run the task-local Copilot-and-Codex review-loop prompt below in TerraformStyleGuide. Do not merge. If bytes change, rerun Task 280 validation.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`:
 
@@ -28442,7 +28442,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 281 | `FS` | The Codex review loop is terminally clean. |
+| Task 281 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
 
 ### Objective
 
@@ -28454,7 +28454,7 @@ Complete only this leaf action: run the independent final quality check on the T
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -28468,7 +28468,7 @@ Run the task-local independent final PR quality-check prompt below. Require comp
 
 ### Independent final PR quality-check prompt
 
-Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Codex review loop is terminally clean:
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Copilot-and-Codex review loop is terminally clean:
 
 ~~~text
 Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
@@ -28477,7 +28477,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -28488,7 +28488,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -28552,7 +28552,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -28565,7 +28565,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -28635,7 +28635,7 @@ Publish the permanent implementation handoff using only the actual landed commit
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -28706,7 +28706,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -28872,7 +28872,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -28944,7 +28944,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -29016,7 +29016,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -29159,7 +29159,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -29183,7 +29183,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -29201,7 +29201,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 290 — run the Codex review loop on the focused repair PR for Terraform #23 applicability in PS
+## Task 290 — run the Copilot-and-Codex review loop on the focused repair PR for Terraform #23 applicability in PS
 
 > **Execution class: Coding agent executable.**
 >
@@ -29237,7 +29237,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -29245,7 +29245,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -29260,7 +29260,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 290 for the new head before Task 291. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -29345,7 +29345,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -29357,7 +29357,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 290 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 289's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 290 for the new head, and then repeat Task 291 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -29369,7 +29369,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -29380,7 +29380,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -29444,7 +29444,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -29457,7 +29457,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -29527,7 +29527,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -29608,7 +29608,7 @@ Perform one reciprocal recheck and emit `FIXED_POINT_READY` or the exact next `R
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -29750,7 +29750,7 @@ Publish only the permanent fixed-point or issue-closure record. Do not compare, 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -29841,7 +29841,7 @@ Explicitly commence only the implementation governed by prepare the PS P3 candid
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -29916,7 +29916,7 @@ Implement and locally validate prepare the PS P3 candidate for merge without cre
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -29997,7 +29997,7 @@ Create or update only the focused candidate PR for prepare the PS P3 candidate f
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -30024,7 +30024,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -30042,7 +30042,7 @@ PS #149 has one locally validated candidate PR and a verified evidence package.
 
 PS #149 has one locally validated candidate PR and a verified evidence package.
 
-## Task 299 — run the Codex review loop on the PS #149 PR
+## Task 299 — run the Copilot-and-Codex review loop on the PS #149 PR
 
 > **Execution class: Coding agent executable.**
 >
@@ -30078,7 +30078,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Complete only this leaf action: run the Codex review loop on the PS #149 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
+Complete only this leaf action: run the Copilot-and-Codex review loop on the PS #149 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
 
 ### Execution controls
 
@@ -30086,7 +30086,7 @@ Complete only this leaf action: run the Codex review loop on the PS #149 PR. Pro
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -30096,9 +30096,9 @@ Complete only this leaf action: run the Codex review loop on the PS #149 PR. Pro
 
 ### Procedure
 
-Run the task-local Codex review-loop prompt below against the PS #149 PR. Do not merge. If bytes change, rerun Task 298 validation and refresh its evidence package.
+Run the task-local Copilot-and-Codex review-loop prompt below against the PS #149 PR. Do not merge. If bytes change, rerun Task 298 validation and refresh its evidence package.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`:
 
@@ -30173,7 +30173,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 299 | `FS` | The Codex review loop is terminally clean. |
+| Task 299 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
 
 ### Objective
 
@@ -30185,7 +30185,7 @@ Complete only this leaf action: run the independent final quality check on the P
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -30199,7 +30199,7 @@ Run the task-local independent final PR quality-check prompt below. Require comp
 
 ### Independent final PR quality-check prompt
 
-Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Codex review loop is terminally clean:
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Copilot-and-Codex review loop is terminally clean:
 
 ~~~text
 Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
@@ -30208,7 +30208,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -30219,7 +30219,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -30273,7 +30273,7 @@ Complete only this leaf action: check the PS #149 advisory-deadline state. Produ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -30355,7 +30355,7 @@ Complete only this leaf action: select and approve the PS #149 deadline path. Pr
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -30432,7 +30432,7 @@ Create or update only the focused advisory-fallback issue authorized by the owne
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -30505,7 +30505,7 @@ Explicitly commence only the implementation governed by implement an approved ad
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -30577,7 +30577,7 @@ Implement and locally validate implement an approved advisory fallback without c
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -30654,7 +30654,7 @@ Create or update only the focused candidate PR for implement an approved advisor
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -30676,7 +30676,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -30694,7 +30694,7 @@ The approved fallback candidate PR exists with all required decision, identity, 
 
 The approved fallback candidate PR exists with all required decision, identity, initial validation, and rollback evidence. If the existing merge path was approved instead, the task is complete only with `SKIPPED — EXISTING MERGE PATH`.
 
-## Task 307 — run the Codex review loop on the fallback PR
+## Task 307 — run the Copilot-and-Codex review loop on the fallback PR
 
 > **Execution class: Coding agent executable.**
 >
@@ -30730,7 +30730,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Complete only this leaf action: run the Codex review loop on the fallback PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
+Complete only this leaf action: run the Copilot-and-Codex review loop on the fallback PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
 
 ### Execution controls
 
@@ -30738,7 +30738,7 @@ Complete only this leaf action: run the Codex review loop on the fallback PR. Pr
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -30748,9 +30748,9 @@ Complete only this leaf action: run the Codex review loop on the fallback PR. Pr
 
 ### Procedure
 
-Run the task-local Codex review-loop prompt below against the fallback PR. Do not merge. If bytes change, rerun Task 306 validation and expiry proof.
+Run the task-local Copilot-and-Codex review-loop prompt below against the fallback PR. Do not merge. If bytes change, rerun Task 306 validation and expiry proof.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`:
 
@@ -30825,7 +30825,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 307 | `FS` | The Codex review loop is terminally clean. |
+| Task 307 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
 
 ### Objective
 
@@ -30837,7 +30837,7 @@ Complete only this leaf action: run the independent final quality check on the f
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -30851,7 +30851,7 @@ Run the task-local independent final PR quality-check prompt below. Require exac
 
 ### Independent final PR quality-check prompt
 
-Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Codex review loop is terminally clean:
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Copilot-and-Codex review loop is terminally clean:
 
 ~~~text
 Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
@@ -30860,7 +30860,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -30871,7 +30871,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -30935,7 +30935,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -30948,7 +30948,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -31019,7 +31019,7 @@ Publish the permanent implementation handoff using only the actual landed commit
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -31110,7 +31110,7 @@ Decide whether the reviewed PS #149 candidate remains merge-ready after the appr
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -31120,7 +31120,7 @@ Decide whether the reviewed PS #149 candidate remains merge-ready after the appr
 
 ### Preserved task-specific procedure
 
-1. If Task 310 changed an input or overlapping path, rebase or update the PS #149 candidate. Return to Task 299 for the Codex review loop and Task 300 for a new independent quality check. Obtain a new Task 302 approval when the prior approval does not cover the resulting bytes.
+1. If Task 310 changed an input or overlapping path, rebase or update the PS #149 candidate. Return to Task 299 for the Copilot-and-Codex review loop and Task 300 for a new independent quality check. Obtain a new Task 302 approval when the prior approval does not cover the resulting bytes.
 
 ### Procedure
 
@@ -31136,7 +31136,7 @@ Apply this gate only if Procedure step 2 changes the PS #149 PR:
 
 1. Complete the affected issue scope, local validation, PR-body correction, and initial required checks on the new candidate.
 2. Record the new base, head SHA and tree, affected paths, issue links, validation, runtime identities, and changed decision or rollback evidence.
-3. Stop the merge action. Return to Task 299 for a new Codex review loop and Task 300 for a new independent final quality check.
+3. Stop the merge action. Return to Task 299 for a new Copilot-and-Codex review loop and Task 300 for a new independent final quality check.
 4. Require a new Task 302 approval when the current approval does not cover the new bytes or settings. Do not resume this task until all three records apply to the same current head and tree.
 
 ### Validation and evidence
@@ -31197,7 +31197,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -31217,7 +31217,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -31287,7 +31287,7 @@ Publish the permanent implementation handoff using only the actual landed commit
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -31416,7 +31416,7 @@ Each applicable row occurs exactly once. Record both repository URLs and commits
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -31495,7 +31495,7 @@ Explicitly commence only the implementation governed by implement Terraform #24.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -31564,7 +31564,7 @@ Implement and locally validate implement Terraform #24 without creating or updat
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -31682,7 +31682,7 @@ Create or update only the focused candidate PR for implement Terraform #24; do n
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -31748,7 +31748,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -31766,7 +31766,7 @@ The Terraform #24 candidate PR exists with complete source, destination, identit
 
 The Terraform #24 candidate PR exists with complete source, destination, identity, initial validation, runtime, and intentional-difference evidence.
 
-## Task 318 — run the Codex review loop on the Terraform #24 PR
+## Task 318 — run the Copilot-and-Codex review loop on the Terraform #24 PR
 
 > **Execution class: Coding agent executable.**
 >
@@ -31802,7 +31802,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Complete only this leaf action: run the Codex review loop on the Terraform #24 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
+Complete only this leaf action: run the Copilot-and-Codex review loop on the Terraform #24 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
 
 ### Task-local common-foundation contract
 
@@ -31855,7 +31855,7 @@ Each applicable row occurs exactly once. Record both repository URLs and commits
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -31865,9 +31865,9 @@ Each applicable row occurs exactly once. Record both repository URLs and commits
 
 ### Procedure
 
-Run the task-local Codex review-loop prompt below in TerraformStyleGuide. Do not merge. If bytes change, rerun Task 317 validation and refresh the reciprocal matrix.
+Run the task-local Copilot-and-Codex review-loop prompt below in TerraformStyleGuide. Do not merge. If bytes change, rerun Task 317 validation and refresh the reciprocal matrix.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`:
 
@@ -31942,7 +31942,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 318 | `FS` | The Codex review loop is terminally clean. |
+| Task 318 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
 
 ### Objective
 
@@ -31954,7 +31954,7 @@ Complete only this leaf action: run the independent final quality check on the T
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -31968,7 +31968,7 @@ Run the task-local independent final PR quality-check prompt below. Require comp
 
 ### Independent final PR quality-check prompt
 
-Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Codex review loop is terminally clean:
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Copilot-and-Codex review loop is terminally clean:
 
 ~~~text
 Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
@@ -31977,7 +31977,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -31988,7 +31988,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -32052,7 +32052,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -32065,7 +32065,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -32135,7 +32135,7 @@ Publish the permanent implementation handoff using only the actual landed commit
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -32205,7 +32205,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -32358,7 +32358,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -32430,7 +32430,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -32502,7 +32502,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -32641,7 +32641,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -32665,7 +32665,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -32683,7 +32683,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 327 — run the Codex review loop on the focused repair PR for T3 in PS
+## Task 327 — run the Copilot-and-Codex review loop on the focused repair PR for T3 in PS
 
 > **Execution class: Coding agent executable.**
 >
@@ -32718,7 +32718,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -32726,7 +32726,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -32741,7 +32741,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 327 for the new head before Task 328. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -32825,7 +32825,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -32837,7 +32837,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 327 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 326's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 327 for the new head, and then repeat Task 328 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -32849,7 +32849,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -32860,7 +32860,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -32923,7 +32923,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -32936,7 +32936,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -33005,7 +33005,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -33076,7 +33076,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -33223,7 +33223,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -33295,7 +33295,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -33367,7 +33367,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -33503,7 +33503,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -33527,7 +33527,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -33545,7 +33545,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 336 — run the Codex review loop on the focused repair PR for the final Terraform T3 recheck
+## Task 336 — run the Copilot-and-Codex review loop on the focused repair PR for the final Terraform T3 recheck
 
 > **Execution class: Coding agent executable.**
 >
@@ -33580,7 +33580,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -33588,7 +33588,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -33603,7 +33603,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 336 for the new head before Task 337. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -33687,7 +33687,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -33699,7 +33699,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 336 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 335's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 336 for the new head, and then repeat Task 337 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -33711,7 +33711,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -33722,7 +33722,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -33785,7 +33785,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -33798,7 +33798,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -33867,7 +33867,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -33947,7 +33947,7 @@ Perform one reciprocal recheck and emit `FIXED_POINT_READY` or the exact next `R
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -34081,7 +34081,7 @@ Publish only the permanent fixed-point or issue-closure record. Do not compare, 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -34153,7 +34153,7 @@ Explicitly commence only the implementation governed by implement PS #151. Do no
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -34222,7 +34222,7 @@ Implement and locally validate implement PS #151 without creating or updating a 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -34295,7 +34295,7 @@ Create or update only the focused candidate PR for implement PS #151; do not run
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -34315,7 +34315,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -34333,7 +34333,7 @@ The PS #151 candidate PR exists with a complete affected-control map and initial
 
 The PS #151 candidate PR exists with a complete affected-control map and initial validation.
 
-## Task 345 — run the Codex review loop on the PS #151 PR
+## Task 345 — run the Copilot-and-Codex review loop on the PS #151 PR
 
 > **Execution class: Coding agent executable.**
 >
@@ -34369,7 +34369,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Complete only this leaf action: run the Codex review loop on the PS #151 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
+Complete only this leaf action: run the Copilot-and-Codex review loop on the PS #151 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
 
 ### Execution controls
 
@@ -34377,7 +34377,7 @@ Complete only this leaf action: run the Codex review loop on the PS #151 PR. Pro
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -34387,9 +34387,9 @@ Complete only this leaf action: run the Codex review loop on the PS #151 PR. Pro
 
 ### Procedure
 
-Run the task-local Codex review-loop prompt below against the PS #151 PR. Do not merge. If bytes change, rerun Task 344 validation.
+Run the task-local Copilot-and-Codex review-loop prompt below against the PS #151 PR. Do not merge. If bytes change, rerun Task 344 validation.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`:
 
@@ -34464,7 +34464,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 345 | `FS` | The Codex review loop is terminally clean. |
+| Task 345 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
 
 ### Objective
 
@@ -34476,7 +34476,7 @@ Complete only this leaf action: run the independent final quality check on the P
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -34490,7 +34490,7 @@ Run the task-local independent final PR quality-check prompt below. Require comp
 
 ### Independent final PR quality-check prompt
 
-Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Codex review loop is terminally clean:
+Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Copilot-and-Codex review loop is terminally clean:
 
 ~~~text
 Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
@@ -34499,7 +34499,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -34510,7 +34510,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -34574,7 +34574,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -34587,7 +34587,7 @@ Merge only the current reviewed PR after both final gates apply to the same head
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -34657,7 +34657,7 @@ Publish the permanent implementation handoff using only the actual landed commit
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -34728,7 +34728,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -34884,7 +34884,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -34956,7 +34956,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -35028,7 +35028,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -35166,7 +35166,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -35190,7 +35190,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -35208,7 +35208,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 354 — run the Codex review loop on the focused repair PR for PS #151 in Terraform
+## Task 354 — run the Copilot-and-Codex review loop on the focused repair PR for PS #151 in Terraform
 
 > **Execution class: Coding agent executable.**
 >
@@ -35244,7 +35244,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -35252,7 +35252,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -35267,7 +35267,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 354 for the new head before Task 355. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -35352,7 +35352,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -35364,7 +35364,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 354 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 353's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 354 for the new head, and then repeat Task 355 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -35376,7 +35376,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -35387,7 +35387,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -35451,7 +35451,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -35464,7 +35464,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -35534,7 +35534,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -35606,7 +35606,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -35759,7 +35759,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -35831,7 +35831,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -35903,7 +35903,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -36042,7 +36042,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -36066,7 +36066,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -36084,7 +36084,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 363 — run the Codex review loop on the focused repair PR for the PS #151 cycle
+## Task 363 — run the Copilot-and-Codex review loop on the focused repair PR for the PS #151 cycle
 
 > **Execution class: Coding agent executable.**
 >
@@ -36120,7 +36120,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -36128,7 +36128,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -36143,7 +36143,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 363 for the new head before Task 364. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -36228,7 +36228,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -36240,7 +36240,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 363 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 362's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 363 for the new head, and then repeat Task 364 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -36252,7 +36252,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -36263,7 +36263,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -36327,7 +36327,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -36340,7 +36340,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -36410,7 +36410,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -36491,7 +36491,7 @@ Perform one reciprocal recheck and emit `FIXED_POINT_READY` or the exact next `R
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -36629,7 +36629,7 @@ Publish only the permanent fixed-point or issue-closure record. Do not compare, 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -36690,7 +36690,7 @@ Complete only this leaf action: check the independent residual triggers. Produce
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -36776,7 +36776,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -36947,7 +36947,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -37019,7 +37019,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -37091,7 +37091,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -37234,7 +37234,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -37258,7 +37258,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -37276,7 +37276,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 375 — run the Codex review loop on the focused repair PR for one triggered residual cycle
+## Task 375 — run the Copilot-and-Codex review loop on the focused repair PR for one triggered residual cycle
 
 > **Execution class: Coding agent executable.**
 >
@@ -37311,7 +37311,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -37319,7 +37319,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -37334,7 +37334,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 375 for the new head before Task 376. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -37418,7 +37418,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -37430,7 +37430,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 375 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 374's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 375 for the new head, and then repeat Task 376 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -37442,7 +37442,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -37453,7 +37453,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -37516,7 +37516,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -37529,7 +37529,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -37598,7 +37598,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -37678,7 +37678,7 @@ Perform one reciprocal recheck and emit `FIXED_POINT_READY` or the exact next `R
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -37819,7 +37819,7 @@ Publish only the permanent fixed-point or issue-closure record. Do not compare, 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -37901,7 +37901,7 @@ Perform only the pinned comparison or trigger evaluation and publish its evidenc
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -37977,7 +37977,7 @@ Replace all placeholders with verified landed identities:
 >
 > Create no shared runtime dependency. Complete the applicable closed reciprocal catalog at implementation start and before merge. Missing, duplicate, unknown, renamed, empty, unexplained, or weaker behavior blocks merge.
 >
-> Do not change repository settings without exact administrator authorization. Run the candidate, Codex review-loop, independent final quality-check, and merge actions as separate steps. Record source and destination blobs, tests, runtime identities, reviewed head/tree, merge method, landed commit/tree, and the next handoff.
+> Do not change repository settings without exact administrator authorization. Run the candidate, Copilot-and-Codex review-loop, independent final quality-check, and merge actions as separate steps. Record source and destination blobs, tests, runtime identities, reviewed head/tree, merge method, landed commit/tree, and the next handoff.
 
 ### Task-local common-foundation contract
 
@@ -38090,7 +38090,7 @@ If repair is required, create or update exactly one focused issue without commen
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -38162,7 +38162,7 @@ Explicitly commence only the focused repair issue. Do not edit implementation by
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -38234,7 +38234,7 @@ Implement and locally validate only the focused repair. Do not create or update 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -38260,7 +38260,7 @@ Replace all placeholders with verified landed identities:
 >
 > Create no shared runtime dependency. Complete the applicable closed reciprocal catalog at implementation start and before merge. Missing, duplicate, unknown, renamed, empty, unexplained, or weaker behavior blocks merge.
 >
-> Do not change repository settings without exact administrator authorization. Run the candidate, Codex review-loop, independent final quality-check, and merge actions as separate steps. Record source and destination blobs, tests, runtime identities, reviewed head/tree, merge method, landed commit/tree, and the next handoff.
+> Do not change repository settings without exact administrator authorization. Run the candidate, Copilot-and-Codex review-loop, independent final quality-check, and merge actions as separate steps. Record source and destination blobs, tests, runtime identities, reviewed head/tree, merge method, landed commit/tree, and the next handoff.
 
 ### Reciprocal fixed-point controls
 
@@ -38395,7 +38395,7 @@ Create or update only one focused repair PR and bring its initial checks to succ
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -38419,7 +38419,7 @@ Before this task is complete:
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
 
 ### Validation and evidence
 
@@ -38437,7 +38437,7 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
 
-## Task 386 — run the Codex review loop on the focused repair PR for one future PS-first paired capability cycle
+## Task 386 — run the Copilot-and-Codex review loop on the focused repair PR for one future PS-first paired capability cycle
 
 > **Execution class: Coding agent executable.**
 >
@@ -38472,7 +38472,7 @@ Completion and authorization records are intentionally outside the table. Replac
 
 ### Objective
 
-Run only the Codex review loop. Do not merge.
+Run only the Copilot-and-Codex review loop. Do not merge.
 
 ### Execution controls
 
@@ -38480,7 +38480,7 @@ Run only the Codex review loop. Do not merge.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -38495,7 +38495,7 @@ Run only the Codex review loop. Do not merge.
 3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
 4. If reviewable repository bytes change, repeat Task 386 for the new head before Task 387. Do not merge.
 
-### Codex review-loop prompt
+### Copilot-and-Codex review-loop prompt
 
 ~~~text
 Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
@@ -38579,7 +38579,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -38591,7 +38591,7 @@ Run only the independent final quality check in a fresh coding-agent session. Do
 
 1. If Task 386 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Obtain `<PR_URL_OR_NUMBER>` from Task 385's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Codex review-loop subagent.
+3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
 4. If any reviewable repository byte changes, return `FAIL`, repeat Task 386 for the new head, and then repeat Task 387 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
 
 ### Independent final quality-check prompt
@@ -38603,7 +38603,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 
 1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
 2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
+3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
 4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
 5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
 6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
@@ -38614,7 +38614,7 @@ Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use
 11. Cross-check the PR title and description against the complete final diff, commits, issue scope, tests, validation results, security effects, generated artifacts, breaking changes, intentional differences, deferred-issue links, and rollback information. Update the PR description directly when tooling and authority permit. Otherwise, produce a redline-style replacement that shows exact deletions and additions for the operator. Re-run this quality check after a body correction.
 12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
 13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
+14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
 15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
 
 PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
@@ -38677,7 +38677,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -38690,7 +38690,7 @@ Merge only the focused repair PR after the exact final-head gates pass. Do not p
 Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
+2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
 3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
 4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
@@ -38759,7 +38759,7 @@ Publish only the landed repair handoff from the actual landed commit.
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -38839,7 +38839,7 @@ Perform one reciprocal recheck and emit `FIXED_POINT_READY` or the exact next `R
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -38887,7 +38887,7 @@ Replace all placeholders with verified landed identities:
 >
 > Create no shared runtime dependency. Complete the applicable closed reciprocal catalog at implementation start and before merge. Missing, duplicate, unknown, renamed, empty, unexplained, or weaker behavior blocks merge.
 >
-> Do not change repository settings without exact administrator authorization. Run the candidate, Codex review-loop, independent final quality-check, and merge actions as separate steps. Record source and destination blobs, tests, runtime identities, reviewed head/tree, merge method, landed commit/tree, and the next handoff.
+> Do not change repository settings without exact administrator authorization. Run the candidate, Copilot-and-Codex review-loop, independent final quality-check, and merge actions as separate steps. Record source and destination blobs, tests, runtime identities, reviewed head/tree, merge method, landed commit/tree, and the next handoff.
 
 ### Task-local common-foundation contract
 
@@ -38998,7 +38998,7 @@ Publish only the permanent fixed-point or issue-closure record. Do not compare, 
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -39149,7 +39149,7 @@ Each applicable row occurs exactly once. Record both repository URLs and commits
 2. Open or identify one focused issue before each implementation. Issue creation does not start implementation.
 3. Read every cross-repository input only from a recorded landed commit and Git blob. Do not copy from a moving branch.
 4. Verify that the implementation slot is free before any feature branch, implementation edit, or implementation PR starts.
-5. Keep candidate preparation, the Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
+5. Keep candidate preparation, the Copilot-and-Codex review loop, the independent final quality check, and merge as separate actions. Perform only the lifecycle action or conditional sequence assigned to this task. Do not merge a PR directly from an implementation or comparison action.
 6. Do not change repository settings unless the applicable administrator issue authorizes the exact request.
 7. Replace every placeholder before posting text. Do not fabricate a SHA, URL, PR number, tree, blob, or evidence identity.
 8. Use native dependencies only for real completion prerequisites. A tracker can list children without a false blocking edge.
@@ -39167,7 +39167,7 @@ Verify all of the following:
 
 - Every implementation had a focused issue record and a separate explicit commencement record. No two feature implementation issues or PRs were active at the same time.
 - Every cross-repository input was pinned to a landed commit and blob. No work copied from a moving branch or introduced a shared runtime dependency, reusable cross-repository workflow, submodule, package, or third source of truth.
-- Every PR completed a discrete Codex review loop and then a discrete independent fresh-agent quality check against the same final head SHA and tree before merge. Every permanent cycle record contains both gate results and both repositories' issue and PR URLs, bases, reviewed heads/trees, merge methods, landed commits/trees, paths, blobs, validation, runtime identities, and review outcomes.
+- Every PR completed a discrete Copilot-and-Codex review loop and then a discrete independent fresh-agent quality check against the same final head SHA and tree before merge. Every permanent cycle record contains both gate results and both repositories' issue and PR URLs, bases, reviewed heads/trees, merge methods, landed commits/trees, paths, blobs, validation, runtime identities, and review outcomes.
 - Every merged PR passed the whole-PR comment and deferral audit. No unfinished reviewer finding or illegitimate deferral remains. Every legitimate deferral has a cited, self-contained GitHub issue with correct native dependencies.
 - Every merged PR title and body accurately describe its final landed diff, issue scope, validation, security effects, intentional differences, deferred-issue links, and rollback information.
 - Every required reciprocal matrix contains each applicable row exactly once. Every common row is `same`. Every intentional difference names both behaviors, repository need, equal security and failure strength, owner, and review or expiry condition. No blocker remains.
@@ -39232,6 +39232,8 @@ Post one permanent final audit that identifies the final research governance-bas
 - [.NET `File.Move`](https://learn.microsoft.com/en-us/dotnet/api/system.io.file.move)
 - [Git pathname format and `-z`](https://git-scm.com/docs/git-status#_pathname_format_notes_and_z)
 - [GitHub issue dependencies](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/creating-issue-dependencies)
+- [GitHub Copilot code review](https://docs.github.com/en/copilot/how-tos/copilot-on-github/use-copilot-agents/copilot-code-review)
+- [OpenAI Codex review for GitHub pull requests](https://developers.openai.com/codex/integrations/github)
 - [OpenAI Codex subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents)
 - [OpenAI Codex non-interactive mode](https://learn.chatgpt.com/docs/non-interactive-mode)
 - [OpenAI Codex `AGENTS.md` instructions](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
