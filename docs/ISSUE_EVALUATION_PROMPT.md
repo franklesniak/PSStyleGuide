@@ -2,6 +2,14 @@
 
 # Issue Evaluation Prompt
 
+## Metadata
+
+- **Status:** Active
+- **Owner:** Repository Maintainers
+- **Last Updated:** 2026-08-23
+- **Scope:** Provides a reusable LLM prompt for evaluating and refining proposed PSStyleGuide issue titles and descriptions. It does not create, authorize, or mutate GitHub issues.
+- **Related:** [PowerShell Style Guide](../STYLE_GUIDE.md), [PowerShell Style Guide Rationale](../STYLE_GUIDE_RATIONALE.md)
+
 This document contains a prompt template used to evaluate proposed GitHub Issues for the style guide. The typical workflow is:
 
 1. A coding agent (e.g., Claude) identifies a potential style guide improvement during a code review loop and suggests a GitHub Issue description.

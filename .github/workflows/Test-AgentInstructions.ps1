@@ -203,6 +203,7 @@ $script:arrObsoleteDeferralLiterals = @(
 )
 $script:arrProhibitedDocumentationClaimLiterals = @(
     '.github/workflows/check-placeholders.yml',
+    '.github/workflows/auto-fix-precommit.yml',
     '.github/ISSUE_TEMPLATE/',
     '.github/pull_request_template.md',
     'comment block at the top of `CONTRIBUTING.md`'
