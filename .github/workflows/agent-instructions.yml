@@ -127,9 +127,19 @@ jobs:
               github.event_name == 'push' && github.sha || '' }}
           AGENT_INSTRUCTION_RANGE_IS_NEW_REF: >-
             ${{ github.event_name == 'push' && github.event.created || false }}
+          AGENT_INSTRUCTION_TRUSTED_EVENT_TIMESTAMP: >-
+            ${{ github.event_name == 'pull_request_target' &&
+              github.event.pull_request.updated_at ||
+              github.event_name == 'push' && github.event.repository.pushed_at || '' }}
+          AGENT_INSTRUCTION_EVENT_HEAD_INTRODUCED: >-
+            ${{ github.event_name == 'push' && github.event.created &&
+              contains(github.event.commits.*.id, github.event.after) || false }}
         run: >-
           ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest
           -InputRevision $env:AGENT_INSTRUCTION_INPUT_REVISION
           -RangeBaseRevision $env:AGENT_INSTRUCTION_RANGE_BASE
           -RangeHeadRevision $env:AGENT_INSTRUCTION_RANGE_HEAD
           -RangeIsNewRef:([bool]::Parse($env:AGENT_INSTRUCTION_RANGE_IS_NEW_REF))
+          -TrustedEventTimestamp $env:AGENT_INSTRUCTION_TRUSTED_EVENT_TIMESTAMP
+          -EventHeadIntroducedByPush:([bool]::Parse(
+          $env:AGENT_INSTRUCTION_EVENT_HEAD_INTRODUCED))
