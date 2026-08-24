@@ -24,8 +24,8 @@
     },
     "reviewedWorkingBytes": {
       "packageJson": {
-        "length": 1008,
-        "sha256": "c6a9a8ac9a574b01b99ceb6f5ad9741d592589a7db34c74ebaf8dba8632fe285"
+        "length": 1021,
+        "sha256": "59e676d981cffa350cb72e7ea4b1aeec2c49d56621958a095aa0e76733ec2cd9"
       },
       "packageLockJson": {
         "length": 65107,
@@ -136,11 +136,11 @@
   },
   "caseCatalog": {
     "path": "workflow-policy-cases.json",
-    "sha256": "afeb59002a2fa704dd4d5bbfb2e13581dee2d730b17c2bcb10fe488096b06953"
+    "sha256": "4122136f482c5f6734ab746975a904f353bc4ebda65c263be4a6e5f974c4c8d9"
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "68fbd92f8ca66304290b5f1f604fe6c49798b5ad38ece3ece367813fe1590686"
+    "sha256": "6c3daca6dd90ea94e9fbaa5daaa7dc0b24d2ddcb13ac822cf8200ebf9ecb889d"
   },
   "actions": {
     "checkout": {
@@ -251,8 +251,8 @@
               { "kind": "action", "role": "markdownlint.markdownlint.checkout_repository", "name": "Checkout repository", "id": "checkout_repository", "action": "checkout" },
               { "kind": "action", "role": "markdownlint.markdownlint.setup_node", "name": "Setup Node.js", "id": "setup_node", "action": "setupNode" },
               { "kind": "run", "role": "markdownlint.markdownlint.verify_node_npm", "name": "Verify Node and npm identities", "shell": "pwsh", "runSha256": "386c76b358d0dc5c588e73d3fa7be034ec01ce984f725e8bb09e7f468cc8c513" },
-              { "kind": "run", "role": "markdownlint.markdownlint.install_dependencies", "name": "Install frozen dependencies", "workingDirectory": ".github/workflows", "shell": "pwsh", "runSha256": "6166d97c4bcf249ac90ace0c52dc7ff2cd3db9a1462d81fd2504ede63ddeab3a" },
-              { "kind": "run", "role": "markdownlint.markdownlint.validate_workflow_policy", "name": "Validate workflow policy offline", "workingDirectory": ".github/workflows", "shell": "pwsh", "runSha256": "52c5ee87de8fc5e26d0b7c4596571dbff1b2a6db9dc768e0e47b154b9ab1ec79" },
+              { "kind": "run", "role": "markdownlint.markdownlint.install_dependencies", "name": "Install frozen dependencies", "workingDirectory": ".github/workflows", "shell": "pwsh", "runSha256": "1e0dd4669097c7ebc4ac5bdc376efafc8d29ec53d23478a960b8a8bb83ed1b9e" },
+              { "kind": "run", "role": "markdownlint.markdownlint.validate_workflow_policy", "name": "Validate workflow policy offline", "workingDirectory": ".github/workflows", "shell": "pwsh", "runSha256": "286f474afb51c16cddf8cea677b355607f1ad19e0e681b036ebfc6e44b86ee42" },
               { "kind": "run", "role": "markdownlint.markdownlint.lint", "name": "Run both Markdown lint surfaces", "workingDirectory": ".github/workflows", "shell": "pwsh", "runSha256": "ebf88f0dc100390363457571de315937b2dbe5de733941b2c6904e203cf5c521" }
             ]
           }
@@ -301,6 +301,44 @@
       "GIT_CONFIG_VALUE",
       "http\\.extraheader"
     ]
+  },
+  "markdownPolicy": {
+    "schema": "PSStyleGuide.MarkdownEntryPointPolicy.v1",
+    "extensions": ["md", "mdc"],
+    "entryPoints": {
+      "rootPackageJson": {
+        "path": "../../package.json",
+        "length": 967,
+        "sha256": "12845335798720381404b79636262c0d68dbcf1f81e03e3ed9f1cfde12c049fb",
+        "lintScript": "markdownlint-cli2 \"**/*.md\" \"**/*.mdc\" \"#node_modules\" \"#.github/workflows/node_modules\" --config .github/workflows/.markdownlint.jsonc"
+      },
+      "workflowPackageJson": {
+        "path": "package.json",
+        "length": 1021,
+        "sha256": "59e676d981cffa350cb72e7ea4b1aeec2c49d56621958a095aa0e76733ec2cd9",
+        "lintScript": "cd ../.. && markdownlint-cli2 \"**/*.md\" \"**/*.mdc\" \"#node_modules\" \"#.github/workflows/node_modules\" --config .github/workflows/.markdownlint.jsonc"
+      },
+      "nestedLinter": {
+        "path": "lint-nested-markdown.js",
+        "length": 9436,
+        "sha256": "fd0bb0fedca20a5d5940a6de4a020ee7080b475eef266368ae565ad4c81e28ac",
+        "glob": "**/*.{md,mdc}",
+        "includeDotDirectories": true
+      },
+      "stagedSelector": {
+        "path": "lint-staged-markdown.mjs",
+        "length": 3448,
+        "sha256": "971622e1fbbd54521a7fa7b3302556f5d64790e05b6f6e6dab7fe7d1cf7e091b",
+        "pathspecs": ["*.md", "*.mdc"]
+      },
+      "preCommit": {
+        "path": "../../.pre-commit-config.yaml",
+        "length": 2582,
+        "sha256": "891fc23b515b14cb9848199c8189c46f87099c2d3beb9198bc852cccdd389d2d",
+        "extensions": ["md", "mdc"],
+        "linebreakArgument": "--markdown-linebreak-ext=md,mdc"
+      }
+    }
   },
   "dependabot": {
     "version": 2,

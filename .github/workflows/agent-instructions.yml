@@ -27,6 +27,10 @@ on:
       - package-lock.json
       - package.json
   pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
 
 permissions:
   contents: read
@@ -131,8 +135,17 @@ jobs:
             ${{ github.event_name == 'pull_request_target' &&
               github.event.pull_request.updated_at ||
               github.event_name == 'push' && github.event.repository.pushed_at || '' }}
+          AGENT_INSTRUCTION_EVENT_NAME: >-
+            ${{ (github.event_name == 'pull_request_target' ||
+              github.event_name == 'push') && github.event_name || '' }}
+          AGENT_INSTRUCTION_PULL_REQUEST_ACTION: >-
+            ${{ github.event_name == 'pull_request_target' &&
+              github.event.action || '' }}
+          AGENT_INSTRUCTION_PREVIOUS_HEAD_REVISION: >-
+            ${{ github.event_name == 'pull_request_target' &&
+              github.event.action == 'synchronize' && github.event.before || '' }}
           AGENT_INSTRUCTION_EVENT_HEAD_INTRODUCED: >-
-            ${{ github.event_name == 'push' && github.event.created &&
+            ${{ github.event_name == 'push' &&
               contains(github.event.commits.*.id, github.event.after) || false }}
         run: >-
           ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest
@@ -141,5 +154,8 @@ jobs:
           -RangeHeadRevision $env:AGENT_INSTRUCTION_RANGE_HEAD
           -RangeIsNewRef:([bool]::Parse($env:AGENT_INSTRUCTION_RANGE_IS_NEW_REF))
           -TrustedEventTimestamp $env:AGENT_INSTRUCTION_TRUSTED_EVENT_TIMESTAMP
+          -EventName $env:AGENT_INSTRUCTION_EVENT_NAME
+          -PullRequestAction $env:AGENT_INSTRUCTION_PULL_REQUEST_ACTION
+          -PreviousHeadRevision $env:AGENT_INSTRUCTION_PREVIOUS_HEAD_REVISION
           -EventHeadIntroducedByPush:([bool]::Parse(
           $env:AGENT_INSTRUCTION_EVENT_HEAD_INTRODUCED))

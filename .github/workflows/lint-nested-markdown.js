@@ -203,10 +203,11 @@ async function main() {
         // Repository root is two levels up from this script
         const repoRoot = path.resolve(__dirname, '../..');
 
-        // Find all markdown files (excluding node_modules)
-        const files = await glob('**/*.md', {
+        // Find all Markdown and Cursor rule files (excluding node_modules)
+        const files = await glob('**/*.{md,mdc}', {
             ignore: ['node_modules/**', '**/node_modules/**'],
             cwd: repoRoot,
+            dot: true,
             absolute: true
         });
 

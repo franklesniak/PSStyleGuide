@@ -10,7 +10,7 @@
   },
   "packageManager": "npm@11.16.0",
   "scripts": {
-    "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#.github/workflows/node_modules\" --config .github/workflows/.markdownlint.jsonc",
+    "lint:md": "markdownlint-cli2 \"**/*.md\" \"**/*.mdc\" \"#node_modules\" \"#.github/workflows/node_modules\" --config .github/workflows/.markdownlint.jsonc",
     "lint:md:nested": "npm --prefix .github/workflows run lint:md:nested",
     "test:agent-instructions": "pwsh -NoLogo -NoProfile -NonInteractive -File .github/workflows/Test-AgentInstructions.ps1 -SelfTest"
   },

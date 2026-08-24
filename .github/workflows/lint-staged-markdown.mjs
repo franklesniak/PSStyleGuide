@@ -40,15 +40,19 @@ const runGit = (args) => {
 const parseNulDelimitedPaths = (value) => value.split('\0').filter(Boolean);
 const toAbsolutePosixPath = (repoRelativePath) => resolve(repoRoot, repoRelativePath).split(sep).join('/');
 
+const stagedMarkdownPathspecs = Object.freeze(['*.md', '*.mdc']);
 let stagedMarkdownPaths;
 
 try {
   // Git pathspec wildcards match across directory separators, unlike shell globs,
-  // so the `*.md` pathspec selects staged Markdown in every subdirectory (e.g.
-  // docs/ISSUE_EVALUATION_PROMPT.md, samples/*.md), not just the repository root.
+  // so these pathspecs select staged Markdown and Cursor rules in every
+  // subdirectory (including hidden .cursor/rules paths), not just the root.
   // See https://git-scm.com/docs/gitglossary (def_pathspec).
   stagedMarkdownPaths = parseNulDelimitedPaths(
-    runGit(['diff', '--cached', '--name-only', '--diff-filter=ACMR', '-z', '--', '*.md'])
+    runGit([
+      'diff', '--cached', '--name-only', '--diff-filter=ACMR', '-z', '--',
+      ...stagedMarkdownPathspecs
+    ])
   );
 } catch (error) {
   console.error(error);

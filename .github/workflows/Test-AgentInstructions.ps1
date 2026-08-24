@@ -26,6 +26,15 @@
 # Indicates that a push created the ref and RangeBaseRevision is Git's
 # all-zero no-prior-ref sentinel.
 #
+# .PARAMETER EventName
+# Identifies the authenticated GitHub event that supplied the optional range.
+#
+# .PARAMETER PullRequestAction
+# Identifies an opened, reopened, or synchronize pull request target event.
+#
+# .PARAMETER PreviousHeadRevision
+# Identifies the previous topic head for a synchronize event.
+#
 # .EXAMPLE
 # & ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest
 #
@@ -42,7 +51,7 @@
 # This validator keeps explicit backtick continuations so that large
 # named-parameter mutation calls remain auditable one argument per line.
 # Private helpers have focused examples. The -SelfTest suite covers edge cases.
-# Version: 1.3.20260823.0
+# Version: 1.4.20260824.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -70,6 +79,18 @@ param(
     [string] $TrustedEventTimestamp = '',
 
     [Parameter()]
+    [AllowEmptyString()]
+    [string] $EventName = '',
+
+    [Parameter()]
+    [AllowEmptyString()]
+    [string] $PullRequestAction = '',
+
+    [Parameter()]
+    [AllowEmptyString()]
+    [string] $PreviousHeadRevision = '',
+
+    [Parameter()]
     [switch] $EventHeadIntroducedByPush
 )
 
@@ -80,7 +101,7 @@ $intClaudeMaximumInputBytes = 131072
 $intCodexConfigMaximumInputBytes = 65536
 $intDocsInstructionsMaximumInputBytes = 131072
 $intInstructionDocumentMaximumInputBytes = 131072
-$intValidatorMaximumInputBytes = 327680
+$intValidatorMaximumInputBytes = 393216
 $intGitPathListMaximumBytes = 1048576
 $intMetadataMaximumParents = 64
 $strMetadataRangePolicyMarker = 'metadata-range-transition-policy-v1'
@@ -2322,23 +2343,130 @@ function Get-CurrentInputMetadataFreshnessFailure {
     }
 }
 
-function Get-EventFreshnessBaseRevision {
+function Get-MetadataEventRevisionContext {
+    # .SYNOPSIS
+    # Resolves history and current-event comparison bases from trusted payload data.
     [CmdletBinding(PositionalBinding = $false)]
-    [OutputType([string])]
+    [OutputType([pscustomobject])]
     param(
+        [Parameter(Mandatory)][string] $RepositoryRootPath,
+        [Parameter(Mandatory)][string] $EventName,
+        [Parameter(Mandatory)][AllowEmptyString()][string] $PullRequestAction,
         [Parameter(Mandatory)][string] $BaseRevision,
         [Parameter(Mandatory)][string] $HeadRevision,
         [Parameter(Mandatory)][bool] $IsNewRefRange,
+        [Parameter(Mandatory)][AllowEmptyString()][string] $PreviousHeadRevision,
         [Parameter(Mandatory)][bool] $HeadIntroducedByPush
     )
 
-    if (-not $IsNewRefRange) {
-        return $BaseRevision
+    $strObjectIdPattern = '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$'
+    $strZeroObjectIdPattern = '^(?:0{40}|0{64})$'
+    if ($HeadRevision -notmatch $strObjectIdPattern -or
+        $HeadRevision -match $strZeroObjectIdPattern) {
+        throw 'The metadata event head is invalid.'
     }
-    if ($HeadIntroducedByPush) {
-        return "$HeadRevision^"
+    & git -C $RepositoryRootPath cat-file -e "$HeadRevision`^{commit}" 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        throw 'The metadata event head is unavailable.'
     }
-    return ''
+
+    if ($EventName -ceq 'push') {
+        if (-not [string]::IsNullOrEmpty($PullRequestAction) -or
+            -not [string]::IsNullOrEmpty($PreviousHeadRevision)) {
+            throw 'A push metadata event must not supply pull request fields.'
+        }
+        if ($IsNewRefRange) {
+            if ($BaseRevision -notmatch $strZeroObjectIdPattern) {
+                throw 'A new-ref push metadata event requires an all-zero base.'
+            }
+            $strFreshnessBase = if ($HeadIntroducedByPush) {
+                "$HeadRevision^"
+            }
+            else {
+                ''
+            }
+            return [pscustomobject]@{
+                HistoryBaseRevision = $BaseRevision
+                FreshnessBaseRevision = $strFreshnessBase
+            }
+        }
+        if ($BaseRevision -notmatch $strObjectIdPattern -or
+            $BaseRevision -match $strZeroObjectIdPattern) {
+            throw 'An existing-ref push metadata event requires a valid base.'
+        }
+        & git -C $RepositoryRootPath merge-base --is-ancestor `
+            $BaseRevision $HeadRevision 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            throw 'The existing-ref push base must be an ancestor of its head.'
+        }
+        return [pscustomobject]@{
+            HistoryBaseRevision = $BaseRevision
+            FreshnessBaseRevision = if ($HeadIntroducedByPush) {
+                $BaseRevision
+            }
+            else {
+                ''
+            }
+        }
+    }
+
+    if ($EventName -cne 'pull_request_target') {
+        throw "Unsupported metadata event name: $EventName"
+    }
+    if ($IsNewRefRange -or $HeadIntroducedByPush) {
+        throw 'A pull request metadata event must not use push-only fields.'
+    }
+    if ($PullRequestAction -cnotin @('opened', 'reopened', 'synchronize')) {
+        throw "Unsupported pull request metadata action: $PullRequestAction"
+    }
+    if ($BaseRevision -notmatch $strObjectIdPattern -or
+        $BaseRevision -match $strZeroObjectIdPattern) {
+        throw 'A pull request metadata event requires a valid base tip.'
+    }
+    & git -C $RepositoryRootPath cat-file -e "$BaseRevision`^{commit}" 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        throw 'The pull request base tip is unavailable.'
+    }
+    $arrMergeBases = @(& git -C $RepositoryRootPath merge-base --all `
+            $BaseRevision $HeadRevision 2>$null)
+    if ($LASTEXITCODE -ne 0 -or $arrMergeBases.Count -ne 1 -or
+        ([string] $arrMergeBases[0]).Trim() -notmatch $strObjectIdPattern) {
+        throw 'The pull request metadata range must have one available merge base.'
+    }
+    $strHistoryBase = ([string] $arrMergeBases[0]).Trim()
+
+    if ($PullRequestAction -cne 'synchronize') {
+        if (-not [string]::IsNullOrEmpty($PreviousHeadRevision)) {
+            throw 'An opened or reopened pull request must not supply a previous head.'
+        }
+        return [pscustomobject]@{
+            HistoryBaseRevision = $strHistoryBase
+            FreshnessBaseRevision = ''
+        }
+    }
+    if ($PreviousHeadRevision -notmatch $strObjectIdPattern -or
+        $PreviousHeadRevision -match $strZeroObjectIdPattern -or
+        [string]::Equals(
+            $PreviousHeadRevision,
+            $HeadRevision,
+            [StringComparison]::OrdinalIgnoreCase
+        )) {
+        throw 'A synchronize event requires a distinct valid previous topic head.'
+    }
+    & git -C $RepositoryRootPath cat-file -e `
+        "$PreviousHeadRevision`^{commit}" 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        throw 'The synchronize previous topic head is unavailable.'
+    }
+    & git -C $RepositoryRootPath merge-base --is-ancestor `
+        $PreviousHeadRevision $HeadRevision 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        throw 'The synchronize previous topic head must be an ancestor of the new head.'
+    }
+    return [pscustomobject]@{
+        HistoryBaseRevision = $strHistoryBase
+        FreshnessBaseRevision = $PreviousHeadRevision
+    }
 }
 
 function Test-GovernedInstructionPath {
@@ -4337,21 +4465,36 @@ $strTrustedEventUtcDate = ''
 $boolEventRangeRequested = -not [string]::IsNullOrEmpty($RangeBaseRevision) -or
     -not [string]::IsNullOrEmpty($RangeHeadRevision)
 if ($boolEventRangeRequested -and
-    [string]::IsNullOrEmpty($TrustedEventTimestamp)) {
-    throw 'A metadata event range requires a trusted GitHub event timestamp.'
+    ([string]::IsNullOrEmpty($TrustedEventTimestamp) -or
+        [string]::IsNullOrEmpty($EventName))) {
+    throw 'A metadata event range requires a trusted GitHub event name and timestamp.'
+}
+if (-not $boolEventRangeRequested -and
+    (-not [string]::IsNullOrEmpty($TrustedEventTimestamp) -or
+        -not [string]::IsNullOrEmpty($EventName) -or
+        -not [string]::IsNullOrEmpty($PullRequestAction) -or
+        -not [string]::IsNullOrEmpty($PreviousHeadRevision) -or
+        $EventHeadIntroducedByPush)) {
+    throw 'Metadata event fields require a complete base and head range.'
 }
 if (-not [string]::IsNullOrEmpty($TrustedEventTimestamp)) {
     $strTrustedEventUtcDate = (ConvertFrom-TrustedEventTimestamp `
             -Timestamp $TrustedEventTimestamp).ToString('yyyy-MM-dd')
 }
+$strEventHistoryBaseRevision = $RangeBaseRevision
 $strEventFreshnessBaseRevision = ''
 if ($boolEventRangeRequested -and
     -not [string]::IsNullOrEmpty($RangeBaseRevision) -and
     -not [string]::IsNullOrEmpty($RangeHeadRevision)) {
-    $strEventFreshnessBaseRevision = Get-EventFreshnessBaseRevision `
+    $objMetadataEventRevisionContext = Get-MetadataEventRevisionContext `
+        -RepositoryRootPath $strRepositoryRootPath `
+        -EventName $EventName -PullRequestAction $PullRequestAction `
         -BaseRevision $RangeBaseRevision -HeadRevision $RangeHeadRevision `
         -IsNewRefRange ([bool]$RangeIsNewRef) `
+        -PreviousHeadRevision $PreviousHeadRevision `
         -HeadIntroducedByPush ([bool]$EventHeadIntroducedByPush)
+    $strEventHistoryBaseRevision = $objMetadataEventRevisionContext.HistoryBaseRevision
+    $strEventFreshnessBaseRevision = $objMetadataEventRevisionContext.FreshnessBaseRevision
 }
 
 if (-not [string]::IsNullOrEmpty($InputRevision)) {
@@ -4641,7 +4784,7 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
             -RepositoryRootPath $strRepositoryRootPath `
             -RepositoryRelativePath $objDocumentContext.Path `
             -MaximumBytes $objDocumentContext.MaximumBytes `
-            -BaseRevision $RangeBaseRevision `
+            -BaseRevision $strEventHistoryBaseRevision `
             -HeadRevision $RangeHeadRevision `
             -InputRevision $strValidatedInputRevision `
             -IsNewRefRange ([bool]$RangeIsNewRef) `
@@ -4649,12 +4792,7 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
             -PolicyMaximumBytes $intValidatorMaximumInputBytes `
             -PolicyMarker $strMetadataRangePolicyMarker)
     if ($boolEventRangeRequested -and
-        -not [string]::IsNullOrEmpty($strEventFreshnessBaseRevision) -and
-        -not [string]::Equals(
-            $RangeBaseRevision,
-            $RangeHeadRevision,
-            [StringComparison]::OrdinalIgnoreCase
-        )) {
+        -not [string]::IsNullOrEmpty($strEventFreshnessBaseRevision)) {
         & git -C $strRepositoryRootPath cat-file -e `
             "$strEventFreshnessBaseRevision`:$($objDocumentContext.Path)" 2>$null
         $strEventBaseContent = if ($LASTEXITCODE -eq 0) {
@@ -5849,14 +5987,18 @@ if ($SelfTest) {
     if ($arrNewRefRangeFailures.Count -ne 0) {
         throw "Valid new-ref metadata range failed: $($arrNewRefRangeFailures -join '; ')"
     }
-    $strExistingRefFreshnessBase = Get-EventFreshnessBaseRevision `
-        -BaseRevision $strNewRefZeroRevision -HeadRevision $strNewRefTestHead `
-        -IsNewRefRange $true -HeadIntroducedByPush $false
-    $strNewHeadFreshnessBase = Get-EventFreshnessBaseRevision `
-        -BaseRevision $strNewRefZeroRevision -HeadRevision $strNewRefTestHead `
-        -IsNewRefRange $true -HeadIntroducedByPush $true
-    if ($strExistingRefFreshnessBase -cne '' -or
-        $strNewHeadFreshnessBase -cne "$strNewRefTestHead`^") {
+    $objExistingHistoryPush = Get-MetadataEventRevisionContext `
+        -RepositoryRootPath $strRepositoryRootPath -EventName 'push' `
+        -PullRequestAction '' -BaseRevision $strNewRefZeroRevision `
+        -HeadRevision $strNewRefTestHead -IsNewRefRange $true `
+        -PreviousHeadRevision '' -HeadIntroducedByPush $false
+    $objIntroducedHeadPush = Get-MetadataEventRevisionContext `
+        -RepositoryRootPath $strRepositoryRootPath -EventName 'push' `
+        -PullRequestAction '' -BaseRevision $strNewRefZeroRevision `
+        -HeadRevision $strNewRefTestHead -IsNewRefRange $true `
+        -PreviousHeadRevision '' -HeadIntroducedByPush $true
+    if ($objExistingHistoryPush.FreshnessBaseRevision -cne '' -or
+        $objIntroducedHeadPush.FreshnessBaseRevision -cne "$strNewRefTestHead`^") {
         throw 'New-ref base selection changed.'
     }
     if (@(Get-CurrentInputMetadataFreshnessFailure -Name 'AGENTS.md' `
@@ -6145,6 +6287,64 @@ if ($SelfTest) {
             -Parents @($strMergeBaseCommit) `
             -Timestamp ($strMergeCurrentDate + 'T00:00:00Z') `
             -Message 'merge fixture advanced base'
+        $strSynchronizedTopicCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strMergeTopicTree `
+            -Parents @($strMergeTopicCommit) `
+            -Timestamp ($strMergeCurrentDate + 'T00:00:30Z') `
+            -Message 'merge fixture synchronized topic'
+        foreach ($strHistoryOnlyAction in @('opened', 'reopened')) {
+            $objHistoryOnlyContext = Get-MetadataEventRevisionContext `
+                -RepositoryRootPath $strMergeFixtureRoot `
+                -EventName 'pull_request_target' `
+                -PullRequestAction $strHistoryOnlyAction `
+                -BaseRevision $strAdvancedBaseCommit `
+                -HeadRevision $strSynchronizedTopicCommit `
+                -IsNewRefRange $false -PreviousHeadRevision '' `
+                -HeadIntroducedByPush $false
+            if ($objHistoryOnlyContext.HistoryBaseRevision -cne $strMergeBaseCommit -or
+                $objHistoryOnlyContext.FreshnessBaseRevision -cne '') {
+                throw "$strHistoryOnlyAction did not use merge-base history without redating."
+            }
+        }
+        $objSynchronizeContext = Get-MetadataEventRevisionContext `
+            -RepositoryRootPath $strMergeFixtureRoot `
+            -EventName 'pull_request_target' -PullRequestAction 'synchronize' `
+            -BaseRevision $strAdvancedBaseCommit `
+            -HeadRevision $strSynchronizedTopicCommit `
+            -IsNewRefRange $false `
+            -PreviousHeadRevision $strMergeTopicCommit `
+            -HeadIntroducedByPush $false
+        if ($objSynchronizeContext.HistoryBaseRevision -cne $strMergeBaseCommit -or
+            $objSynchronizeContext.FreshnessBaseRevision -cne $strMergeTopicCommit) {
+            throw 'Synchronize did not separate merge-base history from topic introduction.'
+        }
+        $boolInvalidPreviousHeadRejected = $false
+        try {
+            [void](Get-MetadataEventRevisionContext `
+                    -RepositoryRootPath $strMergeFixtureRoot `
+                    -EventName 'pull_request_target' `
+                    -PullRequestAction 'synchronize' `
+                    -BaseRevision $strAdvancedBaseCommit `
+                    -HeadRevision $strSynchronizedTopicCommit `
+                    -IsNewRefRange $false `
+                    -PreviousHeadRevision $strAdvancedBaseCommit `
+                    -HeadIntroducedByPush $false)
+        }
+        catch {
+            $boolInvalidPreviousHeadRejected = $_.Exception.Message.Contains(
+                'must be an ancestor',
+                [StringComparison]::Ordinal
+            )
+        }
+        if (-not $boolInvalidPreviousHeadRejected) {
+            throw 'A synchronize event accepted a non-topic previous head.'
+        }
+        $arrAdvancedBaseHistoryFailures = @(& $scriptBlockGetMergeRangeFailure `
+                -Base $objSynchronizeContext.HistoryBaseRevision `
+                -Head $strSynchronizedTopicCommit)
+        if ($arrAdvancedBaseHistoryFailures.Count -ne 0) {
+            throw 'Merge-base history validation rejected an advanced-base topic.'
+        }
         $strInheritedMergeCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strMergeTopicTree `
             -Parents @($strAdvancedBaseCommit, $strMergeTopicCommit) `
@@ -6326,6 +6526,18 @@ if ($SelfTest) {
     if ($strAgentWorkflowContent -notmatch
         "(?s)AGENT_INSTRUCTION_INPUT_REVISION:.+github.event_name == 'push' && github.sha") {
         throw 'The push workflow does not read governed input from the event commit.'
+    }
+    foreach ($strEventPayloadLiteral in @(
+            'AGENT_INSTRUCTION_EVENT_NAME:',
+            'AGENT_INSTRUCTION_PULL_REQUEST_ACTION:',
+            'github.event.action == ''synchronize'' && github.event.before',
+            'contains(github.event.commits.*.id, github.event.after)')) {
+        if (-not $strAgentWorkflowContent.Contains(
+                $strEventPayloadLiteral,
+                [StringComparison]::Ordinal
+            )) {
+            throw "The workflow omits event payload plumbing: $strEventPayloadLiteral"
+        }
     }
     $objProposedHeadFetch = [regex]::Match(
         $strAgentWorkflowContent,

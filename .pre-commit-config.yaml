@@ -25,24 +25,20 @@ repos:
         files: >-
           (?x)^(
             \.codex/config\.toml|
-            (AGENTS|CLAUDE)\.md|
+            .*\.(md|mdc)|
             package(-lock)?\.json|
             \.pre-commit-config\.yaml|
-            \.github/copilot-instructions\.md|
-            \.github/instructions/.*\.instructions\.md|
             \.github/workflows/.*\.(mjs|ps1|ya?ml)
           )$
       - id: trailing-whitespace
         args:
-          - --markdown-linebreak-ext=md
+          - --markdown-linebreak-ext=md,mdc
         files: >-
           (?x)^(
             \.codex/config\.toml|
-            (AGENTS|CLAUDE)\.md|
+            .*\.(md|mdc)|
             package(-lock)?\.json|
             \.pre-commit-config\.yaml|
-            \.github/copilot-instructions\.md|
-            \.github/instructions/.*\.instructions\.md|
             \.github/workflows/.*\.(mjs|ps1|ya?ml)
           )$
 
