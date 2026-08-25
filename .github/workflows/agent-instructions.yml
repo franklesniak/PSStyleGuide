@@ -212,9 +212,12 @@ jobs:
           AGENT_INSTRUCTION_PREVIOUS_HEAD_REVISION: >-
             ${{ github.event_name == 'pull_request_target' &&
               github.event.action == 'synchronize' && github.event.before || '' }}
-          AGENT_INSTRUCTION_EVENT_HEAD_INTRODUCED: >-
+          AGENT_INSTRUCTION_EVENT_HEAD_REVISION: >-
             ${{ github.event_name == 'push' &&
-              contains(github.event.commits.*.id, github.event.after) || false }}
+              github.event.head_commit.id || '' }}
+          AGENT_INSTRUCTION_EVENT_HEAD_DISTINCT: >-
+            ${{ github.event_name == 'push' &&
+              toJSON(github.event.head_commit.distinct) || '' }}
         run: >-
           ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest
           -InputRevision $env:AGENT_INSTRUCTION_INPUT_REVISION
@@ -227,5 +230,5 @@ jobs:
           -EventName $env:AGENT_INSTRUCTION_EVENT_NAME
           -PullRequestAction $env:AGENT_INSTRUCTION_PULL_REQUEST_ACTION
           -PreviousHeadRevision $env:AGENT_INSTRUCTION_PREVIOUS_HEAD_REVISION
-          -EventHeadIntroducedByPush:([bool]::Parse(
-          $env:AGENT_INSTRUCTION_EVENT_HEAD_INTRODUCED))
+          -EventHeadRevision $env:AGENT_INSTRUCTION_EVENT_HEAD_REVISION
+          -EventHeadDistinct $env:AGENT_INSTRUCTION_EVENT_HEAD_DISTINCT

@@ -43,6 +43,12 @@
 # .PARAMETER PreviousHeadRevision
 # Identifies the previous topic head for a synchronize event.
 #
+# .PARAMETER EventHeadRevision
+# Identifies the independently expanded push head commit from the webhook.
+#
+# .PARAMETER EventHeadDistinct
+# Preserves the webhook head commit's exact true or false distinct value.
+#
 # .EXAMPLE
 # & ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest
 #
@@ -59,7 +65,7 @@
 # This validator keeps explicit backtick continuations so that large
 # named-parameter mutation calls remain auditable one argument per line.
 # Private helpers have focused examples. The -SelfTest suite covers edge cases.
-# Version: 1.5.20260824.0
+# Version: 1.5.20260825.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -105,7 +111,12 @@ param(
     [string] $PreviousHeadRevision = '',
 
     [Parameter()]
-    [switch] $EventHeadIntroducedByPush
+    [AllowEmptyString()]
+    [string] $EventHeadRevision = '',
+
+    [Parameter()]
+    [AllowEmptyString()]
+    [string] $EventHeadDistinct = ''
 )
 
 Set-StrictMode -Version Latest
@@ -2388,7 +2399,8 @@ function Get-MetadataEventRevisionContext {
         [Parameter(Mandatory)][string] $HeadRevision,
         [Parameter(Mandatory)][bool] $IsNewRefRange,
         [Parameter(Mandatory)][AllowEmptyString()][string] $PreviousHeadRevision,
-        [Parameter(Mandatory)][bool] $HeadIntroducedByPush
+        [Parameter(Mandatory)][AllowEmptyString()][string] $EventHeadRevision,
+        [Parameter(Mandatory)][AllowEmptyString()][string] $EventHeadDistinct
     )
 
     $strObjectIdPattern = '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$'
@@ -2407,11 +2419,26 @@ function Get-MetadataEventRevisionContext {
             -not [string]::IsNullOrEmpty($PreviousHeadRevision)) {
             throw 'A push metadata event must not supply pull request fields.'
         }
+        if ($EventHeadRevision -notmatch $strObjectIdPattern -or
+            $EventHeadRevision -match $strZeroObjectIdPattern) {
+            throw 'A push metadata event requires a valid expanded head revision.'
+        }
+        if (-not [string]::Equals(
+                $EventHeadRevision,
+                $HeadRevision,
+                [StringComparison]::OrdinalIgnoreCase
+            )) {
+            throw 'The expanded push head revision must match the event after revision.'
+        }
+        if ($EventHeadDistinct -cnotin @('true', 'false')) {
+            throw 'The expanded push head distinct value must be true or false.'
+        }
+        $boolHeadIntroducedByPush = $EventHeadDistinct -ceq 'true'
         if ($IsNewRefRange) {
             if ($BaseRevision -notmatch $strZeroObjectIdPattern) {
                 throw 'A new-ref push metadata event requires an all-zero base.'
             }
-            $strFreshnessBase = if ($HeadIntroducedByPush) {
+            $strFreshnessBase = if ($boolHeadIntroducedByPush) {
                 "$HeadRevision^"
             }
             else {
@@ -2433,7 +2460,7 @@ function Get-MetadataEventRevisionContext {
         }
         return [pscustomobject]@{
             HistoryBaseRevision = $BaseRevision
-            FreshnessBaseRevision = if ($HeadIntroducedByPush) {
+            FreshnessBaseRevision = if ($boolHeadIntroducedByPush) {
                 $BaseRevision
             }
             else {
@@ -2445,7 +2472,9 @@ function Get-MetadataEventRevisionContext {
     if ($EventName -cne 'pull_request_target') {
         throw "Unsupported metadata event name: $EventName"
     }
-    if ($IsNewRefRange -or $HeadIntroducedByPush) {
+    if ($IsNewRefRange -or
+        -not [string]::IsNullOrEmpty($EventHeadRevision) -or
+        -not [string]::IsNullOrEmpty($EventHeadDistinct)) {
         throw 'A pull request metadata event must not use push-only fields.'
     }
     if ($PullRequestAction -cnotin @('opened', 'reopened', 'synchronize')) {
@@ -2537,6 +2566,8 @@ function Test-GovernedInstructionPath {
 
     return (
         $GovernedRootPaths -ccontains $RepositoryRelativePath -or
+        $RepositoryRelativePath -cmatch `
+            '^(?:(?!\.\.?/)[^/]+/)*GEMINI\.md$' -or
         $RepositoryRelativePath -cmatch `
             '^(?:[^/]+/)*AGENTS(?:\.override)?\.md$' -or
         $RepositoryRelativePath -cmatch `
@@ -4618,7 +4649,8 @@ if ($PushApplicabilityOnly) {
         $EventName -cne 'push' -or
         -not [string]::IsNullOrEmpty($PullRequestAction) -or
         -not [string]::IsNullOrEmpty($PreviousHeadRevision) -or
-        $EventHeadIntroducedByPush) {
+        -not [string]::IsNullOrEmpty($EventHeadRevision) -or
+        -not [string]::IsNullOrEmpty($EventHeadDistinct)) {
         throw 'Push-applicability mode received incompatible validation fields.'
     }
     $objPushApplicability = Get-PushGovernedPathApplicability `
@@ -4681,7 +4713,8 @@ if (-not $boolEventRangeRequested -and
         -not [string]::IsNullOrEmpty($PullRequestAction) -or
         -not [string]::IsNullOrEmpty($PreviousHeadRevision) -or
         $RangeIsDeletedRef -or
-        $EventHeadIntroducedByPush)) {
+        -not [string]::IsNullOrEmpty($EventHeadRevision) -or
+        -not [string]::IsNullOrEmpty($EventHeadDistinct))) {
     throw 'Metadata event fields require a complete base and head range.'
 }
 if (-not [string]::IsNullOrEmpty($TrustedEventTimestamp)) {
@@ -4699,7 +4732,8 @@ if ($boolEventRangeRequested -and
         -BaseRevision $RangeBaseRevision -HeadRevision $RangeHeadRevision `
         -IsNewRefRange ([bool]$RangeIsNewRef) `
         -PreviousHeadRevision $PreviousHeadRevision `
-        -HeadIntroducedByPush ([bool]$EventHeadIntroducedByPush)
+        -EventHeadRevision $EventHeadRevision `
+        -EventHeadDistinct $EventHeadDistinct
     $strEventHistoryBaseRevision = $objMetadataEventRevisionContext.HistoryBaseRevision
     $strEventFreshnessBaseRevision = $objMetadataEventRevisionContext.FreshnessBaseRevision
 }
@@ -5210,6 +5244,34 @@ if ($SelfTest) {
         throw 'The supported root CLAUDE.md instruction is not cataloged.'
     }
 
+    foreach ($strHierarchicalGeminiPath in @(
+            'GEMINI.md',
+            'tools/GEMINI.md',
+            'tools/deep/GEMINI.md'
+        )) {
+        if (-not (Test-GovernedInstructionPath `
+                    -RepositoryRelativePath $strHierarchicalGeminiPath `
+                    -GovernedRootPaths $script:arrGovernedInstructionRootPaths) -or
+            -not (Test-AgentInstructionWorkflowPath `
+                    -RepositoryRelativePath $strHierarchicalGeminiPath)) {
+            throw "A hierarchical Gemini context escaped governance: $strHierarchicalGeminiPath"
+        }
+    }
+    foreach ($strGeminiNearMissPath in @(
+            'tools/Gemini.md',
+            'tools/GEMINI.md.bak',
+            './GEMINI.md',
+            '../GEMINI.md',
+            'tools/../GEMINI.md',
+            'tools//GEMINI.md'
+        )) {
+        if (Test-GovernedInstructionPath `
+                -RepositoryRelativePath $strGeminiNearMissPath `
+                -GovernedRootPaths $script:arrGovernedInstructionRootPaths) {
+            throw "A Gemini near-miss path entered governance: $strGeminiNearMissPath"
+        }
+    }
+
     $arrUncatalogedGovernedInstructionPaths = @(
         '.github/instructions/future.instructions.md',
         '.github/instructions/team/future.instructions.md',
@@ -5217,6 +5279,8 @@ if ($SelfTest) {
         '.cursor/rules/team/future.mdc',
         '.hermes.md',
         'GEMINI.md',
+        'tools/GEMINI.md',
+        'tools/deep/GEMINI.md',
         'tools/AGENTS.md',
         'AGENTS.override.md',
         'tools/AGENTS.override.md',
@@ -5258,6 +5322,28 @@ if ($SelfTest) {
                 $strUncatalogedGovernedInstructionPath
             )
         }
+    }
+
+    $arrCatalogedNestedGeminiFailures = @(
+        Get-GovernedInstructionInventoryFailure `
+            -CatalogPaths @($arrGovernedInstructionDocuments.Path +
+                'tools/GEMINI.md') `
+            -TrackedPaths @($arrTrackedGovernedInstructionPaths +
+                'tools/GEMINI.md')
+    )
+    if ($arrCatalogedNestedGeminiFailures.Count -ne 0) {
+        throw 'A cataloged nested GEMINI.md did not enter the governed inventory.'
+    }
+    $arrNestedGeminiMetadataFailures = @(Get-DocumentMetadataTransitionFailure `
+            -Name 'tools/GEMINI.md' `
+            -CurrentContent $strDocsStaleMetadataMutation `
+            -ParentContent $strDocsInstructionsContent `
+            -ExpectedUtcDate $objDocsMetadataContext.UpdatedDate `
+            -IsNewDocumentTransition $false)
+    if (-not ($arrNestedGeminiMetadataFailures -match [regex]::Escape(
+                'tools/GEMINI.md Version revision must be greater than'
+            ))) {
+        throw 'A cataloged nested GEMINI.md bypassed rendered metadata transition.'
     }
 
     $arrRequiredFieldNames = @('Status', 'Owner', 'Scope')
@@ -5406,7 +5492,7 @@ if ($SelfTest) {
 
     $arrHostileGovernedPaths = @(
         "caf$([char]0x00e9)/AGENTS.md", "tab`tname/AGENTS.override.md",
-        'quote"name/CLAUDE.md', 'back\slash/AGENTS.md', "line`nfeed/AGENTS.md",
+        'quote"name/CLAUDE.md', 'back\slash/GEMINI.md', "line`nfeed/AGENTS.md",
         "carriage`rreturn/CLAUDE.md", '-leading/AGENTS.md')
     $listGitPathBytes = [Collections.Generic.List[byte]]::new()
     foreach ($strHostilePath in $arrHostileGovernedPaths) {
@@ -6215,7 +6301,7 @@ if ($SelfTest) {
                 'data 8',
                 'governed',
                 'from :2',
-                'M 100644 inline zzzz/AGENTS.md',
+                'M 100644 inline zzzz/tools/GEMINI.md',
                 'data 0',
                 '',
                 'commit refs/heads/divergent',
@@ -6416,12 +6502,14 @@ if ($SelfTest) {
         -RepositoryRootPath $strRepositoryRootPath -EventName 'push' `
         -PullRequestAction '' -BaseRevision $strNewRefZeroRevision `
         -HeadRevision $strNewRefTestHead -IsNewRefRange $true `
-        -PreviousHeadRevision '' -HeadIntroducedByPush $false
+        -PreviousHeadRevision '' -EventHeadRevision $strNewRefTestHead `
+        -EventHeadDistinct 'false'
     $objIntroducedHeadPush = Get-MetadataEventRevisionContext `
         -RepositoryRootPath $strRepositoryRootPath -EventName 'push' `
         -PullRequestAction '' -BaseRevision $strNewRefZeroRevision `
         -HeadRevision $strNewRefTestHead -IsNewRefRange $true `
-        -PreviousHeadRevision '' -HeadIntroducedByPush $true
+        -PreviousHeadRevision '' -EventHeadRevision $strNewRefTestHead `
+        -EventHeadDistinct 'true'
     if ($objExistingHistoryPush.FreshnessBaseRevision -cne '' -or
         $objIntroducedHeadPush.FreshnessBaseRevision -cne "$strNewRefTestHead`^") {
         throw 'New-ref base selection changed.'
@@ -6430,6 +6518,96 @@ if ($SelfTest) {
             -CurrentContent $strSameDayRevisionJump -BaseContent $strAgentsContent `
             -TrustedEventUtcDate $strNextEventDate).Count -ne 1) {
         throw 'Stale new-ref head passed.'
+    }
+
+    $strExistingPushBase = [string] (
+        & git -C $strRepositoryRootPath rev-parse --verify 'HEAD^'
+    )
+    if ($LASTEXITCODE -ne 0 -or
+        $strExistingPushBase.Trim() -notmatch '^[0-9a-fA-F]{40}$') {
+        throw 'Could not resolve the existing-ref metadata self-test base.'
+    }
+    $strExistingPushBase = $strExistingPushBase.Trim()
+    $arrTruncatedPushCommitIds = @(
+        foreach ($intCommitId in 1..2048) {
+            $intCommitId.ToString('x40')
+        }
+    )
+    if ($arrTruncatedPushCommitIds.Count -ne 2048 -or
+        $arrTruncatedPushCommitIds -contains $strNewRefTestHead) {
+        throw 'The truncated push payload fixture is invalid.'
+    }
+    $objTruncatedPushContext = Get-MetadataEventRevisionContext `
+        -RepositoryRootPath $strRepositoryRootPath -EventName 'push' `
+        -PullRequestAction '' -BaseRevision $strExistingPushBase `
+        -HeadRevision $strNewRefTestHead -IsNewRefRange $false `
+        -PreviousHeadRevision '' -EventHeadRevision $strNewRefTestHead `
+        -EventHeadDistinct 'true'
+    if ($objTruncatedPushContext.HistoryBaseRevision -cne $strExistingPushBase -or
+        $objTruncatedPushContext.FreshnessBaseRevision -cne $strExistingPushBase) {
+        throw 'A truncated push payload suppressed exact pushed-head freshness.'
+    }
+    $objExistingHeadPushContext = Get-MetadataEventRevisionContext `
+        -RepositoryRootPath $strRepositoryRootPath -EventName 'push' `
+        -PullRequestAction '' -BaseRevision $strExistingPushBase `
+        -HeadRevision $strNewRefTestHead -IsNewRefRange $false `
+        -PreviousHeadRevision '' -EventHeadRevision $strNewRefTestHead `
+        -EventHeadDistinct 'false'
+    if ($objExistingHeadPushContext.FreshnessBaseRevision -cne '') {
+        throw 'A move to an existing pushed head required event-date freshness.'
+    }
+
+    foreach ($objInvalidPushHead in @(
+            [pscustomobject]@{
+                Name = 'missing expanded head'
+                Revision = ''
+                Distinct = 'true'
+                Failure = 'requires a valid expanded head revision'
+            },
+            [pscustomobject]@{
+                Name = 'mismatched expanded head'
+                Revision = $strExistingPushBase
+                Distinct = 'true'
+                Failure = 'must match the event after revision'
+            },
+            [pscustomobject]@{
+                Name = 'missing distinct value'
+                Revision = $strNewRefTestHead
+                Distinct = ''
+                Failure = 'distinct value must be true or false'
+            },
+            [pscustomobject]@{
+                Name = 'null distinct value'
+                Revision = $strNewRefTestHead
+                Distinct = 'null'
+                Failure = 'distinct value must be true or false'
+            },
+            [pscustomobject]@{
+                Name = 'wrong-case distinct value'
+                Revision = $strNewRefTestHead
+                Distinct = 'True'
+                Failure = 'distinct value must be true or false'
+            }
+        )) {
+        $boolInvalidPushHeadRejected = $false
+        try {
+            [void](Get-MetadataEventRevisionContext `
+                    -RepositoryRootPath $strRepositoryRootPath -EventName 'push' `
+                    -PullRequestAction '' -BaseRevision $strExistingPushBase `
+                    -HeadRevision $strNewRefTestHead -IsNewRefRange $false `
+                    -PreviousHeadRevision '' `
+                    -EventHeadRevision $objInvalidPushHead.Revision `
+                    -EventHeadDistinct $objInvalidPushHead.Distinct)
+        }
+        catch {
+            $boolInvalidPushHeadRejected = $_.Exception.Message.Contains(
+                $objInvalidPushHead.Failure,
+                [StringComparison]::Ordinal
+            )
+        }
+        if (-not $boolInvalidPushHeadRejected) {
+            throw "Invalid push head passed: $($objInvalidPushHead.Name)"
+        }
     }
 
     $boolUnflaggedZeroBaseRejected = $false
@@ -6725,7 +6903,7 @@ if ($SelfTest) {
                 -BaseRevision $strAdvancedBaseCommit `
                 -HeadRevision $strSynchronizedTopicCommit `
                 -IsNewRefRange $false -PreviousHeadRevision '' `
-                -HeadIntroducedByPush $false
+                -EventHeadRevision '' -EventHeadDistinct ''
             if ($objHistoryOnlyContext.HistoryBaseRevision -cne $strMergeBaseCommit -or
                 $objHistoryOnlyContext.FreshnessBaseRevision -cne '') {
                 throw "$strHistoryOnlyAction did not use merge-base history without redating."
@@ -6738,7 +6916,7 @@ if ($SelfTest) {
             -HeadRevision $strSynchronizedTopicCommit `
             -IsNewRefRange $false `
             -PreviousHeadRevision $strMergeTopicCommit `
-            -HeadIntroducedByPush $false
+            -EventHeadRevision '' -EventHeadDistinct ''
         if ($objSynchronizeContext.HistoryBaseRevision -cne $strMergeBaseCommit -or
             $objSynchronizeContext.FreshnessBaseRevision -cne $strMergeTopicCommit) {
             throw 'Synchronize did not separate merge-base history from topic introduction.'
@@ -6751,7 +6929,7 @@ if ($SelfTest) {
             -HeadRevision $strSynchronizedTopicCommit `
             -IsNewRefRange $false `
             -PreviousHeadRevision $strAdvancedBaseCommit `
-            -HeadIntroducedByPush $false
+            -EventHeadRevision '' -EventHeadDistinct ''
         if ($objDivergentSynchronizeContext.HistoryBaseRevision -cne
                 $strMergeBaseCommit -or
             $objDivergentSynchronizeContext.FreshnessBaseRevision -cne
@@ -6781,7 +6959,7 @@ if ($SelfTest) {
             -HeadRevision $strRebasedTopicCommit `
             -IsNewRefRange $false `
             -PreviousHeadRevision $strMergeTopicCommit `
-            -HeadIntroducedByPush $false
+            -EventHeadRevision '' -EventHeadDistinct ''
         if ($objRebasedSynchronizeContext.HistoryBaseRevision -cne
                 $strAdvancedBaseCommit -or
             $objRebasedSynchronizeContext.FreshnessBaseRevision -cne
@@ -6809,7 +6987,7 @@ if ($SelfTest) {
                     -HeadRevision $strRebasedTopicCommit `
                     -IsNewRefRange $false `
                     -PreviousHeadRevision ('f' * 40) `
-                    -HeadIntroducedByPush $false)
+                    -EventHeadRevision '' -EventHeadDistinct '')
         }
         catch {
             $boolMissingPreviousHeadRejected = $_.Exception.Message.Contains(
@@ -6830,7 +7008,7 @@ if ($SelfTest) {
                     -HeadRevision $strRebasedTopicCommit `
                     -IsNewRefRange $false `
                     -PreviousHeadRevision $strRebasedTopicCommit `
-                    -HeadIntroducedByPush $false)
+                    -EventHeadRevision '' -EventHeadDistinct '')
         }
         catch {
             $boolSamePreviousHeadRejected = $_.Exception.Message.Contains(
@@ -6852,7 +7030,7 @@ if ($SelfTest) {
                         -HeadRevision $strRebasedTopicCommit `
                         -IsNewRefRange $false `
                         -PreviousHeadRevision $strMergeTopicCommit `
-                        -HeadIntroducedByPush $false)
+                        -EventHeadRevision '' -EventHeadDistinct '')
             }
             catch {
                 $boolUnexpectedPreviousHeadRejected = $_.Exception.Message.Contains(
@@ -6897,7 +7075,7 @@ if ($SelfTest) {
                     -BaseRevision $strCrissCrossMergeLeft `
                     -HeadRevision $strCrissCrossMergeRight `
                     -IsNewRefRange $false -PreviousHeadRevision '' `
-                    -HeadIntroducedByPush $false)
+                    -EventHeadRevision '' -EventHeadDistinct '')
         }
         catch {
             $boolMultipleMergeBasesRejected = $_.Exception.Message.Contains(
@@ -7108,7 +7286,12 @@ if ($SelfTest) {
                 'test "${fetched_head}" = "${PR_HEAD_SHA}"',
                 'test "${fetched_previous_head}" = "${PR_PREVIOUS_HEAD_SHA}"',
                 'github.event.action == ''synchronize'' && github.event.before',
-                'contains(github.event.commits.*.id, github.event.after)',
+                'AGENT_INSTRUCTION_EVENT_HEAD_REVISION:',
+                'github.event.head_commit.id',
+                'AGENT_INSTRUCTION_EVENT_HEAD_DISTINCT:',
+                'toJSON(github.event.head_commit.distinct)',
+                '-EventHeadRevision $env:AGENT_INSTRUCTION_EVENT_HEAD_REVISION',
+                '-EventHeadDistinct $env:AGENT_INSTRUCTION_EVENT_HEAD_DISTINCT',
                 'persist-credentials: false',
                 'ref: ${{ github.sha }}'
             )) {
@@ -7124,6 +7307,14 @@ if ($SelfTest) {
         if ($Content -cmatch '(?m)(^|\s)--force(\s|$)' -or
             $Content -cmatch '"\+[^" ]+:') {
             $listFailures.Add('Event-data fetches must not force a destination ref.')
+        }
+        if ($Content.Contains(
+                'github.event.commits.*.id',
+                [StringComparison]::Ordinal
+            )) {
+            $listFailures.Add(
+                'The bounded push commits array must not decide head introduction.'
+            )
         }
         $intExpensiveGateCount = [regex]::Matches(
             $Content,
@@ -7210,6 +7401,14 @@ if ($SelfTest) {
                 'persist-credentials: true'
             )
             Expected = 'Workflow contract literal is missing: persist-credentials: false'
+        },
+        [pscustomobject]@{
+            Name = 'bounded push commit-list head evidence'
+            Content = $strAgentWorkflowContent.Replace(
+                'github.event.head_commit.id',
+                'github.event.commits.*.id'
+            )
+            Expected = 'The bounded push commits array must not decide head introduction.'
         },
         [pscustomobject]@{
             Name = 'ungated expensive steps'
