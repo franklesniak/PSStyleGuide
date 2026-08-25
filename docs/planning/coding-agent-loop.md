@@ -4,6 +4,8 @@
 
 Run this prompt from `C:\Users\flesniak\GitHub\PSStyleGuide` while the local PSStyleGuide checkout is on branch `planning-CRT-PR-852`.
 
+When the workflow will reach an initial coding-task dispatch or a permitted reroute, start or resume it from a user message that explicitly selects the private `model-routing-advisor` skill through the current host. In Codex CLI or the IDE extension, select `$model-routing-advisor` from the `$` picker or `/skills`; in the ChatGPT desktop app, select it with `@`. Put the structured skill selection in the same user message that starts or resumes `/goal`, and retain the skill mention in the durable goal objective when the host supports that shape. For example: `/goal Use $model-routing-advisor and work on the prompt in docs/planning/coding-agent-loop.md`. A literal skill name copied into prose, this file, a tracker, or an executor prompt is not proof of host-level selection.
+
 You are the parent orchestration agent for the cross-repository action plan in `docs/planning/action-items-2026-08-21.md`. Process the plan in numbered order, one atomic task at a time. Continue until every task is complete or the next action requires human or operator intervention. Do not perform a human decision, supply an authorization, weaken a gate, or skip an incomplete task.
 
 The plan file exists only on PSStyleGuide branch `planning-CRT-PR-852`. It is a control input and is not intended to merge to `main`. Never add the plan, this orchestration prompt, or orchestration-state files to an implementation PR. Do not copy them to `main`, cherry-pick them into an implementation branch, or treat their absence from `main` as a defect. When work occurs in TerraformStyleGuide, pass the exact task text to the executor from the PSStyleGuide planning checkout.
@@ -14,6 +16,19 @@ The local repositories are:
 - TerraformStyleGuide: `C:\Users\flesniak\GitHub\TerraformStyleGuide`
 
 Preserve unrelated user changes in both repositories. Before acting in either repository, read its `AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`, and applicable `.github/instructions/**` files when they exist. Obey the most specific repository instruction. Do not use destructive Git recovery commands. Do not expose credentials, tokens, cookies, or private state.
+
+## Required advisor activation
+
+Treat skill discovery, initial-list inclusion, explicit selection, instruction loading, and successful advisor invocation as distinct facts.
+
+- A skill selector or autocomplete result proves discovery only. A local directory or `SKILL.md` file proves neither discovery by the current host nor activation in the current turn.
+- The initial skill list is context-budgeted and may omit a discovered skill. Absence from that initial list is not proof that the skill is unavailable and must not by itself block the workflow.
+- A fixed local directory is not an availability gate. Codex surfaces and versions may resolve user skills from different compatible or legacy roots. Use the current host's selector and resolved skill identity; do not require, copy, move, or modify a private skill merely to satisfy a hard-coded path.
+- Explicit activation is verified only when the current host accepts the structured skill selection and the parent loads the selected skill's complete instructions through the host-provided resource or filesystem path. For a filesystem-backed skill, record its resolved `SKILL.md` path, byte count, and SHA-256. For an opaque host resource, record its stable host identifier and the strongest content identity the host exposes.
+- `policy.allow_implicit_invocation: false` does not make a skill unavailable; it requires explicit selection. Do not change that policy as part of this workflow.
+- If the advisor is needed and is not activated in the current turn, inspect the skill metadata exposed to the parent by the current host. If the parent cannot inspect the interactive selector, do not infer its contents; ask the operator to open `$` or `/skills` in Codex, or `@` in ChatGPT, and select the advisor in one resumption message. Do not classify a discovered-but-unselected skill as unavailable, invoke a substitute, create a test executor, or consume repeated no-progress retries. Only after a direct host or operator read shows that the selector does not expose it following one host restart may the parent record a discovery failure and the minimum operator action.
+
+Record one current-turn `advisor_activation` receipt before every initial advisor invocation or permitted reroute. It must distinguish `discovered`, `explicit_selection_accepted`, `full_instructions_loaded`, and `activation_verified`; name the host surface and resolved skill identity; include the resource path or identifier and content hash when available; and state any limitation. Selector presence alone cannot set `activation_verified: true`.
 
 ## Required executor routing
 
@@ -26,7 +41,7 @@ Run at most one task executor at a time. Never parallelize plan tasks, implement
 - For `Human execution required`, do not invoke the routing advisor or a coding agent to make the decision or perform the restricted action. First re-query the required state. If the human action is already complete and independently verifiable, record that evidence and continue. Otherwise stop at that task and report the exact decision, authorization, credential, setting change, or operator action required.
 - For `Not executable; tracking/control only`, validate the specified state and record it. Do not invoke the routing advisor or treat the task as authority for an implementation action.
 
-At startup, perform one workflow-level capability preflight for per-subagent exact model and reasoning-effort requests. Inspect the actual runtime interfaces and record whether native delegation, exact overrides, post-spawn effective-setting inspection, and an allowed headless fallback are supported. Documentation or a static model list is not proof that a particular route is available. Do not create a test executor merely to perform this preflight. Refresh the preflight if the runtime or interface changes.
+At startup, perform one workflow-level capability preflight for skill selection and loading and for per-subagent exact model and reasoning-effort requests. Inspect the actual runtime interfaces and record whether the advisor is discovered, whether explicit selection was accepted for the current turn, whether its full instructions were loaded, whether native delegation and exact overrides are supported, whether post-spawn effective-setting inspection is available, and whether an allowed headless fallback exists. Documentation, a static model list, an initial skill list, autocomplete, or a local skill file is not proof that a particular route is available or that the advisor is activated. Do not create a test executor merely to perform this preflight. Refresh the preflight if the runtime, host turn, or interface changes.
 
 ### Model-routing boundary
 
@@ -42,7 +57,7 @@ For every numbered task classified as `Coding agent executable`:
 
 1. Complete all existing pre-dispatch repository, worktree, identity, authorization, policy, and implementation-slot checks.
 2. Finalize the exact task text and approved manifest, compute their SHA-256 hashes, and record both hashes. Do not route a draft or placeholder-bearing manifest.
-3. Invoke the private, user-scoped `model-routing-advisor` for that task only. Supply the exact numbered task text; task-text hash; repository, worktree, branch, and baseline commit; allowed and forbidden paths; required commands and validation; risk and uncertainty signals; retry history, if any; any exact model or reasoning requirement from the task or approved plan; and the requirement for one executor with no descendants. Do not copy the advisor or its private instructions into either repository or tracker.
+3. Verify the current-turn `advisor_activation` receipt, then invoke the explicitly selected private, user-scoped `model-routing-advisor` for that task only. Supply the exact numbered task text; task-text hash; repository, worktree, branch, and baseline commit; allowed and forbidden paths; required commands and validation; risk and uncertainty signals; retry history, if any; any exact model or reasoning requirement from the task or approved plan; and the requirement for one executor with no descendants. Do not copy the advisor or its private instructions into either repository or tracker. Do not infer activation from the skill name appearing in these instructions.
 4. Apply the selection precedence below and freeze the selected route before dispatch.
 5. Check the selected route's actual availability through the dispatching runtime. A documented or statically listed route is not sufficient proof of runtime availability.
 6. When automatic delegation is supported, let the advisor create exactly one fresh subagent with no inherited conversational turns when the runtime supports `fork_turns="none"`. The advisor-created subagent is that dispatch's only executor.
@@ -198,10 +213,10 @@ Create or resume `TEMP-coding-agent-loop-state.json` in the PSStyleGuide reposit
 The tracker must contain:
 
 - Schema version, active run ID, overall status, and UTC timestamps.
-- Absolute paths for both repositories and the plan.
-- Current PSStyleGuide planning branch and plan SHA-256.
+- Absolute paths for both repositories, the plan, and this orchestration prompt.
+- Current PSStyleGuide planning branch plus the plan and orchestration-prompt SHA-256 values.
 - The detected task count, first and last task number, and proof that numbering is consecutive and unique.
-- One workflow-level `routing_capability_preflight` that describes the inspected interfaces and their exact-override and post-spawn inspection capabilities without asserting that any task-specific route is currently available.
+- One current-turn `advisor_activation` receipt that separates discovery, explicit-selection acceptance, complete instruction loading, and verified activation, plus one workflow-level `routing_capability_preflight` that describes the inspected interfaces and their exact-override and post-spawn inspection capabilities without asserting that any task-specific route is currently available.
 - For every task:
   - Number, exact title, execution class, target repository, and SHA-256 of the exact extracted task text.
   - Predecessor task numbers, relationship types, conditional branch, and required predecessor outputs.
@@ -219,6 +234,22 @@ A coding task's tracker data must be equivalent in meaning to this normative sha
 
 ```json
 {
+  "advisor_activation": {
+    "checked_at_utc": "<timestamp>",
+    "host_surface": "<codex_ide|codex_cli|chatgpt_desktop|other>",
+    "requested_skill": "model-routing-advisor",
+    "discovered": true,
+    "discovery_source": "<structured_selector|skills_command|host_resource>",
+    "explicit_selection_accepted": true,
+    "full_instructions_loaded": true,
+    "resolved_skill_identity": "<host identity>",
+    "resolved_resource": "<filesystem path or opaque host resource>",
+    "content_utf8_bytes": "<integer or null>",
+    "content_sha256": "<hash or null>",
+    "activation_verified": true,
+    "verification_source": "<host evidence>",
+    "limitation": null
+  },
   "routing_capability_preflight": {
     "checked_at_utc": "<timestamp>",
     "native_subagent_interface_available": true,
@@ -329,14 +360,15 @@ On every startup, resumption, or context-window recovery:
 
 1. Confirm the PSStyleGuide checkout is on `planning-CRT-PR-852`. Confirm the plan and this prompt exist on that branch. If not, stop; do not recreate them on another branch.
 2. Read the plan and this prompt completely. Read applicable repository instructions in both repositories.
-3. Hash the plan. Extract the preamble and every task from a `## Task N — ...` heading through the byte before the next task heading or `## References`.
+3. Hash the plan and this orchestration prompt. Extract the preamble and every task from a `## Task N — ...` heading through the byte before the next task heading or `## References`.
 4. Verify that tasks are numbered consecutively from 1 through the plan's last task with no gap or duplicate. Parse each task's execution class, dependencies, conditional branch, stop conditions, output, and `Complete when` condition.
-5. Read and parse the tracker when it exists. If its plan hash differs, preserve the old run in history and create a new run. Do not carry completion across changed task text without revalidation.
-6. Inspect the live runtime and record or refresh the workflow-level routing capability preflight for per-subagent exact model and reasoning-effort requests, native delegation, post-spawn visibility, and any permitted headless fallback. Do not treat documentation, a static model catalog, a prior task's success, or requested settings as proof that a future task-specific route is available.
-7. Query `git status --short --branch`, local and remote refs, and the task-relevant authenticated GitHub state in both repositories. Paginate every relevant result. Preserve unrelated user changes.
-8. Reconstruct missing tracker state from plan hashes, Git objects, GitHub objects, permanent evidence records, routing evidence, and validation results. File existence or an executor's prior statement is not enough.
-9. Independently revalidate every task marked complete before skipping it. If evidence no longer satisfies its exact `Complete when` condition or routing-record requirements, return it to `in_progress` or `blocked` as the evidence requires.
-10. Select the lowest-numbered incomplete task whose predecessor and branch conditions are satisfied. Never advance past an incomplete predecessor.
+5. Read and parse the tracker when it exists. If its plan hash differs, preserve the old run in history and create a new run. If only the orchestration-prompt hash differs, append a prompt-change reconciliation record, revalidate the current lifecycle and routing gates under the new prompt, and retain task completion only where its unchanged task text and evidence still satisfy the new controls. A parent-only activation-rule change does not by itself change a numbered task or approved task manifest; do not invent a reroute unless the exact task or manifest actually changes or capability-insufficiency evidence independently meets the reroute rule. Do not carry completion across changed task text without revalidation.
+6. Inspect the live host-provided skill metadata. Record or refresh `advisor_activation` without treating autocomplete, an initial-list entry, or a local file as activation. If the parent cannot inspect the interactive selector, record that limitation rather than guessing. If the next action requires an initial advisor invocation or reroute and explicit selection is not accepted in the current turn, follow the one-resumption procedure in Required advisor activation before declaring the skill unavailable.
+7. Inspect the live runtime and record or refresh the workflow-level routing capability preflight for per-subagent exact model and reasoning-effort requests, native delegation, post-spawn visibility, and any permitted headless fallback. Do not treat documentation, a static model catalog, a prior task's success, or requested settings as proof that a future task-specific route is available.
+8. Query `git status --short --branch`, local and remote refs, and the task-relevant authenticated GitHub state in both repositories. Paginate every relevant result. Preserve unrelated user changes.
+9. Reconstruct missing tracker state from plan hashes, Git objects, GitHub objects, permanent evidence records, routing evidence, and validation results. File existence or an executor's prior statement is not enough.
+10. Independently revalidate every task marked complete before skipping it. If evidence no longer satisfies its exact `Complete when` condition or routing-record requirements, return it to `in_progress` or `blocked` as the evidence requires.
+11. Select the lowest-numbered incomplete task whose predecessor and branch conditions are satisfied. Never advance past an incomplete predecessor.
 
 After compaction, restart with this procedure. Do not restart from Task 1 by default.
 
@@ -350,7 +382,7 @@ Before every initial dispatch, continuation, replacement retry, or reroute, comp
 4. Verify the target repository, branch, baseline commit, and working tree. Do not include planning-branch files in an implementation branch or PR.
 5. Verify the implementation slot is free before a feature implementation begins. Issue creation and implementation commencement remain separate actions.
 6. Finalize and approve the exact task manifest, ensure it contains no unresolved known value, compute its SHA-256, and record the task-text and manifest hashes.
-7. For an initial `Coding agent executable` dispatch or permitted reroute, invoke the advisor only now, apply precedence, freeze the route, and check the selected route's actual dispatch-time availability and exact-override support. For a continuation or ordinary replacement retry, do not invoke the advisor; validate the existing frozen routing record and selected route. For any non-coding or parent-reserved task, do not invoke the advisor; record or validate the applicable routing bypass.
+7. For an initial `Coding agent executable` dispatch or permitted reroute, require `advisor_activation.activation_verified: true`, invoke that exact selected advisor only now, apply precedence, freeze the route, and check the selected route's actual dispatch-time availability and exact-override support. If activation is not verified, use the one-resumption procedure instead of treating initial-list absence as unavailability. For a continuation or ordinary replacement retry, do not invoke the advisor; validate the existing frozen routing record and selected route. For any non-coding or parent-reserved task, do not invoke the advisor; record or validate the applicable routing bypass.
 8. Confirm the task-text and manifest hashes still match the routing or bypass record. Mark the task `in_progress`, record the pre-execution state, and save the tracker.
 9. For an initial coding-task dispatch or reroute, let the advisor create exactly one fresh executor when automatic delegation is supported. For a valid continuation, reuse the same executor. For an ordinary replacement retry, create one fresh sequential executor through the existing dispatch mechanism with the same frozen route and without a new advisor invocation. Increment the dispatch ordinal and record the active executor's identity and override acceptance or rejection before permitting substantive work. Do not create another executor for the same dispatch ordinal. If only the explicitly permitted headless fallback can request the identical frozen route, start one fallback process as the sole executor; otherwise block.
 
@@ -374,7 +406,7 @@ Do not accept an executor's verbal completion claim as proof. Independently:
 
 1. Re-read the task's `Complete when` condition and verify every clause.
 2. Recompute the exact task-text and approved manifest hashes and prove that they match the active routing or bypass record.
-3. For a coding task, validate the expected executor identity, task identity, routing-decision identifier, frozen route, dispatch ordinal, no-descendants requirement, and absence of any overlapping executor. For a non-coding task, validate its classification and bypass reason and prove no advisor or executor was used for the reserved work.
+3. For a coding task, validate the applicable `advisor_activation` receipt, expected executor identity, task identity, routing-decision identifier, frozen route, dispatch ordinal, no-descendants requirement, and absence of any overlapping executor. For a non-coding task, validate its classification and bypass reason and prove no advisor or executor was used for the reserved work.
 4. Validate selection precedence, actual route-availability evidence, exact-override support, request acceptance or rejection, and any separately reported resolved settings. Verify effective settings only from the recorded runtime source; otherwise require `effective_override_verified: false` and an honest limitation. Validate the complete append-only reroute history, if any.
 5. Inspect both worktrees, branches, commits, trees, changed paths, and diffs. Preserve unrelated changes and confirm only authorized scope changed.
 6. Re-query affected GitHub state with authenticated structured reads. Paginate comments, reviews, review threads, checks, commits, linked issues, closing references, sub-issues, and dependency connections when applicable.
@@ -409,6 +441,7 @@ After three consecutive invalid or no-progress invocations for the same task, st
 - Exact human approval, administrator authority, a credential, or a setting decision is missing.
 - The selected exact model or reasoning effort cannot be requested through the native interface or an explicitly task-authorized fallback that supports the identical frozen route.
 - An exposed exact override rejects the selected value and no already-authorized interface can request the identical route.
+- The advisor is required, a direct host or operator selector read after one restart proves that it is not discoverable, and no already-activated advisor instance is valid for the current routing boundary. A discovered-but-unselected advisor requires the one-resumption procedure and is not this terminal blocker.
 - A task-local stop or escalation condition occurs.
 - A required identity changed unexpectedly and cannot be reconciled safely.
 - A proposed repository-specific byte or behavior difference remains uncertain.
@@ -418,17 +451,19 @@ When blocked, save a valid tracker and report the completed task range, current 
 
 ## Codex interface references
 
+- [OpenAI Build skills: activation, discovery locations, list budgeting, and invocation policy](https://learn.chatgpt.com/docs/build-skills)
+- [OpenAI Codex configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference)
 - [OpenAI Codex subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents)
 - [OpenAI Codex non-interactive mode](https://learn.chatgpt.com/docs/non-interactive-mode)
 - [OpenAI Codex `AGENTS.md` instructions](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
 
 ## Overall completion
 
-The orchestration run is complete only when every numbered task passes its exact `Complete when` condition and has a valid applicable routing record or valid bypass record; its task-text and approved manifest hashes match; its expected executor identity, or the expected absence of an executor for bypassed work, is proved; its no-overlap evidence matches its routing record; override support and acceptance status are recorded for coding work; effective-verification status is honest; and its reroute history, if any, is complete and append-only. The final completion audit must exist, both repositories must be at the recorded fixed point, all task hashes must still match the active plan, all existing task evidence and independent validation must pass, no blocker or placeholder may remain, and the tracker must be valid and marked complete.
+The orchestration run is complete only when every numbered task passes its exact `Complete when` condition and has a valid applicable routing record or valid bypass record; every advisor invocation has a valid activation receipt; its task-text and approved manifest hashes match; its expected executor identity, or the expected absence of an executor for bypassed work, is proved; its no-overlap evidence matches its routing record; override support and acceptance status are recorded for coding work; effective-verification status is honest; and its reroute history, if any, is complete and append-only. The final completion audit must exist, both repositories must be at the recorded fixed point, all task hashes must still match the active plan, all existing task evidence and independent validation must pass, no blocker or placeholder may remain, and the tracker must be valid and marked complete.
 
 At completion, report:
 
-- Active run ID, plan path, plan SHA-256, and task range.
+- Active run ID, plan and orchestration-prompt paths and SHA-256 values, and task range.
 - Every task's title, execution class, routing applicability or bypass reason, invocation counts, final status, and completion evidence.
 - For each coding task, the selected model, selected reasoning effort, selection source, routing-decision identifier, executor identifier, override-request acceptance status, effective-route verification status, verification limitation when applicable, and continuation, replacement-retry, and reroute history.
 - Commits, trees, blobs, issues, PRs, reviews, checks, comparisons, fixed-point records, and validations produced.
