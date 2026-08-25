@@ -26,6 +26,14 @@
 # Indicates that a push created the ref and RangeBaseRevision is Git's
 # all-zero no-prior-ref sentinel.
 #
+# .PARAMETER RangeIsDeletedRef
+# Indicates that a push deleted the ref and RangeHeadRevision is Git's
+# all-zero no-remaining-ref sentinel.
+#
+# .PARAMETER PushApplicabilityOnly
+# Returns one lowercase Boolean decision for an authenticated push range and
+# stops before parser installation or repository-content validation.
+#
 # .PARAMETER EventName
 # Identifies the authenticated GitHub event that supplied the optional range.
 #
@@ -51,7 +59,7 @@
 # This validator keeps explicit backtick continuations so that large
 # named-parameter mutation calls remain auditable one argument per line.
 # Private helpers have focused examples. The -SelfTest suite covers edge cases.
-# Version: 1.4.20260824.0
+# Version: 1.5.20260824.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -73,6 +81,12 @@ param(
 
     [Parameter()]
     [switch] $RangeIsNewRef,
+
+    [Parameter()]
+    [switch] $RangeIsDeletedRef,
+
+    [Parameter()]
+    [switch] $PushApplicabilityOnly,
 
     [Parameter()]
     [AllowEmptyString()]
@@ -118,6 +132,24 @@ $script:arrTrustRootPaths = @(
     '.github/workflows/Test-AgentInstructions.ps1',
     '.github/workflows/Test-AgentInstructionParserManifest.mjs',
     '.github/workflows/agent-instructions.yml'
+)
+$script:arrGovernedInstructionRootPaths = @(
+    '.hermes.md',
+    'AGENTS.md',
+    'CLAUDE.md',
+    'GEMINI.md',
+    '.github/copilot-instructions.md'
+)
+$script:arrPushGovernedExactPaths = @(
+    $script:arrCheckoutAttributePaths
+    '.codex/config.toml',
+    '.github/workflows/Test-AgentInstructionParserManifest.mjs',
+    '.github/workflows/Test-AgentInstructions.ps1',
+    '.github/workflows/agent-instructions.yml',
+    '.npmrc',
+    'npm-shrinkwrap.json',
+    'package-lock.json',
+    'package.json'
 )
 $script:strStandingPlacementAuthorization =
     'No additional per-round, per-session, or PR-specific direct-push authorization from the owner is required.'
@@ -2394,10 +2426,10 @@ function Get-MetadataEventRevisionContext {
             $BaseRevision -match $strZeroObjectIdPattern) {
             throw 'An existing-ref push metadata event requires a valid base.'
         }
-        & git -C $RepositoryRootPath merge-base --is-ancestor `
-            $BaseRevision $HeadRevision 2>$null
+        & git -C $RepositoryRootPath cat-file -e `
+            "$BaseRevision`^{commit}" 2>$null
         if ($LASTEXITCODE -ne 0) {
-            throw 'The existing-ref push base must be an ancestor of its head.'
+            throw 'The existing-ref push base is unavailable.'
         }
         return [pscustomobject]@{
             HistoryBaseRevision = $BaseRevision
@@ -2458,11 +2490,6 @@ function Get-MetadataEventRevisionContext {
     if ($LASTEXITCODE -ne 0) {
         throw 'The synchronize previous topic head is unavailable.'
     }
-    & git -C $RepositoryRootPath merge-base --is-ancestor `
-        $PreviousHeadRevision $HeadRevision 2>$null
-    if ($LASTEXITCODE -ne 0) {
-        throw 'The synchronize previous topic head must be an ancestor of the new head.'
-    }
     return [pscustomobject]@{
         HistoryBaseRevision = $strHistoryBase
         FreshnessBaseRevision = $PreviousHeadRevision
@@ -2521,6 +2548,163 @@ function Test-GovernedInstructionPath {
         $RepositoryRelativePath -cmatch `
             '^\.claude/rules/(?:[^/]+/)*[^/]+\.md$'
     )
+}
+
+function Test-AgentInstructionWorkflowPath {
+    # .SYNOPSIS
+    # Tests whether one exact changed path requires agent validation.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $RepositoryRelativePath
+    )
+
+    return (
+        $script:arrPushGovernedExactPaths -ccontains $RepositoryRelativePath -or
+        (Test-GovernedInstructionPath `
+            -RepositoryRelativePath $RepositoryRelativePath `
+            -GovernedRootPaths $script:arrGovernedInstructionRootPaths)
+    )
+}
+
+function Get-PushGovernedPathApplicability {
+    # .SYNOPSIS
+    # Makes one fail-closed governed-path decision for a push event.
+    #
+    # .DESCRIPTION
+    # Existing refs use GitHub's exact two-dot push endpoints. Rename detection
+    # is disabled so a governed source or destination remains visible. New refs
+    # validate conservatively because the event does not provide an immutable
+    # boundary for arbitrarily large pushes. Deleted refs have no remaining
+    # repository bytes and are an exact no-op.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $RepositoryRootPath,
+
+        [Parameter(Mandatory)]
+        [string] $BaseRevision,
+
+        [Parameter(Mandatory)]
+        [string] $HeadRevision,
+
+        [Parameter(Mandatory)]
+        [bool] $IsNewRef,
+
+        [Parameter(Mandatory)]
+        [bool] $IsDeletedRef
+    )
+
+    $strObjectIdPattern = '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$'
+    $strZeroObjectIdPattern = '^(?:0{40}|0{64})$'
+    if ($IsNewRef -and $IsDeletedRef) {
+        throw 'A push ref cannot be both created and deleted.'
+    }
+
+    if ($IsDeletedRef) {
+        if ($BaseRevision -notmatch $strObjectIdPattern -or
+            $BaseRevision -match $strZeroObjectIdPattern -or
+            $HeadRevision -notmatch $strZeroObjectIdPattern) {
+            throw 'A deleted-ref push requires a valid base and an all-zero head.'
+        }
+        return [pscustomobject]@{
+            ShouldValidate = $false
+            Decision = 'DELETED_REF_HAS_NO_REMAINING_BYTES'
+            ChangedPathCount = 0
+        }
+    }
+
+    if ($HeadRevision -notmatch $strObjectIdPattern -or
+        $HeadRevision -match $strZeroObjectIdPattern) {
+        throw 'A retained push ref requires a valid nonzero head.'
+    }
+    $strCheckedOutRevision = [string] (
+        & git -C $RepositoryRootPath rev-parse --verify 'HEAD^{commit}' 2>$null
+    )
+    if ($LASTEXITCODE -ne 0 -or
+        -not [string]::Equals(
+            $strCheckedOutRevision.Trim(),
+            $HeadRevision,
+            [StringComparison]::OrdinalIgnoreCase
+        )) {
+        throw 'The checked-out push revision does not match the exact event head.'
+    }
+
+    if ($IsNewRef) {
+        if ($BaseRevision -notmatch $strZeroObjectIdPattern) {
+            throw 'A new-ref push requires an all-zero base.'
+        }
+        return [pscustomobject]@{
+            ShouldValidate = $true
+            Decision = 'NEW_REF_REQUIRES_FAIL_CLOSED_VALIDATION'
+            ChangedPathCount = 0
+        }
+    }
+
+    if ($BaseRevision -notmatch $strObjectIdPattern -or
+        $BaseRevision -match $strZeroObjectIdPattern) {
+        throw 'An existing-ref push requires a valid nonzero base.'
+    }
+    foreach ($strRevision in @($BaseRevision, $HeadRevision)) {
+        & git -C $RepositoryRootPath cat-file -e `
+            "$strRevision`^{commit}" 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            throw "Push endpoint commit is unavailable: $strRevision"
+        }
+    }
+
+    $objStartInfo = [Diagnostics.ProcessStartInfo]::new('git')
+    $objStartInfo.UseShellExecute = $false
+    $objStartInfo.CreateNoWindow = $true
+    $objStartInfo.RedirectStandardOutput = $true
+    $objStartInfo.RedirectStandardError = $true
+    foreach ($strArgument in @(
+            '-C',
+            $RepositoryRootPath,
+            'diff',
+            '--name-only',
+            '-z',
+            '--no-renames',
+            '--no-ext-diff',
+            '--no-textconv',
+            $BaseRevision,
+            $HeadRevision,
+            '--'
+        )) {
+        $objStartInfo.ArgumentList.Add($strArgument)
+    }
+    $objGitProcess = [Diagnostics.Process]::new()
+    $objGitProcess.StartInfo = $objStartInfo
+    $objProcessResult = Read-BoundedProcessData `
+        -Process $objGitProcess `
+        -MaximumBytes $intGitPathListMaximumBytes `
+        -TimeoutMilliseconds 10000 `
+        -DisplayName 'Exact push changed-path enumeration'
+    if ($objProcessResult.ExitCode -ne 0) {
+        throw 'Could not enumerate the exact push changed paths.'
+    }
+    $arrChangedPaths = @()
+    if ($null -ne $objProcessResult.Bytes) {
+        $arrChangedPaths = @(ConvertFrom-GitPathListData `
+                -Bytes ([byte[]] $objProcessResult.Bytes))
+    }
+    foreach ($strChangedPath in $arrChangedPaths) {
+        if (Test-AgentInstructionWorkflowPath `
+                -RepositoryRelativePath $strChangedPath) {
+            return [pscustomobject]@{
+                ShouldValidate = $true
+                Decision = 'GOVERNED_PATH_CHANGED'
+                ChangedPathCount = $arrChangedPaths.Count
+            }
+        }
+    }
+    return [pscustomobject]@{
+        ShouldValidate = $false
+        Decision = 'EXACT_UNGOVERNED_PUSH'
+        ChangedPathCount = $arrChangedPaths.Count
+    }
 }
 
 function Get-GovernedInstructionInventoryFailure {
@@ -4427,6 +4611,28 @@ function Assert-FixtureAccepted {
 $strWorkflowsDirectoryPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($PSScriptRoot)
 $strGitHubDirectoryPath = [System.IO.Path]::GetDirectoryName($strWorkflowsDirectoryPath)
 $strRepositoryRootPath = [System.IO.Path]::GetDirectoryName($strGitHubDirectoryPath)
+if ($PushApplicabilityOnly) {
+    if ($SelfTest -or
+        -not [string]::IsNullOrEmpty($InputRevision) -or
+        -not [string]::IsNullOrEmpty($TrustedEventTimestamp) -or
+        $EventName -cne 'push' -or
+        -not [string]::IsNullOrEmpty($PullRequestAction) -or
+        -not [string]::IsNullOrEmpty($PreviousHeadRevision) -or
+        $EventHeadIntroducedByPush) {
+        throw 'Push-applicability mode received incompatible validation fields.'
+    }
+    $objPushApplicability = Get-PushGovernedPathApplicability `
+        -RepositoryRootPath $strRepositoryRootPath `
+        -BaseRevision $RangeBaseRevision `
+        -HeadRevision $RangeHeadRevision `
+        -IsNewRef ([bool]$RangeIsNewRef) `
+        -IsDeletedRef ([bool]$RangeIsDeletedRef)
+    Write-Output $objPushApplicability.ShouldValidate.ToString().ToLowerInvariant()
+    return
+}
+if ($RangeIsDeletedRef) {
+    throw 'Deleted-ref push validation must stop after its applicability decision.'
+}
 $strAgentsPath = Join-Path -Path $strRepositoryRootPath -ChildPath 'AGENTS.md'
 $strClaudePath = Join-Path -Path $strRepositoryRootPath -ChildPath 'CLAUDE.md'
 $strCodexConfigPath = Join-Path -Path $strRepositoryRootPath -ChildPath '.codex/config.toml'
@@ -4474,6 +4680,7 @@ if (-not $boolEventRangeRequested -and
         -not [string]::IsNullOrEmpty($EventName) -or
         -not [string]::IsNullOrEmpty($PullRequestAction) -or
         -not [string]::IsNullOrEmpty($PreviousHeadRevision) -or
+        $RangeIsDeletedRef -or
         $EventHeadIntroducedByPush)) {
     throw 'Metadata event fields require a complete base and head range.'
 }
@@ -4554,19 +4761,12 @@ $arrTrackedRepositoryPaths = @(Read-GitTrackedPath `
         -RepositoryRootPath $strRepositoryRootPath `
         -Revision $strValidatedInputRevision `
         -MaximumBytes $intGitPathListMaximumBytes)
-$arrGovernedRootPaths = @(
-    '.hermes.md',
-    'AGENTS.md',
-    'CLAUDE.md',
-    'GEMINI.md',
-    '.github/copilot-instructions.md'
-)
 $arrTrackedGovernedInstructionPaths = @(
     $arrTrackedRepositoryPaths |
         Where-Object {
             Test-GovernedInstructionPath `
                 -RepositoryRelativePath ([string] $_) `
-                -GovernedRootPaths $arrGovernedRootPaths
+                -GovernedRootPaths $script:arrGovernedInstructionRootPaths
         }
 )
 $arrGovernedInstructionInventoryFailures = @(
@@ -5031,7 +5231,7 @@ if ($SelfTest) {
     ) {
         if (-not (Test-GovernedInstructionPath `
                     -RepositoryRelativePath $strUncatalogedGovernedInstructionPath `
-                    -GovernedRootPaths $arrGovernedRootPaths)) {
+                    -GovernedRootPaths $script:arrGovernedInstructionRootPaths)) {
             throw (
                 'The governed-instruction selector omitted a documented surface: ' +
                 $strUncatalogedGovernedInstructionPath
@@ -5222,7 +5422,7 @@ if ($SelfTest) {
         if ($arrParsedHostilePaths[$intPath] -cne $arrHostileGovernedPaths[$intPath] -or
             -not (Test-GovernedInstructionPath `
                 -RepositoryRelativePath $arrParsedHostilePaths[$intPath] `
-                -GovernedRootPaths $arrGovernedRootPaths)) {
+                -GovernedRootPaths $script:arrGovernedInstructionRootPaths)) {
             throw 'A hostile Git path changed or escaped governance.'
         }
     }
@@ -5929,6 +6129,231 @@ if ($SelfTest) {
         throw 'Could not resolve the new-ref metadata self-test head.'
     }
     $strNewRefTestHead = $strNewRefTestHead.Trim()
+    $objNewRefApplicability = Get-PushGovernedPathApplicability `
+        -RepositoryRootPath $strRepositoryRootPath `
+        -BaseRevision $strNewRefZeroRevision `
+        -HeadRevision $strNewRefTestHead `
+        -IsNewRef $true -IsDeletedRef $false
+    if (-not $objNewRefApplicability.ShouldValidate -or
+        $objNewRefApplicability.Decision -cne
+            'NEW_REF_REQUIRES_FAIL_CLOSED_VALIDATION') {
+        throw 'A new-ref push did not select fail-closed validation.'
+    }
+    $objDeletedRefApplicability = Get-PushGovernedPathApplicability `
+        -RepositoryRootPath $strRepositoryRootPath `
+        -BaseRevision $strNewRefTestHead `
+        -HeadRevision $strNewRefZeroRevision `
+        -IsNewRef $false -IsDeletedRef $true
+    if ($objDeletedRefApplicability.ShouldValidate -or
+        $objDeletedRefApplicability.Decision -cne
+            'DELETED_REF_HAS_NO_REMAINING_BYTES') {
+        throw 'A deleted-ref push did not select its exact no-op.'
+    }
+    $objUnchangedPushApplicability = Get-PushGovernedPathApplicability `
+        -RepositoryRootPath $strRepositoryRootPath `
+        -BaseRevision $strNewRefTestHead `
+        -HeadRevision $strNewRefTestHead `
+        -IsNewRef $false -IsDeletedRef $false
+    if ($objUnchangedPushApplicability.ShouldValidate -or
+        $objUnchangedPushApplicability.ChangedPathCount -ne 0) {
+        throw 'An unchanged existing-ref push did not select its exact no-op.'
+    }
+
+    $strPushFixtureRoot = [System.IO.Path]::GetFullPath(
+        [System.IO.Path]::Combine(
+            [System.IO.Path]::GetTempPath(),
+            'agent-instruction-push-' + [guid]::NewGuid().ToString('N')
+        )
+    )
+    $strPushFixtureTempRoot = [System.IO.Path]::GetFullPath(
+        [System.IO.Path]::GetTempPath()
+    )
+    if (-not $strPushFixtureRoot.StartsWith(
+            $strPushFixtureTempRoot,
+            [System.StringComparison]::OrdinalIgnoreCase
+        )) {
+        throw 'The push-applicability fixture escaped the system temporary directory.'
+    }
+    try {
+        [void][System.IO.Directory]::CreateDirectory($strPushFixtureRoot)
+        & git -C $strPushFixtureRoot init --quiet
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not initialize the push-applicability fixture.'
+        }
+        $objFastImportText = [Text.StringBuilder]::new()
+        foreach ($strHeaderLine in @(
+                'commit refs/heads/base',
+                'mark :1',
+                'author Fixture <fixture@example.invalid> 1700000000 +0000',
+                'committer Fixture <fixture@example.invalid> 1700000000 +0000',
+                'data 4',
+                'base',
+                'deleteall',
+                'commit refs/heads/ungoverned',
+                'mark :2',
+                'author Fixture <fixture@example.invalid> 1700000001 +0000',
+                'committer Fixture <fixture@example.invalid> 1700000001 +0000',
+                'data 10',
+                'ungoverned',
+                'from :1'
+            )) {
+            [void]$objFastImportText.AppendLine($strHeaderLine)
+        }
+        foreach ($intFixturePath in 1..3000) {
+            [void]$objFastImportText.AppendLine(
+                'M 100644 inline bulk/file' +
+                    $intFixturePath.ToString('D4') + '.txt'
+            )
+            [void]$objFastImportText.AppendLine('data 0')
+            [void]$objFastImportText.AppendLine()
+        }
+        foreach ($strTrailerLine in @(
+                'commit refs/heads/governed',
+                'mark :3',
+                'author Fixture <fixture@example.invalid> 1700000002 +0000',
+                'committer Fixture <fixture@example.invalid> 1700000002 +0000',
+                'data 8',
+                'governed',
+                'from :2',
+                'M 100644 inline zzzz/AGENTS.md',
+                'data 0',
+                '',
+                'commit refs/heads/divergent',
+                'mark :4',
+                'author Fixture <fixture@example.invalid> 1700000003 +0000',
+                'committer Fixture <fixture@example.invalid> 1700000003 +0000',
+                'data 9',
+                'divergent',
+                'from :1',
+                'M 100644 inline zzzz/AGENTS.md',
+                'data 0',
+                '',
+                'done'
+            )) {
+            [void]$objFastImportText.AppendLine($strTrailerLine)
+        }
+        $objFastImportStartInfo = [Diagnostics.ProcessStartInfo]::new('git')
+        $objFastImportStartInfo.UseShellExecute = $false
+        $objFastImportStartInfo.CreateNoWindow = $true
+        $objFastImportStartInfo.RedirectStandardInput = $true
+        $objFastImportStartInfo.RedirectStandardOutput = $true
+        $objFastImportStartInfo.RedirectStandardError = $true
+        foreach ($strFastImportArgument in @(
+                '-C', $strPushFixtureRoot, 'fast-import', '--quiet'
+            )) {
+            $objFastImportStartInfo.ArgumentList.Add($strFastImportArgument)
+        }
+        $objFastImportProcess = [Diagnostics.Process]::new()
+        $objFastImportProcess.StartInfo = $objFastImportStartInfo
+        if (-not $objFastImportProcess.Start()) {
+            throw 'Could not start the push-applicability fixture import.'
+        }
+        $objFastImportErrorTask = $objFastImportProcess.StandardError.ReadToEndAsync()
+        $objFastImportOutputTask = $objFastImportProcess.StandardOutput.ReadToEndAsync()
+        $objFastImportWriteFailure = $null
+        try {
+            $objFastImportProcess.StandardInput.Write(
+                $objFastImportText.ToString().Replace("`r`n", "`n")
+            )
+        }
+        catch {
+            $objFastImportWriteFailure = $_.Exception
+        }
+        $objFastImportProcess.StandardInput.Close()
+        if (-not $objFastImportProcess.WaitForExit(10000)) {
+            $objFastImportProcess.Kill($true)
+            throw 'The push-applicability fixture import timed out.'
+        }
+        $strFastImportError = $objFastImportErrorTask.GetAwaiter().GetResult()
+        [void]$objFastImportOutputTask.GetAwaiter().GetResult()
+        if ($null -ne $objFastImportWriteFailure -or
+            $objFastImportProcess.ExitCode -ne 0) {
+            throw (
+                'Could not import the push-applicability fixture: ' +
+                $strFastImportError.Trim()
+            )
+        }
+        $objFastImportProcess.Dispose()
+
+        $strPushBaseCommit = [string] (
+            & git -C $strPushFixtureRoot rev-parse refs/heads/base
+        )
+        $strPushUngovernedCommit = [string] (
+            & git -C $strPushFixtureRoot rev-parse refs/heads/ungoverned
+        )
+        $strPushGovernedCommit = [string] (
+            & git -C $strPushFixtureRoot rev-parse refs/heads/governed
+        )
+        $strPushDivergentCommit = [string] (
+            & git -C $strPushFixtureRoot rev-parse refs/heads/divergent
+        )
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not resolve the push-applicability fixture commits.'
+        }
+        $strPushBaseCommit = $strPushBaseCommit.Trim()
+        $strPushUngovernedCommit = $strPushUngovernedCommit.Trim()
+        $strPushGovernedCommit = $strPushGovernedCommit.Trim()
+        $strPushDivergentCommit = $strPushDivergentCommit.Trim()
+
+        & git -C $strPushFixtureRoot update-ref HEAD $strPushUngovernedCommit
+        $objUngovernedApplicability = Get-PushGovernedPathApplicability `
+            -RepositoryRootPath $strPushFixtureRoot `
+            -BaseRevision $strPushBaseCommit `
+            -HeadRevision $strPushUngovernedCommit `
+            -IsNewRef $false -IsDeletedRef $false
+        if ($objUngovernedApplicability.ShouldValidate -or
+            $objUngovernedApplicability.ChangedPathCount -ne 3000) {
+            throw 'An exact 3,000-path ungoverned push did not select no-op.'
+        }
+
+        & git -C $strPushFixtureRoot update-ref HEAD $strPushGovernedCommit
+        $objGovernedApplicability = Get-PushGovernedPathApplicability `
+            -RepositoryRootPath $strPushFixtureRoot `
+            -BaseRevision $strPushBaseCommit `
+            -HeadRevision $strPushGovernedCommit `
+            -IsNewRef $false -IsDeletedRef $false
+        if (-not $objGovernedApplicability.ShouldValidate -or
+            $objGovernedApplicability.ChangedPathCount -ne 3001) {
+            throw 'A governed path after 3,000 other paths was not validated.'
+        }
+
+        & git -C $strPushFixtureRoot update-ref HEAD $strPushDivergentCommit
+        $objDivergentPushApplicability = Get-PushGovernedPathApplicability `
+            -RepositoryRootPath $strPushFixtureRoot `
+            -BaseRevision $strPushUngovernedCommit `
+            -HeadRevision $strPushDivergentCommit `
+            -IsNewRef $false -IsDeletedRef $false
+        if (-not $objDivergentPushApplicability.ShouldValidate) {
+            throw 'A divergent governed push did not use exact endpoint trees.'
+        }
+
+        $boolMissingPushEndpointRejected = $false
+        try {
+            [void](Get-PushGovernedPathApplicability `
+                    -RepositoryRootPath $strPushFixtureRoot `
+                    -BaseRevision ('f' * 40) `
+                    -HeadRevision $strPushDivergentCommit `
+                    -IsNewRef $false -IsDeletedRef $false)
+        }
+        catch {
+            $boolMissingPushEndpointRejected = $_.Exception.Message.Contains(
+                'Push endpoint commit is unavailable',
+                [StringComparison]::Ordinal
+            )
+        }
+        if (-not $boolMissingPushEndpointRejected) {
+            throw 'A missing push endpoint did not fail closed.'
+        }
+    }
+    finally {
+        if ([System.IO.Directory]::Exists($strPushFixtureRoot) -and
+            $strPushFixtureRoot.StartsWith(
+                $strPushFixtureTempRoot,
+                [System.StringComparison]::OrdinalIgnoreCase
+            )) {
+            Remove-Item -LiteralPath $strPushFixtureRoot -Recurse -Force
+        }
+    }
     $strRevisionAgentsFixture = Read-GitRevisionText `
         -RepositoryRootPath $strRepositoryRootPath `
         -Revision $strNewRefTestHead `
@@ -6318,32 +6743,170 @@ if ($SelfTest) {
             $objSynchronizeContext.FreshnessBaseRevision -cne $strMergeTopicCommit) {
             throw 'Synchronize did not separate merge-base history from topic introduction.'
         }
-        $boolInvalidPreviousHeadRejected = $false
+        $objDivergentSynchronizeContext = Get-MetadataEventRevisionContext `
+            -RepositoryRootPath $strMergeFixtureRoot `
+            -EventName 'pull_request_target' `
+            -PullRequestAction 'synchronize' `
+            -BaseRevision $strAdvancedBaseCommit `
+            -HeadRevision $strSynchronizedTopicCommit `
+            -IsNewRefRange $false `
+            -PreviousHeadRevision $strAdvancedBaseCommit `
+            -HeadIntroducedByPush $false
+        if ($objDivergentSynchronizeContext.HistoryBaseRevision -cne
+                $strMergeBaseCommit -or
+            $objDivergentSynchronizeContext.FreshnessBaseRevision -cne
+                $strAdvancedBaseCommit) {
+            throw 'A divergent synchronize lost its independent comparison bases.'
+        }
+        $arrDivergentFreshnessFailures = @(
+            Get-CurrentInputMetadataFreshnessFailure `
+                -Name 'AGENTS.md' `
+                -CurrentContent $strMergeTopicContent `
+                -BaseContent $strMergeBaseContent `
+                -TrustedEventUtcDate $strMergeCurrentDate
+        )
+        if ($arrDivergentFreshnessFailures.Count -ne 1) {
+            throw 'A divergent governed replacement bypassed current-event freshness.'
+        }
+
+        $strRebasedTopicCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strMergeTopicTree -Parents @($strAdvancedBaseCommit) `
+            -Timestamp ($strMergeCurrentDate + 'T00:00:45Z') `
+            -Message 'merge fixture rebased topic'
+        $objRebasedSynchronizeContext = Get-MetadataEventRevisionContext `
+            -RepositoryRootPath $strMergeFixtureRoot `
+            -EventName 'pull_request_target' `
+            -PullRequestAction 'synchronize' `
+            -BaseRevision $strAdvancedBaseCommit `
+            -HeadRevision $strRebasedTopicCommit `
+            -IsNewRefRange $false `
+            -PreviousHeadRevision $strMergeTopicCommit `
+            -HeadIntroducedByPush $false
+        if ($objRebasedSynchronizeContext.HistoryBaseRevision -cne
+                $strAdvancedBaseCommit -or
+            $objRebasedSynchronizeContext.FreshnessBaseRevision -cne
+                $strMergeTopicCommit) {
+            throw 'A rebased topic did not retain old-tree freshness comparison.'
+        }
+        $arrNoRenderedChangeFailures = @(
+            Get-CurrentInputMetadataFreshnessFailure `
+                -Name 'AGENTS.md' `
+                -CurrentContent $strMergeTopicContent `
+                -BaseContent $strMergeTopicContent `
+                -TrustedEventUtcDate $strMergeCurrentDate
+        )
+        if ($arrNoRenderedChangeFailures.Count -ne 0) {
+            throw 'A divergent replacement with the same rendered tree was redated.'
+        }
+
+        $boolMissingPreviousHeadRejected = $false
         try {
             [void](Get-MetadataEventRevisionContext `
                     -RepositoryRootPath $strMergeFixtureRoot `
                     -EventName 'pull_request_target' `
                     -PullRequestAction 'synchronize' `
                     -BaseRevision $strAdvancedBaseCommit `
-                    -HeadRevision $strSynchronizedTopicCommit `
+                    -HeadRevision $strRebasedTopicCommit `
                     -IsNewRefRange $false `
-                    -PreviousHeadRevision $strAdvancedBaseCommit `
+                    -PreviousHeadRevision ('f' * 40) `
                     -HeadIntroducedByPush $false)
         }
         catch {
-            $boolInvalidPreviousHeadRejected = $_.Exception.Message.Contains(
-                'must be an ancestor',
+            $boolMissingPreviousHeadRejected = $_.Exception.Message.Contains(
+                'previous topic head is unavailable',
                 [StringComparison]::Ordinal
             )
         }
-        if (-not $boolInvalidPreviousHeadRejected) {
-            throw 'A synchronize event accepted a non-topic previous head.'
+        if (-not $boolMissingPreviousHeadRejected) {
+            throw 'An unavailable synchronize previous head did not fail closed.'
+        }
+        $boolSamePreviousHeadRejected = $false
+        try {
+            [void](Get-MetadataEventRevisionContext `
+                    -RepositoryRootPath $strMergeFixtureRoot `
+                    -EventName 'pull_request_target' `
+                    -PullRequestAction 'synchronize' `
+                    -BaseRevision $strAdvancedBaseCommit `
+                    -HeadRevision $strRebasedTopicCommit `
+                    -IsNewRefRange $false `
+                    -PreviousHeadRevision $strRebasedTopicCommit `
+                    -HeadIntroducedByPush $false)
+        }
+        catch {
+            $boolSamePreviousHeadRejected = $_.Exception.Message.Contains(
+                'distinct valid previous topic head',
+                [StringComparison]::Ordinal
+            )
+        }
+        if (-not $boolSamePreviousHeadRejected) {
+            throw 'A synchronize event accepted the new head as its previous head.'
+        }
+        foreach ($strHistoryOnlyAction in @('opened', 'reopened')) {
+            $boolUnexpectedPreviousHeadRejected = $false
+            try {
+                [void](Get-MetadataEventRevisionContext `
+                        -RepositoryRootPath $strMergeFixtureRoot `
+                        -EventName 'pull_request_target' `
+                        -PullRequestAction $strHistoryOnlyAction `
+                        -BaseRevision $strAdvancedBaseCommit `
+                        -HeadRevision $strRebasedTopicCommit `
+                        -IsNewRefRange $false `
+                        -PreviousHeadRevision $strMergeTopicCommit `
+                        -HeadIntroducedByPush $false)
+            }
+            catch {
+                $boolUnexpectedPreviousHeadRejected = $_.Exception.Message.Contains(
+                    'must not supply a previous head',
+                    [StringComparison]::Ordinal
+                )
+            }
+            if (-not $boolUnexpectedPreviousHeadRejected) {
+                throw "$strHistoryOnlyAction accepted a previous-head field."
+            }
         }
         $arrAdvancedBaseHistoryFailures = @(& $scriptBlockGetMergeRangeFailure `
                 -Base $objSynchronizeContext.HistoryBaseRevision `
                 -Head $strSynchronizedTopicCommit)
         if ($arrAdvancedBaseHistoryFailures.Count -ne 0) {
             throw 'Merge-base history validation rejected an advanced-base topic.'
+        }
+        $strCrissCrossLeft = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strMergeBaseTree -Parents @($strMergeBaseCommit) `
+            -Timestamp ($strMergeHistoricalDate + 'T13:00:00Z') `
+            -Message 'criss-cross left'
+        $strCrissCrossRight = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strMergeBaseTree -Parents @($strMergeBaseCommit) `
+            -Timestamp ($strMergeHistoricalDate + 'T13:01:00Z') `
+            -Message 'criss-cross right'
+        $strCrissCrossMergeLeft = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strMergeBaseTree `
+            -Parents @($strCrissCrossLeft, $strCrissCrossRight) `
+            -Timestamp ($strMergeHistoricalDate + 'T13:02:00Z') `
+            -Message 'criss-cross merge left'
+        $strCrissCrossMergeRight = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strMergeBaseTree `
+            -Parents @($strCrissCrossRight, $strCrissCrossLeft) `
+            -Timestamp ($strMergeHistoricalDate + 'T13:03:00Z') `
+            -Message 'criss-cross merge right'
+        $boolMultipleMergeBasesRejected = $false
+        try {
+            [void](Get-MetadataEventRevisionContext `
+                    -RepositoryRootPath $strMergeFixtureRoot `
+                    -EventName 'pull_request_target' `
+                    -PullRequestAction 'opened' `
+                    -BaseRevision $strCrissCrossMergeLeft `
+                    -HeadRevision $strCrissCrossMergeRight `
+                    -IsNewRefRange $false -PreviousHeadRevision '' `
+                    -HeadIntroducedByPush $false)
+        }
+        catch {
+            $boolMultipleMergeBasesRejected = $_.Exception.Message.Contains(
+                'must have one available merge base',
+                [StringComparison]::Ordinal
+            )
+        }
+        if (-not $boolMultipleMergeBasesRejected) {
+            throw 'A pull request with multiple merge bases did not fail closed.'
         }
         $strInheritedMergeCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strMergeTopicTree `
@@ -6523,100 +7086,149 @@ if ($SelfTest) {
     $strAgentWorkflowContent = [System.IO.File]::ReadAllText(
         [System.IO.Path]::Combine($PSScriptRoot, 'agent-instructions.yml')
     )
-    if ($strAgentWorkflowContent -notmatch
-        "(?s)AGENT_INSTRUCTION_INPUT_REVISION:.+github.event_name == 'push' && github.sha") {
-        throw 'The push workflow does not read governed input from the event commit.'
-    }
-    foreach ($strEventPayloadLiteral in @(
-            'AGENT_INSTRUCTION_EVENT_NAME:',
-            'AGENT_INSTRUCTION_PULL_REQUEST_ACTION:',
-            'github.event.action == ''synchronize'' && github.event.before',
-            'contains(github.event.commits.*.id, github.event.after)')) {
-        if (-not $strAgentWorkflowContent.Contains(
-                $strEventPayloadLiteral,
-                [StringComparison]::Ordinal
-            )) {
-            throw "The workflow omits event payload plumbing: $strEventPayloadLiteral"
-        }
-    }
-    $objProposedHeadFetch = [regex]::Match(
-        $strAgentWorkflowContent,
-        '(?ms)^\s+git fetch (?<Command>.+?)^\s+unset authorization$'
-    )
-    if (-not $objProposedHeadFetch.Success) {
-        throw 'Could not parse the proposed-head fetch command.'
-    }
-    $strProposedHeadFetchCommand = $objProposedHeadFetch.Groups['Command'].Value
-    if ($strProposedHeadFetchCommand -notmatch
-        '"\$\{PR_HEAD_SHA\}:refs/remotes/event/pr-head"') {
-        throw 'The proposed-head fetch does not use the immutable event revision.'
-    }
-    if ($strProposedHeadFetchCommand -match
-            'refs/pull/\$\{PR_NUMBER\}/head' -or
-        $strProposedHeadFetchCommand -match
-            '(?m)(^|\s)--force(\s|$)' -or
-        $strProposedHeadFetchCommand -match '"\+[^" ]+:') {
-        throw 'The proposed-head fetch uses a mutable or forcing source.'
-    }
-    foreach ($strTrigger in @('push', 'pull_request_target')) {
-        $objTriggerMatch = [regex]::Match(
-            $strAgentWorkflowContent,
-            "(?ms)^  $strTrigger`:\r?\n(?<Body>.*?)(?=^(?:\S| {2}\S)|\z)"
-        )
-        if (-not $objTriggerMatch.Success) {
-            throw "Could not parse the $strTrigger agent-validation trigger."
-        }
-        if ($strTrigger -ceq 'push') {
-            $objBranchFilterMatch = [regex]::Match(
-                $objTriggerMatch.Groups['Body'].Value,
-                '(?ms)^    branches:\r?\n(?<Branches>(?:      - [^\r\n]+\r?\n)+)'
-            )
-            if (-not $objBranchFilterMatch.Success -or
-                $objBranchFilterMatch.Groups['Branches'].Value -cnotmatch
-                    '^      - "\*\*"\r?\n$') {
-                throw 'The push agent-validation trigger must cover all branches and exclude tags.'
-            }
+    $scriptBlockGetAgentWorkflowFailure = {
+        param([Parameter(Mandatory)][string] $Content)
 
-            $objPathFilterMatch = [regex]::Match(
-                $objTriggerMatch.Groups['Body'].Value,
-                '(?ms)^    paths:\r?\n(?<Paths>(?:      - [^\r\n]+\r?\n)+)'
-            )
-            if (-not $objPathFilterMatch.Success) {
-                throw 'Could not parse the push agent-validation path filter.'
-            }
-            foreach ($strAttributePath in $script:arrCheckoutAttributePaths) {
-                if (-not [regex]::IsMatch(
-                        $objPathFilterMatch.Groups['Paths'].Value,
-                        "(?m)^      - $([regex]::Escape($strAttributePath))\r?$"
-                    )) {
-                    throw "Push does not cover checkout attribute path $strAttributePath."
-                }
-                if ($script:arrTrustRootPaths -cnotcontains $strAttributePath) {
-                    throw "The trust-root gate omits checkout attribute path $strAttributePath."
-                }
-            }
-            foreach ($strInstructionPattern in @(
-                    '.github/instructions/**/*.instructions.md',
-                    '.cursor/rules/**/*.mdc',
-                    "'**/CLAUDE.md'",
-                    "'.claude/rules/**/*.md'"
+        $listFailures = [System.Collections.Generic.List[string]]::new()
+        if ($Content -notmatch
+            "(?s)AGENT_INSTRUCTION_INPUT_REVISION:.+github.event_name == 'push' && github.event.after") {
+            $listFailures.Add('Push input must use the exact event after revision.')
+        }
+        foreach ($strRequiredLiteral in @(
+                'id: push-applicability',
+                '-PushApplicabilityOnly',
+                'PUSH_BEFORE_SHA: ${{ github.event.before }}',
+                'PUSH_AFTER_SHA: ${{ github.event.after }}',
+                'PUSH_CREATED: ${{ github.event.created }}',
+                'PUSH_DELETED: ${{ github.event.deleted }}',
+                'refs/remotes/event/push-base',
+                'refs/remotes/event/pr-head',
+                'refs/remotes/event/pr-previous-head',
+                'test "${fetched_base}" = "${PUSH_BASE_SHA}"',
+                'test "${fetched_head}" = "${PR_HEAD_SHA}"',
+                'test "${fetched_previous_head}" = "${PR_PREVIOUS_HEAD_SHA}"',
+                'github.event.action == ''synchronize'' && github.event.before',
+                'contains(github.event.commits.*.id, github.event.after)',
+                'persist-credentials: false',
+                'ref: ${{ github.sha }}'
+            )) {
+            if (-not $Content.Contains(
+                    $strRequiredLiteral,
+                    [StringComparison]::Ordinal
                 )) {
-                if (-not [regex]::IsMatch(
-                        $objPathFilterMatch.Groups['Paths'].Value,
-                        "(?m)^      - $([regex]::Escape(
-                                    $strInstructionPattern
-                                ))\r?$"
-                    )) {
-                    throw (
-                        'Push does not cover recursive instruction path pattern ' +
-                        $strInstructionPattern
+                $listFailures.Add(
+                    "Workflow contract literal is missing: $strRequiredLiteral"
+                )
+            }
+        }
+        if ($Content -cmatch '(?m)(^|\s)--force(\s|$)' -or
+            $Content -cmatch '"\+[^" ]+:') {
+            $listFailures.Add('Event-data fetches must not force a destination ref.')
+        }
+        $intExpensiveGateCount = [regex]::Matches(
+            $Content,
+            "steps\.push-applicability\.outputs\.required == 'true'"
+        ).Count
+        if ($intExpensiveGateCount -ne 5) {
+            $listFailures.Add(
+                'All five expensive validation steps require the applicability gate.'
+            )
+        }
+
+        foreach ($strTrigger in @('push', 'pull_request_target')) {
+            $objTriggerMatch = [regex]::Match(
+                $Content,
+                "(?ms)^  $strTrigger`:\r?\n(?<Body>.*?)(?=^(?:\S| {2}\S)|\z)"
+            )
+            if (-not $objTriggerMatch.Success) {
+                $listFailures.Add("Could not parse the $strTrigger trigger.")
+                continue
+            }
+            $strTriggerBody = $objTriggerMatch.Groups['Body'].Value
+            if ($strTriggerBody -cmatch '(?m)^    paths(?:-ignore)?:') {
+                $listFailures.Add(
+                    "$strTrigger must not use a paths or paths-ignore filter."
+                )
+            }
+            if ($strTrigger -ceq 'push') {
+                $objBranchFilterMatch = [regex]::Match(
+                    $strTriggerBody,
+                    '(?ms)^    branches:\r?\n' +
+                        '(?<Branches>(?:      - [^\r\n]+\r?\n)+)'
+                )
+                if (-not $objBranchFilterMatch.Success -or
+                    $objBranchFilterMatch.Groups['Branches'].Value -cnotmatch
+                        '^      - "\*\*"\r?\n$' -or
+                    $strTriggerBody -cmatch '(?m)^    tags(?:-ignore)?:') {
+                    $listFailures.Add(
+                        'Push must cover all branches and exclude tag events.'
                     )
                 }
             }
         }
-        elseif ($objTriggerMatch.Groups['Body'].Value -cmatch
-            '(?m)^    paths(?:-ignore)?:') {
-            throw 'pull_request_target must not use a paths or paths-ignore filter.'
+        return $listFailures.ToArray()
+    }
+
+    $arrAgentWorkflowFailures = @(
+        & $scriptBlockGetAgentWorkflowFailure -Content $strAgentWorkflowContent
+    )
+    if ($arrAgentWorkflowFailures.Count -ne 0) {
+        throw (
+            'Agent workflow contract failed: ' +
+            ($arrAgentWorkflowFailures -join '; ')
+        )
+    }
+    $arrWorkflowMutations = @(
+        [pscustomobject]@{
+            Name = 'push path filter'
+            Content = $strAgentWorkflowContent.Replace(
+                '      - "**"',
+                "      - `"**`"`n    paths:`n      - AGENTS.md"
+            )
+            Expected = 'push must not use a paths or paths-ignore filter.'
+        },
+        [pscustomobject]@{
+            Name = 'forcing previous-head fetch'
+            Content = $strAgentWorkflowContent.Replace(
+                '"${PR_PREVIOUS_HEAD_SHA}:refs/remotes/event/pr-previous-head"',
+                '"+${PR_PREVIOUS_HEAD_SHA}:refs/remotes/event/pr-previous-head"'
+            )
+            Expected = 'Event-data fetches must not force a destination ref.'
+        },
+        [pscustomobject]@{
+            Name = 'missing previous-head identity proof'
+            Content = $strAgentWorkflowContent.Replace(
+                'test "${fetched_previous_head}" = "${PR_PREVIOUS_HEAD_SHA}"',
+                'test -n "${fetched_previous_head}"'
+            )
+            Expected = 'Workflow contract literal is missing: test'
+        },
+        [pscustomobject]@{
+            Name = 'persisted checkout credential'
+            Content = $strAgentWorkflowContent.Replace(
+                'persist-credentials: false',
+                'persist-credentials: true'
+            )
+            Expected = 'Workflow contract literal is missing: persist-credentials: false'
+        },
+        [pscustomobject]@{
+            Name = 'ungated expensive steps'
+            Content = $strAgentWorkflowContent.Replace(
+                "steps.push-applicability.outputs.required == 'true'",
+                "steps.push-applicability.outputs.required != 'false'"
+            )
+            Expected = 'All five expensive validation steps require the applicability gate.'
+        }
+    )
+    foreach ($objWorkflowMutation in $arrWorkflowMutations) {
+        $arrMutationFailures = @(& $scriptBlockGetAgentWorkflowFailure `
+                -Content $objWorkflowMutation.Content)
+        if ($arrMutationFailures.Count -eq 0 -or
+            -not ($arrMutationFailures -join '; ').Contains(
+                $objWorkflowMutation.Expected,
+                [StringComparison]::Ordinal
+            )) {
+            throw "Workflow mutation passed: $($objWorkflowMutation.Name)"
         }
     }
 

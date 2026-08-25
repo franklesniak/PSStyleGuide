@@ -5,27 +5,6 @@ on:
   push:
     branches:
       - "**"
-    paths:
-      - .gitattributes
-      - .github/.gitattributes
-      - .github/workflows/.gitattributes
-      - .codex/config.toml
-      - .cursor/rules/**/*.mdc
-      - .github/copilot-instructions.md
-      - .github/instructions/**/*.instructions.md
-      - .github/workflows/agent-instructions.yml
-      - .github/workflows/Test-AgentInstructionParserManifest.mjs
-      - .github/workflows/Test-AgentInstructions.ps1
-      - .hermes.md
-      - .npmrc
-      - '**/AGENTS.md'
-      - '**/AGENTS.override.md'
-      - '**/CLAUDE.md'
-      - '.claude/rules/**/*.md'
-      - GEMINI.md
-      - npm-shrinkwrap.json
-      - package-lock.json
-      - package.json
   pull_request_target:
     types:
       - opened
@@ -57,13 +36,73 @@ jobs:
           set-safe-directory: true
           allow-unsafe-pr-checkout: false
 
+      - name: Fetch existing push base as data
+        if: >-
+          github.event_name == 'push' && !github.event.created &&
+          !github.event.deleted
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PUSH_BASE_SHA: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          [[ "${PUSH_BASE_SHA}" =~ ^[0-9a-f]{40}$ ]]
+          [[ ! "${PUSH_BASE_SHA}" =~ ^0{40}$ ]]
+          authorization="$(printf 'x-access-token:%s' "${GITHUB_TOKEN}" | base64 -w 0)"
+          GIT_CONFIG_COUNT=1 \
+            GIT_CONFIG_KEY_0="http.${GITHUB_SERVER_URL}/.extraheader" \
+            GIT_CONFIG_VALUE_0="Authorization: Basic ${authorization}" \
+            git fetch --no-tags --no-recurse-submodules origin \
+              "${PUSH_BASE_SHA}:refs/remotes/event/push-base"
+          unset authorization
+          fetched_base="$(git rev-parse --verify \
+            'refs/remotes/event/push-base^{commit}')"
+          test "${fetched_base}" = "${PUSH_BASE_SHA}"
+          git diff --quiet --no-ext-diff
+          git diff --cached --quiet --no-ext-diff
+
+      - name: Determine exact push applicability
+        id: push-applicability
+        if: github.event_name == 'push'
+        shell: pwsh
+        env:
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+          PUSH_AFTER_SHA: ${{ github.event.after }}
+          PUSH_CREATED: ${{ github.event.created }}
+          PUSH_DELETED: ${{ github.event.deleted }}
+        run: |
+          $arrDecision = @(
+              & ./.github/workflows/Test-AgentInstructions.ps1 `
+                  -PushApplicabilityOnly `
+                  -RangeBaseRevision $env:PUSH_BEFORE_SHA `
+                  -RangeHeadRevision $env:PUSH_AFTER_SHA `
+                  -RangeIsNewRef:([bool]::Parse($env:PUSH_CREATED)) `
+                  -RangeIsDeletedRef:([bool]::Parse($env:PUSH_DELETED)) `
+                  -EventName 'push'
+          )
+          if ($arrDecision.Count -ne 1 -or
+              $arrDecision[0] -cnotin @('true', 'false')) {
+              throw 'Push applicability did not return one exact decision.'
+          }
+          [System.IO.File]::AppendAllText(
+              $env:GITHUB_OUTPUT,
+              "required=$($arrDecision[0])`n",
+              [System.Text.UTF8Encoding]::new($false)
+          )
+
       - name: Set up locked Node.js runtime
+        if: >-
+          github.event_name != 'push' ||
+          steps.push-applicability.outputs.required == 'true'
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: package.json
           package-manager-cache: false
 
       - name: Verify locked Node.js runtime
+        if: >-
+          github.event_name != 'push' ||
+          steps.push-applicability.outputs.required == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -78,6 +117,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_ACTION: ${{ github.event.action }}
+          PR_PREVIOUS_HEAD_SHA: >-
+            ${{ github.event.action == 'synchronize' && github.event.before || '' }}
         run: |
           set -euo pipefail
           [[ "${PR_HEAD_SHA}" =~ ^[0-9a-f]{40}$ ]]
@@ -88,14 +130,32 @@ jobs:
             GIT_CONFIG_VALUE_0="Authorization: Basic ${authorization}" \
             git fetch --no-tags --no-recurse-submodules origin \
               "${PR_HEAD_SHA}:refs/remotes/event/pr-head"
-          unset authorization
           fetched_head="$(git rev-parse --verify \
             'refs/remotes/event/pr-head^{commit}')"
           test "${fetched_head}" = "${PR_HEAD_SHA}"
+          if [[ "${PR_ACTION}" = 'synchronize' ]]; then
+            [[ "${PR_PREVIOUS_HEAD_SHA}" =~ ^[0-9a-f]{40}$ ]]
+            [[ ! "${PR_PREVIOUS_HEAD_SHA}" =~ ^0{40}$ ]]
+            test "${PR_PREVIOUS_HEAD_SHA}" != "${PR_HEAD_SHA}"
+            GIT_CONFIG_COUNT=1 \
+              GIT_CONFIG_KEY_0="http.${GITHUB_SERVER_URL}/.extraheader" \
+              GIT_CONFIG_VALUE_0="Authorization: Basic ${authorization}" \
+              git fetch --no-tags --no-recurse-submodules origin \
+                "${PR_PREVIOUS_HEAD_SHA}:refs/remotes/event/pr-previous-head"
+            fetched_previous_head="$(git rev-parse --verify \
+              'refs/remotes/event/pr-previous-head^{commit}')"
+            test "${fetched_previous_head}" = "${PR_PREVIOUS_HEAD_SHA}"
+          else
+            test -z "${PR_PREVIOUS_HEAD_SHA}"
+          fi
+          unset authorization
           git diff --quiet --no-ext-diff
           git diff --cached --quiet --no-ext-diff
 
       - name: Validate parser manifests as inert data
+        if: >-
+          github.event_name != 'push' ||
+          steps.push-applicability.outputs.required == 'true'
         shell: bash
         env:
           TRUSTED_REVISION: ${{ github.sha }}
@@ -110,17 +170,23 @@ jobs:
           --self-test
 
       - name: Install locked Markdown parser
+        if: >-
+          github.event_name != 'push' ||
+          steps.push-applicability.outputs.required == 'true'
         run: >-
           npm ci --ignore-scripts --no-audit --fund=false
           --include=dev --package-lock=true
 
       - name: Validate instruction capacity and capabilities
+        if: >-
+          github.event_name != 'push' ||
+          steps.push-applicability.outputs.required == 'true'
         shell: pwsh
         env:
           AGENT_INSTRUCTION_INPUT_REVISION: >-
             ${{ github.event_name == 'pull_request_target' &&
               github.event.pull_request.head.sha ||
-              github.event_name == 'push' && github.sha || '' }}
+              github.event_name == 'push' && github.event.after || '' }}
           AGENT_INSTRUCTION_RANGE_BASE: >-
             ${{ github.event_name == 'pull_request_target' &&
               github.event.pull_request.base.sha ||
@@ -128,9 +194,11 @@ jobs:
           AGENT_INSTRUCTION_RANGE_HEAD: >-
             ${{ github.event_name == 'pull_request_target' &&
               github.event.pull_request.head.sha ||
-              github.event_name == 'push' && github.sha || '' }}
+              github.event_name == 'push' && github.event.after || '' }}
           AGENT_INSTRUCTION_RANGE_IS_NEW_REF: >-
             ${{ github.event_name == 'push' && github.event.created || false }}
+          AGENT_INSTRUCTION_RANGE_IS_DELETED_REF: >-
+            ${{ github.event_name == 'push' && github.event.deleted || false }}
           AGENT_INSTRUCTION_TRUSTED_EVENT_TIMESTAMP: >-
             ${{ github.event_name == 'pull_request_target' &&
               github.event.pull_request.updated_at ||
@@ -153,6 +221,8 @@ jobs:
           -RangeBaseRevision $env:AGENT_INSTRUCTION_RANGE_BASE
           -RangeHeadRevision $env:AGENT_INSTRUCTION_RANGE_HEAD
           -RangeIsNewRef:([bool]::Parse($env:AGENT_INSTRUCTION_RANGE_IS_NEW_REF))
+          -RangeIsDeletedRef:([bool]::Parse(
+          $env:AGENT_INSTRUCTION_RANGE_IS_DELETED_REF))
           -TrustedEventTimestamp $env:AGENT_INSTRUCTION_TRUSTED_EVENT_TIMESTAMP
           -EventName $env:AGENT_INSTRUCTION_EVENT_NAME
           -PullRequestAction $env:AGENT_INSTRUCTION_PULL_REQUEST_ACTION

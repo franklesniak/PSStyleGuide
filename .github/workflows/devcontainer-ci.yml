@@ -71,20 +71,22 @@ jobs:
             fetch --no-tags --no-recurse-submodules --depth=1 origin \
             "${EXPECTED_REVISION}:refs/remotes/event/target"
 
-          readonly fetched_revision="$(
+          fetched_revision="$(
             /usr/bin/git -C "${checkout_root}" rev-parse --verify \
               'refs/remotes/event/target^{commit}'
           )"
+          readonly fetched_revision
           test "${fetched_revision}" = "${EXPECTED_REVISION}"
           test -z "$(
             /usr/bin/git -C "${checkout_root}" config --local --get-regexp \
               '^(credential\.|http\..*\.extraheader)' || true
           )"
 
-          readonly devcontainer_entries="$(
+          devcontainer_entries="$(
             /usr/bin/git -C "${checkout_root}" ls-tree --name-only \
               "${fetched_revision}" -- .devcontainer .devcontainer.json
           )"
+          readonly devcontainer_entries
           if has_devcontainer_entry <<< "${devcontainer_entries}"; then
             printf '%s\n' \
               'PSStyleGuide has no authorized devcontainer contract.' >&2
