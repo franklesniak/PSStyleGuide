@@ -98,7 +98,7 @@ For a continuation after a controller or infrastructure failure, send a follow-u
 
 Do not close a healthy Codex subagent thread before the review-loop task is durably complete. Protect any persisted thread and local evidence under the approved access and retention controls. Close completed agents and remove retained runtime evidence under the approved retention policy after the task is durably complete.
 
-Before initial routing, create and approve a small declarative manifest. It must state the exact repository, branch, head commit, allowed and forbidden paths, allowed commands, expected review-thread and comment identities, allowed public mutations, checks, completion receipt, and any exact route requirement from the task or approved plan. Resolve values, finalize the manifest, and record its SHA-256 before invoking the advisor. Before every continuation or replacement, prove that the pinned manifest hash still identifies the applicable approved manifest. A material manifest change requires a new hash and explicit reroute. Do not make the executor discover values that the parent already knows.
+Before initial routing, create and approve a small declarative manifest. It must state the exact repository, branch, head commit, allowed and forbidden paths, allowed commands, expected review-thread and comment identities, allowed public mutations, checks, completion receipt, and any exact route requirement from the task or approved plan. When the task can make public mutations, the manifest must also define one complete ordered publication unit. The publication unit must name every target, operation, precondition, exact preimage when available, intended postimage or semantic postcondition, idempotency key when supported, and required targeted readback. A publication unit is one approval unit; multiple GitHub API calls are not atomic. Resolve values, finalize the manifest, and record its SHA-256 before invoking the advisor. Before every continuation or replacement, prove that the pinned manifest hash still identifies the applicable approved manifest. A material manifest change requires a new hash and explicit reroute. Do not make the executor discover values that the parent already knows.
 
 Require every finding record to declare its own applicable review, thread, and comment identities. Do not default an identifier from the first finding into later records. Before launch, test a heterogeneous manifest that mixes a suppressed review finding, a threaded inline comment, and a finding without one of those identity types; prove that each decision is checked only against its own identifiers and that cross-finding contamination is rejected.
 
@@ -144,7 +144,9 @@ Treat package-preparation time as a first-class latency budget. If a routine rou
 
 Assign a stable logical label to every exact command in the manifest. When the Codex subagent starts an allowed command, record both the tool name and that manifest label in the event log or checkpoint. Count validation attempts and their pass or fail results separately from permission denials and other tool errors. Do not infer that the final gate passed merely because an unlabeled shell call returned exit code 0.
 
-Declare validation prerequisites and enforce their order in the controller. When a deterministic identity calculator, generator refresh, syntax check, or focused precheck must precede the full validator, deny an early full-validation request without executing it and state the missing prerequisite label. Run the full validator only after those cheaper prerequisites pass for the current tracked bytes. Invalidate their receipts when a later edit changes a covered path. Do not spend a full validation attempt to discover a deterministic identity update that the manifest already declares.
+Declare validation prerequisites and enforce their order in the controller. When a deterministic identity calculator, generator refresh, syntax check, or focused precheck must precede a more expensive validator, deny the early request without executing it and state the missing prerequisite label. Use four validation tiers: structural state checks after a state change; focused changed-surface checks after an executor result; publication checks at the public-mutation boundary; and task-closure or overall-completion checks at their respective final boundaries. Do not run a broader tier when a cheaper prerequisite has not passed.
+
+Write an immutable validation receipt after a tier passes. The receipt must identify the validator by path and SHA-256 or stable runtime identity; the exact command and native exit code; covered paths, objects, predicates, and task clauses; relevant plan, prompt, task, manifest, commit, tree, PR-head, check, review, and external-object identities; input fingerprints or ETags when exposed; result; and UTC timestamp. Reuse the receipt only while every invalidation key is unchanged and the requirement does not explicitly demand a fresh live observation. A later edit invalidates only receipts whose covered paths, objects, predicates, or dependency identities intersect that edit. Do not spend a full validation attempt to discover a deterministic identity update that the manifest already declares.
 
 Make every validation wrapper preserve the native exit code and bounded, separate standard output and standard error for each child command. On failure, return the validator's structured category and the applicable output before throwing or stopping the session. Redact secrets and cap verbose output, but do not replace a machine-readable failure with only `command failed`; the Codex subagent must be able to act on the first result without re-reading validator source to recover the hidden reason.
 
@@ -164,7 +166,9 @@ Separate a denied tool request from a hard stop. A default-deny controller can r
 
 When a headless fallback has an enforcing controller, treat an out-of-repository read request as a recoverable denial when the controller proves that it blocked the request before execution. Keep an out-of-scope write, an unproved inspection outcome, or an execution-identity mismatch as a hard stop. Do not discard a long-running subagent merely because an enforcing boundary safely refused to expose a user-memory or tool-state file.
 
-For an authorized GitHub mutation, validate the native API response against the exact expected object and write a create-new, read-only receipt. Treat that response and receipt as the immediate idempotency boundary. Perform a separate authenticated reconciliation read. Do not repeat a non-idempotent mutation only because an immediate read is stale or because the response is JSON text inside a tool's `stdout` field.
+For an authorized GitHub publication unit, the parent validates all current preconditions and approves the complete ordered unit once. The single authorized writer then executes each API mutation serially. Keep at least one second between mutative requests when the GitHub REST guidance applies. Validate each native API response against the exact expected object, write a create-new immutable receipt, and perform the declared targeted authenticated readback before the next mutation. Treat the response, receipt, and targeted readback as the immediate idempotency boundary. Stop on preimage drift, a failed mutation, a readback mismatch, or an ambiguous response. Do not repeat an ambiguous non-idempotent mutation. Record a safe partial-completion receipt and reconcile before any continuation.
+
+After the last mutation passes its targeted readback, run one aggregate postflight for the complete publication unit. Do not insert another parent gate between mutation subgroups when the approved manifest, preconditions, ordered operations, executor identity, and target identities remain unchanged. A changed precondition or target invalidates the remaining unit and requires a new parent decision.
 
 Record an authorized public-mutation request separately from a receipt-proved mutation. A request that an enforcing controller blocks before execution is not a mutation. A successful API response without its expected receipt is ambiguous until reconciliation; do not label it as either proved success or proved non-execution.
 
@@ -198,7 +202,7 @@ If the runtime supports a persistent goal primitive, create or resume exactly on
 
 ## Codex observability and control
 
-Use the native Codex subagent interface when the task dispatch rule requires a Codex executor. Record the routing-decision identifier, canonical agent ID or task name, frozen selected route, requested overrides, request-acceptance status, resolved and effective settings only when the interface reports them, effective-verification status and source or limitation, start time, completion time, and terminal status. Require checkpoints after analysis, the first tracked edit, validation, and any public mutation. Inspect the available agent-status or thread interface at least every 60 seconds while work is active. Record the current phase, elapsed time, last checkpoint, quiet interval, and any blocked reason. A live subagent with no new checkpoint during model reasoning is not a hung process by itself. Interrupt it only for an explicit stop condition, an unauthorized mutation, an identity change, a repeated defect that meets the task's kill rule, or evidence that the executor cannot make progress.
+Use the native Codex subagent interface when the task dispatch rule requires a Codex executor. Record the routing-decision identifier, canonical agent ID or task name, frozen selected route, requested overrides, request-acceptance status, resolved and effective settings only when the interface reports them, effective-verification status and source or limitation, start time, completion time, and terminal status. Require checkpoints after analysis, the first tracked edit, validation, and any public mutation. Inspect the available agent-status or thread interface at least every 60 seconds while work is active. This inspection is a lightweight status probe. It is not authority to reload the full tracker, reparse the plan, enumerate the complete worktree, or perform a full GitHub reconciliation. Record the current phase, elapsed time, last checkpoint, quiet interval, and any blocked reason. A live subagent with no new checkpoint during model reasoning is not a hung process by itself. Interrupt it only for an explicit stop condition, an unauthorized mutation, an identity change, a repeated defect that meets the task's kill rule, or evidence that the executor cannot make progress.
 
 If the native subagent interface is unavailable and the task explicitly permits a headless Codex CLI fallback, first inspect `codex --help` and `codex exec --help` and construct the invocation from the installed interface. Use JSON Lines event output, such as `codex exec --json`, when supported. Keep standard output and standard error separate, preserve the native exit code, and capture the final agent message separately when the installed CLI supports that option. Record thread and turn starts and completions, command executions, file changes, tool calls, web searches, plan updates, errors, token usage, first and last event times, the longest quiet interval, and retry or failure state. Write a content-minimized status sidecar after each event and at least every 15 seconds while the process is active.
 
@@ -206,184 +210,98 @@ Apply the least privilege that permits the task. A bypass-approvals or danger-fu
 
 For either Codex interface, use the task manifest and terminal result schema already required by this prompt. After the final validation passes, require the executor to return the small terminal result and stop. Attribute preparation, model, tool, validation, retry, quiet, and post-gate time separately so that a slow run can be diagnosed without guessing.
 
+## Cycle performance and external waits
+
+Use a 15-minute active-work objective. Use 30 minutes only after the parent records why the task is extremely complex. Active work includes preparation, model, controller, tool, and validation time; measure external and human wait separately.
+
+At the objective, finish the current safe receipt boundary and start no new phase or broad audit. Never interrupt a public mutation. Write `PERFORMANCE_BUDGET_EXCEEDED` with elapsed active time, completed boundaries, first unfinished gate, preserved evidence, and one deterministic resume action; save state and end. This is a diagnostic pause, not task failure or CI. Do not add a workflow, required check, `timeout-minutes`, or CI abort for this objective.
+
+For a pending external or human event, write `WAITING_EXTERNAL` or `WAITING_HUMAN` with the wake condition, object identities, last status, ETag or conditional token, and one resume action; then end. Prefer an existing event. Otherwise, make one stable, specific conditional read on explicit continuation. If unchanged, refresh the wait receipt and end without full plan, tracker-history, worktree, or GitHub reads. Do not build webhook infrastructure for this prompt.
+
+Use these check states:
+
+- `SUCCESS`: applicable check completed on the required head with an allowed successful conclusion.
+- `FAILURE`: applicable check completed with a failure-type conclusion.
+- `PENDING_WITH_RUNS`: applicable nonterminal runs exist.
+- `NONTERMINAL_ZERO_RUN`: suite is nonterminal and has zero direct runs; record `passed=false`, `failed=false`, and `execution_count=0`. Suite existence is not provider execution.
+- `NOT_CONFIGURED` or `NOT_APPLICABLE`: separate plan, protection, setting, or integration evidence proves the state. Never infer either state from zero runs alone.
+
+A required zero-run suite can block its gate, but it is not failed and has zero provider execution time. Do not trigger Claude or another optional provider unless the task requires and authorizes that run.
+
 ## Durable orchestration tracker
 
-Create or resume `TEMP-coding-agent-loop-state.json` in the PSStyleGuide repository root. Do not commit it. Use safe structured-file updates: write a complete candidate, parse it successfully, and replace the tracker without leaving invalid JSON. Preserve prior run history when the plan hash changes.
+`TEMP-coding-agent-loop-state.json` is an uncommitted compact mutable projection, not the evidence store. Update it atomically: write, parse, validate, and replace. Put detailed create-new receipts outside the implementation worktree when possible; otherwise use one untracked `TEMP-coding-agent-loop-evidence/<run-id>/` directory. Never edit an accepted receipt; supersede it by identity. A legacy schema-1 tracker that contains recursive history is evidence, not resumable state: preserve it without reading it into the model or overwriting it. The schema-2 controller uses an explicit isolated state directory for its tracker, index, and evidence root.
 
-The tracker must contain:
+The tracker contains only:
 
-- Schema version, active run ID, overall status, and UTC timestamps.
-- Absolute paths for both repositories, the plan, and this orchestration prompt.
-- Current PSStyleGuide planning branch plus the plan and orchestration-prompt SHA-256 values.
-- The detected task count, first and last task number, and proof that numbering is consecutive and unique.
-- One current-turn `advisor_activation` receipt that separates discovery, explicit-selection acceptance, complete instruction loading, and verified activation, plus one workflow-level `routing_capability_preflight` that describes the inspected interfaces and their exact-override and post-spawn inspection capabilities without asserting that any task-specific route is currently available.
-- For every task:
-  - Number, exact title, execution class, target repository, and SHA-256 of the exact extracted task text.
-  - Predecessor task numbers, relationship types, conditional branch, and required predecessor outputs.
-  - Status: `pending`, `in_progress`, `completed`, `failed`, or `blocked`.
-  - Invocation, continuation, failed-validation, and consecutive-no-progress counts.
-  - Approved manifest SHA-256 and one applicable `model_routing` record or explicit routing-bypass record.
-  - Executor type, routing-decision identifier, frozen route, process or agent identifier when available, and start/checkpoint/completion timestamps.
-  - Pre-execution and post-execution Git branches, commits, trees, worktree states, issue/PR states, and other task-local identities.
-  - Files or GitHub objects created or changed.
-  - Validation commands, native exit codes, results, evidence URLs, and independently verified completion result.
-  - Blocker, retry context, and exact deterministic resume action.
-- Last completed task, current task, last successful checkpoint, and next deterministic action.
+- Schema/run/timestamps and overall state: `active`, `waiting_external`, `waiting_human`, `performance_paused`, `blocked`, or `complete`.
+- Control paths and branch plus plan, prompt, index, controller, task-count, and numbering-proof identities.
+- Progress: last/current task, active dependencies, frontier summary, checkpoint, active-work budget/time, wait, and one next action.
+- Per task: number; `pending`, `in_progress`, `completed`, `failed`, or `blocked`; task hash; routing/bypass and completion receipt IDs; invalid flag; retry counters. Keep title, body, dependencies, and completion text in the index.
+- Active executor: routing ID, frozen route, executor ID, ordinal, times, and status.
+- One durable receipt catalog, never an active-only map: each compact entry has ID, type, task, path, UTF-8 bytes, SHA-256, time, validity or supersession state, predecessor IDs, and superseded ID. It contains every receipt reachable from any task root for the active run, even after the task leaves the mutable frontier. The catalog is metadata only; receipt bodies remain in the evidence directory.
+- A completed task has one completion-root receipt. Its routing or bypass root, completion root, every predecessor edge, and every superseded edge MUST resolve through the durable catalog to a byte- and hash-matched immutable receipt. An ID by itself is never a valid edge.
+- Invalid edges and reasons.
 
-A coding task's tracker data must be equivalent in meaning to this normative shape; additional fields are permitted:
+The representative 392-task projection, including its durable catalog, MUST remain at or below 1 MiB serialized UTF-8. Measure it before use and record the byte total and field-level headroom; externalize new detail instead of expanding the tracker.
 
-```json
-{
-  "advisor_activation": {
-    "checked_at_utc": "<timestamp>",
-    "host_surface": "<codex_ide|codex_cli|chatgpt_desktop|other>",
-    "requested_skill": "model-routing-advisor",
-    "discovered": true,
-    "discovery_source": "<structured_selector|skills_command|host_resource>",
-    "explicit_selection_accepted": true,
-    "full_instructions_loaded": true,
-    "resolved_skill_identity": "<host identity>",
-    "resolved_resource": "<filesystem path or opaque host resource>",
-    "content_utf8_bytes": "<integer or null>",
-    "content_sha256": "<hash or null>",
-    "activation_verified": true,
-    "verification_source": "<host evidence>",
-    "limitation": null
-  },
-  "routing_capability_preflight": {
-    "checked_at_utc": "<timestamp>",
-    "native_subagent_interface_available": true,
-    "exact_model_override_request_supported": true,
-    "exact_reasoning_override_request_supported": true,
-    "post_spawn_effective_model_visible": false,
-    "post_spawn_effective_reasoning_visible": false,
-    "headless_fallback_available": false,
-    "evidence_source": "<runtime inspection or command>",
-    "limitations": [
-      "<limitation>"
-    ]
-  },
-  "model_routing": {
-    "applicable": true,
-    "bypass_reason": null,
-    "routing_skill": "model-routing-advisor",
-    "routing_decision_id": "<unique identifier>",
-    "routing_invoked_at_utc": "<timestamp>",
-    "task_text_sha256": "<hash>",
-    "manifest_sha256": "<hash>",
-    "recommendation": {
-      "recommended_model": "<value or null>",
-      "reasoning_effort": "<value or null>",
-      "mode": "<automatic_delegation|manual_switch_required|advisory>",
-      "confidence": "<value or null>",
-      "signals": [
-        "<non-secret routing signal>"
-      ],
-      "escalation_trigger": "<value or null>",
-      "metadata_source": "<runtime_catalog|official_documentation|unavailable>",
-      "cost_verified": false
-    },
-    "selection": {
-      "source": "<task_requirement|approved_plan_requirement|advisor_recommendation>",
-      "exact_model_requirement": "<value or null>",
-      "exact_reasoning_requirement": "<value or null>",
-      "selected_model": "<value or null>",
-      "selected_reasoning_effort": "<value or null>",
-      "frozen_at_utc": "<timestamp>"
-    },
-    "override": {
-      "exact_override_supported": true,
-      "requested_model": "<value or null>",
-      "requested_reasoning_effort": "<value or null>",
-      "request_accepted": "<true|false|unknown>",
-      "resolved_model": "<value or null>",
-      "resolved_reasoning_effort": "<value or null>",
-      "effective_model": "<value or null>",
-      "effective_reasoning_effort": "<value or null>",
-      "effective_override_verified": false,
-      "verification_source": "<value or null>",
-      "verification_limitation": "<value or null>"
-    },
-    "executor": {
-      "agent_or_task_id": "<value or null>",
-      "parent_agent_or_goal_id": "<value or null>",
-      "dispatch_ordinal": 1,
-      "no_descendants_required": true
-    },
-    "reroutes": []
-  }
-}
-```
+Reject any prior tracker, `tracker_snapshot`, task or receipt body, manifest, prompt, tool output, debug log, full worktree inventory, environment dump, private state, or secret in the tracker. Before use, serialize a representative all-task fixture, test all task/routing/wait/retry states, and derive a documented byte budget with field-level headroom. On excess, externalize detail and rebuild before a model read; never discard evidence.
 
-For a `Human execution required`, `Not executable; tracking/control only`, or parent-reserved numbered task, do not invoke the advisor. Record the applicable normalized bypass reason in this shape:
+Every receipt records schema/type/ID, run/task, time, exact inputs, result, evidence references, predecessor IDs when applicable, and controller/validator identity. After readback, its durable catalog entry records path, UTF-8 bytes, and SHA-256. Use distinct types for compilation/reconstruction, activation/capability/routing/bypass/reroute, manifest/dispatch/continuation/replacement, validation, publication/mutation/readback/postflight, wait/budget pause, and task/run termination.
 
-```json
-{
-  "model_routing": {
-    "applicable": false,
-    "bypass_reason": "<human_execution_required|tracking_control_only|parent_reserved>"
-  }
-}
-```
+Activation and capability receipts retain all facts required in Required advisor activation and Required executor routing. A routing receipt retains task/manifest hashes, recommendation and metadata source, cost-verification status, precedence, exact requirements, frozen route, dispatch-time availability, requested/accepted/resolved/effective settings, effective-verification source or limitation, executor/parent IDs, ordinal, no-descendants rule, and append-only reroutes. Never infer effective settings from acceptance; never claim cheapest when `cost_verified: false`. Bypass reasons are only `human_execution_required`, `tracking_control_only`, or `parent_reserved`. A reroute retains trigger/evidence, prior receipt/decision, old/new task and manifest hashes, and old/new routes.
 
-Append each reroute to `reroutes`; never overwrite or discard the previous routing decision or earlier reroutes:
+Write the tracker only at durable boundaries: control reconciliation, capability, route/bypass, dispatch, accepted result, validation tier, mutation readback, publication postflight, wait/budget pause, task termination, and run termination. Coalesce linked transitions; do not write for an unchanged probe/read. Completion requires the applicable current routing or bypass receipt plus independent validation.
 
-```json
-{
-  "rerouting_decision_id": "<unique identifier>",
-  "rerouted_at_utc": "<timestamp>",
-  "trigger": "<material_task_change|verified_capability_insufficiency>",
-  "supporting_evidence": "<reference>",
-  "prior_routing_decision_id": "<identifier>",
-  "prior_task_text_sha256": "<hash>",
-  "prior_manifest_sha256": "<hash>",
-  "new_task_text_sha256": "<hash>",
-  "new_manifest_sha256": "<hash>",
-  "prior_model": "<value>",
-  "prior_reasoning_effort": "<value>",
-  "new_model": "<value>",
-  "new_reasoning_effort": "<value>"
-}
-```
+## Deterministic plan index and invalidation
 
-Update and validate the tracker after discovery, plan hashing, task extraction, state reconstruction, and at every routing lifecycle point: capability preflight; task classification; manifest finalization and hashing; route recommendation; precedence resolution and route freeze; actual route-availability check; executor creation; override acceptance or rejection; post-spawn verification when available; continuation; replacement retry; reroute; receiving an executor result; every independent validation group; task completion or blockage; and overall completion or blockage.
+Use one versioned deterministic controller for hashes, task extraction/offsets/fields, numbering, schemas, receipt indexing, invalidation, counts, comparisons, and state transitions. Record its path/hash. Do not use a model turn for deterministic transformations.
 
-Keep requested, accepted, resolved, and effective settings separate. `effective_override_verified` cannot become `true` solely because the override request was accepted. Populate resolved or effective fields only from a runtime source that exposes the corresponding fact, and record the source or limitation. `cost_verified: false` prohibits claiming the selection is proven to be the cheapest. At dispatch, independently confirm that the task-text and manifest hashes still match the frozen routing record.
+Cache the uncommitted derived index at `TEMP-coding-agent-loop-plan-index.json`. Record schema/parser/controller identities; plan path/bytes/hash; preamble bounds/hash; numbering proof; and each task's number, title, class, target, byte bounds, text hash, dependencies/branches, stops, output, and `Complete when`. Accept only valid, nonoverlapping bounds, consecutive unique numbers, and matching slice hashes. Reuse only when schema/parser/controller and plan identity remain valid; otherwise recompile. On an unchanged resume, give the model only needed preamble, current task, and active dependency slices.
 
-A coding task cannot complete without a valid applicable routing record. A non-coding numbered task cannot complete without an explicit valid routing-bypass record. Tracker evidence and independent validation, not an executor's unsupported assertion, control completion.
+Each reusable receipt declares only applicable invalidation keys: plan, prompt, task, manifest, controller/validator, commit/tree/branch, PR base/head, review/thread/comment, check suite/run, repository setting, external object/ETag, and dependency receipts. The frontier is the current task, active dependencies, affected paths/Git/GitHub objects, waits, and completed tasks with changed keys. Expand through affected dependency edges; exclude unchanged completed tasks.
 
-Never put a credential, token, cookie, complete environment dump, private browser state, or secret value in the tracker.
+Invalidate by exact intersection:
+
+- Plan change: recompile, compare task/dependency hashes, and invalidate affected tasks/downstream only.
+- Prompt change: reconcile affected lifecycle/receipt rules only; it does not invalidate the plan index.
+- Controller/parser/validator/schema change: invalidate dependent receipts only.
+- Local or external identity change: invalidate receipts that name the identity or cover its predicate.
+- Missing receipt, bytes/hash/schema mismatch, malformed catalog entry, unresolved task root, broken predecessor, or broken supersession edge: invalidate it and dependents.
+
+File existence and executor assertions are not validity proof.
 
 ## Startup and resume procedure
 
 On every startup, resumption, or context-window recovery:
 
 1. Confirm the PSStyleGuide checkout is on `planning-CRT-PR-852`. Confirm the plan and this prompt exist on that branch. If not, stop; do not recreate them on another branch.
-2. Read the plan and this prompt completely. Read applicable repository instructions in both repositories.
-3. Hash the plan and this orchestration prompt. Extract the preamble and every task from a `## Task N — ...` heading through the byte before the next task heading or `## References`.
-4. Verify that tasks are numbered consecutively from 1 through the plan's last task with no gap or duplicate. Parse each task's execution class, dependencies, conditional branch, stop conditions, output, and `Complete when` condition.
-5. Read and parse the tracker when it exists. If its plan hash differs, preserve the old run in history and create a new run. If only the orchestration-prompt hash differs, append a prompt-change reconciliation record, revalidate the current lifecycle and routing gates under the new prompt, and retain task completion only where its unchanged task text and evidence still satisfy the new controls. A parent-only activation-rule change does not by itself change a numbered task or approved task manifest; do not invent a reroute unless the exact task or manifest actually changes or capability-insufficiency evidence independently meets the reroute rule. Do not carry completion across changed task text without revalidation.
-6. Inspect the live host-provided skill metadata. Record or refresh `advisor_activation` without treating autocomplete, an initial-list entry, or a local file as activation. If the parent cannot inspect the interactive selector, record that limitation rather than guessing. If the next action requires an initial advisor invocation or reroute and explicit selection is not accepted in the current turn, follow the one-resumption procedure in Required advisor activation before declaring the skill unavailable.
-7. Inspect the live runtime and record or refresh the workflow-level routing capability preflight for per-subagent exact model and reasoning-effort requests, native delegation, post-spawn visibility, and any permitted headless fallback. Do not treat documentation, a static model catalog, a prior task's success, or requested settings as proof that a future task-specific route is available.
-8. Query `git status --short --branch`, local and remote refs, and the task-relevant authenticated GitHub state in both repositories. Paginate every relevant result. Preserve unrelated user changes.
-9. Reconstruct missing tracker state from plan hashes, Git objects, GitHub objects, permanent evidence records, routing evidence, and validation results. File existence or an executor's prior statement is not enough.
-10. Independently revalidate every task marked complete before skipping it. If evidence no longer satisfies its exact `Complete when` condition or routing-record requirements, return it to `in_progress` or `blocked` as the evidence requires.
-11. Select the lowest-numbered incomplete task whose predecessor and branch conditions are satisfied. Never advance past an incomplete predecessor.
+2. Read this prompt completely once for the current parent context. Read applicable repository instructions for the active target repository. Read the other repository's instructions only before that repository enters the mutable frontier.
+3. Use the deterministic controller to stream-hash the plan and prompt without placing the complete plan in model context. Validate the compact tracker and durable receipt-catalog closure from every routing/bypass and completion root. Mechanically verify each catalog path, UTF-8 byte count, SHA-256, schema, predecessor edge, and supersession edge. If any link is missing, malformed, or mismatched, mark its task roots invalid and expand the frontier through dependents before any task can be skipped.
+4. Validate the plan index against the current plan, schema, parser, and controller identities. If the index is missing or invalid, parse the complete plan deterministically, verify consecutive unique tasks, build the index, validate every slice hash and required field, and write one compilation receipt. Do not ask the model to parse all tasks. A prompt-only change does not invalidate a plan index whose plan and parser inputs are unchanged.
+5. If the plan hash changed, finalize the prior run by receipt, compile the new index, compare task hashes and dependencies, and apply the invalidation rules. Create a new run only when the plan semantics require it; do not copy prior tracker bodies into the new tracker. If only the prompt hash changed, write one prompt-change reconciliation receipt, evaluate affected policies and receipt types, and retain unchanged task evidence when its invalidation keys still satisfy the new controls. Do not invent a reroute unless the exact task or manifest changes or verified capability-insufficiency evidence meets the reroute rule.
+6. Load the indexed preamble material needed for interpretation, the exact current task slice, its active dependency closure, and the immutable receipts referenced by the mutable frontier. Do not load every completed task or receipt body.
+7. Inspect live host-provided skill metadata when the next action can reach an initial advisor invocation or permitted reroute, or when the host turn changed. Record or refresh the advisor-activation receipt without treating autocomplete, an initial-list entry, or a local file as activation. If the parent cannot inspect the interactive selector, record that limitation rather than guessing. If explicit selection is required and not accepted in the current turn, follow the one-resumption procedure in Required advisor activation before declaring the skill unavailable.
+8. Inspect the live runtime and refresh the routing-capability receipt when the runtime, host turn, interface, or selected route changed, or before a dispatch whose exact support is not already current. Do not treat documentation, a static model catalog, a prior task's success, or requested settings as proof that a future task-specific route is available.
+9. Query a structured, path-scoped Git status and the local or remote refs in the mutable frontier. Summarize unrelated untracked state by count and byte total; do not inject its complete path inventory. Query only task-relevant authenticated GitHub objects in the frontier. Use stable, specific conditional reads when supported. Paginate a complete connection only on a cache miss, relevant identity change, final task closure, or an explicit completeness predicate.
+10. Reconstruct missing state from validated plan-index entries, Git objects, targeted GitHub objects, and immutable receipts reached through the durable catalog. File existence or an executor statement is not enough. Invalidate a missing or mismatched receipt, an unresolved root, or a broken predecessor/supersession edge and expand the frontier through its dependency edges.
+11. For a task marked complete, validate its routing/bypass and completion-root closure plus invalidation keys before skipping it. Re-run completion validation only when an invalidation key changed or the exact `Complete when` condition requires a fresh observation. Do not revalidate all completed tasks on every resume.
+12. Select the lowest-numbered incomplete task whose predecessor and branch conditions are satisfied. Never advance past an incomplete predecessor.
 
-After compaction, restart with this procedure. Do not restart from Task 1 by default.
+After compaction, restart with this procedure. Reuse the compact projection, validated plan index, and unchanged immutable receipts. Do not restart from Task 1 by default.
 
 ## Task dispatch
 
 Before every initial dispatch, continuation, replacement retry, or reroute, complete the applicable checks below. Invoke the advisor only for the initial dispatch of a `Coding agent executable` task or for a reroute permitted by the frozen-route rules:
 
-1. Re-read the complete current task, compute its SHA-256, confirm it equals the tracker value, classify the task, and record that classification.
+1. Read the exact current-task slice from the validated plan index, compute its SHA-256, confirm that it equals the index and tracker values, classify the task, and write or validate the classification receipt.
 2. Resolve every value already knowable from Git, GitHub, a predecessor's permanent record, or the plan's verified inputs. Do not leave a known value as a placeholder.
-3. Re-query every task-local issue, PR, review, review thread, comment, commit, check, dependency, base/head identity, merge state, main ref, and repository setting needed to prove that the task can start. Use authenticated structured data and paginate relevant connections.
+3. Derive the dispatch mutable frontier from the task's start predicate and receipt invalidation keys. Re-query only affected task-local issues, PRs, reviews, review threads, comments, commits, checks, dependencies, base or head identities, merge state, refs, and repository settings. Use authenticated structured data. Prefer stable, specific conditional reads. Paginate a full connection only on a cache miss, relevant identity change, or explicit completeness predicate. Reuse a valid receipt for an unchanged object.
 4. Verify the target repository, branch, baseline commit, and working tree. Do not include planning-branch files in an implementation branch or PR.
 5. Verify the implementation slot is free before a feature implementation begins. Issue creation and implementation commencement remain separate actions.
 6. Finalize and approve the exact task manifest, ensure it contains no unresolved known value, compute its SHA-256, and record the task-text and manifest hashes.
 7. For an initial `Coding agent executable` dispatch or permitted reroute, require `advisor_activation.activation_verified: true`, invoke that exact selected advisor only now, apply precedence, freeze the route, and check the selected route's actual dispatch-time availability and exact-override support. If activation is not verified, use the one-resumption procedure instead of treating initial-list absence as unavailability. For a continuation or ordinary replacement retry, do not invoke the advisor; validate the existing frozen routing record and selected route. For any non-coding or parent-reserved task, do not invoke the advisor; record or validate the applicable routing bypass.
-8. Confirm the task-text and manifest hashes still match the routing or bypass record. Mark the task `in_progress`, record the pre-execution state, and save the tracker.
+8. Confirm the task-text and manifest hashes still match the routing or bypass receipt. Mark the task `in_progress`, record the compact pre-execution projection, and save the tracker once at this durable boundary.
 9. For an initial coding-task dispatch or reroute, let the advisor create exactly one fresh executor when automatic delegation is supported. For a valid continuation, reuse the same executor. For an ordinary replacement retry, create one fresh sequential executor through the existing dispatch mechanism with the same frozen route and without a new advisor invocation. Increment the dispatch ordinal and record the active executor's identity and override acceptance or rejection before permitting substantive work. Do not create another executor for the same dispatch ordinal. If only the explicitly permitted headless fallback can request the identical frozen route, start one fallback process as the sole executor; otherwise block.
 
 Give the executor:
@@ -402,23 +320,24 @@ The parent does not perform the task's substantive implementation. The parent ca
 
 ## Independent validation after every invocation
 
-Do not accept an executor's verbal completion claim as proof. Independently:
+Do not accept an executor's verbal completion claim as proof. Validate the executor result against the current mutable frontier and the applicable validation tier:
 
-1. Re-read the task's `Complete when` condition and verify every clause.
-2. Recompute the exact task-text and approved manifest hashes and prove that they match the active routing or bypass record.
-3. For a coding task, validate the applicable `advisor_activation` receipt, expected executor identity, task identity, routing-decision identifier, frozen route, dispatch ordinal, no-descendants requirement, and absence of any overlapping executor. For a non-coding task, validate its classification and bypass reason and prove no advisor or executor was used for the reserved work.
-4. Validate selection precedence, actual route-availability evidence, exact-override support, request acceptance or rejection, and any separately reported resolved settings. Verify effective settings only from the recorded runtime source; otherwise require `effective_override_verified: false` and an honest limitation. Validate the complete append-only reroute history, if any.
-5. Inspect both worktrees, branches, commits, trees, changed paths, and diffs. Preserve unrelated changes and confirm only authorized scope changed.
-6. Re-query affected GitHub state with authenticated structured reads. Paginate comments, reviews, review threads, checks, commits, linked issues, closing references, sub-issues, and dependency connections when applicable.
-7. Confirm every recorded SHA, tree, blob, URL, PR number, issue number, review, check, and runtime identity exists and matches the claimed object.
-8. Run or verify every task-local validation command. Record the command, working directory, runtime identity, native exit code, and result.
-9. For review and quality gates, prove that both apply to the same final head SHA and tree. Any reviewable-byte change invalidates both gates and returns execution to the task-local repeat path.
-10. For a merge, prove the reviewed parent, merge method, landed commit/tree/blobs, post-merge checks, issue state, and retained handoff requirements. Do not infer landed identity from a branch name.
-11. For a cross-repository comparison, read both sides only from recorded landed commits and Git blobs. Require byte identity for role-equivalent CI workflows and common materials after only proved repository-specific substitutions. Treat implementation history, separate authorship, convenience, or lower effort as invalid reasons for a difference.
-12. If a binary or behavior differs and the repository-specific justification is not certain, stop and escalate it to the human operator. Do not classify it as intentional merely to let the cycle proceed.
-13. Confirm no unfinished reviewer finding, stale review, invalid deferral, false dependency, fabricated value, unauthorized repository-setting change, or unsupported routing assertion remains.
+1. Parse the manifest-specific terminal result. Identify every claimed local and external change, every unchanged claimed dependency, and the requested lifecycle transition.
+2. Recompute the current-task slice and manifest hashes. Prove that they match the active routing or bypass receipt.
+3. For coding work, validate the applicable advisor-activation receipt, expected executor identity, task identity, routing-decision ID, frozen route, dispatch ordinal, no-descendants requirement, and absence of an overlapping executor. Validate selection precedence, dispatch-time availability, exact-override request support, request acceptance or rejection, separately exposed resolved settings, effective-verification source or limitation, and the append-only reroute chain. For bypassed work, validate the classification and normalized bypass reason and prove that no prohibited executor was used.
+4. Use deterministic code to inspect the target worktree, branch, commit, tree, path-scoped status, and diff. Inspect the other repository only when the task or a changed dependency puts it in the frontier. Preserve unrelated changes. Prove that changed paths are inside the authorized mutation closure.
+5. Compute receipt invalidation by exact intersection with changed paths, Git identities, GitHub object versions, external-state identities, task outputs, and dependency edges. Retain receipts whose inputs and covered predicates are unchanged. Record every invalidation reason.
+6. Run structural validation for the compact tracker, durable receipt catalog, plan index, hashes, schemas, root/predecessor/supersession closure, counters, state transition, and applicable routing or bypass receipt. This tier must not perform a broad repository or GitHub audit.
+7. Run focused changed-surface commands and predicates. Record the exact command, working directory, controller or runtime identity, native exit code, bounded output identity, covered paths and objects, and result. Do not rerun code validation for a metadata-only phase when no covered code or input changed.
+8. Re-query affected GitHub state with authenticated stable and specific reads. Use conditional requests when supported. Paginate only connections required by a changed identity or explicit completeness predicate. Confirm recorded object identities and classify check suites with the explicit check-state taxonomy. Do not count a zero-run suite as provider execution.
+9. For a public mutation, apply the approved publication-unit procedure. Validate each mutation receipt and targeted readback. Run one aggregate postflight after the final mutation. Do not repeat an ambiguous non-idempotent request.
+10. At task closure, read the indexed `Complete when` data and verify every clause. Run the full task-local validator once after all cheaper prerequisites pass. Reuse unchanged prerequisite receipts. For review and quality gates, prove that both apply to the same final head SHA and tree; a reviewable-byte change invalidates those gate receipts and returns execution to the task-local repeat path.
+11. For a merge, prove the reviewed parent, merge method, landed commit, tree, blobs, post-merge checks, issue state, and retained handoff requirements. Do not infer landed identity from a branch name.
+12. For a cross-repository comparison, read both sides only from recorded landed commits and Git blobs. Require byte identity for role-equivalent CI workflows and common materials after only proved repository-specific substitutions. Treat history, separate authorship, convenience, or lower effort as invalid reasons for a difference.
+13. If a binary or behavior differs and the repository-specific justification is uncertain, stop and escalate to the human operator. Do not classify the difference as intentional only to continue.
+14. Confirm that no unfinished reviewer finding, stale review, invalid deferral, false dependency, fabricated value, unauthorized repository-setting change, unsupported routing assertion, or invalid receipt remains in the task frontier.
 
-If all clauses pass, and the task has a valid applicable routing record or valid routing-bypass record, mark the task complete and save the tracker. Advance only to the next satisfied task.
+If every applicable clause passes, write an immutable task-completion receipt, update the compact tracker once, and advance only to the next satisfied task. If the task remains incomplete but made valid progress, write a continuation receipt without rerunning unchanged analysis or validation.
 
 ## Continuations, retries, and blockers
 
@@ -431,7 +350,7 @@ If validation fails:
 3. Increment the failed-validation and consecutive-no-progress counts as applicable.
 4. Stop or close the old executor before replacement. Never overlap the old and replacement executors.
 5. For an ordinary retry, invoke a fresh sequential executor with the unchanged task text, approved manifest hash, routing-decision identifier, and frozen route. Do not invoke the advisor again. Put the defects in a separate `ORCHESTRATOR RETRY CONTEXT` section that does not alter the task or manifest.
-6. Revalidate the complete task, executor identity, hashes, and routing evidence, not only the previously failed part.
+6. Revalidate the new executor identity, task and manifest hashes, routing evidence, failed predicates, and all receipts invalidated by the retry. Reuse unchanged receipts. Run the full task-closure tier only when the retry again claims completion or changes an input covered by that tier.
 
 Reroute only after a material change to the exact task or approved manifest produces a new hash, or after independent validation proves with concrete evidence that the frozen route's capability is insufficient. Invoke the advisor once for the reroute; append the reroute record and supporting evidence; retain all prior routing history; create a new routing-decision identifier; apply selection precedence again; freeze the new route; and use one fresh sequential executor. Do not reroute merely because an invocation failed, made no progress, was interrupted, or is being continued. If an exact task or approved-plan requirement prevents selecting a different route, block instead of overriding it.
 
@@ -459,7 +378,9 @@ When blocked, save a valid tracker and report the completed task range, current 
 
 ## Overall completion
 
-The orchestration run is complete only when every numbered task passes its exact `Complete when` condition and has a valid applicable routing record or valid bypass record; every advisor invocation has a valid activation receipt; its task-text and approved manifest hashes match; its expected executor identity, or the expected absence of an executor for bypassed work, is proved; its no-overlap evidence matches its routing record; override support and acceptance status are recorded for coding work; effective-verification status is honest; and its reroute history, if any, is complete and append-only. The final completion audit must exist, both repositories must be at the recorded fixed point, all task hashes must still match the active plan, all existing task evidence and independent validation must pass, no blocker or placeholder may remain, and the tracker must be valid and marked complete.
+The orchestration run is complete only when every numbered task passes its exact `Complete when` condition and has a valid applicable routing receipt or bypass receipt; every advisor invocation has a valid activation receipt; task-text and approved manifest hashes match; the expected executor identity, or expected absence of an executor for bypassed work, is proved; no-overlap evidence matches the routing receipt; override support and acceptance status are recorded for coding work; effective-verification status is honest; and every reroute chain is complete and append-only.
+
+Run one comprehensive overall-completion audit. Stream-hash the current plan and prompt, validate the complete plan index and numbering proof, and audit every task-status entry, completion receipt, routing or bypass receipt, durable-catalog root/predecessor/supersession closure, dependency edge, receipt hash, and invalidation key. Reuse an immutable validation result when its complete input identity is unchanged; the audit verifies that reuse and does not rerun every historical command only to reproduce the same receipt. Perform fresh live reads for final conditions that are mutable or explicitly require freshness, including applicable repository refs, fixed-point identities, open findings, required checks, reviews, review threads, merge or issue state, and repository settings. Expand the frontier and rerun the affected tier if a live identity changed. Completion requires both repositories at the recorded fixed point, all task hashes matched to the active plan, no invalid or missing receipt or broken catalog link, no blocker or placeholder, and a valid compact tracker marked complete.
 
 At completion, report:
 
