@@ -4676,7 +4676,12 @@ function Assert-Failure {
         [string] $ClaudeExpectedUtcDate = ''
     )
 
-    Write-Verbose "Testing rejected mutation: $Failure"
+    if ([string]::IsNullOrEmpty($Name)) {
+        Write-Verbose "Testing rejected mutation: $Failure"
+    }
+    else {
+        Write-Verbose "Testing rejected mutation '$Name': $Failure"
+    }
     $arrFailures = @(Get-AgentInstructionFailure `
             -AgentsContent $AgentsContent `
             -ClaudeContent $ClaudeContent `
@@ -4727,7 +4732,12 @@ function Assert-FixtureAccepted {
         [string] $ClaudeExpectedUtcDate = ''
     )
 
-    Write-Verbose 'Testing accepted fixture.'
+    if ([string]::IsNullOrEmpty($Name)) {
+        Write-Verbose 'Testing accepted fixture.'
+    }
+    else {
+        Write-Verbose "Testing accepted fixture: $Name."
+    }
     $arrFailures = @(Get-AgentInstructionFailure `
             -AgentsContent $AgentsContent `
             -ClaudeContent $ClaudeContent `
