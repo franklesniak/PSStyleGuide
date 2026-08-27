@@ -148,7 +148,7 @@ $intClaudeMaximumInputBytes = 131072
 $intCodexConfigMaximumInputBytes = 65536
 $intDocsInstructionsMaximumInputBytes = 131072
 $intInstructionDocumentMaximumInputBytes = 131072
-$intValidatorMaximumInputBytes = 393216
+$intValidatorMaximumInputBytes = 425984
 $intHistoricalPolicyMarkerMaximumBytes = 524288
 $intGitPathListMaximumBytes = 1048576
 $intMetadataMaximumParents = 64
@@ -185,6 +185,8 @@ $script:arrPushGovernedExactPaths = @(
     'package-lock.json',
     'package.json'
 )
+$script:strDecisionRecordPathPattern =
+    '^docs/decisions/[0-9]{4}-[a-z0-9]+(?:-[a-z0-9]+)*\.md$'
 $script:strStandingPlacementAuthorization =
     'No additional per-round, per-session, or PR-specific direct-push authorization from the owner is required.'
 $script:arrPlacementStructuralLiterals = @(
@@ -2689,32 +2691,47 @@ function Get-MetadataEventRevisionContext {
 
 function Test-GovernedInstructionPath {
     # .SYNOPSIS
-    # Tests whether a repository-relative path is a governed instruction.
+    # Tests whether a repository-relative path is a governed instruction path.
     #
     # .DESCRIPTION
-    # Matches the closed set of governed root paths and the supported recursive
-    # instruction-file families with ordinal, case-sensitive semantics.
+    # Matches an exact governed root path or a supported recursive instruction
+    # family. The comparison is ordinal and case-sensitive. A case-folded
+    # near-match is handled by Test-GovernedInstructionPathCaseMismatch.
     #
     # .PARAMETER RepositoryRelativePath
-    # The repository-relative path to classify.
+    # The slash-separated repository-relative path to classify.
     #
     # .PARAMETER GovernedRootPaths
-    # The exact governed root paths.
+    # The exact governed root instruction paths. The collection may be empty.
     #
     # .EXAMPLE
-    # Test-GovernedInstructionPath -RepositoryRelativePath 'tools/CLAUDE.md' `
+    # Test-GovernedInstructionPath `
+    #     -RepositoryRelativePath 'tools/CLAUDE.md' `
     #     -GovernedRootPaths @('AGENTS.md', 'CLAUDE.md')
     #
-    # # Returns true for the documented nested Claude instruction surface.
+    # # Returns $true because nested CLAUDE.md files are governed.
+    #
+    # .EXAMPLE
+    # Test-GovernedInstructionPath `
+    #     -RepositoryRelativePath 'docs/readme.md' `
+    #     -GovernedRootPaths @('AGENTS.md', 'CLAUDE.md')
+    #
+    # # Returns $false because the path is not a governed family or exact root.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
-    # [bool] True when the path belongs to a governed instruction family.
+    # [bool] True for an exact governed root or recursive governed instruction
+    # family; otherwise, false.
     #
     # .NOTES
-    # Private helper; no positional parameters. Version: 1.0.20260822.0.
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Positional parameters are disabled. Internal callers must use named
+    # parameters. Version: 1.1.20260827.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param(
@@ -2837,6 +2854,7 @@ function Test-AgentInstructionWorkflowPath {
     return (
         (Test-ProhibitedClaudeLocalPath `
             -RepositoryRelativePath $RepositoryRelativePath) -or
+        $RepositoryRelativePath -cmatch $script:strDecisionRecordPathPattern -or
         $script:arrPushGovernedExactPaths -ccontains $RepositoryRelativePath -or
         (Test-ExactPathCaseMismatch `
             -RepositoryRelativePath $RepositoryRelativePath `
@@ -2855,11 +2873,59 @@ function Get-PushGovernedPathApplicability {
     # Makes one fail-closed governed-path decision for a push event.
     #
     # .DESCRIPTION
-    # Existing refs use GitHub's exact two-dot push endpoints. Rename detection
-    # is disabled so a governed source or destination remains visible. New refs
-    # validate conservatively because the event does not provide an immutable
-    # boundary for arbitrarily large pushes. Deleted refs have no remaining
-    # repository bytes and are an exact no-op.
+    # Validates push endpoint identities and the exact checked-out head. Deleted
+    # refs need no byte validation. New refs validate conservatively. Existing
+    # refs use an exact no-rename Git diff and require validation when any changed
+    # path belongs to an agent-instruction workflow surface.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The absolute or resolved repository root used for authenticated Git reads.
+    #
+    # .PARAMETER BaseRevision
+    # The expanded push-before object ID. New refs require all zeros; deleted and
+    # existing refs require a valid nonzero commit ID.
+    #
+    # .PARAMETER HeadRevision
+    # The expanded push-after object ID. Deleted refs require all zeros; retained
+    # refs require the exact checked-out nonzero commit ID.
+    #
+    # .PARAMETER IsNewRef
+    # True when the authenticated push created the ref.
+    #
+    # .PARAMETER IsDeletedRef
+    # True when the authenticated push deleted the ref.
+    #
+    # .EXAMPLE
+    # $objDecision = Get-PushGovernedPathApplicability `
+    #     -RepositoryRootPath $strRoot -BaseRevision ('0' * 40) `
+    #     -HeadRevision $strHead -IsNewRef $true -IsDeletedRef $false
+    #
+    # # Returns ShouldValidate = $true and the new-ref fail-closed decision.
+    #
+    # .EXAMPLE
+    # $objDecision = Get-PushGovernedPathApplicability `
+    #     -RepositoryRootPath $strRoot -BaseRevision $strBefore `
+    #     -HeadRevision ('0' * 40) -IsNewRef $false -IsDeletedRef $true
+    #
+    # # Returns ShouldValidate = $false because no repository bytes remain.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [pscustomobject] One decision with ShouldValidate, Decision, and
+    # ChangedPathCount. Decision is DELETED_REF_HAS_NO_REMAINING_BYTES,
+    # NEW_REF_REQUIRES_FAIL_CLOSED_VALIDATION, GOVERNED_PATH_CHANGED, or
+    # EXACT_UNGOVERNED_PUSH. Invalid identities or indeterminate Git operations
+    # throw terminating errors instead of returning a decision.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Positional parameters are disabled. Internal callers must use named
+    # parameters. Version: 1.1.20260827.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -3383,6 +3449,66 @@ function Get-DocumentMetadataContext {
 function Get-DocumentMetadataTransitionFailure {
     # .SYNOPSIS
     # Finds metadata-policy failures in one document transition.
+    #
+    # .DESCRIPTION
+    # Parses the current and optional parent metadata, validates calendar dates
+    # and version monotonicity, detects rendered-content changes after removing
+    # metadata fields, and enforces the expected UTC date when requested.
+    # Valid transitions produce no output; each detected failure is written as a
+    # diagnostic string.
+    #
+    # .PARAMETER Name
+    # The governed document display name used in diagnostic output.
+    #
+    # .PARAMETER CurrentContent
+    # The complete current Markdown content to parse and compare.
+    #
+    # .PARAMETER ParentContent
+    # The complete parent Markdown content. Null represents a transition without
+    # a governed parent document.
+    #
+    # .PARAMETER ExpectedUtcDate
+    # The authenticated expected date in yyyy-MM-dd form. It may be empty only
+    # when commit-date enforcement is not required for a rendered change.
+    #
+    # .PARAMETER IsNewDocumentTransition
+    # True when a null ParentContent represents creation of a governed document.
+    # False when the missing parent predates the active metadata policy.
+    #
+    # .PARAMETER RequireExpectedUtcDateForRenderedChange
+    # True to require Last Updated to equal ExpectedUtcDate after rendered content
+    # changes. False retains version and monotonicity checks without that equality.
+    #
+    # .EXAMPLE
+    # $arrFailure = @(Get-DocumentMetadataTransitionFailure `
+    #     -Name 'AGENTS.md' -CurrentContent $strCurrent `
+    #     -ParentContent $strParent -ExpectedUtcDate '2026-08-27' `
+    #     -IsNewDocumentTransition $false)
+    #
+    # # Returns no strings when the changed document has matching date and version.
+    #
+    # .EXAMPLE
+    # $arrFailure = @(Get-DocumentMetadataTransitionFailure `
+    #     -Name 'AGENTS.md' -CurrentContent $strBackdated `
+    #     -ParentContent $strParent -ExpectedUtcDate '2026-08-27' `
+    #     -IsNewDocumentTransition $false)
+    #
+    # # Returns a diagnostic when rendered content has stale Last Updated metadata.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [string] Zero or more exact failure diagnostics. No output means the
+    # transition satisfies metadata structure, date, version, and freshness rules.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Positional parameters are disabled. Internal callers must use named
+    # parameters. Version: 1.1.20260827.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -3548,32 +3674,49 @@ function Get-DocumentMetadataTransitionFailure {
 
 function Get-DocumentMetadataRangeTransitionFailure {
     # .SYNOPSIS
-    # Finds metadata-policy failures across document transitions.
+    # Finds metadata-policy failures across document transition records.
     #
     # .DESCRIPTION
-    # Evaluates each supplied parent-to-current transition and prefixes each
-    # failure with the transition commit identities.
+    # Evaluates each parent-to-current transition with
+    # Get-DocumentMetadataTransitionFailure. It preserves each transition's
+    # authenticated date requirement and prefixes every failure with the parent
+    # and current commit identities for usable range diagnostics.
     #
     # .PARAMETER Name
-    # The governed document name used in failure records.
+    # The governed document display name used in diagnostic output.
     #
     # .PARAMETER TransitionContext
-    # The ordered transition records to validate.
+    # Ordered transition records. Each record supplies CurrentContent,
+    # ParentContent, ExpectedUtcDate, CurrentRevision, and ParentRevision. The
+    # optional RequireExpectedUtcDateForRenderedChange property defaults to true.
     #
     # .EXAMPLE
-    # Get-DocumentMetadataRangeTransitionFailure -Name 'AGENTS.md' `
-    #     -TransitionContext $arrTransitions
+    # $arrFailure = @(Get-DocumentMetadataRangeTransitionFailure `
+    #     -Name 'AGENTS.md' -TransitionContext $arrTransitions)
     #
-    # # Writes one string for each range-transition failure.
+    # # Returns no strings when every transition satisfies the metadata policy.
+    #
+    # .EXAMPLE
+    # Get-DocumentMetadataRangeTransitionFailure `
+    #     -Name 'AGENTS.md' -TransitionContext $arrTransitions
+    #
+    # # Writes one commit-prefixed string for every failed transition rule.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
-    # [string] One prefixed record for each metadata-transition failure.
+    # [string] Zero or more diagnostics in the form Name transition
+    # ParentRevision..CurrentRevision followed by the transition failure. No
+    # output means every supplied transition passed.
     #
     # .NOTES
-    # Private helper; no positional parameters. Version: 1.0.20260819.0.
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Positional parameters are disabled. Internal callers must use named
+    # parameters. Version: 1.1.20260827.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -3612,20 +3755,55 @@ function Get-DocumentMetadataRangeTransitionFailure {
 
 function Get-TrustRootRangeMutationFailure {
     # .SYNOPSIS
-    # Finds proposed changes to trusted validation files.
+    # Finds proposed changes to trusted validation files in an exact Git range.
     #
     # .DESCRIPTION
-    # Compares exact paths in two Git trees without reading proposed file bytes.
-    # Changed paths, invalid revisions, and indeterminate results fail closed.
+    # Authenticates both endpoint commits and compares the requested trust-root
+    # paths without rename detection, external diff drivers, or text conversion.
+    # Each changed trust root produces a failure. Invalid or unavailable Git
+    # state throws so an indeterminate comparison cannot pass.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The repository root used for immutable Git object and diff operations.
+    #
+    # .PARAMETER BaseRevision
+    # The valid nonzero base commit object ID for the comparison.
+    #
+    # .PARAMETER HeadRevision
+    # The valid nonzero head commit object ID for the comparison.
+    #
+    # .PARAMETER RepositoryRelativePath
+    # One or more exact repository-relative trusted validation paths to compare.
     #
     # .EXAMPLE
-    # Get-TrustRootRangeMutationFailure -RepositoryRootPath $strRoot `
-    #     -BaseRevision $strBase -HeadRevision $strHead `
-    #     -RepositoryRelativePath $arrTrustRoots
+    # $arrFailure = @(Get-TrustRootRangeMutationFailure `
+    #     -RepositoryRootPath $strRoot -BaseRevision $strBase `
+    #     -HeadRevision $strHead `
+    #     -RepositoryRelativePath @('.gitattributes', '.github/workflows/check.yml'))
     #
-    # # Writes one failure for each changed trust-root path.
+    # # Returns no strings when neither trust-root path changed.
     #
-    # Version: 1.0.20260820.0
+    # .EXAMPLE
+    # Get-TrustRootRangeMutationFailure `
+    #     -RepositoryRootPath $strRoot -BaseRevision $strBase `
+    #     -HeadRevision $strHead -RepositoryRelativePath '.gitattributes'
+    #
+    # # Writes one failure when the range changes .gitattributes.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [string] Zero or more failure diagnostics, one for each changed trust-root
+    # path. No output means the requested paths are unchanged.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Positional parameters are disabled. Internal callers must use named
+    # parameters. Version: 1.1.20260827.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -3677,7 +3855,86 @@ function Get-TrustRootRangeMutationFailure {
 
 function Get-GovernedDocumentCommitTransitionFailure {
     # .SYNOPSIS
-    # Finds marker-aware metadata failures for one commit and every direct parent.
+    # Finds marker-aware metadata failures for one commit and its direct parents.
+    #
+    # .DESCRIPTION
+    # Authenticates the commit and active policy marker, enumerates every direct
+    # parent where the governed document changed, reads bounded immutable content,
+    # and validates each transition against the commit's authenticated UTC date.
+    # A root commit, a marker-absent historical commit, or a commit with no change
+    # to the document produces no output. Merge parents are checked independently.
+    #
+    # .PARAMETER Name
+    # The governed document display name used in diagnostic output.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The repository root used for immutable Git object and transition reads.
+    #
+    # .PARAMETER RepositoryRelativePath
+    # The exact governed document path to compare across direct parents.
+    #
+    # .PARAMETER MaximumBytes
+    # The inclusive maximum byte count allowed for each governed document blob.
+    #
+    # .PARAMETER CommitRevision
+    # The authenticated nonzero commit object ID whose direct transitions are
+    # evaluated.
+    #
+    # .PARAMETER PolicyRepositoryRelativePath
+    # The exact repository-relative validator policy path that owns PolicyMarker.
+    #
+    # .PARAMETER PolicyMaximumBytes
+    # The inclusive maximum byte count allowed for a historical policy blob.
+    #
+    # .PARAMETER PolicyMarker
+    # The ordinal marker that proves the metadata transition policy is active.
+    #
+    # .PARAMETER RequireExpectedUtcDateForRenderedChange
+    # True to require rendered document changes to use the commit's authenticated
+    # UTC date. False retains transition checks without commit-date equality.
+    #
+    # .PARAMETER RequiresVersion
+    # True for documents with Version and Last Updated metadata. False for
+    # documents that require Last Updated freshness but do not declare Version.
+    #
+    # .EXAMPLE
+    # $arrFailure = @(Get-GovernedDocumentCommitTransitionFailure `
+    #     -Name 'AGENTS.md' -RepositoryRootPath $strRoot `
+    #     -RepositoryRelativePath 'AGENTS.md' -MaximumBytes 32768 `
+    #     -CommitRevision $strCommit `
+    #     -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
+    #     -PolicyMaximumBytes 425984 -PolicyMarker $strMarker `
+    #     -RequireExpectedUtcDateForRenderedChange $true)
+    #
+    # # Returns no strings when changed content uses the commit UTC date.
+    #
+    # .EXAMPLE
+    # Get-GovernedDocumentCommitTransitionFailure `
+    #     -Name 'docs/decisions/0003-policy.md' -RepositoryRootPath $strRoot `
+    #     -RepositoryRelativePath 'docs/decisions/0003-policy.md' `
+    #     -MaximumBytes 131072 -CommitRevision $strCommit `
+    #     -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
+    #     -PolicyMaximumBytes 425984 -PolicyMarker $strMarker `
+    #     -RequireExpectedUtcDateForRenderedChange $true -RequiresVersion $false
+    #
+    # # Writes a Last Updated failure for a backdated rendered decision change.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [string] Zero or more transition or timestamp failure diagnostics. No output
+    # means the policy is not active for that history point, the document did not
+    # change relative to any direct parent, or every applicable transition passed.
+    # Invalid object, parent, size, encoding, marker, or Git state throws.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Positional parameters are disabled. Internal callers must use named
+    # parameters. Version: 1.1.20260827.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -3705,7 +3962,13 @@ function Get-GovernedDocumentCommitTransitionFailure {
         [int] $PolicyMaximumBytes,
 
         [Parameter(Mandatory)]
-        [string] $PolicyMarker
+        [string] $PolicyMarker,
+
+        [Parameter()]
+        [bool] $RequireExpectedUtcDateForRenderedChange = $false,
+
+        [Parameter()]
+        [bool] $RequiresVersion = $true
     )
 
     $strObjectIdPattern = '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$'
@@ -3865,18 +4128,111 @@ function Get-GovernedDocumentCommitTransitionFailure {
                 ExpectedUtcDate = $objCommitTimestamp.UtcDateTime.ToString('yyyy-MM-dd')
                 CurrentRevision = $CommitRevision
                 ParentRevision = $objChangedParent.Revision
-                RequireExpectedUtcDateForRenderedChange = $false
+                RequireExpectedUtcDateForRenderedChange =
+                    $RequireExpectedUtcDateForRenderedChange
             })
     }
 
-    return Get-DocumentMetadataRangeTransitionFailure `
-        -Name $Name `
-        -TransitionContext $listTransitions.ToArray()
+    if ($RequiresVersion) {
+        return Get-DocumentMetadataRangeTransitionFailure `
+            -Name $Name `
+            -TransitionContext $listTransitions.ToArray()
+    }
+    foreach ($objTransition in $listTransitions) {
+        Get-LastUpdatedMetadataFreshnessFailure `
+            -Name $Name `
+            -CurrentContent $objTransition.CurrentContent `
+            -BaseContent $objTransition.ParentContent `
+            -TrustedEventUtcDate $(if ($RequireExpectedUtcDateForRenderedChange) {
+                    $objTransition.ExpectedUtcDate
+                } else { '' })
+    }
 }
 
 function Get-GovernedDocumentRangeTransitionFailure {
     # .SYNOPSIS
     # Finds marker-aware metadata failures in one bounded Git event range.
+    #
+    # .DESCRIPTION
+    # Authenticates the range and validation head, locates the effective policy
+    # introduction when the base predates the marker, enumerates commits in stable
+    # topological order, and delegates each commit to direct-parent transition
+    # validation. New-ref all-zero bases and ordinary ranges use distinct rules.
+    # Invalid or indeterminate history throws instead of passing.
+    #
+    # .PARAMETER Name
+    # The governed document display name used in diagnostic output.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The repository root used for authenticated immutable Git operations.
+    #
+    # .PARAMETER RepositoryRelativePath
+    # The exact governed document path validated throughout the range.
+    #
+    # .PARAMETER MaximumBytes
+    # The inclusive maximum byte count allowed for each governed document blob.
+    #
+    # .PARAMETER BaseRevision
+    # The range base commit object ID, an all-zero object ID for a new ref, or an
+    # empty value together with an empty head when no ordinary event range exists.
+    #
+    # .PARAMETER HeadRevision
+    # The nonzero range head commit object ID, or an empty value together with an
+    # empty base when no ordinary event range exists.
+    #
+    # .PARAMETER InputRevision
+    # The local validation revision that must resolve to HeadRevision. An empty
+    # value selects HEAD.
+    #
+    # .PARAMETER IsNewRefRange
+    # True when BaseRevision is the all-zero object ID for a created ref.
+    #
+    # .PARAMETER PolicyRepositoryRelativePath
+    # The exact repository-relative validator policy path that owns PolicyMarker.
+    #
+    # .PARAMETER PolicyMaximumBytes
+    # The inclusive maximum byte count allowed for each historical policy blob.
+    #
+    # .PARAMETER PolicyMarker
+    # The ordinal marker that identifies history governed by this metadata policy.
+    #
+    # .EXAMPLE
+    # $arrFailure = @(Get-GovernedDocumentRangeTransitionFailure `
+    #     -Name 'AGENTS.md' -RepositoryRootPath $strRoot `
+    #     -RepositoryRelativePath 'AGENTS.md' -MaximumBytes 32768 `
+    #     -BaseRevision $strBase -HeadRevision $strHead `
+    #     -InputRevision $strHead -IsNewRefRange $false `
+    #     -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
+    #     -PolicyMaximumBytes 425984 -PolicyMarker $strMarker)
+    #
+    # # Returns no strings when every governed transition in the range passes.
+    #
+    # .EXAMPLE
+    # Get-GovernedDocumentRangeTransitionFailure `
+    #     -Name 'AGENTS.md' -RepositoryRootPath $strRoot `
+    #     -RepositoryRelativePath 'AGENTS.md' -MaximumBytes 32768 `
+    #     -BaseRevision ('0' * 40) -HeadRevision $strHead `
+    #     -IsNewRefRange $true `
+    #     -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
+    #     -PolicyMaximumBytes 425984 -PolicyMarker $strMarker
+    #
+    # # Writes every applicable transition failure from the bounded new-ref history.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [string] Zero or more commit-transition failure diagnostics in range order.
+    # No output means no ordinary range was supplied, the endpoints are equal, or
+    # every policy-applicable transition passed. Invalid range or Git state throws.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Positional parameters are disabled. Internal callers must use named
+    # parameters. Version: 1.1.20260827.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4857,18 +5213,6 @@ $arrGovernedInstructionDocuments = @(
 )
 $arrGovernedMetadataDocuments = @($arrGovernedInstructionDocuments) + @(
     [pscustomobject]@{
-        Path = 'docs/decisions/0001-accept-in-repository-trust-root.md'
-        MaximumBytes = $intInstructionDocumentMaximumInputBytes
-        RequiresMetadata = $true
-        RequiresVersion = $false
-    },
-    [pscustomobject]@{
-        Path = 'docs/decisions/0002-accept-unverifiable-baseline-provenance.md'
-        MaximumBytes = $intInstructionDocumentMaximumInputBytes
-        RequiresMetadata = $true
-        RequiresVersion = $false
-    },
-    [pscustomobject]@{
         Path = 'docs/ISSUE_EVALUATION_PROMPT.md'
         MaximumBytes = $intInstructionDocumentMaximumInputBytes
         RequiresMetadata = $true
@@ -4994,6 +5338,18 @@ $arrTrackedRepositoryPaths = @(Read-GitTrackedPath `
         -RepositoryRootPath $strRepositoryRootPath `
         -Revision $strValidatedInputRevision `
         -MaximumBytes $intGitPathListMaximumBytes)
+$arrGovernedMetadataDocuments += @(
+    $arrTrackedRepositoryPaths |
+        Where-Object { $_ -cmatch $script:strDecisionRecordPathPattern } |
+        ForEach-Object {
+            [pscustomobject]@{
+                Path = $_
+                MaximumBytes = $intInstructionDocumentMaximumInputBytes
+                RequiresMetadata = $true
+                RequiresVersion = $false
+            }
+        }
+)
 $arrTrackedGovernedInstructionPaths = @(
     $arrTrackedRepositoryPaths |
         Where-Object {
@@ -5235,6 +5591,19 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
                 -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
                 -PolicyMaximumBytes $intValidatorMaximumInputBytes `
                 -PolicyMarker $strMetadataRangePolicyMarker)
+    }
+    if ($EventName -ceq 'push' -and $EventHeadDistinct -ceq 'false') {
+        $arrRepositoryFailures += @(Get-GovernedDocumentCommitTransitionFailure `
+                -Name $objDocumentContext.Path `
+                -RepositoryRootPath $strRepositoryRootPath `
+                -RepositoryRelativePath $objDocumentContext.Path `
+                -MaximumBytes $objDocumentContext.MaximumBytes `
+                -CommitRevision $RangeHeadRevision `
+                -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
+                -PolicyMaximumBytes $intValidatorMaximumInputBytes `
+                -PolicyMarker $strMetadataRangePolicyMarker `
+                -RequireExpectedUtcDateForRenderedChange $true `
+                -RequiresVersion $objDocumentContext.RequiresVersion)
     }
     if ($boolEventRangeRequested -and $boolEvaluateEventFreshness) {
         $boolTopicDeltaUnchanged = $false
@@ -7246,6 +7615,17 @@ if ($SelfTest) {
                 -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
                 -PolicyMaximumBytes 1024 -PolicyMarker $strMetadataRangePolicyMarker
         }
+        $scriptBlockGetDirectFailure = {
+            param([string] $Commit)
+            Get-GovernedDocumentCommitTransitionFailure -Name 'AGENTS.md' `
+                -RepositoryRootPath $strMergeFixtureRoot `
+                -RepositoryRelativePath 'AGENTS.md' `
+                -MaximumBytes $intAgentsMaximumInputBytes `
+                -CommitRevision $Commit `
+                -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
+                -PolicyMaximumBytes 1024 -PolicyMarker $strMetadataRangePolicyMarker `
+                -RequireExpectedUtcDateForRenderedChange $true
+        }
 
         & git -C $strMergeFixtureRoot read-tree $strMergeBaseTree
         $strCaseFixtureBlob = [string] (
@@ -7442,6 +7822,21 @@ if ($SelfTest) {
             -Parents @($strMergeTopicCommit) `
             -Timestamp ($strMergeCurrentDate + 'T00:00:30Z') `
             -Message 'merge fixture synchronized topic'
+        $arrDirectStaleFailures = @(
+            & $scriptBlockGetDirectFailure $strAdvancedBaseCommit
+        )
+        if (($arrDirectStaleFailures -join "`n") -cnotmatch
+                "Last Updated must be $strMergeCurrentDate") {
+            throw 'A non-distinct governed change escaped commit-date freshness.'
+        }
+        foreach ($objDirectPassingFixture in @(
+                [pscustomobject]@{ Commit = $strMergeTopicCommit; Name = 'matching metadata' },
+                [pscustomobject]@{ Commit = $strSynchronizedTopicCommit; Name = 'unchanged head' }
+            )) {
+            if (@(& $scriptBlockGetDirectFailure $objDirectPassingFixture.Commit).Count -ne 0) {
+                throw "A non-distinct $($objDirectPassingFixture.Name) fixture failed."
+            }
+        }
         foreach ($strHistoryOnlyAction in @('opened', 'reopened')) {
             $objHistoryOnlyContext = Get-MetadataEventRevisionContext `
                 -RepositoryRootPath $strMergeFixtureRoot `

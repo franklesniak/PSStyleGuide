@@ -36,8 +36,11 @@ jobs:
 
           has_devcontainer_entry() {
             local candidate_path
+            local normalized_path
+            local LC_ALL=C
             while IFS= read -r candidate_path; do
-              case "${candidate_path}" in
+              normalized_path="${candidate_path,,}"
+              case "${normalized_path}" in
                 .devcontainer|.devcontainer/*|.devcontainer.json)
                   return 0
                   ;;
@@ -52,6 +55,14 @@ jobs:
           }
           has_devcontainer_entry <<< '.devcontainer.json' || {
             printf '%s\n' 'Root-file boundary fixture was not rejected.' >&2
+            exit 1
+          }
+          has_devcontainer_entry <<< '.DEVCONTAINER' || {
+            printf '%s\n' 'Case-folded directory boundary fixture was not rejected.' >&2
+            exit 1
+          }
+          has_devcontainer_entry <<< '.DEVCONTAINER.JSON' || {
+            printf '%s\n' 'Case-folded root-file boundary fixture was not rejected.' >&2
             exit 1
           }
           if has_devcontainer_entry <<< '.env'; then
@@ -84,7 +95,7 @@ jobs:
 
           devcontainer_entries="$(
             /usr/bin/git -C "${checkout_root}" ls-tree --name-only \
-              "${fetched_revision}" -- .devcontainer .devcontainer.json
+              "${fetched_revision}"
           )"
           readonly devcontainer_entries
           if has_devcontainer_entry <<< "${devcontainer_entries}"; then
