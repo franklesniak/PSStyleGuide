@@ -4,7 +4,7 @@
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-08-22
+- **Last Updated:** 2026-08-27
 - **Scope:** Records the accepted limitation on machine-verifying supply-freeze baseline provenance and its reconsideration conditions. Does not redefine enforcement of current reviewed bytes.
 
 ## Status

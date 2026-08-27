@@ -2,7 +2,8 @@
 #
 # Remote hooks validate the repository's JSON, YAML, workflow, whitespace, and
 # line-ending contracts. The local hook runs the repository-owned instruction
-# validator without downloading or executing a proposed dependency.
+# validator without downloading or executing a proposed dependency. Run
+# `npm run bootstrap:agent-instructions` after a fresh clone or lockfile change.
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: "v6.0.0"

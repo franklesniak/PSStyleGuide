@@ -1,13 +1,13 @@
 <!-- markdownlint-disable MD013 -->
 # Agent Instructions for Claude Code
 
-**Version:** 1.8.20260826.0
+**Version:** 1.8.20260827.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository maintainer (@franklesniak)
-- **Last Updated:** 2026-08-26
+- **Last Updated:** 2026-08-27
 - **Scope:** Agent-specific entry point for Claude Code and compatible AI coding agents operating in PSStyleGuide. Mirrors a minimal inline summary of the highest-priority shared rules; `.github/copilot-instructions.md` remains the canonical documentation-authoring source of truth.
 <!-- template-sync: begin markdown-reference-only -->
 - **Related:** [Repository Copilot Instructions](.github/copilot-instructions.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
@@ -33,6 +33,8 @@ During downstream template adoption and stack selection, perform non-protected c
 
 Project `CLAUDE.md` files MUST NOT use active `@path` imports. Keep required instruction text inside governed documents. Import-like text inside inline code or fenced code blocks is not active. Ordinary `@claude` and `@codex` command mentions are not imports.
 
+Tracked `CLAUDE.local.md` files are prohibited at every supported project scope. Claude Code loads these files as operative project memory, while the repository's reviewed instruction catalog intentionally governs only shared instruction files. Keep the root `CLAUDE.local.md` path ignored and keep any personal project memory untracked.
+
 ## Essential Repository Summary
 
 - **Repository purpose and documentation contract**
@@ -50,6 +52,7 @@ Project `CLAUDE.md` files MUST NOT use active `@path` imports. Keep required ins
   - Respect allowlisted file access boundaries; reject path traversal and symlink escapes.
 
 - **Pre-commit and validation**
+  - Run `npm run bootstrap:agent-instructions` once after each fresh clone or lockfile change. This installs the locked Node.js dependencies required by the system-language hook.
   - Run `pre-commit run --all-files` before every commit.
   - Include all auto-fixes in the same commit as the related change.
   - Do not push code when pre-commit or required validation checks are failing; fix issues and re-run until the checks pass.

@@ -227,6 +227,12 @@ jobs:
           AGENT_INSTRUCTION_EVENT_HEAD_DISTINCT: >-
             ${{ github.event_name == 'push' &&
               toJSON(github.event.head_commit.distinct) || '' }}
+          AGENT_INSTRUCTION_NEW_REF_COMMIT_COUNT: >-
+            ${{ github.event_name == 'push' && github.event.created &&
+              github.event.size || '' }}
+          AGENT_INSTRUCTION_NEW_REF_COMMITS_JSON: >-
+            ${{ github.event_name == 'push' && github.event.created &&
+              toJSON(github.event.commits.*.id) || '' }}
         run: >-
           ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest
           -InputRevision $env:AGENT_INSTRUCTION_INPUT_REVISION
@@ -242,3 +248,5 @@ jobs:
           -PullRequestBaseChanged $env:AGENT_INSTRUCTION_PULL_REQUEST_BASE_CHANGED
           -EventHeadRevision $env:AGENT_INSTRUCTION_EVENT_HEAD_REVISION
           -EventHeadDistinct $env:AGENT_INSTRUCTION_EVENT_HEAD_DISTINCT
+          -NewRefCommitCount $env:AGENT_INSTRUCTION_NEW_REF_COMMIT_COUNT
+          -NewRefCommitEvidenceJson $env:AGENT_INSTRUCTION_NEW_REF_COMMITS_JSON

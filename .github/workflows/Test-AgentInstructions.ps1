@@ -53,6 +53,12 @@
 # .PARAMETER EventHeadDistinct
 # Preserves the webhook head commit's exact true or false distinct value.
 #
+# .PARAMETER NewRefCommitCount
+# Identifies the authenticated push size for complete new-ref evidence.
+#
+# .PARAMETER NewRefCommitEvidenceJson
+# Contains the authenticated ordered commit identifiers for a new-ref push.
+#
 # .EXAMPLE
 # & ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest
 #
@@ -69,7 +75,7 @@
 # This validator keeps explicit backtick continuations so that large
 # named-parameter mutation calls remain auditable one argument per line.
 # Private helpers have focused examples. The -SelfTest suite covers edge cases.
-# Version: 1.5.20260825.0
+# Version: 1.6.20260827.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -124,7 +130,15 @@ param(
 
     [Parameter()]
     [AllowEmptyString()]
-    [string] $EventHeadDistinct = ''
+    [string] $EventHeadDistinct = '',
+
+    [Parameter()]
+    [AllowEmptyString()]
+    [string] $NewRefCommitCount = '',
+
+    [Parameter()]
+    [AllowEmptyString()]
+    [string] $NewRefCommitEvidenceJson = ''
 )
 
 Set-StrictMode -Version Latest
@@ -2394,6 +2408,146 @@ function Get-CurrentInputMetadataFreshnessFailure {
     }
 }
 
+function Get-LastUpdatedMetadataFreshnessFailure {
+    # .SYNOPSIS
+    # Finds stale Last Updated metadata on a document without a Version field.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][string] $Name,
+        [Parameter(Mandatory)][string] $CurrentContent,
+        [Parameter()][AllowNull()][string] $BaseContent,
+        [Parameter(Mandatory)][string] $TrustedEventUtcDate
+    )
+
+    $objCurrentMatch = [regex]::Match(
+        $CurrentContent,
+        '(?m)^- \*\*Last Updated:\*\* (?<Date>\d{4}-\d{2}-\d{2})$'
+    )
+    if (-not $objCurrentMatch.Success -or
+        [regex]::Matches(
+            $CurrentContent,
+            '(?m)^- \*\*Last Updated:\*\* \d{4}-\d{2}-\d{2}$'
+        ).Count -ne 1) {
+        Write-Output "$Name must contain one exact Last Updated field."
+        return
+    }
+    $boolRenderedContentChanged = $true
+    if ($BaseContent) {
+        $objBaseMatch = [regex]::Match(
+            $BaseContent,
+            '(?m)^- \*\*Last Updated:\*\* (?<Date>\d{4}-\d{2}-\d{2})$'
+        )
+        if ($objBaseMatch.Success) {
+            $boolRenderedContentChanged =
+                $CurrentContent.Remove(
+                    $objCurrentMatch.Index,
+                    $objCurrentMatch.Length
+                ).Insert($objCurrentMatch.Index, '- **Last Updated:** <metadata-date>') -cne
+                $BaseContent.Remove(
+                    $objBaseMatch.Index,
+                    $objBaseMatch.Length
+                ).Insert($objBaseMatch.Index, '- **Last Updated:** <metadata-date>')
+        }
+    }
+    if ($boolRenderedContentChanged -and
+        $objCurrentMatch.Groups['Date'].Value -cne $TrustedEventUtcDate) {
+        Write-Output (
+            "$Name Last Updated must be $TrustedEventUtcDate after the current " +
+            'event input changes rendered content.'
+        )
+    }
+}
+
+function Test-TopicOwnedGitPathDeltaEqual {
+    # .SYNOPSIS
+    # Compares one authenticated path delta across two topic-head ranges.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)][string] $RepositoryRootPath,
+        [Parameter(Mandatory)][string] $PreviousBaseRevision,
+        [Parameter(Mandatory)][string] $PreviousHeadRevision,
+        [Parameter(Mandatory)][string] $CurrentBaseRevision,
+        [Parameter(Mandatory)][string] $CurrentHeadRevision,
+        [Parameter(Mandatory)][string] $RepositoryRelativePath
+    )
+
+    $arrPreviousDelta = @(& git -C $RepositoryRootPath diff --unified=0 --no-renames `
+            --no-ext-diff --no-textconv $PreviousBaseRevision `
+            $PreviousHeadRevision -- $RepositoryRelativePath)
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Could not read the authenticated previous topic-owned path delta.'
+    }
+    $arrCurrentDelta = @(& git -C $RepositoryRootPath diff --unified=0 --no-renames `
+            --no-ext-diff --no-textconv $CurrentBaseRevision `
+            $CurrentHeadRevision -- $RepositoryRelativePath)
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Could not read the authenticated current topic-owned path delta.'
+    }
+    $scriptBlockGetPatchIdentity = {
+        param(
+            [string[]] $DeltaLines,
+            [string] $RangeDescription
+        )
+
+        if ($DeltaLines.Count -eq 0) {
+            return ''
+        }
+        $arrPatchIdentityOutput = @(
+            $DeltaLines | & git -C $RepositoryRootPath patch-id --verbatim
+        )
+        if ($LASTEXITCODE -ne 0) {
+            throw "Could not fingerprint the authenticated $RangeDescription delta."
+        }
+        $arrPatchIdentityOutput = @(
+            $arrPatchIdentityOutput | Where-Object {
+                -not [string]::IsNullOrWhiteSpace([string]$_)
+            }
+        )
+        if ($arrPatchIdentityOutput.Count -ne 1 -or
+            ([string]$arrPatchIdentityOutput[0]).Trim() -cnotmatch
+                '^(?<PatchId>[0-9a-f]{40}|[0-9a-f]{64})\s+[0-9a-f]+$') {
+            throw "The authenticated $RangeDescription delta has no unique patch identity."
+        }
+        return $Matches['PatchId']
+    }
+    $strPreviousPatchIdentity = & $scriptBlockGetPatchIdentity `
+        -DeltaLines $arrPreviousDelta -RangeDescription 'previous topic-owned path'
+    $strCurrentPatchIdentity = & $scriptBlockGetPatchIdentity `
+        -DeltaLines $arrCurrentDelta -RangeDescription 'current topic-owned path'
+    return (
+        $strPreviousPatchIdentity -ceq $strCurrentPatchIdentity
+    )
+}
+
+function Get-MarkdownParserBootstrapFailure {
+    # .SYNOPSIS
+    # Reports a missing locked Markdown parser bootstrap.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param([Parameter(Mandatory)][string] $RepositoryRootPath)
+
+    $strMarkdownParserPath = Join-Path -Path $RepositoryRootPath `
+        -ChildPath 'node_modules/markdown-it/package.json'
+    if (-not (Test-Path -LiteralPath $strMarkdownParserPath -PathType Leaf)) {
+        Write-Output (
+            'Locked Node.js dependencies are missing. Run ' +
+            '`npm run bootstrap:agent-instructions` before pre-commit validation.'
+        )
+    }
+}
+
+function Test-ProhibitedClaudeLocalPath {
+    # .SYNOPSIS
+    # Tests whether a tracked path is prohibited operative local Claude memory.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([bool])]
+    param([Parameter(Mandatory)][string] $RepositoryRelativePath)
+
+    return $RepositoryRelativePath -cmatch '^(?:[^/]+/)*CLAUDE\.local\.md$'
+}
+
 function Get-MetadataEventRevisionContext {
     # .SYNOPSIS
     # Resolves history and current-event comparison bases from trusted payload data.
@@ -2409,7 +2563,9 @@ function Get-MetadataEventRevisionContext {
         [Parameter(Mandatory)][AllowEmptyString()][string] $PreviousHeadRevision,
         [Parameter()][AllowEmptyString()][string] $PullRequestBaseChanged = '',
         [Parameter(Mandatory)][AllowEmptyString()][string] $EventHeadRevision,
-        [Parameter(Mandatory)][AllowEmptyString()][string] $EventHeadDistinct
+        [Parameter(Mandatory)][AllowEmptyString()][string] $EventHeadDistinct,
+        [Parameter()][AllowEmptyString()][string] $NewRefCommitCount = '',
+        [Parameter()][AllowEmptyString()][string] $NewRefCommitEvidenceJson = ''
     )
 
     $strObjectIdPattern = '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$'
@@ -2448,16 +2604,75 @@ function Get-MetadataEventRevisionContext {
             if ($BaseRevision -notmatch $strZeroObjectIdPattern) {
                 throw 'A new-ref push metadata event requires an all-zero base.'
             }
-            $strFreshnessBase = if ($boolHeadIntroducedByPush) {
-                "$HeadRevision^"
+            if (-not $boolHeadIntroducedByPush) {
+                throw 'A new-ref push head must be authenticated as introduced by the push.'
             }
-            else {
-                ''
+            $intNewRefCommitCount = 0
+            if ($NewRefCommitCount -cnotmatch '^[1-9][0-9]*$' -or
+                -not [int]::TryParse($NewRefCommitCount, [ref]$intNewRefCommitCount)) {
+                throw 'A new-ref push requires a valid authenticated commit count.'
+            }
+            try {
+                $arrNewRefCommitEvidence = @(
+                    ConvertFrom-Json -InputObject $NewRefCommitEvidenceJson -NoEnumerate
+                )
+                if ($arrNewRefCommitEvidence.Count -eq 1 -and
+                    $arrNewRefCommitEvidence[0] -is [System.Array]) {
+                    $arrNewRefCommitEvidence = @($arrNewRefCommitEvidence[0])
+                }
+            }
+            catch {
+                throw 'The authenticated new-ref commit evidence is malformed.'
+            }
+            if ($arrNewRefCommitEvidence.Count -ne $intNewRefCommitCount) {
+                throw 'The authenticated new-ref commit evidence is incomplete.'
+            }
+            $strPreviousEvidenceCommit = ''
+            $strFreshnessBase = ''
+            for ($intEvidenceIndex = 0;
+                $intEvidenceIndex -lt $arrNewRefCommitEvidence.Count;
+                $intEvidenceIndex++) {
+                $strEvidenceCommit = [string]$arrNewRefCommitEvidence[$intEvidenceIndex]
+                if ($strEvidenceCommit -notmatch $strObjectIdPattern -or
+                    $strEvidenceCommit -match $strZeroObjectIdPattern) {
+                    throw 'The authenticated new-ref commit evidence contains an invalid commit.'
+                }
+                $strCommitAndParents = [string](& git -C $RepositoryRootPath `
+                        rev-list --parents -n 1 $strEvidenceCommit 2>$null)
+                if ($LASTEXITCODE -ne 0) {
+                    throw 'The authenticated new-ref commit evidence is unavailable.'
+                }
+                $arrCommitAndParents = @($strCommitAndParents.Trim() -split '\s+')
+                if ($arrCommitAndParents.Count -gt 2) {
+                    throw 'The authenticated new-ref commit evidence has an ambiguous merge.'
+                }
+                if ($intEvidenceIndex -eq 0) {
+                    if ($arrCommitAndParents.Count -eq 2) {
+                        $strFreshnessBase = $arrCommitAndParents[1]
+                    }
+                }
+                elseif ($arrCommitAndParents.Count -ne 2 -or
+                    $arrCommitAndParents[1] -cne $strPreviousEvidenceCommit) {
+                    throw 'The authenticated new-ref commit evidence is not contiguous.'
+                }
+                $strPreviousEvidenceCommit = $strEvidenceCommit
+            }
+            if ($strPreviousEvidenceCommit -cne $HeadRevision) {
+                throw 'The authenticated new-ref commit evidence does not end at the event head.'
             }
             return [pscustomobject]@{
                 HistoryBaseRevision = $BaseRevision
                 FreshnessBaseRevision = $strFreshnessBase
+                EvaluateFreshness = $true
+                PreviousTopicBaseRevision = ''
+                PreviousTopicHeadRevision = ''
+                CurrentTopicBaseRevision = ''
+                CurrentTopicHeadRevision = ''
             }
+        }
+        if (-not [string]::IsNullOrEmpty($NewRefCommitCount) -or
+            -not [string]::IsNullOrEmpty($NewRefCommitEvidenceJson)) {
+            throw 'An existing-ref push must not supply new-ref commit evidence.'
         }
         if ($BaseRevision -notmatch $strObjectIdPattern -or
             $BaseRevision -match $strZeroObjectIdPattern) {
@@ -2476,6 +2691,11 @@ function Get-MetadataEventRevisionContext {
             else {
                 ''
             }
+            EvaluateFreshness = $boolHeadIntroducedByPush
+            PreviousTopicBaseRevision = ''
+            PreviousTopicHeadRevision = ''
+            CurrentTopicBaseRevision = ''
+            CurrentTopicHeadRevision = ''
         }
     }
 
@@ -2484,7 +2704,9 @@ function Get-MetadataEventRevisionContext {
     }
     if ($IsNewRefRange -or
         -not [string]::IsNullOrEmpty($EventHeadRevision) -or
-        -not [string]::IsNullOrEmpty($EventHeadDistinct)) {
+        -not [string]::IsNullOrEmpty($EventHeadDistinct) -or
+        -not [string]::IsNullOrEmpty($NewRefCommitCount) -or
+        -not [string]::IsNullOrEmpty($NewRefCommitEvidenceJson)) {
         throw 'A pull request metadata event must not use push-only fields.'
     }
     if ($PullRequestAction -cnotin @('opened', 'reopened', 'synchronize', 'edited')) {
@@ -2521,6 +2743,11 @@ function Get-MetadataEventRevisionContext {
         return [pscustomobject]@{
             HistoryBaseRevision = $strHistoryBase
             FreshnessBaseRevision = $strHistoryBase
+            EvaluateFreshness = $true
+            PreviousTopicBaseRevision = ''
+            PreviousTopicHeadRevision = ''
+            CurrentTopicBaseRevision = ''
+            CurrentTopicHeadRevision = ''
         }
     }
     if ($PreviousHeadRevision -notmatch $strObjectIdPattern -or
@@ -2537,9 +2764,20 @@ function Get-MetadataEventRevisionContext {
     if ($LASTEXITCODE -ne 0) {
         throw 'The synchronize previous topic head is unavailable.'
     }
+    $arrPreviousMergeBases = @(& git -C $RepositoryRootPath merge-base --all `
+            $BaseRevision $PreviousHeadRevision 2>$null)
+    if ($LASTEXITCODE -ne 0 -or $arrPreviousMergeBases.Count -ne 1 -or
+        ([string]$arrPreviousMergeBases[0]).Trim() -notmatch $strObjectIdPattern) {
+        throw 'The synchronize previous topic range must have one available merge base.'
+    }
     return [pscustomobject]@{
         HistoryBaseRevision = $strHistoryBase
         FreshnessBaseRevision = $PreviousHeadRevision
+        EvaluateFreshness = $true
+        PreviousTopicBaseRevision = ([string]$arrPreviousMergeBases[0]).Trim()
+        PreviousTopicHeadRevision = $PreviousHeadRevision
+        CurrentTopicBaseRevision = $strHistoryBase
+        CurrentTopicHeadRevision = $HeadRevision
     }
 }
 
@@ -2666,6 +2904,8 @@ function Test-GovernedInstructionInventoryPath {
     )
 
     return (
+        (Test-ProhibitedClaudeLocalPath `
+            -RepositoryRelativePath $RepositoryRelativePath) -or
         (Test-GovernedInstructionPath `
             -RepositoryRelativePath $RepositoryRelativePath `
             -GovernedRootPaths $script:arrGovernedInstructionRootPaths) -or
@@ -2689,6 +2929,8 @@ function Test-AgentInstructionWorkflowPath {
     )
 
     return (
+        (Test-ProhibitedClaudeLocalPath `
+            -RepositoryRelativePath $RepositoryRelativePath) -or
         $script:arrPushGovernedExactPaths -ccontains $RepositoryRelativePath -or
         (Test-ExactPathCaseMismatch `
             -RepositoryRelativePath $RepositoryRelativePath `
@@ -2908,6 +3150,13 @@ function Get-GovernedInstructionInventoryFailure {
     }
 
     foreach ($strTrackedPath in $setTrackedPaths) {
+        if (Test-ProhibitedClaudeLocalPath -RepositoryRelativePath $strTrackedPath) {
+            Write-Output (
+                'Tracked CLAUDE.local.md is prohibited operative project memory: ' +
+                $strTrackedPath
+            )
+            continue
+        }
         if (-not $setCatalogPaths.Contains($strTrackedPath)) {
             Write-Output (
                 'Tracked governed instruction is missing from the catalog: ' +
@@ -4754,7 +5003,9 @@ if ($PushApplicabilityOnly) {
         -not [string]::IsNullOrEmpty($PullRequestBaseChanged) -or
         -not [string]::IsNullOrEmpty($PreviousHeadRevision) -or
         -not [string]::IsNullOrEmpty($EventHeadRevision) -or
-        -not [string]::IsNullOrEmpty($EventHeadDistinct)) {
+        -not [string]::IsNullOrEmpty($EventHeadDistinct) -or
+        -not [string]::IsNullOrEmpty($NewRefCommitCount) -or
+        -not [string]::IsNullOrEmpty($NewRefCommitEvidenceJson)) {
         throw 'Push-applicability mode received incompatible validation fields.'
     }
     $objPushApplicability = Get-PushGovernedPathApplicability `
@@ -4769,6 +5020,11 @@ if ($PushApplicabilityOnly) {
 if ($RangeIsDeletedRef) {
     throw 'Deleted-ref push validation must stop after its applicability decision.'
 }
+$arrBootstrapFailures = @(Get-MarkdownParserBootstrapFailure `
+        -RepositoryRootPath $strRepositoryRootPath)
+if ($arrBootstrapFailures.Count -gt 0) {
+    throw ($arrBootstrapFailures -join [Environment]::NewLine)
+}
 $strAgentsPath = Join-Path -Path $strRepositoryRootPath -ChildPath 'AGENTS.md'
 $strClaudePath = Join-Path -Path $strRepositoryRootPath -ChildPath 'CLAUDE.md'
 $strCodexConfigPath = Join-Path -Path $strRepositoryRootPath -ChildPath '.codex/config.toml'
@@ -4780,26 +5036,51 @@ $arrGovernedInstructionDocuments = @(
         Path = 'AGENTS.md'
         MaximumBytes = $intAgentsMaximumInputBytes
         RequiresMetadata = $true
+        RequiresVersion = $true
     },
     [pscustomobject]@{
         Path = 'CLAUDE.md'
         MaximumBytes = $intClaudeMaximumInputBytes
         RequiresMetadata = $true
+        RequiresVersion = $true
     },
     [pscustomobject]@{
         Path = '.github/copilot-instructions.md'
         MaximumBytes = $intInstructionDocumentMaximumInputBytes
         RequiresMetadata = $false
+        RequiresVersion = $false
     },
     [pscustomobject]@{
         Path = '.github/instructions/docs.instructions.md'
         MaximumBytes = $intDocsInstructionsMaximumInputBytes
         RequiresMetadata = $true
+        RequiresVersion = $true
     },
     [pscustomobject]@{
         Path = '.github/instructions/yaml.instructions.md'
         MaximumBytes = $intInstructionDocumentMaximumInputBytes
         RequiresMetadata = $true
+        RequiresVersion = $true
+    }
+)
+$arrGovernedMetadataDocuments = @($arrGovernedInstructionDocuments) + @(
+    [pscustomobject]@{
+        Path = 'docs/decisions/0001-accept-in-repository-trust-root.md'
+        MaximumBytes = $intInstructionDocumentMaximumInputBytes
+        RequiresMetadata = $true
+        RequiresVersion = $false
+    },
+    [pscustomobject]@{
+        Path = 'docs/decisions/0002-accept-unverifiable-baseline-provenance.md'
+        MaximumBytes = $intInstructionDocumentMaximumInputBytes
+        RequiresMetadata = $true
+        RequiresVersion = $false
+    },
+    [pscustomobject]@{
+        Path = 'docs/ISSUE_EVALUATION_PROMPT.md'
+        MaximumBytes = $intInstructionDocumentMaximumInputBytes
+        RequiresMetadata = $true
+        RequiresVersion = $false
     }
 )
 $strValidatedInputRevision = ''
@@ -4819,7 +5100,9 @@ if (-not $boolEventRangeRequested -and
         -not [string]::IsNullOrEmpty($PreviousHeadRevision) -or
         $RangeIsDeletedRef -or
         -not [string]::IsNullOrEmpty($EventHeadRevision) -or
-        -not [string]::IsNullOrEmpty($EventHeadDistinct))) {
+        -not [string]::IsNullOrEmpty($EventHeadDistinct) -or
+        -not [string]::IsNullOrEmpty($NewRefCommitCount) -or
+        -not [string]::IsNullOrEmpty($NewRefCommitEvidenceJson))) {
     throw 'Metadata event fields require a complete base and head range.'
 }
 if (-not [string]::IsNullOrEmpty($TrustedEventTimestamp)) {
@@ -4828,6 +5111,11 @@ if (-not [string]::IsNullOrEmpty($TrustedEventTimestamp)) {
 }
 $strEventHistoryBaseRevision = $RangeBaseRevision
 $strEventFreshnessBaseRevision = ''
+$boolEvaluateEventFreshness = $false
+$strPreviousTopicBaseRevision = ''
+$strPreviousTopicHeadRevision = ''
+$strCurrentTopicBaseRevision = ''
+$strCurrentTopicHeadRevision = ''
 if ($boolEventRangeRequested -and
     -not [string]::IsNullOrEmpty($RangeBaseRevision) -and
     -not [string]::IsNullOrEmpty($RangeHeadRevision)) {
@@ -4839,9 +5127,16 @@ if ($boolEventRangeRequested -and
         -PreviousHeadRevision $PreviousHeadRevision `
         -PullRequestBaseChanged $PullRequestBaseChanged `
         -EventHeadRevision $EventHeadRevision `
-        -EventHeadDistinct $EventHeadDistinct
+        -EventHeadDistinct $EventHeadDistinct `
+        -NewRefCommitCount $NewRefCommitCount `
+        -NewRefCommitEvidenceJson $NewRefCommitEvidenceJson
     $strEventHistoryBaseRevision = $objMetadataEventRevisionContext.HistoryBaseRevision
     $strEventFreshnessBaseRevision = $objMetadataEventRevisionContext.FreshnessBaseRevision
+    $boolEvaluateEventFreshness = $objMetadataEventRevisionContext.EvaluateFreshness
+    $strPreviousTopicBaseRevision = $objMetadataEventRevisionContext.PreviousTopicBaseRevision
+    $strPreviousTopicHeadRevision = $objMetadataEventRevisionContext.PreviousTopicHeadRevision
+    $strCurrentTopicBaseRevision = $objMetadataEventRevisionContext.CurrentTopicBaseRevision
+    $strCurrentTopicHeadRevision = $objMetadataEventRevisionContext.CurrentTopicHeadRevision
 }
 
 if (-not [string]::IsNullOrEmpty($InputRevision)) {
@@ -4929,7 +5224,7 @@ if ($arrGovernedInstructionInventoryFailures.Count -gt 0) {
 if ([string]::IsNullOrEmpty($strValidatedInputRevision)) {
     $arrRequiredPaths = @($strCodexConfigPath)
     $arrRequiredPaths += @(
-        $arrGovernedInstructionDocuments |
+        $arrGovernedMetadataDocuments |
             ForEach-Object {
                 Join-Path -Path $strRepositoryRootPath -ChildPath $_.Path
             }
@@ -5018,7 +5313,7 @@ $hashtableGovernedInstructionContent = @{
     'CLAUDE.md' = $strClaudeContent
     '.github/instructions/docs.instructions.md' = $strDocsInstructionsContent
 }
-foreach ($objDocumentSpec in $arrGovernedInstructionDocuments) {
+foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
     if ($hashtableGovernedInstructionContent.ContainsKey($objDocumentSpec.Path)) {
         continue
     }
@@ -5047,7 +5342,7 @@ foreach ($objDocumentSpec in $arrGovernedInstructionDocuments) {
 }
 
 $listGovernedDocumentContexts = [System.Collections.Generic.List[pscustomobject]]::new()
-foreach ($objDocumentSpec in $arrGovernedInstructionDocuments) {
+foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
     $objParentContext = Get-GovernedDocumentParentContext `
         -RepositoryRootPath $strRepositoryRootPath `
         -RepositoryRelativePath $objDocumentSpec.Path `
@@ -5061,6 +5356,7 @@ foreach ($objDocumentSpec in $arrGovernedInstructionDocuments) {
             ExpectedUtcDate = $objParentContext.ExpectedUtcDate
             IsWorktreeTransition = $objParentContext.IsWorktreeTransition
             RequiresMetadata = $objDocumentSpec.RequiresMetadata
+            RequiresVersion = $objDocumentSpec.RequiresVersion
         })
 }
 
@@ -5093,14 +5389,24 @@ $arrRepositoryFailures += @(Get-DocumentationClaimFailure `
         -Content $strDocsInstructionsContent `
         -TrackedPaths $arrTrackedRepositoryPaths)
 $arrRepositoryFailures += @(Get-NestedClaudeImportFailure `
-        -DocumentContexts @($listGovernedDocumentContexts))
+        -DocumentContexts @(
+            $listGovernedDocumentContexts |
+                Where-Object { $arrGovernedInstructionDocuments.Path -ccontains $_.Path }
+        ))
 foreach ($objDocumentContext in $listGovernedDocumentContexts) {
     if (-not $objDocumentContext.RequiresMetadata) {
         continue
     }
     if ([string]::IsNullOrEmpty($RangeBaseRevision) -and
         [string]::IsNullOrEmpty($RangeHeadRevision)) {
-        if ($objDocumentContext.IsWorktreeTransition -or
+        if (-not $objDocumentContext.RequiresVersion) {
+            $arrRepositoryFailures += @(Get-LastUpdatedMetadataFreshnessFailure `
+                    -Name $objDocumentContext.Path `
+                    -CurrentContent $objDocumentContext.Content `
+                    -BaseContent $objDocumentContext.ParentContent `
+                    -TrustedEventUtcDate $objDocumentContext.ExpectedUtcDate)
+        }
+        elseif ($objDocumentContext.IsWorktreeTransition -or
             -not $boolNoRangeCommitHasParent) {
             $arrRepositoryFailures += @(Get-DocumentMetadataTransitionFailure `
                     -Name $objDocumentContext.Path `
@@ -5124,23 +5430,40 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
                     -PolicyMarker $strMetadataRangePolicyMarker)
         }
     }
-    $arrRepositoryFailures += @(Get-GovernedDocumentRangeTransitionFailure `
-            -Name $objDocumentContext.Path `
-            -RepositoryRootPath $strRepositoryRootPath `
-            -RepositoryRelativePath $objDocumentContext.Path `
-            -MaximumBytes $objDocumentContext.MaximumBytes `
-            -BaseRevision $strEventHistoryBaseRevision `
-            -HeadRevision $RangeHeadRevision `
-            -InputRevision $strValidatedInputRevision `
-            -IsNewRefRange ([bool]$RangeIsNewRef) `
-            -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
-            -PolicyMaximumBytes $intValidatorMaximumInputBytes `
-            -PolicyMarker $strMetadataRangePolicyMarker)
-    if ($boolEventRangeRequested -and
-        -not [string]::IsNullOrEmpty($strEventFreshnessBaseRevision)) {
-        & git -C $strRepositoryRootPath cat-file -e `
-            "$strEventFreshnessBaseRevision`:$($objDocumentContext.Path)" 2>$null
-        $strEventBaseContent = if ($LASTEXITCODE -eq 0) {
+    if ($objDocumentContext.RequiresVersion) {
+        $arrRepositoryFailures += @(Get-GovernedDocumentRangeTransitionFailure `
+                -Name $objDocumentContext.Path `
+                -RepositoryRootPath $strRepositoryRootPath `
+                -RepositoryRelativePath $objDocumentContext.Path `
+                -MaximumBytes $objDocumentContext.MaximumBytes `
+                -BaseRevision $strEventHistoryBaseRevision `
+                -HeadRevision $RangeHeadRevision `
+                -InputRevision $strValidatedInputRevision `
+                -IsNewRefRange ([bool]$RangeIsNewRef) `
+                -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
+                -PolicyMaximumBytes $intValidatorMaximumInputBytes `
+                -PolicyMarker $strMetadataRangePolicyMarker)
+    }
+    if ($boolEventRangeRequested -and $boolEvaluateEventFreshness) {
+        $boolTopicDeltaUnchanged = $false
+        if (-not [string]::IsNullOrEmpty($strPreviousTopicBaseRevision)) {
+            $boolTopicDeltaUnchanged = Test-TopicOwnedGitPathDeltaEqual `
+                -RepositoryRootPath $strRepositoryRootPath `
+                -PreviousBaseRevision $strPreviousTopicBaseRevision `
+                -PreviousHeadRevision $strPreviousTopicHeadRevision `
+                -CurrentBaseRevision $strCurrentTopicBaseRevision `
+                -CurrentHeadRevision $strCurrentTopicHeadRevision `
+                -RepositoryRelativePath $objDocumentContext.Path
+        }
+        if (-not [string]::IsNullOrEmpty($strEventFreshnessBaseRevision)) {
+            & git -C $strRepositoryRootPath cat-file -e `
+                "$strEventFreshnessBaseRevision`:$($objDocumentContext.Path)" 2>$null
+        }
+        $strEventBaseContent = if ($boolTopicDeltaUnchanged) {
+            $objDocumentContext.Content
+        }
+        elseif (-not [string]::IsNullOrEmpty($strEventFreshnessBaseRevision) -and
+            $LASTEXITCODE -eq 0) {
             Read-GitRevisionText `
                 -RepositoryRootPath $strRepositoryRootPath `
                 -Revision $strEventFreshnessBaseRevision `
@@ -5151,11 +5474,20 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
         else {
             $null
         }
-        $arrRepositoryFailures += @(Get-CurrentInputMetadataFreshnessFailure `
-                -Name $objDocumentContext.Path `
-                -CurrentContent $objDocumentContext.Content `
-                -BaseContent $strEventBaseContent `
-                -TrustedEventUtcDate $strTrustedEventUtcDate)
+        if ($objDocumentContext.RequiresVersion) {
+            $arrRepositoryFailures += @(Get-CurrentInputMetadataFreshnessFailure `
+                    -Name $objDocumentContext.Path `
+                    -CurrentContent $objDocumentContext.Content `
+                    -BaseContent $strEventBaseContent `
+                    -TrustedEventUtcDate $strTrustedEventUtcDate)
+        }
+        else {
+            $arrRepositoryFailures += @(Get-LastUpdatedMetadataFreshnessFailure `
+                    -Name $objDocumentContext.Path `
+                    -CurrentContent $objDocumentContext.Content `
+                    -BaseContent $strEventBaseContent `
+                    -TrustedEventUtcDate $strTrustedEventUtcDate)
+        }
     }
 }
 if ($arrRepositoryFailures.Count -gt 0) {
@@ -5168,6 +5500,20 @@ Write-Output 'Agent-instruction contract passed.'
 
 if ($SelfTest) {
     #region Mutation self-tests
+
+    $strMissingBootstrapFixture = [System.IO.Path]::Combine(
+        [System.IO.Path]::GetTempPath(),
+        ('agent-instruction-bootstrap-{0}' -f [Guid]::NewGuid().ToString('N'))
+    )
+    $arrMissingBootstrapFailures = @(Get-MarkdownParserBootstrapFailure `
+            -RepositoryRootPath $strMissingBootstrapFixture)
+    if ($arrMissingBootstrapFailures.Count -ne 1 -or
+        -not $arrMissingBootstrapFailures[0].Contains(
+            'npm run bootstrap:agent-instructions',
+            [StringComparison]::Ordinal
+        )) {
+        throw 'The node_modules-absent bootstrap fixture did not fail actionably.'
+    }
 
     $arrDocumentationClaimFailures = @(Get-DocumentationClaimFailure `
             -Content $strDocsInstructionsContent `
@@ -5354,6 +5700,38 @@ if ($SelfTest) {
         @($arrGovernedInstructionDocuments.Path) -cnotcontains 'CLAUDE.md') {
         throw 'The supported root CLAUDE.md instruction is not cataloged.'
     }
+    foreach ($strProhibitedClaudeLocalPath in @(
+            'CLAUDE.local.md',
+            'tools/CLAUDE.local.md'
+        )) {
+        if (-not (Test-ProhibitedClaudeLocalPath `
+                    -RepositoryRelativePath $strProhibitedClaudeLocalPath) -or
+            -not (Test-AgentInstructionWorkflowPath `
+                    -RepositoryRelativePath $strProhibitedClaudeLocalPath) -or
+            -not (Test-GovernedInstructionInventoryPath `
+                    -RepositoryRelativePath $strProhibitedClaudeLocalPath)) {
+            throw "Prohibited Claude local memory escaped a validator surface: $strProhibitedClaudeLocalPath"
+        }
+        $arrProhibitedClaudeLocalFailures = @(
+            Get-GovernedInstructionInventoryFailure `
+                -CatalogPaths @($arrGovernedInstructionDocuments.Path) `
+                -TrackedPaths @(
+                    $arrTrackedGovernedInstructionPaths + $strProhibitedClaudeLocalPath
+                )
+        )
+        if (-not ($arrProhibitedClaudeLocalFailures -ccontains (
+                    'Tracked CLAUDE.local.md is prohibited operative project memory: ' +
+                    $strProhibitedClaudeLocalPath
+                ))) {
+            throw "Tracked Claude local memory was not explicitly rejected: $strProhibitedClaudeLocalPath"
+        }
+    }
+    $strGitIgnoreContent = [System.IO.File]::ReadAllText(
+        [System.IO.Path]::Combine($strRepositoryRootPath, '.gitignore')
+    )
+    if ($strGitIgnoreContent -cnotmatch '(?m)^/CLAUDE\.local\.md$') {
+        throw 'The root CLAUDE.local.md ignore rule is missing.'
+    }
 
     foreach ($strHierarchicalGeminiPath in @(
             'GEMINI.md',
@@ -5520,7 +5898,7 @@ if ($SelfTest) {
     $arrRequiredFieldNames = @('Status', 'Owner', 'Scope')
     foreach ($objDocumentContext in @(
             $listGovernedDocumentContexts |
-                Where-Object { $_.RequiresMetadata }
+                Where-Object { $_.RequiresMetadata -and $_.RequiresVersion }
         )) {
         foreach ($strFieldName in $arrRequiredFieldNames) {
             $objFieldLineMatch = [regex]::Match(
@@ -6475,10 +6853,20 @@ if ($SelfTest) {
                 'M 100644 inline zzzz/tools/GEMINI.md',
                 'data 0',
                 '',
-                'commit refs/heads/divergent',
-                'mark :4',
+                'commit refs/heads/multi',
+                'mark :5',
                 'author Fixture <fixture@example.invalid> 1700000003 +0000',
                 'committer Fixture <fixture@example.invalid> 1700000003 +0000',
+                'data 5',
+                'multi',
+                'from :3',
+                'M 100644 inline unrelated.txt',
+                'data 0',
+                '',
+                'commit refs/heads/divergent',
+                'mark :4',
+                'author Fixture <fixture@example.invalid> 1700000004 +0000',
+                'committer Fixture <fixture@example.invalid> 1700000004 +0000',
                 'data 9',
                 'divergent',
                 'from :1',
@@ -6541,6 +6929,9 @@ if ($SelfTest) {
         $strPushGovernedCommit = [string] (
             & git -C $strPushFixtureRoot rev-parse refs/heads/governed
         )
+        $strPushMultiCommit = [string] (
+            & git -C $strPushFixtureRoot rev-parse refs/heads/multi
+        )
         $strPushDivergentCommit = [string] (
             & git -C $strPushFixtureRoot rev-parse refs/heads/divergent
         )
@@ -6550,7 +6941,47 @@ if ($SelfTest) {
         $strPushBaseCommit = $strPushBaseCommit.Trim()
         $strPushUngovernedCommit = $strPushUngovernedCommit.Trim()
         $strPushGovernedCommit = $strPushGovernedCommit.Trim()
+        $strPushMultiCommit = $strPushMultiCommit.Trim()
         $strPushDivergentCommit = $strPushDivergentCommit.Trim()
+
+        $strMultiCommitEvidenceJson = ConvertTo-Json -Compress -InputObject @(
+            $strPushUngovernedCommit,
+            $strPushGovernedCommit,
+            $strPushMultiCommit
+        )
+        $objMultiCommitNewRefContext = Get-MetadataEventRevisionContext `
+            -RepositoryRootPath $strPushFixtureRoot `
+            -EventName 'push' -PullRequestAction '' `
+            -BaseRevision ('0' * 40) -HeadRevision $strPushMultiCommit `
+            -IsNewRefRange $true -PreviousHeadRevision '' `
+            -EventHeadRevision $strPushMultiCommit -EventHeadDistinct 'true' `
+            -NewRefCommitCount '3' `
+            -NewRefCommitEvidenceJson $strMultiCommitEvidenceJson
+        if ($objMultiCommitNewRefContext.FreshnessBaseRevision -cne
+                $strPushBaseCommit -or
+            -not $objMultiCommitNewRefContext.EvaluateFreshness) {
+            throw 'Complete multi-commit new-ref evidence did not select its full boundary.'
+        }
+        $boolIncompleteNewRefEvidenceRejected = $false
+        try {
+            [void](Get-MetadataEventRevisionContext `
+                    -RepositoryRootPath $strPushFixtureRoot `
+                    -EventName 'push' -PullRequestAction '' `
+                    -BaseRevision ('0' * 40) -HeadRevision $strPushMultiCommit `
+                    -IsNewRefRange $true -PreviousHeadRevision '' `
+                    -EventHeadRevision $strPushMultiCommit -EventHeadDistinct 'true' `
+                    -NewRefCommitCount '4' `
+                    -NewRefCommitEvidenceJson $strMultiCommitEvidenceJson)
+        }
+        catch {
+            $boolIncompleteNewRefEvidenceRejected = $_.Exception.Message.Contains(
+                'commit evidence is incomplete',
+                [StringComparison]::Ordinal
+            )
+        }
+        if (-not $boolIncompleteNewRefEvidenceRejected) {
+            throw 'Incomplete authenticated new-ref evidence did not fail closed.'
+        }
 
         & git -C $strPushFixtureRoot update-ref HEAD $strPushUngovernedCommit
         $objUngovernedApplicability = Get-PushGovernedPathApplicability `
@@ -6669,21 +7100,23 @@ if ($SelfTest) {
     if ($arrNewRefRangeFailures.Count -ne 0) {
         throw "Valid new-ref metadata range failed: $($arrNewRefRangeFailures -join '; ')"
     }
-    $objExistingHistoryPush = Get-MetadataEventRevisionContext `
-        -RepositoryRootPath $strRepositoryRootPath -EventName 'push' `
-        -PullRequestAction '' -BaseRevision $strNewRefZeroRevision `
-        -HeadRevision $strNewRefTestHead -IsNewRefRange $true `
-        -PreviousHeadRevision '' -EventHeadRevision $strNewRefTestHead `
-        -EventHeadDistinct 'false'
-    $objIntroducedHeadPush = Get-MetadataEventRevisionContext `
-        -RepositoryRootPath $strRepositoryRootPath -EventName 'push' `
-        -PullRequestAction '' -BaseRevision $strNewRefZeroRevision `
-        -HeadRevision $strNewRefTestHead -IsNewRefRange $true `
-        -PreviousHeadRevision '' -EventHeadRevision $strNewRefTestHead `
-        -EventHeadDistinct 'true'
-    if ($objExistingHistoryPush.FreshnessBaseRevision -cne '' -or
-        $objIntroducedHeadPush.FreshnessBaseRevision -cne "$strNewRefTestHead`^") {
-        throw 'New-ref base selection changed.'
+    $boolUnintroducedNewRefHeadRejected = $false
+    try {
+        [void](Get-MetadataEventRevisionContext `
+                -RepositoryRootPath $strRepositoryRootPath -EventName 'push' `
+                -PullRequestAction '' -BaseRevision $strNewRefZeroRevision `
+                -HeadRevision $strNewRefTestHead -IsNewRefRange $true `
+                -PreviousHeadRevision '' -EventHeadRevision $strNewRefTestHead `
+                -EventHeadDistinct 'false')
+    }
+    catch {
+        $boolUnintroducedNewRefHeadRejected = $_.Exception.Message.Contains(
+            'must be authenticated as introduced',
+            [StringComparison]::Ordinal
+        )
+    }
+    if (-not $boolUnintroducedNewRefHeadRejected) {
+        throw 'A new-ref head without introduced evidence did not fail closed.'
     }
     if (@(Get-CurrentInputMetadataFreshnessFailure -Name 'AGENTS.md' `
             -CurrentContent $strSameDayRevisionJump -BaseContent $strAgentsContent `
@@ -7092,11 +7525,14 @@ if ($SelfTest) {
             throw 'A marker-bearing merge imported noncompliant side content.'
         }
         & git -C $strMergeFixtureRoot read-tree $strMergeBaseTree
+        $strMergeTopicVersion = '**Version:** ' +
+            $objAgentsVersionMatch.Groups['Prefix'].Value +
+            $strMergeHistoricalDate.Replace('-', '') + '.1'
         $strMergeTopicContent = $strMergeBaseContent.Replace(
             $strMergeBaseVersion,
-            '**Version:** ' + $objAgentsVersionMatch.Groups['Prefix'].Value +
-                $strMergeHistoricalDate.Replace('-', '') + '.1'
-        ) + [Environment]::NewLine + 'Inherited merge fixture.'
+            $strMergeTopicVersion
+        ) + [Environment]::NewLine + 'Inherited merge fixture.' +
+            [Environment]::NewLine
         [System.IO.File]::WriteAllText(
             [System.IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
             $strMergeTopicContent,
@@ -7112,8 +7548,19 @@ if ($SelfTest) {
             -Parents @($strMergeBaseCommit) `
             -Timestamp ($strMergeHistoricalDate + 'T12:00:00Z') `
             -Message 'merge fixture topic'
+        & git -C $strMergeFixtureRoot read-tree $strMergeBaseTree
+        $strAdvancedBaseContent = $strMergeBaseContent +
+            [Environment]::NewLine + 'Base-only governed fixture.' +
+            [Environment]::NewLine
+        [System.IO.File]::WriteAllText(
+            [System.IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
+            $strAdvancedBaseContent,
+            $objUtf8WithoutBom
+        )
+        & git -C $strMergeFixtureRoot add -- 'AGENTS.md'
+        $strAdvancedBaseTree = ([string](& git -C $strMergeFixtureRoot write-tree)).Trim()
         $strAdvancedBaseCommit = & $scriptBlockCreateMergeFixtureCommit `
-            -Tree $strMergeBaseTree `
+            -Tree $strAdvancedBaseTree `
             -Parents @($strMergeBaseCommit) `
             -Timestamp ($strMergeCurrentDate + 'T00:00:00Z') `
             -Message 'merge fixture advanced base'
@@ -7262,8 +7709,22 @@ if ($SelfTest) {
             throw 'A divergent governed replacement bypassed current-event freshness.'
         }
 
+        & git -C $strMergeFixtureRoot read-tree $strAdvancedBaseTree
+        $strRebasedTopicContent = $strAdvancedBaseContent.Replace(
+            $strMergeBaseVersion,
+            $strMergeTopicVersion
+        ) +
+            [Environment]::NewLine + 'Inherited merge fixture.' +
+            [Environment]::NewLine
+        [System.IO.File]::WriteAllText(
+            [System.IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
+            $strRebasedTopicContent,
+            $objUtf8WithoutBom
+        )
+        & git -C $strMergeFixtureRoot add -- 'AGENTS.md'
+        $strRebasedTopicTree = ([string](& git -C $strMergeFixtureRoot write-tree)).Trim()
         $strRebasedTopicCommit = & $scriptBlockCreateMergeFixtureCommit `
-            -Tree $strMergeTopicTree -Parents @($strAdvancedBaseCommit) `
+            -Tree $strRebasedTopicTree -Parents @($strAdvancedBaseCommit) `
             -Timestamp ($strMergeCurrentDate + 'T00:00:45Z') `
             -Message 'merge fixture rebased topic'
         $objRebasedSynchronizeContext = Get-MetadataEventRevisionContext `
@@ -7279,18 +7740,49 @@ if ($SelfTest) {
                 $strAdvancedBaseCommit -or
             $objRebasedSynchronizeContext.FreshnessBaseRevision -cne
                 $strMergeTopicCommit) {
-            throw 'A rebased topic did not retain old-tree freshness comparison.'
+            throw 'A rebased topic did not retain authenticated topic delta context.'
         }
-        $arrNoRenderedChangeFailures = @(
-            Get-CurrentInputMetadataFreshnessFailure `
-                -Name 'AGENTS.md' `
-                -CurrentContent $strMergeTopicContent `
-                -BaseContent $strMergeTopicContent `
-                -TrustedEventUtcDate $strMergeCurrentDate
+        if (-not (Test-TopicOwnedGitPathDeltaEqual `
+                    -RepositoryRootPath $strMergeFixtureRoot `
+                    -PreviousBaseRevision $objRebasedSynchronizeContext.PreviousTopicBaseRevision `
+                    -PreviousHeadRevision $objRebasedSynchronizeContext.PreviousTopicHeadRevision `
+                    -CurrentBaseRevision $objRebasedSynchronizeContext.CurrentTopicBaseRevision `
+                    -CurrentHeadRevision $objRebasedSynchronizeContext.CurrentTopicHeadRevision `
+                    -RepositoryRelativePath 'AGENTS.md')) {
+            throw 'A base-only governed rebase was falsely attributed to the topic.'
+        }
+        $strChangedRebasedTopicContent = $strRebasedTopicContent.Replace(
+            $strMergeHistoricalDate.Replace('-', '') + '.1',
+            $strMergeHistoricalDate.Replace('-', '') + '.2'
         )
-        if ($arrNoRenderedChangeFailures.Count -ne 0) {
-            throw 'A divergent replacement with the same rendered tree was redated.'
+        [System.IO.File]::WriteAllText(
+            [System.IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
+            $strChangedRebasedTopicContent,
+            $objUtf8WithoutBom
+        )
+        & git -C $strMergeFixtureRoot add -- 'AGENTS.md'
+        $strChangedRebasedTopicTree = ([string](
+                & git -C $strMergeFixtureRoot write-tree
+            )).Trim()
+        $strChangedRebasedTopicCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strChangedRebasedTopicTree -Parents @($strAdvancedBaseCommit) `
+            -Timestamp ($strMergeCurrentDate + 'T00:00:50Z') `
+            -Message 'merge fixture changed rebased topic'
+        if (Test-TopicOwnedGitPathDeltaEqual `
+                -RepositoryRootPath $strMergeFixtureRoot `
+                -PreviousBaseRevision $objRebasedSynchronizeContext.PreviousTopicBaseRevision `
+                -PreviousHeadRevision $objRebasedSynchronizeContext.PreviousTopicHeadRevision `
+                -CurrentBaseRevision $strAdvancedBaseCommit `
+                -CurrentHeadRevision $strChangedRebasedTopicCommit `
+                -RepositoryRelativePath 'AGENTS.md') {
+            throw 'An actual rebased topic delta change was ignored.'
         }
+        & git -C $strMergeFixtureRoot read-tree $strRebasedTopicTree
+        [System.IO.File]::WriteAllText(
+            [System.IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
+            $strRebasedTopicContent,
+            $objUtf8WithoutBom
+        )
 
         $boolMissingPreviousHeadRejected = $false
         try {
@@ -7637,6 +8129,10 @@ if ($SelfTest) {
                 'toJSON(github.event.head_commit.distinct)',
                 '-EventHeadRevision $env:AGENT_INSTRUCTION_EVENT_HEAD_REVISION',
                 '-EventHeadDistinct $env:AGENT_INSTRUCTION_EVENT_HEAD_DISTINCT',
+                'github.event.size',
+                'toJSON(github.event.commits.*.id)',
+                '-NewRefCommitCount $env:AGENT_INSTRUCTION_NEW_REF_COMMIT_COUNT',
+                '-NewRefCommitEvidenceJson $env:AGENT_INSTRUCTION_NEW_REF_COMMITS_JSON',
                 'persist-credentials: false',
                 'ref: ${{ github.sha }}'
             )) {
@@ -7653,10 +8149,8 @@ if ($SelfTest) {
             $Content -cmatch '"\+[^" ]+:') {
             $listFailures.Add('Event-data fetches must not force a destination ref.')
         }
-        if ($Content.Contains(
-                'github.event.commits.*.id',
-                [StringComparison]::Ordinal
-            )) {
+        if ($Content -cmatch
+            '(?s)AGENT_INSTRUCTION_EVENT_HEAD_REVISION:.{0,300}github\.event\.commits\.\*\.id') {
             $listFailures.Add(
                 'The bounded push commits array must not decide head introduction.'
             )
