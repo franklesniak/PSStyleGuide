@@ -2151,19 +2151,22 @@ function ConvertTo-MetadataComparisonText {
     )
 
     $arrNormalizedLines = [regex]::Split($Content, '\r\n|\r|\n')
-    $intVersionLineIndex = [int]$MetadataContext.VersionLineIndex
     $intUpdatedLineIndex = [int]$MetadataContext.UpdatedLineIndex
-    if ($intVersionLineIndex -lt 0 -or
-        $intVersionLineIndex -ge $arrNormalizedLines.Count -or
-        $arrNormalizedLines[$intVersionLineIndex] -cnotmatch
-        '^\*\*Version:\*\* \d+\.\d+\.\d{8}\.\d+$' -or
-        $intUpdatedLineIndex -lt 0 -or
+    if ($intUpdatedLineIndex -lt 0 -or
         $intUpdatedLineIndex -ge $arrNormalizedLines.Count -or
         $arrNormalizedLines[$intUpdatedLineIndex] -cnotmatch
         '^- \*\*Last Updated:\*\* \d{4}-\d{2}-\d{2}$') {
         throw 'The metadata comparison received an invalid header field index.'
     }
-    $arrNormalizedLines[$intVersionLineIndex] = '**Version:** <metadata-version>'
+    $intVersionLineIndex = [int]$MetadataContext.VersionLineIndex
+    if ($intVersionLineIndex -ge 0) {
+        if ($intVersionLineIndex -ge $arrNormalizedLines.Count -or
+            $arrNormalizedLines[$intVersionLineIndex] -cnotmatch
+            '^\*\*Version:\*\* \d+\.\d+\.\d{8}\.\d+$') {
+            throw 'The metadata comparison received an invalid Version field index.'
+        }
+        $arrNormalizedLines[$intVersionLineIndex] = '**Version:** <metadata-version>'
+    }
     $arrNormalizedLines[$intUpdatedLineIndex] = '- **Last Updated:** <metadata-date>'
 
     $listNormalizedLines = [Collections.Generic.List[string]]::new()
@@ -2280,7 +2283,7 @@ function Get-CurrentInputMetadataFreshnessFailure {
 
 function Get-LastUpdatedMetadataFreshnessFailure {
     # .SYNOPSIS
-    # Finds stale Last Updated metadata on a document without a Version field.
+    # Validates metadata and freshness without a Version field.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -2290,41 +2293,68 @@ function Get-LastUpdatedMetadataFreshnessFailure {
         [Parameter(Mandatory)][AllowEmptyString()][string] $TrustedEventUtcDate
     )
 
-    $objCurrentMatch = [regex]::Match(
-        $CurrentContent,
-        '(?m)^- \*\*Last Updated:\*\* (?<Date>\d{4}-\d{2}-\d{2})$'
-    )
-    if (-not $objCurrentMatch.Success -or
-        [regex]::Matches(
-            $CurrentContent,
-            '(?m)^- \*\*Last Updated:\*\* \d{4}-\d{2}-\d{2}$'
-        ).Count -ne 1) {
-        Write-Output "$Name must contain one exact Last Updated field."
+    $objCurrentMetadata = Get-DocumentMetadataContext `
+        -Content $CurrentContent -RequiresVersion $false
+    if ($null -ne $objCurrentMetadata.Failure) {
+        Write-Output "$Name $($objCurrentMetadata.Failure)"
         return
     }
+    $strCurrentDate = $objCurrentMetadata.UpdatedDate
+    if (-not (Test-MetadataCalendarDatePair `
+                -VersionDate $strCurrentDate.Replace('-', '') `
+                -UpdatedDate $strCurrentDate)) {
+        Write-Output "$Name Last Updated must contain one real calendar date."
+        return
+    }
+
     $boolRenderedContentChanged = $true
-    if ($BaseContent) {
-        $objBaseMatch = [regex]::Match(
-            $BaseContent,
-            '(?m)^- \*\*Last Updated:\*\* (?<Date>\d{4}-\d{2}-\d{2})$'
+    $objBaseMetadata = $null
+    if ($null -ne $BaseContent) {
+        $objBaseMetadata = Get-DocumentMetadataContext `
+            -Content $BaseContent -RequiresVersion $false
+        if ($null -ne $objBaseMetadata.Failure) {
+            Write-Output "The parent of $Name $($objBaseMetadata.Failure)"
+            return
+        }
+        $strBaseDate = $objBaseMetadata.UpdatedDate
+        if (-not (Test-MetadataCalendarDatePair `
+                    -VersionDate $strBaseDate.Replace('-', '') `
+                    -UpdatedDate $strBaseDate)) {
+            Write-Output "The parent of $Name Last Updated must contain one real calendar date."
+            return
+        }
+        $boolRenderedContentChanged = (
+            (ConvertTo-MetadataComparisonText -Content $CurrentContent `
+                -MetadataContext $objCurrentMetadata) -cne
+            (ConvertTo-MetadataComparisonText -Content $BaseContent `
+                -MetadataContext $objBaseMetadata)
         )
-        if ($objBaseMatch.Success) {
-            $boolRenderedContentChanged =
-                $CurrentContent.Remove(
-                    $objCurrentMatch.Index,
-                    $objCurrentMatch.Length
-                ).Insert($objCurrentMatch.Index, '- **Last Updated:** <metadata-date>') -cne
-                $BaseContent.Remove(
-                    $objBaseMatch.Index,
-                    $objBaseMatch.Length
-                ).Insert($objBaseMatch.Index, '- **Last Updated:** <metadata-date>')
+        if ([string]::CompareOrdinal(
+                $strCurrentDate,
+                $strBaseDate
+            ) -lt 0) {
+            Write-Output (
+                "$Name Last Updated must not move backward from " +
+                "$strBaseDate to $strCurrentDate."
+            )
+            return
         }
     }
-    if ($boolRenderedContentChanged -and
-        $objCurrentMatch.Groups['Date'].Value -cne $TrustedEventUtcDate) {
+    if (-not $boolRenderedContentChanged) {
+        return
+    }
+    if (-not [string]::IsNullOrEmpty($TrustedEventUtcDate) -and
+        $strCurrentDate -cne $TrustedEventUtcDate) {
         Write-Output (
             "$Name Last Updated must be $TrustedEventUtcDate after the current " +
             'event input changes rendered content.'
+        )
+    }
+    elseif ($null -ne $objBaseMetadata -and
+        $strCurrentDate -ceq $strBaseDate) {
+        Write-Output (
+            "$Name Last Updated must advance from $strBaseDate " +
+            'after a rendered-content change when no trusted event date is available.'
         )
     }
 }
@@ -2415,7 +2445,7 @@ function Test-ProhibitedClaudeLocalPath {
     [OutputType([bool])]
     param([Parameter(Mandatory)][string] $RepositoryRelativePath)
 
-    return $RepositoryRelativePath -cmatch '^(?:[^/]+/)*CLAUDE\.local\.md$'
+    return $RepositoryRelativePath -imatch '^(?:[^/]+/)*CLAUDE\.local\.md$'
 }
 
 function Get-MetadataEventRevisionContext {
@@ -2474,11 +2504,8 @@ function Get-MetadataEventRevisionContext {
             if ($BaseRevision -notmatch $strZeroObjectIdPattern) {
                 throw 'A new-ref push metadata event requires an all-zero base.'
             }
-            if (-not $boolHeadIntroducedByPush) {
-                throw 'A new-ref push head must be authenticated as introduced by the push.'
-            }
             $intNewRefCommitCount = 0
-            if ($NewRefCommitCount -cnotmatch '^[1-9][0-9]*$' -or
+            if ($NewRefCommitCount -cnotmatch '^(?:0|[1-9][0-9]*)$' -or
                 -not [int]::TryParse($NewRefCommitCount, [ref]$intNewRefCommitCount)) {
                 throw 'A new-ref push requires a valid authenticated commit count.'
             }
@@ -2496,6 +2523,14 @@ function Get-MetadataEventRevisionContext {
             }
             if ($arrNewRefCommitEvidence.Count -ne $intNewRefCommitCount) {
                 throw 'The authenticated new-ref commit evidence is incomplete.'
+            }
+            if (-not $boolHeadIntroducedByPush) {
+                if ($intNewRefCommitCount -ne 0) {
+                    throw 'A non-distinct new-ref push must report zero introduced commits.'
+                }
+            }
+            elseif ($intNewRefCommitCount -eq 0) {
+                throw 'Distinct new-ref push requires an introduced commit.'
             }
             $strPreviousEvidenceCommit = ''
             $strFreshnessBase = ''
@@ -2527,13 +2562,14 @@ function Get-MetadataEventRevisionContext {
                 }
                 $strPreviousEvidenceCommit = $strEvidenceCommit
             }
-            if ($strPreviousEvidenceCommit -cne $HeadRevision) {
+            if ($boolHeadIntroducedByPush -and
+                $strPreviousEvidenceCommit -cne $HeadRevision) {
                 throw 'The authenticated new-ref commit evidence does not end at the event head.'
             }
             return [pscustomobject]@{
                 HistoryBaseRevision = $BaseRevision
                 FreshnessBaseRevision = $strFreshnessBase
-                EvaluateFreshness = $true
+                EvaluateFreshness = $boolHeadIntroducedByPush
                 PreviousTopicBaseRevision = ''
                 PreviousTopicHeadRevision = ''
                 CurrentTopicBaseRevision = ''
@@ -3115,29 +3151,21 @@ function Get-DocumentMetadataContext {
     # Gets validated document-level metadata context.
     #
     # .DESCRIPTION
-    # Locates Version and Last Updated in the parsed document header.
+    # Locates the required fields in the parsed document header.
     #
     # .PARAMETER Content
     # The governed Markdown document text.
     #
-    # .EXAMPLE
-    # Get-DocumentMetadataContext -Content $strAgentsContent
-    #
-    # # Returns validated Version and Last Updated values or a failure reason.
-    #
-    # .INPUTS
-    # None. You can't pipe objects to this function.
-    #
     # .OUTPUTS
     # [pscustomobject] The metadata values and structural validation result.
-    #
-    # .NOTES
-    # Private helper; no positional parameters. Version: 1.2.20260820.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
         [Parameter(Mandatory)]
-        [string] $Content
+        [string] $Content,
+
+        [Parameter()]
+        [bool] $RequiresVersion = $true
     )
 
     $arrLines = [regex]::Split($Content, '\r\n|\r|\n')
@@ -3211,33 +3239,33 @@ function Get-DocumentMetadataContext {
     }
 
     $intH1Index = $listH1Indices[0]
-    if ($listVersionRecords.Count -ne 1 -or
-        $listVersionRecords[0].BlockIndex -ne ($intH1Index + 1) -or
-        $listVersionRecords[0].Block.End -ne ($listVersionRecords[0].Block.Start + 1) -or
-        ($listVersionRecords[0].Block.Start - $intBodyStart) -ge 30) {
-        return [pscustomobject]@{
-            Failure = 'must contain one exact document-level Version paragraph immediately after the H1 and within the first 30 body lines.'
-            VersionDate = $null
-            UpdatedDate = $null
-            Revision = $null
+    $intMetadataPredecessorIndex = $intH1Index
+    $objVersionMatch = $null
+    if ($RequiresVersion) {
+        if ($listVersionRecords.Count -eq 1 -and
+            $listVersionRecords[0].BlockIndex -eq ($intH1Index + 1) -and
+            $listVersionRecords[0].Block.End -eq ($listVersionRecords[0].Block.Start + 1) -and
+            ($listVersionRecords[0].Block.Start - $intBodyStart) -lt 30) {
+            $objVersionMatch = [regex]::Match(
+                $arrLines[$listVersionRecords[0].Block.Start], $strVersionPattern)
         }
-    }
-    $objVersionMatch = [regex]::Match(
-        $arrLines[$listVersionRecords[0].Block.Start],
-        $strVersionPattern
-    )
-    if (-not $objVersionMatch.Success) {
-        return [pscustomobject]@{
-            Failure = 'must contain one exact document-level Version paragraph immediately after the H1 and within the first 30 body lines.'
-            VersionDate = $null
-            UpdatedDate = $null
-            Revision = $null
+        if ($null -eq $objVersionMatch -or -not $objVersionMatch.Success) {
+            return [pscustomobject]@{
+                Failure = 'must contain one exact document-level Version paragraph immediately after the H1 and within the first 30 body lines.'
+                VersionDate = $null
+                UpdatedDate = $null
+                Revision = $null
+            }
         }
+        $intMetadataPredecessorIndex = $listVersionRecords[0].BlockIndex
     }
 
+    $strMetadataPredecessor = if ($RequiresVersion) {'Version'} else {'the H1'}
+    $strMetadataPlacementFailure = 'must place Metadata as the first level-two heading ' +
+        "immediately after $strMetadataPredecessor and within the first 30 body lines."
     if ($listH2Indices.Count -eq 0) {
         return [pscustomobject]@{
-            Failure = 'must place Metadata as the first level-two heading immediately after Version and within the first 30 body lines.'
+            Failure = $strMetadataPlacementFailure
             VersionDate = $null
             UpdatedDate = $null
             Revision = $null
@@ -3252,10 +3280,10 @@ function Get-DocumentMetadataContext {
     ).Count
     if ($objMetadataBlock.Text -cne 'Metadata' -or
         $intMetadataHeadingCount -ne 1 -or
-        $intMetadataIndex -ne ($listVersionRecords[0].BlockIndex + 1) -or
+        $intMetadataIndex -ne ($intMetadataPredecessorIndex + 1) -or
         ($objMetadataBlock.Start - $intBodyStart) -ge 30) {
         return [pscustomobject]@{
-            Failure = 'must place Metadata as the first level-two heading immediately after Version and within the first 30 body lines.'
+            Failure = $strMetadataPlacementFailure
             VersionDate = $null
             UpdatedDate = $null
             Revision = $null
@@ -3344,10 +3372,10 @@ function Get-DocumentMetadataContext {
 
     return [pscustomobject]@{
         Failure = $null
-        VersionDate = $objVersionMatch.Groups['Date'].Value
+        VersionDate = if ($RequiresVersion) {$objVersionMatch.Groups['Date'].Value} else {$null}
         UpdatedDate = $objUpdatedMatch.Groups['Date'].Value
-        Revision = $objVersionMatch.Groups['Revision'].Value
-        VersionLineIndex = $listVersionRecords[0].Block.Start
+        Revision = if ($RequiresVersion) {$objVersionMatch.Groups['Revision'].Value} else {$null}
+        VersionLineIndex = if ($RequiresVersion) {$listVersionRecords[0].Block.Start} else {-1}
         UpdatedLineIndex = $hashtableFieldLineIndices['Last Updated']
     }
 }
@@ -5461,7 +5489,9 @@ if ($SelfTest) {
     }
     foreach ($strProhibitedClaudeLocalPath in @(
             'CLAUDE.local.md',
-            'tools/CLAUDE.local.md'
+            'tools/CLAUDE.local.md',
+            'CLAUDE.LOCAL.md',
+            'tools/claude.Local.MD'
         )) {
         if (-not (Test-ProhibitedClaudeLocalPath `
                     -RepositoryRelativePath $strProhibitedClaudeLocalPath) -or
@@ -5484,6 +5514,9 @@ if ($SelfTest) {
                 ))) {
             throw "Tracked Claude local memory was not explicitly rejected: $strProhibitedClaudeLocalPath"
         }
+    }
+    if (Test-ProhibitedClaudeLocalPath -RepositoryRelativePath 'CLAUDE.local.md.bak') {
+        throw 'A Claude local-memory near miss was prohibited.'
     }
     $strGitIgnoreContent = [IO.File]::ReadAllText(
         [IO.Path]::Combine($strRepositoryRootPath, '.gitignore')
@@ -5654,10 +5687,48 @@ if ($SelfTest) {
         throw 'A cataloged nested GEMINI.md bypassed rendered metadata transition.'
     }
 
-    $arrRequiredFieldNames = @('Status', 'Owner', 'Scope')
+    $arrUnversionedMetadataContexts = @($listGovernedDocumentContexts |
+            Where-Object { $_.RequiresMetadata -and -not $_.RequiresVersion })
+    foreach ($objDocumentContext in $arrUnversionedMetadataContexts) {
+        $objMetadata = Get-DocumentMetadataContext -Content $objDocumentContext.Content `
+            -RequiresVersion $false
+        if ($null -ne $objMetadata.Failure) {
+            throw "Invalid unversioned metadata: $($objDocumentContext.Path)"
+        }
+        $strMutation = $objDocumentContext.Content.Replace('## Metadata', '')
+        $arrFailures = @(Get-LastUpdatedMetadataFreshnessFailure -Name `
+                $objDocumentContext.Path -CurrentContent $strMutation -BaseContent `
+                $objDocumentContext.Content -TrustedEventUtcDate $objMetadata.UpdatedDate)
+        if (-not ($arrFailures -match 'first level-two heading immediately after the H1')) {
+            throw "$($objDocumentContext.Path) accepted missing Metadata."
+        }
+    }
+    $objUnversionedDocument = $arrUnversionedMetadataContexts[0]
+    $objUnversionedMetadata = Get-DocumentMetadataContext `
+        -Content $objUnversionedDocument.Content -RequiresVersion $false
+    $strRenderedMutation = $objUnversionedDocument.Content + "`nRendered change.`n"
+    $arrNoDateFailures = @(Get-LastUpdatedMetadataFreshnessFailure `
+            -Name $objUnversionedDocument.Path -CurrentContent $strRenderedMutation `
+            -BaseContent $objUnversionedDocument.Content -TrustedEventUtcDate '')
+    if (-not ($arrNoDateFailures -match 'must advance from')) {
+        throw 'No-date rendered change did not require a date advance.'
+    }
+    $strNextDate = ([datetime]::ParseExact($objUnversionedMetadata.UpdatedDate,
+            'yyyy-MM-dd', [Globalization.CultureInfo]::InvariantCulture)).AddDays(1).ToString('yyyy-MM-dd')
+    $strAdvancedMutation = $strRenderedMutation.Replace(
+        "- **Last Updated:** $($objUnversionedMetadata.UpdatedDate)",
+        "- **Last Updated:** $strNextDate")
+    if (@(Get-LastUpdatedMetadataFreshnessFailure `
+            -Name $objUnversionedDocument.Path -CurrentContent $strAdvancedMutation `
+            -BaseContent $objUnversionedDocument.Content `
+            -TrustedEventUtcDate '').Count -ne 0) {
+        throw 'An advanced unversioned date was rejected.'
+    }
+
+    $arrRequiredFieldNames = @('Status', 'Owner', 'Last Updated', 'Scope')
     foreach ($objDocumentContext in @(
             $listGovernedDocumentContexts |
-                Where-Object { $_.RequiresMetadata -and $_.RequiresVersion }
+                Where-Object { $_.RequiresMetadata }
         )) {
         foreach ($strFieldName in $arrRequiredFieldNames) {
             $objFieldLineMatch = [regex]::Match(
@@ -5671,12 +5742,19 @@ if ($SelfTest) {
                 $objFieldLineMatch.Index,
                 $objFieldLineMatch.Length
             )
-            $arrFieldFailures = @(Get-DocumentMetadataTransitionFailure `
-                    -Name $objDocumentContext.Path `
-                    -CurrentContent $strFieldDeletion `
-                    -ParentContent $objDocumentContext.Content `
-                    -ExpectedUtcDate $objDocumentContext.ExpectedUtcDate `
-                    -IsNewDocumentTransition $false)
+            $arrFieldFailures = if ($objDocumentContext.RequiresVersion) {
+                @(Get-DocumentMetadataTransitionFailure -Name $objDocumentContext.Path `
+                        -CurrentContent $strFieldDeletion `
+                        -ParentContent $objDocumentContext.Content `
+                        -ExpectedUtcDate $objDocumentContext.ExpectedUtcDate `
+                        -IsNewDocumentTransition $false)
+            }
+            else {
+                @(Get-LastUpdatedMetadataFreshnessFailure -Name $objDocumentContext.Path `
+                        -CurrentContent $strFieldDeletion `
+                        -BaseContent $objDocumentContext.Content `
+                        -TrustedEventUtcDate $objDocumentContext.ExpectedUtcDate)
+            }
             $strExpectedFieldFailure = "$($objDocumentContext.Path) must contain " +
                 "one exact top-level $strFieldName list item"
             if (-not ($arrFieldFailures -match [regex]::Escape(
@@ -6659,6 +6737,19 @@ if ($SelfTest) {
             -not $objMultiCommitNewRefContext.EvaluateFreshness) {
             throw 'Complete multi-commit new-ref evidence did not select its full boundary.'
         }
+        $strZeroRevision = '0' * 40
+        $objExistingCommitNewRefContext = Get-MetadataEventRevisionContext `
+            -RepositoryRootPath $strPushFixtureRoot -EventName 'push' -PullRequestAction '' `
+            -BaseRevision $strZeroRevision -HeadRevision $strPushMultiCommit `
+            -IsNewRefRange $true -PreviousHeadRevision '' -EventHeadRevision $strPushMultiCommit `
+            -EventHeadDistinct 'false' `
+            -NewRefCommitCount '0' -NewRefCommitEvidenceJson '[]'
+        if ($objExistingCommitNewRefContext.HistoryBaseRevision -cne
+                $strZeroRevision -or
+            $objExistingCommitNewRefContext.FreshnessBaseRevision -cne '' -or
+            $objExistingCommitNewRefContext.EvaluateFreshness) {
+            throw 'Existing new-ref context is invalid.'
+        }
         $boolIncompleteNewRefEvidenceRejected = $false
         try {
             [void](Get-MetadataEventRevisionContext `
@@ -6797,23 +6888,25 @@ if ($SelfTest) {
     if ($arrNewRefRangeFailures.Count -ne 0) {
         throw "Valid new-ref metadata range failed: $($arrNewRefRangeFailures -join '; ')"
     }
-    $boolUnintroducedNewRefHeadRejected = $false
+    $boolInconsistentNewRefEvidenceRejected = $false
     try {
         [void](Get-MetadataEventRevisionContext `
                 -RepositoryRootPath $strRepositoryRootPath -EventName 'push' `
                 -PullRequestAction '' -BaseRevision $strNewRefZeroRevision `
                 -HeadRevision $strNewRefTestHead -IsNewRefRange $true `
                 -PreviousHeadRevision '' -EventHeadRevision $strNewRefTestHead `
-                -EventHeadDistinct 'false')
+                -EventHeadDistinct 'false' -NewRefCommitCount '1' `
+                -NewRefCommitEvidenceJson (ConvertTo-Json -Compress `
+                    -InputObject @($strNewRefTestHead)))
     }
     catch {
-        $boolUnintroducedNewRefHeadRejected = $_.Exception.Message.Contains(
-            'must be authenticated as introduced',
+        $boolInconsistentNewRefEvidenceRejected = $_.Exception.Message.Contains(
+            'must report zero introduced commits',
             [StringComparison]::Ordinal
         )
     }
-    if (-not $boolUnintroducedNewRefHeadRejected) {
-        throw 'A new-ref head without introduced evidence did not fail closed.'
+    if (-not $boolInconsistentNewRefEvidenceRejected) {
+        throw 'Inconsistent new-ref evidence did not fail closed.'
     }
     if (@(Get-CurrentInputMetadataFreshnessFailure -Name 'AGENTS.md' `
             -CurrentContent $strSameDayRevisionJump -BaseContent $strAgentsContent `
