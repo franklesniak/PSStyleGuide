@@ -10,6 +10,7 @@ on:
       - opened
       - reopened
       - synchronize
+      - edited
 
 permissions:
   contents: read
@@ -17,6 +18,10 @@ permissions:
 jobs:
   validate-agent-instructions:
     name: Validate agent instructions
+    if: >-
+      github.event_name != 'pull_request_target' ||
+      github.event.action != 'edited' ||
+      github.event.changes.base.ref.from != ''
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -212,6 +217,10 @@ jobs:
           AGENT_INSTRUCTION_PREVIOUS_HEAD_REVISION: >-
             ${{ github.event_name == 'pull_request_target' &&
               github.event.action == 'synchronize' && github.event.before || '' }}
+          AGENT_INSTRUCTION_PULL_REQUEST_BASE_CHANGED: >-
+            ${{ github.event_name == 'pull_request_target' &&
+              github.event.action == 'edited' &&
+              github.event.changes.base.ref.from != '' && 'true' || '' }}
           AGENT_INSTRUCTION_EVENT_HEAD_REVISION: >-
             ${{ github.event_name == 'push' &&
               github.event.head_commit.id || '' }}
@@ -230,5 +239,6 @@ jobs:
           -EventName $env:AGENT_INSTRUCTION_EVENT_NAME
           -PullRequestAction $env:AGENT_INSTRUCTION_PULL_REQUEST_ACTION
           -PreviousHeadRevision $env:AGENT_INSTRUCTION_PREVIOUS_HEAD_REVISION
+          -PullRequestBaseChanged $env:AGENT_INSTRUCTION_PULL_REQUEST_BASE_CHANGED
           -EventHeadRevision $env:AGENT_INSTRUCTION_EVENT_HEAD_REVISION
           -EventHeadDistinct $env:AGENT_INSTRUCTION_EVENT_HEAD_DISTINCT

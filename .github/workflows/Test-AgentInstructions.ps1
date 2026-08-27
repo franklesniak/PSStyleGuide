@@ -38,10 +38,14 @@
 # Identifies the authenticated GitHub event that supplied the optional range.
 #
 # .PARAMETER PullRequestAction
-# Identifies an opened, reopened, or synchronize pull request target event.
+# Identifies an opened, reopened, synchronize, or base-changing edited pull
+# request target event.
 #
 # .PARAMETER PreviousHeadRevision
 # Identifies the previous topic head for a synchronize event.
+#
+# .PARAMETER PullRequestBaseChanged
+# Contains true only when an edited pull request payload proves a base change.
 #
 # .PARAMETER EventHeadRevision
 # Identifies the independently expanded push head commit from the webhook.
@@ -109,6 +113,10 @@ param(
     [Parameter()]
     [AllowEmptyString()]
     [string] $PreviousHeadRevision = '',
+
+    [Parameter()]
+    [AllowEmptyString()]
+    [string] $PullRequestBaseChanged = '',
 
     [Parameter()]
     [AllowEmptyString()]
@@ -2399,6 +2407,7 @@ function Get-MetadataEventRevisionContext {
         [Parameter(Mandatory)][string] $HeadRevision,
         [Parameter(Mandatory)][bool] $IsNewRefRange,
         [Parameter(Mandatory)][AllowEmptyString()][string] $PreviousHeadRevision,
+        [Parameter()][AllowEmptyString()][string] $PullRequestBaseChanged = '',
         [Parameter(Mandatory)][AllowEmptyString()][string] $EventHeadRevision,
         [Parameter(Mandatory)][AllowEmptyString()][string] $EventHeadDistinct
     )
@@ -2416,6 +2425,7 @@ function Get-MetadataEventRevisionContext {
 
     if ($EventName -ceq 'push') {
         if (-not [string]::IsNullOrEmpty($PullRequestAction) -or
+            -not [string]::IsNullOrEmpty($PullRequestBaseChanged) -or
             -not [string]::IsNullOrEmpty($PreviousHeadRevision)) {
             throw 'A push metadata event must not supply pull request fields.'
         }
@@ -2477,8 +2487,16 @@ function Get-MetadataEventRevisionContext {
         -not [string]::IsNullOrEmpty($EventHeadDistinct)) {
         throw 'A pull request metadata event must not use push-only fields.'
     }
-    if ($PullRequestAction -cnotin @('opened', 'reopened', 'synchronize')) {
+    if ($PullRequestAction -cnotin @('opened', 'reopened', 'synchronize', 'edited')) {
         throw "Unsupported pull request metadata action: $PullRequestAction"
+    }
+    if ($PullRequestAction -ceq 'edited') {
+        if ($PullRequestBaseChanged -cne 'true') {
+            throw 'An edited pull request event requires trusted base-change proof.'
+        }
+    }
+    elseif (-not [string]::IsNullOrEmpty($PullRequestBaseChanged)) {
+        throw 'Only an edited pull request event may supply base-change proof.'
     }
     if ($BaseRevision -notmatch $strObjectIdPattern -or
         $BaseRevision -match $strZeroObjectIdPattern) {
@@ -2498,11 +2516,11 @@ function Get-MetadataEventRevisionContext {
 
     if ($PullRequestAction -cne 'synchronize') {
         if (-not [string]::IsNullOrEmpty($PreviousHeadRevision)) {
-            throw 'An opened or reopened pull request must not supply a previous head.'
+            throw 'A nonsynchronize pull request must not supply a previous head.'
         }
         return [pscustomobject]@{
             HistoryBaseRevision = $strHistoryBase
-            FreshnessBaseRevision = ''
+            FreshnessBaseRevision = $strHistoryBase
         }
     }
     if ($PreviousHeadRevision -notmatch $strObjectIdPattern -or
@@ -2581,6 +2599,85 @@ function Test-GovernedInstructionPath {
     )
 }
 
+function Test-GovernedInstructionPathCaseMismatch {
+    # .SYNOPSIS
+    # Detects noncanonical casing of one governed instruction path.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $RepositoryRelativePath,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $GovernedRootPaths
+    )
+
+    if (Test-GovernedInstructionPath `
+            -RepositoryRelativePath $RepositoryRelativePath `
+            -GovernedRootPaths $GovernedRootPaths) {
+        return $false
+    }
+    return (
+        $GovernedRootPaths -icontains $RepositoryRelativePath -or
+        $RepositoryRelativePath -imatch `
+            '^(?:(?!\.\.?/)[^/]+/)*GEMINI\.md$' -or
+        $RepositoryRelativePath -imatch `
+            '^(?:[^/]+/)*AGENTS(?:\.override)?\.md$' -or
+        $RepositoryRelativePath -imatch `
+            '^(?:[^/]+/)*CLAUDE\.md$' -or
+        $RepositoryRelativePath -imatch `
+            '^\.github/instructions/(?:[^/]+/)*[^/]+\.instructions\.md$' -or
+        $RepositoryRelativePath -imatch `
+            '^\.cursor/rules/(?:[^/]+/)*[^/]+\.mdc$' -or
+        $RepositoryRelativePath -imatch `
+            '^\.claude/rules/(?:[^/]+/)*[^/]+\.md$'
+    )
+}
+
+function Test-ExactPathCaseMismatch {
+    # .SYNOPSIS
+    # Detects noncanonical casing of one path from an exact reviewed set.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $RepositoryRelativePath,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $CanonicalPaths
+    )
+
+    return (
+        $CanonicalPaths -icontains $RepositoryRelativePath -and
+        $CanonicalPaths -cnotcontains $RepositoryRelativePath
+    )
+}
+
+function Test-GovernedInstructionInventoryPath {
+    # .SYNOPSIS
+    # Selects canonical governed instructions and case-folded near-matches.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $RepositoryRelativePath
+    )
+
+    return (
+        (Test-GovernedInstructionPath `
+            -RepositoryRelativePath $RepositoryRelativePath `
+            -GovernedRootPaths $script:arrGovernedInstructionRootPaths) -or
+        (Test-GovernedInstructionPathCaseMismatch `
+            -RepositoryRelativePath $RepositoryRelativePath `
+            -GovernedRootPaths $script:arrGovernedInstructionRootPaths) -or
+        (Test-ExactPathCaseMismatch `
+            -RepositoryRelativePath $RepositoryRelativePath `
+            -CanonicalPaths $script:arrPushGovernedExactPaths)
+    )
+}
+
 function Test-AgentInstructionWorkflowPath {
     # .SYNOPSIS
     # Tests whether one exact changed path requires agent validation.
@@ -2593,7 +2690,13 @@ function Test-AgentInstructionWorkflowPath {
 
     return (
         $script:arrPushGovernedExactPaths -ccontains $RepositoryRelativePath -or
+        (Test-ExactPathCaseMismatch `
+            -RepositoryRelativePath $RepositoryRelativePath `
+            -CanonicalPaths $script:arrPushGovernedExactPaths) -or
         (Test-GovernedInstructionPath `
+            -RepositoryRelativePath $RepositoryRelativePath `
+            -GovernedRootPaths $script:arrGovernedInstructionRootPaths) -or
+        (Test-GovernedInstructionPathCaseMismatch `
             -RepositoryRelativePath $RepositoryRelativePath `
             -GovernedRootPaths $script:arrGovernedInstructionRootPaths)
     )
@@ -4648,6 +4751,7 @@ if ($PushApplicabilityOnly) {
         -not [string]::IsNullOrEmpty($TrustedEventTimestamp) -or
         $EventName -cne 'push' -or
         -not [string]::IsNullOrEmpty($PullRequestAction) -or
+        -not [string]::IsNullOrEmpty($PullRequestBaseChanged) -or
         -not [string]::IsNullOrEmpty($PreviousHeadRevision) -or
         -not [string]::IsNullOrEmpty($EventHeadRevision) -or
         -not [string]::IsNullOrEmpty($EventHeadDistinct)) {
@@ -4711,6 +4815,7 @@ if (-not $boolEventRangeRequested -and
     (-not [string]::IsNullOrEmpty($TrustedEventTimestamp) -or
         -not [string]::IsNullOrEmpty($EventName) -or
         -not [string]::IsNullOrEmpty($PullRequestAction) -or
+        -not [string]::IsNullOrEmpty($PullRequestBaseChanged) -or
         -not [string]::IsNullOrEmpty($PreviousHeadRevision) -or
         $RangeIsDeletedRef -or
         -not [string]::IsNullOrEmpty($EventHeadRevision) -or
@@ -4732,6 +4837,7 @@ if ($boolEventRangeRequested -and
         -BaseRevision $RangeBaseRevision -HeadRevision $RangeHeadRevision `
         -IsNewRefRange ([bool]$RangeIsNewRef) `
         -PreviousHeadRevision $PreviousHeadRevision `
+        -PullRequestBaseChanged $PullRequestBaseChanged `
         -EventHeadRevision $EventHeadRevision `
         -EventHeadDistinct $EventHeadDistinct
     $strEventHistoryBaseRevision = $objMetadataEventRevisionContext.HistoryBaseRevision
@@ -4778,9 +4884,15 @@ if (-not [string]::IsNullOrEmpty($strValidatedInputRevision) -and
         $strCheckedOutRevision,
         [System.StringComparison]::OrdinalIgnoreCase
     )) {
+    $strTrustRootBaseRevision = if ($EventName -ceq 'pull_request_target') {
+        $strEventHistoryBaseRevision
+    }
+    else {
+        $RangeBaseRevision
+    }
     $arrTrustRootFailures = @(Get-TrustRootRangeMutationFailure `
             -RepositoryRootPath $strRepositoryRootPath `
-            -BaseRevision $RangeBaseRevision `
+            -BaseRevision $strTrustRootBaseRevision `
             -HeadRevision $RangeHeadRevision `
             -RepositoryRelativePath $script:arrTrustRootPaths)
     if ($arrTrustRootFailures.Count -gt 0) {
@@ -4798,9 +4910,8 @@ $arrTrackedRepositoryPaths = @(Read-GitTrackedPath `
 $arrTrackedGovernedInstructionPaths = @(
     $arrTrackedRepositoryPaths |
         Where-Object {
-            Test-GovernedInstructionPath `
-                -RepositoryRelativePath ([string] $_) `
-                -GovernedRootPaths $script:arrGovernedInstructionRootPaths
+            Test-GovernedInstructionInventoryPath `
+                -RepositoryRelativePath ([string] $_)
         }
 )
 $arrGovernedInstructionInventoryFailures = @(
@@ -5269,6 +5380,66 @@ if ($SelfTest) {
                 -RepositoryRelativePath $strGeminiNearMissPath `
                 -GovernedRootPaths $script:arrGovernedInstructionRootPaths) {
             throw "A Gemini near-miss path entered governance: $strGeminiNearMissPath"
+        }
+    }
+
+    $arrCaseFoldedGovernedPaths = @(
+        'agents.md',
+        'tools/agents.md',
+        'AGENTS.Override.md',
+        'claude.md',
+        'gemini.md',
+        '.GitHub/instructions/sample.instructions.md',
+        '.Cursor/rules/sample.mdc',
+        '.Claude/rules/sample.md',
+        '.github/Workflows/agent-instructions.yml',
+        '.Github/workflows/Test-AgentInstructions.ps1'
+    )
+    foreach ($strCaseFoldedGovernedPath in $arrCaseFoldedGovernedPaths) {
+        if ((Test-GovernedInstructionPath `
+                    -RepositoryRelativePath $strCaseFoldedGovernedPath `
+                    -GovernedRootPaths $script:arrGovernedInstructionRootPaths) -or
+            -not (Test-AgentInstructionWorkflowPath `
+                    -RepositoryRelativePath $strCaseFoldedGovernedPath)) {
+            throw "Canonical acceptance changed for case near-match: $strCaseFoldedGovernedPath"
+        }
+        $boolCaseMismatch = if (Test-ExactPathCaseMismatch `
+                -RepositoryRelativePath $strCaseFoldedGovernedPath `
+                -CanonicalPaths $script:arrPushGovernedExactPaths) {
+            $true
+        }
+        else {
+            Test-GovernedInstructionPathCaseMismatch `
+                -RepositoryRelativePath $strCaseFoldedGovernedPath `
+                -GovernedRootPaths $script:arrGovernedInstructionRootPaths
+        }
+        if (-not $boolCaseMismatch) {
+            throw "A case-folded governed path was not detected: $strCaseFoldedGovernedPath"
+        }
+        if (-not (Test-GovernedInstructionInventoryPath `
+                    -RepositoryRelativePath $strCaseFoldedGovernedPath)) {
+            throw "A case-folded path escaped the production inventory selector: $strCaseFoldedGovernedPath"
+        }
+    }
+    foreach ($strCanonicalGovernedPath in @(
+            'AGENTS.md',
+            'tools/AGENTS.md',
+            'AGENTS.override.md',
+            'CLAUDE.md',
+            'GEMINI.md',
+            '.github/instructions/sample.instructions.md',
+            '.cursor/rules/sample.mdc',
+            '.claude/rules/sample.md',
+            '.github/workflows/agent-instructions.yml'
+        )) {
+        if (-not (Test-AgentInstructionWorkflowPath `
+                    -RepositoryRelativePath $strCanonicalGovernedPath)) {
+            throw "A canonical governed control was rejected: $strCanonicalGovernedPath"
+        }
+        if (Test-GovernedInstructionPathCaseMismatch `
+                -RepositoryRelativePath $strCanonicalGovernedPath `
+                -GovernedRootPaths $script:arrGovernedInstructionRootPaths) {
+            throw "A canonical governed control was reported as a case mismatch: $strCanonicalGovernedPath"
         }
     }
 
@@ -6797,6 +6968,62 @@ if ($SelfTest) {
                 -PolicyMaximumBytes 1024 -PolicyMarker $strMetadataRangePolicyMarker
         }
 
+        & git -C $strMergeFixtureRoot read-tree $strMergeBaseTree
+        $strCaseFixtureBlob = [string] (
+            'case-folded instruction fixture' |
+                & git -C $strMergeFixtureRoot hash-object -w --stdin
+        )
+        if ($LASTEXITCODE -ne 0 -or
+            $strCaseFixtureBlob.Trim() -notmatch '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$') {
+            throw 'Could not create the case-folded instruction fixture blob.'
+        }
+        foreach ($strCaseFoldedGovernedPath in $arrCaseFoldedGovernedPaths) {
+            & git -C $strMergeFixtureRoot update-index --add --cacheinfo `
+                "100644,$($strCaseFixtureBlob.Trim()),$strCaseFoldedGovernedPath"
+            if ($LASTEXITCODE -ne 0) {
+                throw "Could not add case-folded instruction fixture: $strCaseFoldedGovernedPath"
+            }
+        }
+        $strCaseFoldedTree = ([string] (
+                & git -C $strMergeFixtureRoot write-tree
+            )).Trim()
+        $arrCaseFoldedTreePaths = @(Read-GitTrackedPath `
+                -RepositoryRootPath $strMergeFixtureRoot `
+                -Revision $strCaseFoldedTree `
+                -MaximumBytes $intGitPathListMaximumBytes)
+        foreach ($strCaseFoldedGovernedPath in $arrCaseFoldedGovernedPaths) {
+            if ($arrCaseFoldedTreePaths -cnotcontains $strCaseFoldedGovernedPath) {
+                throw "A case-folded path was lost from the synthetic Git tree: $strCaseFoldedGovernedPath"
+            }
+        }
+        $arrCaseFoldedInventoryPaths = @(
+            $arrCaseFoldedTreePaths |
+                Where-Object {
+                    Test-GovernedInstructionInventoryPath `
+                        -RepositoryRelativePath ([string] $_)
+                }
+        )
+        foreach ($strCaseFoldedGovernedPath in $arrCaseFoldedGovernedPaths) {
+            if ($arrCaseFoldedInventoryPaths -cnotcontains $strCaseFoldedGovernedPath) {
+                throw "A case-folded path escaped the synthetic tracked inventory: $strCaseFoldedGovernedPath"
+            }
+            $arrCaseFoldedInventoryFailures = @(
+                Get-GovernedInstructionInventoryFailure `
+                    -CatalogPaths @($arrGovernedInstructionDocuments.Path) `
+                    -TrackedPaths @(
+                        $arrTrackedGovernedInstructionPaths +
+                            $strCaseFoldedGovernedPath
+                    )
+            )
+            if (-not ($arrCaseFoldedInventoryFailures -ccontains (
+                        'Tracked governed instruction is missing from the catalog: ' +
+                        $strCaseFoldedGovernedPath
+                    ))) {
+                throw "A case-folded exact path did not fail ordinal inventory: $strCaseFoldedGovernedPath"
+            }
+        }
+        & git -C $strMergeFixtureRoot read-tree $strMergeBaseTree
+
         $strMergeBaseCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strMergeBaseTree `
             -Parents @() `
@@ -6890,6 +7117,33 @@ if ($SelfTest) {
             -Parents @($strMergeBaseCommit) `
             -Timestamp ($strMergeCurrentDate + 'T00:00:00Z') `
             -Message 'merge fixture advanced base'
+        & git -C $strMergeFixtureRoot read-tree $strMergeBaseTree
+        $strBaseOnlyTrustBlob = [string] (
+            'base-only trust-root fixture' |
+                & git -C $strMergeFixtureRoot hash-object -w --stdin
+        )
+        & git -C $strMergeFixtureRoot update-index --add --cacheinfo `
+            "100644,$($strBaseOnlyTrustBlob.Trim()),.gitattributes"
+        $strAdvancedTrustBaseTree = ([string] (
+                & git -C $strMergeFixtureRoot write-tree
+            )).Trim()
+        $strAdvancedTrustBaseCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strAdvancedTrustBaseTree `
+            -Parents @($strMergeBaseCommit) `
+            -Timestamp ($strMergeCurrentDate + 'T00:00:05Z') `
+            -Message 'merge fixture advanced trust base'
+        & git -C $strMergeFixtureRoot read-tree $strMergeTopicTree
+        & git -C $strMergeFixtureRoot update-index --add --cacheinfo `
+            "100644,$($strBaseOnlyTrustBlob.Trim()),.gitattributes"
+        $strTopicTrustTree = ([string] (
+                & git -C $strMergeFixtureRoot write-tree
+            )).Trim()
+        $strTopicTrustCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strTopicTrustTree `
+            -Parents @($strMergeTopicCommit) `
+            -Timestamp ($strMergeCurrentDate + 'T00:00:10Z') `
+            -Message 'merge fixture topic trust-root change'
+        & git -C $strMergeFixtureRoot read-tree $strMergeTopicTree
         $strSynchronizedTopicCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strMergeTopicTree `
             -Parents @($strMergeTopicCommit) `
@@ -6905,9 +7159,70 @@ if ($SelfTest) {
                 -IsNewRefRange $false -PreviousHeadRevision '' `
                 -EventHeadRevision '' -EventHeadDistinct ''
             if ($objHistoryOnlyContext.HistoryBaseRevision -cne $strMergeBaseCommit -or
-                $objHistoryOnlyContext.FreshnessBaseRevision -cne '') {
-                throw "$strHistoryOnlyAction did not use merge-base history without redating."
+                $objHistoryOnlyContext.FreshnessBaseRevision -cne $strMergeBaseCommit) {
+                throw "$strHistoryOnlyAction did not use bounded merge-base freshness."
             }
+            $arrInitialFreshnessFailures = @(
+                Get-CurrentInputMetadataFreshnessFailure `
+                    -Name 'AGENTS.md' `
+                    -CurrentContent $strMergeTopicContent `
+                    -BaseContent $strMergeBaseContent `
+                    -TrustedEventUtcDate $strMergeCurrentDate
+            )
+            if ($arrInitialFreshnessFailures.Count -ne 1) {
+                throw "$strHistoryOnlyAction accepted stale initial-event metadata."
+            }
+        }
+        $objEditedContext = Get-MetadataEventRevisionContext `
+            -RepositoryRootPath $strMergeFixtureRoot `
+            -EventName 'pull_request_target' -PullRequestAction 'edited' `
+            -BaseRevision $strAdvancedBaseCommit `
+            -HeadRevision $strSynchronizedTopicCommit `
+            -IsNewRefRange $false -PreviousHeadRevision '' `
+            -PullRequestBaseChanged 'true' `
+            -EventHeadRevision '' -EventHeadDistinct ''
+        if ($objEditedContext.HistoryBaseRevision -cne $strMergeBaseCommit -or
+            $objEditedContext.FreshnessBaseRevision -cne $strMergeBaseCommit) {
+            throw 'A base-changing edited event did not rebind to its merge base.'
+        }
+        $boolEditedWithoutProofRejected = $false
+        try {
+            [void](Get-MetadataEventRevisionContext `
+                    -RepositoryRootPath $strMergeFixtureRoot `
+                    -EventName 'pull_request_target' -PullRequestAction 'edited' `
+                    -BaseRevision $strAdvancedBaseCommit `
+                    -HeadRevision $strSynchronizedTopicCommit `
+                    -IsNewRefRange $false -PreviousHeadRevision '' `
+                    -EventHeadRevision '' -EventHeadDistinct '')
+        }
+        catch {
+            $boolEditedWithoutProofRejected = $_.Exception.Message.Contains(
+                'requires trusted base-change proof',
+                [StringComparison]::Ordinal
+            )
+        }
+        if (-not $boolEditedWithoutProofRejected) {
+            throw 'An edited event without base-change proof did not fail closed.'
+        }
+        $boolNonEditedProofRejected = $false
+        try {
+            [void](Get-MetadataEventRevisionContext `
+                    -RepositoryRootPath $strMergeFixtureRoot `
+                    -EventName 'pull_request_target' -PullRequestAction 'opened' `
+                    -BaseRevision $strAdvancedBaseCommit `
+                    -HeadRevision $strSynchronizedTopicCommit `
+                    -IsNewRefRange $false -PreviousHeadRevision '' `
+                    -PullRequestBaseChanged 'true' `
+                    -EventHeadRevision '' -EventHeadDistinct '')
+        }
+        catch {
+            $boolNonEditedProofRejected = $_.Exception.Message.Contains(
+                'Only an edited pull request event',
+                [StringComparison]::Ordinal
+            )
+        }
+        if (-not $boolNonEditedProofRejected) {
+            throw 'A nonedited event accepted base-change proof.'
         }
         $objSynchronizeContext = Get-MetadataEventRevisionContext `
             -RepositoryRootPath $strMergeFixtureRoot `
@@ -7047,6 +7362,31 @@ if ($SelfTest) {
                 -Head $strSynchronizedTopicCommit)
         if ($arrAdvancedBaseHistoryFailures.Count -ne 0) {
             throw 'Merge-base history validation rejected an advanced-base topic.'
+        }
+        $arrAdvancedBaseTrustFailures = @(Get-TrustRootRangeMutationFailure `
+                -RepositoryRootPath $strMergeFixtureRoot `
+                -BaseRevision $strMergeBaseCommit `
+                -HeadRevision $strSynchronizedTopicCommit `
+                -RepositoryRelativePath $script:arrTrustRootPaths)
+        if ($arrAdvancedBaseTrustFailures.Count -ne 0) {
+            throw 'A base-only trust-root change was attributed to the topic.'
+        }
+        $arrBaseTipTrustFailures = @(Get-TrustRootRangeMutationFailure `
+                -RepositoryRootPath $strMergeFixtureRoot `
+                -BaseRevision $strAdvancedTrustBaseCommit `
+                -HeadRevision $strSynchronizedTopicCommit `
+                -RepositoryRelativePath $script:arrTrustRootPaths)
+        if ($arrBaseTipTrustFailures.Count -ne 1) {
+            throw 'The advanced-base trust-root reproduction did not distinguish the base tip.'
+        }
+        $arrTopicTrustFailures = @(Get-TrustRootRangeMutationFailure `
+                -RepositoryRootPath $strMergeFixtureRoot `
+                -BaseRevision $strMergeBaseCommit `
+                -HeadRevision $strTopicTrustCommit `
+                -RepositoryRelativePath $script:arrTrustRootPaths)
+        if ($arrTopicTrustFailures.Count -ne 1 -or
+            -not ($arrTopicTrustFailures -match [regex]::Escape('.gitattributes'))) {
+            throw 'A topic trust-root change did not fail closed.'
         }
         $strCrissCrossLeft = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strMergeBaseTree -Parents @($strMergeBaseCommit) `
@@ -7282,6 +7622,11 @@ if ($SelfTest) {
                 'refs/remotes/event/push-base',
                 'refs/remotes/event/pr-head',
                 'refs/remotes/event/pr-previous-head',
+                '      - edited',
+                "github.event.action != 'edited' ||",
+                "github.event.changes.base.ref.from != ''",
+                'AGENT_INSTRUCTION_PULL_REQUEST_BASE_CHANGED:',
+                '-PullRequestBaseChanged $env:AGENT_INSTRUCTION_PULL_REQUEST_BASE_CHANGED',
                 'test "${fetched_base}" = "${PUSH_BASE_SHA}"',
                 'test "${fetched_head}" = "${PR_HEAD_SHA}"',
                 'test "${fetched_previous_head}" = "${PR_PREVIOUS_HEAD_SHA}"',
@@ -7417,6 +7762,30 @@ if ($SelfTest) {
                 "steps.push-applicability.outputs.required != 'false'"
             )
             Expected = 'All five expensive validation steps require the applicability gate.'
+        },
+        [pscustomobject]@{
+            Name = 'missing edited trigger'
+            Content = $strAgentWorkflowContent.Replace(
+                "      - synchronize`n      - edited",
+                '      - synchronize'
+            )
+            Expected = 'Workflow contract literal is missing:       - edited'
+        },
+        [pscustomobject]@{
+            Name = 'missing non-base edited job gate'
+            Content = $strAgentWorkflowContent.Replace(
+                "github.event.action != 'edited' ||",
+                "github.event.action == 'edited' ||"
+            )
+            Expected = "Workflow contract literal is missing: github.event.action != 'edited' ||"
+        },
+        [pscustomobject]@{
+            Name = 'missing edited base-change proof plumbing'
+            Content = $strAgentWorkflowContent.Replace(
+                '-PullRequestBaseChanged $env:AGENT_INSTRUCTION_PULL_REQUEST_BASE_CHANGED',
+                '-PullRequestBaseChanged true'
+            )
+            Expected = 'Workflow contract literal is missing: -PullRequestBaseChanged'
         }
     )
     foreach ($objWorkflowMutation in $arrWorkflowMutations) {
