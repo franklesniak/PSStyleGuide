@@ -140,7 +140,7 @@
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "e0f13575a40d9d5eecac2ebf3aa373173694ab5418dfd7a95aa46ef822d5d45f"
+    "sha256": "f56757430a27afa436ea113bc55cfe51bbaedfa11f94d3fb3aaf97a0c79b8902"
   },
   "actions": {
     "checkout": {
@@ -308,8 +308,8 @@
     "entryPoints": {
       "rootPackageJson": {
         "path": "../../package.json",
-        "length": 967,
-        "sha256": "f5985ff03b7728b5a83e55bb2a467cedf41ae80c3303d54713bcdc559df19b5d",
+        "length": 1088,
+        "sha256": "461d48c936c19cca4e553a2ab25ba0785246709ce91288a3a3f1270fd1a3a05d",
         "lintScript": "markdownlint-cli2 \"**/*.md\" \"**/*.mdc\" \"#node_modules\" \"#.github/workflows/node_modules\" --config .github/workflows/.markdownlint.jsonc"
       },
       "workflowPackageJson": {
@@ -333,8 +333,8 @@
       },
       "preCommit": {
         "path": "../../.pre-commit-config.yaml",
-        "length": 2582,
-        "sha256": "891fc23b515b14cb9848199c8189c46f87099c2d3beb9198bc852cccdd389d2d",
+        "length": 2667,
+        "sha256": "da4abecb71a4fbaac730473f886c4e1a9c84725abb3b0f7567b384376b002538",
         "extensions": ["md", "mdc"],
         "linebreakArgument": "--markdown-linebreak-ext=md,mdc"
       }

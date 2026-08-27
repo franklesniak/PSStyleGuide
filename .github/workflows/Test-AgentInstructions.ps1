@@ -149,6 +149,7 @@ $intCodexConfigMaximumInputBytes = 65536
 $intDocsInstructionsMaximumInputBytes = 131072
 $intInstructionDocumentMaximumInputBytes = 131072
 $intValidatorMaximumInputBytes = 393216
+$intHistoricalPolicyMarkerMaximumBytes = 524288
 $intGitPathListMaximumBytes = 1048576
 $intMetadataMaximumParents = 64
 $strMetadataRangePolicyMarker = 'metadata-range-transition-policy-v1'
@@ -414,51 +415,6 @@ function Assert-EncodingMutationRejected {
 function Get-RepositoryInputMetadataFailure {
     # .SYNOPSIS
     # Finds unsafe repository-input metadata.
-    #
-    # .DESCRIPTION
-    # Validates the Git index and worktree metadata for one governed input and
-    # writes one failure string for each unsafe condition.
-    #
-    # .PARAMETER DisplayName
-    # The input name to include in failure records.
-    #
-    # .PARAMETER GitIndexEntryCount
-    # The number of Git index entries for the input.
-    #
-    # .PARAMETER GitMode
-    # The Git file mode, or null when it cannot be parsed.
-    #
-    # .PARAMETER GitStage
-    # The Git index stage, or null when it cannot be parsed.
-    #
-    # .PARAMETER IsFileInfo
-    # Indicates whether the worktree object is a regular file.
-    #
-    # .PARAMETER Attributes
-    # The worktree file attributes.
-    #
-    # .PARAMETER LinkType
-    # The PowerShell link type, when the provider exposes one.
-    #
-    # .PARAMETER UnixMode
-    # The Unix mode string, when the provider exposes one.
-    #
-    # .EXAMPLE
-    # Get-RepositoryInputMetadataFailure -DisplayName 'AGENTS.md' `
-    #     -GitIndexEntryCount 1 -GitMode '100644' -GitStage '0' `
-    #     -IsFileInfo $true -Attributes Normal
-    #
-    # # Writes no records for safe metadata.
-    #
-    # .INPUTS
-    # None. You can't pipe objects to this function.
-    #
-    # .OUTPUTS
-    # [string] One record for each metadata failure.
-    #
-    # .NOTES
-    # Private helper; no positional parameters.
-    # Version: 1.0.20260819.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -515,54 +471,6 @@ function Get-RepositoryInputMetadataFailure {
 function Assert-RepositoryInputMetadataMutationRejected {
     # .SYNOPSIS
     # Confirms that an unsafe metadata fixture fails closed.
-    #
-    # .DESCRIPTION
-    # Evaluates one repository metadata fixture and verifies that it produces the
-    # specified failure. The expected validation result does not escape.
-    #
-    # .PARAMETER Name
-    # The fixture name and input display name.
-    #
-    # .PARAMETER GitIndexEntryCount
-    # The simulated number of Git index entries.
-    #
-    # .PARAMETER GitMode
-    # The simulated Git file mode.
-    #
-    # .PARAMETER GitStage
-    # The simulated Git index stage.
-    #
-    # .PARAMETER IsFileInfo
-    # Indicates whether the simulated worktree object is a regular file.
-    #
-    # .PARAMETER Attributes
-    # The simulated worktree file attributes.
-    #
-    # .PARAMETER LinkType
-    # The simulated PowerShell link type.
-    #
-    # .PARAMETER UnixMode
-    # The simulated Unix mode string.
-    #
-    # .PARAMETER ExpectedFailure
-    # The exact failure that the fixture must produce.
-    #
-    # .EXAMPLE
-    # Assert-RepositoryInputMetadataMutationRejected -Name 'symlink' `
-    #     -Attributes ReparsePoint `
-    #     -ExpectedFailure 'symlink must not be a symbolic link or reparse point.'
-    #
-    # # Returns no output when the fixture is rejected as expected.
-    #
-    # .INPUTS
-    # None. You can't pipe objects to this function.
-    #
-    # .OUTPUTS
-    # None.
-    #
-    # .NOTES
-    # Private helper; no positional parameters.
-    # Version: 1.0.20260819.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -595,7 +503,7 @@ function Assert-RepositoryInputMetadataMutationRejected {
         [string] $UnixMode = '',
 
         [Parameter(Mandatory)]
-        [string] $ExpectedFailure
+        [string] $Failure
     )
 
     $arrFailures = @(Get-RepositoryInputMetadataFailure `
@@ -610,7 +518,7 @@ function Assert-RepositoryInputMetadataMutationRejected {
     if ($arrFailures.Count -eq 0) {
         throw "Self-test '$Name' was accepted."
     }
-    if (-not ($arrFailures -ccontains $ExpectedFailure)) {
+    if (-not ($arrFailures -ccontains $Failure)) {
         throw "Self-test '$Name' returned an unexpected failure: $($arrFailures -join '; ')"
     }
 }
@@ -821,42 +729,6 @@ function Read-GitTrackedPath {
 function Read-RepositoryInputData {
     # .SYNOPSIS
     # Reads one governed repository file safely.
-    #
-    # .DESCRIPTION
-    # Resolves the provider path, validates Git and worktree metadata, and reads
-    # the regular file through a strict byte limit.
-    #
-    # .PARAMETER Path
-    # The PowerShell path of the worktree file.
-    #
-    # .PARAMETER RepositoryRootPath
-    # The absolute repository root path used by Git.
-    #
-    # .PARAMETER RepositoryRelativePath
-    # The repository-relative path used to inspect the Git index.
-    #
-    # .PARAMETER DisplayName
-    # The input name to include in validation failures.
-    #
-    # .PARAMETER MaximumBytes
-    # The largest accepted byte count.
-    #
-    # .EXAMPLE
-    # $arrBytes = @(Read-RepositoryInputData -Path $strPath `
-    #     -RepositoryRootPath $strRoot -RepositoryRelativePath 'AGENTS.md' `
-    #     -DisplayName 'AGENTS.md' -MaximumBytes 32768)
-    #
-    # # Collects bytes from a safe regular repository file.
-    #
-    # .INPUTS
-    # None. You can't pipe objects to this function.
-    #
-    # .OUTPUTS
-    # [byte] Each byte read from the repository file.
-    #
-    # .NOTES
-    # Private helper; no positional parameters.
-    # Version: 1.0.20260819.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([byte])]
     param(
@@ -1001,7 +873,7 @@ function Read-GitRevisionText {
         -DisplayName "$Revision`:$RepositoryRelativePath"
 }
 
-function Test-GitRevisionFileContainsLiteral {
+function Test-HistoricalPolicyMarker {
     # .SYNOPSIS
     # Tests whether a revision file contains an ordinal literal.
     [CmdletBinding(PositionalBinding = $false)]
@@ -1017,10 +889,6 @@ function Test-GitRevisionFileContainsLiteral {
         [string] $RepositoryRelativePath,
 
         [Parameter(Mandatory)]
-        [ValidateRange(1, 2147483646)]
-        [int] $MaximumBytes,
-
-        [Parameter(Mandatory)]
         [string] $Literal
     )
 
@@ -1034,8 +902,9 @@ function Test-GitRevisionFileContainsLiteral {
         -RepositoryRootPath $RepositoryRootPath `
         -Revision $Revision `
         -RepositoryRelativePath $RepositoryRelativePath `
-        -MaximumBytes $MaximumBytes
-    return $strRevisionContent.Contains($Literal, [System.StringComparison]::Ordinal)
+        -MaximumBytes $intHistoricalPolicyMarkerMaximumBytes `
+        -RequireRegularFile
+    return $strRevisionContent.Contains($Literal, [StringComparison]::Ordinal)
 }
 
 function Get-GovernedDocumentParentContext {
@@ -1349,7 +1218,7 @@ function Get-TomlParseContext {
         'print(json.dumps(context, separators=(",", ":"), sort_keys=True))'
     ) -join "`n"
 
-    $arrPythonArguments = [System.Collections.Generic.List[string]]::new()
+    $arrPythonArguments = [Collections.Generic.List[string]]::new()
     if ($IsWindows) {
         $arrPythonArguments.Add('-3.12')
     }
@@ -1417,7 +1286,7 @@ function Get-TomlParseContext {
         $objParserProcess.Dispose()
     }
 
-    if ([System.Text.Encoding]::UTF8.GetByteCount($strParserOutput) -gt 4096) {
+    if ([Text.Encoding]::UTF8.GetByteCount($strParserOutput) -gt 4096) {
         $objContext.Failure = 'The trusted TOML parser returned oversized typed context.'
         return [pscustomobject]$objContext
     }
@@ -1554,8 +1423,8 @@ function Get-MarkdownParseContext {
         [int] $LineCount
     )
 
-    $strRepositoryRootPath = [System.IO.Path]::GetDirectoryName(
-        [System.IO.Path]::GetDirectoryName($PSScriptRoot)
+    $strRepositoryRootPath = [IO.Path]::GetDirectoryName(
+        [IO.Path]::GetDirectoryName($PSScriptRoot)
     )
     $strMarkdownParserPath = Join-Path `
         -Path $strRepositoryRootPath `
@@ -1706,7 +1575,7 @@ function Get-MarkdownParseContext {
         throw 'The locked Markdown parser returned incomplete context data.'
     }
 
-    $listRanges = [System.Collections.Generic.List[pscustomobject]]::new()
+    $listRanges = [Collections.Generic.List[pscustomobject]]::new()
     $intPreviousEnd = 0
     foreach ($arrRawRange in @($objRawContext.codeBlockRanges)) {
         if ($arrRawRange -isnot [array] -or $arrRawRange.Count -ne 2) {
@@ -1731,7 +1600,7 @@ function Get-MarkdownParseContext {
         $intPreviousEnd = [int]$intEnd
     }
 
-    $listProseBlocks = [System.Collections.Generic.List[pscustomobject]]::new()
+    $listProseBlocks = [Collections.Generic.List[pscustomobject]]::new()
     foreach ($objRawProseBlock in @($objRawContext.proseBlocks)) {
         if ($null -eq $objRawProseBlock -or
             $objRawProseBlock.range -isnot [array] -or
@@ -1760,7 +1629,7 @@ function Get-MarkdownParseContext {
             })
     }
 
-    $listTopLevelBlocks = [System.Collections.Generic.List[pscustomobject]]::new()
+    $listTopLevelBlocks = [Collections.Generic.List[pscustomobject]]::new()
     $intPreviousTopLevelBlockEnd = 0
     foreach ($objRawBlock in @($objRawContext.topLevelBlocks)) {
         if ($null -eq $objRawBlock -or
@@ -1798,7 +1667,7 @@ function Get-MarkdownParseContext {
         $intPreviousTopLevelBlockEnd = [int]$intEnd
     }
 
-    $listTopLevelListItems = [System.Collections.Generic.List[pscustomobject]]::new()
+    $listTopLevelListItems = [Collections.Generic.List[pscustomobject]]::new()
     $intPreviousTopLevelListItemEnd = 0
     foreach ($objRawListItem in @($objRawContext.topLevelListItems)) {
         if ($null -eq $objRawListItem -or
@@ -1835,7 +1704,7 @@ function Get-MarkdownParseContext {
         $intPreviousTopLevelListItemEnd = [int]$intEnd
     }
 
-    $listLevelTwoHeadings = [System.Collections.Generic.List[pscustomobject]]::new()
+    $listLevelTwoHeadings = [Collections.Generic.List[pscustomobject]]::new()
     $intPreviousHeadingEnd = 0
     foreach ($objRawHeading in @($objRawContext.levelTwoHeadings)) {
         if ($null -eq $objRawHeading -or
@@ -1921,7 +1790,7 @@ function Get-OperativeMarkdownContext {
         }
     }
 
-    $listOperativeLines = [System.Collections.Generic.List[string]]::new()
+    $listOperativeLines = [Collections.Generic.List[string]]::new()
     for ($intLine = 0; $intLine -lt $arrLines.Count; $intLine++) {
         if (-not $arrCodeBlockLines[$intLine]) {
             $listOperativeLines.Add($arrLines[$intLine])
@@ -2159,14 +2028,14 @@ function Get-MarkdownLevelTwoSectionContext {
         }
     }
 
-    $listSectionLines = [System.Collections.Generic.List[string]]::new()
+    $listSectionLines = [Collections.Generic.List[string]]::new()
     for ($intLine = $intSectionStart; $intLine -lt $intSectionEnd; $intLine++) {
         if (-not $MarkdownContext.CodeBlockLines[$intLine]) {
             $listSectionLines.Add($MarkdownContext.SourceLines[$intLine])
         }
     }
 
-    $listSectionProse = [System.Collections.Generic.List[string]]::new()
+    $listSectionProse = [Collections.Generic.List[string]]::new()
     foreach ($objProseBlock in $MarkdownContext.ProseBlocks) {
         if ($objProseBlock.Start -ge $intSectionStart -and
             $objProseBlock.End -le $intSectionEnd) {
@@ -2297,7 +2166,7 @@ function ConvertTo-MetadataComparisonText {
     $arrNormalizedLines[$intVersionLineIndex] = '**Version:** <metadata-version>'
     $arrNormalizedLines[$intUpdatedLineIndex] = '- **Last Updated:** <metadata-date>'
 
-    $listNormalizedLines = [System.Collections.Generic.List[string]]::new()
+    $listNormalizedLines = [Collections.Generic.List[string]]::new()
     foreach ($strLine in $arrNormalizedLines) {
         if ($strLine -match ' {2,}$') {
             $listNormalizedLines.Add($strLine)
@@ -2373,6 +2242,7 @@ function Get-CurrentInputMetadataFreshnessFailure {
         [string] $BaseContent,
 
         [Parameter(Mandatory)]
+        [AllowEmptyString()]
         [string] $TrustedEventUtcDate
     )
 
@@ -2417,7 +2287,7 @@ function Get-LastUpdatedMetadataFreshnessFailure {
         [Parameter(Mandatory)][string] $Name,
         [Parameter(Mandatory)][string] $CurrentContent,
         [Parameter()][AllowNull()][string] $BaseContent,
-        [Parameter(Mandatory)][string] $TrustedEventUtcDate
+        [Parameter(Mandatory)][AllowEmptyString()][string] $TrustedEventUtcDate
     )
 
     $objCurrentMatch = [regex]::Match(
@@ -3128,8 +2998,8 @@ function Get-GovernedInstructionInventoryFailure {
     )
     foreach ($strCatalogPath in $CatalogPaths) {
         if ([string]::IsNullOrWhiteSpace($strCatalogPath) -or
-            [System.IO.Path]::IsPathRooted($strCatalogPath) -or
-            $strCatalogPath.Contains('\', [System.StringComparison]::Ordinal) -or
+            [IO.Path]::IsPathRooted($strCatalogPath) -or
+            $strCatalogPath.Contains('\', [StringComparison]::Ordinal) -or
             $strCatalogPath -match '(?:^|/)\.\.(?:/|$)' -or
             $strCatalogPath.IndexOfAny([char[]] @("`0", "`r", "`n")) -ge 0) {
             Write-Output "The governed instruction catalog contains an unsafe path: $strCatalogPath"
@@ -3214,7 +3084,7 @@ function Get-DocumentationClaimFailure {
     )
 
     foreach ($strLiteral in $script:arrProhibitedDocumentationClaimLiterals) {
-        if ($Content.Contains($strLiteral, [System.StringComparison]::Ordinal)) {
+        if ($Content.Contains($strLiteral, [StringComparison]::Ordinal)) {
             Write-Output (
                 'Documentation instructions name an absent repository-specific ' +
                 "source or enforcement claim: $strLiteral"
@@ -3301,8 +3171,8 @@ function Get-DocumentMetadataContext {
     $arrTopLevelBlocks = @($objParseContext.TopLevelBlocks)
     $arrTopLevelListItems = @($objParseContext.TopLevelListItems)
 
-    $listH1Indices = [System.Collections.Generic.List[int]]::new()
-    $listH2Indices = [System.Collections.Generic.List[int]]::new()
+    $listH1Indices = [Collections.Generic.List[int]]::new()
+    $listH2Indices = [Collections.Generic.List[int]]::new()
     for ($intIndex = 0; $intIndex -lt $arrTopLevelBlocks.Count; $intIndex++) {
         $objBlock = $arrTopLevelBlocks[$intIndex]
         if ($objBlock.Type -ceq 'heading_open' -and $objBlock.Tag -ceq 'h1') {
@@ -3325,12 +3195,12 @@ function Get-DocumentMetadataContext {
 
     $strVersionPattern = '^\*\*Version:\*\* (?<Major>\d+)\.(?<Minor>\d+)\.' +
         '(?<Date>\d{8})\.(?<Revision>\d+)$'
-    $listVersionRecords = [System.Collections.Generic.List[pscustomobject]]::new()
+    $listVersionRecords = [Collections.Generic.List[pscustomobject]]::new()
     for ($intIndex = 0; $intIndex -lt $arrTopLevelBlocks.Count; $intIndex++) {
         $objBlock = $arrTopLevelBlocks[$intIndex]
         if ($objBlock.Type -cne 'paragraph_open' -or
             $objBlock.Text -isnot [string] -or
-            -not $objBlock.Text.StartsWith('Version:', [System.StringComparison]::Ordinal)) {
+            -not $objBlock.Text.StartsWith('Version:', [StringComparison]::Ordinal)) {
             continue
         }
 
@@ -3427,7 +3297,7 @@ function Get-DocumentMetadataContext {
                     $_.Text -is [string] -and
                     $_.Text.StartsWith(
                         "$($objField.Name):",
-                        [System.StringComparison]::Ordinal
+                        [StringComparison]::Ordinal
                     ) -and
                     $_.Start -gt $objMetadataBlock.Start -and
                     $_.Start -lt $intMetadataSectionEnd -and
@@ -3818,13 +3688,36 @@ function Get-GovernedDocumentCommitTransitionFailure {
     if ($LASTEXITCODE -ne 0) {
         throw "The governed direct-transition commit is unavailable: $CommitRevision"
     }
-    if (-not (Test-GitRevisionFileContainsLiteral `
-            -RepositoryRootPath $RepositoryRootPath `
-            -Revision $CommitRevision `
-            -RepositoryRelativePath $PolicyRepositoryRelativePath `
-            -MaximumBytes $PolicyMaximumBytes `
-            -Literal $PolicyMarker)) {
-        return [string[]] @()
+    $boolUseWorktreePolicy = $false
+    if ($CommitRevision -ceq $script:strCheckedOutRevision) {
+        & git -C $RepositoryRootPath diff --quiet --no-ext-diff --no-textconv `
+            $CommitRevision -- $PolicyRepositoryRelativePath
+        if ($LASTEXITCODE -eq 1) {
+            $boolUseWorktreePolicy = $true
+        } elseif ($LASTEXITCODE -ne 0) {
+            throw 'Could not compare the checked-out policy with its commit.'
+        }
+    }
+    if ($boolUseWorktreePolicy) {
+        $arrPolicyBytes = [byte[]] @(
+            Read-RepositoryInputData `
+                -Path (Join-Path $RepositoryRootPath $PolicyRepositoryRelativePath) `
+                -RepositoryRootPath $RepositoryRootPath `
+                -RepositoryRelativePath $PolicyRepositoryRelativePath `
+                -DisplayName $PolicyRepositoryRelativePath `
+                -MaximumBytes $PolicyMaximumBytes
+        )
+        $strPolicy = ConvertFrom-StrictUtf8Data `
+            -Bytes $arrPolicyBytes -DisplayName $PolicyRepositoryRelativePath
+        if (-not $strPolicy.Contains($PolicyMarker, [StringComparison]::Ordinal)) {
+            throw 'The checked-out policy is missing its governance marker.'
+        }
+    } elseif (-not (Test-HistoricalPolicyMarker `
+                -RepositoryRootPath $RepositoryRootPath `
+                -Revision $CommitRevision `
+                -RepositoryRelativePath $PolicyRepositoryRelativePath `
+                -Literal $PolicyMarker)) {
+            return [string[]] @()
     }
 
     $strParentLine = [string] (
@@ -3839,7 +3732,7 @@ function Get-GovernedDocumentCommitTransitionFailure {
         -not [string]::Equals(
             $arrCommitAndParents[0],
             $CommitRevision,
-            [System.StringComparison]::OrdinalIgnoreCase
+            [StringComparison]::OrdinalIgnoreCase
         )) {
         throw "Git returned an invalid identity for metadata range commit $CommitRevision."
     }
@@ -3854,7 +3747,7 @@ function Get-GovernedDocumentCommitTransitionFailure {
         )
     }
 
-    $listChangedParents = [System.Collections.Generic.List[pscustomobject]]::new()
+    $listChangedParents = [Collections.Generic.List[pscustomobject]]::new()
     foreach ($strParentRevision in $arrCommitAndParents[1..$intParentCount]) {
         if ($strParentRevision -notmatch $strObjectIdPattern) {
             throw "Git returned an invalid parent for metadata range commit $CommitRevision."
@@ -3879,11 +3772,10 @@ function Get-GovernedDocumentCommitTransitionFailure {
         }
         $listChangedParents.Add([pscustomobject]@{
                 Revision = $strParentRevision
-                HasPolicyMarker = Test-GitRevisionFileContainsLiteral `
+                HasPolicyMarker = Test-HistoricalPolicyMarker `
                     -RepositoryRootPath $RepositoryRootPath `
                     -Revision $strParentRevision `
                     -RepositoryRelativePath $PolicyRepositoryRelativePath `
-                    -MaximumBytes $PolicyMaximumBytes `
                     -Literal $PolicyMarker
             })
     }
@@ -3919,7 +3811,7 @@ function Get-GovernedDocumentCommitTransitionFailure {
         -RepositoryRelativePath $RepositoryRelativePath `
         -MaximumBytes $MaximumBytes `
         -RequireRegularFile
-    $listTransitions = [System.Collections.Generic.List[pscustomobject]]::new()
+    $listTransitions = [Collections.Generic.List[pscustomobject]]::new()
     foreach ($objChangedParent in $listChangedParents) {
         $strParentContent = if ($objChangedParent.HasPolicyMarker) {
             & git -C $RepositoryRootPath cat-file -e `
@@ -4051,23 +3943,22 @@ function Get-GovernedDocumentRangeTransitionFailure {
         -not [string]::Equals(
             $strCheckedOutHead.Trim(),
             $HeadRevision,
-            [System.StringComparison]::OrdinalIgnoreCase
+            [StringComparison]::OrdinalIgnoreCase
         )) {
         throw "The metadata event-range head does not match the validation revision: $HeadRevision"
     }
     if ([string]::Equals(
             $BaseRevision,
             $HeadRevision,
-            [System.StringComparison]::OrdinalIgnoreCase
+            [StringComparison]::OrdinalIgnoreCase
         )) {
         return [string[]] @()
     }
 
-    $boolHeadHasPolicyMarker = Test-GitRevisionFileContainsLiteral `
+    $boolHeadHasPolicyMarker = Test-HistoricalPolicyMarker `
         -RepositoryRootPath $RepositoryRootPath `
         -Revision $HeadRevision `
         -RepositoryRelativePath $PolicyRepositoryRelativePath `
-        -MaximumBytes $PolicyMaximumBytes `
         -Literal $PolicyMarker
     if (-not $boolHeadHasPolicyMarker) {
         throw "The metadata event-range head does not contain policy marker $PolicyMarker."
@@ -4075,11 +3966,10 @@ function Get-GovernedDocumentRangeTransitionFailure {
 
     $boolBaseHasPolicyMarker = $false
     if (-not $IsNewRefRange) {
-        $boolBaseHasPolicyMarker = Test-GitRevisionFileContainsLiteral `
+        $boolBaseHasPolicyMarker = Test-HistoricalPolicyMarker `
             -RepositoryRootPath $RepositoryRootPath `
             -Revision $BaseRevision `
             -RepositoryRelativePath $PolicyRepositoryRelativePath `
-            -MaximumBytes $PolicyMaximumBytes `
             -Literal $PolicyMarker
     }
     if (-not $boolBaseHasPolicyMarker) {
@@ -4107,11 +3997,10 @@ function Get-GovernedDocumentRangeTransitionFailure {
             if ($strPolicyCommit -notmatch $strObjectIdPattern) {
                 throw "Git returned an invalid metadata policy commit: $strPolicyCommit"
             }
-            if (Test-GitRevisionFileContainsLiteral `
+            if (Test-HistoricalPolicyMarker `
                     -RepositoryRootPath $RepositoryRootPath `
                     -Revision $strPolicyCommit `
                     -RepositoryRelativePath $PolicyRepositoryRelativePath `
-                    -MaximumBytes $PolicyMaximumBytes `
                     -Literal $PolicyMarker) {
                 $strPolicyIntroductionCommit = $strPolicyCommit
                 break
@@ -4220,7 +4109,7 @@ function Get-TomlSemanticStatementContext {
         $strLine = $Content.Substring($intLineStart, $intLineEnd - $intLineStart)
         $strTrimmedLine = $strLine.TrimStart()
         if ($strTrimmedLine.Length -gt 0 -and
-            -not $strTrimmedLine.StartsWith('#', [System.StringComparison]::Ordinal)) {
+            -not $strTrimmedLine.StartsWith('#', [StringComparison]::Ordinal)) {
             Write-Output ([pscustomobject]@{
                     Text = $strLine
                     Index = $intLineStart
@@ -4364,47 +4253,6 @@ function ConvertTo-DisabledGitHubPluginMutation {
 function Get-AgentInstructionFailure {
     # .SYNOPSIS
     # Finds violations of the shared agent-instruction contract.
-    #
-    # .DESCRIPTION
-    # Validates project TOML, capacity, operative Markdown capabilities, placement
-    # safety, deferral policy, reviewer controls, and document metadata.
-    #
-    # .PARAMETER AgentsContent
-    # The current AGENTS.md text.
-    #
-    # .PARAMETER ClaudeContent
-    # The current CLAUDE.md text.
-    #
-    # .PARAMETER CodexConfigContent
-    # The current .codex/config.toml text.
-    #
-    # .PARAMETER ParentAgentsContent
-    # The parent AGENTS.md text, or null for no metadata comparison.
-    #
-    # .PARAMETER ParentClaudeContent
-    # The parent CLAUDE.md text, or null for no metadata comparison.
-    #
-    # .PARAMETER AgentsExpectedUtcDate
-    # The required AGENTS.md UTC metadata date after a content change.
-    #
-    # .PARAMETER ClaudeExpectedUtcDate
-    # The required CLAUDE.md UTC metadata date after a content change.
-    #
-    # .EXAMPLE
-    # Get-AgentInstructionFailure -AgentsContent $strAgents `
-    #     -ClaudeContent $strClaude -CodexConfigContent $strConfig
-    #
-    # # Writes one string for each contract failure.
-    #
-    # .INPUTS
-    # None. You can't pipe objects to this function.
-    #
-    # .OUTPUTS
-    # [string] One record for each agent-instruction contract failure.
-    #
-    # .NOTES
-    # Private helper; no positional parameters.
-    # Version: 1.0.20260819.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4485,7 +4333,7 @@ function Get-AgentInstructionFailure {
         )
     }
 
-    $intAgentsBytes = [System.Text.Encoding]::UTF8.GetByteCount($AgentsContent)
+    $intAgentsBytes = [Text.Encoding]::UTF8.GetByteCount($AgentsContent)
     if ($intAgentsBytes -gt 32768) {
         Write-Output 'AGENTS.md must not exceed the ordinary 32768-byte Codex limit.'
     }
@@ -4565,7 +4413,7 @@ function Get-AgentInstructionFailure {
                 Where-Object {
                     $null -ne $_.Text -and $_.Text.StartsWith(
                         $objDocument.InventoryPrefix,
-                        [System.StringComparison]::Ordinal
+                        [StringComparison]::Ordinal
                     )
                 }
         )
@@ -4574,7 +4422,7 @@ function Get-AgentInstructionFailure {
                 Where-Object {
                     $_.Text.StartsWith(
                         $objDocument.SyntheticPrefix,
-                        [System.StringComparison]::Ordinal
+                        [StringComparison]::Ordinal
                     )
                 }
         )
@@ -4604,7 +4452,7 @@ function Get-AgentInstructionFailure {
         foreach ($strLiteral in $script:arrSharedProseLiterals) {
             if (-not $objDocument.ProseContent.Contains(
                     $strLiteral,
-                    [System.StringComparison]::Ordinal
+                    [StringComparison]::Ordinal
                 )) {
                 Write-Output "$($objDocument.Name) is missing required capability marker: $strLiteral"
             }
@@ -4624,7 +4472,7 @@ function Get-AgentInstructionFailure {
             'The agent MUST NOT ask the owner for that additional authorization.'
         if (-not $objDocument.PlacementProseContent.Contains(
                 $strNoAdditionalAuthorizationRequest,
-                [System.StringComparison]::Ordinal
+                [StringComparison]::Ordinal
             )) {
             Write-Output (
                 "$($objDocument.Name) must contain the no-additional-authorization rule as prose."
@@ -4646,14 +4494,14 @@ function Get-AgentInstructionFailure {
         foreach ($strLiteral in $script:arrPlacementProseLiterals) {
             if (-not $objDocument.PlacementProseContent.Contains(
                     $strLiteral,
-                    [System.StringComparison]::Ordinal
+                    [StringComparison]::Ordinal
                 )) {
                 Write-Output "$($objDocument.Name) is missing required direct-placement safety marker: $strLiteral"
             }
         }
 
         foreach ($strLiteral in $script:arrObsoletePlacementLiterals) {
-            if ($objDocument.Content.Contains($strLiteral, [System.StringComparison]::Ordinal)) {
+            if ($objDocument.Content.Contains($strLiteral, [StringComparison]::Ordinal)) {
                 Write-Output (
                     "$($objDocument.Name) contains obsolete session-specific " +
                     "direct-placement authorization: $strLiteral"
@@ -4685,7 +4533,7 @@ function Get-AgentInstructionFailure {
         }
 
         foreach ($strLiteral in $script:arrObsoleteDeferralLiterals) {
-            if ($objDocument.Content.Contains($strLiteral, [System.StringComparison]::Ordinal)) {
+            if ($objDocument.Content.Contains($strLiteral, [StringComparison]::Ordinal)) {
                 Write-Output "$($objDocument.Name) contains an obsolete blanket Issue rule: $strLiteral"
             }
         }
@@ -4724,14 +4572,14 @@ function Get-AgentInstructionFailure {
                 Where-Object {
                     $null -ne $_.Text -and $_.Text.StartsWith(
                         $objContract.OwnerPrefix,
-                        [System.StringComparison]::Ordinal
+                        [StringComparison]::Ordinal
                     )
                 }
         )
         if ($arrOwners.Count -ne 1 -or
             -not $arrOwners[0].Text.Contains(
                 $objContract.Literal,
-                [System.StringComparison]::Ordinal
+                [StringComparison]::Ordinal
             )) {
             Write-Output (
                 'AGENTS.md must contain required policy as prose: ' +
@@ -4749,7 +4597,7 @@ function Get-AgentInstructionFailure {
     }
     if (-not $objClaudeMarkdownContext.ProseText.Contains(
             $script:strClaudeTechnicalProse,
-            [System.StringComparison]::Ordinal
+            [StringComparison]::Ordinal
         )) {
         Write-Output (
             'CLAUDE.md is missing required Claude marker: ' +
@@ -4791,74 +4639,25 @@ function Get-AgentInstructionFailure {
     }
 }
 
-function Assert-MutationRejected {
+function Assert-Failure {
     # .SYNOPSIS
     # Confirms that an agent-instruction mutation fails closed.
-    #
-    # .DESCRIPTION
-    # Evaluates one complete in-memory fixture and verifies that its failures
-    # contain the required text. Expected validation failures do not escape.
-    #
-    # .PARAMETER Name
-    # The mutation name used in self-test failures.
-    #
-    # .PARAMETER AgentsContent
-    # The mutated or control AGENTS.md text.
-    #
-    # .PARAMETER ClaudeContent
-    # The mutated or control CLAUDE.md text.
-    #
-    # .PARAMETER CodexConfigContent
-    # The mutated or control project TOML text.
-    #
-    # .PARAMETER ExpectedFailure
-    # The failure text that the validator must produce.
-    #
-    # .PARAMETER ParentAgentsContent
-    # The parent AGENTS.md text, or null for no metadata comparison.
-    #
-    # .PARAMETER ParentClaudeContent
-    # The parent CLAUDE.md text, or null for no metadata comparison.
-    #
-    # .PARAMETER AgentsExpectedUtcDate
-    # The required AGENTS.md UTC metadata date after a content change.
-    #
-    # .PARAMETER ClaudeExpectedUtcDate
-    # The required CLAUDE.md UTC metadata date after a content change.
-    #
-    # .EXAMPLE
-    # Assert-MutationRejected -Name 'disabled plugin' `
-    #     -AgentsContent $strAgents -ClaudeContent $strClaude `
-    #     -CodexConfigContent $strMutation -ExpectedFailure 'enabled = true'
-    #
-    # # Returns no output when the mutation is rejected for the expected reason.
-    #
-    # .INPUTS
-    # None. You can't pipe objects to this function.
-    #
-    # .OUTPUTS
-    # None.
-    #
-    # .NOTES
-    # Private helper; no positional parameters.
-    # Version: 1.0.20260820.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
-        [Parameter(Mandatory)]
-        [string] $Name,
+        [Parameter()][string] $Name,
+
+        [Parameter()]
+        [string] $AgentsContent = $script:strAgentsContent,
+
+        [Parameter()]
+        [string] $ClaudeContent = $script:strClaudeContent,
+
+        [Parameter()]
+        [string] $CodexConfigContent = $script:strCodexConfigContent,
 
         [Parameter(Mandatory)]
-        [string] $AgentsContent,
-
-        [Parameter(Mandatory)]
-        [string] $ClaudeContent,
-
-        [Parameter(Mandatory)]
-        [string] $CodexConfigContent,
-
-        [Parameter(Mandatory)]
-        [string] $ExpectedFailure,
+        [string] $Failure,
 
         [Parameter()]
         [AllowNull()]
@@ -4877,7 +4676,7 @@ function Assert-MutationRejected {
         [string] $ClaudeExpectedUtcDate = ''
     )
 
-    Write-Verbose "Testing rejected mutation: $Name"
+    Write-Verbose "Testing rejected mutation: $Failure"
     $arrFailures = @(Get-AgentInstructionFailure `
             -AgentsContent $AgentsContent `
             -ClaudeContent $ClaudeContent `
@@ -4887,74 +4686,29 @@ function Assert-MutationRejected {
             -AgentsExpectedUtcDate $AgentsExpectedUtcDate `
             -ClaudeExpectedUtcDate $ClaudeExpectedUtcDate)
     if ($arrFailures.Count -eq 0) {
-        throw "Mutation '$Name' did not fail closed."
+        throw "Mutation for '$Failure' did not fail closed."
     }
-    if (-not ($arrFailures -match [regex]::Escape($ExpectedFailure))) {
-        throw "Mutation '$Name' failed for the wrong reason. Failures: $($arrFailures -join '; ')"
+    if (-not ($arrFailures -match [regex]::Escape($Failure))) {
+        throw "Mutation for '$Failure' failed for the wrong reason. Failures: $($arrFailures -join '; ')"
     }
 }
 
 function Assert-FixtureAccepted {
     # .SYNOPSIS
     # Confirms that an agent-instruction fixture is accepted.
-    #
-    # .DESCRIPTION
-    # Evaluates one complete in-memory fixture and throws if any contract failure
-    # is returned.
-    #
-    # .PARAMETER Name
-    # The fixture name used in self-test failures.
-    #
-    # .PARAMETER AgentsContent
-    # The control AGENTS.md text.
-    #
-    # .PARAMETER ClaudeContent
-    # The control CLAUDE.md text.
-    #
-    # .PARAMETER CodexConfigContent
-    # The control project TOML text.
-    #
-    # .PARAMETER ParentAgentsContent
-    # The parent AGENTS.md text, or null for no metadata comparison.
-    #
-    # .PARAMETER ParentClaudeContent
-    # The parent CLAUDE.md text, or null for no metadata comparison.
-    #
-    # .PARAMETER AgentsExpectedUtcDate
-    # The required AGENTS.md UTC metadata date after a content change.
-    #
-    # .PARAMETER ClaudeExpectedUtcDate
-    # The required CLAUDE.md UTC metadata date after a content change.
-    #
-    # .EXAMPLE
-    # Assert-FixtureAccepted -Name 'baseline' -AgentsContent $strAgents `
-    #     -ClaudeContent $strClaude -CodexConfigContent $strConfig
-    #
-    # # Returns no output when the fixture passes the contract.
-    #
-    # .INPUTS
-    # None. You can't pipe objects to this function.
-    #
-    # .OUTPUTS
-    # None.
-    #
-    # .NOTES
-    # Private helper; no positional parameters.
-    # Version: 1.0.20260820.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
-        [Parameter(Mandatory)]
-        [string] $Name,
+        [Parameter()][string] $Name,
 
-        [Parameter(Mandatory)]
-        [string] $AgentsContent,
+        [Parameter()]
+        [string] $AgentsContent = $script:strAgentsContent,
 
-        [Parameter(Mandatory)]
-        [string] $ClaudeContent,
+        [Parameter()]
+        [string] $ClaudeContent = $script:strClaudeContent,
 
-        [Parameter(Mandatory)]
-        [string] $CodexConfigContent,
+        [Parameter()]
+        [string] $CodexConfigContent = $script:strCodexConfigContent,
 
         [Parameter()]
         [AllowNull()]
@@ -4973,7 +4727,7 @@ function Assert-FixtureAccepted {
         [string] $ClaudeExpectedUtcDate = ''
     )
 
-    Write-Verbose "Testing accepted fixture: $Name"
+    Write-Verbose 'Testing accepted fixture.'
     $arrFailures = @(Get-AgentInstructionFailure `
             -AgentsContent $AgentsContent `
             -ClaudeContent $ClaudeContent `
@@ -4983,7 +4737,7 @@ function Assert-FixtureAccepted {
             -AgentsExpectedUtcDate $AgentsExpectedUtcDate `
             -ClaudeExpectedUtcDate $ClaudeExpectedUtcDate)
     if ($arrFailures.Count -gt 0) {
-        throw "Accepted fixture '$Name' failed validation: $($arrFailures -join '; ')"
+        throw "Accepted fixture failed validation: $($arrFailures -join '; ')"
     }
 }
 
@@ -4992,8 +4746,8 @@ function Assert-FixtureAccepted {
 #region Repository validation
 
 $strWorkflowsDirectoryPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($PSScriptRoot)
-$strGitHubDirectoryPath = [System.IO.Path]::GetDirectoryName($strWorkflowsDirectoryPath)
-$strRepositoryRootPath = [System.IO.Path]::GetDirectoryName($strGitHubDirectoryPath)
+$strGitHubDirectoryPath = [IO.Path]::GetDirectoryName($strWorkflowsDirectoryPath)
+$strRepositoryRootPath = [IO.Path]::GetDirectoryName($strGitHubDirectoryPath)
 if ($PushApplicabilityOnly) {
     if ($SelfTest -or
         -not [string]::IsNullOrEmpty($InputRevision) -or
@@ -5151,7 +4905,7 @@ if (-not [string]::IsNullOrEmpty($InputRevision)) {
         -not [string]::Equals(
             $strValidatedInputRevision.Trim(),
             $InputRevision,
-            [System.StringComparison]::OrdinalIgnoreCase
+            [StringComparison]::OrdinalIgnoreCase
         )) {
         throw "The agent-instruction input commit is unavailable: $InputRevision"
     }
@@ -5160,7 +4914,7 @@ if (-not [string]::IsNullOrEmpty($InputRevision)) {
         -not [string]::Equals(
             $strValidatedInputRevision,
             $RangeHeadRevision,
-            [System.StringComparison]::OrdinalIgnoreCase
+            [StringComparison]::OrdinalIgnoreCase
         )) {
         throw 'The input revision must match the metadata event-range head.'
     }
@@ -5177,7 +4931,7 @@ if (-not [string]::IsNullOrEmpty($strValidatedInputRevision) -and
     -not [string]::Equals(
         $strValidatedInputRevision,
         $strCheckedOutRevision,
-        [System.StringComparison]::OrdinalIgnoreCase
+        [StringComparison]::OrdinalIgnoreCase
     )) {
     $strTrustRootBaseRevision = if ($EventName -ceq 'pull_request_target') {
         $strEventHistoryBaseRevision
@@ -5341,7 +5095,7 @@ foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
     $hashtableGovernedInstructionContent[$objDocumentSpec.Path] = $strDocumentContent
 }
 
-$listGovernedDocumentContexts = [System.Collections.Generic.List[pscustomobject]]::new()
+$listGovernedDocumentContexts = [Collections.Generic.List[pscustomobject]]::new()
 foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
     $objParentContext = Get-GovernedDocumentParentContext `
         -RepositoryRootPath $strRepositoryRootPath `
@@ -5501,8 +5255,8 @@ Write-Output 'Agent-instruction contract passed.'
 if ($SelfTest) {
     #region Mutation self-tests
 
-    $strMissingBootstrapFixture = [System.IO.Path]::Combine(
-        [System.IO.Path]::GetTempPath(),
+    $strMissingBootstrapFixture = [IO.Path]::Combine(
+        [IO.Path]::GetTempPath(),
         ('agent-instruction-bootstrap-{0}' -f [Guid]::NewGuid().ToString('N'))
     )
     $arrMissingBootstrapFailures = @(Get-MarkdownParserBootstrapFailure `
@@ -5563,15 +5317,12 @@ if ($SelfTest) {
         }
     )
     foreach ($objImportMutation in $arrClaudeImportMutations) {
-        Assert-MutationRejected `
-            -Name "Claude $($objImportMutation.Name)" `
-            -AgentsContent $strAgentsContent `
+        Assert-Failure `
             -ClaudeContent (
                 $strClaudeContent + [Environment]::NewLine +
                 $objImportMutation.Text
             ) `
-            -CodexConfigContent $strCodexConfigContent `
-            -ExpectedFailure $script:strClaudeImportFailure
+            -Failure $script:strClaudeImportFailure
     }
 
     $arrNestedClaudeImportFailures = @(Get-NestedClaudeImportFailure `
@@ -5603,8 +5354,6 @@ if ($SelfTest) {
     )
     foreach ($objAcceptedFixture in $arrAcceptedClaudeImportLikeFixtures) {
         Assert-FixtureAccepted `
-            -Name $objAcceptedFixture.Name `
-            -AgentsContent $strAgentsContent `
             -ClaudeContent (
                 $strClaudeContent + [Environment]::NewLine +
                 $objAcceptedFixture.Text
@@ -5688,9 +5437,9 @@ if ($SelfTest) {
                 -ParentContent $objDocumentContext.Content `
                 -ExpectedUtcDate $objMetadataContext.UpdatedDate `
                 -IsNewDocumentTransition $false)
-        $strExpectedFailure = "$strNewlyCoveredPath Version revision must be greater than"
+        $strFailure = "$strNewlyCoveredPath Version revision must be greater than"
         if (-not ($arrStaleMetadataFailures -match [regex]::Escape(
-                    $strExpectedFailure
+                    $strFailure
                 ))) {
             throw "$strNewlyCoveredPath stale-metadata mutation did not fail closed."
         }
@@ -5726,8 +5475,8 @@ if ($SelfTest) {
             throw "Tracked Claude local memory was not explicitly rejected: $strProhibitedClaudeLocalPath"
         }
     }
-    $strGitIgnoreContent = [System.IO.File]::ReadAllText(
-        [System.IO.Path]::Combine($strRepositoryRootPath, '.gitignore')
+    $strGitIgnoreContent = [IO.File]::ReadAllText(
+        [IO.Path]::Combine($strRepositoryRootPath, '.gitignore')
     )
     if ($strGitIgnoreContent -cnotmatch '(?m)^/CLAUDE\.local\.md$') {
         throw 'The root CLAUDE.local.md ignore rule is missing.'
@@ -5993,37 +5742,37 @@ if ($SelfTest) {
     Assert-RepositoryInputMetadataMutationRejected `
         -Name 'missing Git index entry mutation' `
         -GitIndexEntryCount 0 `
-        -ExpectedFailure 'missing Git index entry mutation must have exactly one Git index entry.'
+        -Failure 'missing Git index entry mutation must have exactly one Git index entry.'
 
     Assert-RepositoryInputMetadataMutationRejected `
         -Name 'Git symlink mode mutation' `
         -GitMode '120000' `
-        -ExpectedFailure 'Git symlink mode mutation must be a stage-0 regular file with Git mode 100644.'
+        -Failure 'Git symlink mode mutation must be a stage-0 regular file with Git mode 100644.'
 
     Assert-RepositoryInputMetadataMutationRejected `
         -Name 'nonzero Git stage mutation' `
         -GitStage '2' `
-        -ExpectedFailure 'nonzero Git stage mutation must be a stage-0 regular file with Git mode 100644.'
+        -Failure 'nonzero Git stage mutation must be a stage-0 regular file with Git mode 100644.'
 
     Assert-RepositoryInputMetadataMutationRejected `
         -Name 'non-file worktree item mutation' `
         -IsFileInfo $false `
-        -ExpectedFailure 'non-file worktree item mutation must be a regular worktree file.'
+        -Failure 'non-file worktree item mutation must be a regular worktree file.'
 
     Assert-RepositoryInputMetadataMutationRejected `
         -Name 'reparse-point mutation' `
         -Attributes ([System.IO.FileAttributes]::Normal -bor [System.IO.FileAttributes]::ReparsePoint) `
-        -ExpectedFailure 'reparse-point mutation must not be a symbolic link or reparse point.'
+        -Failure 'reparse-point mutation must not be a symbolic link or reparse point.'
 
     Assert-RepositoryInputMetadataMutationRejected `
         -Name 'link-type mutation' `
         -LinkType 'SymbolicLink' `
-        -ExpectedFailure 'link-type mutation must not have a link type.'
+        -Failure 'link-type mutation must not have a link type.'
 
     Assert-RepositoryInputMetadataMutationRejected `
         -Name 'Unix device mutation' `
         -UnixMode 'crw-rw-rw-' `
-        -ExpectedFailure 'Unix device mutation must have a regular Unix file type.'
+        -Failure 'Unix device mutation must have a regular Unix file type.'
 
     Assert-OversizedStreamMutationRejected
 
@@ -6090,13 +5839,10 @@ if ($SelfTest) {
         throw 'Index and revision path lists differ.'
     }
 
-    Assert-MutationRejected `
-        -Name 'malformed TOML suffix' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
+    Assert-Failure `
         -CodexConfigContent ($strCodexConfigContent + [Environment]::NewLine +
             'invalid = [' + [Environment]::NewLine) `
-        -ExpectedFailure 'The project configuration must contain valid TOML.'
+        -Failure 'The project configuration must contain valid TOML.'
 
     $objAgentsVersionMatch = [regex]::Match(
         $strAgentsContent,
@@ -6362,9 +6108,9 @@ if ($SelfTest) {
                     $strClaudeContent
                 }
                 CodexConfigContent = $strCodexConfigContent
-                ExpectedFailure = $objMutation.Failure
+                Failure = $objMutation.Failure
             }
-            Assert-MutationRejected @hashtableMutation
+            Assert-Failure @hashtableMutation
         }
 
         $strParentMutation = $objDocument.Content.Replace(
@@ -6377,7 +6123,7 @@ if ($SelfTest) {
             AgentsContent = $strAgentsContent
             ClaudeContent = $strClaudeContent
             CodexConfigContent = $strCodexConfigContent
-            ExpectedFailure = $strParentVersionFailure
+            Failure = $strParentVersionFailure
         }
         if ($objDocument.Name -ceq 'AGENTS.md') {
             $hashtableParentMutation.ParentAgentsContent = $strParentMutation
@@ -6389,7 +6135,7 @@ if ($SelfTest) {
             "Testing metadata structure mutation: $($objDocument.Name) parent " +
             'Version in fenced code'
         )
-        Assert-MutationRejected @hashtableParentMutation
+        Assert-Failure @hashtableParentMutation
 
         $strParentUpdatedMutation = $objDocument.Content.Replace(
             $objDocument.UpdatedLine,
@@ -6400,7 +6146,7 @@ if ($SelfTest) {
             AgentsContent = $strAgentsContent
             ClaudeContent = $strClaudeContent
             CodexConfigContent = $strCodexConfigContent
-            ExpectedFailure = "The parent of $strUpdatedFailure"
+            Failure = "The parent of $strUpdatedFailure"
         }
         if ($objDocument.Name -ceq 'AGENTS.md') {
             $hashtableParentUpdatedMutation.ParentAgentsContent = $strParentUpdatedMutation
@@ -6412,7 +6158,7 @@ if ($SelfTest) {
             "Testing metadata structure mutation: $($objDocument.Name) parent " +
             'Last Updated in HTML comment'
         )
-        Assert-MutationRejected @hashtableParentUpdatedMutation
+        Assert-Failure @hashtableParentUpdatedMutation
     }
 
     $intAgentsRevision = [int64] $objAgentsVersionMatch.Groups['Revision'].Value
@@ -6453,13 +6199,10 @@ if ($SelfTest) {
             $objAgentsUpdatedMatch.Value,
             '- **Last Updated:** ' + $objDateFixture.UpdatedDate
         )
-        Assert-MutationRejected `
-            -Name $objDateFixture.Name `
+        Assert-Failure `
             -AgentsContent $strInvalidDateContent `
-            -ClaudeContent $strClaudeContent `
-            -CodexConfigContent $strCodexConfigContent `
             -ParentAgentsContent $strAgentsContent `
-            -ExpectedFailure (
+            -Failure (
                 'AGENTS.md Version and Last Updated must contain one real matching calendar date.'
             )
     }
@@ -6471,22 +6214,15 @@ if ($SelfTest) {
         $objAgentsUpdatedMatch.Value,
         '- **Last Updated:** 2099-12-31'
     ) + [Environment]::NewLine + 'Future metadata fixture.'
-    Assert-MutationRejected `
-        -Name 'future current metadata date' `
+    Assert-Failure `
         -AgentsContent $strFutureMetadataContent `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
         -ParentAgentsContent $strAgentsContent `
-        -ExpectedFailure (
+        -Failure (
             'AGENTS.md Last Updated 2099-12-31 must not be later than trusted UTC date'
         )
-    Assert-MutationRejected `
-        -Name 'future parent metadata recovery' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
+    Assert-Failure `
         -ParentAgentsContent $strFutureMetadataContent `
-        -ExpectedFailure (
+        -Failure (
             'The parent of AGENTS.md Last Updated 2099-12-31 must not be later than trusted UTC date'
         )
 
@@ -6505,10 +6241,7 @@ if ($SelfTest) {
         '- **Last Updated:** 2000-01-01'
     )
     Assert-FixtureAccepted `
-        -Name 'valid leap metadata day' `
         -AgentsContent $strValidLeapDateContent `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
         -ParentAgentsContent $strValidLeapDateParent
 
     $strInvalidDateParent = $strAgentsContent.Replace(
@@ -6518,64 +6251,43 @@ if ($SelfTest) {
         $objAgentsUpdatedMatch.Value,
         '- **Last Updated:** 9999-99-99'
     )
-    Assert-MutationRejected `
-        -Name 'impossible parent metadata date' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
+    Assert-Failure `
         -ParentAgentsContent $strInvalidDateParent `
-        -ExpectedFailure 'The parent of AGENTS.md must contain one real matching calendar date.'
+        -Failure 'The parent of AGENTS.md must contain one real matching calendar date.'
 
     $strRenderedAgentsMutation = $strAgentsContent + [Environment]::NewLine +
         'A rendered governance note.' + [Environment]::NewLine
-    Assert-MutationRejected `
-        -Name 'impossible expected UTC date' `
+    Assert-Failure `
         -AgentsContent $strRenderedAgentsMutation `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
         -ParentAgentsContent $strAgentsContent `
         -AgentsExpectedUtcDate '9999-99-99' `
-        -ExpectedFailure 'The expected UTC date for AGENTS.md is unavailable or invalid.'
+        -Failure 'The expected UTC date for AGENTS.md is unavailable or invalid.'
 
-    Assert-MutationRejected `
-        -Name 'same-day rendered change with stale revision' `
+    Assert-Failure `
         -AgentsContent $strRenderedAgentsMutation `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
         -ParentAgentsContent $strAgentsContent `
         -AgentsExpectedUtcDate $objAgentsUpdatedMatch.Groups['Date'].Value `
-        -ExpectedFailure ("AGENTS.md Version revision must be greater than " +
+        -Failure ("AGENTS.md Version revision must be greater than " +
             "$intAgentsRevision after a same-day content change.")
 
     $strHigherRevisionParent = $strAgentsContent.Replace(
         $objAgentsVersionMatch.Value,
         $strAgentsVersionStem + $intNextAgentsRevision
     )
-    Assert-MutationRejected `
-        -Name 'same-day rendered change with decreasing revision' `
+    Assert-Failure `
         -AgentsContent $strRenderedAgentsMutation `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
         -ParentAgentsContent $strHigherRevisionParent `
         -AgentsExpectedUtcDate $objAgentsUpdatedMatch.Groups['Date'].Value `
-        -ExpectedFailure ("AGENTS.md Version revision must not decrease from " +
+        -Failure ("AGENTS.md Version revision must not decrease from " +
             "$intNextAgentsRevision to $intAgentsRevision.")
 
-    Assert-MutationRejected `
-        -Name 'metadata-only same-day revision rollback' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
+    Assert-Failure `
         -ParentAgentsContent $strHigherRevisionParent `
         -AgentsExpectedUtcDate $objAgentsUpdatedMatch.Groups['Date'].Value `
-        -ExpectedFailure ("AGENTS.md Version revision must not decrease from " +
+        -Failure ("AGENTS.md Version revision must not decrease from " +
             "$intNextAgentsRevision to $intAgentsRevision.")
 
     Assert-FixtureAccepted `
-        -Name 'normalized-equal metadata identity' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
         -ParentAgentsContent $strAgentsContent
 
     $strMaximumRevisionContent = $strAgentsContent.Replace(
@@ -6583,10 +6295,7 @@ if ($SelfTest) {
         $strAgentsVersionStem + [int64]::MaxValue
     )
     Assert-FixtureAccepted `
-        -Name 'normalized-equal maximum revision' `
         -AgentsContent $strMaximumRevisionContent `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
         -ParentAgentsContent $strMaximumRevisionContent
 
     $strSameDayRevisionJump = $strRenderedAgentsMutation.Replace(
@@ -6594,10 +6303,7 @@ if ($SelfTest) {
         $strAgentsVersionStem + $intJumpedAgentsRevision
     )
     Assert-FixtureAccepted `
-        -Name 'same-day squash-preserved revision jump' `
         -AgentsContent $strSameDayRevisionJump `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
         -ParentAgentsContent $strAgentsContent `
         -AgentsExpectedUtcDate $objAgentsUpdatedMatch.Groups['Date'].Value
 
@@ -6636,14 +6342,11 @@ if ($SelfTest) {
         throw 'Metadata-only input was rendered.'
     }
 
-    Assert-MutationRejected `
-        -Name 'rendered change with stale UTC date' `
+    Assert-Failure `
         -AgentsContent $strRenderedAgentsMutation `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
         -ParentAgentsContent $strAgentsContent `
         -AgentsExpectedUtcDate '2099-01-01' `
-        -ExpectedFailure 'AGENTS.md Last Updated must be 2099-01-01 after a rendered-content change.'
+        -Failure 'AGENTS.md Last Updated must be 2099-01-01 after a rendered-content change.'
 
     $strPreviousDateParent = $strAgentsContent.Replace(
         $objAgentsVersionMatch.Value,
@@ -6653,10 +6356,7 @@ if ($SelfTest) {
         '- **Last Updated:** 2000-01-01'
     )
     Assert-FixtureAccepted `
-        -Name 'new-day squash-preserved terminal revision' `
         -AgentsContent $strRenderedAgentsMutation `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
         -ParentAgentsContent $strPreviousDateParent `
         -AgentsExpectedUtcDate $objAgentsUpdatedMatch.Groups['Date'].Value
 
@@ -6665,10 +6365,7 @@ if ($SelfTest) {
         $strAgentsVersionStem + '0'
     )
     Assert-FixtureAccepted `
-        -Name 'new-day revision reset' `
         -AgentsContent $strNewDayReset `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
         -ParentAgentsContent $strPreviousDateParent `
         -AgentsExpectedUtcDate $objAgentsUpdatedMatch.Groups['Date'].Value
 
@@ -6680,10 +6377,6 @@ if ($SelfTest) {
         '- **Last Updated:** 2000-01-01'
     )
     Assert-FixtureAccepted `
-        -Name 'metadata-only forward date with preserved revision' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
         -ParentAgentsContent $strMetadataForwardParent
 
     $strRegressedDateContent = $strRenderedAgentsMutation.Replace(
@@ -6693,14 +6386,11 @@ if ($SelfTest) {
         $objAgentsUpdatedMatch.Value,
         '- **Last Updated:** 2000-01-01'
     )
-    Assert-MutationRejected `
-        -Name 'rendered change with regressing metadata date' `
+    Assert-Failure `
         -AgentsContent $strRegressedDateContent `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
         -ParentAgentsContent $strAgentsContent `
         -AgentsExpectedUtcDate '2000-01-01' `
-        -ExpectedFailure ("AGENTS.md Version date must not move backward from " +
+        -Failure ("AGENTS.md Version date must not move backward from " +
             "$($objAgentsVersionMatch.Groups['Date'].Value) to 20000101.")
 
     $strMetadataOnlyRegressedDate = $strAgentsContent.Replace(
@@ -6710,14 +6400,11 @@ if ($SelfTest) {
         $objAgentsUpdatedMatch.Value,
         '- **Last Updated:** 2000-01-01'
     )
-    Assert-MutationRejected `
-        -Name 'metadata-only date rollback' `
+    Assert-Failure `
         -AgentsContent $strMetadataOnlyRegressedDate `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
         -ParentAgentsContent $strAgentsContent `
         -AgentsExpectedUtcDate $objAgentsUpdatedMatch.Groups['Date'].Value `
-        -ExpectedFailure ("AGENTS.md Version date must not move backward from " +
+        -Failure ("AGENTS.md Version date must not move backward from " +
             "$($objAgentsVersionMatch.Groups['Date'].Value) to 20000101.")
 
     $strEarlierStaleMetadataContent = $strAgentsContent +
@@ -6746,11 +6433,11 @@ if ($SelfTest) {
     if ($arrMultiCommitTransitionFailures.Count -ne 1 -or
         -not $arrMultiCommitTransitionFailures[0].Contains(
             'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-            [System.StringComparison]::Ordinal
+            [StringComparison]::Ordinal
         ) -or
         -not $arrMultiCommitTransitionFailures[0].Contains(
             'Version revision must be greater',
-            [System.StringComparison]::Ordinal
+            [StringComparison]::Ordinal
         )) {
         throw 'Multi-commit metadata validation did not preserve an earlier invalid transition.'
     }
@@ -6794,18 +6481,18 @@ if ($SelfTest) {
         throw 'An unchanged existing-ref push did not select its exact no-op.'
     }
 
-    $strPushFixtureRoot = [System.IO.Path]::GetFullPath(
-        [System.IO.Path]::Combine(
-            [System.IO.Path]::GetTempPath(),
+    $strPushFixtureRoot = [IO.Path]::GetFullPath(
+        [IO.Path]::Combine(
+            [IO.Path]::GetTempPath(),
             'agent-instruction-push-' + [guid]::NewGuid().ToString('N')
         )
     )
-    $strPushFixtureTempRoot = [System.IO.Path]::GetFullPath(
-        [System.IO.Path]::GetTempPath()
+    $strPushFixtureTempRoot = [IO.Path]::GetFullPath(
+        [IO.Path]::GetTempPath()
     )
     if (-not $strPushFixtureRoot.StartsWith(
             $strPushFixtureTempRoot,
-            [System.StringComparison]::OrdinalIgnoreCase
+            [StringComparison]::OrdinalIgnoreCase
         )) {
         throw 'The push-applicability fixture escaped the system temporary directory.'
     }
@@ -7037,7 +6724,7 @@ if ($SelfTest) {
         if ([System.IO.Directory]::Exists($strPushFixtureRoot) -and
             $strPushFixtureRoot.StartsWith(
                 $strPushFixtureTempRoot,
-                [System.StringComparison]::OrdinalIgnoreCase
+                [StringComparison]::OrdinalIgnoreCase
             )) {
             Remove-Item -LiteralPath $strPushFixtureRoot -Recurse -Force
         }
@@ -7055,7 +6742,7 @@ if ($SelfTest) {
                 -Revision $strNewRefTestHead `
                 -RepositoryRelativePath 'AGENTS.md' `
                 -MaximumBytes $intAgentsMaximumInputBytes),
-            [System.StringComparison]::Ordinal
+            [StringComparison]::Ordinal
         )) {
         throw 'Regular revision input validation changed the accepted blob content.'
     }
@@ -7071,7 +6758,7 @@ if ($SelfTest) {
     catch {
         $boolMissingRevisionInputRejected = $_.Exception.Message.Contains(
             'not one regular 100644 blob',
-            [System.StringComparison]::Ordinal
+            [StringComparison]::Ordinal
         )
     }
     if (-not $boolMissingRevisionInputRejected) {
@@ -7231,7 +6918,7 @@ if ($SelfTest) {
     catch {
         $boolUnflaggedZeroBaseRejected = $_.Exception.Message.Contains(
             'requires the new-ref flag',
-            [System.StringComparison]::Ordinal
+            [StringComparison]::Ordinal
         )
     }
     if (-not $boolUnflaggedZeroBaseRejected) {
@@ -7255,7 +6942,7 @@ if ($SelfTest) {
     catch {
         $boolFlaggedNonzeroBaseRejected = $_.Exception.Message.Contains(
             'requires an all-zero base revision',
-            [System.StringComparison]::Ordinal
+            [StringComparison]::Ordinal
         )
     }
     if (-not $boolFlaggedNonzeroBaseRejected) {
@@ -7278,16 +6965,16 @@ if ($SelfTest) {
         throw 'An unchanged ordinary metadata range did not retain its prior behavior.'
     }
 
-    $strMergeFixtureRoot = [System.IO.Path]::GetFullPath(
-        [System.IO.Path]::Combine(
-            [System.IO.Path]::GetTempPath(),
+    $strMergeFixtureRoot = [IO.Path]::GetFullPath(
+        [IO.Path]::Combine(
+            [IO.Path]::GetTempPath(),
             'agent-instruction-merge-' + [guid]::NewGuid().ToString('N')
         )
     )
-    $strSystemTempRoot = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath())
+    $strSystemTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
     if (-not $strMergeFixtureRoot.StartsWith(
             $strSystemTempRoot,
-            [System.StringComparison]::OrdinalIgnoreCase
+            [StringComparison]::OrdinalIgnoreCase
         )) {
         throw 'The merge-transition fixture path escaped the system temporary directory.'
     }
@@ -7310,14 +6997,14 @@ if ($SelfTest) {
         if ($LASTEXITCODE -ne 0) {
             throw 'Could not configure the merge-transition fixture repository.'
         }
-        $strMergePolicyPath = [System.IO.Path]::Combine(
+        $strMergePolicyPath = [IO.Path]::Combine(
             $strMergeFixtureRoot,
             '.github',
             'workflows',
             'Test-AgentInstructions.ps1'
         )
         [void][System.IO.Directory]::CreateDirectory(
-            [System.IO.Path]::GetDirectoryName($strMergePolicyPath)
+            [IO.Path]::GetDirectoryName($strMergePolicyPath)
         )
         $objUtf8WithoutBom = [System.Text.UTF8Encoding]::new($false)
         $objMergeCurrentDate = [DateTime]::ParseExact(
@@ -7343,12 +7030,12 @@ if ($SelfTest) {
             $objAgentsUpdatedMatch.Value,
             "- **Last Updated:** $strMergeHistoricalDate"
         )
-        [System.IO.File]::WriteAllText(
-            [System.IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
+        [IO.File]::WriteAllText(
+            [IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
             $strMergeBaseContent,
             $objUtf8WithoutBom
         )
-        [System.IO.File]::WriteAllText(
+        [IO.File]::WriteAllText(
             $strMergePolicyPath,
             $strMetadataRangePolicyMarker,
             $objUtf8WithoutBom
@@ -7361,6 +7048,62 @@ if ($SelfTest) {
             throw 'Could not create the merge-transition base tree.'
         }
         $strMergeBaseTree = $strMergeBaseTree.Trim()
+
+        $scriptBlockNewPolicyTree = {
+            param([byte[]] $Bytes, [string] $Mode = '100644')
+            [IO.File]::WriteAllBytes($strMergePolicyPath, $Bytes)
+            $strBlob = ([string](& git -C $strMergeFixtureRoot hash-object -w -- `
+                        $strMergePolicyPath)).Trim()
+            & git -C $strMergeFixtureRoot read-tree $strMergeBaseTree
+            & git -C $strMergeFixtureRoot update-index --cacheinfo `
+                "$Mode,$strBlob,.github/workflows/Test-AgentInstructions.ps1"
+            $strTree = ([string](& git -C $strMergeFixtureRoot write-tree)).Trim()
+            if ($LASTEXITCODE -ne 0 -or $strTree -notmatch '^[0-9a-fA-F]{40}$') {
+                throw 'Could not create an immutable policy-marker fixture.'
+            }
+            return $strTree
+        }
+        $scriptBlockAssertHistoryFailure = {
+            param([string] $Tree, [string] $Message)
+            $boolRejected = $false
+            try {
+                [void](Test-HistoricalPolicyMarker -RepositoryRootPath $strMergeFixtureRoot `
+                        -Revision $Tree -RepositoryRelativePath `
+                        '.github/workflows/Test-AgentInstructions.ps1' `
+                        -Literal $strMetadataRangePolicyMarker)
+            }
+            catch {
+                $boolRejected = $_.Exception.Message.Contains(
+                    $Message, [StringComparison]::Ordinal)
+            }
+            if (-not $boolRejected) { throw "Historical policy fixture was not rejected: $Message" }
+        }
+        $arrBoundedHistory = [Text.Encoding]::UTF8.GetBytes(
+            $strMetadataRangePolicyMarker +
+            ('x' * (393217 - $strMetadataRangePolicyMarker.Length)))
+        $strBoundedHistoryTree = & $scriptBlockNewPolicyTree $arrBoundedHistory
+        if (-not (Test-HistoricalPolicyMarker -RepositoryRootPath $strMergeFixtureRoot `
+                    -Revision $strBoundedHistoryTree -RepositoryRelativePath `
+                    '.github/workflows/Test-AgentInstructions.ps1' `
+                    -Literal $strMetadataRangePolicyMarker)) {
+            throw 'A bounded immutable historical marker was not found.'
+        }
+        $strAbsentHistoryTree = & $scriptBlockNewPolicyTree `
+            ([Text.Encoding]::UTF8.GetBytes('marker absent'))
+        if (Test-HistoricalPolicyMarker -RepositoryRootPath $strMergeFixtureRoot `
+                -Revision $strAbsentHistoryTree -RepositoryRelativePath `
+                '.github/workflows/Test-AgentInstructions.ps1' `
+                -Literal $strMetadataRangePolicyMarker) {
+            throw 'A historical marker-absent policy was classified as governed.'
+        }
+        & $scriptBlockAssertHistoryFailure `
+            (& $scriptBlockNewPolicyTree ([byte[]]::new(524289))) 'must not exceed 524288 bytes'
+        & $scriptBlockAssertHistoryFailure `
+            (& $scriptBlockNewPolicyTree ([byte[]] @(0xC3, 0x28))) 'valid UTF-8 without a BOM'
+        & $scriptBlockAssertHistoryFailure `
+            (& $scriptBlockNewPolicyTree `
+                ([Text.Encoding]::UTF8.GetBytes($strMetadataRangePolicyMarker)) '120000') `
+            'not one regular 100644 blob'
 
         $scriptBlockCreateMergeFixtureCommit = {
             param(
@@ -7533,8 +7276,8 @@ if ($SelfTest) {
             $strMergeTopicVersion
         ) + [Environment]::NewLine + 'Inherited merge fixture.' +
             [Environment]::NewLine
-        [System.IO.File]::WriteAllText(
-            [System.IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
+        [IO.File]::WriteAllText(
+            [IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
             $strMergeTopicContent,
             $objUtf8WithoutBom
         )
@@ -7552,8 +7295,8 @@ if ($SelfTest) {
         $strAdvancedBaseContent = $strMergeBaseContent +
             [Environment]::NewLine + 'Base-only governed fixture.' +
             [Environment]::NewLine
-        [System.IO.File]::WriteAllText(
-            [System.IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
+        [IO.File]::WriteAllText(
+            [IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
             $strAdvancedBaseContent,
             $objUtf8WithoutBom
         )
@@ -7716,8 +7459,8 @@ if ($SelfTest) {
         ) +
             [Environment]::NewLine + 'Inherited merge fixture.' +
             [Environment]::NewLine
-        [System.IO.File]::WriteAllText(
-            [System.IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
+        [IO.File]::WriteAllText(
+            [IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
             $strRebasedTopicContent,
             $objUtf8WithoutBom
         )
@@ -7755,8 +7498,8 @@ if ($SelfTest) {
             $strMergeHistoricalDate.Replace('-', '') + '.1',
             $strMergeHistoricalDate.Replace('-', '') + '.2'
         )
-        [System.IO.File]::WriteAllText(
-            [System.IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
+        [IO.File]::WriteAllText(
+            [IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
             $strChangedRebasedTopicContent,
             $objUtf8WithoutBom
         )
@@ -7778,8 +7521,8 @@ if ($SelfTest) {
             throw 'An actual rebased topic delta change was ignored.'
         }
         & git -C $strMergeFixtureRoot read-tree $strRebasedTopicTree
-        [System.IO.File]::WriteAllText(
-            [System.IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
+        [IO.File]::WriteAllText(
+            [IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
             $strRebasedTopicContent,
             $objUtf8WithoutBom
         )
@@ -7940,7 +7683,7 @@ if ($SelfTest) {
                 -Base $strMergeBaseCommit -Head $strFutureTopicCommit)
         if (-not ($arrFutureTopicFailures -join '; ').Contains(
                 "Metadata range commit $strFutureTopicCommit timestamp",
-                [System.StringComparison]::Ordinal
+                [StringComparison]::Ordinal
             )) {
             throw 'An ordinary future commit timestamp did not fail closed.'
         }
@@ -7949,8 +7692,8 @@ if ($SelfTest) {
             $strMergeHistoricalDate.Replace('-', '') + '.2'
         ) +
             [Environment]::NewLine + 'Merge-authored content with stale metadata.'
-        [System.IO.File]::WriteAllText(
-            [System.IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
+        [IO.File]::WriteAllText(
+            [IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
             $strUniqueMergeContent,
             $objUtf8WithoutBom
         )
@@ -7976,15 +7719,15 @@ if ($SelfTest) {
                 -TrustedEventUtcDate $strMergeCurrentDate)
         if (-not ($arrUniqueFreshnessFailures -join '; ').Contains(
                 "Last Updated must be $strMergeCurrentDate",
-                [System.StringComparison]::Ordinal
+                [StringComparison]::Ordinal
             )) {
             throw 'Trusted current-input freshness accepted stale merge metadata.'
         }
 
         $strNewerParentContent = $strAgentsContent +
             [Environment]::NewLine + 'Newer first-parent merge fixture.'
-        [System.IO.File]::WriteAllText(
-            [System.IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
+        [IO.File]::WriteAllText(
+            [IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
             $strNewerParentContent,
             $objUtf8WithoutBom
         )
@@ -8008,11 +7751,11 @@ if ($SelfTest) {
         if ($arrRegressingMergeFailures.Count -eq 0 -or
             -not ($arrRegressingMergeFailures -join '; ').Contains(
                 'Version date must not move backward',
-                [System.StringComparison]::Ordinal
+                [StringComparison]::Ordinal
             )) {
             throw 'An inherited merge metadata rollback did not fail closed.'
         }
-        $listExcessParents = [System.Collections.Generic.List[string]]::new()
+        $listExcessParents = [Collections.Generic.List[string]]::new()
         foreach ($intFixtureParent in 1..($intMetadataMaximumParents + 1)) {
             $listExcessParents.Add((& $scriptBlockCreateMergeFixtureCommit `
                         -Tree $strMergeBaseTree `
@@ -8033,7 +7776,7 @@ if ($SelfTest) {
         catch {
             $boolExcessParentCountRejected = $_.Exception.Message.Contains(
                 "maximum is $intMetadataMaximumParents",
-                [System.StringComparison]::Ordinal
+                [StringComparison]::Ordinal
             )
         }
         if (-not $boolExcessParentCountRejected) {
@@ -8056,7 +7799,7 @@ if ($SelfTest) {
         if ([System.IO.Directory]::Exists($strMergeFixtureRoot) -and
             $strMergeFixtureRoot.StartsWith(
                 $strSystemTempRoot,
-                [System.StringComparison]::OrdinalIgnoreCase
+                [StringComparison]::OrdinalIgnoreCase
             )) {
             Remove-Item -LiteralPath $strMergeFixtureRoot -Recurse -Force
         }
@@ -8086,20 +7829,20 @@ if ($SelfTest) {
     catch {
         $boolRevisionMismatchRejected = $_.Exception.Message.Contains(
             'does not match the validation revision',
-            [System.StringComparison]::Ordinal
+            [StringComparison]::Ordinal
         )
     }
     if (-not $boolRevisionMismatchRejected) {
         throw 'A mismatched explicit validation revision did not fail closed.'
     }
 
-    $strAgentWorkflowContent = [System.IO.File]::ReadAllText(
-        [System.IO.Path]::Combine($PSScriptRoot, 'agent-instructions.yml')
+    $strAgentWorkflowContent = [IO.File]::ReadAllText(
+        [IO.Path]::Combine($PSScriptRoot, 'agent-instructions.yml')
     )
     $scriptBlockGetAgentWorkflowFailure = {
         param([Parameter(Mandatory)][string] $Content)
 
-        $listFailures = [System.Collections.Generic.List[string]]::new()
+        $listFailures = [Collections.Generic.List[string]]::new()
         if ($Content -notmatch
             "(?s)AGENT_INSTRUCTION_INPUT_REVISION:.+github.event_name == 'push' && github.event.after") {
             $listFailures.Add('Push input must use the exact event after revision.')
@@ -8400,49 +8143,38 @@ if ($SelfTest) {
     $strAgentsPlacementHeading = '## PR Review Workflow (Codex-adapted)'
     $strRawHtmlAgentsPlacementHeading = '<div>' + [Environment]::NewLine +
         $strAgentsPlacementHeading + [Environment]::NewLine + '</div>'
-    Assert-MutationRejected `
-        -Name 'AGENTS placement heading hidden in raw HTML' `
+    Assert-Failure `
         -AgentsContent $strAgentsContent.Replace(
             $strAgentsPlacementHeading,
             $strRawHtmlAgentsPlacementHeading
         ) `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
+        -Failure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
 
     $strClaudeLoopHeading = '## Automated Review Loop'
     $strRawHtmlClaudeLoopHeading = '<div>' + [Environment]::NewLine +
         $strClaudeLoopHeading + [Environment]::NewLine + '</div>'
-    Assert-MutationRejected `
-        -Name 'CLAUDE review-loop heading hidden in raw HTML' `
-        -AgentsContent $strAgentsContent `
+    Assert-Failure `
         -ClaudeContent $strClaudeContent.Replace(
             $strClaudeLoopHeading,
             $strRawHtmlClaudeLoopHeading
         ) `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'CLAUDE.md must contain the standing direct-placement authorization exactly once.'
+        -Failure 'CLAUDE.md must contain the standing direct-placement authorization exactly once.'
 
     $strRawHtmlBoundaryFixture = $strAgentsPlacementHeading +
         [Environment]::NewLine + [Environment]::NewLine + '<div>' +
         [Environment]::NewLine + '## Raw HTML Impostor Boundary' +
         [Environment]::NewLine + '</div>'
     Assert-FixtureAccepted `
-        -Name 'raw HTML heading does not terminate a real section' `
         -AgentsContent $strAgentsContent.Replace(
             $strAgentsPlacementHeading,
             $strRawHtmlBoundaryFixture
         ) `
-        -ClaudeContent $strClaudeContent `
         -CodexConfigContent $strCodexConfigContent
 
-    Assert-MutationRejected `
-        -Name 'duplicate parsed AGENTS placement heading' `
+    Assert-Failure `
         -AgentsContent ($strAgentsContent + [Environment]::NewLine +
             $strAgentsPlacementHeading) `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
+        -Failure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
 
     $strContraryPlacementRule =
         'The agent must request a new owner approval before each direct PR-head push.'
@@ -8510,20 +8242,14 @@ if ($SelfTest) {
                     [Environment]::NewLine + '      ' + $strContraryPlacementRule
             )
             if ($objStandingDocument.Name -ceq 'AGENTS') {
-                Assert-MutationRejected `
-                    -Name "AGENTS standing placement hidden in $($objDeletionVariant.Name)" `
+                Assert-Failure `
                     -AgentsContent $strDeletedContent `
-                    -ClaudeContent $strClaudeContent `
-                    -CodexConfigContent $strCodexConfigContent `
-                    -ExpectedFailure $objStandingDocument.Failure
+                    -Failure $objStandingDocument.Failure
             }
             else {
-                Assert-MutationRejected `
-                    -Name "CLAUDE standing placement hidden in $($objDeletionVariant.Name)" `
-                    -AgentsContent $strAgentsContent `
+                Assert-Failure `
                     -ClaudeContent $strDeletedContent `
-                    -CodexConfigContent $strCodexConfigContent `
-                    -ExpectedFailure $objStandingDocument.Failure
+                    -Failure $objStandingDocument.Failure
             }
         }
     }
@@ -8574,20 +8300,14 @@ if ($SelfTest) {
                     [Environment]::NewLine + '      ' + $strContraryPlacementRule
             )
             if ($objStandingDocument.Name -ceq 'AGENTS') {
-                Assert-MutationRejected `
-                    -Name "AGENTS standing placement hidden in $($objHtmlVariant.Name)" `
+                Assert-Failure `
                     -AgentsContent $strHtmlWrappedContent `
-                    -ClaudeContent $strClaudeContent `
-                    -CodexConfigContent $strCodexConfigContent `
-                    -ExpectedFailure $objStandingDocument.Failure
+                    -Failure $objStandingDocument.Failure
             }
             else {
-                Assert-MutationRejected `
-                    -Name "CLAUDE standing placement hidden in $($objHtmlVariant.Name)" `
-                    -AgentsContent $strAgentsContent `
+                Assert-Failure `
                     -ClaudeContent $strHtmlWrappedContent `
-                    -CodexConfigContent $strCodexConfigContent `
-                    -ExpectedFailure $objStandingDocument.Failure
+                    -Failure $objStandingDocument.Failure
             }
         }
     }
@@ -8596,7 +8316,7 @@ if ($SelfTest) {
         -Content 'Visible **operative** prose.'
     if (-not $objVisibleEmphasisContext.ProseText.Contains(
             'Visible operative prose.',
-            [System.StringComparison]::Ordinal
+            [StringComparison]::Ordinal
         )) {
         throw 'Operative Markdown filtering removed ordinary emphasized prose.'
     }
@@ -8605,7 +8325,7 @@ if ($SelfTest) {
         -Content 'Visible<br> operative prose.'
     if (-not $objVoidHtmlContext.ProseText.Contains(
             'Visible operative prose.',
-            [System.StringComparison]::Ordinal
+            [StringComparison]::Ordinal
         )) {
         throw 'Operative Markdown filtering removed prose adjacent to an HTML void element.'
     }
@@ -8617,7 +8337,7 @@ if ($SelfTest) {
     catch {
         $boolUnbalancedDeletionRejected = $_.Exception.Message.Contains(
             'locked Markdown parser rejected',
-            [System.StringComparison]::OrdinalIgnoreCase
+            [StringComparison]::OrdinalIgnoreCase
         )
     }
     if (-not $boolUnbalancedDeletionRejected) {
@@ -8631,39 +8351,33 @@ if ($SelfTest) {
     catch {
         $boolUnbalancedHtmlRejected = $_.Exception.Message.Contains(
             'locked Markdown parser rejected',
-            [System.StringComparison]::OrdinalIgnoreCase
+            [StringComparison]::OrdinalIgnoreCase
         )
     }
     if (-not $boolUnbalancedHtmlRejected) {
         throw 'Unbalanced inline HTML markup did not fail closed.'
     }
 
-    Assert-MutationRejected `
-        -Name 'standing placement hidden in HTML comment' `
+    Assert-Failure `
         -AgentsContent $strAgentsContent.Replace(
             $strAgentsStandingParagraph,
             '<!--' + [Environment]::NewLine +
                 $strAgentsStandingParagraph + [Environment]::NewLine +
                 '-->' + [Environment]::NewLine + $strContraryPlacementRule
         ) `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
+        -Failure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
 
     $strInlineCodeMutation = $strAgentsStandingParagraph.Replace(
         $strAgentsStandingParagraph.TrimStart(),
         [string][char]96 + $strAgentsStandingParagraph.TrimStart() + [string][char]96
     )
-    Assert-MutationRejected `
-        -Name 'standing placement hidden in inline code' `
+    Assert-Failure `
         -AgentsContent $strAgentsContent.Replace(
             $strAgentsStandingParagraph,
             $strInlineCodeMutation + [Environment]::NewLine +
                 [Environment]::NewLine + '      ' + $strContraryPlacementRule
         ) `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
+        -Failure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
 
     $strTechnicalInlineFixture = 'Use `reviewThreads` to enumerate review threads.'
     $objTechnicalInlineContext = Get-OperativeMarkdownContext `
@@ -8674,7 +8388,7 @@ if ($SelfTest) {
         ).Count -ne 1 -or
         $objTechnicalInlineContext.ProseText.Contains(
             'reviewThreads',
-            [System.StringComparison]::Ordinal
+            [StringComparison]::Ordinal
         )) {
         throw 'Inline Markdown parsing did not separate technical code from policy prose.'
     }
@@ -8734,7 +8448,7 @@ if ($SelfTest) {
             foreach ($objMutation in $arrConcealmentMutations) {
                 $strMutation = $strRemovedContent + [Environment]::NewLine +
                     [Environment]::NewLine + $objMutation.Payload
-                $strExpectedFailure = "$($objContract.Name).md is missing required " +
+                $strFailure = "$($objContract.Name).md is missing required " +
                     $(if ($objContract.Name -ceq 'AGENTS') {
                             'Codex'
                         }
@@ -8742,20 +8456,14 @@ if ($SelfTest) {
                             'Claude'
                         }) + " marker: $strLiteral"
                 if ($objContract.Name -ceq 'AGENTS') {
-                    Assert-MutationRejected `
-                        -Name "AGENTS technical marker in $($objMutation.Name): $strLiteral" `
+                    Assert-Failure `
                         -AgentsContent $strMutation `
-                        -ClaudeContent $strClaudeContent `
-                        -CodexConfigContent $strCodexConfigContent `
-                        -ExpectedFailure $strExpectedFailure
+                        -Failure $strFailure
                 }
                 else {
-                    Assert-MutationRejected `
-                        -Name "CLAUDE technical marker in $($objMutation.Name): $strLiteral" `
-                        -AgentsContent $strAgentsContent `
+                    Assert-Failure `
                         -ClaudeContent $strMutation `
-                        -CodexConfigContent $strCodexConfigContent `
-                        -ExpectedFailure $strExpectedFailure
+                        -Failure $strFailure
                 }
             }
         }
@@ -8777,32 +8485,25 @@ if ($SelfTest) {
         [string][char]96 + $script:strClaudeTechnicalProse + [string][char]96
     )
     foreach ($strPayload in $arrClaudeProseMutations) {
-        Assert-MutationRejected `
-            -Name "Claude readiness marker on non-prose surface: $strPayload" `
-            -AgentsContent $strAgentsContent `
+        Assert-Failure `
             -ClaudeContent ($strRemovedClaudeProse + [Environment]::NewLine +
                 [Environment]::NewLine + $strPayload) `
-            -CodexConfigContent $strCodexConfigContent `
-            -ExpectedFailure (
+            -Failure (
                 'CLAUDE.md is missing required Claude marker: ' +
                 $script:strClaudeTechnicalProse
             )
     }
 
-    Assert-MutationRejected `
-        -Name 'standing placement hidden in fenced example' `
+    Assert-Failure `
         -AgentsContent $strAgentsContent.Replace(
             $strAgentsStandingParagraph,
             $strMarkdownFence + 'text' + [Environment]::NewLine +
                 $strAgentsStandingParagraph + [Environment]::NewLine +
                 $strMarkdownFence + [Environment]::NewLine + $strContraryPlacementRule
         ) `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
+        -Failure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
 
-    Assert-MutationRejected `
-        -Name 'standing placement hidden in blockquoted fenced example' `
+    Assert-Failure `
         -AgentsContent $strAgentsContent.Replace(
             $strAgentsStandingParagraph,
             '> ' + $strMarkdownFence + 'text' + [Environment]::NewLine +
@@ -8810,13 +8511,10 @@ if ($SelfTest) {
                 '> ' + $strMarkdownFence + [Environment]::NewLine +
                 $strContraryPlacementRule
         ) `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
+        -Failure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
 
     $strMarkdownTildeFence = '~~~'
-    Assert-MutationRejected `
-        -Name 'standing placement hidden in nested blockquoted tilde fence' `
+    Assert-Failure `
         -AgentsContent $strAgentsContent.Replace(
             $strAgentsStandingParagraph,
             '> > ' + $strMarkdownTildeFence + 'text' + [Environment]::NewLine +
@@ -8824,12 +8522,9 @@ if ($SelfTest) {
                 '> > ' + $strMarkdownTildeFence + [Environment]::NewLine +
                 $strContraryPlacementRule
         ) `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
+        -Failure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
 
-    Assert-MutationRejected `
-        -Name 'standing placement hidden in list-item fenced example' `
+    Assert-Failure `
         -AgentsContent $strAgentsContent.Replace(
             $strAgentsStandingParagraph,
             '- ' + $strMarkdownFence + 'text' + [Environment]::NewLine +
@@ -8837,41 +8532,31 @@ if ($SelfTest) {
                 '  ' + $strMarkdownFence + [Environment]::NewLine +
                 $strContraryPlacementRule
         ) `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
+        -Failure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
 
-    Assert-MutationRejected `
-        -Name 'unclosed blockquoted fence does not swallow operative prose' `
+    Assert-Failure `
         -AgentsContent $strAgentsContent.Replace(
             $strAgentsStandingParagraph,
             '> ' + $strMarkdownFence + 'text' + [Environment]::NewLine +
                 '> ' + $strAgentsStandingParagraph + [Environment]::NewLine +
                 $strContraryPlacementRule
         ) `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
+        -Failure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
 
     Assert-FixtureAccepted `
-        -Name 'ordinary blockquoted policy remains operative' `
         -AgentsContent $strAgentsContent.Replace(
             $strAgentsStandingParagraph,
             '    > ' + $strAgentsStandingParagraph.TrimStart()
         ) `
-        -ClaudeContent $strClaudeContent `
         -CodexConfigContent $strCodexConfigContent
 
-    Assert-MutationRejected `
-        -Name 'standing placement hidden in list-item indented code block' `
+    Assert-Failure `
         -AgentsContent $strAgentsContent.Replace(
             $strAgentsStandingParagraph,
             '    ' + $strAgentsStandingParagraph + [Environment]::NewLine +
                 [Environment]::NewLine + '    ' + $strContraryPlacementRule
         ) `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
+        -Failure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
 
     $arrIndentedCodeFixtures = @(
         [pscustomobject]@{
@@ -8889,9 +8574,9 @@ if ($SelfTest) {
     )
     foreach ($objFixture in $arrIndentedCodeFixtures) {
         $strOperativeFixture = ConvertTo-OperativeMarkdownText -Content $objFixture.Content
-        if ($strOperativeFixture.Contains('HIDDEN-CODE', [System.StringComparison]::Ordinal) -or
-            -not $strOperativeFixture.Contains('Before', [System.StringComparison]::Ordinal) -or
-            -not $strOperativeFixture.Contains('After', [System.StringComparison]::Ordinal)) {
+        if ($strOperativeFixture.Contains('HIDDEN-CODE', [StringComparison]::Ordinal) -or
+            -not $strOperativeFixture.Contains('Before', [StringComparison]::Ordinal) -or
+            -not $strOperativeFixture.Contains('After', [StringComparison]::Ordinal)) {
             throw "Operative Markdown filtering failed for $($objFixture.Name)."
         }
     }
@@ -8906,7 +8591,7 @@ if ($SelfTest) {
     $strNestedListOperativeText = ConvertTo-OperativeMarkdownText -Content $strNestedListProse
     if (-not $strNestedListOperativeText.Contains(
             'OPERATIVE-NESTED-PROSE',
-            [System.StringComparison]::Ordinal
+            [StringComparison]::Ordinal
         )) {
         throw 'Operative Markdown filtering removed ordinary nested-list prose.'
     }
@@ -8920,24 +8605,18 @@ if ($SelfTest) {
         $strAgentsAutomatedLoopHeading + [Environment]::NewLine +
             $strAgentsStandingParagraph
     )
-    Assert-MutationRejected `
-        -Name 'standing placement moved to wrong section' `
+    Assert-Failure `
         -AgentsContent $strRelocatedStandingPlacement `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
+        -Failure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
 
-    Assert-MutationRejected `
-        -Name 'missing shared inventory marker' `
+    Assert-Failure `
         -AgentsContent $strAgentsContent.Replace('`reviewThreads`', '`reviewThreadz`') `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'AGENTS.md is missing required capability marker: `reviewThreads`'
+        -Failure 'AGENTS.md is missing required capability marker: `reviewThreads`'
 
     $arrSharedMarkerSource = @(
         $script:arrSharedStructuralLiterals |
             ForEach-Object {
-                if ($_.StartsWith([string][char]96, [System.StringComparison]::Ordinal)) {
+                if ($_.StartsWith([string][char]96, [StringComparison]::Ordinal)) {
                     $_
                 }
                 else {
@@ -8982,23 +8661,17 @@ if ($SelfTest) {
         foreach ($objConcealment in $arrSharedMarkerConcealments) {
             $strMutation = $strDocumentContent + [Environment]::NewLine +
                 [Environment]::NewLine + $objConcealment.Suffix
-            $strExpectedFailure = $strDocumentName +
+            $strFailure = $strDocumentName +
                 ' is missing required capability marker: `reviewThreads`'
             if ($strDocumentName -ceq 'AGENTS.md') {
-                Assert-MutationRejected `
-                    -Name "AGENTS shared markers in $($objConcealment.Name)" `
+                Assert-Failure `
                     -AgentsContent $strMutation `
-                    -ClaudeContent $strClaudeContent `
-                    -CodexConfigContent $strCodexConfigContent `
-                    -ExpectedFailure $strExpectedFailure
+                    -Failure $strFailure
             }
             else {
-                Assert-MutationRejected `
-                    -Name "CLAUDE shared markers in $($objConcealment.Name)" `
-                    -AgentsContent $strAgentsContent `
+                Assert-Failure `
                     -ClaudeContent $strMutation `
-                    -CodexConfigContent $strCodexConfigContent `
-                    -ExpectedFailure $strExpectedFailure
+                    -Failure $strFailure
             }
         }
     }
@@ -9038,23 +8711,17 @@ if ($SelfTest) {
             }
         )
         foreach ($objMutation in $arrDeferringWorkMutations) {
-            $strExpectedFailure =
+            $strFailure =
                 "$strDocumentName must contain one exact level-two Deferring Work heading."
             if ($strDocumentName -ceq 'AGENTS.md') {
-                Assert-MutationRejected `
-                    -Name "AGENTS Deferring Work heading $($objMutation.Name)" `
+                Assert-Failure `
                     -AgentsContent $objMutation.Content `
-                    -ClaudeContent $strClaudeContent `
-                    -CodexConfigContent $strCodexConfigContent `
-                    -ExpectedFailure $strExpectedFailure
+                    -Failure $strFailure
             }
             else {
-                Assert-MutationRejected `
-                    -Name "CLAUDE Deferring Work heading $($objMutation.Name)" `
-                    -AgentsContent $strAgentsContent `
+                Assert-Failure `
                     -ClaudeContent $objMutation.Content `
-                    -CodexConfigContent $strCodexConfigContent `
-                    -ExpectedFailure $strExpectedFailure
+                    -Failure $strFailure
             }
         }
     }
@@ -9076,7 +8743,7 @@ if ($SelfTest) {
                 -Content $strRemovedMarkerContent
             if ($objRemovedMarkerContext.ProseText.Contains(
                     $strLiteral,
-                    [System.StringComparison]::Ordinal
+                    [StringComparison]::Ordinal
                 )) {
                 throw "Could not remove shared prose marker for mutation: $strLiteral"
             }
@@ -9095,23 +8762,17 @@ if ($SelfTest) {
                         Content = $strRawHtmlMutation
                     }
                 )) {
-                $strExpectedFailure =
+                $strFailure =
                     "$strDocumentName is missing required capability marker: $strLiteral"
                 if ($strDocumentName -ceq 'AGENTS.md') {
-                    Assert-MutationRejected `
-                        -Name "AGENTS shared marker hidden in $($objMutation.Name): $strLiteral" `
+                    Assert-Failure `
                         -AgentsContent $objMutation.Content `
-                        -ClaudeContent $strClaudeContent `
-                        -CodexConfigContent $strCodexConfigContent `
-                        -ExpectedFailure $strExpectedFailure
+                        -Failure $strFailure
                 }
                 else {
-                    Assert-MutationRejected `
-                        -Name "CLAUDE shared marker hidden in $($objMutation.Name): $strLiteral" `
-                        -AgentsContent $strAgentsContent `
+                    Assert-Failure `
                         -ClaudeContent $objMutation.Content `
-                        -CodexConfigContent $strCodexConfigContent `
-                        -ExpectedFailure $strExpectedFailure
+                        -Failure $strFailure
                 }
             }
         }
@@ -9127,7 +8788,7 @@ if ($SelfTest) {
             -Content $strRemovedMarkerContent
         if ($objRemovedMarkerContext.ProseText.Contains(
                 $strLiteral,
-                [System.StringComparison]::Ordinal
+                [StringComparison]::Ordinal
             )) {
             throw "Could not remove AGENTS normative prose marker for mutation: $strLiteral"
         }
@@ -9153,66 +8814,45 @@ if ($SelfTest) {
                     Content = $strVisibleRelocation
                 }
             )) {
-            Assert-MutationRejected `
-                -Name "AGENTS normative marker hidden in $($objMutation.Name): $strLiteral" `
+            Assert-Failure `
                 -AgentsContent $objMutation.Content `
-                -ClaudeContent $strClaudeContent `
-                -CodexConfigContent $strCodexConfigContent `
-                -ExpectedFailure "AGENTS.md must contain required policy as prose: $strLiteral"
+                -Failure "AGENTS.md must contain required policy as prose: $strLiteral"
         }
     }
 
-    Assert-MutationRejected `
-        -Name 'missing Claude readiness marker' `
-        -AgentsContent $strAgentsContent `
+    Assert-Failure `
         -ClaudeContent $strClaudeContent.Replace('review-readiness gate', 'review readiness gate') `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'CLAUDE.md is missing required Claude marker: review-readiness gate'
+        -Failure 'CLAUDE.md is missing required Claude marker: review-readiness gate'
 
-    Assert-MutationRejected `
-        -Name 'missing AGENTS standing placement authorization' `
+    Assert-Failure `
         -AgentsContent $strAgentsContent.Replace(
             $script:strStandingPlacementAuthorization,
             'An additional direct-push authorization from the owner is required.'
         ) `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
+        -Failure 'AGENTS.md must contain the standing direct-placement authorization exactly once.'
 
-    Assert-MutationRejected `
-        -Name 'missing CLAUDE standing placement authorization' `
-        -AgentsContent $strAgentsContent `
+    Assert-Failure `
         -ClaudeContent $strClaudeContent.Replace(
             $script:strStandingPlacementAuthorization,
             'An additional direct-push authorization from the owner is required.'
         ) `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'CLAUDE.md must contain the standing direct-placement authorization exactly once.'
+        -Failure 'CLAUDE.md must contain the standing direct-placement authorization exactly once.'
 
-    Assert-MutationRejected `
-        -Name 'obsolete session-specific placement authorization' `
+    Assert-Failure `
         -AgentsContent ($strAgentsContent + [Environment]::NewLine + $script:arrObsoletePlacementLiterals[0]) `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'AGENTS.md contains obsolete session-specific direct-placement authorization'
+        -Failure 'AGENTS.md contains obsolete session-specific direct-placement authorization'
 
     foreach ($strLiteral in $script:arrPlacementStructuralLiterals) {
         $strInlineCodeLiteral = '`' + $strLiteral + '`'
-        Assert-MutationRejected `
-            -Name "AGENTS placement structure hidden in inline code: $strLiteral" `
+        Assert-Failure `
             -AgentsContent $strAgentsContent.Replace($strLiteral, $strInlineCodeLiteral) `
-            -ClaudeContent $strClaudeContent `
-            -CodexConfigContent $strCodexConfigContent `
-            -ExpectedFailure (
+            -Failure (
                 'AGENTS.md is missing required direct-placement safety marker: ' +
                 $strLiteral
             )
-        Assert-MutationRejected `
-            -Name "CLAUDE placement structure hidden in inline code: $strLiteral" `
-            -AgentsContent $strAgentsContent `
+        Assert-Failure `
             -ClaudeContent $strClaudeContent.Replace($strLiteral, $strInlineCodeLiteral) `
-            -CodexConfigContent $strCodexConfigContent `
-            -ExpectedFailure (
+            -Failure (
                 'CLAUDE.md is missing required direct-placement safety marker: ' +
                 $strLiteral
             )
@@ -9227,12 +8867,9 @@ if ($SelfTest) {
             '**Outgoing-range audit.**',
             '**Outgoing-range audit.** ' + $strInlineCodeLiteral
         )
-        Assert-MutationRejected `
-            -Name "AGENTS placement prose hidden in inline code: $strLiteral" `
+        Assert-Failure `
             -AgentsContent $strAgentsInlineCodeMutation `
-            -ClaudeContent $strClaudeContent `
-            -CodexConfigContent $strCodexConfigContent `
-            -ExpectedFailure (
+            -Failure (
                 'AGENTS.md is missing required direct-placement safety marker: ' +
                 $strLiteral
             )
@@ -9244,69 +8881,51 @@ if ($SelfTest) {
             '**Outgoing-range audit.**',
             '**Outgoing-range audit.** ' + $strInlineCodeLiteral
         )
-        Assert-MutationRejected `
-            -Name "CLAUDE placement prose hidden in inline code: $strLiteral" `
-            -AgentsContent $strAgentsContent `
+        Assert-Failure `
             -ClaudeContent $strClaudeInlineCodeMutation `
-            -CodexConfigContent $strCodexConfigContent `
-            -ExpectedFailure (
+            -Failure (
                 'CLAUDE.md is missing required direct-placement safety marker: ' +
                 $strLiteral
             )
     }
 
-    Assert-MutationRejected `
-        -Name 'missing AGENTS inline style-guide route' `
+    Assert-Failure `
         -AgentsContent $strAgentsContent.Replace(
             $script:arrStyleGuideRoutingLiterals[0],
             'Post the prompt in the review discussion.'
         ) `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure (
+        -Failure (
             'AGENTS.md must contain the style-guide routing marker exactly once: ' +
             $script:arrStyleGuideRoutingLiterals[0]
         )
 
-    Assert-MutationRejected `
-        -Name 'missing CLAUDE body-only style-guide route' `
-        -AgentsContent $strAgentsContent `
+    Assert-Failure `
         -ClaudeContent $strClaudeContent.Replace(
             $script:arrStyleGuideRoutingLiterals[1],
             'Post the prompt in the review discussion.'
         ) `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure (
+        -Failure (
             'CLAUDE.md must contain the style-guide routing marker exactly once: ' +
             $script:arrStyleGuideRoutingLiterals[1]
         )
 
-    Assert-MutationRejected `
-        -Name 'missing AGENTS genuine-deferral Issue rule' `
+    Assert-Failure `
         -AgentsContent $strAgentsContent.Replace(
             $script:strOnlyGenuineDeferredWork,
             'Every non-fix outcome requires a GitHub Issue.'
         ) `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'AGENTS.md must contain the genuine-deferral Issue rule exactly once.'
+        -Failure 'AGENTS.md must contain the genuine-deferral Issue rule exactly once.'
 
-    Assert-MutationRejected `
-        -Name 'missing CLAUDE genuine-deferral Issue rule' `
-        -AgentsContent $strAgentsContent `
+    Assert-Failure `
         -ClaudeContent $strClaudeContent.Replace(
             $script:strOnlyGenuineDeferredWork,
             'Every non-fix outcome requires a GitHub Issue.'
         ) `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'CLAUDE.md must contain the genuine-deferral Issue rule exactly once.'
+        -Failure 'CLAUDE.md must contain the genuine-deferral Issue rule exactly once.'
 
-    Assert-MutationRejected `
-        -Name 'obsolete blanket Issue rule' `
-        -AgentsContent $strAgentsContent `
+    Assert-Failure `
         -ClaudeContent ($strClaudeContent + [Environment]::NewLine + $script:arrObsoleteDeferralLiterals[0]) `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'CLAUDE.md contains an obsolete blanket Issue rule'
+        -Failure 'CLAUDE.md contains an obsolete blanket Issue rule'
 
     $objMaximumMatch = [regex]::Match(
         $strCodexConfigContent,
@@ -9321,12 +8940,9 @@ if ($SelfTest) {
         $objMaximumBytesGroup.Index,
         '32768'
     )
-    Assert-MutationRejected `
-        -Name 'insufficient configured capacity' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
+    Assert-Failure `
         -CodexConfigContent $strInsufficientCapacityConfig `
-        -ExpectedFailure 'project_doc_max_bytes must be at least 65536.'
+        -Failure 'project_doc_max_bytes must be at least 65536.'
 
     $arrAcceptedCapacityStatements = @(
         [pscustomobject]@{
@@ -9372,9 +8988,6 @@ if ($SelfTest) {
     )
     foreach ($objAcceptedCapacityStatement in $arrAcceptedCapacityStatements) {
         Assert-FixtureAccepted `
-            -Name $objAcceptedCapacityStatement.Name `
-            -AgentsContent $strAgentsContent `
-            -ClaudeContent $strClaudeContent `
             -CodexConfigContent $strCodexConfigContent.Replace(
                 $objMaximumMatch.Value,
                 $objAcceptedCapacityStatement.Statement
@@ -9403,47 +9016,35 @@ if ($SelfTest) {
                 Statement = 'project_doc_max_bytes = { value = 65536 }'
             }
         )) {
-        Assert-MutationRejected `
-            -Name $objInvalidCapacityStatement.Name `
-            -AgentsContent $strAgentsContent `
-            -ClaudeContent $strClaudeContent `
+        Assert-Failure `
             -CodexConfigContent $strCodexConfigContent.Replace(
                 $objMaximumMatch.Value,
                 $objInvalidCapacityStatement.Statement
             ) `
-            -ExpectedFailure 'project_doc_max_bytes must be an integer.'
+            -Failure 'project_doc_max_bytes must be an integer.'
     }
 
-    Assert-MutationRejected `
-        -Name 'capacity exceeds signed 64-bit range' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
+    Assert-Failure `
         -CodexConfigContent $strCodexConfigContent.Replace(
             $objMaximumMatch.Value,
             'project_doc_max_bytes = 9223372036854775808'
         ) `
-        -ExpectedFailure 'project_doc_max_bytes must fit in a signed 64-bit integer.'
+        -Failure 'project_doc_max_bytes must fit in a signed 64-bit integer.'
 
-    Assert-MutationRejected `
-        -Name 'hexadecimal capacity below minimum' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
+    Assert-Failure `
         -CodexConfigContent $strCodexConfigContent.Replace(
             $objMaximumMatch.Value,
             'project_doc_max_bytes = 0x8000'
         ) `
-        -ExpectedFailure 'project_doc_max_bytes must be at least 65536.'
+        -Failure 'project_doc_max_bytes must be at least 65536.'
 
     $strNestedMaximumConfig = @(
         '[codex_self_test]'
         $objMaximumMatch.Value
     ) -join [Environment]::NewLine
-    Assert-MutationRejected `
-        -Name 'nested configured capacity' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
+    Assert-Failure `
         -CodexConfigContent $strNestedMaximumConfig `
-        -ExpectedFailure 'project_doc_max_bytes must be the first semantic TOML statement.'
+        -Failure 'project_doc_max_bytes must be the first semantic TOML statement.'
 
     $strMultilineBasicCapacityConfig = $strCodexConfigContent.Replace(
         $objMaximumMatch.Value,
@@ -9453,12 +9054,9 @@ if ($SelfTest) {
                 '"""'
             ) -join [Environment]::NewLine)
     )
-    Assert-MutationRejected `
-        -Name 'capacity assignment inside multiline basic string' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
+    Assert-Failure `
         -CodexConfigContent $strMultilineBasicCapacityConfig `
-        -ExpectedFailure 'project_doc_max_bytes must be the first semantic TOML statement.'
+        -Failure 'project_doc_max_bytes must be the first semantic TOML statement.'
 
     $strMultilineLiteralCapacityConfig = $strCodexConfigContent.Replace(
         $objMaximumMatch.Value,
@@ -9468,12 +9066,9 @@ if ($SelfTest) {
                 "'''"
             ) -join [Environment]::NewLine)
     )
-    Assert-MutationRejected `
-        -Name 'capacity assignment inside multiline literal string' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
+    Assert-Failure `
         -CodexConfigContent $strMultilineLiteralCapacityConfig `
-        -ExpectedFailure 'project_doc_max_bytes must be the first semantic TOML statement.'
+        -Failure 'project_doc_max_bytes must be the first semantic TOML statement.'
 
     $strGitHubPluginTableHeader = '[plugins."github@openai-curated"]'
     $arrAcceptedPluginTableStatements = @(
@@ -9576,17 +9171,11 @@ if ($SelfTest) {
         '"en\u0061bled" = true'
     )
     Assert-FixtureAccepted `
-        -Name 'combined semantically equivalent quoted TOML keys' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
         -CodexConfigContent $strCombinedQuotedKeyConfig
-    Assert-MutationRejected `
-        -Name 'disabled plugin with combined semantically equivalent quoted TOML keys' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
+    Assert-Failure `
         -CodexConfigContent (ConvertTo-DisabledGitHubPluginMutation `
             -Content $strCombinedQuotedKeyConfig) `
-        -ExpectedFailure 'The github@openai-curated plugin table must declare enabled = true exactly once.'
+        -Failure 'The github@openai-curated plugin table must declare enabled = true exactly once.'
 
     foreach ($objNearMissPluginStatement in @(
             [pscustomobject]@{
@@ -9618,35 +9207,26 @@ if ($SelfTest) {
                     'The github@openai-curated enabled value must be the third semantic TOML statement.'
             }
         )) {
-        Assert-MutationRejected `
-            -Name $objNearMissPluginStatement.Name `
-            -AgentsContent $strAgentsContent `
-            -ClaudeContent $strClaudeContent `
+        Assert-Failure `
             -CodexConfigContent $strCodexConfigContent.Replace(
                 $objNearMissPluginStatement.Search,
                 $objNearMissPluginStatement.Replacement
             ) `
-            -ExpectedFailure $objNearMissPluginStatement.Failure
+            -Failure $objNearMissPluginStatement.Failure
     }
 
-    Assert-MutationRejected `
-        -Name 'missing GitHub plugin declaration' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
+    Assert-Failure `
         -CodexConfigContent $strCodexConfigContent.Replace(
             $strGitHubPluginTableHeader,
             '[plugins."github-disabled-for-self-test"]'
         ) `
-        -ExpectedFailure 'The project configuration must declare [plugins."github@openai-curated"] exactly once.'
+        -Failure 'The project configuration must declare [plugins."github@openai-curated"] exactly once.'
 
     $strDisabledGitHubPluginConfig = ConvertTo-DisabledGitHubPluginMutation `
         -Content $strCodexConfigContent
-    Assert-MutationRejected `
-        -Name 'disabled GitHub plugin declaration' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
+    Assert-Failure `
         -CodexConfigContent $strDisabledGitHubPluginConfig `
-        -ExpectedFailure 'The github@openai-curated plugin table must declare enabled = true exactly once.'
+        -Failure 'The github@openai-curated plugin table must declare enabled = true exactly once.'
 
     foreach ($objInvalidPluginValue in @(
             [pscustomobject]@{
@@ -9658,18 +9238,15 @@ if ($SelfTest) {
                 Statement = 'enabled = 1'
             }
         )) {
-        Assert-MutationRejected `
-            -Name $objInvalidPluginValue.Name `
-            -AgentsContent $strAgentsContent `
-            -ClaudeContent $strClaudeContent `
+        Assert-Failure `
             -CodexConfigContent $strCodexConfigContent.Replace(
                 'enabled = true',
                 $objInvalidPluginValue.Statement
             ) `
-            -ExpectedFailure 'The github@openai-curated plugin table must declare enabled = true exactly once.'
+            -Failure 'The github@openai-curated plugin table must declare enabled = true exactly once.'
     }
 
-    $strConfigNewLine = if ($strCodexConfigContent.Contains("`r`n", [System.StringComparison]::Ordinal)) {
+    $strConfigNewLine = if ($strCodexConfigContent.Contains("`r`n", [StringComparison]::Ordinal)) {
         "`r`n"
     }
     else {
@@ -9688,15 +9265,12 @@ if ($SelfTest) {
         ''
         $strCapacityStatement
     ) -join $strConfigNewLine
-    Assert-MutationRejected `
-        -Name 'plugin table before capacity statement' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
+    Assert-Failure `
         -CodexConfigContent $strCodexConfigContent.Replace(
             $strCanonicalConfigPrefix,
             $strReorderedConfigPrefix
         ) `
-        -ExpectedFailure 'project_doc_max_bytes must be the first semantic TOML statement.'
+        -Failure 'project_doc_max_bytes must be the first semantic TOML statement.'
 
     $objCanonicalPluginContext = Get-GitHubPluginEnablementContext `
         -Content $strCodexConfigContent
@@ -9721,31 +9295,22 @@ if ($SelfTest) {
     if ($arrAlternativePluginFailures.Count -gt 0) {
         throw "Accepted plugin formatting failed validation: $($arrAlternativePluginFailures -join '; ')"
     }
-    Assert-MutationRejected `
-        -Name 'disabled GitHub plugin declaration with accepted formatting' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
+    Assert-Failure `
         -CodexConfigContent (ConvertTo-DisabledGitHubPluginMutation `
             -Content $strAlternativePluginFormattingConfig) `
-        -ExpectedFailure 'The github@openai-curated plugin table must declare enabled = true exactly once.'
+        -Failure 'The github@openai-curated plugin table must declare enabled = true exactly once.'
 
-    Assert-MutationRejected `
-        -Name 'duplicate GitHub plugin declaration' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
+    Assert-Failure `
         -CodexConfigContent ($strCodexConfigContent + [Environment]::NewLine +
             $strGitHubPluginTableHeader + [Environment]::NewLine + 'enabled = true') `
-        -ExpectedFailure 'The project configuration must contain valid TOML.'
+        -Failure 'The project configuration must contain valid TOML.'
 
-    Assert-MutationRejected `
-        -Name 'nested GitHub plugin declaration' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
+    Assert-Failure `
         -CodexConfigContent $strCodexConfigContent.Replace(
             $strGitHubPluginTableHeader,
             '[features.plugins."github@openai-curated"]'
         ) `
-        -ExpectedFailure 'The project configuration must declare [plugins."github@openai-curated"] exactly once.'
+        -Failure 'The project configuration must declare [plugins."github@openai-curated"] exactly once.'
 
     $strBasicStringPluginTableConfig = $strCodexConfigContent.Replace(
         $strGitHubPluginTableHeader,
@@ -9754,12 +9319,9 @@ if ($SelfTest) {
         'enabled = true',
         "enabled = true$strConfigNewLine`"`"`""
     )
-    Assert-MutationRejected `
-        -Name 'plugin table inside multiline basic string' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
+    Assert-Failure `
         -CodexConfigContent $strBasicStringPluginTableConfig `
-        -ExpectedFailure 'The github@openai-curated plugin table must be the second semantic TOML statement.'
+        -Failure 'The github@openai-curated plugin table must be the second semantic TOML statement.'
 
     $strLiteralStringPluginTableConfig = $strCodexConfigContent.Replace(
         $strGitHubPluginTableHeader,
@@ -9768,36 +9330,27 @@ if ($SelfTest) {
         'enabled = true',
         "enabled = true$strConfigNewLine'''"
     )
-    Assert-MutationRejected `
-        -Name 'plugin table inside multiline literal string' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
+    Assert-Failure `
         -CodexConfigContent $strLiteralStringPluginTableConfig `
-        -ExpectedFailure 'The github@openai-curated plugin table must be the second semantic TOML statement.'
+        -Failure 'The github@openai-curated plugin table must be the second semantic TOML statement.'
 
     $strBasicStringPluginEnabledConfig = $strCodexConfigContent.Replace(
         'enabled = true',
         "model = `"`"`"$strConfigNewLine" +
             "enabled = true$strConfigNewLine`"`"`""
     )
-    Assert-MutationRejected `
-        -Name 'plugin enabled value inside multiline basic string' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
+    Assert-Failure `
         -CodexConfigContent $strBasicStringPluginEnabledConfig `
-        -ExpectedFailure 'The github@openai-curated enabled value must be the third semantic TOML statement.'
+        -Failure 'The github@openai-curated enabled value must be the third semantic TOML statement.'
 
     $strLiteralStringPluginEnabledConfig = $strCodexConfigContent.Replace(
         'enabled = true',
         "model = '''$strConfigNewLine" +
             "enabled = true$strConfigNewLine'''"
     )
-    Assert-MutationRejected `
-        -Name 'plugin enabled value inside multiline literal string' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
+    Assert-Failure `
         -CodexConfigContent $strLiteralStringPluginEnabledConfig `
-        -ExpectedFailure 'The github@openai-curated enabled value must be the third semantic TOML statement.'
+        -Failure 'The github@openai-curated enabled value must be the third semantic TOML statement.'
 
     $strLaterBasicStringConfig = $strCodexConfigContent + $strConfigNewLine +
         (@(
@@ -9809,17 +9362,11 @@ if ($SelfTest) {
                 '"""'
             ) -join $strConfigNewLine)
     Assert-FixtureAccepted `
-        -Name 'later multiline basic string contains configuration-like lines' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
         -CodexConfigContent $strLaterBasicStringConfig
-    Assert-MutationRejected `
-        -Name 'disabled plugin with later multiline basic string' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
+    Assert-Failure `
         -CodexConfigContent (ConvertTo-DisabledGitHubPluginMutation `
             -Content $strLaterBasicStringConfig) `
-        -ExpectedFailure 'The github@openai-curated plugin table must declare enabled = true exactly once.'
+        -Failure 'The github@openai-curated plugin table must declare enabled = true exactly once.'
 
     $strLaterLiteralStringConfig = $strCodexConfigContent + $strConfigNewLine +
         (@(
@@ -9831,35 +9378,23 @@ if ($SelfTest) {
                 "'''"
             ) -join $strConfigNewLine)
     Assert-FixtureAccepted `
-        -Name 'later multiline literal string contains configuration-like lines' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
         -CodexConfigContent $strLaterLiteralStringConfig
-    Assert-MutationRejected `
-        -Name 'disabled plugin with later multiline literal string' `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
+    Assert-Failure `
         -CodexConfigContent (ConvertTo-DisabledGitHubPluginMutation `
             -Content $strLaterLiteralStringConfig) `
-        -ExpectedFailure 'The github@openai-curated plugin table must declare enabled = true exactly once.'
+        -Failure 'The github@openai-curated plugin table must declare enabled = true exactly once.'
 
-    $intCurrentBytes = [System.Text.Encoding]::UTF8.GetByteCount($strAgentsContent)
+    $intCurrentBytes = [Text.Encoding]::UTF8.GetByteCount($strAgentsContent)
     $intDefaultFillerLength = [Math]::Max(1, 32768 - $intCurrentBytes + 1)
-    Assert-MutationRejected `
-        -Name 'ordinary Codex limit exceeded' `
+    Assert-Failure `
         -AgentsContent ($strAgentsContent + ('x' * $intDefaultFillerLength)) `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'AGENTS.md must not exceed the ordinary 32768-byte Codex limit.'
+        -Failure 'AGENTS.md must not exceed the ordinary 32768-byte Codex limit.'
 
     $intMaximumBytes = [int64]$objMaximumBytesGroup.Value
     $intFillerLength = [Math]::Max(1, $intMaximumBytes - $intCurrentBytes - 16384 + 1)
-    Assert-MutationRejected `
-        -Name 'consumed capacity reserve' `
+    Assert-Failure `
         -AgentsContent ($strAgentsContent + ('x' * $intFillerLength)) `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'Configured AGENTS.md capacity must retain at least 16384 bytes of reserve.'
+        -Failure 'Configured AGENTS.md capacity must retain at least 16384 bytes of reserve.'
 
     foreach ($objSafetyLimitContract in $script:arrSafetyLimitContracts) {
         $strSafetyDocumentContent = if ($objSafetyLimitContract.DocumentName -ceq 'AGENTS.md') {
@@ -9877,70 +9412,46 @@ if ($SelfTest) {
             $strHtmlOnlySafetyLimit
         )
         if ($objSafetyLimitContract.DocumentName -ceq 'AGENTS.md') {
-            Assert-MutationRejected `
-                -Name "AGENTS safety limit hidden in raw HTML: $($objSafetyLimitContract.ProseLiteral)" `
+            Assert-Failure `
                 -AgentsContent $strSafetyLimitMutation `
-                -ClaudeContent $strClaudeContent `
-                -CodexConfigContent $strCodexConfigContent `
-                -ExpectedFailure $objSafetyLimitContract.Failure
+                -Failure $objSafetyLimitContract.Failure
         }
         else {
-            Assert-MutationRejected `
-                -Name "CLAUDE safety limit hidden in raw HTML: $($objSafetyLimitContract.ProseLiteral)" `
-                -AgentsContent $strAgentsContent `
+            Assert-Failure `
                 -ClaudeContent $strSafetyLimitMutation `
-                -CodexConfigContent $strCodexConfigContent `
-                -ExpectedFailure $objSafetyLimitContract.Failure
+                -Failure $objSafetyLimitContract.Failure
         }
     }
 
-    Assert-MutationRejected `
-        -Name 'weakened Codex round cap' `
+    Assert-Failure `
         -AgentsContent $strAgentsContent.Replace('**Maximum rounds:** 8', '**Maximum rounds:** 80') `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'AGENTS.md is missing required Codex marker: **Maximum rounds:** 8'
+        -Failure 'AGENTS.md is missing required Codex marker: **Maximum rounds:** 8'
 
-    Assert-MutationRejected `
-        -Name 'weakened Claude round cap' `
-        -AgentsContent $strAgentsContent `
+    Assert-Failure `
         -ClaudeContent $strClaudeContent.Replace('**Maximum rounds:** 80', '**Maximum rounds:** 800') `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'CLAUDE.md is missing the 80-round Claude limit.'
+        -Failure 'CLAUDE.md is missing the 80-round Claude limit.'
 
-    Assert-MutationRejected `
-        -Name 'punctuated Codex round cap' `
+    Assert-Failure `
         -AgentsContent $strAgentsContent.Replace('**Maximum rounds:** 8', '**Maximum rounds:** 8,000') `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'AGENTS.md is missing required Codex marker: **Maximum rounds:** 8'
+        -Failure 'AGENTS.md is missing required Codex marker: **Maximum rounds:** 8'
 
-    Assert-MutationRejected `
-        -Name 'qualified Codex wall-clock limit' `
+    Assert-Failure `
         -AgentsContent $strAgentsContent.Replace(
             '**Wall-clock timeout:** 6 hours from cycle start.',
             '**Wall-clock timeout:** 6 hours minimum from cycle start.'
         ) `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'AGENTS.md is missing the 6-hour Codex wall-clock limit.'
+        -Failure 'AGENTS.md is missing the 6-hour Codex wall-clock limit.'
 
-    Assert-MutationRejected `
-        -Name 'punctuated Claude round cap' `
-        -AgentsContent $strAgentsContent `
+    Assert-Failure `
         -ClaudeContent $strClaudeContent.Replace('**Maximum rounds:** 80', '**Maximum rounds:** 80,000') `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'CLAUDE.md is missing the 80-round Claude limit.'
+        -Failure 'CLAUDE.md is missing the 80-round Claude limit.'
 
-    Assert-MutationRejected `
-        -Name 'qualified Claude wall-clock limit' `
-        -AgentsContent $strAgentsContent `
+    Assert-Failure `
         -ClaudeContent $strClaudeContent.Replace(
             '**Wall-clock timeout:** 6 hours from loop start.',
             '**Wall-clock timeout:** 6 hours minimum from loop start.'
         ) `
-        -CodexConfigContent $strCodexConfigContent `
-        -ExpectedFailure 'CLAUDE.md is missing the 6-hour Claude wall-clock limit.'
+        -Failure 'CLAUDE.md is missing the 6-hour Claude wall-clock limit.'
 
     Write-Output 'Agent-instruction mutation self-tests passed.'
     #endregion Mutation self-tests
