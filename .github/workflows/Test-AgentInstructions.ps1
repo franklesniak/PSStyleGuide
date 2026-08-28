@@ -72,10 +72,7 @@
 #
 # .NOTES
 # This script does not support positional parameters.
-# This validator keeps explicit backtick continuations so that large
-# named-parameter mutation calls remain auditable one argument per line.
-# Private helpers have focused examples. The -SelfTest suite covers edge cases.
-# Version: 1.7.20260828.2
+# Version: 1.7.20260828.3
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -2336,6 +2333,11 @@ function Get-LastUpdatedMetadataFreshnessFailure {
         Write-Output "$Name Last Updated must contain one real calendar date."
         return
     }
+    if ([string]::CompareOrdinal(
+            $strCurrentDate, $script:strMaximumMetadataUtcDate) -gt 0) {
+        Write-Output "$Name Last Updated is later than trusted UTC."
+        return
+    }
 
     $boolRenderedContentChanged = $true
     $objBaseMetadata = $null
@@ -3719,10 +3721,7 @@ function Get-DocumentMetadataRangeTransitionFailure {
     # Finds metadata-policy failures across document transition records.
     #
     # .DESCRIPTION
-    # Evaluates each parent-to-current transition with
-    # Get-DocumentMetadataTransitionFailure. It preserves each transition's
-    # authenticated date requirement and prefixes every failure with the parent
-    # and current commit identities for usable range diagnostics.
+    # Evaluates direct-parent metadata transitions.
     #
     # .PARAMETER Name
     # The governed document display name used in diagnostic output.
@@ -4112,7 +4111,8 @@ function Get-GovernedDocumentCommitTransitionFailure {
                 CurrentRevision = $CommitRevision
                 ParentRevision = $objChangedParent.Revision
                 RequireExpectedUtcDateForRenderedChange =
-                    $RequireExpectedUtcDateForRenderedChange
+                    $RequireExpectedUtcDateForRenderedChange -and
+                    $objChangedParent.HasPolicyMarker
             })
     }
 
@@ -4126,7 +4126,8 @@ function Get-GovernedDocumentCommitTransitionFailure {
             -Name $Name `
             -CurrentContent $objTransition.CurrentContent `
             -BaseContent $objTransition.ParentContent `
-            -TrustedEventUtcDate $(if ($RequireExpectedUtcDateForRenderedChange) {
+            -TrustedEventUtcDate $(if (
+                $objTransition.RequireExpectedUtcDateForRenderedChange) {
                     $objTransition.ExpectedUtcDate
                 } else { '' })
     }
@@ -5626,7 +5627,13 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
                 -RequireExpectedUtcDateForRenderedChange $true `
                 -RequiresVersion $objDocumentContext.RequiresVersion)
     }
-    if ($boolEventRangeRequested -and $boolEvaluateEventFreshness) {
+    if ($boolEventRangeRequested -and $boolEvaluateEventFreshness -and
+        -not [string]::IsNullOrEmpty($strEventFreshnessBaseRevision) -and
+        (Test-HistoricalPolicyMarker `
+            -RepositoryRootPath $strRepositoryRootPath `
+            -Revision $strEventFreshnessBaseRevision `
+            -RepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
+            -Literal $objDocumentContext.PolicyMarker)) {
         $boolTopicDeltaUnchanged = $false
         if (-not [string]::IsNullOrEmpty($strPreviousTopicBaseRevision)) {
             $boolTopicDeltaUnchanged = Test-TopicOwnedGitPathDeltaEqual `
@@ -5645,11 +5652,7 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
             $objDocumentContext.Content
         }
         elseif (-not [string]::IsNullOrEmpty($strEventFreshnessBaseRevision) -and
-            $LASTEXITCODE -eq 0 -and (Test-HistoricalPolicyMarker `
-                -RepositoryRootPath $strRepositoryRootPath `
-                -Revision $strEventFreshnessBaseRevision `
-                -RepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
-                -Literal $objDocumentContext.PolicyMarker)) {
+            $LASTEXITCODE -eq 0) {
             Read-GitRevisionText `
                 -RepositoryRootPath $strRepositoryRootPath `
                 -Revision $strEventFreshnessBaseRevision `
@@ -5690,7 +5693,7 @@ if ($SelfTest) {
     $strValidatorSource = [IO.File]::ReadAllText($PSCommandPath)
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260828\.2$'
+            '(?m)^# Version: 1\.7\.20260828\.3$'
         ).Count -ne 1) {
         throw 'The validator script version does not use build date 20260828.'
     }
@@ -8016,10 +8019,10 @@ if ($SelfTest) {
             -Message 'pre-policy side'
         $strSideAdoptsPolicy = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strMergeBaseTree -Parents @($strPrePolicySideCommit) `
-            -Timestamp ($strMergeHistoricalDate + 'T02:30:00Z') `
+            -Timestamp ($strMergeCurrentDate + 'T02:30:00Z') `
             -Message 'side adopts policy'
         if (@(& $scriptBlockGetMergeRangeFailure -Base $strPrePolicySideCommit `
-                -Head $strSideAdoptsPolicy).Count -ne 0) {
+                -Head $strSideAdoptsPolicy -RequireCommitDate $true).Count -ne 0) {
             throw 'A side branch could not adopt the policy.'
         }
         $strPolicyBaseCommit = & $scriptBlockCreateMergeFixtureCommit `
