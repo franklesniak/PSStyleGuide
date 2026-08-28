@@ -4,7 +4,7 @@
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-08-27
+- **Last Updated:** 2026-08-28
 - **Scope:** Records the accepted in-repository trust-root limitation, its consequences, and the conditions that require reconsideration. Does not claim that the limitation is absent.
 
 ## Status
@@ -191,6 +191,11 @@ Reopen this decision if any of the following becomes true.
   reading the diff.
 
 ## References
+
+### Canonical guides
+
+- [STYLE_GUIDE.md](../../STYLE_GUIDE.md)
+- [STYLE_GUIDE_RATIONALE.md](../../STYLE_GUIDE_RATIONALE.md)
 
 Each source was retrieved and confirmed to resolve on 2026-08-01 rather than cited from
 memory.

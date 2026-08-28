@@ -22,7 +22,7 @@ node .github/workflows/lint-nested-markdown.js
 
 ### How It Works
 
-1. Scans all `.md` files in the repository (excluding `node_modules`)
+1. Scans all `.md` and `.mdc` files in the repository (excluding `node_modules`)
 2. Parses each file using `markdown-it` to extract the AST
 3. **Recursively** identifies code fences with language identifier `markdown` or `md` at all nesting depths
 4. Runs markdownlint on each extracted block

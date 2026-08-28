@@ -205,11 +205,8 @@ jobs:
           AGENT_INSTRUCTION_RANGE_IS_DELETED_REF: >-
             ${{ github.event_name == 'push' && github.event.deleted || false }}
           AGENT_INSTRUCTION_TRUSTED_EVENT_TIMESTAMP: >-
-            ${{ github.event_name == 'pull_request_target' &&
-              (github.event.action == 'synchronize' ||
-              github.event.action == 'edited') &&
-              github.event.pull_request.updated_at ||
-              github.event_name == 'push' && github.event.repository.pushed_at || '' }}
+            ${{ github.event_name == 'push' &&
+              github.event.repository.pushed_at || '' }}
           AGENT_INSTRUCTION_EVENT_NAME: >-
             ${{ (github.event_name == 'pull_request_target' ||
               github.event_name == 'push') && github.event_name || '' }}

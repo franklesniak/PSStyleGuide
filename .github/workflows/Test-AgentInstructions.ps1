@@ -75,7 +75,7 @@
 # This validator keeps explicit backtick continuations so that large
 # named-parameter mutation calls remain auditable one argument per line.
 # Private helpers have focused examples. The -SelfTest suite covers edge cases.
-# Version: 1.6.20260828.0
+# Version: 1.7.20260828.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -5286,8 +5286,7 @@ $strValidatedInputRevision = ''
 $strTrustedEventUtcDate = ''
 $boolEventRangeRequested = -not [string]::IsNullOrEmpty($RangeBaseRevision) -or
     -not [string]::IsNullOrEmpty($RangeHeadRevision)
-$boolCommitDateOnlyEvent = $EventName -ceq 'pull_request_target' -and
-    $PullRequestAction -cin @('opened', 'reopened')
+$boolCommitDateOnlyEvent = $EventName -ceq 'pull_request_target'
 if ($boolEventRangeRequested -and
     ([string]::IsNullOrEmpty($EventName) -or
         ([string]::IsNullOrEmpty($TrustedEventTimestamp) -and
@@ -5337,8 +5336,8 @@ if ($boolEventRangeRequested -and
     $strEventFreshnessBaseRevision = $objMetadataEventRevisionContext.FreshnessBaseRevision
     $boolEvaluateEventFreshness = $objMetadataEventRevisionContext.EvaluateFreshness
     $boolRequireRangeCommitDateFreshness =
-        ($EventName -ceq 'push' -and $EventHeadDistinct -ceq 'false' -and
-            -not $RangeIsNewRef) -or $boolCommitDateOnlyEvent
+        ($EventName -ceq 'push' -and -not $RangeIsNewRef) -or
+        $boolCommitDateOnlyEvent
     if ($boolCommitDateOnlyEvent) {
         $boolEvaluateEventFreshness = $false
     }
@@ -5630,6 +5629,24 @@ if ($strGitIgnoreContent -cnotmatch '(?m)^/CLAUDE\.local\.md$') {
 $arrRepositoryFailures += @(Get-DocumentationClaimFailure `
         -Content $strDocsInstructionsContent `
         -TrackedPaths $arrTrackedRepositoryPaths)
+$arrCanonicalDecisionGuideLinks = @(
+    '](../../STYLE_GUIDE.md)',
+    '](../../STYLE_GUIDE_RATIONALE.md)'
+)
+foreach ($objDecisionContext in @(
+        $listGovernedDocumentContexts |
+            Where-Object { $_.Path -cmatch $script:strDecisionRecordPathPattern }
+    )) {
+    foreach ($strGuideLink in $arrCanonicalDecisionGuideLinks) {
+        if (-not $objDecisionContext.Content.Contains(
+                $strGuideLink,
+                [StringComparison]::Ordinal
+            )) {
+            $arrRepositoryFailures +=
+                "$($objDecisionContext.Path) must link to $strGuideLink"
+        }
+    }
+}
 $arrRepositoryFailures += @(Get-NestedClaudeImportFailure `
         -DocumentContexts @(
             $listGovernedDocumentContexts |
@@ -5761,7 +5778,7 @@ if ($SelfTest) {
     $strValidatorSource = [IO.File]::ReadAllText($PSCommandPath)
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.6\.20260828\.0$'
+            '(?m)^# Version: 1\.7\.20260828\.0$'
         ).Count -ne 1) {
         throw 'The validator script version does not use build date 20260828.'
     }
@@ -8142,6 +8159,11 @@ if ($SelfTest) {
             $objEditedContext.FreshnessBaseRevision -cne $strMergeBaseCommit) {
             throw 'A base-changing edited event did not rebind to its merge base.'
         }
+        if (@(& $scriptBlockGetMergeRangeFailure `
+                -Base $objEditedContext.HistoryBaseRevision `
+                -Head $strSynchronizedTopicCommit -RequireCommitDate $true).Count -ne 0) {
+            throw 'A base-changing edited event rejected commit-dated metadata.'
+        }
         $boolEditedWithoutProofRejected = $false
         try {
             [void](Get-MetadataEventRevisionContext `
@@ -8606,6 +8628,33 @@ if ($SelfTest) {
     $strAgentWorkflowContent = [IO.File]::ReadAllText(
         [IO.Path]::Combine($PSScriptRoot, 'agent-instructions.yml')
     )
+    $strValidatorSourceContent = [IO.File]::ReadAllText($PSCommandPath)
+    if ($strValidatorSourceContent -notmatch
+        '\(\$EventName -ceq ''push'' -and -not \$RangeIsNewRef\)' -or
+        $strValidatorSourceContent -notmatch
+        '\$boolCommitDateOnlyEvent = \$EventName -ceq ''pull_request_target''') {
+        throw 'Commit-date range freshness selectors are incomplete.'
+    }
+    foreach ($objNestedLintDocumentation in @(
+            [pscustomobject]@{
+                Path = 'MARKDOWN-LINTING-IMPLEMENTATION.md'
+                Literal = 'Scans all `.md` and `.mdc` files in the repository'
+            },
+            [pscustomobject]@{
+                Path = 'scripts-README.md'
+                Literal = 'Scans all `.md` and `.mdc` files in the repository'
+            }
+        )) {
+        $strNestedLintDocumentation = [IO.File]::ReadAllText(
+            [IO.Path]::Combine($PSScriptRoot, $objNestedLintDocumentation.Path)
+        )
+        if (-not $strNestedLintDocumentation.Contains(
+                $objNestedLintDocumentation.Literal,
+                [StringComparison]::Ordinal
+            )) {
+            throw "Nested Markdown scope is stale: $($objNestedLintDocumentation.Path)"
+        }
+    }
     $scriptBlockGetAgentWorkflowFailure = {
         param([Parameter(Mandatory)][string] $Content)
 
@@ -8663,6 +8712,14 @@ if ($SelfTest) {
             '(?s)AGENT_INSTRUCTION_EVENT_HEAD_REVISION:.{0,300}github\.event\.commits\.\*\.id') {
             $listFailures.Add(
                 'The bounded push commits array must not decide head introduction.'
+            )
+        }
+        if ($Content.Contains(
+                'github.event.pull_request.updated_at',
+                [StringComparison]::Ordinal
+            )) {
+            $listFailures.Add(
+                'Pull request metadata freshness must use commit dates.'
             )
         }
         $intExpensiveGateCount = [regex]::Matches(
@@ -8790,9 +8847,25 @@ if ($SelfTest) {
                 '-PullRequestBaseChanged true'
             )
             Expected = 'Workflow contract literal is missing: -PullRequestBaseChanged'
+        },
+        [pscustomobject]@{
+            Name = 'mutable pull request activity timestamp'
+            Content = $strAgentWorkflowContent -replace (
+                "github.event_name == 'push' &&\r?\n\s+" +
+                'github.event.repository.pushed_at'
+            ),
+                'github.event.pull_request.updated_at'
+            Expected = 'Pull request metadata freshness must use commit dates.'
         }
     )
     foreach ($objWorkflowMutation in $arrWorkflowMutations) {
+        if ([string]::Equals(
+                $objWorkflowMutation.Content,
+                $strAgentWorkflowContent,
+                [StringComparison]::Ordinal
+            )) {
+            throw "Workflow mutation changed zero bytes: $($objWorkflowMutation.Name)"
+        }
         $arrMutationFailures = @(& $scriptBlockGetAgentWorkflowFailure `
                 -Content $objWorkflowMutation.Content)
         if ($arrMutationFailures.Count -eq 0 -or

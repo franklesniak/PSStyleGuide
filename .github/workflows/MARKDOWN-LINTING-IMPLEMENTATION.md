@@ -17,7 +17,7 @@ This implementation adds the capability to lint Markdown content that appears in
 
 A new Node.js script that:
 
-- Scans all `.md` files in the repository (excluding `node_modules`)
+- Scans all `.md` and `.mdc` files in the repository (excluding `node_modules`)
 - Uses markdown-it to parse each file and extract the AST
 - **Recursively** identifies code fences with language identifier `markdown` or `md` at all nesting depths
 - Runs markdownlint on each extracted block
