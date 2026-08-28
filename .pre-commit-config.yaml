@@ -1,8 +1,8 @@
 # Pre-commit configuration for PSStyleGuide.
 #
 # Remote hooks validate the repository's JSON, YAML, workflow, whitespace, and
-# line-ending contracts. The local hook runs the repository-owned instruction
-# validator without downloading or executing a proposed dependency. Run
+# line-ending contracts. The local hooks run repository-owned policy and
+# instruction validators without downloading or executing a proposed dependency. Run
 # `npm run bootstrap:agent-instructions` after a fresh clone or lockfile change.
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -75,6 +75,16 @@ repos:
 
   - repo: local
     hooks:
+      - id: workflow-policy-contract
+        name: workflow policy contract
+        entry: >-
+          pwsh -NoLogo -NoProfile -NonInteractive
+          -WorkingDirectory .github/workflows -Command
+          node Validate-WorkflowPolicy.mjs
+          build.yml markdownlint.yml
+        language: system
+        pass_filenames: false
+        always_run: true
       - id: agent-instruction-contract
         name: agent instruction contract and mutation tests
         entry: >-
