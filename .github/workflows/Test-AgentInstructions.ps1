@@ -75,7 +75,7 @@
 # This validator keeps explicit backtick continuations so that large
 # named-parameter mutation calls remain auditable one argument per line.
 # Private helpers have focused examples. The -SelfTest suite covers edge cases.
-# Version: 1.6.20260827.0
+# Version: 1.6.20260828.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -146,6 +146,7 @@ $ErrorActionPreference = 'Stop'
 $intAgentsMaximumInputBytes = 32768
 $intClaudeMaximumInputBytes = 131072
 $intCodexConfigMaximumInputBytes = 65536
+$intGitIgnoreMaximumInputBytes = 65536
 $intDocsInstructionsMaximumInputBytes = 131072
 $intInstructionDocumentMaximumInputBytes = 131072
 $intValidatorMaximumInputBytes = 425984
@@ -180,7 +181,9 @@ $script:arrPushGovernedExactPaths = @(
     '.github/workflows/Test-AgentInstructionParserManifest.mjs',
     '.github/workflows/Test-AgentInstructions.ps1',
     '.github/workflows/agent-instructions.yml',
+    '.gitignore',
     '.npmrc',
+    'docs/ISSUE_EVALUATION_PROMPT.md',
     'npm-shrinkwrap.json',
     'package-lock.json',
     'package.json'
@@ -4243,6 +4246,10 @@ function Get-GovernedDocumentRangeTransitionFailure {
     # True to require each rendered transition to use its commit's authenticated
     # UTC date. False retains range transition checks without date equality.
     #
+    # .PARAMETER RequiresVersion
+    # True for documents with Version and Last Updated metadata. False for
+    # documents that require Last Updated freshness but do not declare Version.
+    #
     # .EXAMPLE
     # $arrFailure = @(Get-GovernedDocumentRangeTransitionFailure `
     #     -Name 'AGENTS.md' -RepositoryRootPath $strRoot `
@@ -4279,7 +4286,7 @@ function Get-GovernedDocumentRangeTransitionFailure {
     # without notice.
     #
     # Positional parameters are disabled. Internal callers must use named
-    # parameters. Version: 1.2.20260828.0.
+    # parameters. Version: 1.3.20260828.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4322,7 +4329,10 @@ function Get-GovernedDocumentRangeTransitionFailure {
         [string] $PolicyMarker,
 
         [Parameter()]
-        [bool] $RequireExpectedUtcDateForRenderedChange = $false
+        [bool] $RequireExpectedUtcDateForRenderedChange = $false,
+
+        [Parameter()]
+        [bool] $RequiresVersion = $true
     )
 
     if ([string]::IsNullOrEmpty($BaseRevision) -and
@@ -4495,7 +4505,8 @@ function Get-GovernedDocumentRangeTransitionFailure {
             -PolicyMaximumBytes $PolicyMaximumBytes `
             -PolicyMarker $PolicyMarker `
             -RequireExpectedUtcDateForRenderedChange `
-                $RequireExpectedUtcDateForRenderedChange)
+                $RequireExpectedUtcDateForRenderedChange `
+            -RequiresVersion $RequiresVersion)
         foreach ($strCommitFailure in $arrCommitFailures) {
             Write-Output $strCommitFailure
         }
@@ -5595,6 +5606,27 @@ $arrRepositoryFailures = @(Get-AgentInstructionFailure `
         -AgentsContent $strAgentsContent `
         -ClaudeContent $strClaudeContent `
         -CodexConfigContent $strCodexConfigContent)
+$strGitIgnoreContent = if ([string]::IsNullOrEmpty($strValidatedInputRevision)) {
+    ConvertFrom-StrictUtf8Data `
+        -Bytes (Read-RepositoryInputData `
+            -Path (Join-Path $strRepositoryRootPath '.gitignore') `
+            -RepositoryRootPath $strRepositoryRootPath `
+            -RepositoryRelativePath '.gitignore' `
+            -DisplayName '.gitignore' `
+            -MaximumBytes $intGitIgnoreMaximumInputBytes) `
+        -DisplayName '.gitignore'
+}
+else {
+    Read-GitRevisionText `
+        -RepositoryRootPath $strRepositoryRootPath `
+        -Revision $strValidatedInputRevision `
+        -RepositoryRelativePath '.gitignore' `
+        -MaximumBytes $intGitIgnoreMaximumInputBytes `
+        -RequireRegularFile
+}
+if ($strGitIgnoreContent -cnotmatch '(?m)^/CLAUDE\.local\.md$') {
+    $arrRepositoryFailures += 'The root CLAUDE.local.md ignore rule is missing.'
+}
 $arrRepositoryFailures += @(Get-DocumentationClaimFailure `
         -Content $strDocsInstructionsContent `
         -TrackedPaths $arrTrackedRepositoryPaths)
@@ -5640,22 +5672,21 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
                     -PolicyMarker $strMetadataRangePolicyMarker)
         }
     }
-    if ($objDocumentContext.RequiresVersion) {
-        $arrRepositoryFailures += @(Get-GovernedDocumentRangeTransitionFailure `
-                -Name $objDocumentContext.Path `
-                -RepositoryRootPath $strRepositoryRootPath `
-                -RepositoryRelativePath $objDocumentContext.Path `
-                -MaximumBytes $objDocumentContext.MaximumBytes `
-                -BaseRevision $strEventHistoryBaseRevision `
-                -HeadRevision $RangeHeadRevision `
-                -InputRevision $strValidatedInputRevision `
-                -IsNewRefRange ([bool]$RangeIsNewRef) `
-                -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
-                -PolicyMaximumBytes $intValidatorMaximumInputBytes `
-                -PolicyMarker $strMetadataRangePolicyMarker `
-                -RequireExpectedUtcDateForRenderedChange `
-                    $boolRequireRangeCommitDateFreshness)
-    }
+    $arrRepositoryFailures += @(Get-GovernedDocumentRangeTransitionFailure `
+            -Name $objDocumentContext.Path `
+            -RepositoryRootPath $strRepositoryRootPath `
+            -RepositoryRelativePath $objDocumentContext.Path `
+            -MaximumBytes $objDocumentContext.MaximumBytes `
+            -BaseRevision $strEventHistoryBaseRevision `
+            -HeadRevision $RangeHeadRevision `
+            -InputRevision $strValidatedInputRevision `
+            -IsNewRefRange ([bool]$RangeIsNewRef) `
+            -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
+            -PolicyMaximumBytes $intValidatorMaximumInputBytes `
+            -PolicyMarker $strMetadataRangePolicyMarker `
+            -RequireExpectedUtcDateForRenderedChange `
+                $boolRequireRangeCommitDateFreshness `
+            -RequiresVersion $objDocumentContext.RequiresVersion)
     if ($EventName -ceq 'push' -and $EventHeadDistinct -ceq 'false' -and
         $RangeIsNewRef) {
         $arrRepositoryFailures += @(Get-GovernedDocumentCommitTransitionFailure `
@@ -5726,6 +5757,14 @@ Write-Output 'Agent-instruction contract passed.'
 
 if ($SelfTest) {
     #region Mutation self-tests
+
+    $strValidatorSource = [IO.File]::ReadAllText($PSCommandPath)
+    if ([regex]::Matches(
+            $strValidatorSource,
+            '(?m)^# Version: 1\.6\.20260828\.0$'
+        ).Count -ne 1) {
+        throw 'The validator script version does not use build date 20260828.'
+    }
 
     $strMissingBootstrapFixture = [IO.Path]::Combine(
         [IO.Path]::GetTempPath(),
@@ -5952,13 +5991,24 @@ if ($SelfTest) {
     if (Test-ProhibitedClaudeLocalPath -RepositoryRelativePath 'CLAUDE.local.md.bak') {
         throw 'A Claude local-memory near miss was prohibited.'
     }
-    $strGitIgnoreContent = [IO.File]::ReadAllText(
-        [IO.Path]::Combine($strRepositoryRootPath, '.gitignore')
-    )
-    if ($strGitIgnoreContent -cnotmatch '(?m)^/CLAUDE\.local\.md$') {
-        throw 'The root CLAUDE.local.md ignore rule is missing.'
+    foreach ($strExactValidatorInputPath in @(
+            '.gitignore',
+            'docs/ISSUE_EVALUATION_PROMPT.md'
+        )) {
+        if (-not (Test-AgentInstructionWorkflowPath `
+                    -RepositoryRelativePath $strExactValidatorInputPath)) {
+            throw "An exact validator input escaped push applicability: $strExactValidatorInputPath"
+        }
     }
-
+    foreach ($strValidatorInputNearMiss in @(
+            '.github/.gitignore',
+            'docs/ISSUE_EVALUATION_PROMPT.md.bak'
+        )) {
+        if (Test-AgentInstructionWorkflowPath `
+                -RepositoryRelativePath $strValidatorInputNearMiss) {
+            throw "A validator-input near miss selected push validation: $strValidatorInputNearMiss"
+        }
+    }
     foreach ($strHierarchicalGeminiPath in @(
             'GEMINI.md',
             'tools/GEMINI.md',
@@ -7575,8 +7625,21 @@ if ($SelfTest) {
             'workflows',
             'Test-AgentInstructions.ps1'
         )
+        $strMergeUnversionedRelativePath = 'docs/ISSUE_EVALUATION_PROMPT.md'
+        $strMergeUnversionedPath = [IO.Path]::Combine(
+            $strMergeFixtureRoot,
+            'docs',
+            'ISSUE_EVALUATION_PROMPT.md'
+        )
+        $strMergeGitIgnorePath = [IO.Path]::Combine(
+            $strMergeFixtureRoot,
+            '.gitignore'
+        )
         [void][System.IO.Directory]::CreateDirectory(
             [IO.Path]::GetDirectoryName($strMergePolicyPath)
+        )
+        [void][System.IO.Directory]::CreateDirectory(
+            [IO.Path]::GetDirectoryName($strMergeUnversionedPath)
         )
         $objUtf8WithoutBom = [System.Text.UTF8Encoding]::new($false)
         $objMergeCurrentDate = [DateTime]::ParseExact(
@@ -7612,8 +7675,19 @@ if ($SelfTest) {
             $strMetadataRangePolicyMarker,
             $objUtf8WithoutBom
         )
+        [IO.File]::WriteAllText(
+            $strMergeUnversionedPath,
+            $objUnversionedDocument.Content,
+            $objUtf8WithoutBom
+        )
+        [IO.File]::WriteAllText(
+            $strMergeGitIgnorePath,
+            "/CLAUDE.local.md`n",
+            $objUtf8WithoutBom
+        )
         & git -C $strMergeFixtureRoot add -- `
-            'AGENTS.md' '.github/workflows/Test-AgentInstructions.ps1'
+            'AGENTS.md' '.github/workflows/Test-AgentInstructions.ps1' `
+            $strMergeUnversionedRelativePath '.gitignore'
         $strMergeBaseTree = [string] (& git -C $strMergeFixtureRoot write-tree)
         if ($LASTEXITCODE -ne 0 -or
             $strMergeBaseTree.Trim() -notmatch '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$') {
@@ -7731,6 +7805,22 @@ if ($SelfTest) {
                 -PolicyMaximumBytes 1024 -PolicyMarker $strMetadataRangePolicyMarker `
                 -RequireExpectedUtcDateForRenderedChange $true
         }
+        $scriptBlockGetUnversionedRangeFailure = {
+            param([string] $Base, [string] $Head)
+            Get-GovernedDocumentRangeTransitionFailure `
+                -Name $strMergeUnversionedRelativePath `
+                -RepositoryRootPath $strMergeFixtureRoot `
+                -RepositoryRelativePath $strMergeUnversionedRelativePath `
+                -MaximumBytes $intInstructionDocumentMaximumInputBytes `
+                -BaseRevision $Base -HeadRevision $Head -InputRevision $Head `
+                -IsNewRefRange $false `
+                -PolicyRepositoryRelativePath `
+                    '.github/workflows/Test-AgentInstructions.ps1' `
+                -PolicyMaximumBytes 1024 `
+                -PolicyMarker $strMetadataRangePolicyMarker `
+                -RequireExpectedUtcDateForRenderedChange $true `
+                -RequiresVersion $false
+        }
 
         & git -C $strMergeFixtureRoot read-tree $strMergeBaseTree
         $strCaseFixtureBlob = [string] (
@@ -7793,6 +7883,72 @@ if ($SelfTest) {
             -Parents @() `
             -Timestamp ($strMergeHistoricalDate + 'T08:00:00Z') `
             -Message 'merge fixture base'
+
+        & git -C $strMergeFixtureRoot read-tree $strMergeBaseTree
+        [IO.File]::WriteAllText(
+            $strMergeGitIgnorePath,
+            "node_modules/`n",
+            $objUtf8WithoutBom
+        )
+        & git -C $strMergeFixtureRoot add -- '.gitignore'
+        $strProposedGitIgnoreTree = ([string] (
+                & git -C $strMergeFixtureRoot write-tree
+            )).Trim()
+        $strProposedGitIgnoreCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strProposedGitIgnoreTree `
+            -Parents @($strMergeBaseCommit) `
+            -Timestamp ($strMergeCurrentDate + 'T00:00:40Z') `
+            -Message 'proposed gitignore deletion'
+        $strProposedGitIgnore = Read-GitRevisionText `
+            -RepositoryRootPath $strMergeFixtureRoot `
+            -Revision $strProposedGitIgnoreCommit `
+            -RepositoryRelativePath '.gitignore' `
+            -MaximumBytes $intGitIgnoreMaximumInputBytes `
+            -RequireRegularFile
+        if ($strProposedGitIgnore -cmatch '(?m)^/CLAUDE\.local\.md$') {
+            throw 'The proposed .gitignore deletion fixture retained the required rule.'
+        }
+        [IO.File]::WriteAllText(
+            $strMergeGitIgnorePath,
+            "/CLAUDE.local.md`n",
+            $objUtf8WithoutBom
+        )
+
+        & git -C $strMergeFixtureRoot read-tree $strMergeBaseTree
+        [IO.File]::WriteAllText(
+            $strMergeUnversionedPath,
+            $objUnversionedDocument.Content + "`nRendered stale range change.`n",
+            $objUtf8WithoutBom
+        )
+        & git -C $strMergeFixtureRoot add -- $strMergeUnversionedRelativePath
+        $strUnversionedStaleTree = ([string] (
+                & git -C $strMergeFixtureRoot write-tree
+            )).Trim()
+        $strUnversionedStaleCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strUnversionedStaleTree `
+            -Parents @($strMergeBaseCommit) `
+            -Timestamp ($strMergeCurrentDate + 'T00:00:45Z') `
+            -Message 'stale unversioned transition'
+        $strUnversionedRestoreCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strMergeBaseTree `
+            -Parents @($strUnversionedStaleCommit) `
+            -Timestamp ($strMergeCurrentDate + 'T00:00:46Z') `
+            -Message 'restore unversioned endpoint'
+        $arrUnversionedRangeFailures = @(
+            & $scriptBlockGetUnversionedRangeFailure `
+                -Base $strMergeBaseCommit -Head $strUnversionedRestoreCommit
+        )
+        if (($arrUnversionedRangeFailures -join "`n") -cnotmatch
+                'Last Updated must') {
+            throw 'A stale change-then-restore unversioned range escaped validation.'
+        }
+        [IO.File]::WriteAllText(
+            $strMergeUnversionedPath,
+            $objUnversionedDocument.Content,
+            $objUtf8WithoutBom
+        )
+        & git -C $strMergeFixtureRoot read-tree $strMergeBaseTree
+
         & git -C $strMergeFixtureRoot rm --cached --quiet -- `
             '.github/workflows/Test-AgentInstructions.ps1'
         [IO.File]::WriteAllText(
