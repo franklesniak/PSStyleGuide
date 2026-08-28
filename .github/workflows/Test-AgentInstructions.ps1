@@ -75,7 +75,7 @@
 # This validator keeps explicit backtick continuations so that large
 # named-parameter mutation calls remain auditable one argument per line.
 # Private helpers have focused examples. The -SelfTest suite covers edge cases.
-# Version: 1.7.20260828.0
+# Version: 1.7.20260828.1
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -190,6 +190,7 @@ $script:arrPushGovernedExactPaths = @(
 )
 $script:strDecisionRecordPathPattern =
     '^docs/decisions/[0-9]{4}-[a-z0-9]+(?:-[a-z0-9]+)*\.md$'
+$script:strDecisionRecordDirectoryPathPattern = '^docs/decisions/[^/]+$'
 $script:strStandingPlacementAuthorization =
     'No additional per-round, per-session, or PR-specific direct-push authorization from the owner is required.'
 $script:arrPlacementStructuralLiterals = @(
@@ -2897,7 +2898,7 @@ function Test-AgentInstructionWorkflowPath {
     return (
         (Test-ProhibitedClaudeLocalPath `
             -RepositoryRelativePath $RepositoryRelativePath) -or
-        $RepositoryRelativePath -cmatch $script:strDecisionRecordPathPattern -or
+        $RepositoryRelativePath -cmatch $script:strDecisionRecordDirectoryPathPattern -or
         $script:arrPushGovernedExactPaths -ccontains $RepositoryRelativePath -or
         (Test-ExactPathCaseMismatch `
             -RepositoryRelativePath $RepositoryRelativePath `
@@ -2911,65 +2912,73 @@ function Test-AgentInstructionWorkflowPath {
     )
 }
 
+function Test-BackwardCommitMove {
+    # .SYNOPSIS
+    # Tests a strict backward commit move.
+    # .PARAMETER RepositoryRootPath
+    # The Git repository.
+    # .PARAMETER BaseRevision
+    # The before commit.
+    # .PARAMETER HeadRevision
+    # The after commit.
+    # .EXAMPLE
+    # Test-BackwardCommitMove @params
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)][string] $RepositoryRootPath,
+        [Parameter(Mandatory)][string] $BaseRevision,
+        [Parameter(Mandatory)][string] $HeadRevision
+    )
+
+    if ($BaseRevision -eq $HeadRevision) {
+        return $false
+    }
+    & git -C $RepositoryRootPath merge-base --is-ancestor `
+        $HeadRevision $BaseRevision 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        return $true
+    }
+    if ($LASTEXITCODE -eq 1) {
+        return $false
+    }
+    throw 'Could not determine backward push ancestry.'
+}
+
+function Get-DecisionRecordPathFailure {
+    # .SYNOPSIS
+    # Gets a decision-name failure.
+    # .PARAMETER RepositoryRelativePath
+    # The path to test.
+    # .EXAMPLE
+    # Get-DecisionRecordPathFailure docs/decisions/security.md
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param([Parameter(Mandatory)][string] $RepositoryRelativePath)
+
+    if ($RepositoryRelativePath -cmatch $script:strDecisionRecordDirectoryPathPattern -and
+        $RepositoryRelativePath -cnotmatch $script:strDecisionRecordPathPattern) {
+        Write-Output "$RepositoryRelativePath must use docs/decisions/NNNN-short-title.md."
+    }
+}
+
 function Get-PushGovernedPathApplicability {
     # .SYNOPSIS
-    # Makes one fail-closed governed-path decision for a push event.
-    #
+    # Selects push validation.
     # .DESCRIPTION
-    # Validates push endpoint identities and the exact checked-out head. Deleted
-    # refs need no byte validation. New refs validate conservatively. Existing
-    # refs enumerate commit-range touches and endpoint-tree changes. Validation is
-    # required when either set contains an instruction workflow path.
-    #
+    # Uses authenticated range and endpoint paths.
     # .PARAMETER RepositoryRootPath
-    # The absolute or resolved repository root used for authenticated Git reads.
-    #
+    # The Git repository.
     # .PARAMETER BaseRevision
-    # The expanded push-before object ID. New refs require all zeros; deleted and
-    # existing refs require a valid nonzero commit ID.
-    #
+    # The before ID.
     # .PARAMETER HeadRevision
-    # The expanded push-after object ID. Deleted refs require all zeros; retained
-    # refs require the exact checked-out nonzero commit ID.
-    #
+    # The after ID.
     # .PARAMETER IsNewRef
-    # True when the authenticated push created the ref.
-    #
+    # True for creation.
     # .PARAMETER IsDeletedRef
-    # True when the authenticated push deleted the ref.
-    #
+    # True for deletion.
     # .EXAMPLE
-    # $objDecision = Get-PushGovernedPathApplicability `
-    #     -RepositoryRootPath $strRoot -BaseRevision ('0' * 40) `
-    #     -HeadRevision $strHead -IsNewRef $true -IsDeletedRef $false
-    #
-    # # Returns ShouldValidate = $true and the new-ref fail-closed decision.
-    #
-    # .EXAMPLE
-    # $objDecision = Get-PushGovernedPathApplicability `
-    #     -RepositoryRootPath $strRoot -BaseRevision $strBefore `
-    #     -HeadRevision ('0' * 40) -IsNewRef $false -IsDeletedRef $true
-    #
-    # # Returns ShouldValidate = $false because no repository bytes remain.
-    #
-    # .INPUTS
-    # None. You can't pipe objects to this function.
-    #
-    # .OUTPUTS
-    # [pscustomobject] One decision with ShouldValidate, Decision, and
-    # ChangedPathCount. The count includes range touches plus endpoint changes that
-    # are not already in the range. Decision is DELETED_REF_HAS_NO_REMAINING_BYTES,
-    # NEW_REF_REQUIRES_FAIL_CLOSED_VALIDATION, GOVERNED_PATH_CHANGED, or
-    # EXACT_UNGOVERNED_PUSH. Invalid identities or indeterminate Git operations
-    # throw terminating errors instead of returning a decision.
-    #
-    # .NOTES
-    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
-    # surface. Parameters, return shape, and positional contract may change
-    # without notice.
-    #
-    # Positional parameters are disabled. Internal callers must use named
-    # parameters. Version: 1.3.20260828.0.
+    # Get-PushGovernedPathApplicability @params
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -3904,86 +3913,31 @@ function Get-TrustRootRangeMutationFailure {
 
 function Get-GovernedDocumentCommitTransitionFailure {
     # .SYNOPSIS
-    # Finds marker-aware metadata failures for one commit and its direct parents.
-    #
+    # Checks one governed commit.
     # .DESCRIPTION
-    # Authenticates the commit and active policy marker, enumerates every direct
-    # parent where the governed document changed, reads bounded immutable content,
-    # and validates each transition against the commit's authenticated UTC date.
-    # A root commit, a marker-absent historical commit, or a commit with no change
-    # to the document produces no output. Merge parents are checked independently.
-    #
+    # Checks each immutable direct-parent transition.
     # .PARAMETER Name
-    # The governed document display name used in diagnostic output.
-    #
+    # The display name.
     # .PARAMETER RepositoryRootPath
-    # The repository root used for immutable Git object and transition reads.
-    #
+    # The Git repository.
     # .PARAMETER RepositoryRelativePath
-    # The exact governed document path to compare across direct parents.
-    #
+    # The document path.
     # .PARAMETER MaximumBytes
-    # The inclusive maximum byte count allowed for each governed document blob.
-    #
+    # The blob limit.
     # .PARAMETER CommitRevision
-    # The authenticated nonzero commit object ID whose direct transitions are
-    # evaluated.
-    #
+    # The commit ID.
     # .PARAMETER PolicyRepositoryRelativePath
-    # The exact repository-relative validator policy path that owns PolicyMarker.
-    #
+    # The policy path.
     # .PARAMETER PolicyMaximumBytes
-    # The inclusive maximum byte count allowed for a historical policy blob.
-    #
+    # The policy limit.
     # .PARAMETER PolicyMarker
-    # The ordinal marker that proves the metadata transition policy is active.
-    #
+    # The policy marker.
     # .PARAMETER RequireExpectedUtcDateForRenderedChange
-    # True to require rendered document changes to use the commit's authenticated
-    # UTC date. False retains transition checks without commit-date equality.
-    #
+    # True to require the commit date.
     # .PARAMETER RequiresVersion
-    # True for documents with Version and Last Updated metadata. False for
-    # documents that require Last Updated freshness but do not declare Version.
-    #
+    # True if versioned.
     # .EXAMPLE
-    # $arrFailure = @(Get-GovernedDocumentCommitTransitionFailure `
-    #     -Name 'AGENTS.md' -RepositoryRootPath $strRoot `
-    #     -RepositoryRelativePath 'AGENTS.md' -MaximumBytes 32768 `
-    #     -CommitRevision $strCommit `
-    #     -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
-    #     -PolicyMaximumBytes 425984 -PolicyMarker $strMarker `
-    #     -RequireExpectedUtcDateForRenderedChange $true)
-    #
-    # # Returns no strings when changed content uses the commit UTC date.
-    #
-    # .EXAMPLE
-    # Get-GovernedDocumentCommitTransitionFailure `
-    #     -Name 'docs/decisions/0003-policy.md' -RepositoryRootPath $strRoot `
-    #     -RepositoryRelativePath 'docs/decisions/0003-policy.md' `
-    #     -MaximumBytes 131072 -CommitRevision $strCommit `
-    #     -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
-    #     -PolicyMaximumBytes 425984 -PolicyMarker $strMarker `
-    #     -RequireExpectedUtcDateForRenderedChange $true -RequiresVersion $false
-    #
-    # # Writes a Last Updated failure for a backdated rendered decision change.
-    #
-    # .INPUTS
-    # None. You can't pipe objects to this function.
-    #
-    # .OUTPUTS
-    # [string] Zero or more transition or timestamp failure diagnostics. No output
-    # means the policy is not active for that history point, the document did not
-    # change relative to any direct parent, or every applicable transition passed.
-    # Invalid object, parent, size, encoding, marker, or Git state throws.
-    #
-    # .NOTES
-    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
-    # surface. Parameters, return shape, and positional contract may change
-    # without notice.
-    #
-    # Positional parameters are disabled. Internal callers must use named
-    # parameters. Version: 1.1.20260827.0.
+    # Get-GovernedDocumentCommitTransitionFailure @params
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4200,96 +4154,37 @@ function Get-GovernedDocumentCommitTransitionFailure {
 
 function Get-GovernedDocumentRangeTransitionFailure {
     # .SYNOPSIS
-    # Finds marker-aware metadata failures in one bounded Git event range.
-    #
+    # Checks a governed commit range.
     # .DESCRIPTION
-    # Authenticates the range and validation head, locates the effective policy
-    # introduction when the base predates the marker, enumerates commits in stable
-    # topological order, and delegates each commit to direct-parent transition
-    # validation. New-ref all-zero bases and ordinary ranges use distinct rules.
-    # Invalid or indeterminate history throws instead of passing.
-    #
+    # Validates each policy-applicable commit.
     # .PARAMETER Name
-    # The governed document display name used in diagnostic output.
-    #
+    # The display name.
     # .PARAMETER RepositoryRootPath
-    # The repository root used for authenticated immutable Git operations.
-    #
+    # The Git repository.
     # .PARAMETER RepositoryRelativePath
-    # The exact governed document path validated throughout the range.
-    #
+    # The document path.
     # .PARAMETER MaximumBytes
-    # The inclusive maximum byte count allowed for each governed document blob.
-    #
+    # The blob limit.
     # .PARAMETER BaseRevision
-    # The range base commit object ID, an all-zero object ID for a new ref, or an
-    # empty value together with an empty head when no ordinary event range exists.
-    #
+    # The base ID.
     # .PARAMETER HeadRevision
-    # The nonzero range head commit object ID, or an empty value together with an
-    # empty base when no ordinary event range exists.
-    #
+    # The head ID.
     # .PARAMETER InputRevision
-    # The local validation revision that must resolve to HeadRevision. An empty
-    # value selects HEAD.
-    #
+    # The validation revision.
     # .PARAMETER IsNewRefRange
-    # True when BaseRevision is the all-zero object ID for a created ref.
-    #
+    # True for a new ref.
     # .PARAMETER PolicyRepositoryRelativePath
-    # The exact repository-relative validator policy path that owns PolicyMarker.
-    #
+    # The policy path.
     # .PARAMETER PolicyMaximumBytes
-    # The inclusive maximum byte count allowed for each historical policy blob.
-    #
+    # The policy limit.
     # .PARAMETER PolicyMarker
-    # The ordinal marker that identifies history governed by this metadata policy.
-    #
+    # The policy marker.
     # .PARAMETER RequireExpectedUtcDateForRenderedChange
-    # True to require each rendered transition to use its commit's authenticated
-    # UTC date. False retains range transition checks without date equality.
-    #
+    # True to require commit dates.
     # .PARAMETER RequiresVersion
-    # True for documents with Version and Last Updated metadata. False for
-    # documents that require Last Updated freshness but do not declare Version.
-    #
+    # True if versioned.
     # .EXAMPLE
-    # $arrFailure = @(Get-GovernedDocumentRangeTransitionFailure `
-    #     -Name 'AGENTS.md' -RepositoryRootPath $strRoot `
-    #     -RepositoryRelativePath 'AGENTS.md' -MaximumBytes 32768 `
-    #     -BaseRevision $strBase -HeadRevision $strHead `
-    #     -InputRevision $strHead -IsNewRefRange $false `
-    #     -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
-    #     -PolicyMaximumBytes 425984 -PolicyMarker $strMarker)
-    #
-    # # Returns no strings when every governed transition in the range passes.
-    #
-    # .EXAMPLE
-    # Get-GovernedDocumentRangeTransitionFailure `
-    #     -Name 'AGENTS.md' -RepositoryRootPath $strRoot `
-    #     -RepositoryRelativePath 'AGENTS.md' -MaximumBytes 32768 `
-    #     -BaseRevision ('0' * 40) -HeadRevision $strHead `
-    #     -IsNewRefRange $true `
-    #     -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
-    #     -PolicyMaximumBytes 425984 -PolicyMarker $strMarker
-    #
-    # # Writes every applicable transition failure from the bounded new-ref history.
-    #
-    # .INPUTS
-    # None. You can't pipe objects to this function.
-    #
-    # .OUTPUTS
-    # [string] Zero or more commit-transition failure diagnostics in range order.
-    # No output means no ordinary range was supplied, the endpoints are equal, or
-    # every policy-applicable transition passed. Invalid range or Git state throws.
-    #
-    # .NOTES
-    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
-    # surface. Parameters, return shape, and positional contract may change
-    # without notice.
-    #
-    # Positional parameters are disabled. Internal callers must use named
-    # parameters. Version: 1.3.20260828.0.
+    # Get-GovernedDocumentRangeTransitionFailure @params
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -5321,6 +5216,7 @@ $strPreviousTopicBaseRevision = ''
 $strPreviousTopicHeadRevision = ''
 $strCurrentTopicBaseRevision = ''
 $strCurrentTopicHeadRevision = ''
+$boolValidateBackwardPushHead = $false
 if ($boolEventRangeRequested -and
     -not [string]::IsNullOrEmpty($RangeBaseRevision) -and
     -not [string]::IsNullOrEmpty($RangeHeadRevision)) {
@@ -5348,6 +5244,13 @@ if ($boolEventRangeRequested -and
     $strPreviousTopicHeadRevision = $objMetadataEventRevisionContext.PreviousTopicHeadRevision
     $strCurrentTopicBaseRevision = $objMetadataEventRevisionContext.CurrentTopicBaseRevision
     $strCurrentTopicHeadRevision = $objMetadataEventRevisionContext.CurrentTopicHeadRevision
+    if ($EventName -ceq 'push' -and -not $RangeIsNewRef -and
+        $EventHeadDistinct -ceq 'false' -and
+        $RangeBaseRevision -ne $RangeHeadRevision) {
+        $boolValidateBackwardPushHead = Test-BackwardCommitMove `
+            -RepositoryRootPath $strRepositoryRootPath `
+            -BaseRevision $RangeBaseRevision -HeadRevision $RangeHeadRevision
+    }
 }
 
 if (-not [string]::IsNullOrEmpty($InputRevision)) {
@@ -5415,7 +5318,7 @@ $arrTrackedRepositoryPaths = @(Read-GitTrackedPath `
         -MaximumBytes $intGitPathListMaximumBytes)
 $arrGovernedMetadataDocuments += @(
     $arrTrackedRepositoryPaths |
-        Where-Object { $_ -cmatch $script:strDecisionRecordPathPattern } |
+        Where-Object { $_ -cmatch $script:strDecisionRecordDirectoryPathPattern } |
         ForEach-Object {
             [pscustomobject]@{
                 Path = $_
@@ -5638,8 +5541,10 @@ $arrCanonicalDecisionGuideLinks = @(
 )
 foreach ($objDecisionContext in @(
         $listGovernedDocumentContexts |
-            Where-Object { $_.Path -cmatch $script:strDecisionRecordPathPattern }
+            Where-Object { $_.Path -cmatch $script:strDecisionRecordDirectoryPathPattern }
     )) {
+    $arrRepositoryFailures += @(Get-DecisionRecordPathFailure `
+            -RepositoryRelativePath $objDecisionContext.Path)
     foreach ($strGuideLink in $arrCanonicalDecisionGuideLinks) {
         if (-not $objDecisionContext.Content.Contains(
                 $strGuideLink,
@@ -5708,7 +5613,7 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
                 $boolRequireRangeCommitDateFreshness `
             -RequiresVersion $objDocumentContext.RequiresVersion)
     if ($EventName -ceq 'push' -and $EventHeadDistinct -ceq 'false' -and
-        $RangeIsNewRef) {
+        ($RangeIsNewRef -or $boolValidateBackwardPushHead)) {
         $arrRepositoryFailures += @(Get-GovernedDocumentCommitTransitionFailure `
                 -Name $objDocumentContext.Path `
                 -RepositoryRootPath $strRepositoryRootPath `
@@ -5781,7 +5686,7 @@ if ($SelfTest) {
     $strValidatorSource = [IO.File]::ReadAllText($PSCommandPath)
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260828\.0$'
+            '(?m)^# Version: 1\.7\.20260828\.1$'
         ).Count -ne 1) {
         throw 'The validator script version does not use build date 20260828.'
     }
@@ -6028,6 +5933,45 @@ if ($SelfTest) {
                 -RepositoryRelativePath $strValidatorInputNearMiss) {
             throw "A validator-input near miss selected push validation: $strValidatorInputNearMiss"
         }
+    }
+    $strCanonicalDecisionPath = 'docs/decisions/0003-new-policy.md'
+    if (@(Get-DecisionRecordPathFailure `
+                -RepositoryRelativePath $strCanonicalDecisionPath).Count -ne 0 -or
+        -not (Test-AgentInstructionWorkflowPath `
+                -RepositoryRelativePath $strCanonicalDecisionPath)) {
+        throw 'A canonical decision-record path was not accepted and governed.'
+    }
+    foreach ($objDecisionPathMutation in @(
+            [pscustomobject]@{ Find = '0003-new-policy.md'; Replace = 'security.md' },
+            [pscustomobject]@{ Find = 'new'; Replace = 'New' },
+            [pscustomobject]@{ Find = '.md'; Replace = '.txt' }
+        )) {
+        $intMutationCount = [regex]::Matches(
+            $strCanonicalDecisionPath,
+            [regex]::Escape($objDecisionPathMutation.Find)
+        ).Count
+        $strDecisionPathMutation = $strCanonicalDecisionPath.Replace(
+            $objDecisionPathMutation.Find,
+            $objDecisionPathMutation.Replace
+        )
+        $arrDecisionPathFailures = @(Get-DecisionRecordPathFailure `
+                -RepositoryRelativePath $strDecisionPathMutation)
+        if ($intMutationCount -ne 1 -or
+            $strDecisionPathMutation -ceq $strCanonicalDecisionPath -or
+            -not (Test-AgentInstructionWorkflowPath `
+                    -RepositoryRelativePath $strDecisionPathMutation) -or
+            $arrDecisionPathFailures.Count -ne 1 -or
+            $arrDecisionPathFailures[0] -cne
+                "$strDecisionPathMutation must use docs/decisions/NNNN-short-title.md.") {
+            throw "A noncanonical decision path did not fail closed exactly: $strDecisionPathMutation"
+        }
+    }
+    $strNestedDecisionNearMiss = "$strCanonicalDecisionPath/nested"
+    if ((Test-AgentInstructionWorkflowPath `
+                -RepositoryRelativePath $strNestedDecisionNearMiss) -or
+        @(Get-DecisionRecordPathFailure `
+                -RepositoryRelativePath $strNestedDecisionNearMiss).Count -ne 0) {
+        throw 'A nested decision-path near miss became a direct decision record.'
     }
     foreach ($strHierarchicalGeminiPath in @(
             'GEMINI.md',
@@ -7132,6 +7076,16 @@ if ($SelfTest) {
                 'M 100644 inline zzzz/tools/GEMINI.md',
                 'data 0',
                 '',
+                'commit refs/heads/malformed-decision',
+                'mark :8',
+                'author Fixture <fixture@example.invalid> 1700000002 +0000',
+                'committer Fixture <fixture@example.invalid> 1700000002 +0000',
+                'data 18',
+                'malformed decision',
+                'from :2',
+                'M 100644 inline docs/decisions/security.md',
+                'data 0',
+                '',
                 'commit refs/heads/multi',
                 'mark :5',
                 'author Fixture <fixture@example.invalid> 1700000003 +0000',
@@ -7227,6 +7181,9 @@ if ($SelfTest) {
         $strPushGoverned = [string] (
             & git -C $strPushRoot rev-parse refs/heads/governed
         )
+        $strPushMalformedDecision = [string] (
+            & git -C $strPushRoot rev-parse refs/heads/malformed-decision
+        )
         $strPushMulti = [string] (
             & git -C $strPushRoot rev-parse refs/heads/multi
         )
@@ -7242,6 +7199,7 @@ if ($SelfTest) {
         $strPushBase = $strPushBase.Trim()
         $strPushUngoverned = $strPushUngoverned.Trim()
         $strPushGoverned = $strPushGoverned.Trim()
+        $strPushMalformedDecision = $strPushMalformedDecision.Trim()
         $strPushMulti = $strPushMulti.Trim()
         $strPushDivergent = $strPushDivergent.Trim()
         $strPushRestore = $strPushRestore.Trim()
@@ -7318,6 +7276,21 @@ if ($SelfTest) {
         if (-not $objGoverned.ShouldValidate -or
             $objGoverned.ChangedPathCount -ne 3001) {
             throw 'A governed path after 3,000 other paths was not validated.'
+        }
+
+        & git -C $strPushRoot update-ref HEAD $strPushMalformedDecision
+        $arrMalformedDecisionPaths = @(& git -C $strPushRoot diff `
+                --name-only $strPushUngoverned $strPushMalformedDecision --)
+        $objMalformedDecision = Get-PushGovernedPathApplicability `
+            -RepositoryRootPath $strPushRoot `
+            -BaseRevision $strPushUngoverned `
+            -HeadRevision $strPushMalformedDecision `
+            -IsNewRef $false -IsDeletedRef $false
+        if ($arrMalformedDecisionPaths.Count -ne 1 -or
+            $arrMalformedDecisionPaths[0] -cne 'docs/decisions/security.md' -or
+            -not $objMalformedDecision.ShouldValidate -or
+            $objMalformedDecision.ChangedPathCount -ne 1) {
+            throw 'A malformed decision-record push escaped exact applicability.'
         }
 
         & git -C $strPushRoot update-ref HEAD $strPushDivergent
@@ -8557,6 +8530,37 @@ if ($SelfTest) {
                 [StringComparison]::Ordinal
             )) {
             throw 'An inherited merge metadata rollback did not fail closed.'
+        }
+        $strBackwardBaseCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strNewerParentTree -Parents @($strRegressingMergeCommit) `
+            -Timestamp ($strMergeCurrentDate + 'T00:05:00Z') `
+            -Message 'backward push base fixture'
+        $arrBackwardRangeCommits = @(& git -C $strMergeFixtureRoot rev-list `
+                "$strBackwardBaseCommit..$strRegressingMergeCommit")
+        $arrBackwardEndpointPaths = @(& git -C $strMergeFixtureRoot diff `
+                --name-only $strBackwardBaseCommit $strRegressingMergeCommit --)
+        $arrBackwardHeadFailures = @(Get-GovernedDocumentCommitTransitionFailure `
+                -Name 'AGENTS.md' -RepositoryRootPath $strMergeFixtureRoot `
+                -RepositoryRelativePath 'AGENTS.md' `
+                -MaximumBytes $intAgentsMaximumInputBytes `
+                -CommitRevision $strRegressingMergeCommit `
+                -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
+                -PolicyMaximumBytes 1024 -PolicyMarker $strMetadataRangePolicyMarker `
+                -RequireExpectedUtcDateForRenderedChange $true)
+        if ($arrBackwardRangeCommits.Count -ne 0 -or
+            $arrBackwardEndpointPaths.Count -ne 1 -or
+            $arrBackwardEndpointPaths[0] -cne 'AGENTS.md' -or
+            -not (Test-BackwardCommitMove -RepositoryRootPath $strMergeFixtureRoot `
+                    -BaseRevision $strBackwardBaseCommit `
+                    -HeadRevision $strRegressingMergeCommit) -or
+            (Test-BackwardCommitMove -RepositoryRootPath $strMergeFixtureRoot `
+                    -BaseRevision $strRegressingMergeCommit `
+                    -HeadRevision $strBackwardBaseCommit) -or
+            -not ($arrBackwardHeadFailures -join '; ').Contains(
+                'Version date must not move backward',
+                [StringComparison]::Ordinal
+            )) {
+            throw 'A reused backward target did not receive exact direct transition validation.'
         }
         $listExcessParents = [Collections.Generic.List[string]]::new()
         foreach ($intFixtureParent in 1..($intMetadataMaximumParents + 1)) {
