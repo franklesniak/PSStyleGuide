@@ -53,6 +53,10 @@
     { "id": "PS-P1-WFPOL-050", "semanticKey": "markdown-nested-mdc-glob-omitted", "domain": "contract", "operation": { "type": "set", "path": "/markdownPolicy/entryPoints/nestedLinter/glob", "value": "**/*.md" }, "expected": false },
     { "id": "PS-P1-WFPOL-051", "semanticKey": "markdown-staged-mdc-pathspec-omitted", "domain": "contract", "operation": { "type": "delete", "path": "/markdownPolicy/entryPoints/stagedSelector/pathspecs/1" }, "expected": false },
     { "id": "PS-P1-WFPOL-052", "semanticKey": "markdown-linebreak-mdc-omitted", "domain": "contract", "operation": { "type": "set", "path": "/markdownPolicy/entryPoints/preCommit/linebreakArgument", "value": "--markdown-linebreak-ext=md" }, "expected": false },
-    { "id": "PS-P1-WFPOL-053", "semanticKey": "markdown-hidden-directory-omitted", "domain": "contract", "operation": { "type": "set", "path": "/markdownPolicy/entryPoints/nestedLinter/includeDotDirectories", "value": false }, "expected": false }
+    { "id": "PS-P1-WFPOL-053", "semanticKey": "markdown-hidden-directory-omitted", "domain": "contract", "operation": { "type": "set", "path": "/markdownPolicy/entryPoints/nestedLinter/includeDotDirectories", "value": false }, "expected": false },
+    { "id": "PS-P1-WFPOL-054", "semanticKey": "markdown-git-prune-omitted", "domain": "markdown-contract", "operation": { "type": "delete", "path": "/entryPoints/nestedLinter/ignoredDirectoryNames/1" }, "expected": false },
+    { "id": "PS-P1-WFPOL-055", "semanticKey": "markdown-venv-prune-omitted", "domain": "markdown-contract", "operation": { "type": "delete", "path": "/entryPoints/nestedLinter/ignoredDirectoryNames/2" }, "expected": false },
+    { "id": "PS-P1-WFPOL-056", "semanticKey": "markdown-github-retention-omitted", "domain": "markdown-contract", "operation": { "type": "delete", "path": "/entryPoints/nestedLinter/retainedDotDirectoryNames/0" }, "expected": false },
+    { "id": "PS-P1-WFPOL-057", "semanticKey": "markdown-cursor-retention-omitted", "domain": "markdown-contract", "operation": { "type": "delete", "path": "/entryPoints/nestedLinter/retainedDotDirectoryNames/1" }, "expected": false }
   ]
 }

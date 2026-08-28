@@ -16,6 +16,24 @@ const { glob } = require('glob');
 const MarkdownIt = require('markdown-it');
 const { lint: markdownlintSync } = require('markdownlint/sync');
 
+const markdownIgnore = [
+    'node_modules/**',
+    '**/node_modules/**',
+    '.git/**',
+    '**/.git/**',
+    '.venv/**',
+    '**/.venv/**'
+];
+
+function findMarkdownFiles(repoRoot) {
+    return glob('**/*.{md,mdc}', {
+        ignore: markdownIgnore,
+        cwd: repoRoot,
+        dot: true,
+        absolute: true
+    });
+}
+
 // Initialize markdown-it parser
 const md = new MarkdownIt();
 
@@ -204,12 +222,7 @@ async function main() {
         const repoRoot = path.resolve(__dirname, '../..');
 
         // Find all Markdown and Cursor rule files (excluding node_modules)
-        const files = await glob('**/*.{md,mdc}', {
-            ignore: ['node_modules/**', '**/node_modules/**'],
-            cwd: repoRoot,
-            dot: true,
-            absolute: true
-        });
+        const files = await findMarkdownFiles(repoRoot);
 
         console.log(`Found ${files.length} Markdown file(s) to scan\n`);
 
@@ -266,4 +279,8 @@ async function main() {
 }
 
 // Run main function
-main();
+if (require.main === module) {
+    main();
+}
+
+module.exports = { findMarkdownFiles };

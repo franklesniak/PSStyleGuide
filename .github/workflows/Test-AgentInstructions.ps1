@@ -1139,30 +1139,7 @@ function Assert-OversizedStreamMutationRejected {
 }
 
 function Get-TomlParseContext {
-    # .SYNOPSIS
-    # Gets a safe typed TOML parse context.
-    #
-    # .DESCRIPTION
-    # Resolves Python 3.12, parses in isolated mode, and validates a fixed JSON
-    # projection of the required TOML values and statement positions.
-    #
-    # .PARAMETER Content
-    # The TOML text to validate.
-    #
-    # .EXAMPLE
-    # Get-TomlParseContext -Content 'project_doc_max_bytes = 65536'
-    #
-    # # Returns typed context for valid TOML.
-    #
-    # .INPUTS
-    # None. You can't pipe objects to this function.
-    #
-    # .OUTPUTS
-    # [pscustomobject] A failure and validated typed TOML context.
-    #
-    # .NOTES
-    # Private helper; no positional parameters.
-    # Version: 1.3.20260828.0
+    # Gets a bounded Python 3.12 TOML projection. Version: 1.4.20260828.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -1181,6 +1158,11 @@ function Get-TomlParseContext {
         PluginEnabledPresent = $false
         PluginEnabledType = 'missing'
         PluginEnabledValue = $false
+        FeatureTablePresent = $false
+        FeatureTableType = 'missing'
+        MultiAgentPresent = $false
+        MultiAgentType = 'missing'
+        MultiAgentValue = $false
         CapacityIsFirstStatement = $false
         PluginHeaderIsSecondStatement = $false
         PluginEnablementIsThirdStatement = $false
@@ -1267,7 +1249,8 @@ if v:
  else:vo=q+1+m.start(1);vl=len(m.group(1))
 cp="project_doc_max_bytes" in d;cv=d.get("project_doc_max_bytes");ps=d.get("plugins");tb=g(ps,"github@openai-curated")
 tp=type(ps)is dict and "github@openai-curated" in ps;ep=type(tb)is dict and "enabled" in tb;ev=g(tb,"enabled")
-r=dict(a=cp,b=type(cv).__name__ if cp else "missing",c=str(cv) if type(cv)is int else None,d=tp,e=type(tb).__name__ if tp else "missing",f=ep,g=type(ev).__name__ if ep else "missing",h=ev if type(ev)is bool else None,i=a1,j=h,k=v,l=vo,m=vl)
+fe=d.get("features");mp=type(fe)is dict and "multi_agent" in fe;ma=g(fe,"multi_agent")
+r=dict(a=cp,b=type(cv).__name__ if cp else "missing",c=str(cv) if type(cv)is int else None,d=tp,e=type(tb).__name__ if tp else "missing",f=ep,g=type(ev).__name__ if ep else "missing",h=ev if type(ev)is bool else None,i=a1,j=h,k=v,l=vo,m=vl,n="features" in d,o=type(fe).__name__ if "features" in d else "missing",p=mp,q=type(ma).__name__ if mp else "missing",r=ma if type(ma)is bool else None)
 print(json.dumps(r,separators=(",",":"),sort_keys=True))
 '@
 
@@ -1356,7 +1339,7 @@ print(json.dumps(r,separators=(",",":"),sort_keys=True))
     }
 
     $arrExpectedProperties = @('a', 'b', 'c', 'd', 'e', 'f', 'g',
-        'h', 'i', 'j', 'k', 'l', 'm')
+        'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r')
     $arrActualProperties = @($objParserContext.PSObject.Properties.Name)
     if ($arrActualProperties.Count -ne $arrExpectedProperties.Count -or
         @(Compare-Object $arrExpectedProperties $arrActualProperties).Count -ne 0 -or
@@ -1368,6 +1351,9 @@ print(json.dumps(r,separators=(",",":"),sort_keys=True))
         $objParserContext.i -isnot [bool] -or $objParserContext.j -isnot [bool] -or
         $objParserContext.k -isnot [bool] -or $objParserContext.l -isnot [int64] -or
         $objParserContext.m -isnot [int64] -or $objParserContext.l -lt -1 -or
+        $objParserContext.n -isnot [bool] -or $objParserContext.o -isnot [string] -or
+        $objParserContext.p -isnot [bool] -or $objParserContext.q -isnot [string] -or
+        ($null -ne $objParserContext.r -and $objParserContext.r -isnot [bool]) -or
         $objParserContext.l -gt $Content.Length -or $objParserContext.m -lt 0 -or
         $objParserContext.m -gt 5 -or
         ($objParserContext.k -and ($objParserContext.l -lt 0 -or
@@ -1398,6 +1384,13 @@ print(json.dumps(r,separators=(",",":"),sort_keys=True))
     $objContext.PluginEnabledType = $objParserContext.g
     if ($objParserContext.h -is [bool]) {
         $objContext.PluginEnabledValue = $objParserContext.h
+    }
+    $objContext.FeatureTablePresent = $objParserContext.n
+    $objContext.FeatureTableType = $objParserContext.o
+    $objContext.MultiAgentPresent = $objParserContext.p
+    $objContext.MultiAgentType = $objParserContext.q
+    if ($objParserContext.r -is [bool]) {
+        $objContext.MultiAgentValue = $objParserContext.r
     }
     $objContext.CapacityIsFirstStatement = $objParserContext.i
     $objContext.PluginHeaderIsSecondStatement = $objParserContext.j
@@ -3895,28 +3888,7 @@ function Get-TrustRootRangeMutationFailure {
 }
 
 function Get-GovernedDocumentCommitTransitionFailure {
-    # .SYNOPSIS
-    # Checks one governed commit.
-    # .PARAMETER Name
-    # The display name.
-    # .PARAMETER RepositoryRootPath
-    # The Git repository.
-    # .PARAMETER RepositoryRelativePath
-    # The document path.
-    # .PARAMETER MaximumBytes
-    # The blob limit.
-    # .PARAMETER CommitRevision
-    # The commit ID.
-    # .PARAMETER PolicyRepositoryRelativePath
-    # The policy path.
-    # .PARAMETER PolicyMaximumBytes
-    # The policy limit.
-    # .PARAMETER PolicyMarker
-    # The policy marker.
-    # .PARAMETER RequireExpectedUtcDateForRenderedChange
-    # True to require the commit date.
-    # .PARAMETER RequiresVersion
-    # True if versioned.
+    # Checks one governed commit against all parents. Version: 1.1.20260828.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4021,6 +3993,7 @@ function Get-GovernedDocumentCommitTransitionFailure {
     }
 
     $listChangedParents = [Collections.Generic.List[pscustomobject]]::new()
+    $boolMatchesPolicyActiveParent = $false
     foreach ($strParentRevision in $arrCommitAndParents[1..$intParentCount]) {
         if ($strParentRevision -notmatch $strObjectIdPattern) {
             throw "Git returned an invalid parent for metadata range commit $CommitRevision."
@@ -4031,10 +4004,18 @@ function Get-GovernedDocumentCommitTransitionFailure {
             throw "Git returned an unavailable parent for metadata range commit $CommitRevision."
         }
 
+        $boolParentHasPolicyMarker = Test-HistoricalPolicyMarker `
+            -RepositoryRootPath $RepositoryRootPath `
+            -Revision $strParentRevision `
+            -RepositoryRelativePath $PolicyRepositoryRelativePath `
+            -Literal $PolicyMarker
         & git -C $RepositoryRootPath diff --quiet --no-ext-diff --no-textconv `
             $strParentRevision $CommitRevision -- $RepositoryRelativePath
         $intDiffExitCode = $LASTEXITCODE
         if ($intDiffExitCode -eq 0) {
+            if ($boolParentHasPolicyMarker) {
+                $boolMatchesPolicyActiveParent = $true
+            }
             continue
         }
         if ($intDiffExitCode -ne 1) {
@@ -4045,11 +4026,7 @@ function Get-GovernedDocumentCommitTransitionFailure {
         }
         $listChangedParents.Add([pscustomobject]@{
                 Revision = $strParentRevision
-                HasPolicyMarker = Test-HistoricalPolicyMarker `
-                    -RepositoryRootPath $RepositoryRootPath `
-                    -Revision $strParentRevision `
-                    -RepositoryRelativePath $PolicyRepositoryRelativePath `
-                    -Literal $PolicyMarker
+                HasPolicyMarker = $boolParentHasPolicyMarker
             })
     }
     if ($listChangedParents.Count -eq 0) {
@@ -4112,7 +4089,8 @@ function Get-GovernedDocumentCommitTransitionFailure {
                 ParentRevision = $objChangedParent.Revision
                 RequireExpectedUtcDateForRenderedChange =
                     $RequireExpectedUtcDateForRenderedChange -and
-                    $objChangedParent.HasPolicyMarker
+                    $objChangedParent.HasPolicyMarker -and
+                    -not $boolMatchesPolicyActiveParent
             })
     }
 
@@ -4134,34 +4112,6 @@ function Get-GovernedDocumentCommitTransitionFailure {
 }
 
 function Get-GovernedDocumentRangeTransitionFailure {
-    # .SYNOPSIS
-    # Checks a governed commit range.
-    # .PARAMETER Name
-    # The display name.
-    # .PARAMETER RepositoryRootPath
-    # The Git repository.
-    # .PARAMETER RepositoryRelativePath
-    # The document path.
-    # .PARAMETER MaximumBytes
-    # The blob limit.
-    # .PARAMETER BaseRevision
-    # The base ID.
-    # .PARAMETER HeadRevision
-    # The head ID.
-    # .PARAMETER InputRevision
-    # The validation revision.
-    # .PARAMETER IsNewRefRange
-    # True for a new ref.
-    # .PARAMETER PolicyRepositoryRelativePath
-    # The policy path.
-    # .PARAMETER PolicyMaximumBytes
-    # The policy limit.
-    # .PARAMETER PolicyMarker
-    # The policy marker.
-    # .PARAMETER RequireExpectedUtcDateForRenderedChange
-    # True to require commit dates.
-    # .PARAMETER RequiresVersion
-    # True if versioned.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4453,30 +4403,6 @@ function Get-TomlSemanticStatementContext {
 }
 
 function Get-GitHubPluginEnablementContext {
-    # .SYNOPSIS
-    # Gets GitHub plugin enablement locations from TOML.
-    #
-    # .DESCRIPTION
-    # Uses parser-confirmed statement identities and returns the matching table
-    # count, enablement count, value, and value location.
-    #
-    # .PARAMETER Content
-    # The project TOML text to inspect.
-    #
-    # .EXAMPLE
-    # Get-GitHubPluginEnablementContext -Content $strCodexConfigContent
-    #
-    # # Returns the table and enabled-value match context.
-    #
-    # .INPUTS
-    # None. You can't pipe objects to this function.
-    #
-    # .OUTPUTS
-    # [pscustomobject] Counts, value, and source location for plugin enablement.
-    #
-    # .NOTES
-    # Private helper; no positional parameters.
-    # Version: 1.1.20260820.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -4518,30 +4444,6 @@ function Get-GitHubPluginEnablementContext {
 }
 
 function ConvertTo-DisabledGitHubPluginMutation {
-    # .SYNOPSIS
-    # Creates a disabled GitHub plugin mutation.
-    #
-    # .DESCRIPTION
-    # Replaces the unique enabled value in valid project TOML with false. It
-    # rejects ambiguous input and verifies that the mutation changes the text.
-    #
-    # .PARAMETER Content
-    # The project TOML text to mutate.
-    #
-    # .EXAMPLE
-    # ConvertTo-DisabledGitHubPluginMutation -Content $strCodexConfigContent
-    #
-    # # Returns TOML with the GitHub plugin disabled.
-    #
-    # .INPUTS
-    # None. You can't pipe objects to this function.
-    #
-    # .OUTPUTS
-    # [string] The disabled-plugin TOML mutation.
-    #
-    # .NOTES
-    # Private helper; no positional parameters.
-    # Version: 1.0.20260819.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4653,6 +4555,16 @@ function Get-AgentInstructionFailure {
         Write-Output (
             'The github@openai-curated plugin table must declare enabled = true exactly once.'
         )
+    }
+
+    if (-not $objTomlParseContext.FeatureTablePresent -or
+        $objTomlParseContext.FeatureTableType -cne 'dict') {
+        Write-Output 'The project configuration must declare [features] exactly once.'
+    }
+    elseif (-not $objTomlParseContext.MultiAgentPresent -or
+        $objTomlParseContext.MultiAgentType -cne 'bool' -or
+        -not $objTomlParseContext.MultiAgentValue) {
+        Write-Output 'The [features] table must declare multi_agent = true exactly once.'
     }
 
     $intAgentsBytes = [Text.Encoding]::UTF8.GetByteCount($AgentsContent)
@@ -8483,7 +8395,8 @@ if ($SelfTest) {
             -Timestamp ($strMergeCurrentDate + 'T00:01:00Z') `
             -Message 'merge fixture inherited result'
         $arrInheritedMergeFailures = @(& $scriptBlockGetMergeRangeFailure `
-                -Base $strAdvancedBaseCommit -Head $strInheritedMergeCommit)
+                -Base $strAdvancedBaseCommit -Head $strInheritedMergeCommit `
+                -RequireCommitDate $true)
         if ($arrInheritedMergeFailures.Count -ne 0) {
             throw (
                 'A merge that inherited governed content from its non-first parent failed: ' +
@@ -8524,9 +8437,14 @@ if ($SelfTest) {
             -Timestamp ($strMergeCurrentDate + 'T00:02:00Z') `
             -Message 'merge fixture unique result'
         $arrUniqueMergeFailures = @(& $scriptBlockGetMergeRangeFailure `
-                -Base $strAdvancedBaseCommit -Head $strUniqueMergeCommit)
-        if ($arrUniqueMergeFailures.Count -ne 0) {
-            throw 'Historical range validation conflated commit time with current freshness.'
+                -Base $strAdvancedBaseCommit -Head $strUniqueMergeCommit `
+                -RequireCommitDate $true)
+        if ($arrUniqueMergeFailures.Count -eq 0 -or
+            -not ($arrUniqueMergeFailures -join '; ').Contains(
+                "Last Updated must be $strMergeCurrentDate",
+                [StringComparison]::Ordinal
+            )) {
+            throw 'Merge-authored stale metadata did not fail the commit-date rule.'
         }
         $arrUniqueFreshnessFailures = @(Get-CurrentInputMetadataFreshnessFailure `
                 -Name 'AGENTS.md' `
@@ -8563,7 +8481,8 @@ if ($SelfTest) {
             -Timestamp ($strMergeCurrentDate + 'T00:04:00Z') `
             -Message 'merge fixture regressing inherited result'
         $arrRegressingMergeFailures = @(& $scriptBlockGetMergeRangeFailure `
-                -Base $strNewerParentCommit -Head $strRegressingMergeCommit)
+                -Base $strNewerParentCommit -Head $strRegressingMergeCommit `
+                -RequireCommitDate $true)
         if ($arrRegressingMergeFailures.Count -eq 0 -or
             -not ($arrRegressingMergeFailures -join '; ').Contains(
                 'Version date must not move backward',
@@ -10126,6 +10045,45 @@ if ($SelfTest) {
         -CodexConfigContent $strDisabledGitHubPluginConfig `
         -Failure 'The github@openai-curated plugin table must declare enabled = true exactly once.'
 
+    $strConfigNewLine = if ($strCodexConfigContent.Contains("`r`n", [StringComparison]::Ordinal)) {
+        "`r`n"
+    }
+    else {
+        "`n"
+    }
+    $strMultiAgentStatement = 'multi_agent = true'
+    Assert-Failure `
+        -CodexConfigContent $strCodexConfigContent.Replace(
+            $strMultiAgentStatement,
+            'multi_agent = false'
+        ) `
+        -Failure 'The [features] table must declare multi_agent = true exactly once.'
+    Assert-Failure `
+        -CodexConfigContent $strCodexConfigContent.Replace(
+            $strMultiAgentStatement,
+            'multi_agent = "true"'
+        ) `
+        -Failure 'The [features] table must declare multi_agent = true exactly once.'
+    Assert-Failure `
+        -CodexConfigContent $strCodexConfigContent.Replace(
+            $strMultiAgentStatement,
+            '# multi_agent removed'
+        ) `
+        -Failure 'The [features] table must declare multi_agent = true exactly once.'
+    Assert-Failure `
+        -CodexConfigContent $strCodexConfigContent.Replace(
+            "[features]$strConfigNewLine" + 'goals = true' +
+            "$strConfigNewLine$strMultiAgentStatement",
+            '[features.multi_agent]' + "$strConfigNewLine" + 'enabled = true'
+        ) `
+        -Failure 'The [features] table must declare multi_agent = true exactly once.'
+    Assert-Failure `
+        -CodexConfigContent $strCodexConfigContent.Replace(
+            $strMultiAgentStatement,
+            'multi_agent ='
+        ) `
+        -Failure 'The project configuration must contain valid TOML.'
+
     foreach ($objInvalidPluginValue in @(
             [pscustomobject]@{
                 Name = 'string GitHub plugin enablement'
@@ -10144,12 +10102,6 @@ if ($SelfTest) {
             -Failure 'The github@openai-curated plugin table must declare enabled = true exactly once.'
     }
 
-    $strConfigNewLine = if ($strCodexConfigContent.Contains("`r`n", [StringComparison]::Ordinal)) {
-        "`r`n"
-    }
-    else {
-        "`n"
-    }
     $strCapacityStatement = $objMaximumMatch.Value.TrimEnd([char[]] "`r`n")
     $strCanonicalConfigPrefix = @(
         $strCapacityStatement

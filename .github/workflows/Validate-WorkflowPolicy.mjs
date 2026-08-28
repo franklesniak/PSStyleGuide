@@ -25,12 +25,12 @@ async function loadYamlBindings() {
   } = await import('yaml'));
 }
 
-const VALIDATOR_VERSION = '1.1.0';
+const VALIDATOR_VERSION = '1.2.0';
 const RESULT_SCHEMA = 'PSStyleGuide.WorkflowPolicyResult.v1';
 const PREFLIGHT_SCHEMA = 'PSStyleGuide.WorkflowPreflightResult.v1';
 const PREFLIGHT_ARGUMENTS = ['--preflight'];
-const EXPECTED_CONTRACT_CANONICAL_SHA256 = '01cd96b631e0b18636f814a8c276447cc4b838c7c09b606789f919f1d07dbb28';
-const MINIMUM_CASE_COUNT = 53;
+const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'd003c4d9da92d04332eb98101bb22b03553ce87c6733f3366ab6d36fb3919c80';
+const MINIMUM_CASE_COUNT = 57;
 const CASE_CATALOG_FILE_NAME = 'workflow-policy-cases.json';
 const VALIDATOR_FILE_NAME = 'Validate-WorkflowPolicy.mjs';
 // Mapping keys that alias JavaScript object internals. Plain assignment to
@@ -58,6 +58,8 @@ const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 const POLICY_ROOT = path.resolve(SCRIPT_DIRECTORY, '../..');
 const REQUIRED_ARGUMENTS = ['build.yml', 'markdownlint.yml'];
 const REQUIRED_MARKDOWN_EXTENSIONS = ['md', 'mdc'];
+const REQUIRED_IGNORED_MARKDOWN_DIRECTORIES = ['node_modules', '.git', '.venv'];
+const REQUIRED_RETAINED_MARKDOWN_DOT_DIRECTORIES = ['.github', '.cursor'];
 const REQUIRED_ROOT_LINT_SCRIPT = 'markdownlint-cli2 "**/*.md" "**/*.mdc" "#node_modules" "#.github/workflows/node_modules" --config .github/workflows/.markdownlint.jsonc';
 const REQUIRED_WORKFLOW_LINT_SCRIPT = 'cd ../.. && markdownlint-cli2 "**/*.md" "**/*.mdc" "#node_modules" "#.github/workflows/node_modules" --config .github/workflows/.markdownlint.jsonc';
 const REQUIRED_RECIPROCAL_ROWS = [
@@ -439,6 +441,8 @@ function validateMarkdownContract(policy) {
     'sha256',
     'glob',
     'includeDotDirectories',
+    'ignoredDirectoryNames',
+    'retainedDotDirectoryNames',
   ], 'markdown-policy');
   expectExactKeys(entryPoints.stagedSelector, ['path', 'length', 'sha256', 'pathspecs'], 'markdown-policy');
   expectExactKeys(entryPoints.preCommit, ['path', 'length', 'sha256', 'extensions', 'linebreakArgument'], 'markdown-policy');
@@ -450,6 +454,10 @@ function validateMarkdownContract(policy) {
     || entryPoints.nestedLinter.path !== 'lint-nested-markdown.js'
     || entryPoints.nestedLinter.glob !== '**/*.{md,mdc}'
     || entryPoints.nestedLinter.includeDotDirectories !== true
+    || canonicalJson(entryPoints.nestedLinter.ignoredDirectoryNames)
+      !== canonicalJson(REQUIRED_IGNORED_MARKDOWN_DIRECTORIES)
+    || canonicalJson(entryPoints.nestedLinter.retainedDotDirectoryNames)
+      !== canonicalJson(REQUIRED_RETAINED_MARKDOWN_DOT_DIRECTORIES)
     || entryPoints.stagedSelector.path !== 'lint-staged-markdown.mjs'
     || canonicalJson(entryPoints.stagedSelector.pathspecs) !== canonicalJson(['*.md', '*.mdc'])
     || entryPoints.preCommit.path !== '../../.pre-commit-config.yaml'
@@ -610,9 +618,20 @@ function validateMarkdownEntryPoints(contract) {
     readMarkdownEntryPoint(entryPoints.nestedLinter, contract),
     'markdown-nested-linter',
   );
+  const requiredIgnorePatterns = REQUIRED_IGNORED_MARKDOWN_DIRECTORIES.flatMap(
+    (directoryName) => [`${directoryName}/**`, `**/${directoryName}/**`],
+  );
+  const expectedIgnoreSource = [
+    'const markdownIgnore = [',
+    ...requiredIgnorePatterns.map((pattern, index) => (
+      `    '${pattern}'${index === requiredIgnorePatterns.length - 1 ? '' : ','}`
+    )),
+    '];',
+  ].join('\n');
   if (
     !nestedLinter.includes(`glob('${entryPoints.nestedLinter.glob}'`)
     || !nestedLinter.includes('dot: true')
+    || !nestedLinter.replaceAll('\r\n', '\n').includes(expectedIgnoreSource)
   ) {
     fail('markdown-nested-linter');
   }
@@ -875,7 +894,11 @@ function runCaseCatalog(catalog, workflows, dependabot, contract) {
       ) {
         fail('case-catalog');
       }
-    } else if (testCase.domain === 'contract' || testCase.domain === 'dependabot') {
+    } else if (
+      testCase.domain === 'contract'
+      || testCase.domain === 'markdown-contract'
+      || testCase.domain === 'dependabot'
+    ) {
       if (testCase.operation === null || typeof testCase.operation !== 'object') {
         fail('case-catalog');
       }
@@ -901,6 +924,10 @@ function runCaseCatalog(catalog, workflows, dependabot, contract) {
         const fixture = clone(contract);
         applyOperation(fixture, testCase.operation);
         validateContract(fixture);
+      } else if (testCase.domain === 'markdown-contract') {
+        const fixture = clone(contract.markdownPolicy);
+        applyOperation(fixture, testCase.operation);
+        validateMarkdownContract(fixture);
       } else if (testCase.domain === 'dependabot') {
         const fixture = clone(dependabot);
         applyOperation(fixture, testCase.operation);

@@ -136,11 +136,11 @@
   },
   "caseCatalog": {
     "path": "workflow-policy-cases.json",
-    "sha256": "4122136f482c5f6734ab746975a904f353bc4ebda65c263be4a6e5f974c4c8d9"
+    "sha256": "c0221ac73687b9eb0cbe83fb21bbef6419f4359420fbdcafff73e36464bbe09e"
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "02c92b8c2e1edf14adaa9283f1f48106ab827a14151b9b6eeab0d494e5d7307f"
+    "sha256": "d3e2f2b3c0c323ffa0051aea68b23e9f6bd101cc69beeb14e0b7539c0ee32e45"
   },
   "actions": {
     "checkout": {
@@ -320,10 +320,12 @@
       },
       "nestedLinter": {
         "path": "lint-nested-markdown.js",
-        "length": 9436,
-        "sha256": "fd0bb0fedca20a5d5940a6de4a020ee7080b475eef266368ae565ad4c81e28ac",
+        "length": 9694,
+        "sha256": "c361154749a3763d4084b86d733aa0fc0967c2ee20b81e0a36a65e8d48af7a52",
         "glob": "**/*.{md,mdc}",
-        "includeDotDirectories": true
+        "includeDotDirectories": true,
+        "ignoredDirectoryNames": ["node_modules", ".git", ".venv"],
+        "retainedDotDirectoryNames": [".github", ".cursor"]
       },
       "stagedSelector": {
         "path": "lint-staged-markdown.mjs",
