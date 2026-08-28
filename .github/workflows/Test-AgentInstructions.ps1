@@ -3898,8 +3898,6 @@ function Get-TrustRootRangeMutationFailure {
 function Get-GovernedDocumentCommitTransitionFailure {
     # .SYNOPSIS
     # Checks one governed commit.
-    # .DESCRIPTION
-    # Checks each immutable direct-parent transition.
     # .PARAMETER Name
     # The display name.
     # .PARAMETER RepositoryRootPath
@@ -3920,8 +3918,6 @@ function Get-GovernedDocumentCommitTransitionFailure {
     # True to require the commit date.
     # .PARAMETER RequiresVersion
     # True if versioned.
-    # .EXAMPLE
-    # Get-GovernedDocumentCommitTransitionFailure @params
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4139,8 +4135,6 @@ function Get-GovernedDocumentCommitTransitionFailure {
 function Get-GovernedDocumentRangeTransitionFailure {
     # .SYNOPSIS
     # Checks a governed commit range.
-    # .DESCRIPTION
-    # Validates each policy-applicable commit.
     # .PARAMETER Name
     # The display name.
     # .PARAMETER RepositoryRootPath
@@ -4167,8 +4161,6 @@ function Get-GovernedDocumentRangeTransitionFailure {
     # True to require commit dates.
     # .PARAMETER RequiresVersion
     # True if versioned.
-    # .EXAMPLE
-    # Get-GovernedDocumentRangeTransitionFailure @params
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -5653,7 +5645,11 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
             $objDocumentContext.Content
         }
         elseif (-not [string]::IsNullOrEmpty($strEventFreshnessBaseRevision) -and
-            $LASTEXITCODE -eq 0) {
+            $LASTEXITCODE -eq 0 -and (Test-HistoricalPolicyMarker `
+                -RepositoryRootPath $strRepositoryRootPath `
+                -Revision $strEventFreshnessBaseRevision `
+                -RepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
+                -Literal $objDocumentContext.PolicyMarker)) {
             Read-GitRevisionText `
                 -RepositoryRootPath $strRepositoryRootPath `
                 -Revision $strEventFreshnessBaseRevision `
