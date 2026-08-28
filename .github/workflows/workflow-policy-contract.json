@@ -140,7 +140,7 @@
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "e252de8cae5ee9f801657c88fad62c3c9ee580cd205946ef862621f451e63875"
+    "sha256": "02c92b8c2e1edf14adaa9283f1f48106ab827a14151b9b6eeab0d494e5d7307f"
   },
   "actions": {
     "checkout": {
@@ -308,8 +308,8 @@
     "entryPoints": {
       "rootPackageJson": {
         "path": "../../package.json",
-        "length": 1052,
-        "sha256": "591a6ba2653fa2dc33590e165c5d83305853265b07c665cabe27433690a12f5f",
+        "length": 1164,
+        "sha256": "9ed97f44152bfc1ba6c8172880ceab48e3ce28e881dc0fb436f9c2058ce404e0",
         "lintScript": "markdownlint-cli2 \"**/*.md\" \"**/*.mdc\" \"#node_modules\" \"#.github/workflows/node_modules\" --config .github/workflows/.markdownlint.jsonc"
       },
       "workflowPackageJson": {

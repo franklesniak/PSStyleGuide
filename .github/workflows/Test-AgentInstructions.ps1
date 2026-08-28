@@ -2918,8 +2918,8 @@ function Get-PushGovernedPathApplicability {
     # .DESCRIPTION
     # Validates push endpoint identities and the exact checked-out head. Deleted
     # refs need no byte validation. New refs validate conservatively. Existing
-    # refs enumerate every path touched in the exact commit range and require
-    # validation when any touched path belongs to an instruction workflow surface.
+    # refs enumerate commit-range touches and endpoint-tree changes. Validation is
+    # required when either set contains an instruction workflow path.
     #
     # .PARAMETER RepositoryRootPath
     # The absolute or resolved repository root used for authenticated Git reads.
@@ -2957,8 +2957,8 @@ function Get-PushGovernedPathApplicability {
     #
     # .OUTPUTS
     # [pscustomobject] One decision with ShouldValidate, Decision, and
-    # ChangedPathCount. The count includes commit-range path touches. Decision is
-    # DELETED_REF_HAS_NO_REMAINING_BYTES,
+    # ChangedPathCount. The count includes range touches plus endpoint changes that
+    # are not already in the range. Decision is DELETED_REF_HAS_NO_REMAINING_BYTES,
     # NEW_REF_REQUIRES_FAIL_CLOSED_VALIDATION, GOVERNED_PATH_CHANGED, or
     # EXACT_UNGOVERNED_PUSH. Invalid identities or indeterminate Git operations
     # throw terminating errors instead of returning a decision.
@@ -2969,7 +2969,7 @@ function Get-PushGovernedPathApplicability {
     # without notice.
     #
     # Positional parameters are disabled. Internal callers must use named
-    # parameters. Version: 1.2.20260828.0.
+    # parameters. Version: 1.3.20260828.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -3047,57 +3047,60 @@ function Get-PushGovernedPathApplicability {
         }
     }
 
-    $objStartInfo = [Diagnostics.ProcessStartInfo]::new('git')
-    $objStartInfo.UseShellExecute = $false
-    $objStartInfo.CreateNoWindow = $true
-    $objStartInfo.RedirectStandardOutput = $true
-    $objStartInfo.RedirectStandardError = $true
-    foreach ($strArgument in @(
-            '-C',
-            $RepositoryRootPath,
-            'log',
-            '--format=',
-            '--name-only',
-            '-z',
-            '-m',
-            '--no-renames',
-            '--no-ext-diff',
-            '--no-textconv',
-            "$BaseRevision..$HeadRevision",
-            '--'
-        )) {
-        $objStartInfo.ArgumentList.Add($strArgument)
+    $scriptBlockReadPaths = {
+        param([string[]] $Arguments, [string] $Name, [switch] $Duplicates)
+
+        $objStart = [Diagnostics.ProcessStartInfo]::new('git')
+        $objStart.UseShellExecute = $false
+        $objStart.CreateNoWindow = $true
+        $objStart.RedirectStandardOutput = $true
+        $objStart.RedirectStandardError = $true
+        foreach ($strArgument in @('-C', $RepositoryRootPath) + $Arguments) {
+            [void]$objStart.ArgumentList.Add($strArgument)
+        }
+        $objProcess = [Diagnostics.Process]::new()
+        $objProcess.StartInfo = $objStart
+        $objResult = Read-BoundedProcessData -Process $objProcess `
+            -MaximumBytes $intGitPathListMaximumBytes -TimeoutMilliseconds 10000 `
+            -DisplayName $Name
+        if ($objResult.ExitCode -ne 0) {
+            throw "Git $Name failed."
+        }
+        if ($null -ne $objResult.Bytes) {
+            ConvertFrom-GitPathListData -Bytes ([byte[]] $objResult.Bytes) `
+                -AllowDuplicatePath:$Duplicates
+        }
     }
-    $objGitProcess = [Diagnostics.Process]::new()
-    $objGitProcess.StartInfo = $objStartInfo
-    $objProcessResult = Read-BoundedProcessData `
-        -Process $objGitProcess `
-        -MaximumBytes $intGitPathListMaximumBytes `
-        -TimeoutMilliseconds 10000 `
-        -DisplayName 'Exact push range path-touch enumeration'
-    if ($objProcessResult.ExitCode -ne 0) {
-        throw 'Could not enumerate the exact push range path touches.'
+    $arrPaths = @(& $scriptBlockReadPaths -Name 'push range path enumeration' `
+            -Duplicates -Arguments @(
+                'log', '--format=', '--name-only', '-z', '-m', '--no-renames',
+                '--no-ext-diff', '--no-textconv', "$BaseRevision..$HeadRevision", '--'
+            ))
+    $objPathSet = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    $objPathSet.UnionWith([string[]] $arrPaths)
+    foreach ($strPath in @(& $scriptBlockReadPaths `
+                -Name 'push endpoint path enumeration' -Arguments @(
+                    'diff', '--name-only', '-z', '--no-renames', '--no-ext-diff',
+                    '--no-textconv', $BaseRevision, $HeadRevision, '--'
+                ))) {
+        if ($objPathSet.Add($strPath)) {
+            $arrPaths += $strPath
+        }
     }
-    $arrChangedPaths = @()
-    if ($null -ne $objProcessResult.Bytes) {
-        $arrChangedPaths = @(ConvertFrom-GitPathListData `
-                -Bytes ([byte[]] $objProcessResult.Bytes) `
-                -AllowDuplicatePath)
-    }
-    foreach ($strChangedPath in $arrChangedPaths) {
+    foreach ($strChangedPath in $arrPaths) {
         if (Test-AgentInstructionWorkflowPath `
                 -RepositoryRelativePath $strChangedPath) {
             return [pscustomobject]@{
                 ShouldValidate = $true
                 Decision = 'GOVERNED_PATH_CHANGED'
-                ChangedPathCount = $arrChangedPaths.Count
+                ChangedPathCount = $arrPaths.Count
             }
         }
     }
     return [pscustomobject]@{
         ShouldValidate = $false
         Decision = 'EXACT_UNGOVERNED_PUSH'
-        ChangedPathCount = $arrChangedPaths.Count
+        ChangedPathCount = $arrPaths.Count
     }
 }
 
@@ -7014,17 +7017,17 @@ if ($SelfTest) {
             ParentRevision = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
         }
     )
-    $arrMultiCommitTransitionFailures = @(
+    $arrTransitionFailures = @(
         Get-DocumentMetadataRangeTransitionFailure `
             -Name 'AGENTS.md' `
             -TransitionContext $arrMultiCommitTransitionContexts
     )
-    if ($arrMultiCommitTransitionFailures.Count -ne 1 -or
-        -not $arrMultiCommitTransitionFailures[0].Contains(
+    if ($arrTransitionFailures.Count -ne 1 -or
+        -not $arrTransitionFailures[0].Contains(
             'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
             [StringComparison]::Ordinal
         ) -or
-        -not $arrMultiCommitTransitionFailures[0].Contains(
+        -not $arrTransitionFailures[0].Contains(
             'Version revision must be greater',
             [StringComparison]::Ordinal
         )) {
@@ -7040,58 +7043,58 @@ if ($SelfTest) {
         throw 'Could not resolve the new-ref metadata self-test head.'
     }
     $strNewRefTestHead = $strNewRefTestHead.Trim()
-    $objNewRefApplicability = Get-PushGovernedPathApplicability `
+    $objNewRef = Get-PushGovernedPathApplicability `
         -RepositoryRootPath $strRepositoryRootPath `
         -BaseRevision $strNewRefZeroRevision `
         -HeadRevision $strNewRefTestHead `
         -IsNewRef $true -IsDeletedRef $false
-    if (-not $objNewRefApplicability.ShouldValidate -or
-        $objNewRefApplicability.Decision -cne
+    if (-not $objNewRef.ShouldValidate -or
+        $objNewRef.Decision -cne
             'NEW_REF_REQUIRES_FAIL_CLOSED_VALIDATION') {
         throw 'A new-ref push did not select fail-closed validation.'
     }
-    $objDeletedRefApplicability = Get-PushGovernedPathApplicability `
+    $objDeleted = Get-PushGovernedPathApplicability `
         -RepositoryRootPath $strRepositoryRootPath `
         -BaseRevision $strNewRefTestHead `
         -HeadRevision $strNewRefZeroRevision `
         -IsNewRef $false -IsDeletedRef $true
-    if ($objDeletedRefApplicability.ShouldValidate -or
-        $objDeletedRefApplicability.Decision -cne
+    if ($objDeleted.ShouldValidate -or
+        $objDeleted.Decision -cne
             'DELETED_REF_HAS_NO_REMAINING_BYTES') {
         throw 'A deleted-ref push did not select its exact no-op.'
     }
-    $objUnchangedPushApplicability = Get-PushGovernedPathApplicability `
+    $objUnchanged = Get-PushGovernedPathApplicability `
         -RepositoryRootPath $strRepositoryRootPath `
         -BaseRevision $strNewRefTestHead `
         -HeadRevision $strNewRefTestHead `
         -IsNewRef $false -IsDeletedRef $false
-    if ($objUnchangedPushApplicability.ShouldValidate -or
-        $objUnchangedPushApplicability.ChangedPathCount -ne 0) {
+    if ($objUnchanged.ShouldValidate -or
+        $objUnchanged.ChangedPathCount -ne 0) {
         throw 'An unchanged existing-ref push did not select its exact no-op.'
     }
 
-    $strPushFixtureRoot = [IO.Path]::GetFullPath(
+    $strPushRoot = [IO.Path]::GetFullPath(
         [IO.Path]::Combine(
             [IO.Path]::GetTempPath(),
             'agent-instruction-push-' + [guid]::NewGuid().ToString('N')
         )
     )
-    $strPushFixtureTempRoot = [IO.Path]::GetFullPath(
+    $strPushTempRoot = [IO.Path]::GetFullPath(
         [IO.Path]::GetTempPath()
     )
-    if (-not $strPushFixtureRoot.StartsWith(
-            $strPushFixtureTempRoot,
+    if (-not $strPushRoot.StartsWith(
+            $strPushTempRoot,
             [StringComparison]::OrdinalIgnoreCase
         )) {
         throw 'The push-applicability fixture escaped the system temporary directory.'
     }
     try {
-        [void][System.IO.Directory]::CreateDirectory($strPushFixtureRoot)
-        & git -C $strPushFixtureRoot init --quiet
+        [void][System.IO.Directory]::CreateDirectory($strPushRoot)
+        & git -C $strPushRoot init --quiet
         if ($LASTEXITCODE -ne 0) {
             throw 'Could not initialize the push-applicability fixture.'
         }
-        $objFastImportText = [Text.StringBuilder]::new()
+        $objImportText = [Text.StringBuilder]::new()
         foreach ($strHeaderLine in @(
                 'commit refs/heads/base',
                 'mark :1',
@@ -7108,15 +7111,15 @@ if ($SelfTest) {
                 'ungoverned',
                 'from :1'
             )) {
-            [void]$objFastImportText.AppendLine($strHeaderLine)
+            [void]$objImportText.AppendLine($strHeaderLine)
         }
         foreach ($intFixturePath in 1..3000) {
-            [void]$objFastImportText.AppendLine(
+            [void]$objImportText.AppendLine(
                 'M 100644 inline bulk/file' +
                     $intFixturePath.ToString('D4') + '.txt'
             )
-            [void]$objFastImportText.AppendLine('data 0')
-            [void]$objFastImportText.AppendLine()
+            [void]$objImportText.AppendLine('data 0')
+            [void]$objImportText.AppendLine()
         }
         foreach ($strTrailerLine in @(
                 'commit refs/heads/governed',
@@ -7170,181 +7173,192 @@ if ($SelfTest) {
                 '',
                 'done'
             )) {
-            [void]$objFastImportText.AppendLine($strTrailerLine)
+            [void]$objImportText.AppendLine($strTrailerLine)
         }
-        $objFastImportStartInfo = [Diagnostics.ProcessStartInfo]::new('git')
-        $objFastImportStartInfo.UseShellExecute = $false
-        $objFastImportStartInfo.CreateNoWindow = $true
-        $objFastImportStartInfo.RedirectStandardInput = $true
-        $objFastImportStartInfo.RedirectStandardOutput = $true
-        $objFastImportStartInfo.RedirectStandardError = $true
-        foreach ($strFastImportArgument in @(
-                '-C', $strPushFixtureRoot, 'fast-import', '--quiet'
+        $objImportStart = [Diagnostics.ProcessStartInfo]::new('git')
+        $objImportStart.UseShellExecute = $false
+        $objImportStart.CreateNoWindow = $true
+        $objImportStart.RedirectStandardInput = $true
+        $objImportStart.RedirectStandardOutput = $true
+        $objImportStart.RedirectStandardError = $true
+        foreach ($strImportArgument in @(
+                '-C', $strPushRoot, 'fast-import', '--quiet'
             )) {
-            $objFastImportStartInfo.ArgumentList.Add($strFastImportArgument)
+            $objImportStart.ArgumentList.Add($strImportArgument)
         }
-        $objFastImportProcess = [Diagnostics.Process]::new()
-        $objFastImportProcess.StartInfo = $objFastImportStartInfo
-        if (-not $objFastImportProcess.Start()) {
+        $objImportProcess = [Diagnostics.Process]::new()
+        $objImportProcess.StartInfo = $objImportStart
+        if (-not $objImportProcess.Start()) {
             throw 'Could not start the push-applicability fixture import.'
         }
-        $objFastImportErrorTask = $objFastImportProcess.StandardError.ReadToEndAsync()
-        $objFastImportOutputTask = $objFastImportProcess.StandardOutput.ReadToEndAsync()
-        $objFastImportWriteFailure = $null
+        $objImportErrorTask = $objImportProcess.StandardError.ReadToEndAsync()
+        $objImportOutputTask = $objImportProcess.StandardOutput.ReadToEndAsync()
+        $objImportWriteFailure = $null
         try {
-            $objFastImportProcess.StandardInput.Write(
-                $objFastImportText.ToString().Replace("`r`n", "`n")
+            $objImportProcess.StandardInput.Write(
+                $objImportText.ToString().Replace("`r`n", "`n")
             )
         }
         catch {
-            $objFastImportWriteFailure = $_.Exception
+            $objImportWriteFailure = $_.Exception
         }
-        $objFastImportProcess.StandardInput.Close()
-        if (-not $objFastImportProcess.WaitForExit(10000)) {
-            $objFastImportProcess.Kill($true)
+        $objImportProcess.StandardInput.Close()
+        if (-not $objImportProcess.WaitForExit(10000)) {
+            $objImportProcess.Kill($true)
             throw 'The push-applicability fixture import timed out.'
         }
-        $strFastImportError = $objFastImportErrorTask.GetAwaiter().GetResult()
-        [void]$objFastImportOutputTask.GetAwaiter().GetResult()
-        if ($null -ne $objFastImportWriteFailure -or
-            $objFastImportProcess.ExitCode -ne 0) {
+        $strImportError = $objImportErrorTask.GetAwaiter().GetResult()
+        [void]$objImportOutputTask.GetAwaiter().GetResult()
+        if ($null -ne $objImportWriteFailure -or
+            $objImportProcess.ExitCode -ne 0) {
             throw (
                 'Could not import the push-applicability fixture: ' +
-                $strFastImportError.Trim()
+                $strImportError.Trim()
             )
         }
-        $objFastImportProcess.Dispose()
+        $objImportProcess.Dispose()
 
-        $strPushBaseCommit = [string] (
-            & git -C $strPushFixtureRoot rev-parse refs/heads/base
+        $strPushBase = [string] (
+            & git -C $strPushRoot rev-parse refs/heads/base
         )
-        $strPushUngovernedCommit = [string] (
-            & git -C $strPushFixtureRoot rev-parse refs/heads/ungoverned
+        $strPushUngoverned = [string] (
+            & git -C $strPushRoot rev-parse refs/heads/ungoverned
         )
-        $strPushGovernedCommit = [string] (
-            & git -C $strPushFixtureRoot rev-parse refs/heads/governed
+        $strPushGoverned = [string] (
+            & git -C $strPushRoot rev-parse refs/heads/governed
         )
-        $strPushMultiCommit = [string] (
-            & git -C $strPushFixtureRoot rev-parse refs/heads/multi
+        $strPushMulti = [string] (
+            & git -C $strPushRoot rev-parse refs/heads/multi
         )
-        $strPushDivergentCommit = [string] (
-            & git -C $strPushFixtureRoot rev-parse refs/heads/divergent
+        $strPushDivergent = [string] (
+            & git -C $strPushRoot rev-parse refs/heads/divergent
         )
-        $strPushRestoreCommit = [string] (
-            & git -C $strPushFixtureRoot rev-parse refs/heads/restore
+        $strPushRestore = [string] (
+            & git -C $strPushRoot rev-parse refs/heads/restore
         )
         if ($LASTEXITCODE -ne 0) {
             throw 'Could not resolve the push-applicability fixture commits.'
         }
-        $strPushBaseCommit = $strPushBaseCommit.Trim()
-        $strPushUngovernedCommit = $strPushUngovernedCommit.Trim()
-        $strPushGovernedCommit = $strPushGovernedCommit.Trim()
-        $strPushMultiCommit = $strPushMultiCommit.Trim()
-        $strPushDivergentCommit = $strPushDivergentCommit.Trim()
-        $strPushRestoreCommit = $strPushRestoreCommit.Trim()
+        $strPushBase = $strPushBase.Trim()
+        $strPushUngoverned = $strPushUngoverned.Trim()
+        $strPushGoverned = $strPushGoverned.Trim()
+        $strPushMulti = $strPushMulti.Trim()
+        $strPushDivergent = $strPushDivergent.Trim()
+        $strPushRestore = $strPushRestore.Trim()
 
-        $strMultiCommitEvidenceJson = ConvertTo-Json -Compress -InputObject @(
-            $strPushUngovernedCommit,
-            $strPushGovernedCommit,
-            $strPushMultiCommit
+        $strMultiEvidence = ConvertTo-Json -Compress -InputObject @(
+            $strPushUngoverned,
+            $strPushGoverned,
+            $strPushMulti
         )
-        $objMultiCommitNewRefContext = Get-MetadataEventRevisionContext `
-            -RepositoryRootPath $strPushFixtureRoot `
+        $objMultiContext = Get-MetadataEventRevisionContext `
+            -RepositoryRootPath $strPushRoot `
             -EventName 'push' -PullRequestAction '' `
-            -BaseRevision ('0' * 40) -HeadRevision $strPushMultiCommit `
+            -BaseRevision ('0' * 40) -HeadRevision $strPushMulti `
             -IsNewRefRange $true -PreviousHeadRevision '' `
-            -EventHeadRevision $strPushMultiCommit -EventHeadDistinct 'true' `
+            -EventHeadRevision $strPushMulti -EventHeadDistinct 'true' `
             -NewRefCommitCount '3' `
-            -NewRefCommitEvidenceJson $strMultiCommitEvidenceJson
-        if ($objMultiCommitNewRefContext.FreshnessBaseRevision -cne
-                $strPushBaseCommit -or
-            -not $objMultiCommitNewRefContext.EvaluateFreshness) {
+            -NewRefCommitEvidenceJson $strMultiEvidence
+        if ($objMultiContext.FreshnessBaseRevision -cne
+                $strPushBase -or
+            -not $objMultiContext.EvaluateFreshness) {
             throw 'Complete multi-commit new-ref evidence did not select its full boundary.'
         }
         $strZeroRevision = '0' * 40
-        $objExistingCommitNewRefContext = Get-MetadataEventRevisionContext `
-            -RepositoryRootPath $strPushFixtureRoot -EventName 'push' -PullRequestAction '' `
-            -BaseRevision $strZeroRevision -HeadRevision $strPushMultiCommit `
-            -IsNewRefRange $true -PreviousHeadRevision '' -EventHeadRevision $strPushMultiCommit `
+        $objExistingContext = Get-MetadataEventRevisionContext `
+            -RepositoryRootPath $strPushRoot -EventName 'push' -PullRequestAction '' `
+            -BaseRevision $strZeroRevision -HeadRevision $strPushMulti `
+            -IsNewRefRange $true -PreviousHeadRevision '' -EventHeadRevision $strPushMulti `
             -EventHeadDistinct 'false' `
             -NewRefCommitCount '0' -NewRefCommitEvidenceJson '[]'
-        if ($objExistingCommitNewRefContext.HistoryBaseRevision -cne
+        if ($objExistingContext.HistoryBaseRevision -cne
                 $strZeroRevision -or
-            $objExistingCommitNewRefContext.FreshnessBaseRevision -cne '' -or
-            $objExistingCommitNewRefContext.EvaluateFreshness) {
+            $objExistingContext.FreshnessBaseRevision -cne '' -or
+            $objExistingContext.EvaluateFreshness) {
             throw 'Existing new-ref context is invalid.'
         }
-        $boolIncompleteNewRefEvidenceRejected = $false
+        $boolIncompleteRejected = $false
         try {
             [void](Get-MetadataEventRevisionContext `
-                    -RepositoryRootPath $strPushFixtureRoot `
+                    -RepositoryRootPath $strPushRoot `
                     -EventName 'push' -PullRequestAction '' `
-                    -BaseRevision ('0' * 40) -HeadRevision $strPushMultiCommit `
+                    -BaseRevision ('0' * 40) -HeadRevision $strPushMulti `
                     -IsNewRefRange $true -PreviousHeadRevision '' `
-                    -EventHeadRevision $strPushMultiCommit -EventHeadDistinct 'true' `
+                    -EventHeadRevision $strPushMulti -EventHeadDistinct 'true' `
                     -NewRefCommitCount '4' `
-                    -NewRefCommitEvidenceJson $strMultiCommitEvidenceJson)
+                    -NewRefCommitEvidenceJson $strMultiEvidence)
         }
         catch {
-            $boolIncompleteNewRefEvidenceRejected = $_.Exception.Message.Contains(
+            $boolIncompleteRejected = $_.Exception.Message.Contains(
                 'commit evidence is incomplete',
                 [StringComparison]::Ordinal
             )
         }
-        if (-not $boolIncompleteNewRefEvidenceRejected) {
+        if (-not $boolIncompleteRejected) {
             throw 'Incomplete authenticated new-ref evidence did not fail closed.'
         }
 
-        & git -C $strPushFixtureRoot update-ref HEAD $strPushUngovernedCommit
-        $objUngovernedApplicability = Get-PushGovernedPathApplicability `
-            -RepositoryRootPath $strPushFixtureRoot `
-            -BaseRevision $strPushBaseCommit `
-            -HeadRevision $strPushUngovernedCommit `
+        & git -C $strPushRoot update-ref HEAD $strPushUngoverned
+        $objUngoverned = Get-PushGovernedPathApplicability `
+            -RepositoryRootPath $strPushRoot `
+            -BaseRevision $strPushBase `
+            -HeadRevision $strPushUngoverned `
             -IsNewRef $false -IsDeletedRef $false
-        if ($objUngovernedApplicability.ShouldValidate -or
-            $objUngovernedApplicability.ChangedPathCount -ne 3000) {
+        if ($objUngoverned.ShouldValidate -or
+            $objUngoverned.ChangedPathCount -ne 3000) {
             throw 'An exact 3,000-path ungoverned push did not select no-op.'
         }
 
-        & git -C $strPushFixtureRoot update-ref HEAD $strPushGovernedCommit
-        $objGovernedApplicability = Get-PushGovernedPathApplicability `
-            -RepositoryRootPath $strPushFixtureRoot `
-            -BaseRevision $strPushBaseCommit `
-            -HeadRevision $strPushGovernedCommit `
+        & git -C $strPushRoot update-ref HEAD $strPushGoverned
+        $objGoverned = Get-PushGovernedPathApplicability `
+            -RepositoryRootPath $strPushRoot `
+            -BaseRevision $strPushBase `
+            -HeadRevision $strPushGoverned `
             -IsNewRef $false -IsDeletedRef $false
-        if (-not $objGovernedApplicability.ShouldValidate -or
-            $objGovernedApplicability.ChangedPathCount -ne 3001) {
+        if (-not $objGoverned.ShouldValidate -or
+            $objGoverned.ChangedPathCount -ne 3001) {
             throw 'A governed path after 3,000 other paths was not validated.'
         }
 
-        & git -C $strPushFixtureRoot update-ref HEAD $strPushDivergentCommit
-        $objDivergentPushApplicability = Get-PushGovernedPathApplicability `
-            -RepositoryRootPath $strPushFixtureRoot `
-            -BaseRevision $strPushUngovernedCommit `
-            -HeadRevision $strPushDivergentCommit `
+        & git -C $strPushRoot update-ref HEAD $strPushDivergent
+        $objDivergent = Get-PushGovernedPathApplicability `
+            -RepositoryRootPath $strPushRoot `
+            -BaseRevision $strPushUngoverned `
+            -HeadRevision $strPushDivergent `
             -IsNewRef $false -IsDeletedRef $false
-        if (-not $objDivergentPushApplicability.ShouldValidate) {
+        if (-not $objDivergent.ShouldValidate) {
             throw 'A divergent governed push did not use exact endpoint trees.'
         }
 
-        & git -C $strPushFixtureRoot update-ref HEAD $strPushRestoreCommit
-        $objRestorePushApplicability = Get-PushGovernedPathApplicability `
-            -RepositoryRootPath $strPushFixtureRoot `
-            -BaseRevision $strPushBaseCommit `
-            -HeadRevision $strPushRestoreCommit `
+        & git -C $strPushRoot update-ref HEAD $strPushRestore
+        $objRestore = Get-PushGovernedPathApplicability `
+            -RepositoryRootPath $strPushRoot `
+            -BaseRevision $strPushBase `
+            -HeadRevision $strPushRestore `
             -IsNewRef $false -IsDeletedRef $false
-        if (-not $objRestorePushApplicability.ShouldValidate -or
-            $objRestorePushApplicability.ChangedPathCount -ne 2) {
+        if (-not $objRestore.ShouldValidate -or
+            $objRestore.ChangedPathCount -ne 2) {
             throw 'A governed change-then-restore push escaped range applicability.'
         }
 
-        & git -C $strPushFixtureRoot update-ref HEAD $strPushDivergentCommit
+        & git -C $strPushRoot update-ref HEAD $strPushUngoverned
+        $objBackward = Get-PushGovernedPathApplicability `
+            -RepositoryRootPath $strPushRoot `
+            -BaseRevision $strPushGoverned `
+            -HeadRevision $strPushUngoverned `
+            -IsNewRef $false -IsDeletedRef $false
+        if (-not $objBackward.ShouldValidate -or
+            $objBackward.ChangedPathCount -ne 1) {
+            throw 'A backward governed endpoint change escaped applicability.'
+        }
+
+        & git -C $strPushRoot update-ref HEAD $strPushDivergent
         $boolMissingPushEndpointRejected = $false
         try {
             [void](Get-PushGovernedPathApplicability `
-                    -RepositoryRootPath $strPushFixtureRoot `
+                    -RepositoryRootPath $strPushRoot `
                     -BaseRevision ('f' * 40) `
-                    -HeadRevision $strPushDivergentCommit `
+                    -HeadRevision $strPushDivergent `
                     -IsNewRef $false -IsDeletedRef $false)
         }
         catch {
@@ -7358,12 +7372,12 @@ if ($SelfTest) {
         }
     }
     finally {
-        if ([System.IO.Directory]::Exists($strPushFixtureRoot) -and
-            $strPushFixtureRoot.StartsWith(
-                $strPushFixtureTempRoot,
+        if ([System.IO.Directory]::Exists($strPushRoot) -and
+            $strPushRoot.StartsWith(
+                $strPushTempRoot,
                 [StringComparison]::OrdinalIgnoreCase
             )) {
-            Remove-Item -LiteralPath $strPushFixtureRoot -Recurse -Force
+            Remove-Item -LiteralPath $strPushRoot -Recurse -Force
         }
     }
     $strRevisionAgentsFixture = Read-GitRevisionText `
