@@ -1,5 +1,13 @@
 # PowerShell Writing Style — Rationale and Design Philosophy
 
+## Metadata
+
+- **Status:** Active
+- **Owner:** Repository Maintainer (@franklesniak)
+- **Last Updated:** 2026-08-28
+- **Scope:** Explains the rationale, design philosophy, and historical context behind the normative rules in `STYLE_GUIDE.md`. It does not define normative rules.
+- **Related:** [PowerShell Writing Style](STYLE_GUIDE.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
+
 This companion document preserves the extended rationale, design philosophy, and historical context behind the rules in [STYLE_GUIDE.md](STYLE_GUIDE.md). The main guide contains all actionable rules, normative guidance, examples, and reference material. This document explains *why* those rules exist.
 
 ## Table of Contents

@@ -72,7 +72,7 @@
 #
 # .NOTES
 # This script does not support positional parameters.
-# Version: 1.7.20260828.3
+# Version: 1.7.20260828.4
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -146,13 +146,17 @@ $intCodexConfigMaximumInputBytes = 65536
 $intGitIgnoreMaximumInputBytes = 65536
 $intDocsInstructionsMaximumInputBytes = 131072
 $intInstructionDocumentMaximumInputBytes = 131072
-$intValidatorMaximumInputBytes = 425984
+$intStyleGuideRationaleMaximumInputBytes = 196608
+$intValidatorMaximumInputBytes = 458752
 $intHistoricalPolicyMarkerMaximumBytes = 524288
 $intGitPathListMaximumBytes = 1048576
 $intMetadataMaximumParents = 64
+$intNewRefMaximumCommitEvidence = 2048
 $strMetadataRangePolicyMarker = 'metadata-range-transition-policy-v1'
 $strLintGuideMetadataPolicyMarker =
     'operational-lint-guide-metadata-policy-v1'
+$strStyleGuideRationaleMetadataPolicyMarker =
+    'style-guide-rationale-metadata-policy-v1'
 $strPythonPrerequisite =
     'Python 3.12 is required to validate .codex/config.toml. On Windows, ' +
     'install the Python launcher for `py -3.12`; otherwise, expose ' +
@@ -196,7 +200,8 @@ $script:arrPushGovernedExactPaths = @(
     'docs/ISSUE_EVALUATION_PROMPT.md',
     'npm-shrinkwrap.json',
     'package-lock.json',
-    'package.json'
+    'package.json',
+    'STYLE_GUIDE_RATIONALE.md'
 )
 $script:strDecisionRecordPathPattern =
     '^docs/decisions/[0-9]{4}-[a-z0-9]+(?:-[a-z0-9]+)*\.md$'
@@ -2534,14 +2539,19 @@ function Get-MetadataEventRevisionContext {
                 -not [int]::TryParse($NewRefCommitCount, [ref]$intNewRefCommitCount)) {
                 throw 'A new-ref push requires a valid authenticated commit count.'
             }
-            try {
-                $arrNewRefCommitEvidence = @(
-                    ConvertFrom-Json -InputObject $NewRefCommitEvidenceJson -NoEnumerate
+            if ($intNewRefCommitCount -gt $intNewRefMaximumCommitEvidence) {
+                throw (
+                    'The authenticated new-ref commit count exceeds the maximum of ' +
+                    "$intNewRefMaximumCommitEvidence."
                 )
-                if ($arrNewRefCommitEvidence.Count -eq 1 -and
-                    $arrNewRefCommitEvidence[0] -is [System.Array]) {
-                    $arrNewRefCommitEvidence = @($arrNewRefCommitEvidence[0])
+            }
+            try {
+                $objNewRefCommitEvidence = ConvertFrom-Json `
+                    -InputObject $NewRefCommitEvidenceJson -NoEnumerate
+                if ($objNewRefCommitEvidence -isnot [System.Array]) {
+                    throw 'The evidence value is not an array.'
                 }
+                $arrNewRefCommitEvidence = @($objNewRefCommitEvidence)
             }
             catch {
                 throw 'The authenticated new-ref commit evidence is malformed.'
@@ -2557,15 +2567,26 @@ function Get-MetadataEventRevisionContext {
             elseif ($intNewRefCommitCount -eq 0) {
                 throw 'Distinct new-ref push requires an introduced commit.'
             }
-            $strPreviousEvidenceCommit = ''
-            $strFreshnessBase = ''
-            for ($intEvidenceIndex = 0;
-                $intEvidenceIndex -lt $arrNewRefCommitEvidence.Count;
-                $intEvidenceIndex++) {
-                $strEvidenceCommit = [string]$arrNewRefCommitEvidence[$intEvidenceIndex]
+            $setEvidenceCommits = [Collections.Generic.HashSet[string]]::new(
+                [StringComparer]::OrdinalIgnoreCase
+            )
+            $dictionaryEvidenceParents =
+                [Collections.Generic.Dictionary[string, string[]]]::new(
+                    [StringComparer]::OrdinalIgnoreCase
+                )
+            foreach ($objEvidenceCommit in $arrNewRefCommitEvidence) {
+                $strEvidenceCommit = [string]$objEvidenceCommit
                 if ($strEvidenceCommit -notmatch $strObjectIdPattern -or
                     $strEvidenceCommit -match $strZeroObjectIdPattern) {
                     throw 'The authenticated new-ref commit evidence contains an invalid commit.'
+                }
+                if (-not $setEvidenceCommits.Add($strEvidenceCommit)) {
+                    throw 'The authenticated new-ref commit evidence contains a duplicate commit.'
+                }
+                & git -C $RepositoryRootPath cat-file -e `
+                    "$strEvidenceCommit`^{commit}" 2>$null
+                if ($LASTEXITCODE -ne 0) {
+                    throw 'The authenticated new-ref commit evidence is unavailable.'
                 }
                 $strCommitAndParents = [string](& git -C $RepositoryRootPath `
                         rev-list --parents -n 1 $strEvidenceCommit 2>$null)
@@ -2573,27 +2594,83 @@ function Get-MetadataEventRevisionContext {
                     throw 'The authenticated new-ref commit evidence is unavailable.'
                 }
                 $arrCommitAndParents = @($strCommitAndParents.Trim() -split '\s+')
-                if ($arrCommitAndParents.Count -gt 2) {
-                    throw 'The authenticated new-ref commit evidence has an ambiguous merge.'
+                if ($arrCommitAndParents.Count -eq 0 -or
+                    $arrCommitAndParents[0] -notmatch $strObjectIdPattern -or
+                    -not [string]::Equals(
+                        $arrCommitAndParents[0],
+                        $strEvidenceCommit,
+                        [StringComparison]::OrdinalIgnoreCase
+                    )) {
+                    throw 'Git returned a mismatched new-ref evidence identity.'
                 }
-                if ($intEvidenceIndex -eq 0) {
-                    if ($arrCommitAndParents.Count -eq 2) {
-                        $strFreshnessBase = $arrCommitAndParents[1]
+                $intEvidenceParentCount = $arrCommitAndParents.Count - 1
+                if ($intEvidenceParentCount -gt $intMetadataMaximumParents) {
+                    throw (
+                        "Authenticated new-ref commit $strEvidenceCommit has " +
+                        "$intEvidenceParentCount parents; the maximum is " +
+                        "$intMetadataMaximumParents."
+                    )
+                }
+                $listEvidenceParents = [Collections.Generic.List[string]]::new()
+                for ($intParentIndex = 1;
+                    $intParentIndex -lt $arrCommitAndParents.Count;
+                    $intParentIndex++) {
+                    $strEvidenceParent = [string]$arrCommitAndParents[$intParentIndex]
+                    if ($strEvidenceParent -notmatch $strObjectIdPattern -or
+                        $strEvidenceParent -match $strZeroObjectIdPattern) {
+                        throw 'Git returned an invalid new-ref evidence parent.'
                     }
+                    & git -C $RepositoryRootPath cat-file -e `
+                        "$strEvidenceParent`^{commit}" 2>$null
+                    if ($LASTEXITCODE -ne 0) {
+                        throw 'Git returned an unavailable new-ref evidence parent.'
+                    }
+                    $listEvidenceParents.Add($strEvidenceParent)
                 }
-                elseif ($arrCommitAndParents.Count -ne 2 -or
-                    $arrCommitAndParents[1] -cne $strPreviousEvidenceCommit) {
-                    throw 'The authenticated new-ref commit evidence is not contiguous.'
-                }
-                $strPreviousEvidenceCommit = $strEvidenceCommit
+                $dictionaryEvidenceParents.Add(
+                    $strEvidenceCommit,
+                    $listEvidenceParents.ToArray()
+                )
             }
             if ($boolHeadIntroducedByPush -and
-                $strPreviousEvidenceCommit -cne $HeadRevision) {
-                throw 'The authenticated new-ref commit evidence does not end at the event head.'
+                -not $setEvidenceCommits.Contains($HeadRevision)) {
+                throw 'The authenticated new-ref commit evidence does not contain the event head.'
             }
+            $setReachableEvidence = [Collections.Generic.HashSet[string]]::new(
+                [StringComparer]::OrdinalIgnoreCase
+            )
+            $setBoundaryParents = [Collections.Generic.HashSet[string]]::new(
+                [StringComparer]::OrdinalIgnoreCase
+            )
+            if ($boolHeadIntroducedByPush) {
+                $stackEvidenceCommits = [Collections.Generic.Stack[string]]::new()
+                $stackEvidenceCommits.Push($HeadRevision)
+                while ($stackEvidenceCommits.Count -gt 0) {
+                    $strReachableCommit = $stackEvidenceCommits.Pop()
+                    if (-not $setReachableEvidence.Add($strReachableCommit)) {
+                        continue
+                    }
+                    foreach ($strReachableParent in
+                        $dictionaryEvidenceParents[$strReachableCommit]) {
+                        if ($setEvidenceCommits.Contains($strReachableParent)) {
+                            $stackEvidenceCommits.Push($strReachableParent)
+                        }
+                        else {
+                            [void]$setBoundaryParents.Add($strReachableParent)
+                        }
+                    }
+                }
+                if ($setReachableEvidence.Count -ne $setEvidenceCommits.Count) {
+                    throw 'The authenticated new-ref commit evidence contains a disconnected commit.'
+                }
+            }
+            $arrFreshnessBases = @($setBoundaryParents | Sort-Object)
             return [pscustomobject]@{
                 HistoryBaseRevision = $BaseRevision
-                FreshnessBaseRevision = $strFreshnessBase
+                FreshnessBaseRevision = if ($arrFreshnessBases.Count -eq 1) {
+                    $arrFreshnessBases[0]
+                } else { '' }
+                FreshnessBaseRevisions = $arrFreshnessBases
                 EvaluateFreshness = $boolHeadIntroducedByPush
                 PreviousTopicBaseRevision = ''
                 PreviousTopicHeadRevision = ''
@@ -2622,6 +2699,9 @@ function Get-MetadataEventRevisionContext {
             else {
                 ''
             }
+            FreshnessBaseRevisions = if ($boolHeadIntroducedByPush) {
+                @($BaseRevision)
+            } else { @() }
             EvaluateFreshness = $boolHeadIntroducedByPush
             PreviousTopicBaseRevision = ''
             PreviousTopicHeadRevision = ''
@@ -2674,6 +2754,7 @@ function Get-MetadataEventRevisionContext {
         return [pscustomobject]@{
             HistoryBaseRevision = $strHistoryBase
             FreshnessBaseRevision = $strHistoryBase
+            FreshnessBaseRevisions = @($strHistoryBase)
             EvaluateFreshness = $true
             PreviousTopicBaseRevision = ''
             PreviousTopicHeadRevision = ''
@@ -2704,6 +2785,7 @@ function Get-MetadataEventRevisionContext {
     return [pscustomobject]@{
         HistoryBaseRevision = $strHistoryBase
         FreshnessBaseRevision = $PreviousHeadRevision
+        FreshnessBaseRevisions = @($PreviousHeadRevision)
         EvaluateFreshness = $true
         PreviousTopicBaseRevision = ([string]$arrPreviousMergeBases[0]).Trim()
         PreviousTopicHeadRevision = $PreviousHeadRevision
@@ -3888,7 +3970,7 @@ function Get-TrustRootRangeMutationFailure {
 }
 
 function Get-GovernedDocumentCommitTransitionFailure {
-    # Checks one governed commit against all parents. Version: 1.1.20260828.0.
+    # Checks one governed commit against all parents. Version: 1.2.20260828.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -3933,6 +4015,56 @@ function Get-GovernedDocumentCommitTransitionFailure {
     if ($LASTEXITCODE -ne 0) {
         throw "The governed direct-transition commit is unavailable: $CommitRevision"
     }
+    $strParentLine = [string] (
+        & git -C $RepositoryRootPath rev-list --parents -n 1 $CommitRevision
+    )
+    if ($LASTEXITCODE -ne 0) {
+        throw "Could not read the parents of metadata range commit $CommitRevision."
+    }
+    $arrCommitAndParents = @($strParentLine.Trim() -split '\s+')
+    if ($arrCommitAndParents.Count -eq 0 -or
+        $arrCommitAndParents[0] -notmatch $strObjectIdPattern -or
+        -not [string]::Equals(
+            $arrCommitAndParents[0],
+            $CommitRevision,
+            [StringComparison]::OrdinalIgnoreCase
+        )) {
+        throw "Git returned an invalid identity for metadata range commit $CommitRevision."
+    }
+    $intParentCount = $arrCommitAndParents.Count - 1
+    if ($intParentCount -gt $intMetadataMaximumParents) {
+        throw (
+            "Metadata range commit $CommitRevision has $intParentCount parents; " +
+            "the maximum is $intMetadataMaximumParents."
+        )
+    }
+    $listParentContexts = [Collections.Generic.List[pscustomobject]]::new()
+    $boolHasPolicyActiveParent = $false
+    for ($intParentIndex = 1;
+        $intParentIndex -lt $arrCommitAndParents.Count;
+        $intParentIndex++) {
+        $strParentRevision = [string]$arrCommitAndParents[$intParentIndex]
+        if ($strParentRevision -notmatch $strObjectIdPattern) {
+            throw "Git returned an invalid parent for metadata range commit $CommitRevision."
+        }
+        & git -C $RepositoryRootPath cat-file -e `
+            "$strParentRevision`^{commit}" 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            throw "Git returned an unavailable parent for metadata range commit $CommitRevision."
+        }
+        $boolParentHasPolicyMarker = Test-HistoricalPolicyMarker `
+            -RepositoryRootPath $RepositoryRootPath `
+            -Revision $strParentRevision `
+            -RepositoryRelativePath $PolicyRepositoryRelativePath `
+            -Literal $PolicyMarker
+        if ($boolParentHasPolicyMarker) {
+            $boolHasPolicyActiveParent = $true
+        }
+        $listParentContexts.Add([pscustomobject]@{
+                Revision = $strParentRevision
+                HasPolicyMarker = $boolParentHasPolicyMarker
+            })
+    }
     $boolUseWorktreePolicy = $false
     if ($CommitRevision -ceq $script:strCheckedOutRevision) {
         & git -C $RepositoryRootPath diff --quiet --no-ext-diff --no-textconv `
@@ -3962,58 +4094,27 @@ function Get-GovernedDocumentCommitTransitionFailure {
                 -Revision $CommitRevision `
                 -RepositoryRelativePath $PolicyRepositoryRelativePath `
                 -Literal $PolicyMarker)) {
-            return [string[]] @()
+        if ($boolHasPolicyActiveParent) {
+            Write-Output (
+                "$PolicyRepositoryRelativePath governance marker $PolicyMarker " +
+                "must not be removed at metadata range commit $CommitRevision."
+            )
+        }
+        return
     }
 
-    $strParentLine = [string] (
-        & git -C $RepositoryRootPath rev-list --parents -n 1 $CommitRevision
-    )
-    if ($LASTEXITCODE -ne 0) {
-        throw "Could not read the parents of metadata range commit $CommitRevision."
-    }
-    $arrCommitAndParents = @($strParentLine.Trim() -split '\s+')
-    if ($arrCommitAndParents.Count -eq 0 -or
-        $arrCommitAndParents[0] -notmatch $strObjectIdPattern -or
-        -not [string]::Equals(
-            $arrCommitAndParents[0],
-            $CommitRevision,
-            [StringComparison]::OrdinalIgnoreCase
-        )) {
-        throw "Git returned an invalid identity for metadata range commit $CommitRevision."
-    }
-    if ($arrCommitAndParents.Count -eq 1) {
+    if ($intParentCount -eq 0) {
         return [string[]] @()
-    }
-    $intParentCount = $arrCommitAndParents.Count - 1
-    if ($intParentCount -gt $intMetadataMaximumParents) {
-        throw (
-            "Metadata range commit $CommitRevision has $intParentCount parents; " +
-            "the maximum is $intMetadataMaximumParents."
-        )
     }
 
     $listChangedParents = [Collections.Generic.List[pscustomobject]]::new()
     $boolMatchesPolicyActiveParent = $false
-    foreach ($strParentRevision in $arrCommitAndParents[1..$intParentCount]) {
-        if ($strParentRevision -notmatch $strObjectIdPattern) {
-            throw "Git returned an invalid parent for metadata range commit $CommitRevision."
-        }
-        & git -C $RepositoryRootPath cat-file -e `
-            "$strParentRevision`^{commit}" 2>$null
-        if ($LASTEXITCODE -ne 0) {
-            throw "Git returned an unavailable parent for metadata range commit $CommitRevision."
-        }
-
-        $boolParentHasPolicyMarker = Test-HistoricalPolicyMarker `
-            -RepositoryRootPath $RepositoryRootPath `
-            -Revision $strParentRevision `
-            -RepositoryRelativePath $PolicyRepositoryRelativePath `
-            -Literal $PolicyMarker
+    foreach ($objParentContext in $listParentContexts) {
         & git -C $RepositoryRootPath diff --quiet --no-ext-diff --no-textconv `
-            $strParentRevision $CommitRevision -- $RepositoryRelativePath
+            $objParentContext.Revision $CommitRevision -- $RepositoryRelativePath
         $intDiffExitCode = $LASTEXITCODE
         if ($intDiffExitCode -eq 0) {
-            if ($boolParentHasPolicyMarker) {
+            if ($objParentContext.HasPolicyMarker) {
                 $boolMatchesPolicyActiveParent = $true
             }
             continue
@@ -4025,8 +4126,8 @@ function Get-GovernedDocumentCommitTransitionFailure {
             )
         }
         $listChangedParents.Add([pscustomobject]@{
-                Revision = $strParentRevision
-                HasPolicyMarker = $boolParentHasPolicyMarker
+                Revision = $objParentContext.Revision
+                HasPolicyMarker = $objParentContext.HasPolicyMarker
             })
     }
     if ($listChangedParents.Count -eq 0) {
@@ -5067,6 +5168,12 @@ $arrGovernedMetadataDocuments = @($arrGovernedInstructionDocuments) + @(
         MaximumBytes = $intInstructionDocumentMaximumInputBytes
         RequiresMetadata = $true
         RequiresVersion = $false
+    },
+    [pscustomobject]@{
+        Path = 'STYLE_GUIDE_RATIONALE.md'
+        MaximumBytes = $intStyleGuideRationaleMaximumInputBytes
+        RequiresMetadata = $true
+        RequiresVersion = $false
     }
 )
 $arrGovernedMetadataDocuments += @(
@@ -5109,6 +5216,7 @@ if (-not [string]::IsNullOrEmpty($TrustedEventTimestamp)) {
 }
 $strEventHistoryBaseRevision = $RangeBaseRevision
 $strEventFreshnessBaseRevision = ''
+$arrEventFreshnessBaseRevisions = @()
 $boolEvaluateEventFreshness = $false
 $boolRequireRangeCommitDateFreshness = $false
 $strPreviousTopicBaseRevision = ''
@@ -5132,6 +5240,9 @@ if ($boolEventRangeRequested -and
         -NewRefCommitEvidenceJson $NewRefCommitEvidenceJson
     $strEventHistoryBaseRevision = $objMetadataEventRevisionContext.HistoryBaseRevision
     $strEventFreshnessBaseRevision = $objMetadataEventRevisionContext.FreshnessBaseRevision
+    $arrEventFreshnessBaseRevisions = @(
+        $objMetadataEventRevisionContext.FreshnessBaseRevisions
+    )
     $boolEvaluateEventFreshness = $objMetadataEventRevisionContext.EvaluateFreshness
     $boolRequireRangeCommitDateFreshness =
         ($EventName -ceq 'push' -and -not $RangeIsNewRef) -or
@@ -5374,7 +5485,9 @@ foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
         -MaximumBytes $objDocumentSpec.MaximumBytes `
         -Revision $strValidatedInputRevision
     $strDocumentPolicyMarker = if (
-        $objDocumentSpec.Path -in $script:arrOperationalLintGuidePaths) {
+        $objDocumentSpec.Path -ceq 'STYLE_GUIDE_RATIONALE.md') {
+        $strStyleGuideRationaleMetadataPolicyMarker
+    } elseif ($objDocumentSpec.Path -in $script:arrOperationalLintGuidePaths) {
         $strLintGuideMetadataPolicyMarker
     } else {
         $strMetadataRangePolicyMarker
@@ -5539,55 +5652,57 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
                 -RequireExpectedUtcDateForRenderedChange $true `
                 -RequiresVersion $objDocumentContext.RequiresVersion)
     }
-    if ($boolEventRangeRequested -and $boolEvaluateEventFreshness -and
-        -not [string]::IsNullOrEmpty($strEventFreshnessBaseRevision) -and
-        (Test-HistoricalPolicyMarker `
-            -RepositoryRootPath $strRepositoryRootPath `
-            -Revision $strEventFreshnessBaseRevision `
-            -RepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
-            -Literal $objDocumentContext.PolicyMarker)) {
-        $boolTopicDeltaUnchanged = $false
-        if (-not [string]::IsNullOrEmpty($strPreviousTopicBaseRevision)) {
-            $boolTopicDeltaUnchanged = Test-TopicOwnedGitPathDeltaEqual `
-                -RepositoryRootPath $strRepositoryRootPath `
-                -PreviousBaseRevision $strPreviousTopicBaseRevision `
-                -PreviousHeadRevision $strPreviousTopicHeadRevision `
-                -CurrentBaseRevision $strCurrentTopicBaseRevision `
-                -CurrentHeadRevision $strCurrentTopicHeadRevision `
-                -RepositoryRelativePath $objDocumentContext.Path
-        }
-        if (-not [string]::IsNullOrEmpty($strEventFreshnessBaseRevision)) {
+    if ($boolEventRangeRequested -and $boolEvaluateEventFreshness) {
+        foreach ($strEventFreshnessBaseRevision in
+            $arrEventFreshnessBaseRevisions) {
+            if ([string]::IsNullOrEmpty($strEventFreshnessBaseRevision) -or
+                -not (Test-HistoricalPolicyMarker `
+                    -RepositoryRootPath $strRepositoryRootPath `
+                    -Revision $strEventFreshnessBaseRevision `
+                    -RepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
+                    -Literal $objDocumentContext.PolicyMarker)) {
+                continue
+            }
+            $boolTopicDeltaUnchanged = $false
+            if (-not [string]::IsNullOrEmpty($strPreviousTopicBaseRevision)) {
+                $boolTopicDeltaUnchanged = Test-TopicOwnedGitPathDeltaEqual `
+                    -RepositoryRootPath $strRepositoryRootPath `
+                    -PreviousBaseRevision $strPreviousTopicBaseRevision `
+                    -PreviousHeadRevision $strPreviousTopicHeadRevision `
+                    -CurrentBaseRevision $strCurrentTopicBaseRevision `
+                    -CurrentHeadRevision $strCurrentTopicHeadRevision `
+                    -RepositoryRelativePath $objDocumentContext.Path
+            }
             & git -C $strRepositoryRootPath cat-file -e `
                 "$strEventFreshnessBaseRevision`:$($objDocumentContext.Path)" 2>$null
-        }
-        $strEventBaseContent = if ($boolTopicDeltaUnchanged) {
-            $objDocumentContext.Content
-        }
-        elseif (-not [string]::IsNullOrEmpty($strEventFreshnessBaseRevision) -and
-            $LASTEXITCODE -eq 0) {
-            Read-GitRevisionText `
-                -RepositoryRootPath $strRepositoryRootPath `
-                -Revision $strEventFreshnessBaseRevision `
-                -RepositoryRelativePath $objDocumentContext.Path `
-                -MaximumBytes $objDocumentContext.MaximumBytes `
-                -RequireRegularFile
-        }
-        else {
-            $null
-        }
-        if ($objDocumentContext.RequiresVersion) {
-            $arrRepositoryFailures += @(Get-CurrentInputMetadataFreshnessFailure `
-                    -Name $objDocumentContext.Path `
-                    -CurrentContent $objDocumentContext.Content `
-                    -BaseContent $strEventBaseContent `
-                    -TrustedEventUtcDate $strTrustedEventUtcDate)
-        }
-        else {
-            $arrRepositoryFailures += @(Get-LastUpdatedMetadataFreshnessFailure `
-                    -Name $objDocumentContext.Path `
-                    -CurrentContent $objDocumentContext.Content `
-                    -BaseContent $strEventBaseContent `
-                    -TrustedEventUtcDate $strTrustedEventUtcDate)
+            $strEventBaseContent = if ($boolTopicDeltaUnchanged) {
+                $objDocumentContext.Content
+            }
+            elseif ($LASTEXITCODE -eq 0) {
+                Read-GitRevisionText `
+                    -RepositoryRootPath $strRepositoryRootPath `
+                    -Revision $strEventFreshnessBaseRevision `
+                    -RepositoryRelativePath $objDocumentContext.Path `
+                    -MaximumBytes $objDocumentContext.MaximumBytes `
+                    -RequireRegularFile
+            }
+            else {
+                $null
+            }
+            if ($objDocumentContext.RequiresVersion) {
+                $arrRepositoryFailures += @(Get-CurrentInputMetadataFreshnessFailure `
+                        -Name $objDocumentContext.Path `
+                        -CurrentContent $objDocumentContext.Content `
+                        -BaseContent $strEventBaseContent `
+                        -TrustedEventUtcDate $strTrustedEventUtcDate)
+            }
+            else {
+                $arrRepositoryFailures += @(Get-LastUpdatedMetadataFreshnessFailure `
+                        -Name $objDocumentContext.Path `
+                        -CurrentContent $objDocumentContext.Content `
+                        -BaseContent $strEventBaseContent `
+                        -TrustedEventUtcDate $strTrustedEventUtcDate)
+            }
         }
     }
 }
@@ -5605,7 +5720,7 @@ if ($SelfTest) {
     $strValidatorSource = [IO.File]::ReadAllText($PSCommandPath)
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260828\.3$'
+            '(?m)^# Version: 1\.7\.20260828\.4$'
         ).Count -ne 1) {
         throw 'The validator script version does not use build date 20260828.'
     }
@@ -5862,6 +5977,38 @@ if ($SelfTest) {
             throw "An exact validator input escaped push applicability: $strExactValidatorInputPath"
         }
     }
+    $strRationalePath = 'STYLE_GUIDE_RATIONALE.md'
+    $arrRationaleSpecs = @($arrGovernedMetadataDocuments |
+            Where-Object { $_.Path -ceq $strRationalePath })
+    $arrRationaleContexts = @($listGovernedDocumentContexts |
+            Where-Object { $_.Path -ceq $strRationalePath })
+    if (@($script:arrPushGovernedExactPaths |
+            Where-Object { $_ -ceq $strRationalePath }).Count -ne 1 -or
+        $arrRationaleSpecs.Count -ne 1 -or
+        $arrRationaleContexts.Count -ne 1 -or
+        $arrRationaleSpecs[0].MaximumBytes -ne
+            $intStyleGuideRationaleMaximumInputBytes -or
+        -not $arrRationaleSpecs[0].RequiresMetadata -or
+        $arrRationaleSpecs[0].RequiresVersion -or
+        $intStyleGuideRationaleMaximumInputBytes -ne 196608 -or
+        [Text.Encoding]::UTF8.GetByteCount($arrRationaleContexts[0].Content) -gt
+            $intStyleGuideRationaleMaximumInputBytes -or
+        $arrRationaleContexts[0].PolicyMarker -cne
+            $strStyleGuideRationaleMetadataPolicyMarker) {
+        throw 'The canonical rationale lacks exact bounded Tier 1 catalog enforcement.'
+    }
+    foreach ($objGenericMetadataContext in @(
+            $listGovernedDocumentContexts |
+                Where-Object {
+                    $_.Path -cne $strRationalePath -and
+                    $_.Path -notin $script:arrOperationalLintGuidePaths
+                }
+        )) {
+        if ($objGenericMetadataContext.PolicyMarker -cne
+            $strMetadataRangePolicyMarker) {
+            throw "Generic metadata marker selection changed: $($objGenericMetadataContext.Path)"
+        }
+    }
     foreach ($strLintGuidePath in $script:arrOperationalLintGuidePaths) {
         $arrLintGuideContexts = @($listGovernedDocumentContexts |
                 Where-Object { $_.Path -ceq $strLintGuidePath })
@@ -6094,13 +6241,29 @@ if ($SelfTest) {
         if ($null -ne $objMetadata.Failure) {
             throw "Invalid unversioned metadata: $($objDocumentContext.Path)"
         }
-        $strMutation = $objDocumentContext.Content.Replace('## Metadata', '')
+        $strMutation = $objDocumentContext.Content -creplace
+            '(?m)^## Metadata(?=\r?$)', ''
         $arrFailures = @(Get-LastUpdatedMetadataFreshnessFailure -Name `
                 $objDocumentContext.Path -CurrentContent $strMutation -BaseContent `
                 $objDocumentContext.Content -TrustedEventUtcDate $objMetadata.UpdatedDate)
         if (-not ($arrFailures -match 'first level-two heading immediately after the H1')) {
             throw "$($objDocumentContext.Path) accepted missing Metadata."
         }
+    }
+    $objRationaleContext = $arrRationaleContexts[0]
+    $objRationaleMetadata = Get-DocumentMetadataContext `
+        -Content $objRationaleContext.Content -RequiresVersion $false
+    $strRationaleStaleMutation = $objRationaleContext.Content +
+        [Environment]::NewLine + 'Rendered rationale mutation.' +
+        [Environment]::NewLine
+    $arrRationaleStaleFailures = @(Get-LastUpdatedMetadataFreshnessFailure `
+            -Name $strRationalePath `
+            -CurrentContent $strRationaleStaleMutation `
+            -BaseContent $objRationaleContext.Content `
+            -TrustedEventUtcDate $objRationaleMetadata.UpdatedDate)
+    if ($null -ne $objRationaleMetadata.Failure -or
+        -not ($arrRationaleStaleFailures -match 'must advance from')) {
+        throw 'A stale canonical-rationale rendered change did not fail closed.'
     }
     $objUnversionedDocument = $arrUnversionedMetadataContexts[0]
     $objUnversionedMetadata = Get-DocumentMetadataContext `
@@ -7156,9 +7319,9 @@ if ($SelfTest) {
         $strPushRestore = $strPushRestore.Trim()
 
         $strMultiEvidence = ConvertTo-Json -Compress -InputObject @(
+            $strPushMulti,
             $strPushUngoverned,
-            $strPushGoverned,
-            $strPushMulti
+            $strPushGoverned
         )
         $objMultiContext = Get-MetadataEventRevisionContext `
             -RepositoryRootPath $strPushRoot `
@@ -7170,6 +7333,8 @@ if ($SelfTest) {
             -NewRefCommitEvidenceJson $strMultiEvidence
         if ($objMultiContext.FreshnessBaseRevision -cne
                 $strPushBase -or
+            @($objMultiContext.FreshnessBaseRevisions).Count -ne 1 -or
+            $objMultiContext.FreshnessBaseRevisions[0] -cne $strPushBase -or
             -not $objMultiContext.EvaluateFreshness) {
             throw 'Complete multi-commit new-ref evidence did not select its full boundary.'
         }
@@ -7205,6 +7370,72 @@ if ($SelfTest) {
         }
         if (-not $boolIncompleteRejected) {
             throw 'Incomplete authenticated new-ref evidence did not fail closed.'
+        }
+        foreach ($objInvalidNewRefEvidence in @(
+                [pscustomobject]@{
+                    Name = 'non-array evidence'
+                    Count = '1'
+                    Json = ConvertTo-Json -Compress -InputObject $strPushMulti
+                    Failure = 'commit evidence is malformed'
+                },
+                [pscustomobject]@{
+                    Name = 'duplicate evidence'
+                    Count = '3'
+                    Json = ConvertTo-Json -Compress -InputObject @(
+                        $strPushUngoverned,
+                        $strPushUngoverned,
+                        $strPushMulti
+                    )
+                    Failure = 'contains a duplicate commit'
+                },
+                [pscustomobject]@{
+                    Name = 'missing head evidence'
+                    Count = '1'
+                    Json = ConvertTo-Json -Compress -InputObject @($strPushUngoverned)
+                    Failure = 'does not contain the event head'
+                },
+                [pscustomobject]@{
+                    Name = 'disconnected evidence'
+                    Count = '2'
+                    Json = ConvertTo-Json -Compress -InputObject @(
+                        $strPushMulti,
+                        $strPushDivergent
+                    )
+                    Failure = 'contains a disconnected commit'
+                },
+                [pscustomobject]@{
+                    Name = 'unavailable evidence'
+                    Count = '1'
+                    Json = ConvertTo-Json -Compress -InputObject @(('f' * 40))
+                    Failure = 'commit evidence is unavailable'
+                },
+                [pscustomobject]@{
+                    Name = 'excessive evidence count'
+                    Count = '2049'
+                    Json = '[]'
+                    Failure = 'commit count exceeds the maximum of 2048'
+                }
+            )) {
+            $boolInvalidEvidenceRejected = $false
+            try {
+                [void](Get-MetadataEventRevisionContext `
+                        -RepositoryRootPath $strPushRoot `
+                        -EventName 'push' -PullRequestAction '' `
+                        -BaseRevision ('0' * 40) -HeadRevision $strPushMulti `
+                        -IsNewRefRange $true -PreviousHeadRevision '' `
+                        -EventHeadRevision $strPushMulti -EventHeadDistinct 'true' `
+                        -NewRefCommitCount $objInvalidNewRefEvidence.Count `
+                        -NewRefCommitEvidenceJson $objInvalidNewRefEvidence.Json)
+            }
+            catch {
+                $boolInvalidEvidenceRejected = $_.Exception.Message.Contains(
+                    $objInvalidNewRefEvidence.Failure,
+                    [StringComparison]::Ordinal
+                )
+            }
+            if (-not $boolInvalidEvidenceRejected) {
+                throw "$($objInvalidNewRefEvidence.Name) did not fail closed."
+            }
         }
 
         & git -C $strPushRoot update-ref HEAD $strPushUngoverned
@@ -7587,6 +7818,11 @@ if ($SelfTest) {
             'docs',
             'ISSUE_EVALUATION_PROMPT.md'
         )
+        $strRationaleFixtureRelativePath = 'STYLE_GUIDE_RATIONALE.md'
+        $strRationaleFixturePath = [IO.Path]::Combine(
+            $strMergeFixtureRoot,
+            $strRationaleFixtureRelativePath
+        )
         $strMergeGitIgnorePath = [IO.Path]::Combine(
             $strMergeFixtureRoot,
             '.gitignore'
@@ -7621,6 +7857,13 @@ if ($SelfTest) {
             $objAgentsUpdatedMatch.Value,
             "- **Last Updated:** $strMergeHistoricalDate"
         )
+        $strRationaleFixturePrePolicy = @(
+            '# Rationale fixture',
+            '',
+            '## Table of Contents',
+            '',
+            'Pre-policy rationale content.'
+        ) -join "`n"
         [IO.File]::WriteAllText(
             [IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
             $strMergeBaseContent,
@@ -7637,13 +7880,19 @@ if ($SelfTest) {
             $objUtf8WithoutBom
         )
         [IO.File]::WriteAllText(
+            $strRationaleFixturePath,
+            $strRationaleFixturePrePolicy + "`n",
+            $objUtf8WithoutBom
+        )
+        [IO.File]::WriteAllText(
             $strMergeGitIgnorePath,
             "/CLAUDE.local.md`n",
             $objUtf8WithoutBom
         )
         & git -C $strMergeFixtureRoot add -- `
             'AGENTS.md' '.github/workflows/Test-AgentInstructions.ps1' `
-            $strMergeUnversionedRelativePath '.gitignore'
+            $strMergeUnversionedRelativePath $strRationaleFixtureRelativePath `
+            '.gitignore'
         $strMergeBaseTree = [string] (& git -C $strMergeFixtureRoot write-tree)
         if ($LASTEXITCODE -ne 0 -or
             $strMergeBaseTree.Trim() -notmatch '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$') {
@@ -7840,6 +8089,219 @@ if ($SelfTest) {
             -Timestamp ($strMergeHistoricalDate + 'T08:00:00Z') `
             -Message 'merge fixture base'
 
+        $strRationaleFixturePolicy = $strMetadataRangePolicyMarker + "`n" +
+            $strStyleGuideRationaleMetadataPolicyMarker + "`n"
+        $strRationaleFixtureActive = @(
+            '# Rationale fixture',
+            '',
+            '## Metadata',
+            '',
+            '- **Status:** Active',
+            '- **Owner:** Repository Maintainer',
+            "- **Last Updated:** $strMergeHistoricalDate",
+            '- **Scope:** Explains the rationale fixture.',
+            '',
+            '## Rationale body',
+            '',
+            'Activation content.'
+        ) -join "`n"
+        $strRationaleFixtureActive += "`n"
+        $scriptBlockNewRationaleTree = {
+            param([string] $PolicyContent, [string] $RationaleContent)
+
+            & git -C $strMergeFixtureRoot read-tree $strMergeBaseTree
+            if ($LASTEXITCODE -ne 0) {
+                throw 'Could not reset the rationale adoption fixture tree.'
+            }
+            [IO.File]::WriteAllText(
+                $strMergePolicyPath,
+                $PolicyContent,
+                $objUtf8WithoutBom
+            )
+            [IO.File]::WriteAllText(
+                $strRationaleFixturePath,
+                $RationaleContent,
+                $objUtf8WithoutBom
+            )
+            & git -C $strMergeFixtureRoot add -- `
+                '.github/workflows/Test-AgentInstructions.ps1' `
+                $strRationaleFixtureRelativePath
+            $strRationaleTree = ([string] (
+                    & git -C $strMergeFixtureRoot write-tree
+                )).Trim()
+            if ($LASTEXITCODE -ne 0 -or
+                $strRationaleTree -notmatch '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$') {
+                throw 'Could not create the rationale adoption fixture tree.'
+            }
+            return $strRationaleTree
+        }
+        $scriptBlockGetRationaleRangeFailure = {
+            param([string] $Base, [string] $Head)
+
+            Get-GovernedDocumentRangeTransitionFailure `
+                -Name $strRationaleFixtureRelativePath `
+                -RepositoryRootPath $strMergeFixtureRoot `
+                -RepositoryRelativePath $strRationaleFixtureRelativePath `
+                -MaximumBytes $intStyleGuideRationaleMaximumInputBytes `
+                -BaseRevision $Base -HeadRevision $Head -InputRevision $Head `
+                -IsNewRefRange $false `
+                -PolicyRepositoryRelativePath `
+                    '.github/workflows/Test-AgentInstructions.ps1' `
+                -PolicyMaximumBytes 1024 `
+                -PolicyMarker $strStyleGuideRationaleMetadataPolicyMarker `
+                -RequireExpectedUtcDateForRenderedChange $true `
+                -RequiresVersion $false
+        }
+        if (Test-HistoricalPolicyMarker `
+                -RepositoryRootPath $strMergeFixtureRoot `
+                -Revision $strMergeBaseCommit `
+                -RepositoryRelativePath `
+                    '.github/workflows/Test-AgentInstructions.ps1' `
+                -Literal $strStyleGuideRationaleMetadataPolicyMarker) {
+            throw 'The rationale pre-policy parent contained the adoption marker.'
+        }
+        $strRationaleActivationTree = & $scriptBlockNewRationaleTree `
+            -PolicyContent $strRationaleFixturePolicy `
+            -RationaleContent $strRationaleFixtureActive
+        $strRationaleActivationCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strRationaleActivationTree `
+            -Parents @($strMergeBaseCommit) `
+            -Timestamp ($strMergeHistoricalDate + 'T09:00:00Z') `
+            -Message 'activate rationale metadata policy'
+        if (-not (Test-HistoricalPolicyMarker `
+                -RepositoryRootPath $strMergeFixtureRoot `
+                -Revision $strRationaleActivationCommit `
+                -RepositoryRelativePath `
+                    '.github/workflows/Test-AgentInstructions.ps1' `
+                -Literal $strStyleGuideRationaleMetadataPolicyMarker)) {
+            throw 'The rationale activation child lacked the dedicated marker.'
+        }
+        $arrRationaleActivationFailures = @(
+            & $scriptBlockGetRationaleRangeFailure `
+                -Base $strMergeBaseCommit `
+                -Head $strRationaleActivationCommit
+        )
+        if ($arrRationaleActivationFailures.Count -ne 0) {
+            throw (
+                'The first governed rationale revision failed adoption: ' +
+                ($arrRationaleActivationFailures -join '; ')
+            )
+        }
+
+        $strRationaleFixtureMissingOwner = $strRationaleFixtureActive.Replace(
+            '- **Owner:** Repository Maintainer' + "`n",
+            ''
+        )
+        $strRationaleFixtureStale = $strRationaleFixtureActive.Replace(
+            'Activation content.',
+            'Rendered content changed after activation.'
+        )
+        $strRationaleFixtureMalformed = @(
+            '# Rationale fixture',
+            '',
+            '## Rationale body',
+            '',
+            'Metadata has the wrong position.',
+            '',
+            '## Metadata',
+            '',
+            '- **Status:** Active',
+            '- **Owner:** Repository Maintainer',
+            "- **Last Updated:** $strMergeCurrentDate",
+            '- **Scope:** Explains the rationale fixture.'
+        ) -join "`n"
+        $strRationaleFixtureMalformed += "`n"
+        $strRationaleFixtureRemoved = @(
+            '# Rationale fixture',
+            '',
+            '## Rationale body',
+            '',
+            'The complete metadata block was removed.'
+        ) -join "`n"
+        $strRationaleFixtureRemoved += "`n"
+        $arrRationaleNegativeCases = @(
+            [pscustomobject]@{
+                Name = 'missing owner'
+                Content = $strRationaleFixtureMissingOwner
+                Failure = 'must contain one exact top-level Owner list item'
+            },
+            [pscustomobject]@{
+                Name = 'stale date'
+                Content = $strRationaleFixtureStale
+                Failure = "Last Updated must be $strMergeCurrentDate"
+            },
+            [pscustomobject]@{
+                Name = 'malformed placement'
+                Content = $strRationaleFixtureMalformed
+                Failure = 'must place Metadata as the first level-two heading'
+            },
+            [pscustomobject]@{
+                Name = 'removed metadata'
+                Content = $strRationaleFixtureRemoved
+                Failure = 'must place Metadata as the first level-two heading'
+            }
+        )
+        $intRationaleNegativeCase = 0
+        foreach ($objRationaleNegativeCase in $arrRationaleNegativeCases) {
+            $intRationaleNegativeCase++
+            $strRationaleNegativeTree = & $scriptBlockNewRationaleTree `
+                -PolicyContent $strRationaleFixturePolicy `
+                -RationaleContent $objRationaleNegativeCase.Content
+            $strRationaleNegativeCommit = & $scriptBlockCreateMergeFixtureCommit `
+                -Tree $strRationaleNegativeTree `
+                -Parents @($strRationaleActivationCommit) `
+                -Timestamp (
+                    $strMergeCurrentDate +
+                    "T09:00:$($intRationaleNegativeCase.ToString('00'))Z"
+                ) `
+                -Message "rationale $($objRationaleNegativeCase.Name)"
+            $arrRationaleNegativeFailures = @(
+                & $scriptBlockGetRationaleRangeFailure `
+                    -Base $strRationaleActivationCommit `
+                    -Head $strRationaleNegativeCommit
+            )
+            if (-not ($arrRationaleNegativeFailures -join '; ').Contains(
+                    $objRationaleNegativeCase.Failure,
+                    [StringComparison]::Ordinal
+                )) {
+                throw (
+                    "Rationale $($objRationaleNegativeCase.Name) did not fail closed: " +
+                    ($arrRationaleNegativeFailures -join '; ')
+                )
+            }
+        }
+
+        $strRationaleMarkerRemovalTree = & $scriptBlockNewRationaleTree `
+            -PolicyContent ($strMetadataRangePolicyMarker + "`n") `
+            -RationaleContent ($strRationaleFixtureActive.Replace(
+                'Activation content.',
+                'Content changed while the rationale marker was absent.'
+            ))
+        $strRationaleMarkerRemovalCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strRationaleMarkerRemovalTree `
+            -Parents @($strRationaleActivationCommit) `
+            -Timestamp ($strMergeCurrentDate + 'T09:01:00Z') `
+            -Message 'remove rationale metadata policy marker'
+        $strRationaleMarkerRestoreCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strRationaleActivationTree `
+            -Parents @($strRationaleMarkerRemovalCommit) `
+            -Timestamp ($strMergeCurrentDate + 'T09:02:00Z') `
+            -Message 'restore rationale marker and endpoint bytes'
+        $arrRationaleMarkerRemovalFailures = @(
+            & $scriptBlockGetRationaleRangeFailure `
+                -Base $strRationaleActivationCommit `
+                -Head $strRationaleMarkerRestoreCommit
+        )
+        $strRationaleMarkerRemovalFailure =
+            'governance marker style-guide-rationale-metadata-policy-v1 ' +
+            'must not be removed'
+        if (-not ($arrRationaleMarkerRemovalFailures -join '; ').Contains(
+                $strRationaleMarkerRemovalFailure,
+                [StringComparison]::Ordinal
+            )) {
+            throw 'An intermediate rationale policy-marker removal escaped validation.'
+        }
+
         & git -C $strMergeFixtureRoot read-tree $strMergeBaseTree
         [IO.File]::WriteAllText(
             $strMergeGitIgnorePath,
@@ -7905,8 +8367,44 @@ if ($SelfTest) {
         )
         & git -C $strMergeFixtureRoot read-tree $strMergeBaseTree
 
-        & git -C $strMergeFixtureRoot rm --cached --quiet -- `
+        & git -C $strMergeFixtureRoot rm --cached --force --quiet -- `
             '.github/workflows/Test-AgentInstructions.ps1'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not remove the policy marker from the transition fixture index.'
+        }
+        [IO.File]::WriteAllText(
+            [IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
+            $strMergeBaseContent + [Environment]::NewLine +
+                'Marker-removal transition fixture.' + [Environment]::NewLine,
+            $objUtf8WithoutBom
+        )
+        & git -C $strMergeFixtureRoot add -- 'AGENTS.md'
+        $strMarkerRemovalTree = ([string] (
+                & git -C $strMergeFixtureRoot write-tree
+            )).Trim()
+        $strMarkerRemovalCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strMarkerRemovalTree -Parents @($strMergeBaseCommit) `
+            -Timestamp ($strMergeHistoricalDate + 'T00:47:00Z') `
+            -Message 'remove marker during governed transition'
+        $strMarkerRestoreCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strMergeBaseTree -Parents @($strMarkerRemovalCommit) `
+            -Timestamp ($strMergeHistoricalDate + 'T00:48:00Z') `
+            -Message 'restore marker and endpoint bytes'
+        $arrMarkerRemovalFailures = @(& $scriptBlockGetMergeRangeFailure `
+                -Base $strMergeBaseCommit -Head $strMarkerRestoreCommit)
+        if (-not ($arrMarkerRemovalFailures -join '; ').Contains(
+                'governance marker metadata-range-transition-policy-v1 must not be removed',
+                [StringComparison]::Ordinal
+            )) {
+            throw 'An intermediate policy-marker removal escaped edge validation.'
+        }
+        & git -C $strMergeFixtureRoot read-tree $strMergeBaseTree
+
+        & git -C $strMergeFixtureRoot rm --cached --force --quiet -- `
+            '.github/workflows/Test-AgentInstructions.ps1'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not remove the policy marker from the pre-policy fixture index.'
+        }
         [IO.File]::WriteAllText(
             [IO.Path]::Combine($strMergeFixtureRoot, 'AGENTS.md'),
             'pre-policy root',
@@ -7929,6 +8427,10 @@ if ($SelfTest) {
             -Tree $strPrePolicySideTree -Parents @($strPrePolicyRootCommit) `
             -Timestamp ($strMergeHistoricalDate + 'T02:00:00Z') `
             -Message 'pre-policy side'
+        if (@(& $scriptBlockGetDirectFailure `
+                -Commit $strPrePolicySideCommit).Count -ne 0) {
+            throw 'A wholly pre-policy transition failed marker-continuity validation.'
+        }
         $strSideAdoptsPolicy = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strMergeBaseTree -Parents @($strPrePolicySideCommit) `
             -Timestamp ($strMergeCurrentDate + 'T02:30:00Z') `
@@ -8403,6 +8905,44 @@ if ($SelfTest) {
                 ($arrInheritedMergeFailures -join '; ')
             )
         }
+        $objCreatedMergeContext = Get-MetadataEventRevisionContext `
+            -RepositoryRootPath $strMergeFixtureRoot `
+            -EventName 'push' -PullRequestAction '' `
+            -BaseRevision ('0' * 40) -HeadRevision $strInheritedMergeCommit `
+            -IsNewRefRange $true -PreviousHeadRevision '' `
+            -EventHeadRevision $strInheritedMergeCommit -EventHeadDistinct 'true' `
+            -NewRefCommitCount '1' `
+            -NewRefCommitEvidenceJson (ConvertTo-Json -Compress `
+                -InputObject @($strInheritedMergeCommit))
+        $arrCreatedMergeBoundaries = @(
+            $objCreatedMergeContext.FreshnessBaseRevisions
+        )
+        if ($objCreatedMergeContext.FreshnessBaseRevision -cne '' -or
+            $arrCreatedMergeBoundaries.Count -ne 2 -or
+            $arrCreatedMergeBoundaries -cnotcontains $strAdvancedBaseCommit -or
+            $arrCreatedMergeBoundaries -cnotcontains $strMergeTopicCommit) {
+            throw 'A valid created-ref merge did not retain both authenticated boundaries.'
+        }
+        $strReorderedMergeEvidence = ConvertTo-Json -Compress -InputObject @(
+            $strInheritedMergeCommit,
+            $strMergeTopicCommit,
+            $strAdvancedBaseCommit
+        )
+        $objReorderedMergeContext = Get-MetadataEventRevisionContext `
+            -RepositoryRootPath $strMergeFixtureRoot `
+            -EventName 'push' -PullRequestAction '' `
+            -BaseRevision ('0' * 40) -HeadRevision $strInheritedMergeCommit `
+            -IsNewRefRange $true -PreviousHeadRevision '' `
+            -EventHeadRevision $strInheritedMergeCommit -EventHeadDistinct 'true' `
+            -NewRefCommitCount '3' `
+            -NewRefCommitEvidenceJson $strReorderedMergeEvidence
+        if ($objReorderedMergeContext.FreshnessBaseRevision -cne
+                $strMergeBaseCommit -or
+            @($objReorderedMergeContext.FreshnessBaseRevisions).Count -ne 1 -or
+            $objReorderedMergeContext.FreshnessBaseRevisions[0] -cne
+                $strMergeBaseCommit) {
+            throw 'Reordered exact created-ref DAG evidence was rejected or misbounded.'
+        }
         $strFutureTopicCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strMergeTopicTree `
             -Parents @($strMergeBaseCommit) `
@@ -8547,6 +9087,27 @@ if ($SelfTest) {
         }
         if (-not $boolExcessParentCountRejected) {
             throw 'An excessive metadata merge-parent count did not fail closed.'
+        }
+        $boolExcessEvidenceParentCountRejected = $false
+        try {
+            [void](Get-MetadataEventRevisionContext `
+                    -RepositoryRootPath $strMergeFixtureRoot `
+                    -EventName 'push' -PullRequestAction '' `
+                    -BaseRevision ('0' * 40) -HeadRevision $strExcessParentMerge `
+                    -IsNewRefRange $true -PreviousHeadRevision '' `
+                    -EventHeadRevision $strExcessParentMerge `
+                    -EventHeadDistinct 'true' -NewRefCommitCount '1' `
+                    -NewRefCommitEvidenceJson (ConvertTo-Json -Compress `
+                        -InputObject @($strExcessParentMerge)))
+        }
+        catch {
+            $boolExcessEvidenceParentCountRejected = $_.Exception.Message.Contains(
+                "the maximum is $intMetadataMaximumParents",
+                [StringComparison]::Ordinal
+            )
+        }
+        if (-not $boolExcessEvidenceParentCountRejected) {
+            throw 'Excessive created-ref merge-parent evidence did not fail closed.'
         }
     }
     finally {
