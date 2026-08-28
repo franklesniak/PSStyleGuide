@@ -645,12 +645,52 @@ function Read-BoundedProcessData {
 }
 
 function ConvertFrom-GitPathListData {
+    # .SYNOPSIS
+    # Decodes a NUL-delimited Git path list.
+    #
+    # .DESCRIPTION
+    # Requires strict UTF-8, a terminal NUL, nonempty path records, and unique
+    # paths by default. Commit-range path-touch output can opt into duplicates
+    # because one path can be changed by more than one commit in the same range.
+    #
+    # .PARAMETER Bytes
+    # The bounded raw bytes produced by a Git path-list command.
+    #
+    # .PARAMETER AllowDuplicatePath
+    # Allows repeated ordinal path records while retaining every other check.
+    #
+    # .EXAMPLE
+    # ConvertFrom-GitPathListData -Bytes $arrGitOutput
+    #
+    # # Returns each unique decoded tracked path.
+    #
+    # .EXAMPLE
+    # ConvertFrom-GitPathListData -Bytes $arrRangeOutput -AllowDuplicatePath
+    #
+    # # Returns repeated commit-range path touches in their original order.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [string] Zero or more decoded repository-relative paths.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
+    #
+    # Positional parameters are disabled. Internal callers must use named
+    # parameters. Version: 1.1.20260828.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
         [Parameter(Mandatory)]
         [AllowEmptyCollection()]
-        [byte[]] $Bytes
+        [byte[]] $Bytes,
+
+        [Parameter()]
+        [switch] $AllowDuplicatePath
     )
 
     if ($Bytes.Length -eq 0) {
@@ -675,7 +715,7 @@ function ConvertFrom-GitPathListData {
         $arrPathBytes = $Bytes[$intRecordStart..($intByteIndex - 1)]
         $strPath = ConvertFrom-StrictUtf8Data `
             -Bytes $arrPathBytes -DisplayName 'Git path'
-        if (-not $setPaths.Add($strPath)) {
+        if (-not $setPaths.Add($strPath) -and -not $AllowDuplicatePath) {
             throw [IO.InvalidDataException]::new('Git path list contains a duplicate path.')
         }
         $listPaths.Add($strPath)
@@ -2875,8 +2915,8 @@ function Get-PushGovernedPathApplicability {
     # .DESCRIPTION
     # Validates push endpoint identities and the exact checked-out head. Deleted
     # refs need no byte validation. New refs validate conservatively. Existing
-    # refs use an exact no-rename Git diff and require validation when any changed
-    # path belongs to an agent-instruction workflow surface.
+    # refs enumerate every path touched in the exact commit range and require
+    # validation when any touched path belongs to an instruction workflow surface.
     #
     # .PARAMETER RepositoryRootPath
     # The absolute or resolved repository root used for authenticated Git reads.
@@ -2914,7 +2954,8 @@ function Get-PushGovernedPathApplicability {
     #
     # .OUTPUTS
     # [pscustomobject] One decision with ShouldValidate, Decision, and
-    # ChangedPathCount. Decision is DELETED_REF_HAS_NO_REMAINING_BYTES,
+    # ChangedPathCount. The count includes commit-range path touches. Decision is
+    # DELETED_REF_HAS_NO_REMAINING_BYTES,
     # NEW_REF_REQUIRES_FAIL_CLOSED_VALIDATION, GOVERNED_PATH_CHANGED, or
     # EXACT_UNGOVERNED_PUSH. Invalid identities or indeterminate Git operations
     # throw terminating errors instead of returning a decision.
@@ -2925,7 +2966,7 @@ function Get-PushGovernedPathApplicability {
     # without notice.
     #
     # Positional parameters are disabled. Internal callers must use named
-    # parameters. Version: 1.1.20260827.0.
+    # parameters. Version: 1.2.20260828.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -3011,14 +3052,15 @@ function Get-PushGovernedPathApplicability {
     foreach ($strArgument in @(
             '-C',
             $RepositoryRootPath,
-            'diff',
+            'log',
+            '--format=',
             '--name-only',
             '-z',
+            '-m',
             '--no-renames',
             '--no-ext-diff',
             '--no-textconv',
-            $BaseRevision,
-            $HeadRevision,
+            "$BaseRevision..$HeadRevision",
             '--'
         )) {
         $objStartInfo.ArgumentList.Add($strArgument)
@@ -3029,14 +3071,15 @@ function Get-PushGovernedPathApplicability {
         -Process $objGitProcess `
         -MaximumBytes $intGitPathListMaximumBytes `
         -TimeoutMilliseconds 10000 `
-        -DisplayName 'Exact push changed-path enumeration'
+        -DisplayName 'Exact push range path-touch enumeration'
     if ($objProcessResult.ExitCode -ne 0) {
-        throw 'Could not enumerate the exact push changed paths.'
+        throw 'Could not enumerate the exact push range path touches.'
     }
     $arrChangedPaths = @()
     if ($null -ne $objProcessResult.Bytes) {
         $arrChangedPaths = @(ConvertFrom-GitPathListData `
-                -Bytes ([byte[]] $objProcessResult.Bytes))
+                -Bytes ([byte[]] $objProcessResult.Bytes) `
+                -AllowDuplicatePath)
     }
     foreach ($strChangedPath in $arrChangedPaths) {
         if (Test-AgentInstructionWorkflowPath `
@@ -4196,6 +4239,10 @@ function Get-GovernedDocumentRangeTransitionFailure {
     # .PARAMETER PolicyMarker
     # The ordinal marker that identifies history governed by this metadata policy.
     #
+    # .PARAMETER RequireExpectedUtcDateForRenderedChange
+    # True to require each rendered transition to use its commit's authenticated
+    # UTC date. False retains range transition checks without date equality.
+    #
     # .EXAMPLE
     # $arrFailure = @(Get-GovernedDocumentRangeTransitionFailure `
     #     -Name 'AGENTS.md' -RepositoryRootPath $strRoot `
@@ -4232,7 +4279,7 @@ function Get-GovernedDocumentRangeTransitionFailure {
     # without notice.
     #
     # Positional parameters are disabled. Internal callers must use named
-    # parameters. Version: 1.1.20260827.0.
+    # parameters. Version: 1.2.20260828.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4272,7 +4319,10 @@ function Get-GovernedDocumentRangeTransitionFailure {
         [int] $PolicyMaximumBytes,
 
         [Parameter(Mandatory)]
-        [string] $PolicyMarker
+        [string] $PolicyMarker,
+
+        [Parameter()]
+        [bool] $RequireExpectedUtcDateForRenderedChange = $false
     )
 
     if ([string]::IsNullOrEmpty($BaseRevision) -and
@@ -4443,7 +4493,9 @@ function Get-GovernedDocumentRangeTransitionFailure {
             -CommitRevision $strRangeCommit `
             -PolicyRepositoryRelativePath $PolicyRepositoryRelativePath `
             -PolicyMaximumBytes $PolicyMaximumBytes `
-            -PolicyMarker $PolicyMarker)
+            -PolicyMarker $PolicyMarker `
+            -RequireExpectedUtcDateForRenderedChange `
+                $RequireExpectedUtcDateForRenderedChange)
         foreach ($strCommitFailure in $arrCommitFailures) {
             Write-Output $strCommitFailure
         }
@@ -5223,9 +5275,12 @@ $strValidatedInputRevision = ''
 $strTrustedEventUtcDate = ''
 $boolEventRangeRequested = -not [string]::IsNullOrEmpty($RangeBaseRevision) -or
     -not [string]::IsNullOrEmpty($RangeHeadRevision)
+$boolCommitDateOnlyEvent = $EventName -ceq 'pull_request_target' -and
+    $PullRequestAction -cin @('opened', 'reopened')
 if ($boolEventRangeRequested -and
-    ([string]::IsNullOrEmpty($TrustedEventTimestamp) -or
-        [string]::IsNullOrEmpty($EventName))) {
+    ([string]::IsNullOrEmpty($EventName) -or
+        ([string]::IsNullOrEmpty($TrustedEventTimestamp) -and
+            -not $boolCommitDateOnlyEvent))) {
     throw 'A metadata event range requires a trusted GitHub event name and timestamp.'
 }
 if (-not $boolEventRangeRequested -and
@@ -5248,6 +5303,7 @@ if (-not [string]::IsNullOrEmpty($TrustedEventTimestamp)) {
 $strEventHistoryBaseRevision = $RangeBaseRevision
 $strEventFreshnessBaseRevision = ''
 $boolEvaluateEventFreshness = $false
+$boolRequireRangeCommitDateFreshness = $false
 $strPreviousTopicBaseRevision = ''
 $strPreviousTopicHeadRevision = ''
 $strCurrentTopicBaseRevision = ''
@@ -5269,6 +5325,12 @@ if ($boolEventRangeRequested -and
     $strEventHistoryBaseRevision = $objMetadataEventRevisionContext.HistoryBaseRevision
     $strEventFreshnessBaseRevision = $objMetadataEventRevisionContext.FreshnessBaseRevision
     $boolEvaluateEventFreshness = $objMetadataEventRevisionContext.EvaluateFreshness
+    $boolRequireRangeCommitDateFreshness =
+        ($EventName -ceq 'push' -and $EventHeadDistinct -ceq 'false' -and
+            -not $RangeIsNewRef) -or $boolCommitDateOnlyEvent
+    if ($boolCommitDateOnlyEvent) {
+        $boolEvaluateEventFreshness = $false
+    }
     $strPreviousTopicBaseRevision = $objMetadataEventRevisionContext.PreviousTopicBaseRevision
     $strPreviousTopicHeadRevision = $objMetadataEventRevisionContext.PreviousTopicHeadRevision
     $strCurrentTopicBaseRevision = $objMetadataEventRevisionContext.CurrentTopicBaseRevision
@@ -5590,9 +5652,12 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
                 -IsNewRefRange ([bool]$RangeIsNewRef) `
                 -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
                 -PolicyMaximumBytes $intValidatorMaximumInputBytes `
-                -PolicyMarker $strMetadataRangePolicyMarker)
+                -PolicyMarker $strMetadataRangePolicyMarker `
+                -RequireExpectedUtcDateForRenderedChange `
+                    $boolRequireRangeCommitDateFreshness)
     }
-    if ($EventName -ceq 'push' -and $EventHeadDistinct -ceq 'false') {
+    if ($EventName -ceq 'push' -and $EventHeadDistinct -ceq 'false' -and
+        $RangeIsNewRef) {
         $arrRepositoryFailures += @(Get-GovernedDocumentCommitTransitionFailure `
                 -Name $objDocumentContext.Path `
                 -RepositoryRootPath $strRepositoryRootPath `
@@ -7017,6 +7082,25 @@ if ($SelfTest) {
                 'M 100644 inline zzzz/AGENTS.md',
                 'data 0',
                 '',
+                'commit refs/heads/restore-change',
+                'mark :6',
+                'author Fixture <fixture@example.invalid> 1700000005 +0000',
+                'committer Fixture <fixture@example.invalid> 1700000005 +0000',
+                'data 14',
+                'restore change',
+                'from :1',
+                'M 100644 inline AGENTS.md',
+                'data 0',
+                '',
+                'commit refs/heads/restore',
+                'mark :7',
+                'author Fixture <fixture@example.invalid> 1700000006 +0000',
+                'committer Fixture <fixture@example.invalid> 1700000006 +0000',
+                'data 7',
+                'restore',
+                'from :6',
+                'D AGENTS.md',
+                '',
                 'done'
             )) {
             [void]$objFastImportText.AppendLine($strTrailerLine)
@@ -7079,6 +7163,9 @@ if ($SelfTest) {
         $strPushDivergentCommit = [string] (
             & git -C $strPushFixtureRoot rev-parse refs/heads/divergent
         )
+        $strPushRestoreCommit = [string] (
+            & git -C $strPushFixtureRoot rev-parse refs/heads/restore
+        )
         if ($LASTEXITCODE -ne 0) {
             throw 'Could not resolve the push-applicability fixture commits.'
         }
@@ -7087,6 +7174,7 @@ if ($SelfTest) {
         $strPushGovernedCommit = $strPushGovernedCommit.Trim()
         $strPushMultiCommit = $strPushMultiCommit.Trim()
         $strPushDivergentCommit = $strPushDivergentCommit.Trim()
+        $strPushRestoreCommit = $strPushRestoreCommit.Trim()
 
         $strMultiCommitEvidenceJson = ConvertTo-Json -Compress -InputObject @(
             $strPushUngovernedCommit,
@@ -7172,6 +7260,18 @@ if ($SelfTest) {
             throw 'A divergent governed push did not use exact endpoint trees.'
         }
 
+        & git -C $strPushFixtureRoot update-ref HEAD $strPushRestoreCommit
+        $objRestorePushApplicability = Get-PushGovernedPathApplicability `
+            -RepositoryRootPath $strPushFixtureRoot `
+            -BaseRevision $strPushBaseCommit `
+            -HeadRevision $strPushRestoreCommit `
+            -IsNewRef $false -IsDeletedRef $false
+        if (-not $objRestorePushApplicability.ShouldValidate -or
+            $objRestorePushApplicability.ChangedPathCount -ne 2) {
+            throw 'A governed change-then-restore push escaped range applicability.'
+        }
+
+        & git -C $strPushFixtureRoot update-ref HEAD $strPushDivergentCommit
         $boolMissingPushEndpointRejected = $false
         try {
             [void](Get-PushGovernedPathApplicability `
@@ -7605,7 +7705,11 @@ if ($SelfTest) {
             return $strFixtureCommit.Trim()
         }
         $scriptBlockGetMergeRangeFailure = {
-            param([string] $Base, [string] $Head)
+            param(
+                [string] $Base,
+                [string] $Head,
+                [bool] $RequireCommitDate = $false
+            )
             Get-GovernedDocumentRangeTransitionFailure -Name 'AGENTS.md' `
                 -RepositoryRootPath $strMergeFixtureRoot `
                 -RepositoryRelativePath 'AGENTS.md' `
@@ -7613,7 +7717,8 @@ if ($SelfTest) {
                 -BaseRevision $Base -HeadRevision $Head -InputRevision $Head `
                 -IsNewRefRange $false `
                 -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
-                -PolicyMaximumBytes 1024 -PolicyMarker $strMetadataRangePolicyMarker
+                -PolicyMaximumBytes 1024 -PolicyMarker $strMetadataRangePolicyMarker `
+                -RequireExpectedUtcDateForRenderedChange $RequireCommitDate
         }
         $scriptBlockGetDirectFailure = {
             param([string] $Commit)
@@ -7790,6 +7895,11 @@ if ($SelfTest) {
             -Parents @($strMergeBaseCommit) `
             -Timestamp ($strMergeCurrentDate + 'T00:00:00Z') `
             -Message 'merge fixture advanced base'
+        $strAdvancedBaseDescendant = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strAdvancedBaseTree `
+            -Parents @($strAdvancedBaseCommit) `
+            -Timestamp ($strMergeCurrentDate + 'T00:00:01Z') `
+            -Message 'merge fixture unchanged advanced-base descendant'
         & git -C $strMergeFixtureRoot read-tree $strMergeBaseTree
         $strBaseOnlyTrustBlob = [string] (
             'base-only trust-root fixture' |
@@ -7829,6 +7939,13 @@ if ($SelfTest) {
                 "Last Updated must be $strMergeCurrentDate") {
             throw 'A non-distinct governed change escaped commit-date freshness.'
         }
+        $arrNonDistinctRangeFailures = @(& $scriptBlockGetMergeRangeFailure `
+                -Base $strMergeBaseCommit -Head $strAdvancedBaseDescendant `
+                -RequireCommitDate $true)
+        if (($arrNonDistinctRangeFailures -join "`n") -cnotmatch
+                "Last Updated must be $strMergeCurrentDate") {
+            throw 'An earlier non-distinct range transition escaped commit-date freshness.'
+        }
         foreach ($objDirectPassingFixture in @(
                 [pscustomobject]@{ Commit = $strMergeTopicCommit; Name = 'matching metadata' },
                 [pscustomobject]@{ Commit = $strSynchronizedTopicCommit; Name = 'unchanged head' }
@@ -7848,17 +7965,13 @@ if ($SelfTest) {
                 -EventHeadRevision '' -EventHeadDistinct ''
             if ($objHistoryOnlyContext.HistoryBaseRevision -cne $strMergeBaseCommit -or
                 $objHistoryOnlyContext.FreshnessBaseRevision -cne $strMergeBaseCommit) {
-                throw "$strHistoryOnlyAction did not use bounded merge-base freshness."
+                throw "$strHistoryOnlyAction did not use its bounded merge base."
             }
-            $arrInitialFreshnessFailures = @(
-                Get-CurrentInputMetadataFreshnessFailure `
-                    -Name 'AGENTS.md' `
-                    -CurrentContent $strMergeTopicContent `
-                    -BaseContent $strMergeBaseContent `
-                    -TrustedEventUtcDate $strMergeCurrentDate
-            )
-            if ($arrInitialFreshnessFailures.Count -ne 1) {
-                throw "$strHistoryOnlyAction accepted stale initial-event metadata."
+            $arrInitialFreshnessFailures = @(& $scriptBlockGetMergeRangeFailure `
+                    -Base $objHistoryOnlyContext.HistoryBaseRevision `
+                    -Head $strSynchronizedTopicCommit -RequireCommitDate $true)
+            if ($arrInitialFreshnessFailures.Count -ne 0) {
+                throw "$strHistoryOnlyAction rejected correctly dated commit metadata."
             }
         }
         $objEditedContext = Get-MetadataEventRevisionContext `
