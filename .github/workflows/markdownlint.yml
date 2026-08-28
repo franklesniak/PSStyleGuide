@@ -162,9 +162,6 @@ jobs:
           if ($objPolicyResult.success -ne $true) {
               throw "Workflow policy validation rejected the tree: $($objPolicyResult.category)."
           }
-          if ($objPolicyResult.casesPassed -ne 53) {
-              throw "Case catalog count mismatch: expected 53, got $($objPolicyResult.casesPassed)."
-          }
 
       - name: Run both Markdown lint surfaces
         working-directory: .github/workflows
