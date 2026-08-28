@@ -1,4 +1,13 @@
+<!-- markdownlint-disable MD013 -->
 # Nested Markdown Linting Implementation Summary
+
+## Metadata
+
+- **Status:** Active
+- **Owner:** Repository Maintainers
+- **Last Updated:** 2026-08-28
+- **Scope:** Describes the implemented nested-Markdown lint pipeline, its dependencies, workflow integration, behavior, and validation. It does not define general Markdown authoring rules.
+- **Related:** [Scripts Directory](scripts-README.md), [Documentation Writing Style](../instructions/docs.instructions.md)
 
 ## Overview
 

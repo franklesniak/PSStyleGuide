@@ -1,13 +1,13 @@
 <!-- markdownlint-disable MD013 -->
 # Agent Instructions for OpenAI Codex CLI
 
-**Version:** 1.5.20260827.0
+**Version:** 1.5.20260828.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository maintainer (@franklesniak)
-- **Last Updated:** 2026-08-27
+- **Last Updated:** 2026-08-28
 - **Scope:** Agent-specific entry point for OpenAI Codex CLI and compatible AI coding agents operating in PSStyleGuide. Mirrors a minimal inline summary of the highest-priority shared rules; `.github/copilot-instructions.md` remains the canonical documentation-authoring source of truth.
 <!-- template-sync: begin markdown-reference-only -->
 - **Related:** [Repository Copilot Instructions](.github/copilot-instructions.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
@@ -55,7 +55,8 @@ During downstream template adoption and stack selection, perform non-protected c
   - Respect allowlisted file access boundaries; reject path traversal and symlink escapes.
 
 - **Pre-commit and validation**
-  - Run `npm run bootstrap:agent-instructions` once after each fresh clone or lockfile change. This installs the locked Node.js dependencies required by the system-language hook.
+  - Install Python 3.12 before validation. On Windows, use `py -3.12`; otherwise, expose `python3.12`, `python3`, or `python` on `PATH` as Python 3.12.
+  - Run `npm run bootstrap:agent-instructions` once after each fresh clone or lockfile change. This installs only the locked Node.js dependencies required by the system-language hook.
   - Run `pre-commit run --all-files` before every commit.
   - Include all auto-fixes in the same commit as the related change.
   - Do not push code when pre-commit or required validation checks are failing; fix issues and re-run until the checks pass.

@@ -75,7 +75,7 @@
 # This validator keeps explicit backtick continuations so that large
 # named-parameter mutation calls remain auditable one argument per line.
 # Private helpers have focused examples. The -SelfTest suite covers edge cases.
-# Version: 1.7.20260828.1
+# Version: 1.7.20260828.2
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -154,6 +154,14 @@ $intHistoricalPolicyMarkerMaximumBytes = 524288
 $intGitPathListMaximumBytes = 1048576
 $intMetadataMaximumParents = 64
 $strMetadataRangePolicyMarker = 'metadata-range-transition-policy-v1'
+$strLintGuideMetadataPolicyMarker =
+    'operational-lint-guide-metadata-policy-v1'
+$strPythonPrerequisite =
+    'Python 3.12 is required to validate .codex/config.toml. On Windows, ' +
+    'install the Python launcher for `py -3.12`; otherwise, expose ' +
+    '`python3.12`, `python3`, or `python` on PATH.'
+$script:useWindowsPythonLauncher = $IsWindows
+$script:pythonPathNames = @('python3.12', 'python3', 'python')
 $script:objValidationUtcNow = [DateTimeOffset]::UtcNow
 $script:strMaximumMetadataUtcDate = $script:objValidationUtcNow.ToString('yyyy-MM-dd')
 $script:objMaximumCommitUtcTimestamp = $script:objValidationUtcNow.AddMinutes(5)
@@ -161,6 +169,10 @@ $script:arrCheckoutAttributePaths = @(
     '.gitattributes',
     '.github/.gitattributes',
     '.github/workflows/.gitattributes'
+)
+$script:arrOperationalLintGuidePaths = @(
+    '.github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md',
+    '.github/workflows/scripts-README.md'
 )
 $script:arrTrustRootPaths = @(
     $script:arrCheckoutAttributePaths
@@ -177,6 +189,7 @@ $script:arrGovernedInstructionRootPaths = @(
 )
 $script:arrPushGovernedExactPaths = @(
     $script:arrCheckoutAttributePaths
+    $script:arrOperationalLintGuidePaths
     '.codex/config.toml',
     '.github/workflows/Test-AgentInstructionParserManifest.mjs',
     '.github/workflows/Test-AgentInstructions.ps1',
@@ -190,7 +203,7 @@ $script:arrPushGovernedExactPaths = @(
 )
 $script:strDecisionRecordPathPattern =
     '^docs/decisions/[0-9]{4}-[a-z0-9]+(?:-[a-z0-9]+)*\.md$'
-$script:strDecisionRecordDirectoryPathPattern = '^docs/decisions/[^/]+$'
+$script:strDecisionRecordDirectoryPathPattern = '^docs/decisions/.+$'
 $script:strStandingPlacementAuthorization =
     'No additional per-round, per-session, or PR-specific direct-push authorization from the owner is required.'
 $script:arrPlacementStructuralLiterals = @(
@@ -1133,10 +1146,8 @@ function Get-TomlParseContext {
     # Gets a safe typed TOML parse context.
     #
     # .DESCRIPTION
-    # Runs the trusted Python 3.12 TOML parser once in isolated mode. It returns
-    # a fixed JSON projection of the root capacity, GitHub plugin enablement,
-    # and parser-confirmed identities of the first three semantic statements.
-    # PowerShell validates that projection before returning typed values.
+    # Resolves Python 3.12, parses in isolated mode, and validates a fixed JSON
+    # projection of the required TOML values and statement positions.
     #
     # .PARAMETER Content
     # The TOML text to validate.
@@ -1144,7 +1155,7 @@ function Get-TomlParseContext {
     # .EXAMPLE
     # Get-TomlParseContext -Content 'project_doc_max_bytes = 65536'
     #
-    # # Returns typed capacity and plugin context for valid TOML.
+    # # Returns typed context for valid TOML.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
@@ -1154,7 +1165,7 @@ function Get-TomlParseContext {
     #
     # .NOTES
     # Private helper; no positional parameters.
-    # Version: 1.2.20260820.0
+    # Version: 1.3.20260828.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -1180,93 +1191,92 @@ function Get-TomlParseContext {
         PluginEnabledValueLength = 0
     }
 
-    $strPythonPath = if ($IsWindows) {
-        Join-Path `
-            -Path ([System.Environment]::GetFolderPath(
-                [System.Environment+SpecialFolder]::Windows
-            )) `
-            -ChildPath 'py.exe'
+    $listPythonCandidates = [Collections.Generic.List[pscustomobject]]::new()
+    if ($IsWindows -and $script:useWindowsPythonLauncher) {
+        $strLauncher = Join-Path ([Environment]::GetFolderPath(
+                [Environment+SpecialFolder]::Windows)) 'py.exe'
+        if (Test-Path -LiteralPath $strLauncher -PathType Leaf) {
+            $listPythonCandidates.Add([pscustomobject]@{
+                    Path = $strLauncher; Arguments = [string[]] @('-3.12') })
+        }
     }
-    else {
-        '/usr/bin/python3'
+    foreach ($strName in $script:pythonPathNames) {
+        $objCommand = Get-Command -Name $strName -CommandType Application `
+            -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($null -ne $objCommand) {
+            $listPythonCandidates.Add([pscustomobject]@{
+                    Path = [IO.Path]::GetFullPath([string] $objCommand.Source)
+                    Arguments = [string[]] @() })
+        }
     }
-    if (-not (Test-Path -LiteralPath $strPythonPath -PathType Leaf)) {
-        $objContext.Failure =
-            'A trusted Python 3.12 interpreter is required to validate .codex/config.toml.'
+    $objPythonCommand = $null
+    $setPythonPaths = [Collections.Generic.HashSet[string]]::new($(if ($IsWindows) {
+                [StringComparer]::OrdinalIgnoreCase
+            } else { [StringComparer]::Ordinal }))
+    foreach ($objCandidate in $listPythonCandidates) {
+        if (-not $setPythonPaths.Add($objCandidate.Path)) { continue }
+        $objProbeInfo = [Diagnostics.ProcessStartInfo]::new($objCandidate.Path)
+        $objProbeInfo.UseShellExecute = $false
+        $objProbeInfo.CreateNoWindow = $true
+        $objProbeInfo.RedirectStandardOutput = $true
+        $objProbeInfo.RedirectStandardError = $true
+        foreach ($strArgument in @($objCandidate.Arguments) + @(
+                '-I', '-S', '-c',
+                'import sys;sys.stdout.write("3.12" if sys.version_info[:2]==(3,12) else "")'
+            )) { $objProbeInfo.ArgumentList.Add($strArgument) }
+        $objProbe = [Diagnostics.Process]::new()
+        $objProbe.StartInfo = $objProbeInfo
+        try {
+            $objProbeResult = Read-BoundedProcessData -Process $objProbe `
+                -MaximumBytes 4 -TimeoutMilliseconds 5000 `
+                -DisplayName 'Python 3.12 prerequisite probe'
+            if ($objProbeResult.ExitCode -eq 0 -and
+                [Text.Encoding]::UTF8.GetString($objProbeResult.Bytes) -ceq '3.12') {
+                $objPythonCommand = $objCandidate
+                break
+            }
+        } catch { continue }
+    }
+    if ($null -eq $objPythonCommand) {
+        $objContext.Failure = $strPythonPrerequisite
         return [pscustomobject]$objContext
     }
+    $strPythonPath = $objPythonCommand.Path
 
-    $strPythonProgram = @(
-        'import json, re, sys, tomllib'
-        'content = sys.stdin.read()'
-        'data = tomllib.loads(content)'
-        'semantic_lines = []'
-        'semantic_ends = []'
-        'offset = 0'
-        'for line in content.splitlines(keepends=True):'
-        '    text = line[:-2] if line.endswith("\r\n") else line[:-1] if line.endswith("\n") else line'
-        '    stripped = text.lstrip()'
-        '    offset += len(line)'
-        '    if stripped and not stripped.startswith("#"):'
-        '        semantic_lines.append(text)'
-        '        semantic_ends.append(offset)'
-        'def parse_prefix(statement_count):'
-        '    if len(semantic_ends) < statement_count:'
-        '        return None'
-        '    try:'
-        '        return tomllib.loads(content[:semantic_ends[statement_count - 1]])'
-        '    except tomllib.TOMLDecodeError:'
-        '        return None'
-        'prefix_one = parse_prefix(1)'
-        'prefix_two = parse_prefix(2)'
-        'prefix_three = parse_prefix(3)'
-        'capacity_is_first = isinstance(prefix_one, dict) and set(prefix_one) == {"project_doc_max_bytes"}'
-        'prefix_two_plugins = prefix_two.get("plugins") if isinstance(prefix_two, dict) else None'
-        'prefix_two_plugin = prefix_two_plugins.get("github@openai-curated") if isinstance(prefix_two_plugins, dict) else None'
-        'second_is_table_header = len(semantic_lines) > 1 and semantic_lines[1].lstrip().startswith("[") and not semantic_lines[1].lstrip().startswith("[[")'
-        'plugin_header_is_second = capacity_is_first and second_is_table_header and isinstance(prefix_two, dict) and set(prefix_two) == {"project_doc_max_bytes", "plugins"} and isinstance(prefix_two_plugins, dict) and set(prefix_two_plugins) == {"github@openai-curated"} and prefix_two_plugin == {}'
-        'prefix_three_plugins = prefix_three.get("plugins") if isinstance(prefix_three, dict) else None'
-        'prefix_three_plugin = prefix_three_plugins.get("github@openai-curated") if isinstance(prefix_three_plugins, dict) else None'
-        'third_is_assignment = len(semantic_lines) > 2 and not semantic_lines[2].lstrip().startswith("[")'
-        'plugin_enablement_is_third = plugin_header_is_second and third_is_assignment and isinstance(prefix_three, dict) and set(prefix_three) == {"project_doc_max_bytes", "plugins"} and isinstance(prefix_three_plugins, dict) and set(prefix_three_plugins) == {"github@openai-curated"} and isinstance(prefix_three_plugin, dict) and set(prefix_three_plugin) == {"enabled"} and type(prefix_three_plugin.get("enabled")) is bool'
-        'enabled_value_statement_offset = -1'
-        'enabled_value_length = 0'
-        'if plugin_enablement_is_third:'
-        '    separator = semantic_lines[2].find("=")'
-        '    value_match = re.fullmatch(r"\s*(true|false)\s*(?:#.*)?", semantic_lines[2][separator + 1:]) if separator >= 0 else None'
-        '    if value_match is None:'
-        '        plugin_enablement_is_third = False'
-        '    else:'
-        '        enabled_value_statement_offset = separator + 1 + value_match.start(1)'
-        '        enabled_value_length = len(value_match.group(1))'
-        'capacity_present = "project_doc_max_bytes" in data'
-        'capacity = data.get("project_doc_max_bytes")'
-        'plugins = data.get("plugins")'
-        'plugin_table_present = isinstance(plugins, dict) and "github@openai-curated" in plugins'
-        'plugin_table = plugins.get("github@openai-curated") if plugin_table_present else None'
-        'plugin_enabled_present = isinstance(plugin_table, dict) and "enabled" in plugin_table'
-        'plugin_enabled = plugin_table.get("enabled") if plugin_enabled_present else None'
-        'context = {'
-        '    "capacity_present": capacity_present,'
-        '    "capacity_type": type(capacity).__name__ if capacity_present else "missing",'
-        '    "capacity_value": str(capacity) if type(capacity) is int else None,'
-        '    "plugin_table_present": plugin_table_present,'
-        '    "plugin_table_type": type(plugin_table).__name__ if plugin_table_present else "missing",'
-        '    "plugin_enabled_present": plugin_enabled_present,'
-        '    "plugin_enabled_type": type(plugin_enabled).__name__ if plugin_enabled_present else "missing",'
-        '    "plugin_enabled_value": plugin_enabled if type(plugin_enabled) is bool else None,'
-        '    "capacity_is_first_statement": capacity_is_first,'
-        '    "plugin_header_is_second_statement": plugin_header_is_second,'
-        '    "plugin_enablement_is_third_statement": plugin_enablement_is_third,'
-        '    "plugin_enabled_value_statement_offset": enabled_value_statement_offset,'
-        '    "plugin_enabled_value_length": enabled_value_length,'
-        '}'
-        'print(json.dumps(context, separators=(",", ":"), sort_keys=True))'
-    ) -join "`n"
+    $strPythonProgram = @'
+import json,re,sys
+if sys.version_info[:2]!=(3,12):sys.exit(78)
+import tomllib
+c=sys.stdin.read();d=tomllib.loads(c);l=[];e=[];o=0
+for x in c.splitlines(keepends=True):
+ t=x[:-2] if x.endswith("\r\n") else x[:-1] if x.endswith("\n") else x;o+=len(x);s=t.lstrip()
+ if s and not s.startswith("#"):l.append(t);e.append(o)
+def p(n):
+ if len(e)<n:return None
+ try:return tomllib.loads(c[:e[n-1]])
+ except tomllib.TOMLDecodeError:return None
+def g(x,k):return x.get(k) if type(x)is dict else None
+a=p(1);b=p(2);f=p(3);a1=type(a)is dict and set(a)=={"project_doc_max_bytes"}
+bp=g(b,"plugins");bt=g(bp,"github@openai-curated")
+h=len(l)>1 and l[1].lstrip().startswith("[") and not l[1].lstrip().startswith("[[")
+h=a1 and h and type(b)is dict and set(b)=={"project_doc_max_bytes","plugins"} and type(bp)is dict and set(bp)=={"github@openai-curated"} and bt=={}
+fp=g(f,"plugins");ft=g(fp,"github@openai-curated")
+v=len(l)>2 and not l[2].lstrip().startswith("[")
+v=h and v and type(f)is dict and set(f)=={"project_doc_max_bytes","plugins"} and type(fp)is dict and set(fp)=={"github@openai-curated"} and type(ft)is dict and set(ft)=={"enabled"} and type(ft.get("enabled"))is bool
+vo=-1;vl=0
+if v:
+ q=l[2].find("=");m=re.fullmatch(r"\s*(true|false)\s*(?:#.*)?",l[2][q+1:]) if q>=0 else None
+ if m is None:v=False
+ else:vo=q+1+m.start(1);vl=len(m.group(1))
+cp="project_doc_max_bytes" in d;cv=d.get("project_doc_max_bytes");ps=d.get("plugins");tb=g(ps,"github@openai-curated")
+tp=type(ps)is dict and "github@openai-curated" in ps;ep=type(tb)is dict and "enabled" in tb;ev=g(tb,"enabled")
+r=dict(a=cp,b=type(cv).__name__ if cp else "missing",c=str(cv) if type(cv)is int else None,d=tp,e=type(tb).__name__ if tp else "missing",f=ep,g=type(ev).__name__ if ep else "missing",h=ev if type(ev)is bool else None,i=a1,j=h,k=v,l=vo,m=vl)
+print(json.dumps(r,separators=(",",":"),sort_keys=True))
+'@
 
     $arrPythonArguments = [Collections.Generic.List[string]]::new()
-    if ($IsWindows) {
-        $arrPythonArguments.Add('-3.12')
+    foreach ($strPythonArgument in $objPythonCommand.Arguments) {
+        $arrPythonArguments.Add($strPythonArgument)
     }
     foreach ($strPythonArgument in @(
             '-I',
@@ -1296,8 +1306,7 @@ function Get-TomlParseContext {
     $objParserProcess.StartInfo = $objStartInfo
     try {
         if (-not $objParserProcess.Start()) {
-            $objContext.Failure =
-                'A trusted Python 3.12 interpreter is required to validate .codex/config.toml.'
+            $objContext.Failure = $strPythonPrerequisite
             return [pscustomobject]$objContext
         }
 
@@ -1315,7 +1324,12 @@ function Get-TomlParseContext {
         $strParserOutput = $objStandardOutputTask.GetAwaiter().GetResult()
         $strParserError = $objStandardErrorTask.GetAwaiter().GetResult()
         if ($objParserProcess.ExitCode -ne 0) {
-            $objContext.Failure = 'The project configuration must contain valid TOML.'
+            $objContext.Failure = if ($objParserProcess.ExitCode -eq 78) {
+                $strPythonPrerequisite
+            }
+            else {
+                'The project configuration must contain valid TOML.'
+            }
             return [pscustomobject]$objContext
         }
         if (-not [string]::IsNullOrEmpty($strParserError)) {
@@ -1324,8 +1338,7 @@ function Get-TomlParseContext {
         }
     }
     catch {
-        $objContext.Failure =
-            'A trusted Python 3.12 interpreter is required to validate .codex/config.toml.'
+        $objContext.Failure = $strPythonPrerequisite
         return [pscustomobject]$objContext
     }
     finally {
@@ -1345,60 +1358,35 @@ function Get-TomlParseContext {
         return [pscustomobject]$objContext
     }
 
-    $arrExpectedProperties = @(
-        'capacity_present',
-        'capacity_type',
-        'capacity_value',
-        'plugin_table_present',
-        'plugin_table_type',
-        'plugin_enabled_present',
-        'plugin_enabled_type',
-        'plugin_enabled_value',
-        'capacity_is_first_statement',
-        'plugin_header_is_second_statement',
-        'plugin_enablement_is_third_statement',
-        'plugin_enabled_value_statement_offset',
-        'plugin_enabled_value_length'
-    )
+    $arrExpectedProperties = @('a', 'b', 'c', 'd', 'e', 'f', 'g',
+        'h', 'i', 'j', 'k', 'l', 'm')
     $arrActualProperties = @($objParserContext.PSObject.Properties.Name)
     if ($arrActualProperties.Count -ne $arrExpectedProperties.Count -or
         @(Compare-Object $arrExpectedProperties $arrActualProperties).Count -ne 0 -or
-        $objParserContext.capacity_present -isnot [bool] -or
-        $objParserContext.capacity_type -isnot [string] -or
-        ($null -ne $objParserContext.capacity_value -and
-            $objParserContext.capacity_value -isnot [string]) -or
-        $objParserContext.plugin_table_present -isnot [bool] -or
-        $objParserContext.plugin_table_type -isnot [string] -or
-        $objParserContext.plugin_enabled_present -isnot [bool] -or
-        $objParserContext.plugin_enabled_type -isnot [string] -or
-        ($null -ne $objParserContext.plugin_enabled_value -and
-            $objParserContext.plugin_enabled_value -isnot [bool]) -or
-        $objParserContext.capacity_is_first_statement -isnot [bool] -or
-        $objParserContext.plugin_header_is_second_statement -isnot [bool] -or
-        $objParserContext.plugin_enablement_is_third_statement -isnot [bool] -or
-        $objParserContext.plugin_enabled_value_statement_offset -isnot [int64] -or
-        $objParserContext.plugin_enabled_value_length -isnot [int64] -or
-        $objParserContext.plugin_enabled_value_statement_offset -lt -1 -or
-        $objParserContext.plugin_enabled_value_statement_offset -gt $Content.Length -or
-        $objParserContext.plugin_enabled_value_length -lt 0 -or
-        $objParserContext.plugin_enabled_value_length -gt 5 -or
-        ($objParserContext.plugin_enablement_is_third_statement -and
-            ($objParserContext.plugin_enabled_value_statement_offset -lt 0 -or
-                $objParserContext.plugin_enabled_value_length -notin @(4, 5))) -or
-        (-not $objParserContext.plugin_enablement_is_third_statement -and
-            ($objParserContext.plugin_enabled_value_statement_offset -ne -1 -or
-                $objParserContext.plugin_enabled_value_length -ne 0))) {
+        $objParserContext.a -isnot [bool] -or $objParserContext.b -isnot [string] -or
+        ($null -ne $objParserContext.c -and $objParserContext.c -isnot [string]) -or
+        $objParserContext.d -isnot [bool] -or $objParserContext.e -isnot [string] -or
+        $objParserContext.f -isnot [bool] -or $objParserContext.g -isnot [string] -or
+        ($null -ne $objParserContext.h -and $objParserContext.h -isnot [bool]) -or
+        $objParserContext.i -isnot [bool] -or $objParserContext.j -isnot [bool] -or
+        $objParserContext.k -isnot [bool] -or $objParserContext.l -isnot [int64] -or
+        $objParserContext.m -isnot [int64] -or $objParserContext.l -lt -1 -or
+        $objParserContext.l -gt $Content.Length -or $objParserContext.m -lt 0 -or
+        $objParserContext.m -gt 5 -or
+        ($objParserContext.k -and ($objParserContext.l -lt 0 -or
+                $objParserContext.m -notin @(4, 5))) -or
+        (-not $objParserContext.k -and ($objParserContext.l -ne -1 -or
+                $objParserContext.m -ne 0))) {
         $objContext.Failure = 'The trusted TOML parser returned invalid typed context.'
         return [pscustomobject]$objContext
     }
 
-    $objContext.CapacityPresent = $objParserContext.capacity_present
-    $objContext.CapacityType = $objParserContext.capacity_type
-    if ($objParserContext.capacity_type -ceq 'int' -and
-        $objParserContext.capacity_value -is [string]) {
+    $objContext.CapacityPresent = $objParserContext.a
+    $objContext.CapacityType = $objParserContext.b
+    if ($objParserContext.b -ceq 'int' -and $objParserContext.c -is [string]) {
         $intCapacityValue = [int64]0
         $objContext.CapacityFitsInt64 = [int64]::TryParse(
-            $objParserContext.capacity_value,
+            $objParserContext.c,
             [System.Globalization.NumberStyles]::AllowLeadingSign,
             [System.Globalization.CultureInfo]::InvariantCulture,
             [ref] $intCapacityValue
@@ -1407,22 +1395,18 @@ function Get-TomlParseContext {
             $objContext.CapacityValue = $intCapacityValue
         }
     }
-    $objContext.PluginTablePresent = $objParserContext.plugin_table_present
-    $objContext.PluginTableType = $objParserContext.plugin_table_type
-    $objContext.PluginEnabledPresent = $objParserContext.plugin_enabled_present
-    $objContext.PluginEnabledType = $objParserContext.plugin_enabled_type
-    if ($objParserContext.plugin_enabled_value -is [bool]) {
-        $objContext.PluginEnabledValue = $objParserContext.plugin_enabled_value
+    $objContext.PluginTablePresent = $objParserContext.d
+    $objContext.PluginTableType = $objParserContext.e
+    $objContext.PluginEnabledPresent = $objParserContext.f
+    $objContext.PluginEnabledType = $objParserContext.g
+    if ($objParserContext.h -is [bool]) {
+        $objContext.PluginEnabledValue = $objParserContext.h
     }
-    $objContext.CapacityIsFirstStatement = $objParserContext.capacity_is_first_statement
-    $objContext.PluginHeaderIsSecondStatement =
-        $objParserContext.plugin_header_is_second_statement
-    $objContext.PluginEnablementIsThirdStatement =
-        $objParserContext.plugin_enablement_is_third_statement
-    $objContext.PluginEnabledValueStatementOffset =
-        [int]$objParserContext.plugin_enabled_value_statement_offset
-    $objContext.PluginEnabledValueLength =
-        [int]$objParserContext.plugin_enabled_value_length
+    $objContext.CapacityIsFirstStatement = $objParserContext.i
+    $objContext.PluginHeaderIsSecondStatement = $objParserContext.j
+    $objContext.PluginEnablementIsThirdStatement = $objParserContext.k
+    $objContext.PluginEnabledValueStatementOffset = [int]$objParserContext.l
+    $objContext.PluginEnabledValueLength = [int]$objParserContext.m
 
     return [pscustomobject]$objContext
 }
@@ -2335,7 +2319,7 @@ function Get-LastUpdatedMetadataFreshnessFailure {
     param(
         [Parameter(Mandatory)][string] $Name,
         [Parameter(Mandatory)][string] $CurrentContent,
-        [Parameter()][AllowNull()][string] $BaseContent,
+        [Parameter()][AllowNull()][object] $BaseContent,
         [Parameter(Mandatory)][AllowEmptyString()][string] $TrustedEventUtcDate
     )
 
@@ -5180,6 +5164,16 @@ $arrGovernedMetadataDocuments = @($arrGovernedInstructionDocuments) + @(
         RequiresVersion = $false
     }
 )
+$arrGovernedMetadataDocuments += @(
+    $script:arrOperationalLintGuidePaths | ForEach-Object {
+        [pscustomobject]@{
+        Path = $_
+        MaximumBytes = $intInstructionDocumentMaximumInputBytes
+        RequiresMetadata = $true
+        RequiresVersion = $false
+        }
+    }
+)
 $strValidatedInputRevision = ''
 $strTrustedEventUtcDate = ''
 $boolEventRangeRequested = -not [string]::IsNullOrEmpty($RangeBaseRevision) -or
@@ -5474,15 +5468,29 @@ foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
         -RepositoryRelativePath $objDocumentSpec.Path `
         -MaximumBytes $objDocumentSpec.MaximumBytes `
         -Revision $strValidatedInputRevision
+    $strDocumentPolicyMarker = if (
+        $objDocumentSpec.Path -in $script:arrOperationalLintGuidePaths) {
+        $strLintGuideMetadataPolicyMarker
+    } else {
+        $strMetadataRangePolicyMarker
+    }
+    $boolParentPolicyApplies = Test-HistoricalPolicyMarker `
+        -RepositoryRootPath $strRepositoryRootPath `
+        -Revision $objParentContext.ParentRevision `
+        -RepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
+        -Literal $strDocumentPolicyMarker
     $listGovernedDocumentContexts.Add([pscustomobject]@{
             Path = $objDocumentSpec.Path
             MaximumBytes = $objDocumentSpec.MaximumBytes
             Content = $hashtableGovernedInstructionContent[$objDocumentSpec.Path]
-            ParentContent = $objParentContext.ParentContent
+            ParentContent = if ($boolParentPolicyApplies) {
+                $objParentContext.ParentContent
+            } else { $null }
             ExpectedUtcDate = $objParentContext.ExpectedUtcDate
             IsWorktreeTransition = $objParentContext.IsWorktreeTransition
             RequiresMetadata = $objDocumentSpec.RequiresMetadata
             RequiresVersion = $objDocumentSpec.RequiresVersion
+            PolicyMarker = $strDocumentPolicyMarker
         })
 }
 
@@ -5594,7 +5602,7 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
                     -CommitRevision $strNoRangeCommitRevision `
                     -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
                     -PolicyMaximumBytes $intValidatorMaximumInputBytes `
-                    -PolicyMarker $strMetadataRangePolicyMarker)
+                    -PolicyMarker $objDocumentContext.PolicyMarker)
         }
     }
     $arrRepositoryFailures += @(Get-GovernedDocumentRangeTransitionFailure `
@@ -5608,7 +5616,7 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
             -IsNewRefRange ([bool]$RangeIsNewRef) `
             -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
             -PolicyMaximumBytes $intValidatorMaximumInputBytes `
-            -PolicyMarker $strMetadataRangePolicyMarker `
+            -PolicyMarker $objDocumentContext.PolicyMarker `
             -RequireExpectedUtcDateForRenderedChange `
                 $boolRequireRangeCommitDateFreshness `
             -RequiresVersion $objDocumentContext.RequiresVersion)
@@ -5622,7 +5630,7 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
                 -CommitRevision $RangeHeadRevision `
                 -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
                 -PolicyMaximumBytes $intValidatorMaximumInputBytes `
-                -PolicyMarker $strMetadataRangePolicyMarker `
+                -PolicyMarker $objDocumentContext.PolicyMarker `
                 -RequireExpectedUtcDateForRenderedChange $true `
                 -RequiresVersion $objDocumentContext.RequiresVersion)
     }
@@ -5686,9 +5694,30 @@ if ($SelfTest) {
     $strValidatorSource = [IO.File]::ReadAllText($PSCommandPath)
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260828\.1$'
+            '(?m)^# Version: 1\.7\.20260828\.2$'
         ).Count -ne 1) {
         throw 'The validator script version does not use build date 20260828.'
+    }
+    $boolSavedWindowsPython = $script:useWindowsPythonLauncher
+    $arrSavedPythonNames = $script:pythonPathNames
+    try {
+        $script:useWindowsPythonLauncher = $false
+        $script:pythonPathNames = @('python3.12', 'python3', 'python')
+        if ((Get-TomlParseContext -Content $strCodexConfigContent).Failure) {
+            throw 'A compatible PATH Python 3.12 interpreter was rejected.'
+        }
+        foreach ($strRejectedPythonName in @(
+                'pwsh', 'missing-python312')) {
+            $script:pythonPathNames = @($strRejectedPythonName)
+            if ((Get-TomlParseContext -Content $strCodexConfigContent).Failure -cne
+                $strPythonPrerequisite) {
+                throw "Python candidate was accepted: $strRejectedPythonName"
+            }
+        }
+    }
+    finally {
+        $script:useWindowsPythonLauncher = $boolSavedWindowsPython
+        $script:pythonPathNames = $arrSavedPythonNames
     }
 
     $strMissingBootstrapFixture = [IO.Path]::Combine(
@@ -5916,17 +5945,25 @@ if ($SelfTest) {
     if (Test-ProhibitedClaudeLocalPath -RepositoryRelativePath 'CLAUDE.local.md.bak') {
         throw 'A Claude local-memory near miss was prohibited.'
     }
-    foreach ($strExactValidatorInputPath in @(
-            '.gitignore',
-            'docs/ISSUE_EVALUATION_PROMPT.md'
-        )) {
+    foreach ($strExactValidatorInputPath in $script:arrPushGovernedExactPaths) {
         if (-not (Test-AgentInstructionWorkflowPath `
                     -RepositoryRelativePath $strExactValidatorInputPath)) {
             throw "An exact validator input escaped push applicability: $strExactValidatorInputPath"
         }
     }
+    foreach ($strLintGuidePath in $script:arrOperationalLintGuidePaths) {
+        $arrLintGuideContexts = @($listGovernedDocumentContexts |
+                Where-Object { $_.Path -ceq $strLintGuidePath })
+        if ($arrLintGuideContexts.Count -ne 1 -or
+            $arrLintGuideContexts[0].PolicyMarker -cne
+                $strLintGuideMetadataPolicyMarker) {
+            throw "Lint guide is outside Tier 1 policy: $strLintGuidePath"
+        }
+    }
     foreach ($strValidatorInputNearMiss in @(
             '.github/.gitignore',
+            '.github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md.bak',
+            '.github/workflows/scripts-README.md.bak',
             'docs/ISSUE_EVALUATION_PROMPT.md.bak'
         )) {
         if (Test-AgentInstructionWorkflowPath `
@@ -5967,11 +6004,14 @@ if ($SelfTest) {
         }
     }
     $strNestedDecisionNearMiss = "$strCanonicalDecisionPath/nested"
-    if ((Test-AgentInstructionWorkflowPath `
+    $arrNestedDecisionFailures = @(Get-DecisionRecordPathFailure `
+            -RepositoryRelativePath $strNestedDecisionNearMiss)
+    if (-not (Test-AgentInstructionWorkflowPath `
                 -RepositoryRelativePath $strNestedDecisionNearMiss) -or
-        @(Get-DecisionRecordPathFailure `
-                -RepositoryRelativePath $strNestedDecisionNearMiss).Count -ne 0) {
-        throw 'A nested decision-path near miss became a direct decision record.'
+        $arrNestedDecisionFailures.Count -ne 1 -or
+        $arrNestedDecisionFailures[0] -cne
+            "$strNestedDecisionNearMiss must use docs/decisions/NNNN-short-title.md.") {
+        throw 'A nested decision path escaped explicit canonical rejection.'
     }
     foreach ($strHierarchicalGeminiPath in @(
             'GEMINI.md',
@@ -7083,7 +7123,7 @@ if ($SelfTest) {
                 'data 18',
                 'malformed decision',
                 'from :2',
-                'M 100644 inline docs/decisions/security.md',
+                'M 100644 inline docs/decisions/archive/0003-new-policy.md',
                 'data 0',
                 '',
                 'commit refs/heads/multi',
@@ -7287,10 +7327,11 @@ if ($SelfTest) {
             -HeadRevision $strPushMalformedDecision `
             -IsNewRef $false -IsDeletedRef $false
         if ($arrMalformedDecisionPaths.Count -ne 1 -or
-            $arrMalformedDecisionPaths[0] -cne 'docs/decisions/security.md' -or
+            $arrMalformedDecisionPaths[0] -cne
+                'docs/decisions/archive/0003-new-policy.md' -or
             -not $objMalformedDecision.ShouldValidate -or
             $objMalformedDecision.ChangedPathCount -ne 1) {
-            throw 'A malformed decision-record push escaped exact applicability.'
+            throw 'A nested decision-record push escaped exact applicability.'
         }
 
         & git -C $strPushRoot update-ref HEAD $strPushDivergent
