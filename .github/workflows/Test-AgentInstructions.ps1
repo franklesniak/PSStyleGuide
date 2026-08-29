@@ -72,7 +72,7 @@
 #
 # .NOTES
 # This script does not support positional parameters.
-# Version: 1.7.20260828.4
+# Version: 1.7.20260828.5
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -147,7 +147,7 @@ $intGitIgnoreMaximumInputBytes = 65536
 $intDocsInstructionsMaximumInputBytes = 131072
 $intInstructionDocumentMaximumInputBytes = 131072
 $intStyleGuideRationaleMaximumInputBytes = 196608
-$intValidatorMaximumInputBytes = 458752
+$intValidatorMaximumInputBytes = 491520
 $intHistoricalPolicyMarkerMaximumBytes = 524288
 $intGitPathListMaximumBytes = 1048576
 $intMetadataMaximumParents = 64
@@ -785,6 +785,115 @@ function Read-GitTrackedPath {
         throw 'Could not enumerate tracked files for the governed instruction inventory.'
     }
     return ConvertFrom-GitPathListData -Bytes $objProcessResult.Bytes
+}
+
+function Read-GitRangeTouchedPath {
+    # Reads unique paths touched by an authenticated commit range. Version: 1.0.20260828.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $RepositoryRootPath,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyString()]
+        [string] $BaseRevision,
+
+        [Parameter(Mandatory)]
+        [string] $HeadRevision,
+
+        [Parameter(Mandatory)]
+        [bool] $IsNewRefRange,
+
+        [Parameter()]
+        [AllowEmptyCollection()]
+        [string[]] $NewRefBoundaryRevision = @(),
+
+        [Parameter()]
+        [bool] $NewRefHasIntroducedCommit = $false,
+
+        [Parameter(Mandatory)]
+        [string] $RepositoryRelativePathspec,
+
+        [Parameter(Mandatory)]
+        [ValidateRange(1, 2147483646)]
+        [int] $MaximumBytes
+    )
+
+    $strObjectIdPattern = '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$'
+    $strZeroObjectIdPattern = '^(?:0{40}|0{64})$'
+    if ($HeadRevision -notmatch $strObjectIdPattern -or
+        $HeadRevision -match $strZeroObjectIdPattern) {
+        throw 'The touched-path range head is invalid.'
+    }
+    if ($RepositoryRelativePathspec.StartsWith('-', [StringComparison]::Ordinal) -or
+        [IO.Path]::IsPathRooted($RepositoryRelativePathspec) -or
+        $RepositoryRelativePathspec -match '(^|/)\.\.?(/|$)' -or
+        $RepositoryRelativePathspec.Contains('\', [StringComparison]::Ordinal)) {
+        throw 'The touched-path range pathspec is invalid.'
+    }
+
+    $arrRevisionArguments = @()
+    if ($IsNewRefRange) {
+        if ($BaseRevision -notmatch $strZeroObjectIdPattern) {
+            throw 'A new-ref touched-path range requires an all-zero base.'
+        }
+        if (-not $NewRefHasIntroducedCommit) {
+            if ($NewRefBoundaryRevision.Count -ne 0) {
+                throw 'A new-ref range without introduced commits must not have boundaries.'
+            }
+            return [string[]] @()
+        }
+        $arrRevisionArguments += $HeadRevision
+        if ($NewRefBoundaryRevision.Count -gt 0) {
+            $arrRevisionArguments += '--not'
+            foreach ($strBoundaryRevision in $NewRefBoundaryRevision) {
+                if ($strBoundaryRevision -notmatch $strObjectIdPattern -or
+                    $strBoundaryRevision -match $strZeroObjectIdPattern) {
+                    throw 'The new-ref touched-path boundary is invalid.'
+                }
+                $arrRevisionArguments += $strBoundaryRevision
+            }
+        }
+    }
+    else {
+        if ($BaseRevision -notmatch $strObjectIdPattern -or
+            $BaseRevision -match $strZeroObjectIdPattern) {
+            throw 'An existing touched-path range requires a valid base.'
+        }
+        $arrRevisionArguments += "$BaseRevision..$HeadRevision"
+    }
+
+    $objStartInfo = [Diagnostics.ProcessStartInfo]::new('git')
+    $objStartInfo.UseShellExecute = $false
+    $objStartInfo.CreateNoWindow = $true
+    $objStartInfo.RedirectStandardOutput = $true
+    $objStartInfo.RedirectStandardError = $true
+    foreach ($strArgument in @(
+            '-C', $RepositoryRootPath, 'log', '--format=', '--name-only', '-z',
+            '-m', '--no-renames', '--no-ext-diff', '--no-textconv'
+        ) + $arrRevisionArguments + @('--', $RepositoryRelativePathspec)) {
+        $objStartInfo.ArgumentList.Add($strArgument)
+    }
+    $objGitProcess = [Diagnostics.Process]::new()
+    $objGitProcess.StartInfo = $objStartInfo
+    $objProcessResult = Read-BoundedProcessData `
+        -Process $objGitProcess `
+        -MaximumBytes $MaximumBytes `
+        -TimeoutMilliseconds 10000 `
+        -DisplayName 'Git authenticated range touched-path enumeration'
+    if ($objProcessResult.ExitCode -ne 0) {
+        throw 'Could not enumerate paths touched by the authenticated range.'
+    }
+
+    $setTouchedPaths = [Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal
+    )
+    foreach ($strTouchedPath in @(ConvertFrom-GitPathListData `
+                -Bytes $objProcessResult.Bytes -AllowDuplicatePath)) {
+        [void]$setTouchedPaths.Add($strTouchedPath)
+    }
+    return @($setTouchedPaths | Sort-Object)
 }
 
 function Read-RepositoryInputData {
@@ -2468,6 +2577,68 @@ function Get-MarkdownParserBootstrapFailure {
     }
 }
 
+function Test-GitIgnorePathEffective {
+    # Uses Git to evaluate proposed ignore content in isolation. Version: 1.0.20260828.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)]
+        [AllowEmptyString()]
+        [string] $GitIgnoreContent,
+
+        [Parameter(Mandatory)]
+        [string] $RepositoryRelativePath
+    )
+
+    if ($RepositoryRelativePath.StartsWith('-', [StringComparison]::Ordinal) -or
+        [IO.Path]::IsPathRooted($RepositoryRelativePath) -or
+        $RepositoryRelativePath -match '(^|/)\.\.?(/|$)' -or
+        $RepositoryRelativePath.Contains('\', [StringComparison]::Ordinal)) {
+        throw 'The effective-ignore probe path is invalid.'
+    }
+
+    $strSystemTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+    $strFixtureRoot = [IO.Path]::Combine(
+        $strSystemTempRoot,
+        'agent-instruction-gitignore-' + [Guid]::NewGuid().ToString('N')
+    )
+    [void][IO.Directory]::CreateDirectory($strFixtureRoot)
+    try {
+        $objUtf8WithoutBom = [Text.UTF8Encoding]::new($false)
+        $strEmptyExcludesPath = [IO.Path]::Combine($strFixtureRoot, 'empty-excludes')
+        [IO.File]::WriteAllText(
+            [IO.Path]::Combine($strFixtureRoot, '.gitignore'),
+            $GitIgnoreContent,
+            $objUtf8WithoutBom
+        )
+        [IO.File]::WriteAllText($strEmptyExcludesPath, '', $objUtf8WithoutBom)
+        & git -C $strFixtureRoot init --quiet
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not initialize the effective-ignore fixture.'
+        }
+        & git -C $strFixtureRoot `
+            -c "core.excludesFile=$strEmptyExcludesPath" `
+            check-ignore --no-index --quiet -- $RepositoryRelativePath
+        $intCheckIgnoreExitCode = $LASTEXITCODE
+        if ($intCheckIgnoreExitCode -eq 0) {
+            return $true
+        }
+        if ($intCheckIgnoreExitCode -eq 1) {
+            return $false
+        }
+        throw 'Git could not evaluate the proposed ignore rules.'
+    }
+    finally {
+        if ([IO.Directory]::Exists($strFixtureRoot) -and
+            $strFixtureRoot.StartsWith(
+                $strSystemTempRoot,
+                [StringComparison]::OrdinalIgnoreCase
+            )) {
+            Remove-Item -LiteralPath $strFixtureRoot -Recurse -Force
+        }
+    }
+}
+
 function Test-ProhibitedClaudeLocalPath {
     # .SYNOPSIS
     # Tests whether a tracked path is prohibited operative local Claude memory.
@@ -2676,6 +2847,10 @@ function Get-MetadataEventRevisionContext {
                 PreviousTopicHeadRevision = ''
                 CurrentTopicBaseRevision = ''
                 CurrentTopicHeadRevision = ''
+                NewRefBoundaryRevisions = $arrFreshnessBases
+                NewRefIntroducedCommitRevisions = @(
+                    $setEvidenceCommits | Sort-Object
+                )
             }
         }
         if (-not [string]::IsNullOrEmpty($NewRefCommitCount) -or
@@ -4156,6 +4331,18 @@ function Get-GovernedDocumentCommitTransitionFailure {
         return
     }
 
+    $arrCurrentTreeEntries = @(& git -C $RepositoryRootPath ls-tree `
+            $CommitRevision -- $RepositoryRelativePath 2>&1)
+    if ($LASTEXITCODE -ne 0) {
+        throw (
+            "Could not inspect $RepositoryRelativePath for metadata range commit " +
+            "$CommitRevision."
+        )
+    }
+    if ($arrCurrentTreeEntries.Count -eq 0) {
+        return [string[]] @()
+    }
+
     $strCurrentContent = Read-GitRevisionText `
         -RepositoryRootPath $RepositoryRootPath `
         -Revision $CommitRevision `
@@ -4256,6 +4443,10 @@ function Get-GovernedDocumentRangeTransitionFailure {
 
         [Parameter()]
         [bool] $RequireExpectedUtcDateForRenderedChange = $false,
+
+        [Parameter()]
+        [AllowEmptyCollection()]
+        [string[]] $CommitDateFreshnessRevision = @(),
 
         [Parameter()]
         [bool] $RequiresVersion = $true
@@ -4419,6 +4610,24 @@ function Get-GovernedDocumentRangeTransitionFailure {
         throw 'Could not enumerate the metadata event range.'
     }
 
+    $setRangeCommits = [Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::OrdinalIgnoreCase
+    )
+    foreach ($strRangeCommitValue in $arrRangeCommits) {
+        [void]$setRangeCommits.Add(([string]$strRangeCommitValue).Trim())
+    }
+    $setCommitDateFreshnessRevisions =
+        [Collections.Generic.HashSet[string]]::new(
+            [StringComparer]::OrdinalIgnoreCase
+        )
+    foreach ($strFreshnessRevision in $CommitDateFreshnessRevision) {
+        if ($strFreshnessRevision -notmatch $strObjectIdPattern -or
+            -not $setRangeCommits.Contains($strFreshnessRevision)) {
+            throw 'A commit-date freshness revision is outside the metadata event range.'
+        }
+        [void]$setCommitDateFreshnessRevisions.Add($strFreshnessRevision)
+    }
+
     foreach ($strRangeCommitValue in $arrRangeCommits) {
         $strRangeCommit = ([string]$strRangeCommitValue).Trim()
         $arrCommitFailures = @(Get-GovernedDocumentCommitTransitionFailure `
@@ -4431,7 +4640,8 @@ function Get-GovernedDocumentRangeTransitionFailure {
             -PolicyMaximumBytes $PolicyMaximumBytes `
             -PolicyMarker $PolicyMarker `
             -RequireExpectedUtcDateForRenderedChange `
-                $RequireExpectedUtcDateForRenderedChange `
+                ($RequireExpectedUtcDateForRenderedChange -or
+                    $setCommitDateFreshnessRevisions.Contains($strRangeCommit)) `
             -RequiresVersion $RequiresVersion)
         foreach ($strCommitFailure in $arrCommitFailures) {
             Write-Output $strCommitFailure
@@ -5217,6 +5427,8 @@ if (-not [string]::IsNullOrEmpty($TrustedEventTimestamp)) {
 $strEventHistoryBaseRevision = $RangeBaseRevision
 $strEventFreshnessBaseRevision = ''
 $arrEventFreshnessBaseRevisions = @()
+$arrNewRefBoundaryRevisions = @()
+$arrNewRefIntroducedCommitRevisions = @()
 $boolEvaluateEventFreshness = $false
 $boolRequireRangeCommitDateFreshness = $false
 $strPreviousTopicBaseRevision = ''
@@ -5244,6 +5456,14 @@ if ($boolEventRangeRequested -and
         $objMetadataEventRevisionContext.FreshnessBaseRevisions
     )
     $boolEvaluateEventFreshness = $objMetadataEventRevisionContext.EvaluateFreshness
+    if ($RangeIsNewRef) {
+        $arrNewRefBoundaryRevisions = @(
+            $objMetadataEventRevisionContext.NewRefBoundaryRevisions
+        )
+        $arrNewRefIntroducedCommitRevisions = @(
+            $objMetadataEventRevisionContext.NewRefIntroducedCommitRevisions
+        )
+    }
     $boolRequireRangeCommitDateFreshness =
         ($EventName -ceq 'push' -and -not $RangeIsNewRef) -or
         $boolCommitDateOnlyEvent
@@ -5326,9 +5546,26 @@ $arrTrackedRepositoryPaths = @(Read-GitTrackedPath `
         -RepositoryRootPath $strRepositoryRootPath `
         -Revision $strValidatedInputRevision `
         -MaximumBytes $intGitPathListMaximumBytes)
-$arrGovernedMetadataDocuments += @(
-    $arrTrackedRepositoryPaths |
+$arrRangeTouchedDecisionPaths = @()
+if ($boolEventRangeRequested) {
+    $arrRangeTouchedDecisionPaths = @(Read-GitRangeTouchedPath `
+            -RepositoryRootPath $strRepositoryRootPath `
+            -BaseRevision $strEventHistoryBaseRevision `
+            -HeadRevision $RangeHeadRevision `
+            -IsNewRefRange ([bool]$RangeIsNewRef) `
+            -NewRefBoundaryRevision $arrNewRefBoundaryRevisions `
+            -NewRefHasIntroducedCommit `
+                ($arrNewRefIntroducedCommitRevisions.Count -gt 0) `
+            -RepositoryRelativePathspec 'docs/decisions/' `
+            -MaximumBytes $intGitPathListMaximumBytes)
+}
+$arrDecisionRecordInventoryPaths = @(
+    @($arrTrackedRepositoryPaths + $arrRangeTouchedDecisionPaths) |
         Where-Object { $_ -cmatch $script:strDecisionRecordDirectoryPathPattern } |
+        Sort-Object -Unique
+)
+$arrGovernedMetadataDocuments += @(
+    $arrDecisionRecordInventoryPaths |
         ForEach-Object {
             [pscustomobject]@{
                 Path = $_
@@ -5361,6 +5598,10 @@ if ([string]::IsNullOrEmpty($strValidatedInputRevision)) {
     $arrRequiredPaths = @($strCodexConfigPath)
     $arrRequiredPaths += @(
         $arrGovernedMetadataDocuments |
+            Where-Object {
+                $arrRangeTouchedDecisionPaths -cnotcontains $_.Path -or
+                $arrTrackedRepositoryPaths -ccontains $_.Path
+            } |
             ForEach-Object {
                 Join-Path -Path $strRepositoryRootPath -ChildPath $_.Path
             }
@@ -5456,7 +5697,13 @@ foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
     $strDocumentPath = Join-Path `
         -Path $strRepositoryRootPath `
         -ChildPath $objDocumentSpec.Path
-    $strDocumentContent = if ([string]::IsNullOrEmpty($strValidatedInputRevision)) {
+    $boolRangeOnlyDecisionRecord =
+        $arrRangeTouchedDecisionPaths -ccontains $objDocumentSpec.Path -and
+        $arrTrackedRepositoryPaths -cnotcontains $objDocumentSpec.Path
+    $strDocumentContent = if ($boolRangeOnlyDecisionRecord) {
+        $null
+    }
+    elseif ([string]::IsNullOrEmpty($strValidatedInputRevision)) {
         ConvertFrom-StrictUtf8Data `
             -Bytes (Read-RepositoryInputData `
                 -Path $strDocumentPath `
@@ -5558,6 +5805,11 @@ else {
 if ($strGitIgnoreContent -cnotmatch '(?m)^/CLAUDE\.local\.md$') {
     $arrRepositoryFailures += 'The root CLAUDE.local.md ignore rule is missing.'
 }
+elseif (-not (Test-GitIgnorePathEffective `
+            -GitIgnoreContent $strGitIgnoreContent `
+            -RepositoryRelativePath 'CLAUDE.local.md')) {
+    $arrRepositoryFailures += 'The root CLAUDE.local.md ignore rule is ineffective.'
+}
 $arrRepositoryFailures += @(Get-DocumentationClaimFailure `
         -Content $strDocsInstructionsContent `
         -TrackedPaths $arrTrackedRepositoryPaths)
@@ -5571,6 +5823,9 @@ foreach ($objDecisionContext in @(
     )) {
     $arrRepositoryFailures += @(Get-DecisionRecordPathFailure `
             -RepositoryRelativePath $objDecisionContext.Path)
+    if ($null -eq $objDecisionContext.Content) {
+        continue
+    }
     foreach ($strGuideLink in $arrCanonicalDecisionGuideLinks) {
         if (-not $objDecisionContext.Content.Contains(
                 $strGuideLink,
@@ -5637,6 +5892,8 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
             -PolicyMarker $objDocumentContext.PolicyMarker `
             -RequireExpectedUtcDateForRenderedChange `
                 $boolRequireRangeCommitDateFreshness `
+            -CommitDateFreshnessRevision `
+                $arrNewRefIntroducedCommitRevisions `
             -RequiresVersion $objDocumentContext.RequiresVersion)
     if ($EventName -ceq 'push' -and $EventHeadDistinct -ceq 'false' -and
         ($RangeIsNewRef -or $boolValidateBackwardPushHead)) {
@@ -5651,6 +5908,9 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
                 -PolicyMarker $objDocumentContext.PolicyMarker `
                 -RequireExpectedUtcDateForRenderedChange $true `
                 -RequiresVersion $objDocumentContext.RequiresVersion)
+    }
+    if ($null -eq $objDocumentContext.Content) {
+        continue
     }
     if ($boolEventRangeRequested -and $boolEvaluateEventFreshness) {
         foreach ($strEventFreshnessBaseRevision in
@@ -5717,10 +5977,14 @@ Write-Output 'Agent-instruction contract passed.'
 if ($SelfTest) {
     #region Mutation self-tests
 
+    if ($intValidatorMaximumInputBytes -ne 491520) {
+        throw 'The validator current-input cap must be 491520 bytes.'
+    }
+
     $strValidatorSource = [IO.File]::ReadAllText($PSCommandPath)
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260828\.4$'
+            '(?m)^# Version: 1\.7\.20260828\.5$'
         ).Count -ne 1) {
         throw 'The validator script version does not use build date 20260828.'
     }
@@ -5758,6 +6022,36 @@ if ($SelfTest) {
             [StringComparison]::Ordinal
         )) {
         throw 'The node_modules-absent bootstrap fixture did not fail actionably.'
+    }
+
+    foreach ($objIgnoreFixture in @(
+            [pscustomobject]@{
+                Name = 'effective exact root rule'
+                Content = "/CLAUDE.local.md`n"
+                Expected = $true
+            },
+            [pscustomobject]@{
+                Name = 'later exact negation'
+                Content = "/CLAUDE.local.md`n!/CLAUDE.local.md`n"
+                Expected = $false
+            },
+            [pscustomobject]@{
+                Name = 'later broad negation'
+                Content = "/CLAUDE.local.md`n!/*.local.md`n"
+                Expected = $false
+            },
+            [pscustomobject]@{
+                Name = 'unrelated later negation'
+                Content = "/CLAUDE.local.md`n!/README.local.md`n"
+                Expected = $true
+            }
+        )) {
+        $boolIgnoreResult = Test-GitIgnorePathEffective `
+            -GitIgnoreContent $objIgnoreFixture.Content `
+            -RepositoryRelativePath 'CLAUDE.local.md'
+        if ($boolIgnoreResult -ne $objIgnoreFixture.Expected) {
+            throw "Effective-ignore fixture failed: $($objIgnoreFixture.Name)"
+        }
     }
 
     $arrDocumentationClaimFailures = @(Get-DocumentationClaimFailure `
@@ -7987,17 +8281,24 @@ if ($SelfTest) {
             param(
                 [string] $Base,
                 [string] $Head,
-                [bool] $RequireCommitDate = $false
+                [bool] $RequireCommitDate = $false,
+                [string] $Path = 'AGENTS.md',
+                [int] $MaximumBytes = $intAgentsMaximumInputBytes,
+                [bool] $IsNewRef = $false,
+                [string[]] $FreshnessRevision = @(),
+                [bool] $RequiresVersion = $true
             )
-            Get-GovernedDocumentRangeTransitionFailure -Name 'AGENTS.md' `
+            Get-GovernedDocumentRangeTransitionFailure -Name $Path `
                 -RepositoryRootPath $strMergeFixtureRoot `
-                -RepositoryRelativePath 'AGENTS.md' `
-                -MaximumBytes $intAgentsMaximumInputBytes `
+                -RepositoryRelativePath $Path `
+                -MaximumBytes $MaximumBytes `
                 -BaseRevision $Base -HeadRevision $Head -InputRevision $Head `
-                -IsNewRefRange $false `
+                -IsNewRefRange $IsNewRef `
                 -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
                 -PolicyMaximumBytes 1024 -PolicyMarker $strMetadataRangePolicyMarker `
-                -RequireExpectedUtcDateForRenderedChange $RequireCommitDate
+                -RequireExpectedUtcDateForRenderedChange $RequireCommitDate `
+                -CommitDateFreshnessRevision $FreshnessRevision `
+                -RequiresVersion $RequiresVersion
         }
         $scriptBlockGetDirectFailure = {
             param([string] $Commit)
@@ -8088,6 +8389,256 @@ if ($SelfTest) {
             -Parents @() `
             -Timestamp ($strMergeHistoricalDate + 'T08:00:00Z') `
             -Message 'merge fixture base'
+
+        $scriptBlockNewFixturePathTree = {
+            param(
+                [string] $BaseTree,
+                [hashtable] $PathContent
+            )
+
+            & git -C $strMergeFixtureRoot read-tree $BaseTree
+            if ($LASTEXITCODE -ne 0) {
+                throw 'Could not reset the range-path fixture tree.'
+            }
+            foreach ($strFixturePath in $PathContent.Keys) {
+                $strFixtureFile = [IO.Path]::Combine(
+                    $strMergeFixtureRoot,
+                    $strFixturePath.Replace('/', [IO.Path]::DirectorySeparatorChar)
+                )
+                [void][IO.Directory]::CreateDirectory(
+                    [IO.Path]::GetDirectoryName($strFixtureFile)
+                )
+                [IO.File]::WriteAllText(
+                    $strFixtureFile,
+                    [string]$PathContent[$strFixturePath],
+                    $objUtf8WithoutBom
+                )
+                & git -C $strMergeFixtureRoot add -- $strFixturePath
+                if ($LASTEXITCODE -ne 0) {
+                    throw "Could not add range-path fixture: $strFixturePath"
+                }
+            }
+            $strFixtureTree = ([string] (
+                    & git -C $strMergeFixtureRoot write-tree
+                )).Trim()
+            if ($LASTEXITCODE -ne 0 -or
+                $strFixtureTree -notmatch '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$') {
+                throw 'Could not create the range-path fixture tree.'
+            }
+            return $strFixtureTree
+        }
+        $scriptBlockNewFixtureDeletionTree = {
+            param(
+                [string] $BaseTree,
+                [string[]] $Path
+            )
+
+            & git -C $strMergeFixtureRoot read-tree $BaseTree
+            foreach ($strFixturePath in $Path) {
+                & git -C $strMergeFixtureRoot update-index `
+                    --force-remove -- $strFixturePath
+                if ($LASTEXITCODE -ne 0) {
+                    throw "Could not delete range-path fixture: $strFixturePath"
+                }
+            }
+            $strFixtureTree = ([string] (
+                    & git -C $strMergeFixtureRoot write-tree
+                )).Trim()
+            if ($LASTEXITCODE -ne 0 -or
+                $strFixtureTree -notmatch '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$') {
+                throw 'Could not create the deleted range-path fixture tree.'
+            }
+            return $strFixtureTree
+        }
+
+        $strIntroducedStaleVersion = $strMergeBaseVersion -replace '\.0$', '.1'
+        $strIntroducedRestoredVersion = $strMergeBaseVersion -replace '\.0$', '.2'
+        $strIntroducedStaleContent = $strMergeBaseContent.Replace(
+            $strMergeBaseVersion,
+            $strIntroducedStaleVersion
+        ) + "`nIntroduced stale rendered content.`n"
+        $strIntroducedStaleTree = & $scriptBlockNewFixturePathTree `
+            -BaseTree $strMergeBaseTree `
+            -PathContent @{'AGENTS.md' = $strIntroducedStaleContent}
+        $strIntroducedStaleCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strIntroducedStaleTree -Parents @($strMergeBaseCommit) `
+            -Timestamp ($strMergeCurrentDate + 'T01:00:00Z') `
+            -Message 'introduced stale new-ref content'
+        $strIntroducedRestoreContent = $strMergeBaseContent.Replace(
+            $strMergeBaseVersion,
+            $strIntroducedRestoredVersion
+        )
+        $strIntroducedRestoreTree = & $scriptBlockNewFixturePathTree `
+            -BaseTree $strIntroducedStaleTree `
+            -PathContent @{'AGENTS.md' = $strIntroducedRestoreContent}
+        $strIntroducedRestoreCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strIntroducedRestoreTree `
+            -Parents @($strIntroducedStaleCommit) `
+            -Timestamp ($strMergeCurrentDate + 'T01:01:00Z') `
+            -Message 'introduced endpoint restore'
+        $objIntroducedRestoreContext = Get-MetadataEventRevisionContext `
+            -RepositoryRootPath $strMergeFixtureRoot `
+            -EventName 'push' -PullRequestAction '' `
+            -BaseRevision ('0' * 40) `
+            -HeadRevision $strIntroducedRestoreCommit `
+            -IsNewRefRange $true -PreviousHeadRevision '' `
+            -EventHeadRevision $strIntroducedRestoreCommit `
+            -EventHeadDistinct 'true' -NewRefCommitCount '2' `
+            -NewRefCommitEvidenceJson (ConvertTo-Json -Compress -InputObject @(
+                    $strIntroducedStaleCommit,
+                    $strIntroducedRestoreCommit
+                ))
+        $arrIntroducedRestoreFailures = @(& $scriptBlockGetMergeRangeFailure `
+                -Base ('0' * 40) -Head $strIntroducedRestoreCommit `
+                -IsNewRef $true -FreshnessRevision `
+                    $objIntroducedRestoreContext.NewRefIntroducedCommitRevisions)
+        if (-not ($arrIntroducedRestoreFailures -join '; ').Contains(
+                "Last Updated must be $strMergeCurrentDate",
+                [StringComparison]::Ordinal
+            )) {
+            throw 'A stale introduced new-ref commit escaped commit-date freshness.'
+        }
+
+        $strInheritedStaleVersion = $strMergeBaseVersion -replace '\.0$', '.3'
+        $strInheritedStaleContent = $strMergeBaseContent.Replace(
+            $strMergeBaseVersion,
+            $strInheritedStaleVersion
+        ) + "`nInherited stale rendered content.`n"
+        $strInheritedStaleTree = & $scriptBlockNewFixturePathTree `
+            -BaseTree $strMergeBaseTree `
+            -PathContent @{'AGENTS.md' = $strInheritedStaleContent}
+        $strInheritedStaleCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strInheritedStaleTree -Parents @($strMergeBaseCommit) `
+            -Timestamp ($strMergeCurrentDate + 'T01:02:00Z') `
+            -Message 'inherited stale boundary content'
+        $strInheritedBoundaryHead = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strInheritedStaleTree -Parents @($strInheritedStaleCommit) `
+            -Timestamp ($strMergeCurrentDate + 'T01:03:00Z') `
+            -Message 'introduced unchanged boundary head'
+        $objInheritedBoundaryContext = Get-MetadataEventRevisionContext `
+            -RepositoryRootPath $strMergeFixtureRoot `
+            -EventName 'push' -PullRequestAction '' `
+            -BaseRevision ('0' * 40) `
+            -HeadRevision $strInheritedBoundaryHead `
+            -IsNewRefRange $true -PreviousHeadRevision '' `
+            -EventHeadRevision $strInheritedBoundaryHead `
+            -EventHeadDistinct 'true' -NewRefCommitCount '1' `
+            -NewRefCommitEvidenceJson (ConvertTo-Json -Compress `
+                -InputObject @($strInheritedBoundaryHead))
+        if (@($objInheritedBoundaryContext.NewRefIntroducedCommitRevisions).Count -ne 1 -or
+            $objInheritedBoundaryContext.NewRefIntroducedCommitRevisions[0] -cne
+                $strInheritedBoundaryHead) {
+            throw 'The new-ref freshness allowlist included inherited history.'
+        }
+        $arrInheritedBoundaryFailures = @(& $scriptBlockGetMergeRangeFailure `
+                -Base ('0' * 40) -Head $strInheritedBoundaryHead `
+                -IsNewRef $true -FreshnessRevision `
+                    $objInheritedBoundaryContext.NewRefIntroducedCommitRevisions)
+        if ($arrInheritedBoundaryFailures.Count -ne 0) {
+            throw (
+                'Inherited new-ref history received introduced-commit freshness: ' +
+                ($arrInheritedBoundaryFailures -join '; ')
+            )
+        }
+
+        $strDecisionPath = 'docs/decisions/0001-range-fixture.md'
+        $strMalformedDecisionPath = 'docs/decisions/range-fixture.md'
+        $strUnrelatedRangePath = 'docs/range-fixture.md'
+        $strDecisionContentPrefix = @(
+            '# Range fixture decision',
+            '',
+            '## Metadata',
+            '',
+            '- **Status:** Active',
+            '- **Owner:** Repository Maintainer'
+        ) -join "`n"
+        $strStaleDecisionContent = $strDecisionContentPrefix + "`n" +
+            "- **Last Updated:** $strMergeHistoricalDate`n" +
+            "- **Scope:** Tests range-only decision records.`n"
+        $strMalformedDecisionContent = $strStaleDecisionContent.Replace(
+            '# Range fixture decision',
+            '# Malformed range fixture decision'
+        )
+        $strDecisionAddTree = & $scriptBlockNewFixturePathTree `
+            -BaseTree $strMergeBaseTree `
+            -PathContent @{
+                $strDecisionPath = $strStaleDecisionContent
+                $strMalformedDecisionPath = $strMalformedDecisionContent
+                $strUnrelatedRangePath = 'Unrelated range fixture.'
+            }
+        $strDecisionAddCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strDecisionAddTree -Parents @($strMergeBaseCommit) `
+            -Timestamp ($strMergeCurrentDate + 'T01:04:00Z') `
+            -Message 'add range-only decision fixtures'
+        $strDecisionDeleteTree = & $scriptBlockNewFixtureDeletionTree `
+            -BaseTree $strDecisionAddTree `
+            -Path @(
+                $strDecisionPath,
+                $strMalformedDecisionPath,
+                $strUnrelatedRangePath
+            )
+        $strDecisionDeleteCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strDecisionDeleteTree -Parents @($strDecisionAddCommit) `
+            -Timestamp ($strMergeCurrentDate + 'T01:05:00Z') `
+            -Message 'delete range-only decision fixtures'
+        $arrTouchedDecisionPaths = @(Read-GitRangeTouchedPath `
+                -RepositoryRootPath $strMergeFixtureRoot `
+                -BaseRevision $strMergeBaseCommit `
+                -HeadRevision $strDecisionDeleteCommit `
+                -IsNewRefRange $false `
+                -RepositoryRelativePathspec 'docs/decisions/' `
+                -MaximumBytes $intGitPathListMaximumBytes)
+        if ($arrTouchedDecisionPaths -cnotcontains $strDecisionPath -or
+            $arrTouchedDecisionPaths -cnotcontains $strMalformedDecisionPath -or
+            $arrTouchedDecisionPaths -ccontains $strUnrelatedRangePath) {
+            throw 'Authenticated range-touched decision discovery was incomplete.'
+        }
+        $arrMalformedDecisionFailures = @(Get-DecisionRecordPathFailure `
+                -RepositoryRelativePath $strMalformedDecisionPath)
+        if ($arrMalformedDecisionFailures.Count -ne 1) {
+            throw 'A deleted malformed decision path escaped range inventory validation.'
+        }
+        $arrStaleDecisionFailures = @(& $scriptBlockGetMergeRangeFailure `
+                -Base $strMergeBaseCommit -Head $strDecisionDeleteCommit `
+                -RequireCommitDate $true -Path $strDecisionPath `
+                -MaximumBytes $intInstructionDocumentMaximumInputBytes `
+                -RequiresVersion $false)
+        if (-not ($arrStaleDecisionFailures -join '; ').Contains(
+                "Last Updated must be $strMergeCurrentDate",
+                [StringComparison]::Ordinal
+            )) {
+            throw 'A stale add-then-delete decision record escaped range validation.'
+        }
+
+        $strFreshDecisionContent = $strStaleDecisionContent.Replace(
+            $strMergeHistoricalDate,
+            $strMergeCurrentDate
+        )
+        $strFreshDecisionAddTree = & $scriptBlockNewFixturePathTree `
+            -BaseTree $strMergeBaseTree `
+            -PathContent @{$strDecisionPath = $strFreshDecisionContent}
+        $strFreshDecisionAddCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strFreshDecisionAddTree -Parents @($strMergeBaseCommit) `
+            -Timestamp ($strMergeCurrentDate + 'T01:06:00Z') `
+            -Message 'add valid range-only decision fixture'
+        $strFreshDecisionDeleteTree = & $scriptBlockNewFixtureDeletionTree `
+            -BaseTree $strFreshDecisionAddTree -Path @($strDecisionPath)
+        $strFreshDecisionDeleteCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strFreshDecisionDeleteTree `
+            -Parents @($strFreshDecisionAddCommit) `
+            -Timestamp ($strMergeCurrentDate + 'T01:07:00Z') `
+            -Message 'delete valid range-only decision fixture'
+        $arrFreshDecisionFailures = @(& $scriptBlockGetMergeRangeFailure `
+                -Base $strMergeBaseCommit -Head $strFreshDecisionDeleteCommit `
+                -RequireCommitDate $true -Path $strDecisionPath `
+                -MaximumBytes $intInstructionDocumentMaximumInputBytes `
+                -RequiresVersion $false)
+        if ($arrFreshDecisionFailures.Count -ne 0) {
+            throw (
+                'A valid add-then-delete decision record failed validation: ' +
+                ($arrFreshDecisionFailures -join '; ')
+            )
+        }
 
         $strRationaleFixturePolicy = $strMetadataRangePolicyMarker + "`n" +
             $strStyleGuideRationaleMetadataPolicyMarker + "`n"

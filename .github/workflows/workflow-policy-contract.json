@@ -140,7 +140,7 @@
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "a1fbcdd3ee7d1834fef6ad298340187722c43f1095aa336bd91b608eb2f9d14e"
+    "sha256": "70d506ca41f671fe60e744792cab55f854421bc02306a3af87bc9cce53d787de"
   },
   "actions": {
     "checkout": {
@@ -320,8 +320,8 @@
       },
       "nestedLinter": {
         "path": "lint-nested-markdown.js",
-        "length": 9694,
-        "sha256": "c361154749a3763d4084b86d733aa0fc0967c2ee20b81e0a36a65e8d48af7a52",
+        "length": 13668,
+        "sha256": "b20aaab172224da4377cda75fa6cad1a8eeb00f8bdd26737ffe0e6c2ad222492",
         "glob": "**/*.{md,mdc}",
         "includeDotDirectories": true,
         "ignoredDirectoryNames": ["node_modules", ".git", ".venv"],
