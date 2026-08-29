@@ -11,7 +11,7 @@
 
 This directory contains utility scripts for the repository.
 
-## lint-nested-markdown.js
+## [lint-nested-markdown.js](lint-nested-markdown.js)
 
 This script extracts Markdown code blocks from Markdown files and validates them using markdownlint. It's used by the GitHub Actions workflow to ensure that nested Markdown content (inside code fences with language identifier `markdown` or `md`) follows the same linting rules as the outer Markdown files.
 
@@ -31,7 +31,7 @@ node .github/workflows/lint-nested-markdown.js
 
 ### How It Works
 
-1. Scans all `.md` and `.mdc` files in the repository (excluding `node_modules`)
+1. Scans all `.md` and `.mdc` files in the repository (excluding `node_modules`, `.git`, and `.venv` directories)
 2. Parses each file using `markdown-it` to extract the AST
 3. **Recursively** identifies code fences with language identifier `markdown` or `md` at all nesting depths
 4. Runs markdownlint on each extracted block

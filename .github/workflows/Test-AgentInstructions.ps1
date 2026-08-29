@@ -990,9 +990,14 @@ function Get-GovernedDocumentParentContext {
         if ($Revision -notmatch '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$') {
             throw "The governed-document input revision is invalid: $Revision"
         }
-        & git -C $RepositoryRootPath cat-file -e "$Revision`^{commit}" 2>$null
-        if ($LASTEXITCODE -ne 0) {
-            throw "The governed-document input commit is unavailable: $Revision"
+        $arrCommitAndParents = @(([string](& git -C $RepositoryRootPath rev-list --parents `
+                    -n 1 $Revision)).Trim() -split '\s+')
+        if ($LASTEXITCODE -ne 0 -or $arrCommitAndParents[0] -ine $Revision) {
+            throw "Could not read parents of input commit $Revision."
+        }
+        if ($arrCommitAndParents.Count -eq 1) {
+            return [pscustomobject]@{ParentContent = $null; ExpectedUtcDate = ''
+                ParentRevision = $null; IsWorktreeTransition = $false}
         }
         $strParentRevision = "$Revision`^1"
         & git -C $RepositoryRootPath cat-file -e `
@@ -2630,7 +2635,8 @@ function Get-LastUpdatedMetadataFreshnessFailure {
         [Parameter(Mandatory)][string] $Name,
         [Parameter(Mandatory)][string] $CurrentContent,
         [Parameter()][AllowNull()][object] $BaseContent,
-        [Parameter(Mandatory)][AllowEmptyString()][string] $TrustedEventUtcDate
+        [Parameter(Mandatory)][AllowEmptyString()][string] $TrustedEventUtcDate,
+        [Parameter()][bool] $RequireCurrentMaximumDateForRenderedChange = $false
     )
 
     $objCurrentMetadata = Get-DocumentMetadataContext `
@@ -2695,11 +2701,20 @@ function Get-LastUpdatedMetadataFreshnessFailure {
             'event input changes rendered content.'
         )
     }
-    elseif ($null -ne $objBaseMetadata -and
+    elseif ($RequireCurrentMaximumDateForRenderedChange -and
+        -not $TrustedEventUtcDate -and
+        $strCurrentDate -cne $script:strMaximumMetadataUtcDate) {
+        Write-Output (
+            "$Name Last Updated must be $script:strMaximumMetadataUtcDate " +
+            'after a rendered-content change without a trusted event date.'
+        )
+    }
+    elseif (-not $RequireCurrentMaximumDateForRenderedChange -and
+        $null -ne $objBaseMetadata -and
         $strCurrentDate -ceq $strBaseDate) {
         Write-Output (
             "$Name Last Updated must advance from $strBaseDate " +
-            'after a rendered-content change when no trusted event date is available.'
+            'after a historical rendered-content change.'
         )
     }
 }
@@ -5995,11 +6010,12 @@ foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
     } else {
         $strMetadataRangePolicyMarker
     }
-    $boolParentPolicyApplies = Test-HistoricalPolicyMarker `
-        -RepositoryRootPath $strRepositoryRootPath `
-        -Revision $objParentContext.ParentRevision `
-        -RepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
-        -Literal $strDocumentPolicyMarker
+    $boolParentPolicyApplies = $null -ne $objParentContext.ParentRevision -and
+        (Test-HistoricalPolicyMarker `
+            -RepositoryRootPath $strRepositoryRootPath `
+            -Revision $objParentContext.ParentRevision `
+            -RepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
+            -Literal $strDocumentPolicyMarker)
     $listGovernedDocumentContexts.Add([pscustomobject]@{
             Path = $objDocumentSpec.Path
             MaximumBytes = $objDocumentSpec.MaximumBytes
@@ -6110,7 +6126,9 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
                     -Name $objDocumentContext.Path `
                     -CurrentContent $objDocumentContext.Content `
                     -BaseContent $objDocumentContext.ParentContent `
-                    -TrustedEventUtcDate $objDocumentContext.ExpectedUtcDate)
+                    -TrustedEventUtcDate $objDocumentContext.ExpectedUtcDate `
+                    -RequireCurrentMaximumDateForRenderedChange `
+                        $objDocumentContext.IsWorktreeTransition)
         }
         elseif ($objDocumentContext.IsWorktreeTransition -or
             -not $boolNoRangeCommitHasParent) {
@@ -6805,42 +6823,7 @@ if ($SelfTest) {
             throw "$($objDocumentContext.Path) accepted missing Metadata."
         }
     }
-    $objRationaleContext = $arrRationaleContexts[0]
-    $objRationaleMetadata = Get-DocumentMetadataContext `
-        -Content $objRationaleContext.Content -RequiresVersion $false
-    $strRationaleStaleMutation = $objRationaleContext.Content +
-        [Environment]::NewLine + 'Rendered rationale mutation.' +
-        [Environment]::NewLine
-    $arrRationaleStaleFailures = @(Get-LastUpdatedMetadataFreshnessFailure `
-            -Name $strRationalePath `
-            -CurrentContent $strRationaleStaleMutation `
-            -BaseContent $objRationaleContext.Content `
-            -TrustedEventUtcDate $objRationaleMetadata.UpdatedDate)
-    if ($null -ne $objRationaleMetadata.Failure -or
-        -not ($arrRationaleStaleFailures -match 'must advance from')) {
-        throw 'A stale canonical-rationale rendered change did not fail closed.'
-    }
     $objUnversionedDocument = $arrUnversionedMetadataContexts[0]
-    $objUnversionedMetadata = Get-DocumentMetadataContext `
-        -Content $objUnversionedDocument.Content -RequiresVersion $false
-    $strRenderedMutation = $objUnversionedDocument.Content + "`nRendered change.`n"
-    $arrNoDateFailures = @(Get-LastUpdatedMetadataFreshnessFailure `
-            -Name $objUnversionedDocument.Path -CurrentContent $strRenderedMutation `
-            -BaseContent $objUnversionedDocument.Content -TrustedEventUtcDate '')
-    if (-not ($arrNoDateFailures -match 'must advance from')) {
-        throw 'No-date rendered change did not require a date advance.'
-    }
-    $strPreviousDate = ([datetime]::ParseExact($objUnversionedMetadata.UpdatedDate,
-            'yyyy-MM-dd', [Globalization.CultureInfo]::InvariantCulture)).AddDays(-1).ToString('yyyy-MM-dd')
-    $strPreviousContent = $objUnversionedDocument.Content.Replace(
-        "- **Last Updated:** $($objUnversionedMetadata.UpdatedDate)",
-        "- **Last Updated:** $strPreviousDate")
-    if (@(Get-LastUpdatedMetadataFreshnessFailure `
-            -Name $objUnversionedDocument.Path -CurrentContent $strRenderedMutation `
-            -BaseContent $strPreviousContent `
-            -TrustedEventUtcDate '').Count -ne 0) {
-        throw 'An advanced unversioned date was rejected.'
-    }
 
     $arrRequiredFieldNames = @('Status', 'Owner', 'Last Updated', 'Scope')
     foreach ($objDocumentContext in @(
@@ -8129,15 +8112,10 @@ if ($SelfTest) {
     if (-not $boolMissingRevisionInputRejected) {
         throw 'A missing revision input did not fail the regular-blob check.'
     }
-    $objRevisionParentFixture = Get-GovernedDocumentParentContext `
+    & "$PSScriptRoot/Test-AgentInstructions.SelfTest.ps1" `
         -RepositoryRootPath $strRepositoryRootPath `
-        -RepositoryRelativePath 'AGENTS.md' `
-        -MaximumBytes $intAgentsMaximumInputBytes `
-        -Revision $strNewRefTestHead
-    if ($objRevisionParentFixture.ParentRevision -cne "$strNewRefTestHead`^1" -or
-        [string]::IsNullOrEmpty($objRevisionParentFixture.ParentContent)) {
-        throw 'The explicit revision parent context is invalid.'
-    }
+        -Revision $strNewRefTestHead -MaximumBytes $intAgentsMaximumInputBytes `
+        -MaximumMetadataUtcDate $script:strMaximumMetadataUtcDate
     $arrNewRefRangeFailures = @(Get-GovernedDocumentRangeTransitionFailure `
             -Name 'AGENTS.md' `
             -RepositoryRootPath $strRepositoryRootPath `
