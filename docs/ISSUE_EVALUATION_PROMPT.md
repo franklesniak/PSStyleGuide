@@ -6,7 +6,7 @@
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-08-27
+- **Last Updated:** 2026-08-29
 - **Scope:** Provides a reusable LLM prompt for evaluating and refining proposed PSStyleGuide issue titles and descriptions. It does not create, authorize, or mutate GitHub issues.
 - **Related:** [PowerShell Style Guide](../STYLE_GUIDE.md), [PowerShell Style Guide Rationale](../STYLE_GUIDE_RATIONALE.md)
 

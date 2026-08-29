@@ -4,7 +4,7 @@
 
 - **Status:** Active
 - **Owner:** Repository Maintainer (@franklesniak)
-- **Last Updated:** 2026-08-28
+- **Last Updated:** 2026-08-29
 - **Scope:** Explains the rationale, design philosophy, and historical context behind the normative rules in `STYLE_GUIDE.md`. It does not define normative rules.
 - **Related:** [PowerShell Writing Style](STYLE_GUIDE.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
 

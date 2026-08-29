@@ -5,7 +5,7 @@
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-08-28
+- **Last Updated:** 2026-08-29
 - **Scope:** Describes the maintainer-facing nested-Markdown lint script, its use, configuration, and output. It does not define repository-wide documentation policy.
 - **Related:** [Nested Markdown Linting Implementation Summary](MARKDOWN-LINTING-IMPLEMENTATION.md), [Documentation Writing Style](../instructions/docs.instructions.md)
 
