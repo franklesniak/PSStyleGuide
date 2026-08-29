@@ -633,6 +633,7 @@ function Read-BoundedProcessData {
             -MaximumBytes $MaximumBytes `
             -DisplayName $DisplayName `
             -CancellationToken $objCancel.Token
+        $arrBytes = [byte[]] @($arrBytes)
         $intRemaining = [Math]::Max(
             0, $TimeoutMilliseconds - [int]$objTimer.ElapsedMilliseconds)
         if (-not $Process.WaitForExit($intRemaining)) {
@@ -1194,6 +1195,32 @@ function Assert-OversizedStreamMutationRejected {
         $objOversizedStream.Dispose()
     }
 
+    $objEmptyStartInfo = [Diagnostics.ProcessStartInfo]::new(
+        [Environment]::ProcessPath
+    )
+    $objEmptyStartInfo.UseShellExecute = $false
+    $objEmptyStartInfo.CreateNoWindow = $true
+    $objEmptyStartInfo.RedirectStandardOutput = $true
+    $objEmptyStartInfo.RedirectStandardError = $true
+    foreach ($strArgument in @(
+            '-NoLogo', '-NoProfile', '-NonInteractive', '-Command', 'exit 0'
+        )) {
+        $objEmptyStartInfo.ArgumentList.Add($strArgument)
+    }
+    $objEmptyProcess = [Diagnostics.Process]::new()
+    $objEmptyProcess.StartInfo = $objEmptyStartInfo
+    $objEmptyResult = Read-BoundedProcessData `
+        -Process $objEmptyProcess `
+        -MaximumBytes 4 `
+        -TimeoutMilliseconds 5000 `
+        -DisplayName 'successful zero-output process read'
+    if ($null -eq $objEmptyResult.Bytes -or
+        -not ($objEmptyResult.Bytes -is [byte[]]) -or
+        $objEmptyResult.Bytes.Length -ne 0 -or
+        $objEmptyResult.ExitCode -ne 0) {
+        throw "Self-test 'successful zero-output process read' changed output."
+    }
+
     $arrProcessCases = @(
         @{N='stalled process read';C='Start-Sleep -Seconds 5';T=250;E=[TimeoutException]},
         @{
@@ -1249,6 +1276,99 @@ function Assert-OversizedStreamMutationRejected {
         if ($objTimer.ElapsedMilliseconds -ge 4000) {
             throw "Self-test '$($objProcessCase.N)' exceeded its cleanup deadline."
         }
+    }
+}
+
+function Assert-MarkdownParserTransportCleanup {
+    # Confirms retry classification and child cleanup at the process boundary.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param()
+
+    $strPidPath = [IO.Path]::GetTempFileName()
+    try {
+        $objNodeCommand = Get-Command node -CommandType Application |
+            Select-Object -First 1
+        $objStartInfo = [Diagnostics.ProcessStartInfo]::new(
+            $objNodeCommand.Source
+        )
+        $objStartInfo.UseShellExecute = $false
+        $objStartInfo.CreateNoWindow = $true
+        $objStartInfo.RedirectStandardInput = $true
+        $objStartInfo.RedirectStandardOutput = $true
+        $objStartInfo.RedirectStandardError = $true
+        $objStartInfo.StandardInputEncoding = [Text.UTF8Encoding]::new($false)
+        $objStartInfo.StandardOutputEncoding = [Text.UTF8Encoding]::new($false)
+        $objStartInfo.StandardErrorEncoding = [Text.UTF8Encoding]::new($false)
+        foreach ($strArgument in @(
+                '-e',
+                'const fs = require("node:fs"); fs.appendFileSync(process.argv[1], process.pid + "\n"); setTimeout(() => process.exit(23), 100);',
+                $strPidPath
+            )) {
+            $objStartInfo.ArgumentList.Add($strArgument)
+        }
+
+        $strSentinel = 'governed-content-must-not-appear-in-transport-evidence'
+        $objTimer = [Diagnostics.Stopwatch]::StartNew()
+        try {
+            [void](Invoke-MarkdownParserProcess `
+                    -StartInfo $objStartInfo `
+                    -Content ($strSentinel + ('x' * 1048576)))
+            throw "Self-test 'premature parser input close' was accepted."
+        }
+        catch [IO.IOException] {
+            if (-not $_.Exception.Message.Contains(
+                    'input closed prematurely after 2 attempts',
+                    [StringComparison]::Ordinal
+                ) -or
+                ([regex]::Matches(
+                        $_.Exception.Message,
+                        'premature-input-close, exit=23, stderr=empty'
+                    )).Count -ne 2 -or
+                $_.Exception.Message.Contains(
+                    $strSentinel,
+                    [StringComparison]::Ordinal
+                )) {
+                throw (
+                    "Self-test 'premature parser input close' changed classification: " +
+                        $_.Exception.Message
+                )
+            }
+        }
+        finally {
+            $objTimer.Stop()
+        }
+        if ($objTimer.ElapsedMilliseconds -ge 5000) {
+            throw "Self-test 'premature parser input close' exceeded its cleanup deadline."
+        }
+
+        $arrParserPids = @(
+            [IO.File]::ReadAllLines($strPidPath) |
+                ForEach-Object { [int]$_ }
+        )
+        if ($arrParserPids.Count -ne 2) {
+            throw "Self-test 'premature parser input close' changed attempt count."
+        }
+        foreach ($intParserPid in $arrParserPids) {
+            $objParserProcess = $null
+            try {
+                $objParserProcess = [Diagnostics.Process]::GetProcessById($intParserPid)
+                if (-not $objParserProcess.HasExited) {
+                    throw "Self-test 'premature parser input close' left a child running."
+                }
+            }
+            catch [ArgumentException] {
+                [void]$_
+            }
+            finally {
+                if ($null -ne $objParserProcess) {
+                    $objParserProcess.Dispose()
+                }
+            }
+        }
+    }
+    finally {
+        Remove-Item -LiteralPath $strPidPath -Force -ErrorAction SilentlyContinue
     }
 }
 
@@ -1515,6 +1635,201 @@ print(json.dumps(r,separators=(",",":"),sort_keys=True))
     return [pscustomobject]$objContext
 }
 
+function Invoke-MarkdownParserProcess {
+    # Runs one locked parser request with one transport-only retry.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory)]
+        [Diagnostics.ProcessStartInfo] $StartInfo,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyString()]
+        [string] $Content
+    )
+
+    if ($StartInfo.UseShellExecute -or
+        -not $StartInfo.RedirectStandardInput -or
+        -not $StartInfo.RedirectStandardOutput -or
+        -not $StartInfo.RedirectStandardError) {
+        throw 'The locked Markdown parser requires shell-free redirected process streams.'
+    }
+
+    $listAttemptEvidence = [Collections.Generic.List[string]]::new()
+    foreach ($intAttempt in 1..2) {
+        $objParserProcess = [Diagnostics.Process]::new()
+        $objParserProcess.StartInfo = $StartInfo
+        $objStandardOutputTask = $null
+        $objStandardErrorTask = $null
+        $objTimer = [Diagnostics.Stopwatch]::StartNew()
+        $objFailure = $null
+        $objInputFailure = $null
+        $objCleanupFailure = $null
+        $boolStarted = $false
+        $boolInputAccepted = $false
+        $strParserOutput = ''
+        $strParserError = ''
+        $strExitClassification = 'unavailable'
+        $intExitCode = $null
+        try {
+            if (-not $objParserProcess.Start()) {
+                throw 'Could not start the locked Markdown parser.'
+            }
+            $boolStarted = $true
+            $objStandardOutputTask = $objParserProcess.StandardOutput.ReadToEndAsync()
+            $objStandardErrorTask = $objParserProcess.StandardError.ReadToEndAsync()
+            try {
+                $objWriteTask = $objParserProcess.StandardInput.WriteAsync($Content)
+                $intRemaining = [Math]::Max(
+                    0, 10000 - [int]$objTimer.ElapsedMilliseconds)
+                if (-not $objWriteTask.Wait($intRemaining)) {
+                    throw [TimeoutException]::new(
+                        'Markdown block parsing must complete within 10 seconds.'
+                    )
+                }
+                [void]$objWriteTask.GetAwaiter().GetResult()
+                $objParserProcess.StandardInput.Close()
+                $boolInputAccepted = $true
+            }
+            catch {
+                $objInputFailure = $_.Exception
+                throw
+            }
+
+            $intRemaining = [Math]::Max(
+                0, 10000 - [int]$objTimer.ElapsedMilliseconds)
+            if (-not $objParserProcess.WaitForExit($intRemaining)) {
+                throw [TimeoutException]::new(
+                    'Markdown block parsing must complete within 10 seconds.'
+                )
+            }
+        }
+        catch {
+            $objFailure = $_.Exception
+        }
+        finally {
+            if ($boolStarted) {
+                try { $objParserProcess.StandardInput.Close() } catch { [void]$_ }
+                try {
+                    if (-not $objParserProcess.HasExited) {
+                        $intRemaining = [Math]::Max(
+                            0, 10000 - [int]$objTimer.ElapsedMilliseconds)
+                        if ($intRemaining -gt 0) {
+                            [void]$objParserProcess.WaitForExit($intRemaining)
+                        }
+                    }
+                    if (-not $objParserProcess.HasExited) {
+                        $objParserProcess.Kill($true)
+                    }
+                    if (-not $objParserProcess.WaitForExit(1000)) {
+                        throw 'The locked Markdown parser could not be reaped.'
+                    }
+                    $intExitCode = $objParserProcess.ExitCode
+                    $strExitClassification = [string]$intExitCode
+                }
+                catch {
+                    $objCleanupFailure = $_.Exception
+                }
+                if ($null -ne $objStandardOutputTask) {
+                    try {
+                        $strParserOutput = $objStandardOutputTask.GetAwaiter().GetResult()
+                    }
+                    catch {
+                        if ($null -eq $objCleanupFailure) {
+                            $objCleanupFailure = $_.Exception
+                        }
+                    }
+                }
+                if ($null -ne $objStandardErrorTask) {
+                    try {
+                        $strParserError = $objStandardErrorTask.GetAwaiter().GetResult()
+                    }
+                    catch {
+                        if ($null -eq $objCleanupFailure) {
+                            $objCleanupFailure = $_.Exception
+                        }
+                    }
+                }
+            }
+            $objTimer.Stop()
+            $objParserProcess.Dispose()
+        }
+
+        $strErrorClassification = if ([string]::IsNullOrEmpty($strParserError)) {
+            'stderr=empty'
+        }
+        else {
+            'stderr=present'
+        }
+        if ($null -ne $objCleanupFailure) {
+            throw [InvalidOperationException]::new(
+                "The locked Markdown parser cleanup failed on attempt $intAttempt " +
+                    "(exit=$strExitClassification; $strErrorClassification).",
+                $objCleanupFailure
+            )
+        }
+        if ($null -ne $objFailure) {
+            $listExceptions = [Collections.Generic.List[Exception]]::new()
+            $listExceptions.Add($objFailure)
+            $boolPrematureInputClose = $false
+            for ($intException = 0;
+                $intException -lt $listExceptions.Count -and $intException -lt 16;
+                $intException++) {
+                $objException = $listExceptions[$intException]
+                if ($objException -is [IO.IOException]) {
+                    $boolPrematureInputClose = $true
+                    break
+                }
+                if ($objException -is [AggregateException]) {
+                    foreach ($objInnerException in $objException.InnerExceptions) {
+                        $listExceptions.Add($objInnerException)
+                    }
+                }
+                elseif ($null -ne $objException.InnerException) {
+                    $listExceptions.Add($objException.InnerException)
+                }
+            }
+            if ($null -ne $objInputFailure -and
+                -not $boolInputAccepted -and $boolPrematureInputClose) {
+                $listAttemptEvidence.Add(
+                    "attempt $intAttempt`: premature-input-close, " +
+                        "exit=$strExitClassification, $strErrorClassification"
+                )
+                if ($intAttempt -lt 2) {
+                    continue
+                }
+                throw [IO.IOException]::new(
+                    'The locked Markdown parser input closed prematurely after ' +
+                        "2 attempts ($($listAttemptEvidence -join '; ')).",
+                    $objFailure
+                )
+            }
+            if ($objFailure -is [TimeoutException]) {
+                throw [TimeoutException]::new(
+                    'Markdown block parsing must complete within 10 seconds ' +
+                        "(attempt $intAttempt; exit=$strExitClassification; " +
+                        "$strErrorClassification).",
+                    $objFailure
+                )
+            }
+            throw [InvalidOperationException]::new(
+                "The locked Markdown parser failed on attempt $intAttempt " +
+                    "(exit=$strExitClassification; $strErrorClassification).",
+                $objFailure
+            )
+        }
+        if ($intExitCode -ne 0) {
+            throw "The locked Markdown parser rejected a governed document " +
+                "(attempt $intAttempt; exit=$strExitClassification; " +
+                "$strErrorClassification)."
+        }
+        return [pscustomobject]@{
+            Output = $strParserOutput
+            AttemptCount = $intAttempt
+        }
+    }
+}
+
 function Get-MarkdownParseContext {
     # .SYNOPSIS
     # Parses Markdown into trusted structural context.
@@ -1664,32 +1979,10 @@ function Get-MarkdownParseContext {
     $objStartInfo.ArgumentList.Add('-e')
     $objStartInfo.ArgumentList.Add($strNodeProgram)
 
-    $objParserProcess = [System.Diagnostics.Process]::new()
-    $objParserProcess.StartInfo = $objStartInfo
-    try {
-        if (-not $objParserProcess.Start()) {
-            throw 'Could not start the locked Markdown parser.'
-        }
-
-        $objStandardOutputTask = $objParserProcess.StandardOutput.ReadToEndAsync()
-        $objStandardErrorTask = $objParserProcess.StandardError.ReadToEndAsync()
-        $objParserProcess.StandardInput.Write($Content)
-        $objParserProcess.StandardInput.Close()
-        if (-not $objParserProcess.WaitForExit(10000)) {
-            $objParserProcess.Kill($true)
-            [void]$objParserProcess.WaitForExit(1000)
-            throw 'Markdown block parsing must complete within 10 seconds.'
-        }
-
-        $strParserOutput = $objStandardOutputTask.GetAwaiter().GetResult()
-        [void]$objStandardErrorTask.GetAwaiter().GetResult()
-        if ($objParserProcess.ExitCode -ne 0) {
-            throw 'The locked Markdown parser rejected a governed document.'
-        }
-    }
-    finally {
-        $objParserProcess.Dispose()
-    }
+    $objParserResult = Invoke-MarkdownParserProcess `
+        -StartInfo $objStartInfo `
+        -Content $Content
+    $strParserOutput = $objParserResult.Output
 
     try {
         $objRawContext = $strParserOutput | ConvertFrom-Json -ErrorAction Stop
@@ -1873,6 +2166,32 @@ function Get-MarkdownParseContext {
         TopLevelBlocks = [pscustomobject[]]$listTopLevelBlocks.ToArray()
         TopLevelListItems = [pscustomobject[]]$listTopLevelListItems.ToArray()
         LevelTwoHeadings = [pscustomobject[]]$listLevelTwoHeadings.ToArray()
+    }
+}
+
+function Assert-MarkdownParserExactContext {
+    # Confirms ordinary locked-parser output at the process boundary.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param()
+
+    $strMarkdown = @(
+        '## Transport'
+        ''
+        'Paragraph `code`.'
+    ) -join "`n"
+    $objContext = Get-MarkdownParseContext -Content $strMarkdown -LineCount 3
+    $strActual = $objContext | ConvertTo-Json -Depth 5 -Compress
+    $strExpected = '{"CodeBlockRanges":[],"ProseBlocks":[' +
+        '{"Start":0,"End":1,"Text":"Transport","Code":[]},' +
+        '{"Start":2,"End":3,"Text":"Paragraph .","Code":["code"]}],' +
+        '"TopLevelBlocks":[' +
+        '{"Type":"heading_open","Tag":"h2","Start":0,"End":1,"Text":"Transport"},' +
+        '{"Type":"paragraph_open","Tag":"p","Start":2,"End":3,"Text":"Paragraph ."}],' +
+        '"TopLevelListItems":[],"LevelTwoHeadings":[' +
+        '{"Start":0,"End":1,"Text":"Transport"}]}'
+    if ($strActual -cne $strExpected) {
+        throw "Self-test 'ordinary exact Markdown parser context' changed output."
     }
 }
 
@@ -6719,6 +7038,10 @@ if ($SelfTest) {
         -Failure 'Unix device mutation must have a regular Unix file type.'
 
     Assert-OversizedStreamMutationRejected
+
+    Assert-MarkdownParserTransportCleanup
+
+    Assert-MarkdownParserExactContext
 
     Assert-EncodingMutationRejected `
         -Name 'malformed UTF-8 mutation' `
