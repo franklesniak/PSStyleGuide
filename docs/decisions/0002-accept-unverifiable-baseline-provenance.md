@@ -112,11 +112,6 @@ These must equal `length` and `sha256` for `packageLockJson`, and the same two c
 blob `923106fc4ee5508b7a03930b3d8b774db9fcd009` must equal the values for `packageJson`. A
 shallow clone will not have the objects; use `git fetch --unshallow` first.
 
-## Canonical guides
-
-- [STYLE_GUIDE.md](../../STYLE_GUIDE.md)
-- [STYLE_GUIDE_RATIONALE.md](../../STYLE_GUIDE_RATIONALE.md)
-
 ## 7. When this decision must be revisited
 
 - Any gate, script, or workflow starts reading `supplyFreeze.baseline`. It then stops being
@@ -126,3 +121,10 @@ shallow clone will not have the objects; use `git fetch --unshallow` first.
   line-ending difference cannot recur.
 - The repository gains a Git-aware pre-merge verification step for other reasons, which would
   make the rejected third option nearly free.
+
+## References
+
+### Canonical guides
+
+- [STYLE_GUIDE.md](../../STYLE_GUIDE.md)
+- [STYLE_GUIDE_RATIONALE.md](../../STYLE_GUIDE_RATIONALE.md)
