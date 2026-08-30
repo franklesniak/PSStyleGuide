@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260830.6
+# Version: 1.7.20260830.7
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -6087,9 +6087,9 @@ function Get-GovernedDocumentRangeTransitionFailure {
         throw "The metadata event-range head does not contain policy marker $PolicyMarker."
     }
 
-    $boolBaseHasPolicyMarker = $false
+    $boolAnyBaseHasPolicyMarker = $false
     if (-not $IsNewRefRange) {
-        $boolBaseHasPolicyMarker = @(
+        $boolAnyBaseHasPolicyMarker = @(
             $arrBaseRevisions | Where-Object {
                 Test-HistoricalPolicyMarker `
                     -RepositoryRootPath $RepositoryRootPath `
@@ -6097,9 +6097,9 @@ function Get-GovernedDocumentRangeTransitionFailure {
                     -RepositoryRelativePath $PolicyRepositoryRelativePath `
                     -Literal $PolicyMarker
             }
-        ).Count -eq $arrBaseRevisions.Count
+        ).Count -gt 0
     }
-    if (-not $boolBaseHasPolicyMarker) {
+    if (-not $boolAnyBaseHasPolicyMarker) {
         if ($IsNewRefRange) {
             $arrPolicyPathCommits = @(
                 & git -C $RepositoryRootPath log --reverse --topo-order `
@@ -7794,7 +7794,7 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260830\.6$'
+            '(?m)^# Version: 1\.7\.20260830\.7$'
         ).Count -ne 1) {
         throw 'The validator script version does not use build date 20260830.'
     }
@@ -8084,6 +8084,37 @@ if ($SelfTest) {
                 $_ -ceq $strExtractedSelfTestPath
             }).Count -ne 1) {
         throw 'The extracted self-test is outside exact governance.'
+    }
+    $strExtractedSelfTestSource = [IO.File]::ReadAllText(
+        (Join-Path $strRepositoryRootPath $strExtractedSelfTestPath),
+        [Text.UTF8Encoding]::new($false)
+    )
+    foreach ($strHelpSection in @(
+            'SYNOPSIS', 'DESCRIPTION', 'EXAMPLE', 'INPUTS', 'OUTPUTS', 'NOTES'
+        )) {
+        if ([regex]::Matches(
+                $strExtractedSelfTestSource,
+                "(?m)^# \.$strHelpSection$"
+            ).Count -ne 1) {
+            throw "The extracted self-test lacks one $strHelpSection help section."
+        }
+    }
+    foreach ($strExtractedParameter in @(
+            'RepositoryRootPath', 'Revision', 'MaximumBytes',
+            'MaximumMetadataUtcDate'
+        )) {
+        if ([regex]::Matches(
+                $strExtractedSelfTestSource,
+                "(?m)^# \.PARAMETER $strExtractedParameter$"
+            ).Count -ne 1) {
+            throw "The extracted self-test lacks help for $strExtractedParameter."
+        }
+    }
+    if ([regex]::Matches(
+            $strExtractedSelfTestSource,
+            '(?m)^# Version: 1\.0\.20260830\.0$'
+        ).Count -ne 1) {
+        throw 'The extracted self-test lacks first-published version 1.0.20260830.0.'
     }
     foreach ($strExactValidatorInputPath in $script:arrPushGovernedExactPaths) {
         if (-not (Test-AgentInstructionWorkflowPath `
@@ -11344,6 +11375,42 @@ if ($SelfTest) {
         if ($arrTopicTrustFailures.Count -ne 1 -or
             -not ($arrTopicTrustFailures -match [regex]::Escape('.gitattributes'))) {
             throw 'A topic trust-root change did not fail closed.'
+        }
+        $strMixedPolicyPreBase = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strAbsentHistoryTree -Parents @() `
+            -Timestamp ($strMergeHistoricalDate + 'T12:50:00Z') `
+            -Message 'mixed policy pre-base'
+        $strMixedPolicyActiveBase = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strMergeBaseTree -Parents @($strMixedPolicyPreBase) `
+            -Timestamp ($strMergeHistoricalDate + 'T12:51:00Z') `
+            -Message 'mixed policy active base'
+        $strMixedPolicyInactiveBase = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strAbsentHistoryTree -Parents @($strMixedPolicyPreBase) `
+            -Timestamp ($strMergeHistoricalDate + 'T12:52:00Z') `
+            -Message 'mixed policy inactive base'
+        $strMixedPolicyHead = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strMergeBaseTree `
+            -Parents @($strMixedPolicyActiveBase, $strMixedPolicyInactiveBase) `
+            -Timestamp ($strMergeHistoricalDate + 'T12:53:00Z') `
+            -Message 'mixed policy head'
+        $arrMixedPolicyOutsideBases = @(
+            & git -C $strMergeFixtureRoot log --reverse --topo-order `
+                --format=%H "-S$strMetadataRangePolicyMarker" `
+                $strMixedPolicyHead --not $strMixedPolicyActiveBase `
+                $strMixedPolicyInactiveBase -- `
+                '.github/workflows/Test-AgentInstructions.ps1'
+        )
+        if ($LASTEXITCODE -ne 0 -or $arrMixedPolicyOutsideBases.Count -ne 0) {
+            throw 'The mixed-policy fixture did not exclude the active-base introduction.'
+        }
+        $arrMixedPolicyFailures = @(& $scriptBlockGetMergeRangeFailure `
+                -Base @($strMixedPolicyActiveBase, $strMixedPolicyInactiveBase) `
+                -Head $strMixedPolicyHead)
+        if ($arrMixedPolicyFailures.Count -ne 0) {
+            throw (
+                'A valid mixed-policy best-base range was rejected: ' +
+                ($arrMixedPolicyFailures -join '; ')
+            )
         }
         $strCrissCrossLeft = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strMergeBaseTree -Parents @($strMergeBaseCommit) `

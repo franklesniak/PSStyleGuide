@@ -1,3 +1,36 @@
+# .SYNOPSIS
+# Runs the extracted agent-instruction validator self-tests.
+#
+# .DESCRIPTION
+# Validates explicit revision-parent behavior and day-precision metadata
+# freshness with functions loaded by Test-AgentInstructions.ps1.
+#
+# .PARAMETER RepositoryRootPath
+# The absolute path of the repository that supplies Git and document fixtures.
+#
+# .PARAMETER Revision
+# The exact Git commit to use for revision-parent tests.
+#
+# .PARAMETER MaximumBytes
+# The maximum permitted byte count for governed document reads.
+#
+# .PARAMETER MaximumMetadataUtcDate
+# The latest trusted UTC calendar date permitted in metadata fixtures.
+#
+# .EXAMPLE
+# & ./Test-AgentInstructions.SelfTest.ps1 @hashtableArguments
+#
+# # Runs the extracted self-tests with validated named arguments.
+#
+# .INPUTS
+# None. This script does not accept pipeline input.
+#
+# .OUTPUTS
+# None. The script throws when a self-test fails.
+#
+# .NOTES
+# Version: 1.0.20260830.0
+
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param(
