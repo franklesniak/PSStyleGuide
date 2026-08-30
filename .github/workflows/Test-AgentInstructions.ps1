@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260829.0
+# Version: 1.7.20260830.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -223,6 +223,33 @@ $script:strClaudeImportFailure =
 function ConvertFrom-StrictUtf8Data {
     # .SYNOPSIS
     # Decodes trusted bytes as strict UTF-8 without a byte-order mark.
+    #
+    # .DESCRIPTION
+    # Rejects recognized byte-order marks or malformed UTF-8 before decoding.
+    #
+    # .PARAMETER Bytes
+    # Trusted bytes to decode.
+    #
+    # .PARAMETER DisplayName
+    # Input name for invalid-data diagnostics.
+    #
+    # .EXAMPLE
+    # ConvertFrom-StrictUtf8Data -Bytes ([byte[]] @(0x4F, 0x4B)) `
+    #     -DisplayName 'fixture' # Returns System.String 'OK'.
+    #
+    # .INPUTS
+    # None. Pipeline input is not supported.
+    #
+    # .OUTPUTS
+    # System.String.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled by PositionalBinding = $false.
+    # Throws InvalidDataException for a recognized byte-order mark or malformed
+    # UTF-8.
+    #
+    # Version: 1.0.20260830.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -6263,9 +6290,9 @@ if ($SelfTest) {
     $strValidatorSource = [IO.File]::ReadAllText($PSCommandPath)
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260829\.0$'
+            '(?m)^# Version: 1\.7\.20260830\.0$'
         ).Count -ne 1) {
-        throw 'The validator script version does not use build date 20260829.'
+        throw 'The validator script version does not use build date 20260830.'
     }
     $boolSavedWindowsPython = $script:useWindowsPythonLauncher
     $arrSavedPythonNames = $script:pythonPathNames
@@ -8379,6 +8406,7 @@ if ($SelfTest) {
             'yyyy-MM-dd',
             [System.Globalization.CultureInfo]::InvariantCulture
         )
+        $strMergeCurrentTimestamp = $script:objValidationUtcNow.ToString('o')
         $strMergeHistoricalDate = $objMergeCurrentDate.AddDays(-1).ToString(
             'yyyy-MM-dd',
             [System.Globalization.CultureInfo]::InvariantCulture
@@ -8705,7 +8733,7 @@ if ($SelfTest) {
             -PathContent @{'AGENTS.md' = $strIntroducedStaleContent}
         $strIntroducedStaleCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strIntroducedStaleTree -Parents @($strMergeBaseCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T01:00:00Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'introduced stale new-ref content'
         $strIntroducedRestoreContent = $strMergeBaseContent.Replace(
             $strMergeBaseVersion,
@@ -8717,7 +8745,7 @@ if ($SelfTest) {
         $strIntroducedRestoreCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strIntroducedRestoreTree `
             -Parents @($strIntroducedStaleCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T01:01:00Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'introduced endpoint restore'
         $objIntroducedRestoreContext = Get-MetadataEventRevisionContext `
             -RepositoryRootPath $strMergeFixtureRoot `
@@ -8752,11 +8780,11 @@ if ($SelfTest) {
             -PathContent @{'AGENTS.md' = $strInheritedStaleContent}
         $strInheritedStaleCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strInheritedStaleTree -Parents @($strMergeBaseCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T01:02:00Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'inherited stale boundary content'
         $strInheritedBoundaryHead = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strInheritedStaleTree -Parents @($strInheritedStaleCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T01:03:00Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'introduced unchanged boundary head'
         $objInheritedBoundaryContext = Get-MetadataEventRevisionContext `
             -RepositoryRootPath $strMergeFixtureRoot `
@@ -8811,7 +8839,7 @@ if ($SelfTest) {
             }
         $strDecisionAddCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strDecisionAddTree -Parents @($strMergeBaseCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T01:04:00Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'add range-only decision fixtures'
         $strDecisionDeleteTree = & $scriptBlockNewFixtureDeletionTree `
             -BaseTree $strDecisionAddTree `
@@ -8822,7 +8850,7 @@ if ($SelfTest) {
             )
         $strDecisionDeleteCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strDecisionDeleteTree -Parents @($strDecisionAddCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T01:05:00Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'delete range-only decision fixtures'
         $arrTouchedDecisionPaths = @(Read-GitRangeTouchedPath `
                 -RepositoryRootPath $strMergeFixtureRoot `
@@ -8862,14 +8890,14 @@ if ($SelfTest) {
             -PathContent @{$strDecisionPath = $strFreshDecisionContent}
         $strFreshDecisionAddCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strFreshDecisionAddTree -Parents @($strMergeBaseCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T01:06:00Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'add valid range-only decision fixture'
         $strFreshDecisionDeleteTree = & $scriptBlockNewFixtureDeletionTree `
             -BaseTree $strFreshDecisionAddTree -Path @($strDecisionPath)
         $strFreshDecisionDeleteCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strFreshDecisionDeleteTree `
             -Parents @($strFreshDecisionAddCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T01:07:00Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'delete valid range-only decision fixture'
         $arrFreshDecisionFailures = @(& $scriptBlockGetMergeRangeFailure `
                 -Base $strMergeBaseCommit -Head $strFreshDecisionDeleteCommit `
@@ -9044,10 +9072,7 @@ if ($SelfTest) {
             $strRationaleNegativeCommit = & $scriptBlockCreateMergeFixtureCommit `
                 -Tree $strRationaleNegativeTree `
                 -Parents @($strRationaleActivationCommit) `
-                -Timestamp (
-                    $strMergeCurrentDate +
-                    "T09:00:$($intRationaleNegativeCase.ToString('00'))Z"
-                ) `
+                -Timestamp $strMergeCurrentTimestamp `
                 -Message "rationale $($objRationaleNegativeCase.Name)"
             $arrRationaleNegativeFailures = @(
                 & $scriptBlockGetRationaleRangeFailure `
@@ -9074,12 +9099,12 @@ if ($SelfTest) {
         $strRationaleMarkerRemovalCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strRationaleMarkerRemovalTree `
             -Parents @($strRationaleActivationCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T09:01:00Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'remove rationale metadata policy marker'
         $strRationaleMarkerRestoreCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strRationaleActivationTree `
             -Parents @($strRationaleMarkerRemovalCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T09:02:00Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'restore rationale marker and endpoint bytes'
         $arrRationaleMarkerRemovalFailures = @(
             & $scriptBlockGetRationaleRangeFailure `
@@ -9109,7 +9134,7 @@ if ($SelfTest) {
         $strProposedGitIgnoreCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strProposedGitIgnoreTree `
             -Parents @($strMergeBaseCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T00:00:40Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'proposed gitignore deletion'
         $strProposedGitIgnore = Read-GitRevisionText `
             -RepositoryRootPath $strMergeFixtureRoot `
@@ -9139,12 +9164,12 @@ if ($SelfTest) {
         $strUnversionedStaleCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strUnversionedStaleTree `
             -Parents @($strMergeBaseCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T00:00:45Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'stale unversioned transition'
         $strUnversionedRestoreCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strMergeBaseTree `
             -Parents @($strUnversionedStaleCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T00:00:46Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'restore unversioned endpoint'
         $arrUnversionedRangeFailures = @(
             & $scriptBlockGetUnversionedRangeFailure `
@@ -9230,7 +9255,7 @@ if ($SelfTest) {
         }
         $strSideAdoptsPolicy = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strMergeBaseTree -Parents @($strPrePolicySideCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T02:30:00Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'side adopts policy'
         if (@(& $scriptBlockGetMergeRangeFailure -Base $strPrePolicySideCommit `
                 -Head $strSideAdoptsPolicy -RequireCommitDate $true).Count -ne 0) {
@@ -9304,12 +9329,12 @@ if ($SelfTest) {
         $strAdvancedBaseCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strAdvancedBaseTree `
             -Parents @($strMergeBaseCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T00:00:00Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'merge fixture advanced base'
         $strAdvancedBaseDescendant = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strAdvancedBaseTree `
             -Parents @($strAdvancedBaseCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T00:00:01Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'merge fixture unchanged advanced-base descendant'
         & git -C $strMergeFixtureRoot read-tree $strMergeBaseTree
         $strBaseOnlyTrustBlob = [string] (
@@ -9324,7 +9349,7 @@ if ($SelfTest) {
         $strAdvancedTrustBaseCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strAdvancedTrustBaseTree `
             -Parents @($strMergeBaseCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T00:00:05Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'merge fixture advanced trust base'
         & git -C $strMergeFixtureRoot read-tree $strMergeTopicTree
         & git -C $strMergeFixtureRoot update-index --add --cacheinfo `
@@ -9335,13 +9360,13 @@ if ($SelfTest) {
         $strTopicTrustCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strTopicTrustTree `
             -Parents @($strMergeTopicCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T00:00:10Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'merge fixture topic trust-root change'
         & git -C $strMergeFixtureRoot read-tree $strMergeTopicTree
         $strSynchronizedTopicCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strMergeTopicTree `
             -Parents @($strMergeTopicCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T00:00:30Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'merge fixture synchronized topic'
         $arrDirectStaleFailures = @(
             & $scriptBlockGetDirectFailure $strAdvancedBaseCommit
@@ -9495,7 +9520,7 @@ if ($SelfTest) {
         $strRebasedTopicTree = ([string](& git -C $strMergeFixtureRoot write-tree)).Trim()
         $strRebasedTopicCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strRebasedTopicTree -Parents @($strAdvancedBaseCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T00:00:45Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'merge fixture rebased topic'
         $objRebasedSynchronizeContext = Get-MetadataEventRevisionContext `
             -RepositoryRootPath $strMergeFixtureRoot `
@@ -9536,7 +9561,7 @@ if ($SelfTest) {
             )).Trim()
         $strChangedRebasedTopicCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strChangedRebasedTopicTree -Parents @($strAdvancedBaseCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T00:00:50Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'merge fixture changed rebased topic'
         if (Test-TopicOwnedGitPathDeltaEqual `
                 -RepositoryRootPath $strMergeFixtureRoot `
@@ -9691,7 +9716,7 @@ if ($SelfTest) {
         $strInheritedMergeCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strMergeTopicTree `
             -Parents @($strAdvancedBaseCommit, $strMergeTopicCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T00:01:00Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'merge fixture inherited result'
         $arrInheritedMergeFailures = @(& $scriptBlockGetMergeRangeFailure `
                 -Base $strAdvancedBaseCommit -Head $strInheritedMergeCommit `
@@ -9771,7 +9796,7 @@ if ($SelfTest) {
         $strUniqueMergeCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strUniqueMergeTree `
             -Parents @($strAdvancedBaseCommit, $strMergeTopicCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T00:02:00Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'merge fixture unique result'
         $arrUniqueMergeFailures = @(& $scriptBlockGetMergeRangeFailure `
                 -Base $strAdvancedBaseCommit -Head $strUniqueMergeCommit `
@@ -9810,12 +9835,12 @@ if ($SelfTest) {
         $strNewerParentCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strNewerParentTree `
             -Parents @($strMergeBaseCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T00:03:00Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'merge fixture newer parent'
         $strRegressingMergeCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strMergeTopicTree `
             -Parents @($strNewerParentCommit, $strMergeTopicCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T00:04:00Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'merge fixture regressing inherited result'
         $arrRegressingMergeFailures = @(& $scriptBlockGetMergeRangeFailure `
                 -Base $strNewerParentCommit -Head $strRegressingMergeCommit `
@@ -9829,7 +9854,7 @@ if ($SelfTest) {
         }
         $strBackwardBaseCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strNewerParentTree -Parents @($strRegressingMergeCommit) `
-            -Timestamp ($strMergeCurrentDate + 'T00:05:00Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'backward push base fixture'
         $arrBackwardRangeCommits = @(& git -C $strMergeFixtureRoot rev-list `
                 "$strBackwardBaseCommit..$strRegressingMergeCommit")
@@ -9869,7 +9894,7 @@ if ($SelfTest) {
         $strExcessParentMerge = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strMergeBaseTree `
             -Parents $listExcessParents.ToArray() `
-            -Timestamp ($strMergeCurrentDate + 'T12:00:00Z') `
+            -Timestamp $strMergeCurrentTimestamp `
             -Message 'merge fixture excessive parent count'
         $boolExcessParentCountRejected = $false
         try {

@@ -4,7 +4,7 @@
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-08-29
+- **Last Updated:** 2026-08-30
 - **Scope:** Records the accepted in-repository trust-root limitation, its consequences, and the conditions that require reconsideration. Does not claim that the limitation is absent.
 
 ## Status
