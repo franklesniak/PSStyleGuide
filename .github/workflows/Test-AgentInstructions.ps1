@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260830.3
+# Version: 1.7.20260830.4
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -34,8 +34,8 @@ $intGitIgnoreMaximumInputBytes = 65536
 $intDocsInstructionsMaximumInputBytes = 131072
 $intInstructionDocumentMaximumInputBytes = 131072
 $intStyleGuideRationaleMaximumInputBytes = 196608
-$intValidatorMaximumInputBytes = 540672
-$intHistoricalPolicyMarkerMaximumBytes = 540672
+$intValidatorMaximumInputBytes = 557056
+$intHistoricalPolicyMarkerMaximumBytes = 557056
 $intGitPathListMaximumBytes = 1048576
 $intMetadataMaximumParents = 64
 $intNewRefMaximumCommitEvidence = 2048
@@ -247,11 +247,9 @@ function ConvertFrom-StrictUtf8Data {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled by PositionalBinding = $false.
-    # Throws InvalidDataException for a recognized byte-order mark or malformed
-    # UTF-8.
-    #
-    # Version: 1.0.20260830.0
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -325,8 +323,10 @@ function Assert-EncodingMutationRejected {
     # None.
     #
     # .NOTES
-    # Private helper; no positional parameters.
-    # Version: 1.0.20260819.0
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -393,7 +393,8 @@ function Get-RepositoryInputMetadataFailure {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
@@ -495,7 +496,8 @@ function Assert-RepositoryInputMetadataMutationRejected {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
@@ -581,7 +583,8 @@ function Read-BoundedStreamData {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([byte])]
@@ -673,7 +676,8 @@ function Read-BoundedProcessData {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
@@ -766,12 +770,10 @@ function ConvertFrom-GitPathListData {
     # [string] Zero or more decoded repository-relative paths.
     #
     # .NOTES
-    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
-    # surface. Parameters, return shape, and positional contract may change
-    # without notice.
-    #
-    # Positional parameters are disabled. Internal callers must use named
-    # parameters. Version: 1.1.20260828.0.
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -843,7 +845,8 @@ function Read-GitTrackedPath {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
@@ -932,7 +935,8 @@ function Read-GitRangeTouchedPath {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
@@ -1076,7 +1080,8 @@ function Read-RepositoryInputData {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([byte])]
@@ -1188,7 +1193,8 @@ function Read-GitRevisionText {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
@@ -1288,7 +1294,8 @@ function Test-HistoricalPolicyMarker {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
@@ -1353,7 +1360,8 @@ function Get-GovernedDocumentParentContext {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
@@ -1469,7 +1477,8 @@ function Assert-OversizedStreamMutationRejected {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
@@ -1597,7 +1606,8 @@ function Assert-MarkdownParserTransportCleanup {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
@@ -1713,7 +1723,8 @@ function Get-TomlParseContext {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
@@ -2002,7 +2013,8 @@ function Invoke-MarkdownParserProcess {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
@@ -2225,8 +2237,10 @@ function Get-MarkdownParseContext {
     # [pscustomobject] The validated Markdown parse context.
     #
     # .NOTES
-    # Private helper; no positional parameters.
-    # Version: 1.2.20260820.0
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -2568,7 +2582,8 @@ function Assert-MarkdownParserExactContext {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
@@ -2617,8 +2632,10 @@ function Get-OperativeMarkdownContext {
     # [pscustomobject] Operative Markdown text, prose, lines, and range metadata.
     #
     # .NOTES
-    # Private helper; no positional parameters.
-    # Version: 1.0.20260819.0
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -2682,8 +2699,10 @@ function ConvertTo-OperativeMarkdownText {
     # [string] The operative Markdown text.
     #
     # .NOTES
-    # Private helper; no positional parameters.
-    # Version: 1.0.20260819.0
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -2717,7 +2736,10 @@ function Get-ActiveClaudeImportReference {
     # [string] Each active Claude import target.
     #
     # .NOTES
-    # Private helper; no positional parameters. Version: 1.0.20260823.0.
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -2764,7 +2786,8 @@ function Get-ClaudeImportFailure {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
@@ -2805,7 +2828,8 @@ function Get-NestedClaudeImportFailure {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
@@ -2855,8 +2879,10 @@ function Get-MarkdownLevelTwoSectionContext {
     # [pscustomobject] The section's text and parser-derived block context.
     #
     # .NOTES
-    # Private helper; no positional parameters.
-    # Version: 1.1.20260820.0
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -2949,7 +2975,10 @@ function Test-MetadataCalendarDatePair {
     # [bool] True when both strings represent the same real calendar date.
     #
     # .NOTES
-    # Private helper; no positional parameters. Version: 1.0.20260819.0.
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param(
@@ -3000,7 +3029,10 @@ function ConvertTo-MetadataComparisonText {
     # [string] Normalized comparison text.
     #
     # .NOTES
-    # Private helper; no positional parameters. Version: 1.1.20260820.0.
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -3070,7 +3102,8 @@ function ConvertFrom-TrustedEventTimestamp {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([DateTimeOffset])]
@@ -3143,7 +3176,8 @@ function Get-CurrentInputMetadataFreshnessFailure {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
@@ -3230,7 +3264,8 @@ function Get-LastUpdatedMetadataFreshnessFailure {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
@@ -3360,7 +3395,8 @@ function Test-TopicOwnedGitPathDeltaEqual {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
@@ -3444,7 +3480,8 @@ function Get-MarkdownParserBootstrapFailure {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
@@ -3486,7 +3523,8 @@ function Test-GitIgnorePathEffective {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
@@ -3571,7 +3609,8 @@ function Test-ProhibitedClaudeLocalPath {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
@@ -3636,7 +3675,8 @@ function Get-MetadataEventRevisionContext {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
@@ -3861,6 +3901,7 @@ function Get-MetadataEventRevisionContext {
             $arrFreshnessBases = @($setBoundaryParents | Sort-Object)
             return [pscustomobject]@{
                 HistoryBaseRevision = $BaseRevision
+                HistoryBaseRevisions = @($BaseRevision)
                 FreshnessBaseRevision = if ($arrFreshnessBases.Count -eq 1) {
                     $arrFreshnessBases[0]
                 } else { '' }
@@ -3891,6 +3932,7 @@ function Get-MetadataEventRevisionContext {
         }
         return [pscustomobject]@{
             HistoryBaseRevision = $BaseRevision
+            HistoryBaseRevisions = @($BaseRevision)
             FreshnessBaseRevision = if ($boolHeadIntroducedByPush) {
                 $BaseRevision
             }
@@ -3937,13 +3979,28 @@ function Get-MetadataEventRevisionContext {
     if ($LASTEXITCODE -ne 0) {
         throw 'The pull request base tip is unavailable.'
     }
-    $arrMergeBases = @(& git -C $RepositoryRootPath merge-base --all `
-            $BaseRevision $HeadRevision 2>$null)
-    if ($LASTEXITCODE -ne 0 -or $arrMergeBases.Count -ne 1 -or
-        ([string] $arrMergeBases[0]).Trim() -notmatch $strObjectIdPattern) {
-        throw 'The pull request metadata range must have one available merge base.'
+    $arrMergeBases = @(
+        & git -C $RepositoryRootPath merge-base --all `
+            $BaseRevision $HeadRevision 2>$null |
+            ForEach-Object { ([string]$_).Trim() } |
+            Sort-Object -Unique
+    )
+    if ($LASTEXITCODE -ne 0 -or $arrMergeBases.Count -lt 1 -or
+        $arrMergeBases.Count -gt $intMetadataMaximumParents -or
+        @($arrMergeBases | Where-Object {
+                $_ -notmatch $strObjectIdPattern -or $_ -match $strZeroObjectIdPattern
+            }).Count -ne 0) {
+        throw 'The pull request metadata range must have 1 through 64 available merge bases.'
     }
-    $strHistoryBase = ([string] $arrMergeBases[0]).Trim()
+    foreach ($strMergeBase in $arrMergeBases) {
+        & git -C $RepositoryRootPath cat-file -e "$strMergeBase`^{commit}" 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            throw 'The pull request metadata range contains an unavailable merge base.'
+        }
+    }
+    $strHistoryBase = if ($arrMergeBases.Count -eq 1) {
+        $arrMergeBases[0]
+    } else { '' }
 
     if ($PullRequestAction -cne 'synchronize') {
         if (-not [string]::IsNullOrEmpty($PreviousHeadRevision)) {
@@ -3951,8 +4008,9 @@ function Get-MetadataEventRevisionContext {
         }
         return [pscustomobject]@{
             HistoryBaseRevision = $strHistoryBase
+            HistoryBaseRevisions = $arrMergeBases
             FreshnessBaseRevision = $strHistoryBase
-            FreshnessBaseRevisions = @($strHistoryBase)
+            FreshnessBaseRevisions = $arrMergeBases
             EvaluateFreshness = $true
             PreviousTopicBaseRevision = ''
             PreviousTopicHeadRevision = ''
@@ -3974,20 +4032,41 @@ function Get-MetadataEventRevisionContext {
     if ($LASTEXITCODE -ne 0) {
         throw 'The synchronize previous topic head is unavailable.'
     }
-    $arrPreviousMergeBases = @(& git -C $RepositoryRootPath merge-base --all `
-            $BaseRevision $PreviousHeadRevision 2>$null)
-    if ($LASTEXITCODE -ne 0 -or $arrPreviousMergeBases.Count -ne 1 -or
-        ([string]$arrPreviousMergeBases[0]).Trim() -notmatch $strObjectIdPattern) {
-        throw 'The synchronize previous topic range must have one available merge base.'
+    $arrPreviousMergeBases = @(
+        & git -C $RepositoryRootPath merge-base --all `
+            $BaseRevision $PreviousHeadRevision 2>$null |
+            ForEach-Object { ([string]$_).Trim() } |
+            Sort-Object -Unique
+    )
+    if ($LASTEXITCODE -ne 0 -or $arrPreviousMergeBases.Count -lt 1 -or
+        $arrPreviousMergeBases.Count -gt $intMetadataMaximumParents -or
+        @($arrPreviousMergeBases | Where-Object {
+                $_ -notmatch $strObjectIdPattern -or $_ -match $strZeroObjectIdPattern
+            }).Count -ne 0) {
+        throw 'The synchronize previous topic range must have 1 through 64 available merge bases.'
     }
+    foreach ($strPreviousMergeBase in $arrPreviousMergeBases) {
+        & git -C $RepositoryRootPath cat-file -e `
+            "$strPreviousMergeBase`^{commit}" 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            throw 'The synchronize previous topic range contains an unavailable merge base.'
+        }
+    }
+    $boolSingleTopicBase = $arrMergeBases.Count -eq 1 -and
+        $arrPreviousMergeBases.Count -eq 1
     return [pscustomobject]@{
         HistoryBaseRevision = $strHistoryBase
+        HistoryBaseRevisions = $arrMergeBases
         FreshnessBaseRevision = $PreviousHeadRevision
         FreshnessBaseRevisions = @($PreviousHeadRevision)
         EvaluateFreshness = $true
-        PreviousTopicBaseRevision = ([string]$arrPreviousMergeBases[0]).Trim()
+        PreviousTopicBaseRevision = if ($boolSingleTopicBase) {
+            $arrPreviousMergeBases[0]
+        } else { '' }
         PreviousTopicHeadRevision = $PreviousHeadRevision
-        CurrentTopicBaseRevision = $strHistoryBase
+        CurrentTopicBaseRevision = if ($boolSingleTopicBase) {
+            $arrMergeBases[0]
+        } else { '' }
         CurrentTopicHeadRevision = $HeadRevision
     }
 }
@@ -4029,12 +4108,10 @@ function Test-GovernedInstructionPath {
     # family; otherwise, false.
     #
     # .NOTES
-    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
-    # surface. Parameters, return shape, and positional contract may change
-    # without notice.
-    #
-    # Positional parameters are disabled. Internal callers must use named
-    # parameters. Version: 1.1.20260827.0.
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param(
@@ -4089,7 +4166,8 @@ function Test-GovernedInstructionPathCaseMismatch {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
@@ -4150,7 +4228,8 @@ function Test-ExactPathCaseMismatch {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
@@ -4192,7 +4271,8 @@ function Test-GovernedInstructionInventoryPath {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
@@ -4239,7 +4319,8 @@ function Test-AgentInstructionWorkflowPath {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
@@ -4294,7 +4375,8 @@ function Test-BackwardCommitMove {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
@@ -4341,7 +4423,8 @@ function Get-DecisionRecordPathFailure {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
@@ -4388,7 +4471,8 @@ function Get-PushGovernedPathApplicability {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
@@ -4551,7 +4635,10 @@ function Get-GovernedInstructionInventoryFailure {
     # [string] One record for each inventory failure.
     #
     # .NOTES
-    # Private helper; no positional parameters. Version: 1.0.20260820.1.
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4642,7 +4729,10 @@ function Get-DocumentationClaimFailure {
     # [string] One record for each documentation claim failure.
     #
     # .NOTES
-    # Private helper; no positional parameters. Version: 1.0.20260823.0.
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4707,7 +4797,8 @@ function Get-DocumentMetadataContext {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
@@ -4970,7 +5061,10 @@ function Get-DocumentMetadataTransitionFailure {
     # [string] Zero or more failure diagnostics.
     #
     # .NOTES
-    # Private helper. Positional binding is disabled. Version: 1.2.20260830.0.
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -5170,12 +5264,10 @@ function Get-DocumentMetadataRangeTransitionFailure {
     # output means every supplied transition passed.
     #
     # .NOTES
-    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
-    # surface. Parameters, return shape, and positional contract may change
-    # without notice.
-    #
-    # Positional parameters are disabled. Internal callers must use named
-    # parameters. Version: 1.1.20260827.0.
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -5244,7 +5336,10 @@ function Get-TrustRootRangeMutationFailure {
     # [string] One diagnostic per touched trust-root path.
     #
     # .NOTES
-    # Private helper. Positional binding is disabled. Version: 1.2.20260830.0.
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -5355,7 +5450,8 @@ function Get-GovernedDocumentCommitTransitionFailure {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
@@ -5691,7 +5787,8 @@ function Get-GovernedDocumentRangeTransitionFailure {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
@@ -5969,8 +6066,10 @@ function Get-TomlSemanticStatementContext {
     # [pscustomobject] One semantic TOML statement and source offset.
     #
     # .NOTES
-    # Private helper; no positional parameters.
-    # Version: 1.0.20260819.0
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -6033,7 +6132,8 @@ function Get-GitHubPluginEnablementContext {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
@@ -6098,7 +6198,8 @@ function ConvertTo-DisabledGitHubPluginMutation {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
@@ -6171,7 +6272,8 @@ function Get-AgentInstructionFailure {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
@@ -6616,7 +6718,8 @@ function Assert-Failure {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
@@ -6718,7 +6821,8 @@ function Assert-FixtureAccepted {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Positional parameters are disabled for internal callers.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
     # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
@@ -6898,7 +7002,7 @@ if (-not [string]::IsNullOrEmpty($TrustedEventTimestamp)) {
     $strTrustedEventUtcDate = (ConvertFrom-TrustedEventTimestamp `
             -Timestamp $TrustedEventTimestamp).ToString('yyyy-MM-dd')
 }
-$strEventHistoryBaseRevision = $RangeBaseRevision
+$arrEventHistoryBaseRevisions = @($RangeBaseRevision)
 $strEventFreshnessBaseRevision = ''
 $arrEventFreshnessBaseRevisions = @()
 $arrNewRefBoundaryRevisions = @()
@@ -6924,7 +7028,9 @@ if ($boolEventRangeRequested -and
         -EventHeadDistinct $EventHeadDistinct `
         -NewRefCommitCount $NewRefCommitCount `
         -NewRefCommitEvidenceJson $NewRefCommitEvidenceJson
-    $strEventHistoryBaseRevision = $objMetadataEventRevisionContext.HistoryBaseRevision
+    $arrEventHistoryBaseRevisions = @(
+        $objMetadataEventRevisionContext.HistoryBaseRevisions
+    )
     $strEventFreshnessBaseRevision = $objMetadataEventRevisionContext.FreshnessBaseRevision
     $arrEventFreshnessBaseRevisions = @(
         $objMetadataEventRevisionContext.FreshnessBaseRevisions
@@ -6997,17 +7103,18 @@ if (-not [string]::IsNullOrEmpty($strValidatedInputRevision) -and
         $strCheckedOutRevision,
         [StringComparison]::OrdinalIgnoreCase
     )) {
-    $strTrustRootBaseRevision = if ($EventName -ceq 'pull_request_target') {
-        $strEventHistoryBaseRevision
-    }
-    else {
-        $RangeBaseRevision
-    }
-    $arrTrustRootFailures = @(Get-TrustRootRangeMutationFailure `
-            -RepositoryRootPath $strRepositoryRootPath `
-            -BaseRevision $strTrustRootBaseRevision `
-            -HeadRevision $RangeHeadRevision `
-            -RepositoryRelativePath $script:arrTrustRootPaths)
+    $arrTrustRootBaseRevisions = if ($EventName -ceq 'pull_request_target') {
+        $arrEventHistoryBaseRevisions
+    } else { @($RangeBaseRevision) }
+    $arrTrustRootFailures = @(
+        foreach ($strTrustRootBaseRevision in $arrTrustRootBaseRevisions) {
+            Get-TrustRootRangeMutationFailure `
+                -RepositoryRootPath $strRepositoryRootPath `
+                -BaseRevision $strTrustRootBaseRevision `
+                -HeadRevision $RangeHeadRevision `
+                -RepositoryRelativePath $script:arrTrustRootPaths
+        }
+    ) | Sort-Object -Unique
     if ($arrTrustRootFailures.Count -gt 0) {
         throw (
             'Trusted validation root changed:' + [Environment]::NewLine + '- ' +
@@ -7020,19 +7127,34 @@ $arrTrackedRepositoryPaths = @(Read-GitTrackedPath `
         -RepositoryRootPath $strRepositoryRootPath `
         -Revision $strValidatedInputRevision `
         -MaximumBytes $intGitPathListMaximumBytes)
-$arrRangeTouchedDecisionPaths = @()
+$arrRangeTouchedRepositoryPaths = @()
 if ($boolEventRangeRequested) {
-    $arrRangeTouchedDecisionPaths = @(Read-GitRangeTouchedPath `
-            -RepositoryRootPath $strRepositoryRootPath `
-            -BaseRevision $strEventHistoryBaseRevision `
-            -HeadRevision $RangeHeadRevision `
-            -IsNewRefRange ([bool]$RangeIsNewRef) `
-            -NewRefBoundaryRevision $arrNewRefBoundaryRevisions `
-            -NewRefHasIntroducedCommit `
-                ($arrNewRefIntroducedCommitRevisions.Count -gt 0) `
-            -RepositoryRelativePathspec 'docs/decisions/' `
-            -MaximumBytes $intGitPathListMaximumBytes)
+    $arrRangeTouchedRepositoryPaths = @(
+        foreach ($strEventHistoryBase in $arrEventHistoryBaseRevisions) {
+            Read-GitRangeTouchedPath `
+                -RepositoryRootPath $strRepositoryRootPath `
+                -BaseRevision $strEventHistoryBase `
+                -HeadRevision $RangeHeadRevision `
+                -IsNewRefRange ([bool]$RangeIsNewRef) `
+                -NewRefBoundaryRevision $arrNewRefBoundaryRevisions `
+                -NewRefHasIntroducedCommit `
+                    ($arrNewRefIntroducedCommitRevisions.Count -gt 0) `
+                -RepositoryRelativePathspec ':(top)**' `
+                -MaximumBytes $intGitPathListMaximumBytes
+        }
+    ) | Sort-Object -Unique
 }
+$arrRangeTouchedDecisionPaths = @(
+    $arrRangeTouchedRepositoryPaths |
+        Where-Object { $_ -cmatch $script:strDecisionRecordDirectoryPathPattern }
+)
+$arrRangeTouchedGovernedInstructionPaths = @(
+    $arrRangeTouchedRepositoryPaths |
+        Where-Object {
+            Test-GovernedInstructionInventoryPath `
+                -RepositoryRelativePath ([string]$_)
+        }
+)
 $arrDecisionRecordInventoryPaths = @(
     @($arrTrackedRepositoryPaths + $arrRangeTouchedDecisionPaths) |
         Where-Object { $_ -cmatch $script:strDecisionRecordDirectoryPathPattern } |
@@ -7050,11 +7172,12 @@ $arrGovernedMetadataDocuments += @(
         }
 )
 $arrTrackedGovernedInstructionPaths = @(
-    $arrTrackedRepositoryPaths |
+    @($arrTrackedRepositoryPaths + $arrRangeTouchedGovernedInstructionPaths) |
         Where-Object {
             Test-GovernedInstructionInventoryPath `
                 -RepositoryRelativePath ([string] $_)
-        }
+        } |
+        Sort-Object -Unique
 )
 $arrGovernedInstructionInventoryFailures = @(
     Get-GovernedInstructionInventoryFailure `
@@ -7073,7 +7196,7 @@ if ([string]::IsNullOrEmpty($strValidatedInputRevision)) {
     $arrRequiredPaths += @(
         $arrGovernedMetadataDocuments |
             Where-Object {
-                $arrRangeTouchedDecisionPaths -cnotcontains $_.Path -or
+                $arrRangeTouchedRepositoryPaths -cnotcontains $_.Path -or
                 $arrTrackedRepositoryPaths -ccontains $_.Path
             } |
             ForEach-Object {
@@ -7171,10 +7294,10 @@ foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
     $strDocumentPath = Join-Path `
         -Path $strRepositoryRootPath `
         -ChildPath $objDocumentSpec.Path
-    $boolRangeOnlyDecisionRecord =
-        $arrRangeTouchedDecisionPaths -ccontains $objDocumentSpec.Path -and
+    $boolRangeOnlyGovernedDocument =
+        $arrRangeTouchedRepositoryPaths -ccontains $objDocumentSpec.Path -and
         $arrTrackedRepositoryPaths -cnotcontains $objDocumentSpec.Path
-    $strDocumentContent = if ($boolRangeOnlyDecisionRecord) {
+    $strDocumentContent = if ($boolRangeOnlyGovernedDocument) {
         $null
     }
     elseif ([string]::IsNullOrEmpty($strValidatedInputRevision)) {
@@ -7360,24 +7483,30 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
                     -RequiredDocument $objDocumentContext.RequiredDocument)
         }
     }
-    $arrRepositoryFailures += @(Get-GovernedDocumentRangeTransitionFailure `
-            -Name $objDocumentContext.Path `
-            -RepositoryRootPath $strRepositoryRootPath `
-            -RepositoryRelativePath $objDocumentContext.Path `
-            -MaximumBytes $objDocumentContext.MaximumBytes `
-            -BaseRevision $strEventHistoryBaseRevision `
-            -HeadRevision $RangeHeadRevision `
-            -InputRevision $strValidatedInputRevision `
-            -IsNewRefRange ([bool]$RangeIsNewRef) `
-            -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
-            -PolicyMaximumBytes $intValidatorMaximumInputBytes `
-            -PolicyMarker $objDocumentContext.PolicyMarker `
-            -RequireExpectedUtcDateForRenderedChange `
-                $boolRequireRangeCommitDateFreshness `
-            -CommitDateFreshnessRevision `
-                $arrNewRefIntroducedCommitRevisions `
-            -RequiresVersion $objDocumentContext.RequiresVersion `
-            -RequiredDocument $objDocumentContext.RequiredDocument)
+    $arrRangeTransitionFailures = @(
+        foreach ($strEventHistoryBase in $arrEventHistoryBaseRevisions) {
+            Get-GovernedDocumentRangeTransitionFailure `
+                -Name $objDocumentContext.Path `
+                -RepositoryRootPath $strRepositoryRootPath `
+                -RepositoryRelativePath $objDocumentContext.Path `
+                -MaximumBytes $objDocumentContext.MaximumBytes `
+                -BaseRevision $strEventHistoryBase `
+                -HeadRevision $RangeHeadRevision `
+                -InputRevision $strValidatedInputRevision `
+                -IsNewRefRange ([bool]$RangeIsNewRef) `
+                -PolicyRepositoryRelativePath `
+                    '.github/workflows/Test-AgentInstructions.ps1' `
+                -PolicyMaximumBytes $intValidatorMaximumInputBytes `
+                -PolicyMarker $objDocumentContext.PolicyMarker `
+                -RequireExpectedUtcDateForRenderedChange `
+                    $boolRequireRangeCommitDateFreshness `
+                -CommitDateFreshnessRevision `
+                    $arrNewRefIntroducedCommitRevisions `
+                -RequiresVersion $objDocumentContext.RequiresVersion `
+                -RequiredDocument $objDocumentContext.RequiredDocument
+        }
+    ) | Sort-Object -Unique
+    $arrRepositoryFailures += @($arrRangeTransitionFailures)
     if ($EventName -ceq 'push' -and $EventHeadDistinct -ceq 'false' -and
         ($RangeIsNewRef -or $boolValidateBackwardPushHead)) {
         $arrRepositoryFailures += @(Get-GovernedDocumentCommitTransitionFailure `
@@ -7461,9 +7590,9 @@ Write-Output 'Agent-instruction contract passed.'
 if ($SelfTest) {
     #region Mutation self-tests
 
-    if ($intValidatorMaximumInputBytes -ne 540672 -or
-        $intHistoricalPolicyMarkerMaximumBytes -ne 540672) {
-        throw 'The validator and historical policy-marker caps must be 540672 bytes.'
+    if ($intValidatorMaximumInputBytes -ne 557056 -or
+        $intHistoricalPolicyMarkerMaximumBytes -ne 557056) {
+        throw 'The validator and historical policy-marker caps must be 557056 bytes.'
     }
 
     $strValidatorSource = [IO.File]::ReadAllText($PSCommandPath)
@@ -7506,6 +7635,25 @@ if ($SelfTest) {
             if (@($objHelp.Examples).Count -eq 0) {
                 $listMissingHelp.Add('EXAMPLE')
             }
+            $strFunctionNotes = [string]$objHelp.Notes
+            foreach ($strRequiredNote in @(
+                    'PRIVATE/INTERNAL HELPER - This function is not part of the public API.',
+                    'Parameters, return shape, and positional contract can change without notice.',
+                    'Positional parameters are disabled; internal callers use named arguments.'
+                )) {
+                if (-not $strFunctionNotes.Contains(
+                        $strRequiredNote,
+                        [StringComparison]::Ordinal
+                    )) {
+                    $listMissingHelp.Add("NOTES literal: $strRequiredNote")
+                }
+            }
+            if ([regex]::Matches(
+                    $strFunctionNotes,
+                    '(?m)^Version: 1\.0\.20260830\.0\.$'
+                ).Count -ne 1) {
+                $listMissingHelp.Add('landing Version 1.0.20260830.0')
+            }
             foreach ($objParameterAst in $objFunctionAst.Body.ParamBlock.Parameters) {
                 $strParameterName = $objParameterAst.Name.VariablePath.UserPath
                 if (-not $objHelp.Parameters.ContainsKey($strParameterName.ToUpperInvariant())) {
@@ -7524,7 +7672,7 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260830\.3$'
+            '(?m)^# Version: 1\.7\.20260830\.4$'
         ).Count -ne 1) {
         throw 'The validator script version does not use build date 20260830.'
     }
@@ -9756,7 +9904,7 @@ if ($SelfTest) {
             throw 'A historical marker-absent policy was classified as governed.'
         }
         & $scriptBlockAssertHistoryFailure `
-            (& $scriptBlockNewPolicyTree ([byte[]]::new(540673))) 'must not exceed 540672 bytes'
+            (& $scriptBlockNewPolicyTree ([byte[]]::new(557057))) 'must not exceed 557056 bytes'
         & $scriptBlockAssertHistoryFailure `
             (& $scriptBlockNewPolicyTree ([byte[]] @(0xC3, 0x28))) 'valid UTF-8 without a BOM'
         & $scriptBlockAssertHistoryFailure `
@@ -10074,6 +10222,10 @@ if ($SelfTest) {
         $strDecisionPath = 'docs/decisions/0001-range-fixture.md'
         $strMalformedDecisionPath = 'docs/decisions/range-fixture.md'
         $strUnrelatedRangePath = 'docs/range-fixture.md'
+        $arrTransientGovernedPaths = @(
+            '.cursor/rules/transient.mdc',
+            'tools/AGENTS.md'
+        )
         $strDecisionContentPrefix = @(
             '# Range fixture decision',
             '',
@@ -10095,6 +10247,8 @@ if ($SelfTest) {
                 $strDecisionPath = $strStaleDecisionContent
                 $strMalformedDecisionPath = $strMalformedDecisionContent
                 $strUnrelatedRangePath = 'Unrelated range fixture.'
+                '.cursor/rules/transient.mdc' = 'Transient Cursor instruction.'
+                'tools/AGENTS.md' = 'Transient nested agent instruction.'
             }
         $strDecisionAddCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strDecisionAddTree -Parents @($strMergeBaseCommit) `
@@ -10105,7 +10259,9 @@ if ($SelfTest) {
             -Path @(
                 $strDecisionPath,
                 $strMalformedDecisionPath,
-                $strUnrelatedRangePath
+                $strUnrelatedRangePath,
+                $arrTransientGovernedPaths[0],
+                $arrTransientGovernedPaths[1]
             )
         $strDecisionDeleteCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strDecisionDeleteTree -Parents @($strDecisionAddCommit) `
@@ -10122,6 +10278,36 @@ if ($SelfTest) {
             $arrTouchedDecisionPaths -cnotcontains $strMalformedDecisionPath -or
             $arrTouchedDecisionPaths -ccontains $strUnrelatedRangePath) {
             throw 'Authenticated range-touched decision discovery was incomplete.'
+        }
+        $arrTouchedRepositoryPaths = @(Read-GitRangeTouchedPath `
+                -RepositoryRootPath $strMergeFixtureRoot `
+                -BaseRevision $strMergeBaseCommit `
+                -HeadRevision $strDecisionDeleteCommit `
+                -IsNewRefRange $false `
+                -RepositoryRelativePathspec ':(top)**' `
+                -MaximumBytes $intGitPathListMaximumBytes)
+        $arrTouchedGovernedPaths = @(
+            $arrTouchedRepositoryPaths |
+                Where-Object {
+                    Test-GovernedInstructionInventoryPath `
+                        -RepositoryRelativePath ([string]$_)
+                }
+        )
+        $arrTransientInventoryFailures = @(
+            Get-GovernedInstructionInventoryFailure `
+                -CatalogPaths @($arrGovernedInstructionDocuments.Path) `
+                -TrackedPaths @(
+                    $arrTrackedGovernedInstructionPaths + $arrTouchedGovernedPaths
+                )
+        )
+        foreach ($strTransientGovernedPath in $arrTransientGovernedPaths) {
+            $strExpectedTransientFailure =
+                'Tracked governed instruction is missing from the catalog: ' +
+                $strTransientGovernedPath
+            if ($arrTouchedGovernedPaths -cnotcontains $strTransientGovernedPath -or
+                $arrTransientInventoryFailures -cnotcontains $strExpectedTransientFailure) {
+                throw "Transient governed path escaped range inventory: $strTransientGovernedPath"
+            }
         }
         $arrMalformedDecisionFailures = @(Get-DecisionRecordPathFailure `
                 -RepositoryRelativePath $strMalformedDecisionPath)
@@ -10963,25 +11149,86 @@ if ($SelfTest) {
             -Parents @($strCrissCrossRight, $strCrissCrossLeft) `
             -Timestamp ($strMergeHistoricalDate + 'T13:03:00Z') `
             -Message 'criss-cross merge right'
-        $boolMultipleMergeBasesRejected = $false
+        $arrExpectedCrissCrossBases = @(
+            $strCrissCrossLeft,
+            $strCrissCrossRight
+        ) | Sort-Object
+        $objCrissCrossOpenedContext = Get-MetadataEventRevisionContext `
+            -RepositoryRootPath $strMergeFixtureRoot `
+            -EventName 'pull_request_target' `
+            -PullRequestAction 'opened' `
+            -BaseRevision $strCrissCrossMergeLeft `
+            -HeadRevision $strCrissCrossMergeRight `
+            -IsNewRefRange $false -PreviousHeadRevision '' `
+            -EventHeadRevision '' -EventHeadDistinct ''
+        if ($objCrissCrossOpenedContext.HistoryBaseRevision -cne '' -or
+            $objCrissCrossOpenedContext.FreshnessBaseRevision -cne '' -or
+            (@($objCrissCrossOpenedContext.HistoryBaseRevisions) -join ',') -cne
+                ($arrExpectedCrissCrossBases -join ',') -or
+            (@($objCrissCrossOpenedContext.FreshnessBaseRevisions) -join ',') -cne
+                ($arrExpectedCrissCrossBases -join ',')) {
+            throw 'A valid opened criss-cross range did not retain every best merge base.'
+        }
+        $strCrissCrossCurrentHead = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strMergeBaseTree -Parents @($strCrissCrossMergeRight) `
+            -Timestamp ($strMergeHistoricalDate + 'T13:04:00Z') `
+            -Message 'criss-cross synchronize current head'
+        $objCrissCrossSynchronizeContext = Get-MetadataEventRevisionContext `
+            -RepositoryRootPath $strMergeFixtureRoot `
+            -EventName 'pull_request_target' `
+            -PullRequestAction 'synchronize' `
+            -BaseRevision $strCrissCrossMergeLeft `
+            -HeadRevision $strCrissCrossCurrentHead `
+            -IsNewRefRange $false `
+            -PreviousHeadRevision $strCrissCrossMergeRight `
+            -EventHeadRevision '' -EventHeadDistinct ''
+        if ((@($objCrissCrossSynchronizeContext.HistoryBaseRevisions) -join ',') -cne
+                ($arrExpectedCrissCrossBases -join ',') -or
+            $objCrissCrossSynchronizeContext.FreshnessBaseRevision -cne
+                $strCrissCrossMergeRight -or
+            $objCrissCrossSynchronizeContext.PreviousTopicBaseRevision -cne '' -or
+            $objCrissCrossSynchronizeContext.CurrentTopicBaseRevision -cne '') {
+            throw 'A valid synchronize criss-cross range used an incomplete base contract.'
+        }
+        $listExcessiveMergeBases = [Collections.Generic.List[string]]::new()
+        for ($intBaseIndex = 0; $intBaseIndex -lt 65; $intBaseIndex++) {
+            $listExcessiveMergeBases.Add(
+                (& $scriptBlockCreateMergeFixtureCommit `
+                    -Tree $strMergeBaseTree -Parents @($strMergeBaseCommit) `
+                    -Timestamp ([DateTimeOffset]::Parse(
+                            $strMergeHistoricalDate + 'T14:00:00Z'
+                        ).AddSeconds($intBaseIndex).ToString('o')) `
+                    -Message "excessive merge base $intBaseIndex")
+            )
+        }
+        $arrExcessiveMergeBases = $listExcessiveMergeBases.ToArray()
+        $strExcessiveMergeLeft = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strMergeBaseTree -Parents $arrExcessiveMergeBases `
+            -Timestamp ($strMergeHistoricalDate + 'T14:02:00Z') `
+            -Message 'excessive merge-base left'
+        [array]::Reverse($arrExcessiveMergeBases)
+        $strExcessiveMergeRight = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strMergeBaseTree -Parents $arrExcessiveMergeBases `
+            -Timestamp ($strMergeHistoricalDate + 'T14:03:00Z') `
+            -Message 'excessive merge-base right'
+        $boolExcessiveMergeBasesRejected = $false
         try {
             [void](Get-MetadataEventRevisionContext `
                     -RepositoryRootPath $strMergeFixtureRoot `
-                    -EventName 'pull_request_target' `
-                    -PullRequestAction 'opened' `
-                    -BaseRevision $strCrissCrossMergeLeft `
-                    -HeadRevision $strCrissCrossMergeRight `
+                    -EventName 'pull_request_target' -PullRequestAction 'opened' `
+                    -BaseRevision $strExcessiveMergeLeft `
+                    -HeadRevision $strExcessiveMergeRight `
                     -IsNewRefRange $false -PreviousHeadRevision '' `
                     -EventHeadRevision '' -EventHeadDistinct '')
         }
         catch {
-            $boolMultipleMergeBasesRejected = $_.Exception.Message.Contains(
-                'must have one available merge base',
+            $boolExcessiveMergeBasesRejected = $_.Exception.Message.Contains(
+                'must have 1 through 64 available merge bases',
                 [StringComparison]::Ordinal
             )
         }
-        if (-not $boolMultipleMergeBasesRejected) {
-            throw 'A pull request with multiple merge bases did not fail closed.'
+        if (-not $boolExcessiveMergeBasesRejected) {
+            throw 'A pull request with more than 64 best merge bases did not fail closed.'
         }
         $strInheritedMergeCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strMergeTopicTree `
