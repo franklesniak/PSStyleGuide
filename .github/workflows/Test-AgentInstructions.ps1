@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260830.2
+# Version: 1.7.20260830.3
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -34,8 +34,8 @@ $intGitIgnoreMaximumInputBytes = 65536
 $intDocsInstructionsMaximumInputBytes = 131072
 $intInstructionDocumentMaximumInputBytes = 131072
 $intStyleGuideRationaleMaximumInputBytes = 196608
-$intValidatorMaximumInputBytes = 491520
-$intHistoricalPolicyMarkerMaximumBytes = 524288
+$intValidatorMaximumInputBytes = 540672
+$intHistoricalPolicyMarkerMaximumBytes = 540672
 $intGitPathListMaximumBytes = 1048576
 $intMetadataMaximumParents = 64
 $intNewRefMaximumCommitEvidence = 2048
@@ -352,6 +352,49 @@ function Assert-EncodingMutationRejected {
 function Get-RepositoryInputMetadataFailure {
     # .SYNOPSIS
     # Finds unsafe repository-input metadata.
+    #
+    # .DESCRIPTION
+    # Validates Git index and file-system metadata for one repository input.
+    #
+    # .PARAMETER DisplayName
+    # The trusted label to use in diagnostics.
+    #
+    # .PARAMETER GitIndexEntryCount
+    # The number of exact Git index entries for the path.
+    #
+    # .PARAMETER GitMode
+    # The exact Git mode recorded for the path.
+    #
+    # .PARAMETER GitStage
+    # The Git index stage recorded for the path.
+    #
+    # .PARAMETER IsFileInfo
+    # Indicates whether file-system inspection returned a regular FileInfo object.
+    #
+    # .PARAMETER Attributes
+    # The file-system attributes recorded for the path.
+    #
+    # .PARAMETER LinkType
+    # The file-system link type, when one exists.
+    #
+    # .PARAMETER UnixMode
+    # The Unix file mode recorded for the path.
+    #
+    # .EXAMPLE
+    # Get-RepositoryInputMetadataFailure @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.String] Zero or more validated values or diagnostics described in the function description.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -408,6 +451,52 @@ function Get-RepositoryInputMetadataFailure {
 function Assert-RepositoryInputMetadataMutationRejected {
     # .SYNOPSIS
     # Confirms that an unsafe metadata fixture fails closed.
+    #
+    # .DESCRIPTION
+    # Builds one unsafe metadata fixture and confirms that the metadata validator rejects it with the exact expected diagnostic.
+    #
+    # .PARAMETER Name
+    # The fixture or document name to use in diagnostics.
+    #
+    # .PARAMETER GitIndexEntryCount
+    # The number of exact Git index entries for the path.
+    #
+    # .PARAMETER GitMode
+    # The exact Git mode recorded for the path.
+    #
+    # .PARAMETER GitStage
+    # The Git index stage recorded for the path.
+    #
+    # .PARAMETER IsFileInfo
+    # Indicates whether file-system inspection returned a regular FileInfo object.
+    #
+    # .PARAMETER Attributes
+    # The file-system attributes recorded for the path.
+    #
+    # .PARAMETER LinkType
+    # The file-system link type, when one exists.
+    #
+    # .PARAMETER UnixMode
+    # The Unix file mode recorded for the path.
+    #
+    # .PARAMETER Failure
+    # The exact diagnostic that the fixture must produce.
+    #
+    # .EXAMPLE
+    # Assert-RepositoryInputMetadataMutationRejected @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # None.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -463,6 +552,37 @@ function Assert-RepositoryInputMetadataMutationRejected {
 function Read-BoundedStreamData {
     # .SYNOPSIS
     # Reads a stream through a strict byte limit.
+    #
+    # .DESCRIPTION
+    # Reads a stream until end-of-stream while enforcing a strict byte cap and cancellation.
+    #
+    # .PARAMETER Stream
+    # The readable stream to consume.
+    #
+    # .PARAMETER MaximumBytes
+    # The maximum permitted output size in bytes.
+    #
+    # .PARAMETER DisplayName
+    # The trusted label to use in diagnostics.
+    #
+    # .PARAMETER CancellationToken
+    # The token that bounds or cancels the read.
+    #
+    # .EXAMPLE
+    # Read-BoundedStreamData @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Byte] Zero or more bytes read from the stream.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([byte])]
     param(
@@ -522,7 +642,41 @@ function Read-BoundedStreamData {
 }
 
 function Read-BoundedProcessData {
+    # .SYNOPSIS
+    # Reads bounded data from a child process.
+    #
+    # .DESCRIPTION
+    # Starts one shell-free child process, reads its standard output through a strict byte cap, waits through a strict timeout, and always reaps and disposes the process.
+    #
+    # .PARAMETER Process
+    # The configured shell-free process to start.
+    #
+    # .PARAMETER MaximumBytes
+    # The maximum permitted output size in bytes.
+    #
+    # .PARAMETER TimeoutMilliseconds
+    # The maximum elapsed time in milliseconds.
+    #
+    # .PARAMETER DisplayName
+    # The trusted label to use in diagnostics.
+    #
+    # .EXAMPLE
+    # Read-BoundedProcessData @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Management.Automation.PSCustomObject] One object with Bytes and ExitCode properties.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([pscustomobject])]
     param(
         [Parameter(Mandatory)][Diagnostics.Process] $Process,
         [Parameter(Mandatory)][ValidateRange(1, 2147483646)][int] $MaximumBytes,
@@ -661,6 +815,36 @@ function ConvertFrom-GitPathListData {
 }
 
 function Read-GitTrackedPath {
+    # .SYNOPSIS
+    # Reads a bounded tracked path list from one Git revision.
+    #
+    # .DESCRIPTION
+    # Runs Git against one revision and returns its decoded, NUL-delimited tracked paths.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The absolute path of the trusted Git repository.
+    #
+    # .PARAMETER Revision
+    # The exact Git revision to inspect.
+    #
+    # .PARAMETER MaximumBytes
+    # The maximum permitted output size in bytes.
+    #
+    # .EXAMPLE
+    # Read-GitTrackedPath @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.String] Zero or more validated values or diagnostics described in the function description.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -705,7 +889,51 @@ function Read-GitTrackedPath {
 }
 
 function Read-GitRangeTouchedPath {
-    # Reads unique paths touched by an authenticated commit range. Version: 1.0.20260828.0.
+    # .SYNOPSIS
+    # Reads bounded path-touch history from a Git revision range.
+    #
+    # .DESCRIPTION
+    # Reads every path touched by the authenticated commit history in a revision range.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The absolute path of the trusted Git repository.
+    #
+    # .PARAMETER BaseRevision
+    # The authenticated base Git object ID.
+    #
+    # .PARAMETER HeadRevision
+    # The authenticated head Git object ID.
+    #
+    # .PARAMETER IsNewRefRange
+    # Indicates whether the range represents a newly created ref.
+    #
+    # .PARAMETER NewRefBoundaryRevision
+    # The authenticated boundary revision for a new ref.
+    #
+    # .PARAMETER NewRefHasIntroducedCommit
+    # Indicates whether the new ref introduces a commit outside the boundary.
+    #
+    # .PARAMETER RepositoryRelativePathspec
+    # The exact repository-relative Git pathspec to inspect.
+    #
+    # .PARAMETER MaximumBytes
+    # The maximum permitted output size in bytes.
+    #
+    # .EXAMPLE
+    # Read-GitRangeTouchedPath @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.String] Zero or more validated values or diagnostics described in the function description.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -816,6 +1044,40 @@ function Read-GitRangeTouchedPath {
 function Read-RepositoryInputData {
     # .SYNOPSIS
     # Reads one governed repository file safely.
+    #
+    # .DESCRIPTION
+    # Reads one worktree file only after exact repository metadata validation.
+    #
+    # .PARAMETER Path
+    # The absolute worktree path to read.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The absolute path of the trusted Git repository.
+    #
+    # .PARAMETER RepositoryRelativePath
+    # The canonical repository-relative path to inspect.
+    #
+    # .PARAMETER DisplayName
+    # The trusted label to use in diagnostics.
+    #
+    # .PARAMETER MaximumBytes
+    # The maximum permitted output size in bytes.
+    #
+    # .EXAMPLE
+    # Read-RepositoryInputData @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Byte] Zero or more validated bytes described in the function description.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([byte])]
     param(
@@ -894,6 +1156,40 @@ function Read-RepositoryInputData {
 function Read-GitRevisionText {
     # .SYNOPSIS
     # Reads one bounded UTF-8 file from a Git revision.
+    #
+    # .DESCRIPTION
+    # Reads one file from an exact Git revision as strict UTF-8.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The absolute path of the trusted Git repository.
+    #
+    # .PARAMETER Revision
+    # The exact Git revision to inspect.
+    #
+    # .PARAMETER RepositoryRelativePath
+    # The canonical repository-relative path to inspect.
+    #
+    # .PARAMETER MaximumBytes
+    # The maximum permitted output size in bytes.
+    #
+    # .PARAMETER RequireRegularFile
+    # Requires the Git object to have a regular-file mode.
+    #
+    # .EXAMPLE
+    # Read-GitRevisionText @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.String] Zero or more validated values or diagnostics described in the function description.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -963,6 +1259,37 @@ function Read-GitRevisionText {
 function Test-HistoricalPolicyMarker {
     # .SYNOPSIS
     # Tests whether a revision file contains an ordinal literal.
+    #
+    # .DESCRIPTION
+    # Reads one historical policy file and tests for an exact ordinal marker.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The absolute path of the trusted Git repository.
+    #
+    # .PARAMETER Revision
+    # The exact Git revision to inspect.
+    #
+    # .PARAMETER RepositoryRelativePath
+    # The canonical repository-relative path to inspect.
+    #
+    # .PARAMETER Literal
+    # The exact ordinal marker to find.
+    #
+    # .EXAMPLE
+    # Test-HistoricalPolicyMarker @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Boolean] True when the condition in the synopsis is satisfied; otherwise false.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param(
@@ -997,6 +1324,37 @@ function Test-HistoricalPolicyMarker {
 function Get-GovernedDocumentParentContext {
     # .SYNOPSIS
     # Gets the worktree or first-parent comparison for one governed document.
+    #
+    # .DESCRIPTION
+    # Resolves the current governed document and its comparison parent from the worktree or an exact revision.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The absolute path of the trusted Git repository.
+    #
+    # .PARAMETER RepositoryRelativePath
+    # The canonical repository-relative path to inspect.
+    #
+    # .PARAMETER MaximumBytes
+    # The maximum permitted output size in bytes.
+    #
+    # .PARAMETER Revision
+    # The exact Git revision to inspect.
+    #
+    # .EXAMPLE
+    # Get-GovernedDocumentParentContext @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Management.Automation.PSCustomObject] One validated context object described in the function description.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -1094,6 +1452,25 @@ function Get-GovernedDocumentParentContext {
 function Assert-OversizedStreamMutationRejected {
     # .SYNOPSIS
     # Confirms that bounded stream and child-process reads fail closed.
+    #
+    # .DESCRIPTION
+    # Exercises oversized stream and child-process fixtures.
+    #
+    # .EXAMPLE
+    # Assert-OversizedStreamMutationRejected
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # None.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param()
@@ -1201,7 +1578,27 @@ function Assert-OversizedStreamMutationRejected {
 }
 
 function Assert-MarkdownParserTransportCleanup {
-    # Confirms retry classification and child cleanup at the process boundary.
+    # .SYNOPSIS
+    # Confirms that failed Markdown parser processes are cleaned up.
+    #
+    # .DESCRIPTION
+    # Exercises timeout and transport failures in the locked Markdown parser.
+    #
+    # .EXAMPLE
+    # Assert-MarkdownParserTransportCleanup
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # None.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param()
@@ -1294,7 +1691,30 @@ function Assert-MarkdownParserTransportCleanup {
 }
 
 function Get-TomlParseContext {
-    # Gets a bounded Python 3.12 TOML projection. Version: 1.4.20260828.0.
+    # .SYNOPSIS
+    # Parses the trusted TOML subset used by the validator.
+    #
+    # .DESCRIPTION
+    # Parses the repository-owned TOML subset without evaluating code.
+    #
+    # .PARAMETER Content
+    # The trusted input text to parse or transform.
+    #
+    # .EXAMPLE
+    # Get-TomlParseContext @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Management.Automation.PSCustomObject] One validated context object described in the function description.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -1557,7 +1977,33 @@ print(json.dumps(r,separators=(",",":"),sort_keys=True))
 }
 
 function Invoke-MarkdownParserProcess {
-    # Runs one locked parser request with one transport-only retry.
+    # .SYNOPSIS
+    # Runs the locked Markdown parser process with strict bounds.
+    #
+    # .DESCRIPTION
+    # Sends Markdown to the locked parser through redirected streams.
+    #
+    # .PARAMETER StartInfo
+    # The validated process start configuration.
+    #
+    # .PARAMETER Content
+    # The trusted input text to parse or transform.
+    #
+    # .EXAMPLE
+    # Invoke-MarkdownParserProcess @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Management.Automation.PSCustomObject] One validated context object described in the function description.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -1757,8 +2203,8 @@ function Get-MarkdownParseContext {
     #
     # .DESCRIPTION
     # Uses the repository-locked markdown-it package to identify code-block ranges,
-    # prose blocks with operative code spans, top-level blocks, top-level list
-    # items, and level-two headings.
+    # prose blocks with operative code spans and link destinations, top-level
+    # blocks, top-level list items, and level-two headings.
     # It validates all parser output before returning it.
     #
     # .PARAMETER Content
@@ -1824,6 +2270,7 @@ function Get-MarkdownParseContext {
         '  const htmlContainerStack = [];'
         '  const output = [];'
         '  const code = [];'
+        '  const links = [];'
         '  for (const child of children) {'
         '    if (child.type === "s_open" || child.type === "s_close") {'
         '      const isOpening = child.type === "s_open";'
@@ -1848,13 +2295,18 @@ function Get-MarkdownParseContext {
         '      }'
         '    }'
         '    if (deletionStack.length > 0 || htmlContainerStack.length > 0) continue;'
+        '    if (child.type === "link_open") {'
+        '      const href = child.attrGet("href");'
+        '      if (typeof href !== "string") throw new Error("Invalid Markdown link destination.");'
+        '      links.push(href);'
+        '    }'
         '    if (child.type === "text" || child.type === "text_special") output.push(child.content);'
         '    else if (child.type === "softbreak" || child.type === "hardbreak") output.push("\n");'
         '    else if (child.type === "code_inline") code.push(child.content);'
         '  }'
         '  if (deletionStack.length > 0) throw new Error("Unclosed deletion container.");'
         '  if (htmlContainerStack.length > 0) throw new Error("Unclosed inline HTML container.");'
-        '  return { text: output.join(""), code };'
+        '  return { text: output.join(""), code, links };'
         '};'
         'const codeBlockRanges = tokens.filter((token) => token.type === "fence" || token.type === "code_block").map((token) => token.map);'
         'const proseBlocks = tokens.filter((token) => token.type === "inline" && Array.isArray(token.map) && Array.isArray(token.children)).map((token) => ({ range: token.map, ...getOperativeInlineContext(token.children) }));'
@@ -1874,7 +2326,7 @@ function Get-MarkdownParseContext {
         '  if (closeIndex < 0) throw new Error("Unclosed top-level list item.");'
         '  const inlineToken = tokens.slice(index + 1, closeIndex).find((candidate) => candidate.type === "inline" && candidate.level === 3 && Array.isArray(candidate.children));'
         '  const context = inlineToken ? getOperativeInlineContext(inlineToken.children) : null;'
-        '  return [{ range: token.map, text: context?.text ?? null, code: context?.code ?? [] }];'
+        '  return [{ range: token.map, text: context?.text ?? null, code: context?.code ?? [], links: context?.links ?? [] }];'
         '});'
         'const levelTwoHeadings = tokens.flatMap((token, index) => {'
         '  if (token.type !== "heading_open" || token.tag !== "h2" || token.level !== 0) return [];'
@@ -1955,7 +2407,9 @@ function Get-MarkdownParseContext {
             $objRawProseBlock.range.Count -ne 2 -or
             $null -eq $objRawProseBlock.text -or
             $objRawProseBlock.code -isnot [array] -or
-            @($objRawProseBlock.code | Where-Object { $_ -isnot [string] }).Count -ne 0) {
+            @($objRawProseBlock.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or
+            $objRawProseBlock.links -isnot [array] -or
+            @($objRawProseBlock.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {
             throw 'The locked Markdown parser returned a malformed prose block.'
         }
 
@@ -1974,6 +2428,7 @@ function Get-MarkdownParseContext {
                 End = [int]$intEnd
                 Text = [string]$objRawProseBlock.text
                 Code = [string[]]@($objRawProseBlock.code)
+                Links = [string[]]@($objRawProseBlock.links)
             })
     }
 
@@ -2023,7 +2478,9 @@ function Get-MarkdownParseContext {
             $objRawListItem.range.Count -ne 2 -or
             ($null -ne $objRawListItem.text -and $objRawListItem.text -isnot [string]) -or
             $objRawListItem.code -isnot [array] -or
-            @($objRawListItem.code | Where-Object { $_ -isnot [string] }).Count -ne 0) {
+            @($objRawListItem.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or
+            $objRawListItem.links -isnot [array] -or
+            @($objRawListItem.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {
             throw 'The locked Markdown parser returned a malformed top-level list item.'
         }
 
@@ -2048,6 +2505,7 @@ function Get-MarkdownParseContext {
                     [string]$objRawListItem.text
                 }
                 Code = [string[]]@($objRawListItem.code)
+                Links = [string[]]@($objRawListItem.links)
             })
         $intPreviousTopLevelListItemEnd = [int]$intEnd
     }
@@ -2091,7 +2549,27 @@ function Get-MarkdownParseContext {
 }
 
 function Assert-MarkdownParserExactContext {
-    # Confirms ordinary locked-parser output at the process boundary.
+    # .SYNOPSIS
+    # Confirms exact operative Markdown parsing behavior.
+    #
+    # .DESCRIPTION
+    # Parses adversarial Markdown fixtures and confirms that only visible, operative content reaches policy checks.
+    #
+    # .EXAMPLE
+    # Assert-MarkdownParserExactContext
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # None.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param()
@@ -2104,8 +2582,8 @@ function Assert-MarkdownParserExactContext {
     $objContext = Get-MarkdownParseContext -Content $strMarkdown -LineCount 3
     $strActual = $objContext | ConvertTo-Json -Depth 5 -Compress
     $strExpected = '{"CodeBlockRanges":[],"ProseBlocks":[' +
-        '{"Start":0,"End":1,"Text":"Transport","Code":[]},' +
-        '{"Start":2,"End":3,"Text":"Paragraph .","Code":["code"]}],' +
+        '{"Start":0,"End":1,"Text":"Transport","Code":[],"Links":[]},' +
+        '{"Start":2,"End":3,"Text":"Paragraph .","Code":["code"],"Links":[]}],' +
         '"TopLevelBlocks":[' +
         '{"Type":"heading_open","Tag":"h2","Start":0,"End":1,"Text":"Transport"},' +
         '{"Type":"paragraph_open","Tag":"p","Start":2,"End":3,"Text":"Paragraph ."}],' +
@@ -2264,26 +2742,30 @@ function Get-ClaudeImportFailure {
     # .SYNOPSIS
     # Finds an active import in one governed Claude instruction document.
     #
+    # .DESCRIPTION
+    # Inspects one validated Markdown context for an active Claude import.
+    #
     # .PARAMETER Name
-    # The repository-relative governed CLAUDE.md path.
+    # The fixture or document name to use in diagnostics.
     #
     # .PARAMETER MarkdownContext
     # The validated operative Markdown context to inspect.
     #
     # .EXAMPLE
-    # Get-ClaudeImportFailure -Name 'tools/CLAUDE.md' `
-    #     -MarkdownContext $objClaudeContext
+    # Get-ClaudeImportFailure @hashtableArguments
     #
-    # # Returns the path-specific failure when an active import exists.
+    # # Runs with validated named arguments.
     #
     # .INPUTS
-    # None. You can't pipe objects to this function.
+    # None. No pipeline input.
     #
     # .OUTPUTS
-    # [string] The path-specific active-import failure.
+    # [System.String] Zero or more validated values or diagnostics described in the function description.
     #
     # .NOTES
-    # Private helper; no positional parameters. Version: 1.0.20260823.0.
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -2304,22 +2786,27 @@ function Get-NestedClaudeImportFailure {
     # .SYNOPSIS
     # Finds active imports in cataloged nested Claude instruction documents.
     #
+    # .DESCRIPTION
+    # Inspects every cataloged nested Claude instruction context.
+    #
     # .PARAMETER DocumentContexts
-    # The cataloged governed-document contexts to inspect.
+    # The cataloged nested instruction document contexts to inspect.
     #
     # .EXAMPLE
-    # Get-NestedClaudeImportFailure -DocumentContexts $listGovernedDocumentContexts
+    # Get-NestedClaudeImportFailure @hashtableArguments
     #
-    # # Returns a path-specific failure for each affected nested CLAUDE.md.
+    # # Runs with validated named arguments.
     #
     # .INPUTS
-    # None. You can't pipe objects to this function.
+    # None. No pipeline input.
     #
     # .OUTPUTS
-    # [string] Each path-specific active-import failure.
+    # [System.String] Zero or more validated values or diagnostics described in the function description.
     #
     # .NOTES
-    # Private helper; no positional parameters. Version: 1.0.20260823.0.
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -2563,6 +3050,28 @@ function ConvertTo-MetadataComparisonText {
 function ConvertFrom-TrustedEventTimestamp {
     # .SYNOPSIS
     # Parses a stable server event timestamp.
+    #
+    # .DESCRIPTION
+    # Parses an authenticated event timestamp with invariant rules and converts it to a UTC DateTimeOffset value.
+    #
+    # .PARAMETER Timestamp
+    # The authenticated server event timestamp.
+    #
+    # .EXAMPLE
+    # ConvertFrom-TrustedEventTimestamp @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.DateTimeOffset] The parsed timestamp normalized to UTC.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([DateTimeOffset])]
     param(
@@ -2605,6 +3114,37 @@ function ConvertFrom-TrustedEventTimestamp {
 function Get-CurrentInputMetadataFreshnessFailure {
     # .SYNOPSIS
     # Finds stale metadata on one exact current event input.
+    #
+    # .DESCRIPTION
+    # Compares current and base metadata against the trusted event date.
+    #
+    # .PARAMETER Name
+    # The fixture or document name to use in diagnostics.
+    #
+    # .PARAMETER CurrentContent
+    # The exact content at the current event revision.
+    #
+    # .PARAMETER BaseContent
+    # The exact content at the comparison revision.
+    #
+    # .PARAMETER TrustedEventUtcDate
+    # The authenticated event date in UTC.
+    #
+    # .EXAMPLE
+    # Get-CurrentInputMetadataFreshnessFailure @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.String] Zero or more validated values or diagnostics described in the function description.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -2658,6 +3198,40 @@ function Get-CurrentInputMetadataFreshnessFailure {
 function Get-LastUpdatedMetadataFreshnessFailure {
     # .SYNOPSIS
     # Validates metadata and freshness without a Version field.
+    #
+    # .DESCRIPTION
+    # Validates Last Updated metadata for a document that has no Version field.
+    #
+    # .PARAMETER Name
+    # The fixture or document name to use in diagnostics.
+    #
+    # .PARAMETER CurrentContent
+    # The exact content at the current event revision.
+    #
+    # .PARAMETER BaseContent
+    # The exact content at the comparison revision.
+    #
+    # .PARAMETER TrustedEventUtcDate
+    # The authenticated event date in UTC.
+    #
+    # .PARAMETER RequireCurrentMaximumDateForRenderedChange
+    # Requires changed rendered content to use the latest allowed current date.
+    #
+    # .EXAMPLE
+    # Get-LastUpdatedMetadataFreshnessFailure @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.String] Zero or more validated values or diagnostics described in the function description.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -2751,6 +3325,43 @@ function Get-LastUpdatedMetadataFreshnessFailure {
 function Test-TopicOwnedGitPathDeltaEqual {
     # .SYNOPSIS
     # Compares one authenticated path delta across two topic-head ranges.
+    #
+    # .DESCRIPTION
+    # Compares one path delta across previous and current topic-head ranges.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The absolute path of the trusted Git repository.
+    #
+    # .PARAMETER PreviousBaseRevision
+    # The previous authenticated base Git object ID.
+    #
+    # .PARAMETER PreviousHeadRevision
+    # The previous authenticated head Git object ID.
+    #
+    # .PARAMETER CurrentBaseRevision
+    # The current authenticated base Git object ID.
+    #
+    # .PARAMETER CurrentHeadRevision
+    # The current authenticated head Git object ID.
+    #
+    # .PARAMETER RepositoryRelativePath
+    # The canonical repository-relative path to inspect.
+    #
+    # .EXAMPLE
+    # Test-TopicOwnedGitPathDeltaEqual @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Boolean] True when the condition in the synopsis is satisfied; otherwise false.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param(
@@ -2813,6 +3424,28 @@ function Test-TopicOwnedGitPathDeltaEqual {
 function Get-MarkdownParserBootstrapFailure {
     # .SYNOPSIS
     # Reports a missing locked Markdown parser bootstrap.
+    #
+    # .DESCRIPTION
+    # Checks that the locked Markdown parser dependency and runtime are available.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The absolute path of the trusted Git repository.
+    #
+    # .EXAMPLE
+    # Get-MarkdownParserBootstrapFailure @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.String] Zero or more validated values or diagnostics described in the function description.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param([Parameter(Mandatory)][string] $RepositoryRootPath)
@@ -2828,7 +3461,33 @@ function Get-MarkdownParserBootstrapFailure {
 }
 
 function Test-GitIgnorePathEffective {
-    # Uses Git to evaluate proposed ignore content in isolation. Version: 1.0.20260828.0.
+    # .SYNOPSIS
+    # Tests whether a Git ignore rule excludes one exact path.
+    #
+    # .DESCRIPTION
+    # Evaluates the supplied ignore rules against one exact repository-relative path.
+    #
+    # .PARAMETER GitIgnoreContent
+    # The exact .gitignore text to evaluate.
+    #
+    # .PARAMETER RepositoryRelativePath
+    # The canonical repository-relative path to inspect.
+    #
+    # .EXAMPLE
+    # Test-GitIgnorePathEffective @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Boolean] True when the condition in the synopsis is satisfied; otherwise false.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param(
@@ -2892,6 +3551,28 @@ function Test-GitIgnorePathEffective {
 function Test-ProhibitedClaudeLocalPath {
     # .SYNOPSIS
     # Tests whether a tracked path is prohibited operative local Claude memory.
+    #
+    # .DESCRIPTION
+    # Classifies one repository-relative path under the prohibited Claude local-memory policy.
+    #
+    # .PARAMETER RepositoryRelativePath
+    # The canonical repository-relative path to inspect.
+    #
+    # .EXAMPLE
+    # Test-ProhibitedClaudeLocalPath @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Boolean] True when the condition in the synopsis is satisfied; otherwise false.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param([Parameter(Mandatory)][string] $RepositoryRelativePath)
@@ -2902,6 +3583,61 @@ function Test-ProhibitedClaudeLocalPath {
 function Get-MetadataEventRevisionContext {
     # .SYNOPSIS
     # Resolves history and current-event comparison bases from trusted payload data.
+    #
+    # .DESCRIPTION
+    # Authenticates event revisions and derives the exact historical and current comparison ranges used for metadata freshness validation.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The absolute path of the trusted Git repository.
+    #
+    # .PARAMETER EventName
+    # The authenticated GitHub event name.
+    #
+    # .PARAMETER PullRequestAction
+    # The authenticated pull-request action.
+    #
+    # .PARAMETER BaseRevision
+    # The authenticated base Git object ID.
+    #
+    # .PARAMETER HeadRevision
+    # The authenticated head Git object ID.
+    #
+    # .PARAMETER IsNewRefRange
+    # Indicates whether the range represents a newly created ref.
+    #
+    # .PARAMETER PreviousHeadRevision
+    # The previous authenticated head Git object ID.
+    #
+    # .PARAMETER PullRequestBaseChanged
+    # Indicates whether the pull-request base changed in this event.
+    #
+    # .PARAMETER EventHeadRevision
+    # The head revision authenticated by the event payload.
+    #
+    # .PARAMETER EventHeadDistinct
+    # Indicates whether the event head differs from the current head.
+    #
+    # .PARAMETER NewRefCommitCount
+    # The authenticated number of introduced commits for a new ref.
+    #
+    # .PARAMETER NewRefCommitEvidenceJson
+    # The authenticated JSON evidence for introduced new-ref commits.
+    #
+    # .EXAMPLE
+    # Get-MetadataEventRevisionContext @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Management.Automation.PSCustomObject] One validated context object described in the function description.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -3330,6 +4066,31 @@ function Test-GovernedInstructionPath {
 function Test-GovernedInstructionPathCaseMismatch {
     # .SYNOPSIS
     # Detects noncanonical casing of one governed instruction path.
+    #
+    # .DESCRIPTION
+    # Compares one path with the governed root paths.
+    #
+    # .PARAMETER RepositoryRelativePath
+    # The canonical repository-relative path to inspect.
+    #
+    # .PARAMETER GovernedRootPaths
+    # The canonical governed root instruction paths.
+    #
+    # .EXAMPLE
+    # Test-GovernedInstructionPathCaseMismatch @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Boolean] True when the condition in the synopsis is satisfied; otherwise false.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param(
@@ -3366,6 +4127,31 @@ function Test-GovernedInstructionPathCaseMismatch {
 function Test-ExactPathCaseMismatch {
     # .SYNOPSIS
     # Detects noncanonical casing of one path from an exact reviewed set.
+    #
+    # .DESCRIPTION
+    # Compares one path with an exact reviewed path set.
+    #
+    # .PARAMETER RepositoryRelativePath
+    # The canonical repository-relative path to inspect.
+    #
+    # .PARAMETER CanonicalPaths
+    # The exact canonical paths accepted by the policy.
+    #
+    # .EXAMPLE
+    # Test-ExactPathCaseMismatch @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Boolean] True when the condition in the synopsis is satisfied; otherwise false.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param(
@@ -3386,6 +4172,28 @@ function Test-ExactPathCaseMismatch {
 function Test-GovernedInstructionInventoryPath {
     # .SYNOPSIS
     # Selects canonical governed instructions and case-folded near-matches.
+    #
+    # .DESCRIPTION
+    # Selects canonical governed instruction paths and their case-folded near-matches for closed-world inventory checks.
+    #
+    # .PARAMETER RepositoryRelativePath
+    # The canonical repository-relative path to inspect.
+    #
+    # .EXAMPLE
+    # Test-GovernedInstructionInventoryPath @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Boolean] True when the condition in the synopsis is satisfied; otherwise false.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param(
@@ -3411,6 +4219,28 @@ function Test-GovernedInstructionInventoryPath {
 function Test-AgentInstructionWorkflowPath {
     # .SYNOPSIS
     # Tests whether one exact changed path requires agent validation.
+    #
+    # .DESCRIPTION
+    # Tests one changed path against the exact set that activates agent-instruction validation.
+    #
+    # .PARAMETER RepositoryRelativePath
+    # The canonical repository-relative path to inspect.
+    #
+    # .EXAMPLE
+    # Test-AgentInstructionWorkflowPath @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Boolean] True when the condition in the synopsis is satisfied; otherwise false.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param(
@@ -3438,14 +4268,34 @@ function Test-AgentInstructionWorkflowPath {
 function Test-BackwardCommitMove {
     # .SYNOPSIS
     # Tests a strict backward commit move.
+    #
+    # .DESCRIPTION
+    # Uses Git ancestry to detect a strict backward move from the head revision to the base revision.
+    #
     # .PARAMETER RepositoryRootPath
-    # The Git repository.
+    # The absolute path of the trusted Git repository.
+    #
     # .PARAMETER BaseRevision
-    # The before commit.
+    # The authenticated base Git object ID.
+    #
     # .PARAMETER HeadRevision
-    # The after commit.
+    # The authenticated head Git object ID.
+    #
     # .EXAMPLE
-    # Test-BackwardCommitMove @params
+    # Test-BackwardCommitMove @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Boolean] True when the condition in the synopsis is satisfied; otherwise false.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param(
@@ -3471,10 +4321,28 @@ function Test-BackwardCommitMove {
 function Get-DecisionRecordPathFailure {
     # .SYNOPSIS
     # Gets a decision-name failure.
+    #
+    # .DESCRIPTION
+    # Validates one decision-record path against the canonical numbered filename contract.
+    #
     # .PARAMETER RepositoryRelativePath
-    # The path to test.
+    # The canonical repository-relative path to inspect.
+    #
     # .EXAMPLE
-    # Get-DecisionRecordPathFailure docs/decisions/security.md
+    # Get-DecisionRecordPathFailure @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.String] Zero or more validated values or diagnostics described in the function description.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param([Parameter(Mandatory)][string] $RepositoryRelativePath)
@@ -3488,20 +4356,40 @@ function Get-DecisionRecordPathFailure {
 function Get-PushGovernedPathApplicability {
     # .SYNOPSIS
     # Selects push validation.
+    #
     # .DESCRIPTION
-    # Uses authenticated range and endpoint paths.
+    # Authenticates push endpoints and combines range and endpoint evidence.
+    #
     # .PARAMETER RepositoryRootPath
-    # The Git repository.
+    # The absolute path of the trusted Git repository.
+    #
     # .PARAMETER BaseRevision
-    # The before ID.
+    # The authenticated base Git object ID.
+    #
     # .PARAMETER HeadRevision
-    # The after ID.
+    # The authenticated head Git object ID.
+    #
     # .PARAMETER IsNewRef
-    # True for creation.
+    # Indicates whether the push creates a ref.
+    #
     # .PARAMETER IsDeletedRef
-    # True for deletion.
+    # Indicates whether the push deletes a ref.
+    #
     # .EXAMPLE
-    # Get-PushGovernedPathApplicability @params
+    # Get-PushGovernedPathApplicability @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Management.Automation.PSCustomObject] One validated context object described in the function description.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -3798,13 +4686,29 @@ function Get-DocumentMetadataContext {
     # Gets validated document-level metadata context.
     #
     # .DESCRIPTION
-    # Locates the required fields in the parsed document header.
+    # Parses the document header and validates required Last Updated and optional Version fields.
     #
     # .PARAMETER Content
-    # The governed Markdown document text.
+    # The trusted input text to parse or transform.
+    #
+    # .PARAMETER RequiresVersion
+    # Indicates whether the document header must contain Version metadata.
+    #
+    # .EXAMPLE
+    # Get-DocumentMetadataContext @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
     #
     # .OUTPUTS
-    # [pscustomobject] The metadata values and structural validation result.
+    # [System.Management.Automation.PSCustomObject] One validated context object described in the function description.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -4399,7 +5303,60 @@ function Get-TrustRootRangeMutationFailure {
 }
 
 function Get-GovernedDocumentCommitTransitionFailure {
-    # Checks one governed commit against all parents. Version: 1.2.20260829.0.
+    # .SYNOPSIS
+    # Finds an invalid governed-document transition in one commit.
+    #
+    # .DESCRIPTION
+    # Validates one commit against each parent as a governed-document transition.
+    #
+    # .PARAMETER Name
+    # The fixture or document name to use in diagnostics.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The absolute path of the trusted Git repository.
+    #
+    # .PARAMETER RepositoryRelativePath
+    # The canonical repository-relative path to inspect.
+    #
+    # .PARAMETER MaximumBytes
+    # The maximum permitted output size in bytes.
+    #
+    # .PARAMETER CommitRevision
+    # The exact commit whose parent transitions must be validated.
+    #
+    # .PARAMETER PolicyRepositoryRelativePath
+    # The repository-relative policy document path.
+    #
+    # .PARAMETER PolicyMaximumBytes
+    # The maximum permitted policy document size in bytes.
+    #
+    # .PARAMETER PolicyMarker
+    # The exact marker that activates the historical policy.
+    #
+    # .PARAMETER RequireExpectedUtcDateForRenderedChange
+    # Requires a rendered change to use the expected UTC date.
+    #
+    # .PARAMETER RequiresVersion
+    # Indicates whether the document header must contain Version metadata.
+    #
+    # .PARAMETER RequiredDocument
+    # Indicates whether deletion of the governed document is prohibited.
+    #
+    # .EXAMPLE
+    # Get-GovernedDocumentCommitTransitionFailure @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.String] Zero or more validated values or diagnostics described in the function description.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4670,6 +5627,72 @@ function Get-GovernedDocumentCommitTransitionFailure {
 }
 
 function Get-GovernedDocumentRangeTransitionFailure {
+    # .SYNOPSIS
+    # Finds an invalid governed-document transition across a revision range.
+    #
+    # .DESCRIPTION
+    # Validates endpoint state and every touched commit in the authenticated range.
+    #
+    # .PARAMETER Name
+    # The fixture or document name to use in diagnostics.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The absolute path of the trusted Git repository.
+    #
+    # .PARAMETER RepositoryRelativePath
+    # The canonical repository-relative path to inspect.
+    #
+    # .PARAMETER MaximumBytes
+    # The maximum permitted output size in bytes.
+    #
+    # .PARAMETER BaseRevision
+    # The authenticated base Git object ID.
+    #
+    # .PARAMETER HeadRevision
+    # The authenticated head Git object ID.
+    #
+    # .PARAMETER InputRevision
+    # The exact revision used to read current validation inputs.
+    #
+    # .PARAMETER IsNewRefRange
+    # Indicates whether the range represents a newly created ref.
+    #
+    # .PARAMETER PolicyRepositoryRelativePath
+    # The repository-relative policy document path.
+    #
+    # .PARAMETER PolicyMaximumBytes
+    # The maximum permitted policy document size in bytes.
+    #
+    # .PARAMETER PolicyMarker
+    # The exact marker that activates the historical policy.
+    #
+    # .PARAMETER RequireExpectedUtcDateForRenderedChange
+    # Requires a rendered change to use the expected UTC date.
+    #
+    # .PARAMETER CommitDateFreshnessRevision
+    # The revision whose trusted commit date bounds metadata freshness.
+    #
+    # .PARAMETER RequiresVersion
+    # Indicates whether the document header must contain Version metadata.
+    #
+    # .PARAMETER RequiredDocument
+    # Indicates whether deletion of the governed document is prohibited.
+    #
+    # .EXAMPLE
+    # Get-GovernedDocumentRangeTransitionFailure @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.String] Zero or more validated values or diagnostics described in the function description.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4988,6 +6011,30 @@ function Get-TomlSemanticStatementContext {
 }
 
 function Get-GitHubPluginEnablementContext {
+    # .SYNOPSIS
+    # Gets the validated GitHub plugin enablement context.
+    #
+    # .DESCRIPTION
+    # Parses the Codex configuration and locates the exact GitHub plugin enablement assignment.
+    #
+    # .PARAMETER Content
+    # The trusted input text to parse or transform.
+    #
+    # .EXAMPLE
+    # Get-GitHubPluginEnablementContext @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Management.Automation.PSCustomObject] One validated context object described in the function description.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -5029,6 +6076,30 @@ function Get-GitHubPluginEnablementContext {
 }
 
 function ConvertTo-DisabledGitHubPluginMutation {
+    # .SYNOPSIS
+    # Creates a configuration mutation that disables the GitHub plugin.
+    #
+    # .DESCRIPTION
+    # Uses the validated enablement context to replace the active GitHub plugin value with false while preserving all unrelated text.
+    #
+    # .PARAMETER Content
+    # The trusted input text to parse or transform.
+    #
+    # .EXAMPLE
+    # ConvertTo-DisabledGitHubPluginMutation @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.String] The configuration text with the GitHub plugin disabled.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -5062,6 +6133,46 @@ function ConvertTo-DisabledGitHubPluginMutation {
 function Get-AgentInstructionFailure {
     # .SYNOPSIS
     # Finds violations of the shared agent-instruction contract.
+    #
+    # .DESCRIPTION
+    # Validates the combined AGENTS, Claude, and Codex configuration contract.
+    #
+    # .PARAMETER AgentsContent
+    # The root AGENTS.md content to validate.
+    #
+    # .PARAMETER ClaudeContent
+    # The root CLAUDE.md content to validate.
+    #
+    # .PARAMETER CodexConfigContent
+    # The Codex configuration content to validate.
+    #
+    # .PARAMETER ParentAgentsContent
+    # The optional parent AGENTS.md content used by the fixture.
+    #
+    # .PARAMETER ParentClaudeContent
+    # The optional parent CLAUDE.md content used by the fixture.
+    #
+    # .PARAMETER AgentsExpectedUtcDate
+    # The expected AGENTS.md metadata date in UTC.
+    #
+    # .PARAMETER ClaudeExpectedUtcDate
+    # The expected CLAUDE.md metadata date in UTC.
+    #
+    # .EXAMPLE
+    # Get-AgentInstructionFailure @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.String] Zero or more validated values or diagnostics described in the function description.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -5461,6 +6572,52 @@ function Get-AgentInstructionFailure {
 function Assert-Failure {
     # .SYNOPSIS
     # Confirms that an agent-instruction mutation fails closed.
+    #
+    # .DESCRIPTION
+    # Applies one mutated agent-instruction fixture and confirms that validation returns the exact expected failure.
+    #
+    # .PARAMETER Name
+    # The fixture or document name to use in diagnostics.
+    #
+    # .PARAMETER AgentsContent
+    # The root AGENTS.md content to validate.
+    #
+    # .PARAMETER ClaudeContent
+    # The root CLAUDE.md content to validate.
+    #
+    # .PARAMETER CodexConfigContent
+    # The Codex configuration content to validate.
+    #
+    # .PARAMETER Failure
+    # The exact diagnostic that the fixture must produce.
+    #
+    # .PARAMETER ParentAgentsContent
+    # The optional parent AGENTS.md content used by the fixture.
+    #
+    # .PARAMETER ParentClaudeContent
+    # The optional parent CLAUDE.md content used by the fixture.
+    #
+    # .PARAMETER AgentsExpectedUtcDate
+    # The expected AGENTS.md metadata date in UTC.
+    #
+    # .PARAMETER ClaudeExpectedUtcDate
+    # The expected CLAUDE.md metadata date in UTC.
+    #
+    # .EXAMPLE
+    # Assert-Failure @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # None.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -5520,6 +6677,49 @@ function Assert-Failure {
 function Assert-FixtureAccepted {
     # .SYNOPSIS
     # Confirms that an agent-instruction fixture is accepted.
+    #
+    # .DESCRIPTION
+    # Applies one valid agent-instruction fixture and confirms that validation returns no diagnostics.
+    #
+    # .PARAMETER Name
+    # The fixture or document name to use in diagnostics.
+    #
+    # .PARAMETER AgentsContent
+    # The root AGENTS.md content to validate.
+    #
+    # .PARAMETER ClaudeContent
+    # The root CLAUDE.md content to validate.
+    #
+    # .PARAMETER CodexConfigContent
+    # The Codex configuration content to validate.
+    #
+    # .PARAMETER ParentAgentsContent
+    # The optional parent AGENTS.md content used by the fixture.
+    #
+    # .PARAMETER ParentClaudeContent
+    # The optional parent CLAUDE.md content used by the fixture.
+    #
+    # .PARAMETER AgentsExpectedUtcDate
+    # The expected AGENTS.md metadata date in UTC.
+    #
+    # .PARAMETER ClaudeExpectedUtcDate
+    # The expected CLAUDE.md metadata date in UTC.
+    #
+    # .EXAMPLE
+    # Assert-FixtureAccepted @hashtableArguments
+    #
+    # # Runs with validated named arguments.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # None.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -6091,8 +7291,8 @@ $arrRepositoryFailures += @(Get-DocumentationClaimFailure `
         -Content $strDocsInstructionsContent `
         -TrackedPaths $arrTrackedRepositoryPaths)
 $arrCanonicalDecisionGuideLinks = @(
-    '](../../STYLE_GUIDE.md)',
-    '](../../STYLE_GUIDE_RATIONALE.md)'
+    '../../STYLE_GUIDE.md',
+    '../../STYLE_GUIDE_RATIONALE.md'
 )
 foreach ($objDecisionContext in @(
         $listGovernedDocumentContexts |
@@ -6103,13 +7303,15 @@ foreach ($objDecisionContext in @(
     if ($null -eq $objDecisionContext.Content) {
         continue
     }
+    $objDecisionMarkdownContext = Get-OperativeMarkdownContext `
+        -Content $objDecisionContext.Content
+    $arrDecisionLinks = [string[]]@(
+        $objDecisionMarkdownContext.ProseBlocks.Links
+    )
     foreach ($strGuideLink in $arrCanonicalDecisionGuideLinks) {
-        if (-not $objDecisionContext.Content.Contains(
-                $strGuideLink,
-                [StringComparison]::Ordinal
-            )) {
+        if ($arrDecisionLinks -cnotcontains $strGuideLink) {
             $arrRepositoryFailures +=
-                "$($objDecisionContext.Path) must link to $strGuideLink"
+                "$($objDecisionContext.Path) must contain an operative link to $strGuideLink"
         }
     }
 }
@@ -6259,14 +7461,70 @@ Write-Output 'Agent-instruction contract passed.'
 if ($SelfTest) {
     #region Mutation self-tests
 
-    if ($intValidatorMaximumInputBytes -ne 491520) {
-        throw 'The validator current-input cap must be 491520 bytes.'
+    if ($intValidatorMaximumInputBytes -ne 540672 -or
+        $intHistoricalPolicyMarkerMaximumBytes -ne 540672) {
+        throw 'The validator and historical policy-marker caps must be 540672 bytes.'
     }
 
     $strValidatorSource = [IO.File]::ReadAllText($PSCommandPath)
+    $objValidatorTokens = $null
+    $arrValidatorParseErrors = $null
+    $objValidatorAst = [Management.Automation.Language.Parser]::ParseInput(
+        $strValidatorSource,
+        $PSCommandPath,
+        [ref] $objValidatorTokens,
+        [ref] $arrValidatorParseErrors
+    )
+    if (@($arrValidatorParseErrors).Count -ne 0) {
+        throw 'The validator source did not parse for the function-help inventory.'
+    }
+    $arrValidatorFunctionAsts = @($objValidatorAst.FindAll({
+        param($objNode)
+        $objNode -is [Management.Automation.Language.FunctionDefinitionAst]
+    }, $true))
+    if ($arrValidatorFunctionAsts.Count -ne 57) {
+        throw 'The validator function-help inventory must contain exactly 57 functions.'
+    }
+    foreach ($objFunctionAst in $arrValidatorFunctionAsts) {
+        $objHelp = $objFunctionAst.GetHelpContent()
+        $listMissingHelp = [Collections.Generic.List[string]]::new()
+        if ($null -eq $objHelp) {
+            $listMissingHelp.Add('comment-based help')
+        }
+        else {
+            foreach ($objHelpSection in @(
+                    [pscustomobject]@{ Name = 'SYNOPSIS'; Value = $objHelp.Synopsis },
+                    [pscustomobject]@{ Name = 'DESCRIPTION'; Value = $objHelp.Description },
+                    [pscustomobject]@{ Name = 'INPUTS'; Value = ($objHelp.Inputs | Out-String) },
+                    [pscustomobject]@{ Name = 'OUTPUTS'; Value = ($objHelp.Outputs | Out-String) },
+                    [pscustomobject]@{ Name = 'NOTES'; Value = $objHelp.Notes }
+                )) {
+                if ([string]::IsNullOrWhiteSpace([string]$objHelpSection.Value)) {
+                    $listMissingHelp.Add($objHelpSection.Name)
+                }
+            }
+            if (@($objHelp.Examples).Count -eq 0) {
+                $listMissingHelp.Add('EXAMPLE')
+            }
+            foreach ($objParameterAst in $objFunctionAst.Body.ParamBlock.Parameters) {
+                $strParameterName = $objParameterAst.Name.VariablePath.UserPath
+                if (-not $objHelp.Parameters.ContainsKey($strParameterName.ToUpperInvariant())) {
+                    $listMissingHelp.Add("PARAMETER $strParameterName")
+                }
+            }
+        }
+        if (@($objFunctionAst.Body.ParamBlock.Attributes | Where-Object {
+                    $_.TypeName.Name -eq 'OutputType'
+                }).Count -ne 1) {
+            $listMissingHelp.Add('OutputType')
+        }
+        if ($listMissingHelp.Count -ne 0) {
+            throw "Function $($objFunctionAst.Name) lacks: $($listMissingHelp -join ', ')."
+        }
+    }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260830\.2$'
+            '(?m)^# Version: 1\.7\.20260830\.3$'
         ).Count -ne 1) {
         throw 'The validator script version does not use build date 20260830.'
     }
@@ -8498,7 +9756,7 @@ if ($SelfTest) {
             throw 'A historical marker-absent policy was classified as governed.'
         }
         & $scriptBlockAssertHistoryFailure `
-            (& $scriptBlockNewPolicyTree ([byte[]]::new(524289))) 'must not exceed 524288 bytes'
+            (& $scriptBlockNewPolicyTree ([byte[]]::new(540673))) 'must not exceed 540672 bytes'
         & $scriptBlockAssertHistoryFailure `
             (& $scriptBlockNewPolicyTree ([byte[]] @(0xC3, 0x28))) 'valid UTF-8 without a BOM'
         & $scriptBlockAssertHistoryFailure `
@@ -10535,6 +11793,35 @@ if ($SelfTest) {
             [StringComparison]::Ordinal
         )) {
         throw 'Operative Markdown filtering removed ordinary emphasized prose.'
+    }
+
+    $strLinkFence = [string]::new([char]96, 3)
+    $strDecisionLinkFixture = @(
+        '[Guide](../../STYLE_GUIDE.md)',
+        '[Rationale][rationale]',
+        '',
+        '[rationale]: ../../STYLE_GUIDE_RATIONALE.md',
+        '',
+        '~~[Deleted](../../STYLE_GUIDE.md)~~',
+        '<span>[HTML](../../STYLE_GUIDE.md)</span>',
+        '<!-- [Comment](../../STYLE_GUIDE.md) -->',
+        $strLinkFence,
+        '[Fence](../../STYLE_GUIDE.md)',
+        $strLinkFence
+    ) -join "`n"
+    $objDecisionLinkContext = Get-OperativeMarkdownContext `
+        -Content $strDecisionLinkFixture
+    $arrDecisionLinkFixtureActual = [string[]]@(
+        $objDecisionLinkContext.ProseBlocks.Links
+    )
+    $arrDecisionLinkFixtureExpected = [string[]]@(
+        '../../STYLE_GUIDE.md',
+        '../../STYLE_GUIDE_RATIONALE.md'
+    )
+    if ($arrDecisionLinkFixtureActual.Count -ne 2 -or
+        $arrDecisionLinkFixtureActual[0] -cne $arrDecisionLinkFixtureExpected[0] -or
+        $arrDecisionLinkFixtureActual[1] -cne $arrDecisionLinkFixtureExpected[1]) {
+        throw 'Operative Markdown link parsing accepted hidden or rejected visible links.'
     }
 
     $objVoidHtmlContext = Get-OperativeMarkdownContext `
