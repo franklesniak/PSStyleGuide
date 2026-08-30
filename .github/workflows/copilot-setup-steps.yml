@@ -1,0 +1,109 @@
+name: Copilot setup steps
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "**"
+    paths:
+      - .github/workflows/.npmrc
+      - .github/workflows/copilot-setup-steps.yml
+      - .github/workflows/npm-shrinkwrap.json
+      - .github/workflows/package.json
+      - .github/workflows/package-lock.json
+      - .npmrc
+      - .pre-commit-config.yaml
+      - npm-shrinkwrap.json
+      - package.json
+      - package-lock.json
+  pull_request:
+    paths:
+      - .github/workflows/.npmrc
+      - .github/workflows/copilot-setup-steps.yml
+      - .github/workflows/npm-shrinkwrap.json
+      - .github/workflows/package.json
+      - .github/workflows/package-lock.json
+      - .npmrc
+      - .pre-commit-config.yaml
+      - npm-shrinkwrap.json
+      - package.json
+      - package-lock.json
+
+permissions:
+  contents: read
+
+jobs:
+  copilot-setup-steps:
+    name: Install locked repository validation tools
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ github.sha }}
+          token: ${{ github.token }}
+          persist-credentials: false
+          clean: true
+          fetch-depth: 1
+          fetch-tags: false
+          show-progress: true
+          lfs: false
+          submodules: false
+          set-safe-directory: true
+          allow-unsafe-pr-checkout: false
+
+      - name: Reject alternate npm install inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          declare -ar alternate_inputs=(
+            .npmrc
+            npm-shrinkwrap.json
+            .github/workflows/.npmrc
+            .github/workflows/npm-shrinkwrap.json
+          )
+          for alternate_input in "${alternate_inputs[@]}"; do
+            if [[ -e "${alternate_input}" || -L "${alternate_input}" ]]; then
+              echo "::error file=${alternate_input}::Unsupported npm" \
+                'install input.'
+              exit 1
+            fi
+          done
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: package.json
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            .github/workflows/package-lock.json
+
+      - name: Verify locked Node.js runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected_node="$(node -p 'require("./package.json").engines.node')"
+          expected_npm="$(node -p 'require("./package.json").engines.npm')"
+          test "$(node --version)" = "v${expected_node}"
+          test "$(npm --version)" = "${expected_npm}"
+
+      - name: Install both locked Node.js validation tuples
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts --no-audit --fund=false --include=dev
+          npm ci --ignore-scripts --no-audit --fund=false --include=dev \
+            --prefix .github/workflows
+
+      - name: Verify locked dependency trees and immutable manifests
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ls --all
+          npm --prefix .github/workflows ls --all
+          git diff --exit-code -- package.json package-lock.json \
+            .github/workflows/package.json \
+            .github/workflows/package-lock.json

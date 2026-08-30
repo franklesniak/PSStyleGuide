@@ -1,24 +1,31 @@
-name: Agent Instruction Validation
+name: Agent instruction validation
 
 on:
+  workflow_dispatch:
   push:
     branches:
-      - main
-  pull_request:
-    branches:
-      - main
+      - "**"
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - edited
 
-permissions: {}
+permissions:
+  contents: read
 
 jobs:
-  validate_agent_instructions:
+  validate-agent-instructions:
+    name: Validate agent instructions
+    if: >-
+      github.event_name != 'pull_request_target' ||
+      github.event.action != 'edited' ||
+      github.event.changes.base.ref.from != ''
     runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-
+    timeout-minutes: 10
     steps:
-      - name: Checkout repository
-        id: checkout_repository
+      - name: Check out trusted validation revision
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ${{ github.repository }}
@@ -26,7 +33,7 @@ jobs:
           token: ${{ github.token }}
           persist-credentials: false
           clean: true
-          fetch-depth: 1
+          fetch-depth: 0
           fetch-tags: false
           show-progress: true
           lfs: false
@@ -34,8 +41,211 @@ jobs:
           set-safe-directory: true
           allow-unsafe-pr-checkout: false
 
-      - name: Verify agent instruction capacity and parity
-        shell: pwsh
+      - name: Fetch existing push base as data
+        if: >-
+          github.event_name == 'push' && !github.event.created &&
+          !github.event.deleted
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PUSH_BASE_SHA: ${{ github.event.before }}
         run: |
-          $ErrorActionPreference = 'Stop'
-          & ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest
+          set -euo pipefail
+          [[ "${PUSH_BASE_SHA}" =~ ^[0-9a-f]{40}$ ]]
+          [[ ! "${PUSH_BASE_SHA}" =~ ^0{40}$ ]]
+          authorization="$(printf 'x-access-token:%s' "${GITHUB_TOKEN}" | base64 -w 0)"
+          GIT_CONFIG_COUNT=1 \
+            GIT_CONFIG_KEY_0="http.${GITHUB_SERVER_URL}/.extraheader" \
+            GIT_CONFIG_VALUE_0="Authorization: Basic ${authorization}" \
+            git fetch --no-tags --no-recurse-submodules origin \
+              "${PUSH_BASE_SHA}:refs/remotes/event/push-base"
+          unset authorization
+          fetched_base="$(git rev-parse --verify \
+            'refs/remotes/event/push-base^{commit}')"
+          test "${fetched_base}" = "${PUSH_BASE_SHA}"
+          git diff --quiet --no-ext-diff
+          git diff --cached --quiet --no-ext-diff
+
+      - name: Determine exact push applicability
+        id: push-applicability
+        if: github.event_name == 'push'
+        shell: pwsh
+        env:
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+          PUSH_AFTER_SHA: ${{ github.event.after }}
+          PUSH_CREATED: ${{ github.event.created }}
+          PUSH_DELETED: ${{ github.event.deleted }}
+        run: |
+          $arrDecision = @(
+              & ./.github/workflows/Test-AgentInstructions.ps1 `
+                  -PushApplicabilityOnly `
+                  -RangeBaseRevision $env:PUSH_BEFORE_SHA `
+                  -RangeHeadRevision $env:PUSH_AFTER_SHA `
+                  -RangeIsNewRef:([bool]::Parse($env:PUSH_CREATED)) `
+                  -RangeIsDeletedRef:([bool]::Parse($env:PUSH_DELETED)) `
+                  -EventName 'push'
+          )
+          if ($arrDecision.Count -ne 1 -or
+              $arrDecision[0] -cnotin @('true', 'false')) {
+              throw 'Push applicability did not return one exact decision.'
+          }
+          [System.IO.File]::AppendAllText(
+              $env:GITHUB_OUTPUT,
+              "required=$($arrDecision[0])`n",
+              [System.Text.UTF8Encoding]::new($false)
+          )
+
+      - name: Set up locked Node.js runtime
+        if: >-
+          github.event_name != 'push' ||
+          steps.push-applicability.outputs.required == 'true'
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: package.json
+          package-manager-cache: false
+
+      - name: Verify locked Node.js runtime
+        if: >-
+          github.event_name != 'push' ||
+          steps.push-applicability.outputs.required == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected_node="$(node -p 'require("./package.json").engines.node')"
+          expected_npm="$(node -p 'require("./package.json").engines.npm')"
+          test "$(node --version)" = "v${expected_node}"
+          test "$(npm --version)" = "${expected_npm}"
+
+      - name: Fetch pull request head as data
+        if: github.event_name == 'pull_request_target'
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_ACTION: ${{ github.event.action }}
+          PR_PREVIOUS_HEAD_SHA: >-
+            ${{ github.event.action == 'synchronize' && github.event.before || '' }}
+        run: |
+          set -euo pipefail
+          [[ "${PR_HEAD_SHA}" =~ ^[0-9a-f]{40}$ ]]
+          authorization="$(printf 'x-access-token:%s' "${GITHUB_TOKEN}" | base64 -w 0)"
+          # An unexpected non-fast-forward local ref must fail closed.
+          GIT_CONFIG_COUNT=1 \
+            GIT_CONFIG_KEY_0="http.${GITHUB_SERVER_URL}/.extraheader" \
+            GIT_CONFIG_VALUE_0="Authorization: Basic ${authorization}" \
+            git fetch --no-tags --no-recurse-submodules origin \
+              "${PR_HEAD_SHA}:refs/remotes/event/pr-head"
+          fetched_head="$(git rev-parse --verify \
+            'refs/remotes/event/pr-head^{commit}')"
+          test "${fetched_head}" = "${PR_HEAD_SHA}"
+          if [[ "${PR_ACTION}" = 'synchronize' ]]; then
+            [[ "${PR_PREVIOUS_HEAD_SHA}" =~ ^[0-9a-f]{40}$ ]]
+            [[ ! "${PR_PREVIOUS_HEAD_SHA}" =~ ^0{40}$ ]]
+            test "${PR_PREVIOUS_HEAD_SHA}" != "${PR_HEAD_SHA}"
+            GIT_CONFIG_COUNT=1 \
+              GIT_CONFIG_KEY_0="http.${GITHUB_SERVER_URL}/.extraheader" \
+              GIT_CONFIG_VALUE_0="Authorization: Basic ${authorization}" \
+              git fetch --no-tags --no-recurse-submodules origin \
+                "${PR_PREVIOUS_HEAD_SHA}:refs/remotes/event/pr-previous-head"
+            fetched_previous_head="$(git rev-parse --verify \
+              'refs/remotes/event/pr-previous-head^{commit}')"
+            test "${fetched_previous_head}" = "${PR_PREVIOUS_HEAD_SHA}"
+          else
+            test -z "${PR_PREVIOUS_HEAD_SHA}"
+          fi
+          unset authorization
+          git diff --quiet --no-ext-diff
+          git diff --cached --quiet --no-ext-diff
+
+      - name: Validate parser manifests as inert data
+        if: >-
+          github.event_name != 'push' ||
+          steps.push-applicability.outputs.required == 'true'
+        shell: bash
+        env:
+          TRUSTED_REVISION: ${{ github.sha }}
+          INPUT_REVISION: >-
+            ${{ github.event_name == 'pull_request_target' &&
+              github.event.pull_request.head.sha || github.sha }}
+        run: >-
+          node .github/workflows/Test-AgentInstructionParserManifest.mjs
+          --repository-root .
+          --trusted-revision "${TRUSTED_REVISION}"
+          --input-revision "${INPUT_REVISION}"
+          --self-test
+
+      - name: Install locked Markdown parser
+        if: >-
+          github.event_name != 'push' ||
+          steps.push-applicability.outputs.required == 'true'
+        run: >-
+          npm ci --ignore-scripts --no-audit --fund=false
+          --include=dev --package-lock=true
+
+      - name: Validate instruction capacity and capabilities
+        if: >-
+          github.event_name != 'push' ||
+          steps.push-applicability.outputs.required == 'true'
+        shell: pwsh
+        env:
+          AGENT_INSTRUCTION_INPUT_REVISION: >-
+            ${{ github.event_name == 'pull_request_target' &&
+              github.event.pull_request.head.sha ||
+              github.event_name == 'push' && github.event.after || '' }}
+          AGENT_INSTRUCTION_RANGE_BASE: >-
+            ${{ github.event_name == 'pull_request_target' &&
+              github.event.pull_request.base.sha ||
+              github.event_name == 'push' && github.event.before || '' }}
+          AGENT_INSTRUCTION_RANGE_HEAD: >-
+            ${{ github.event_name == 'pull_request_target' &&
+              github.event.pull_request.head.sha ||
+              github.event_name == 'push' && github.event.after || '' }}
+          AGENT_INSTRUCTION_RANGE_IS_NEW_REF: >-
+            ${{ github.event_name == 'push' && github.event.created || false }}
+          AGENT_INSTRUCTION_RANGE_IS_DELETED_REF: >-
+            ${{ github.event_name == 'push' && github.event.deleted || false }}
+          AGENT_INSTRUCTION_TRUSTED_EVENT_TIMESTAMP: >-
+            ${{ github.event_name == 'push' &&
+              github.event.repository.pushed_at || '' }}
+          AGENT_INSTRUCTION_EVENT_NAME: >-
+            ${{ (github.event_name == 'pull_request_target' ||
+              github.event_name == 'push') && github.event_name || '' }}
+          AGENT_INSTRUCTION_PULL_REQUEST_ACTION: >-
+            ${{ github.event_name == 'pull_request_target' &&
+              github.event.action || '' }}
+          AGENT_INSTRUCTION_PREVIOUS_HEAD_REVISION: >-
+            ${{ github.event_name == 'pull_request_target' &&
+              github.event.action == 'synchronize' && github.event.before || '' }}
+          AGENT_INSTRUCTION_PULL_REQUEST_BASE_CHANGED: >-
+            ${{ github.event_name == 'pull_request_target' &&
+              github.event.action == 'edited' &&
+              github.event.changes.base.ref.from != '' && 'true' || '' }}
+          AGENT_INSTRUCTION_EVENT_HEAD_REVISION: >-
+            ${{ github.event_name == 'push' &&
+              github.event.head_commit.id || '' }}
+          AGENT_INSTRUCTION_EVENT_HEAD_DISTINCT: >-
+            ${{ github.event_name == 'push' &&
+              toJSON(github.event.head_commit.distinct) || '' }}
+          AGENT_INSTRUCTION_NEW_REF_COMMIT_COUNT: >-
+            ${{ github.event_name == 'push' && github.event.created &&
+              github.event.size || '' }}
+          AGENT_INSTRUCTION_NEW_REF_COMMITS_JSON: >-
+            ${{ github.event_name == 'push' && github.event.created &&
+              toJSON(github.event.commits.*.id) || '' }}
+        run: >-
+          ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest
+          -InputRevision $env:AGENT_INSTRUCTION_INPUT_REVISION
+          -RangeBaseRevision $env:AGENT_INSTRUCTION_RANGE_BASE
+          -RangeHeadRevision $env:AGENT_INSTRUCTION_RANGE_HEAD
+          -RangeIsNewRef:([bool]::Parse($env:AGENT_INSTRUCTION_RANGE_IS_NEW_REF))
+          -RangeIsDeletedRef:([bool]::Parse(
+          $env:AGENT_INSTRUCTION_RANGE_IS_DELETED_REF))
+          -TrustedEventTimestamp $env:AGENT_INSTRUCTION_TRUSTED_EVENT_TIMESTAMP
+          -EventName $env:AGENT_INSTRUCTION_EVENT_NAME
+          -PullRequestAction $env:AGENT_INSTRUCTION_PULL_REQUEST_ACTION
+          -PreviousHeadRevision $env:AGENT_INSTRUCTION_PREVIOUS_HEAD_REVISION
+          -PullRequestBaseChanged $env:AGENT_INSTRUCTION_PULL_REQUEST_BASE_CHANGED
+          -EventHeadRevision $env:AGENT_INSTRUCTION_EVENT_HEAD_REVISION
+          -EventHeadDistinct $env:AGENT_INSTRUCTION_EVENT_HEAD_DISTINCT
+          -NewRefCommitCount $env:AGENT_INSTRUCTION_NEW_REF_COMMIT_COUNT
+          -NewRefCommitEvidenceJson $env:AGENT_INSTRUCTION_NEW_REF_COMMITS_JSON

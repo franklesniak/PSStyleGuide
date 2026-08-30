@@ -1,0 +1,108 @@
+name: Dev container boundary
+
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+  merge_group:
+    types:
+      - checks_requested
+  schedule:
+    - cron: "23 06 * * 1"
+
+permissions: {}
+
+# Keep each exact-ref check independent. A superseded run can still prove the
+# immutable commit that triggered it, and cancellation cannot obscure failure.
+concurrency:
+  group: devcontainer-boundary-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate-no-devcontainer-contract:
+    name: Validate the PS devcontainer exclusion
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      EXPECTED_REPOSITORY: ${{ github.repository }}
+      EXPECTED_REVISION: ${{ github.sha }}
+    steps:
+      - name: Acquire the event commit anonymously and verify the boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "${EXPECTED_REPOSITORY}" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]
+          [[ "${EXPECTED_REVISION}" =~ ^[0-9a-f]{40}$ ]]
+
+          has_devcontainer_entry() {
+            local candidate_path
+            local normalized_path
+            local LC_ALL=C
+            while IFS= read -r candidate_path; do
+              normalized_path="${candidate_path,,}"
+              case "${normalized_path}" in
+                .devcontainer|.devcontainer/*|.devcontainer.json)
+                  return 0
+                  ;;
+              esac
+            done
+            return 1
+          }
+
+          has_devcontainer_entry <<< '.devcontainer' || {
+            printf '%s\n' 'Directory boundary fixture was not rejected.' >&2
+            exit 1
+          }
+          has_devcontainer_entry <<< '.devcontainer.json' || {
+            printf '%s\n' 'Root-file boundary fixture was not rejected.' >&2
+            exit 1
+          }
+          has_devcontainer_entry <<< '.DEVCONTAINER' || {
+            printf '%s\n' 'Case-folded directory boundary fixture was not rejected.' >&2
+            exit 1
+          }
+          has_devcontainer_entry <<< '.DEVCONTAINER.JSON' || {
+            printf '%s\n' 'Case-folded root-file boundary fixture was not rejected.' >&2
+            exit 1
+          }
+          if has_devcontainer_entry <<< '.env'; then
+            printf '%s\n' 'Unrelated dot-file boundary fixture was rejected.' >&2
+            exit 1
+          fi
+
+          readonly checkout_root="${RUNNER_TEMP}/psstyleguide-devcontainer-boundary"
+          test ! -e "${checkout_root}"
+          /usr/bin/mkdir -m 0700 -- "${checkout_root}"
+          /usr/bin/git -C "${checkout_root}" init --quiet
+          /usr/bin/git -C "${checkout_root}" remote add origin \
+            "https://github.com/${EXPECTED_REPOSITORY}.git"
+          /usr/bin/git -C "${checkout_root}" \
+            -c credential.helper= \
+            -c core.askPass= \
+            fetch --no-tags --no-recurse-submodules --depth=1 origin \
+            "${EXPECTED_REVISION}:refs/remotes/event/target"
+
+          fetched_revision="$(
+            /usr/bin/git -C "${checkout_root}" rev-parse --verify \
+              'refs/remotes/event/target^{commit}'
+          )"
+          readonly fetched_revision
+          test "${fetched_revision}" = "${EXPECTED_REVISION}"
+          test -z "$(
+            /usr/bin/git -C "${checkout_root}" config --local --get-regexp \
+              '^(credential\.|http\..*\.extraheader)' || true
+          )"
+
+          devcontainer_entries="$(
+            /usr/bin/git -C "${checkout_root}" ls-tree --name-only \
+              "${fetched_revision}"
+          )"
+          readonly devcontainer_entries
+          if has_devcontainer_entry <<< "${devcontainer_entries}"; then
+            printf '%s\n' \
+              'PSStyleGuide has no authorized devcontainer contract.' >&2
+            exit 1
+          fi
+
+          printf '%s\n' \
+            'The exact event commit preserves the PS devcontainer exclusion.'

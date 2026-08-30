@@ -1,4 +1,13 @@
+<!-- markdownlint-disable MD013 -->
 # Nested Markdown Linting Implementation Summary
+
+## Metadata
+
+- **Status:** Active
+- **Owner:** Repository Maintainers
+- **Last Updated:** 2026-08-30
+- **Scope:** Describes the implemented nested-Markdown lint pipeline, its dependencies, workflow integration, behavior, and validation. It does not define general Markdown authoring rules.
+- **Related:** [Scripts Directory](scripts-README.md), [Documentation Writing Style](../instructions/docs.instructions.md)
 
 ## Overview
 
@@ -13,11 +22,11 @@ This implementation adds the capability to lint Markdown content that appears in
 - **glob** (^10.3.10): File pattern matching for finding Markdown files
 - **New npm script**: `lint:md:nested` - runs the nested markdown linting
 
-### 2. Extraction Script (.github/workflows/lint-nested-markdown.js)
+### 2. Extraction Script ([lint-nested-markdown.js](lint-nested-markdown.js))
 
 A new Node.js script that:
 
-- Scans all `.md` files in the repository (excluding `node_modules`)
+- Scans all `.md` and `.mdc` files in the repository (excluding `node_modules`, `.git`, and `.venv` directories)
 - Uses markdown-it to parse each file and extract the AST
 - **Recursively** identifies code fences with language identifier `markdown` or `md` at all nesting depths
 - Runs markdownlint on each extracted block

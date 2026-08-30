@@ -1,5 +1,12 @@
 # Decision 0002: Accept that the supply-freeze baseline cannot be machine-verified
 
+## Metadata
+
+- **Status:** Active
+- **Owner:** Repository Maintainers
+- **Last Updated:** 2026-08-30
+- **Scope:** Records the accepted limitation on machine-verifying supply-freeze baseline provenance and its reconsideration conditions. Does not redefine enforcement of current reviewed bytes.
+
 ## Status
 
 Accepted on 2026-08-01 by Frank Lesniak, PSStyleGuide repository owner.
@@ -104,6 +111,11 @@ git cat-file blob 7e96fd1fd41765ba31488762f60c2f74ba17d3a8 | sha256sum
 These must equal `length` and `sha256` for `packageLockJson`, and the same two commands with
 blob `923106fc4ee5508b7a03930b3d8b774db9fcd009` must equal the values for `packageJson`. A
 shallow clone will not have the objects; use `git fetch --unshallow` first.
+
+## Canonical guides
+
+- [STYLE_GUIDE.md](../../STYLE_GUIDE.md)
+- [STYLE_GUIDE_RATIONALE.md](../../STYLE_GUIDE_RATIONALE.md)
 
 ## 7. When this decision must be revisited
 

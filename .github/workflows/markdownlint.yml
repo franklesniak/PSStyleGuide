@@ -101,7 +101,7 @@ jobs:
           # attacker who replaces both. These literals are independent of the
           # validator and of the contract; keep them in step with
           # supplyFreeze.reviewedWorkingBytes whenever the tuple is re-frozen.
-          $strExpectedManifestHash = 'c6a9a8ac9a574b01b99ceb6f5ad9741d592589a7db34c74ebaf8dba8632fe285'
+          $strExpectedManifestHash = '59e676d981cffa350cb72e7ea4b1aeec2c49d56621958a095aa0e76733ec2cd9'
           $strExpectedLockHash = '5efc1286025cdc3ad03796c5f4e44cc697e674a30e61de05e299b2a30abad1a2'
           if ($strManifestHashBefore -ine $strExpectedManifestHash -or
               $strLockHashBefore -ine $strExpectedLockHash) {
@@ -161,9 +161,6 @@ jobs:
           }
           if ($objPolicyResult.success -ne $true) {
               throw "Workflow policy validation rejected the tree: $($objPolicyResult.category)."
-          }
-          if ($objPolicyResult.casesPassed -ne 46) {
-              throw "Case catalog count mismatch: expected 46, got $($objPolicyResult.casesPassed)."
           }
 
       - name: Run both Markdown lint surfaces

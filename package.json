@@ -1,0 +1,29 @@
+{
+  "name": "psstyleguide",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A style guide for consistent PowerShell authoring.",
+  "license": "MIT",
+  "engines": {
+    "node": "24.18.0",
+    "npm": "11.16.0"
+  },
+  "packageManager": "npm@11.16.0",
+  "scripts": {
+    "bootstrap:agent-instructions": "npm ci --ignore-scripts --no-audit --fund=false --include=dev --package-lock=true && npm --prefix .github/workflows ci --ignore-scripts --no-audit --fund=false --include=dev --package-lock=true",
+    "lint:md": "markdownlint-cli2 \"**/*.md\" \"**/*.mdc\" \"#node_modules\" \"#.github/workflows/node_modules\" --config .github/workflows/.markdownlint.jsonc",
+    "lint:md:nested": "npm --prefix .github/workflows run lint:md:nested",
+    "test:agent-instructions": "pwsh -NoLogo -NoProfile -NonInteractive -File .github/workflows/Test-AgentInstructions.ps1 -SelfTest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/franklesniak/PSStyleGuide.git"
+  },
+  "devDependencies": {
+    "glob": "10.5.0",
+    "jsonc-parser": "3.3.1",
+    "markdown-it": "14.2.0",
+    "markdownlint": "0.41.0",
+    "markdownlint-cli2": "0.23.2"
+  }
+}

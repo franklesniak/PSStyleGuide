@@ -16,6 +16,127 @@ const { glob } = require('glob');
 const MarkdownIt = require('markdown-it');
 const { lint: markdownlintSync } = require('markdownlint/sync');
 
+const markdownIgnore = [
+    'node_modules/**',
+    '**/node_modules/**',
+    '.git/**',
+    '**/.git/**',
+    '.venv/**',
+    '**/.venv/**'
+];
+
+function findMarkdownFiles(repoRoot) {
+    return glob('**/*.{md,mdc}', {
+        ignore: markdownIgnore,
+        cwd: repoRoot,
+        dot: true,
+        absolute: true,
+        follow: false,
+        nodir: true
+    });
+}
+
+/**
+ * Validate one nested-Markdown input before reading it.
+ * @param {string} repoRoot - Repository root.
+ * @param {string} filePath - Candidate Markdown input.
+ * @param {object} fileSystem - File-system adapter used by deterministic tests.
+ * @returns {string} Canonical in-repository input path.
+ */
+function validateMarkdownInput(repoRoot, filePath, fileSystem = fs) {
+    const rootPath = fileSystem.realpathSync(repoRoot);
+    const inputMetadata = fileSystem.lstatSync(filePath);
+
+    if (inputMetadata.isSymbolicLink() || !inputMetadata.isFile()) {
+        throw new Error(`Markdown input must be a non-symlink regular file: ${filePath}`);
+    }
+
+    const resolvedInputPath = fileSystem.realpathSync(filePath);
+    const relativeInputPath = path.relative(rootPath, resolvedInputPath);
+    if (relativeInputPath === '..' ||
+        relativeInputPath.startsWith(`..${path.sep}`) ||
+        path.isAbsolute(relativeInputPath)) {
+        throw new Error(`Markdown input resolves outside the repository: ${filePath}`);
+    }
+
+    return resolvedInputPath;
+}
+
+/**
+ * Prove the input boundary with deterministic file-system projections.
+ */
+function runMarkdownInputSafetySelfTest() {
+    const fixtureRoot = path.resolve('nested-markdown-input-fixture');
+    const regularInput = path.join(fixtureRoot, 'rules', 'valid.mdc');
+    const outsideInput = path.resolve('nested-markdown-outside', 'outside.mdc');
+    const siblingInput = path.resolve(`${fixtureRoot}-other`, 'sibling.mdc');
+    const metadata = (symbolicLink, regularFile) => ({
+        isSymbolicLink: () => symbolicLink,
+        isFile: () => regularFile
+    });
+    const cases = [
+        {
+            name: 'regular in-root file',
+            metadata: metadata(false, true),
+            resolvedInput: regularInput,
+            expectedFailure: ''
+        },
+        {
+            name: 'symbolic-link leaf',
+            metadata: metadata(true, true),
+            resolvedInput: outsideInput,
+            expectedFailure: 'must be a non-symlink regular file'
+        },
+        {
+            name: 'non-regular leaf',
+            metadata: metadata(false, false),
+            resolvedInput: regularInput,
+            expectedFailure: 'must be a non-symlink regular file'
+        },
+        {
+            name: 'resolved outside file',
+            metadata: metadata(false, true),
+            resolvedInput: outsideInput,
+            expectedFailure: 'resolves outside the repository'
+        },
+        {
+            name: 'sibling-prefix file',
+            metadata: metadata(false, true),
+            resolvedInput: siblingInput,
+            expectedFailure: 'resolves outside the repository'
+        }
+    ];
+
+    for (const inputCase of cases) {
+        const fileSystem = {
+            lstatSync: () => inputCase.metadata,
+            realpathSync: (targetPath) => targetPath === fixtureRoot
+                ? fixtureRoot
+                : inputCase.resolvedInput
+        };
+        let failure = '';
+        try {
+            const result = validateMarkdownInput(
+                fixtureRoot,
+                regularInput,
+                fileSystem
+            );
+            if (result !== inputCase.resolvedInput) {
+                failure = 'returned an unexpected resolved path';
+            }
+        } catch (error) {
+            failure = error.message;
+        }
+        if (inputCase.expectedFailure === '') {
+            if (failure !== '') {
+                throw new Error(`Input-safety self-test failed (${inputCase.name}): ${failure}`);
+            }
+        } else if (!failure.includes(inputCase.expectedFailure)) {
+            throw new Error(`Input-safety self-test did not reject ${inputCase.name}`);
+        }
+    }
+}
+
 // Initialize markdown-it parser
 const md = new MarkdownIt();
 
@@ -111,9 +232,10 @@ function extractMarkdownFencesRecursive(content, filePath, baseLine = 0, depth =
  * @param {string} filePath - Path to the markdown file
  * @returns {Array} Array of extracted blocks with metadata
  */
-function extractMarkdownFences(filePath) {
-    const content = fs.readFileSync(filePath, 'utf8');
-    return extractMarkdownFencesRecursive(content, filePath, 0, 0, '');
+function extractMarkdownFences(filePath, repoRoot) {
+    const safeInputPath = validateMarkdownInput(repoRoot, filePath);
+    const content = fs.readFileSync(safeInputPath, 'utf8');
+    return extractMarkdownFencesRecursive(content, safeInputPath, 0, 0, '');
 }
 
 /**
@@ -197,18 +319,16 @@ async function main() {
     try {
         console.log(`${colors.bold}Linting nested Markdown in code fences...${colors.reset}\n`);
 
+        runMarkdownInputSafetySelfTest();
+
         // Load markdownlint configuration
         const config = loadMarkdownlintConfig();
 
         // Repository root is two levels up from this script
         const repoRoot = path.resolve(__dirname, '../..');
 
-        // Find all markdown files (excluding node_modules)
-        const files = await glob('**/*.md', {
-            ignore: ['node_modules/**', '**/node_modules/**'],
-            cwd: repoRoot,
-            absolute: true
-        });
+        // Find all Markdown and Cursor rule files (excluding node_modules)
+        const files = await findMarkdownFiles(repoRoot);
 
         console.log(`Found ${files.length} Markdown file(s) to scan\n`);
 
@@ -218,7 +338,7 @@ async function main() {
         // Process each file
         for (const file of files) {
             const relativePath = path.relative(repoRoot, file);
-            const blocks = extractMarkdownFences(file);
+            const blocks = extractMarkdownFences(file, repoRoot);
 
             if (blocks.length > 0) {
                 console.log(`${colors.cyan}${relativePath}${colors.reset}: Found ${blocks.length} nested Markdown block(s)`);
@@ -265,4 +385,12 @@ async function main() {
 }
 
 // Run main function
-main();
+if (require.main === module) {
+    main();
+}
+
+module.exports = {
+    findMarkdownFiles,
+    runMarkdownInputSafetySelfTest,
+    validateMarkdownInput
+};

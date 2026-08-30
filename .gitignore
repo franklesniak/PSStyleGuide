@@ -1,6 +1,9 @@
 # Node.js dependencies
 node_modules/
 
+# Personal Claude Code project memory must remain untracked.
+/CLAUDE.local.md
+
 # npm logs
 npm-debug.log*
 yarn-debug.log*

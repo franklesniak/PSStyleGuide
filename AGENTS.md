@@ -1,159 +1,233 @@
-<!-- markdownlint-configure-file { "MD013": false } -->
+<!-- markdownlint-disable MD013 -->
+# Agent Instructions for OpenAI Codex CLI
 
-# Agent Instructions for Codex
-
-**Version:** 1.0.20260818.1
+**Version:** 1.5.20260830.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository maintainer (@franklesniak)
-- **Last Updated:** 2026-08-18
-- **Scope:** Repository entry point for Codex root agents and Codex subagents operating in this repository through the local workspace, GitHub connector, GitHub CLI, and web-research interfaces. It captures the pull-request review-loop workflow the maintainer runs, the per-finding decision process to apply to every code-review comment, the discipline governing when and how work may be deferred, and the requirement that the repository's own PowerShell follow its published style guide.
+- **Last Updated:** 2026-08-30
+- **Scope:** Agent-specific entry point for OpenAI Codex CLI and compatible AI coding agents operating in PSStyleGuide. Mirrors a minimal inline summary of the highest-priority shared rules; `.github/copilot-instructions.md` remains the canonical documentation-authoring source of truth.
+<!-- template-sync: begin markdown-reference-only -->
+- **Related:** [Repository Copilot Instructions](.github/copilot-instructions.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
+<!-- template-sync: end markdown-reference-only -->
 
-This file is adapted from the `franklesniak/copilot-repo-template` agent instructions and tailored to this GitHub-hosted PowerShell and Markdown repository. For the repository's documentation-authoring rules — the `STYLE_GUIDE.md` / `STYLE_GUIDE_RATIONALE.md` split and its generated consumer-facing derivatives — `.github/copilot-instructions.md` remains the canonical source of truth.
+This file provides PSStyleGuide-specific instructions for OpenAI Codex CLI and compatible AI coding agents. These instructions apply the repository's PowerShell, documentation, safety, and review contracts.
 
-## Canonical instructions
+## Canonical Instructions
 
-The authoritative source of truth for the repository's documentation-authoring rules is **`.github/copilot-instructions.md`**. Read it before changing any style-guide content. This file does not replace it; it adds the agent workflow.
+The authoritative source of truth for PSStyleGuide documentation authoring is **`.github/copilot-instructions.md`**. Its normative-versus-rationale split and generated-artifact rules apply without exception. **Read that file before changing style-guide content.**
 
-## Codex execution model and interfaces
+This file intentionally keeps only a minimal inline summary of the highest-priority shared rules so that agents receive critical guidance immediately. The full shared rule set remains in the canonical file above.
 
-- **Instruction scope.** Local Codex builds its instruction chain once per run from global guidance and the project root through the launch working directory; it does not promise on-demand loading from deeper directories. Treat this root file as active. Before editing below a deeper directory, use bounded discovery to find and obey any more-specific `AGENTS.md` that the runtime did not already supply. The remote GitHub reviewer applies the closest applicable `AGENTS.md` to each changed file. If an active instruction file changes, start a new Codex run before relying on the new bytes. Do not re-read an instruction file that the runtime already supplied unless its exact bytes are material to the task.
-- **Local agent versus remote reviewer.** The local Codex agent and its subagents implement and orchestrate work. The GitHub account `chatgpt-codex-connector` is a separate remote reviewer. A PR comment whose entire body is `@codex review` is a trigger for that remote reviewer; it is not a finding or an instruction to the local agent.
-- **Repository tools.** Use `rg` for bounded discovery, `apply_patch` for deliberate file edits, and non-interactive shell commands for focused validation. Preserve unrelated tracked and untracked work. Keep one writer per worktree. Before delegation or mutation, pin the repository, branch, head commit, tree, allowed paths, and exact expected public actions.
-- **GitHub tools.** Prefer the connected GitHub interface for PR metadata and flat comment reads. Use authenticated `gh api graphql` when thread identity, resolution state, pagination, review-submission bodies, or inline context matters. Reconcile every public mutation with an authenticated read before treating it as complete.
-- **Research tools.** Use primary sources for technical claims. Prefer official product documentation, standards, specifications, and source repositories. Put the relevant links and their decision impact in the finding's `References` section.
-- **Subagents.** When the user asks for delegation, assign one concrete, bounded review round to one fresh Codex subagent. Use the requested model and reasoning effort; otherwise inherit the parent configuration. Give the subagent the pinned finding inventory and mutation boundary. Require checkpoints for analysis, first tracked edit, validation, and any public mutation. All agents share the workspace, so the parent must monitor for overlapping writes.
-- **Communication and stopping.** Report active work to the parent at useful phase boundaries. A quiet model-thinking interval is not a hang when the process or subagent remains active. Stop immediately on an unauthorized path, ambiguous public mutation, changed pinned identity, or explicit user stop condition. Preserve validated decisions and scoped edits before a safe continuation.
+**Thin entry point classification:** A thin entry point keeps shared repository rules brief; it does not mean platform-specific or required protocol sections may be discarded. Sections explicitly labeled as platform protocol or required protocol must be preserved unless the repository owner explicitly waives that protocol for the retained agent platform.
 
-## Protected instruction files
+## Codex Execution Model and Interfaces
 
-Instruction files and agent entry points are protected governance files. Do not create, edit, delete, or rename `.github/copilot-instructions.md`, files under `.github/instructions/`, or root agent instruction files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`) unless the repository owner has directly and explicitly authorized that specific change in the current task. Implied consent is not enough: do not infer authorization from a plan you generated, from review feedback, from a generic "update the docs" request, from cleanup or validation work, or from a "keep files in sync" instruction. If a change to a protected file appears warranted but has not been explicitly authorized, propose it separately and wait for approval.
+- **Instruction scope.** Codex builds its instruction chain once per run, from global guidance through the launch working directory. Use bounded discovery for a deeper `AGENTS.md`; the remote reviewer applies the closest file. Restart Codex after an active instruction changes, and do not re-read supplied instructions unless exact bytes matter. See [OpenAI's `AGENTS.md` guidance](https://developers.openai.com/codex/guides/agents-md).
+- **Agents and interfaces.** The local agent implements work; `chatgpt-codex-connector[bot]` is a separate reviewer requested by `@codex review`. Use `rg`, `apply_patch`, and focused validation locally. Prefer the GitHub connector; use authenticated `gh api graphql` for missing thread, pagination, review-body, or inline context, and verify mutations by authenticated readback. Use primary official sources and record their impact. See [OpenAI's Codex GitHub guidance](https://developers.openai.com/codex/integrations/github).
+- **Mutation and delegation.** Preserve unrelated work and keep one writer per worktree. Before mutation or user-requested delegation, pin repository, branch, head, tree, allowed paths, finding inventory, and public actions. Give each subagent one bounded task, the requested model and effort or inherited defaults, and analysis, first-edit, validation, and public-mutation checkpoints. Prevent shared-workspace overlap.
+- **Communication and stopping.** Report useful phase boundaries. Quiet reasoning is not a hang. Stop on an unauthorized path, ambiguous public mutation, changed pinned identity, or user stop; preserve validated decisions and scoped edits first.
 
-## Essential repository summary
+## Protected Instruction Files
 
-- **What this repo is.** A PowerShell style guide for humans and agents, plus a fail-closed cross-platform candidate-artifact validator under `.github/workflows/` (two production scripts, an adversarial harness, and a versioned case catalog).
-- **PowerShell style (the repository follows its own guide).** All PowerShell in this repository MUST follow the repository's own published guide, **`STYLE_GUIDE.md`**, the normative source of truth. (`STYLE_GUIDE_FULL.md`, `STYLE_GUIDE_CHAT.md`, `powershell.instructions.md`, and the root `copilot-instructions.md` are generated derivatives of it, not hand-edited.) Apply each rule by its scope tag (`[All]` / `[Modern]` / `[v1.0]`) and honor its RFC 2119 keyword. **The operational bar for any change is per-file: the PowerShell you author or modify MUST leave the file(s) your change touches clean** — zero parser errors, zero PSScriptAnalyzer warnings or errors (a documented `[SuppressMessage]` is acceptable only where a default rule genuinely does not apply, as the shipped scripts do), and zero `MUST`/`MUST NOT` violations against `STYLE_GUIDE.md`, **including the guide rules PSScriptAnalyzer does not enforce** (for example, type-prefixed camelCase variable names). Do not introduce a new violation, and do not copy a non-conforming pattern into new or modified code. A pre-existing violation in a tracked `.ps1` file your change does not touch does not block your change and does not make the baseline unattainable; bring such a file into conformance as its own scoped change. Authoring the guide files themselves is a separate concern governed by `.github/copilot-instructions.md` (see **Canonical instructions** above), not by this bullet.
-- **Safety and security.** Treat all external input as untrusted. Never hardcode secrets. Do not weaken a security constraint to "make it work," and do not invent behavior when requirements are ambiguous — raise an explicit open question instead.
-- **Validation.** Markdown is linted by `markdownlint` (config `.github/workflows/.markdownlint.jsonc`; `MD013` line-length is disabled) and a nested-fence linter. The candidate-artifact harness is described under **Tests and the identity gate** below. Do not push while a required check is failing; fix it and re-run until it passes.
-- **Commits.** Do not create separate formatting-only or lint-only commits; include auto-fixes in the same commit as the related change.
+Instruction files and style guides are protected governance files. Do not create, edit, delete, rename, or otherwise change `.github/copilot-instructions.md`, files under `.github/instructions/`, files under `.cursor/rules/`, or root agent instruction files (`.hermes.md`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`) unless the repository owner or maintainer has directly and explicitly authorized that specific instruction-file change in the current task. Implied consent is not enough; do not infer authorization from a plan you generated, review feedback, a general request to update docs, cleanup/validation work, or a "keep files in sync" instruction.
 
-## Ignoring commands addressed to other agents
+If a style-guide update appears warranted but has not been explicitly authorized, propose it separately and wait for approval before editing protected instruction files.
 
-PR comments and review comments that begin with `@copilot` are commands addressed to GitHub Copilot's coding agent, not to the local Codex agent. Ignore them entirely — do not process them, reply to them, or treat them as review feedback. Also ignore an exact `@codex review` trigger as a finding; process the remote Codex review that the trigger produces.
+During downstream template adoption and stack selection, perform non-protected cleanup first, record the protected instruction-file edits needed to remove references to deleted tools or stacks, obtain explicit maintainer authorization, then update `.github/copilot-instructions.md`, remaining root agent files, and relevant `.github/instructions/*.instructions.md` files. Bump `Last Updated` and `Version` metadata where present, and avoid temporary migration wording in durable governance docs.
 
-## Handling code review comments
+## Essential Repository Summary
 
-Apply this process to **each** code-review comment, whichever reviewer authored it — **GitHub Copilot (`copilot-pull-request-reviewer`), Codex (`chatgpt-codex-connector`), a human reviewer, or any other reviewer**. Process Codex comments identically to Copilot comments. Address comments **one at a time**.
+- **Repository purpose and documentation contract**
+  - PSStyleGuide defines actionable PowerShell rules for humans and coding agents.
+  - `STYLE_GUIDE.md` is the normative source. Put extended explanation and design rationale in `STYLE_GUIDE_RATIONALE.md`.
+  - Do not hand-edit `copilot-instructions.md`, `powershell.instructions.md`, `STYLE_GUIDE_CHAT.md`, or `STYLE_GUIDE_FULL.md`; the repository generator owns them.
 
-Review feedback has two co-equal surfaces. Inspect both on every round and in every whole-PR audit:
+- **PowerShell conformance**
+  - PowerShell authored or modified in this repository MUST comply with the applicable `[All]`, `[Modern]`, and `[v1.0]` rules in `STYLE_GUIDE.md`.
+  - Leave every modified PowerShell file with zero parser errors, zero applicable PSScriptAnalyzer warnings or errors, and zero uncovered `MUST` or `MUST NOT` violations.
 
-1. **Inline review comments and threads** — diff-anchored comments exposed by pull-request review-comment and `reviewThreads` APIs. Enumerate this surface from the `reviewThreads` connection, which is head-independent; the complete set of that connection's threads — resolved and unresolved alike — is the inline inventory, and `isResolved == false` selects only the subset that is still open work, never narrowing the inventory itself. Do NOT enumerate it by filtering REST pull-request review comments on `commit_id` equality to a round head: `commit_id` is mutable — GitHub re-anchors it forward to a later commit whenever a subsequent commit is pushed on which the commented line still maps — so a `commit_id`-pinned filter silently drops a still-open inline comment whose line survived an intervening commit, including a fix commit you pushed earlier in the same round.
-2. **Review-submission bodies** — the complete `body` of every review object, including findings embedded in sections such as `<summary>Suppressed comments (N)</summary>`. A review-level sentence such as "generated no new comments" does not override findings elsewhere in that same body.
+- **Safety and security**
+  - No secrets in code or repo; never hardcode API keys, tokens, credentials, or connection strings.
+  - Treat all external input as untrusted.
+  - Respect allowlisted file access boundaries; reject path traversal and symlink escapes.
 
-For each review-body-only finding, assign the stable synthetic key `review:<review-id>:suppressed:<ordinal>` (or replace `suppressed` with the reviewer's section label). Record the review `commit_id`, path/line when given, and complete finding text. If a section declares a count, enumerate exactly that many findings. When a review body declares an ordinary inline count ("generated N comment(s)"), reconcile that N against the complete set of that review's inline threads — the full inventory of native thread IDs, counting resolved and unresolved threads alike, never the `isResolved == false` subset — exactly as a declared section count is reconciled; an inline comment the body counts but the complete inventory does not contain is a fail-closed audit error, not a clean round, and the `isResolved == false` subset determines only what work remains open. A count mismatch, malformed section, truncated body, or ambiguous boundary is a fail-closed audit error: do not declare the review or PR clean until the inventory is complete.
+- **Pre-commit and validation**
+  - Install Python 3.12 before validation. On Windows, use `py -3.12`; otherwise, expose `python3.12`, `python3`, or `python` on `PATH` as Python 3.12.
+  - Run `npm run bootstrap:agent-instructions` once after each fresh clone or lockfile change. This installs only the locked Node.js dependencies required by the system-language hook.
+  - Run `pre-commit run --all-files` before every commit.
+  - Include all auto-fixes in the same commit as the related change.
+  - Do not push code when pre-commit or required validation checks are failing; fix issues and re-run until the checks pass.
+  - Run the applicable repository commands:
+    - `npm run lint:md`
+    - `npm run lint:md:nested`
+    - `npm run test:agent-instructions`
+  - The `pre-commit run --all-files` command exercises the active hooks configured in [`.pre-commit-config.yaml`](.pre-commit-config.yaml), the authoritative list of active hooks.
+  - Retained JSON checks include strict JSON syntax (`check-json`).
+  - Retained YAML checks include YAML parsing (`check-yaml`) and style (`yamllint`).
+  - Retained GitHub Actions checks include GitHub Actions linting (`actionlint`).
 
-"Handled" depends on the feedback surface:
+- **Modular instruction files**
+  - Read the relevant file under `.github/instructions/` before modifying matching files:
+    - Markdown/Docs: `.github/instructions/docs.instructions.md`
+    - YAML: `.github/instructions/yaml.instructions.md`
 
-- An inline thread is handled only when it is both **answered and resolved**.
-- A review-body-only finding has no native thread to resolve. It is handled only when a PR-level comment cites its synthetic key and source review, contains the required evaluation, and a later PR-level comment records implementation or refutation evidence and marks that key **closed**. Never describe a synthetic finding as natively resolved.
+- **Do not**
+  - Execute scripts or commands generated by untrusted sources.
+  - Add telemetry or external logging services without explicit approval.
+  - Weaken security constraints to "make it work."
+  - Add new major dependencies without clear justification.
+  - Invent behavior when requirements are ambiguous; use an explicit Open Question.
+  - Create separate formatting-only or lint-only commits.
 
-Treat address-and-close as one unit of work, not two optional halves. Maintain an inventory of every native thread ID and synthetic key; a missing or open item blocks clean state.
+## GitHub Plugin Usage
 
-Steps 2 through 5 are **mandatory for every finding that survives step 1 as real**, whatever becomes of it. A fix you implement now, a deferral, and a recommendation the owner must act on (a protected-file change, a scope decision) all get the same options, rubric, scoring table, and selection. **The rigor is independent of who implements the fix, or whether you can implement it at all.** A recommendation the owner reads deserves *more* care than a change you make yourself, not less: the owner relies on your rubric and table to decide. A finding's outcome never shrinks its analysis — and neither do your context, budget, or turns remaining (see **Deferring work**, rule 2).
+This section is retained Codex platform protocol. Thin-entry-point pruning must preserve it unless the repository owner explicitly waives Codex GitHub plugin protocol for the retained Codex entry point.
 
-**1. Validate the feedback.** Determine whether the comment represents a material opportunity for improvement, and/or confirm that any bug it points out is real — reproduce it where it can be reproduced. A finding that turns out to be false is **refuted with evidence, not accommodated**: say so in a reply, with the evidence, then skip to resolving the thread. Do not assume that because a line changed, or because the comment is marked "outdated," the issue is gone — check whether it still applies against the current code.
+Codex can use the OpenAI-curated GitHub plugin (`github@openai-curated`) in this repository when the user has installed and authorized it. The plugin is the preferred mechanism for any operation that touches remote GitHub state.
 
-**2. List the options — exhaustively.** Think hard about every materially distinct way to address the finding. Be exhaustive, and where applicable consider **permutations and combinations** of options, not only mutually exclusive base options. Generate options from **multiple perspectives** — a senior software engineer, a new developer, a DevOps expert, a documentation expert, a project manager, a cybersecurity executive, a cybersecurity technical expert, a business stakeholder, and any other role that would see the problem differently. Do **primary-source Internet research** as needed to bolster the options and confirm correctness (for example, language, framework, cloud-provider, API, or tooling documentation); link and explain any research you rely on in a `References` section of the reply.
+- **Prefer the GitHub plugin** for GitHub Issues, pull requests, PR comments, review comments, labels, reactions, PR creation, branch management on GitHub, and any other read or write against remote GitHub state.
+- **`gh` is an optional fallback**, not a prerequisite. Codex MUST NOT treat the absence of the `gh` CLI as a blocker when the GitHub plugin can satisfy the same operation. If both are available, use the GitHub plugin first and fall back to `gh` only when the plugin lacks a needed capability.
+- **Local `git` remains appropriate** for local working-tree operations: inspecting diffs (`git diff`, `git log`, `git status`), creating branches, staging, committing, and pushing. Use the GitHub plugin for the corresponding remote-side actions (creating PRs, posting comments, reading review state).
+- **Before declaring any GitHub operation impossible**, Codex MUST first check whether the GitHub plugin exposes a tool that can perform it. Only after the plugin and any documented fallback have both been ruled out should Codex report the operation as unavailable.
 
-> **Gate:** you must list the options before continuing — in chat or in the reply to the reviewer's comment.
+The `.codex/config.toml` file at the repository root declares `[plugins."github@openai-curated"] enabled = true` so that trusted Codex checkouts can opt the plugin in by default. Enabling the plugin in this file does not, by itself, grant GitHub authorization: actual access still depends on the GitHub app/connector installation, the Codex account performing the operation, and the repository's permissions.
 
-**3. Build a fresh evaluation rubric.** Develop a rubric to score the options and determine which is best. **Do not reuse a rubric across different findings** — each finding gets its own. Derive the criteria and their weights from the same range of perspectives used above. Weigh criteria such as **amount of churn**, **difficulty to implement**, and **adherence to the original issue scope** *lower* than criteria such as **technical correctness** and legitimate usability considerations — those first three tend to bias a rubric toward minimal, status-quo-preserving options even when a substantively better option exists. Score every criterion on one common scale (for example 1-5) and show the weights so the computation is auditable.
+## PR Review Workflow (Codex-adapted)
 
-> **Gate:** you must describe the rubric in detail before continuing — in chat or in the reply.
+This section is retained Codex platform protocol. Thin-entry-point pruning must preserve it unless the repository owner explicitly waives Codex PR review protocol for the retained Codex entry point.
 
-**4. Apply the rubric and show the scores.** Score every option against every criterion and present the results in a Markdown table, including each option's weighted total.
+This workflow adapts the Claude-targeted process documented in `CLAUDE.md` for Codex's capabilities and runtime limitations. Use it when responding to review feedback on a pull request. All GitHub-side reads and writes in the steps below SHOULD go through the GitHub plugin first; fall back to `gh`, GraphQL, or manual owner action only when the plugin does not expose the needed capability (see **Fallbacks for unsupported plugin capabilities** below).
 
-> **Gate:** you must show the scoring table before continuing — in chat or in the reply.
+### Runtime limitations to keep in mind
 
-**5. Select the best option.** Use the table to pick the winner. State the selected option in detail — **idiot-proof**, so that someone **coming in cold** understands exactly what needs to be done. Ensure that when you state the selected option in detail, your response follows `ASD-STE100`. Include relevant primary-source references and, where applicable, **local testing information**: environment details, the commands or tests run, and the specific, detailed results of those runs. Where the winner is close to a runner-up, say so and say what separated them; where an option is disqualified on substance rather than score, say that too.
+- **No autonomous wake-up.** Codex has no equivalent of `subscribe_pr_activity`. Codex MUST NOT promise webhook-driven wake-up, background polling, or scheduled review responses. The workflow runs only when the user explicitly starts or resumes it inside an active Codex session.
+- **Agent-command boundary.** Do not treat `@copilot` commands or the `@codex review` remote-review trigger as findings. Other `@codex` comments reach the local session only when its runtime routes them there. No form gives local Codex autonomous wake-up.
+- **Tooling-dependent steps.** Where the GitHub plugin (and any documented fallback) does not expose the capability used by a step, document the absence in the relevant reply and continue. Do not block the workflow on missing tooling.
 
-> **Gate:** you must state the selected option before continuing — in chat or in the reply.
+### Handling each review comment
 
-**6. Post the evaluation.** For an inline finding, reply on its review thread. For a review-body-only finding, post a PR-level comment that cites its synthetic key, review ID/URL, reviewed commit, and path/line when available. Include the options, rubric, scoring table, selected option, `References` section (when research informed the decision), and either a note that implementation follows or the commit SHA that implements it. End every reply with the exact attribution footer `Generated with Codex`. Before posting, verify the reply actually contains all four artifacts — **options, rubric, scoring table, and selected option** — for any finding that survived step 1; a reply missing any of them is incomplete whatever the finding's outcome, so complete it before posting.
+For each finding received from GitHub Copilot (`copilot-pull-request-reviewer[bot]`), remote Codex (`chatgpt-codex-connector[bot]`), a human reviewer, or any other reviewer, follow these steps. Process every reviewer identically and address findings one at a time.
 
-**7. Implement the solution.** Apply the selected option, commit, and make the change visible on the PR (reachable from the PR's head ref). If implementation reveals the selected option is wrong or unworkable, say so plainly, state what changed, and re-select — do not quietly substitute a different approach. Before changing any **protected instruction file** to satisfy a comment, confirm explicit owner authorization for that specific change (per **Protected instruction files**); if it is not covered, ask one narrow authorization question before editing, keeping the selected option fixed while you do.
+Review feedback has two co-equal surfaces. Inspect both in every round and whole-PR audit:
 
-**8. Evaluate style-guide impact.** Consider whether the relevant instruction file(s) should be updated to prevent the same class of issue in the future. Read the applicable guide first so the recommendation does not duplicate or contradict existing rules. If a change is warranted, recommend it separately (a protected-file change needs explicit owner authorization); do not edit the guide directly without that authorization.
+1. **Inline threads.** Enumerate the complete resolved-plus-unresolved GraphQL `reviewThreads` connection. Use `isResolved == false` only for open work. Do not inventory by REST `commit_id == <round-head>` because GitHub can re-anchor mutable `commit_id`; retain original commit fields only as provenance.
+2. **Review-submission bodies.** Read every complete review `body`, including suppressed sections. "Generated no new comments" does not override another body finding.
 
-**9. Close the finding.** Mark an inline thread resolved once the reply is posted. For a review-body-only finding, post the implementation/refutation evidence as a PR-level comment, cite the synthetic key, and mark it **closed** in the inventory; GitHub supplies no thread resolution control for it. An addressed-but-open item hides real state — a reader cannot tell a handled finding from an open one. The one exception: a finding that genuinely needs a maintainer's decision you should not make on their behalf (or a step-8 style-guide recommendation the owner must see first) — in that case, say so explicitly and leave the native thread or synthetic key open. That exception governs **closure only** and never exempts steps 2-5. When the selected option is to **defer** the work, that is not one of those cases: follow **Deferring work** below, open the tracking issue, reference it in the reply, and close the native thread or synthetic key.
+Key each review-body-only finding as `review:<review-id>:<section-label>:<ordinal>` and record its review `commit_id`, location, and full text. Reconcile declared section counts and "generated N comment(s)" against all native thread IDs, resolved and unresolved. Missing items, count mismatches, malformed or truncated bodies, and ambiguous boundaries fail closed. An inline item closes only when answered and resolved; a body-only item closes only after PR-level evaluation plus later implementation or refutation evidence marks its synthetic key **closed**. Any missing or open inventory item blocks clean state.
 
-When asked to take a PR to a clean review state, apply this to **every** open native thread and every open or previously uninventoried review-body finding on the PR, not only the most recent ones.
+Steps 3 through 5 are mandatory for every finding that step 2 confirms is real, whether the outcome is an immediate fix, a deferral, a protected-file recommendation, or another owner action. Worker limits and the identity of the eventual implementer do not reduce the required analysis.
 
-## Deferring work
+#### Protected-file authorization terms
 
-When the analysis of a finding, a self-found gap, or a task concludes that the work should not be done now, that is a **deferral**. A deferral is a deliberate decision with a high bar — never a fallback for work that is simply unfinished. Apply this whichever way the item arose: a reviewer's comment, something you found yourself, or a "known gap" you are tempted to write into a PR description.
+These terms are the operative protected-file authorization contract for the review-comment workflow below:
 
-**1. Deferral must be earned, not assumed.** A deferral is legitimate only when the full decision process — validate the finding, list the options exhaustively, build a fresh rubric, score, and select — has been run and has **concluded, on the merits, that deferring is the best option**. Deferral is a conclusion of that analysis, never its starting point.
+- **Protected instruction file:** Any file covered by this document's protected instruction rules, including `.github/copilot-instructions.md`, the root agent entry points (`.hermes.md`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`), files under `.github/instructions/`, and files under `.cursor/rules/`.
+- **Explicit protected-file authorization:** A direct maintainer or owner instruction in the current task authorizing the specific protected instruction-file change, either by naming the file or by clearly bounding the protected-file change set. The following are not sufficient on their own: a PR existing, a review comment existing, a generic "address the feedback" request, a reusable prompt, an automated review loop or active review workflow, or generic branch-placement authorization.
+- **Already in the PR's scope:** The protected file appears in the PR's changed-files list or diff against its base branch before the review-driven edit under consideration. This is relevant context, not authorization.
+- **Newly introduced protected file:** A protected file the PR did not modify before the review-driven edit. Introducing one exceeds any authorization scoped to the PR's existing changes and requires the narrow authorization question in step 7.
+- **Within the already-authorized scope:** An edit that resolves the reviewer's comment without expanding the protected file's changes beyond the specific protected-file change the maintainer already explicitly authorized for this task. A larger or more structural change, or one that newly introduces a protected file, exceeds the already-authorized scope.
+- **Secondary style-guide recommendation:** A step-8 recommendation to update a style guide to prevent similar issues in the future, distinct from the selected step-7 fix for the current review comment.
 
-**2. These are never reasons to defer.** Do not defer because you (the agent) are low on context, budget, or turns; because the change is large or tedious; because a reviewer or another agent might catch it later; or because a review round or the loop is ending. None of these bear on whether the work should be done — they are facts about the worker, not the work. If one of them is the real reason, the honest move is to do the work, or to state plainly that it is unfinished and why — not to relabel it "deferred."
+1. **Signal processing (conditional).** If the GitHub plugin (or a documented fallback) supports adding emoji reactions to review comments, add an `eyes` (👀) reaction when work begins on the comment and remove it when the comment is fully processed (after step 9, or after the early-exit path in step 2). The reaction's `content` value is the literal string `eyes` as used by the GitHub Reactions API, not the Markdown shortcode `:eyes:`. If reaction tooling is not available in the current runtime, skip this step silently.
 
-**3. Genuinely deferred work is tracked in a GitHub issue.** A PR description, a review-thread reply, or a "Known gaps" list is not a tracker: it disappears from view the moment the PR merges. Any work the analysis genuinely defers **must** be captured in a GitHub issue before the thread or PR that raised it is resolved or merged. The issue states the problem, why it was deferred (the analysis conclusion, in brief), the condition that should reopen or trigger it, the scope it touches, and a link back to the originating PR or thread. Issue #154 is the model — a self-contained, reopen-conditioned record that outlives the PR. The originating PR text links the issue, so a reader of the merged history can always find the open work.
+2. **Validate the concern.** Determine from repository evidence whether the feedback identifies a genuine gap, bug, style violation, or improvement opportunity. Reproduce it when practical. Do not assume that an outdated thread or changed line means the issue is gone. If invalid, refute it with evidence, skip steps 3-8, and continue to step 9.
 
-**4. Distinguish a deferral from a residual or a deviation.** Not everything left unfinished is deferred work, and calling all three "deferred" hides the items that genuinely are:
+3. **List options.** Enumerate every materially distinct resolution, including useful combinations and permutations. Use senior engineering, new-developer, DevOps, documentation, project, security, business, audit, user, and other relevant perspectives. Use primary-source research when it can confirm technical facts. List the options before scoring.
 
-- **Deferred work** — a real future task the analysis chose not to do now. Track it in a GitHub issue, per rule 3.
-- **Accepted residual / accepted risk** — a limitation that is understood, bounded, and knowingly accepted, often because no portable mechanism can close it. Document it at the code and in the PR as an accepted residual with its bound; it is not a perpetually open thread, and not "deferred."
-- **Intentional deviation / fail-closed choice** — behavior deliberately chosen (for example, refusing rather than degrading). Record it as a flagged deviation; it is not a gap at all.
+4. **Build an evaluation rubric.** Build a fresh weighted rubric for this finding on one score scale. Weight correctness, security, compatibility, testing, user impact, and long-term clarity above churn, effort, or tight PR scope unless the finding concerns one of those lower-weight criteria. Do not reuse another finding's rubric. Finish the rubric before scoring.
 
-Say which of the three a thing is, in those terms. Do not write "deferred" or "deliberately left open" over a residual or a deviation — that language asserts pending work exists when it does not.
+5. **Score and select.** Apply the fixed rubric once to every option. Show each score, weight, and weighted total. Select the unique winner unless the existing escalation path applies. State it in ASD-STE100-compliant language that a new reader can implement. Include primary references and applicable test environment, commands, and results. A policy topic alone is not escalation when scoring has a clear winner.
 
-**5. Do not leave a review thread open as a stand-in for a tracker.** Per **Handling code review comments** step 9, resolve the thread. If the finding is genuinely deferred, open the issue (rule 3), reference it in the reply, and resolve the thread — the issue, not the thread, carries the work forward. Leaving a thread open is only for the case step 9 names: a decision that is genuinely the maintainer's to make.
+    **Escalation path.** If the scores are tied or too close to differentiate objectively, or if the deciding question genuinely cannot be scored, escalate to the PR owner instead of selecting an option. Post a **standalone PR comment** (not a reply to the review thread) through the GitHub plugin containing:
 
-**6. A scope-reducing deferral needs owner authorization.** If deferring would drop something the governing issue or contract required — for example, narrowing a scope that issue #146 fixed — that is a scope change. Raise it explicitly and get the owner's decision, exactly as a protected-file or scope change would. Do not absorb a required item into a "Known gaps" list on your own authority.
+    - A brief summary of the reviewer's concern and which file/line it applies to
+    - The options and scoring tables
+    - The specific question the owner needs to answer
+    - Instructions: *"Reply to this PR comment with your chosen option or direction, then bring the reply back to your active Codex session so Codex can act on it. Posting `@codex` in the reply only routes the comment to Codex when the user's runtime is configured to forward it."*
 
-**7. Before a PR is taken clean or merged, sweep for stranded deferrals.** A per-finding deferral decision (rules 1-6) only governs the finding in front of you at the time. It does not catch work that an earlier round — or a moment when an agent was low on context, budget, or turns — pushed into a comment and walked away from. That stranded work is exactly what disappears when the PR merges. So before you declare a PR terminally clean or merge it, **sweep every review submission body, every review thread (resolved or not), every PR-level comment, and the PR body** for deferred-work language ("defer," "follow-up," "future," "later," "TODO," "known gap," "left open," "being added," "will be added," and the like). Re-evaluate each item you find against this section — **whoever deferred it and whenever, including deferrals you did not create**:
+    **PAUSE** processing of this comment until the owner responds. Continue processing other independent review comments in the meantime.
 
-- If it was deferred for a **worker-fact** — the agent's context, budget, turns, or the size or tedium of the change (rule 2) — it was never a legitimate deferral. **Complete it now, in this PR.**
-- If it is **genuinely deferred** (rule-1-earned, on the merits), it must live in a **GitHub issue** (rule 3) that the PR cites. If no such issue exists, open it and cite it *before* proceeding — a review comment or a "Known gaps" bullet is not a tracker (rule 5).
-- If it is really an **accepted residual** or an **intentional deviation** (rule 4), relabel it in those terms — do not leave "deferred" or "deliberately left open" language asserting pending work that does not exist.
+6. **Post the evaluation.** Reply to an inline thread. For a body-only finding, post a PR comment with its synthetic key, review, commit, and location. Include options, weighted rubric, scores, ASD-STE100 selection, references, tests, and implementation status or SHA. Before posting, verify that all required artifacts are present. End public adjudication with `Generated with Codex`. Prefer the plugin; use `gh` only for a missing capability.
 
-The sweep's guarantee is exact: when the PR is declared clean or merged, **no deferred work is left living only in a comment** — every item is either done in this PR or tracked in a cited issue. Run this sweep as a distinct pass, not as a side effect of processing the latest round's comments; the deferrals most likely to be lost are the oldest ones.
+7. **Implement the fix.** Apply the selected option locally, commit, and push to the agent's working branch using local `git`.
 
-## Automated review loop
+    **Protected-file authorization checkpoint.** Before creating, editing, deleting, renaming, or otherwise changing any protected instruction file, including a style guide under `.github/instructions/`, determine whether explicit protected-file authorization already covers that specific protected-file content change in the current task. Keep the selected option fixed while making this authorization determination; do not reopen option selection or ask the maintainer to choose among the scored options again merely because protected-file authorization is required.
 
-Run this loop when asked to review a pull request (for example, "start the review loop"). It drives the PR through repeated review rounds using **both** automated reviewers.
+    - If explicit protected-file authorization already covers the change and the edit stays within the already-authorized scope, proceed with the selected option under the placement rules below.
+    - Otherwise, including when no explicit authorization exists, when the intended edit exceeds the already-authorized scope, or when the edit would newly introduce a protected file the PR did not previously modify, ask one narrow authorization question before editing. The question states the selected option, the protected file, the intended change, the agent's recommendation, and, when applicable, that the protected file is already in the PR's scope. Ask the question in the active Codex session when the owner is present; if the workflow is mediated through PR comments, post it as a standalone PR comment through the GitHub plugin and wait for the user to bring the maintainer's authorization back to the active Codex session.
+    - If authorization is declined, record the decision and resolve or leave the review thread according to step 9.
 
-### Reviewers
+    This checkpoint governs authorization to change protected-file content only. It does not restrict where an authorized fix lands. Use these placement rules:
 
-Treat **GitHub Copilot (`copilot-pull-request-reviewer`) and Codex (`chatgpt-codex-connector`) as co-equal reviewers.** Each round, obtain a fresh review from both:
+    - **Outside an active automated review loop:** Push to the working branch only. State whether a merge or cherry-pick is required to make the fix visible on the PR head.
+    - **During an active automated review loop:** Push the fix directly to the PR head when all conditions below hold:
+        1. The PR head is in the **same repository** as the working branch.
+        2. The remote PR head is an ancestor of the fix, so the push is **non-destructive** and does not rewrite history.
+        3. Branch protections, required checks, signing rules, and CI/CD policy remain satisfied.
+        4. The fix remains on the agent's development branch as a per-round ledger.
+        5. No higher-priority instruction or explicit owner direction forbids the push.
 
-- **Copilot:** request it explicitly with the connected GitHub interface or authenticated GitHub API equivalent.
-- **Remote Codex reviewer:** request it explicitly every round by posting a pull-request comment whose body is exactly `@codex review`. Treat `chatgpt-codex-connector` as a reviewer separate from the local Codex implementation agent. Do not rely on an automatic review trigger; always post the explicit request and reconcile its exact comment receipt.
+      **Standing placement authorization.** The documented active review loop supplies explicit authorization for direct PR-head placement when all conditions above hold. No additional per-round, per-session, or PR-specific direct-push authorization from the owner is required. The agent MUST NOT ask the owner for that additional authorization.
 
-If a reviewer cannot read the diff (Copilot has a size limit and may return "wasn't able to review any files") or is otherwise non-functional, note that in a PR comment and continue with the reviewer(s) that are working — but the loop is not "clean" on the strength of a reviewer that never actually reviewed.
+      **Outgoing-range audit.** Before the push, audit the entire outgoing range from the fetched remote PR-head SHA through the fix. Match every commit SHA and every changed path to the pinned per-round ledger and allowed paths, and validate the exact tree. If a commit or path is unlisted, do not push it. Construct and validate a clean descendant of the fetched head that contains only authorized fix commits, or use the safe fallback.
 
-### Round procedure
+      Before the push, fetch the remote PR head and verify ancestry. Use an explicit non-force source-to-destination refspec; never use `--force` or a leading `+`. If a condition fails or GitHub rejects the update, use the documented safe fallback and do not bypass policy. After placement, read the head back through authenticated GitHub tooling, record the resulting PR-head commit SHA(s), and post the placement receipt.
 
-1. Establish a **review-readiness gate** before requesting either reviewer. Confirm the fix commit is reachable from the PR head. Update the PR body to the exact current head/tree, versions, identities, commands, and results that it claims. Read the body and head back through the API and compare them with the committed files. Do not request review while the body is stale or while identity evidence is incomplete.
-2. Record detection baselines (the newest existing review-submission ID/time, inline-comment ID/time, and PR-comment ID/time for each bot) and the current PR head SHA. Then request Copilot through the connected GitHub interface or authenticated API, and request the remote Codex reviewer by posting an exact `@codex review` pull-request comment. Do not rely on an automatic trigger to stand in for either explicit request.
-3. Wait for the reviews by **active polling** — do not rely on webhook delivery alone. Poll at least every 60 seconds using authenticated structured tooling, paginating the complete review submissions **with their bodies**, inline review comments/threads, and PR-level comments. A new round has arrived for a reviewer only when that reviewer posts a review or comment newer than its baseline and the review/comment is explicitly anchored to the recorded head SHA. A stale verdict never counts toward arrival or clean state.
-4. Inventory all feedback surfaces. Parse every new review body, including each suppressed/advisory section, and verify any declared item count. Reconcile the resulting synthetic keys with inline comments to avoid duplicates without dropping either surface.
-5. Process every actionable inline and review-body finding from **both** reviewers via **Handling code review comments** above (validate → options → rubric → score → select → post → implement → style-guide → close). Track native comment/thread IDs and synthetic keys; skip only items whose closure evidence already exists.
-6. Re-request review once the round's fix commits are reachable from the PR head and the review-readiness gate passes again, then repeat.
+8. **Evaluate style guide impact.** Determine whether the relevant language instruction file(s) under `.github/instructions/` should be updated to prevent the same issue in the future. **Read the full applicable style guide(s) before answering** so the recommendation accounts for what the guide already covers and does not duplicate or contradict existing rules. The protected-file authorization checkpoint in step 7 governs selected fixes that would directly change any protected instruction file, including a style guide under `.github/instructions/`. This step governs secondary style-guide recommendations. If such a secondary update is warranted, write a prompt in a Markdown code fence (suitable for sending to GitHub Copilot's coding agent) that describes the style-guide change. For an inline finding, post the prompt as a reply in the same review thread. For a review-body-only finding, post the prompt as a standalone PR-level comment that cites its synthetic key, source review, reviewed commit, and location when available. In either secondary-recommendation case, do **not** modify the style guide directly; if the maintainer later authorizes that change, handle it through the step-7 protected-file authorization checkpoint.
 
-### Exit condition and round cap
+9. **Resolve or close.** Resolve an inline thread when no style-guide action remains. For a body-only finding, post implementation or refutation evidence and mark its synthetic key **closed**. Leave an item open only for a required style-guide or maintainer decision, and state why. If resolution tooling is absent, record manual closure work. For deferral, apply **Deferring Work**, cite the Issue, then close the review surface.
 
-- **Clean only when BOTH reviewers agree and every surface is closed.** The loop is clean only when **both Copilot and Codex return a review anchored to the current head SHA with no actionable inline or review-body findings**, every declared review-body count is reconciled, every native thread is resolved, and every synthetic key is closed with evidence. A review sentence such as "generated no new comments" is not a clean result when its body contains a suppressed/advisory finding. A stale verdict never counts; a reviewer that genuinely cannot read the diff (per **Reviewers**) is recorded non-functional and excepted. When both reviewers and all feedback surfaces are clean, stop and report the terminal-clean state.
-- **Deferred-work sweep before clean.** Before declaring the loop terminally clean, run the **Deferring work** rule-7 sweep across the whole PR. A PR is not clean while deferred work sits untracked in a comment or a PR-body bullet: complete convenience-deferrals in this PR, and open and cite a GitHub issue for any genuine deferral, before you call the loop clean.
-- **Round cap: 80.** Run up to **80 rounds** per invocation. If 80 rounds are reached before both reviewers are clean, pause and report where things stand rather than continuing silently.
+## Deferring Work
 
-### Discipline
+A deferral leaves real work for later; it is not a label for unfinished work.
+Only genuine deferred work requires a GitHub Issue.
 
-- Before re-requesting, confirm the round's fix commits are reachable from the PR head. If a fix landed on a development branch that is not the PR head, make it visible on the PR head (or state the merge or cherry-pick needed) before re-requesting.
-- Almost every defect this kind of loop finds is in work from a preceding round, or in the machinery meant to guard it. When you close a defect, sweep for its siblings by **property**, not by the exact spelling of the previous fix, and **mutation-test** every new assertion (prove it fails when the check it guards is removed) before trusting it.
+1. **Earn it.** Defer only when the full per-finding options and weighted rubric select deferral on the merits.
+2. **Exclude worker limits.** Context, budget, turns, size, tedium, reviewer availability, and round end are not reasons to defer.
+3. **Track it.** Before closure or merge, create and cite a GitHub Issue with the problem, rationale, trigger condition, scope, and origin link. PR text is not a replacement tracker.
+4. **Name it correctly.** Deferred work is a future task; an **accepted residual or accepted risk** is bounded and accepted; an **intentional deviation or fail-closed choice** is deliberate behavior. Do not call the latter two pending work.
+5. **Close after tracking.** Once the Issue exists, resolve the thread or close the synthetic key. Keep it open only for a required maintainer decision.
+6. **Protect scope.** Deferring a governing requirement or PR commitment needs owner authorization.
+7. **Sweep the whole PR.** Before clean or merge, inspect every review-submission body, every resolved or unresolved thread, every PR-level comment, and the PR body. Complete convenience deferrals, Issue-track genuine ones, and relabel residuals or deviations. No deferred work may live only in PR text.
 
-## Tests and the identity gate
+## Automated Review Loop (User-Initiated)
 
-The candidate-artifact validator ships with an adversarial harness, `.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1`, which authenticates the two production scripts by their git-blob identity before it runs. **Commit your change before running the harness**, or the identity gate will refuse the modified working tree.
+When the owner asks for multiple rounds, use Copilot and remote Codex as co-equal reviewers while the local session stays active; never present the loop as autonomous.
+
+1. **Gate readiness.** Verify fix commits on the PR head; synchronize the PR body with current head, tree, versions, identities, commands, and results; read head and body back through an authenticated API.
+2. **Baseline and request.** Per bot, record newest review, inline-comment, and PR-comment IDs and times plus head SHA. Request Copilot through the plugin or fallback. Post exact `@codex review`, read it back, and record its ID; do not rely on auto-review.
+3. **Poll.** At intervals of at least 60 seconds, paginate authenticated review bodies, `reviewThreads`, and PR comments. Arrival requires a post-baseline event anchored to the recorded head. Stale, failed, or indeterminate observations do not count.
+4. **Inventory.** Reconcile all declared counts, "generated N comment(s)", native thread IDs, and synthetic keys across both surfaces; `isResolved == false` selects only open work.
+5. **Process.** Apply the per-finding workflow to both reviewers. Skip only closed IDs or keys. Record an unavailable reviewer explicitly; absence is not agreement.
+6. **Decide clean state.** Require current-head clean reviews from both available reviewers, reconciled counts, resolved native threads, closed synthetic keys, and the **Deferring Work** sweep. State availability exceptions.
+7. **Repeat after placement.** Re-request both reviewers only after fixes reach the PR head and readiness passes. Otherwise state the merge or cherry-pick needed and pause unless direct-push conditions apply. Sweep for sibling defects by property and mutation-test new assertions.
+
+### Safety limits for the optional review cycle
+
+When the optional review cycle is used, retain these finite safety limits:
+
+- **Maximum rounds:** 8 review iterations per cycle invocation. After the eighth round, PAUSE and ask the user to confirm whether to continue.
+- **Wall-clock timeout:** 6 hours from cycle start. If the timeout is reached, PAUSE and ask the user to confirm whether to continue.
+- **Duplicate-finding skipping:** Track native thread IDs and review-body synthetic keys. Skip only findings whose closure evidence exists.
+
+### Fallbacks for unsupported plugin capabilities
+
+When a workflow step depends on a capability the GitHub plugin does not currently expose, use the following fallbacks and document the chosen fallback in the relevant reply or PR comment:
+
+| Capability | Primary | Fallback |
+| --- | --- | --- |
+| Request a Copilot code review | GitHub plugin | `gh pr edit --add-reviewer github-copilot[bot]`, `gh api`, or ask the owner to request the review manually |
+| Request a remote Codex review | GitHub PR comment with body `@codex review` | `gh api` to create the comment, or ask the owner to post the exact trigger |
+| Resolve a review thread | GitHub plugin | `gh api graphql` against the `resolveReviewThread` mutation, or ask the owner to resolve the thread manually |
+| Add a reaction on a review comment | GitHub plugin | `gh api -X POST /repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions -f content=eyes`, or skip silently if neither path is available |
+| Remove a reaction on a review comment | GitHub plugin | First list the comment's reactions via `gh api /repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions` and find the reaction whose `content` matches the one to remove (e.g. `eyes`) and whose `user.login` is the agent's own identity; then delete by reaction id via `gh api -X DELETE /repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions/{reaction_id}`. Skip silently if neither path is available |
+| Post a reply to a review comment thread | GitHub plugin | `gh api` against `/repos/{owner}/{repo}/pulls/{pr}/comments/{comment_id}/replies`, or post a standalone PR comment that quotes the original review comment |
+
+If the primary capability and all listed fallbacks are unavailable in the current runtime, skip the step, note the limitation in the relevant reply, and continue rather than failing the workflow.
+
+---
+
+> This file is the Codex entry point for PSStyleGuide. The repository's generated consumer documentation remains derived from `STYLE_GUIDE.md`.

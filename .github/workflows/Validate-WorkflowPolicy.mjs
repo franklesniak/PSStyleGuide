@@ -25,12 +25,12 @@ async function loadYamlBindings() {
   } = await import('yaml'));
 }
 
-const VALIDATOR_VERSION = '1.0.0';
+const VALIDATOR_VERSION = '1.2.0';
 const RESULT_SCHEMA = 'PSStyleGuide.WorkflowPolicyResult.v1';
 const PREFLIGHT_SCHEMA = 'PSStyleGuide.WorkflowPreflightResult.v1';
 const PREFLIGHT_ARGUMENTS = ['--preflight'];
-const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'eaab84c88082aa932722c88eb931641d887a0bf88ae06cc7dda67e34e96df570';
-const MINIMUM_CASE_COUNT = 46;
+const EXPECTED_CONTRACT_CANONICAL_SHA256 = '948043a4467abc1a6d4025b6c5b4c13dc98c8bab726b76cc9306d559dd88ac63';
+const MINIMUM_CASE_COUNT = 57;
 const CASE_CATALOG_FILE_NAME = 'workflow-policy-cases.json';
 const VALIDATOR_FILE_NAME = 'Validate-WorkflowPolicy.mjs';
 // Mapping keys that alias JavaScript object internals. Plain assignment to
@@ -51,10 +51,17 @@ const AUTHORIZED_ADVISORY_FINDING_KEYS = [
   'picomatch',
 ];
 const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
-// Every input the validator reads lives under .github/, so that directory is the
-// containment boundary for readOrdinaryFile().
-const POLICY_ROOT = path.resolve(SCRIPT_DIRECTORY, '..');
+// Entry-point parity includes root configuration and .github-owned tooling.
+// The repository root is therefore the common containment boundary, while every
+// accepted path remains an exact contract literal and every component must be
+// an ordinary directory or file.
+const POLICY_ROOT = path.resolve(SCRIPT_DIRECTORY, '../..');
 const REQUIRED_ARGUMENTS = ['build.yml', 'markdownlint.yml'];
+const REQUIRED_MARKDOWN_EXTENSIONS = ['md', 'mdc'];
+const REQUIRED_IGNORED_MARKDOWN_DIRECTORIES = ['node_modules', '.git', '.venv'];
+const REQUIRED_RETAINED_MARKDOWN_DOT_DIRECTORIES = ['.github', '.cursor'];
+const REQUIRED_ROOT_LINT_SCRIPT = 'markdownlint-cli2 "**/*.md" "**/*.mdc" "#node_modules" "#.github/workflows/node_modules" --config .github/workflows/.markdownlint.jsonc';
+const REQUIRED_WORKFLOW_LINT_SCRIPT = 'cd ../.. && markdownlint-cli2 "**/*.md" "**/*.mdc" "#node_modules" "#.github/workflows/node_modules" --config .github/workflows/.markdownlint.jsonc';
 const REQUIRED_RECIPROCAL_ROWS = [
   'GF-PARAMETERS',
   'GF-DESTINATION',
@@ -315,9 +322,11 @@ function validateContract(contract) {
     'validatorIdentity',
     'actions',
     'workflowPolicy',
+    'markdownPolicy',
     'dependabot',
     'reciprocalFoundation',
   ], 'contract-shape');
+  validateMarkdownContract(contract.markdownPolicy);
   expectExactKeys(contract.caseCatalog, ['path', 'sha256'], 'contract-shape');
   if (
     contract.caseCatalog.path !== CASE_CATALOG_FILE_NAME
@@ -396,6 +405,66 @@ function validateContract(contract) {
     if (!['same', 'intentional difference'].includes(row.status) || !row.observed || !row.rationale) {
       fail('reciprocal-matrix');
     }
+  }
+}
+
+function validateMarkdownContract(policy) {
+  expectExactKeys(policy, ['schema', 'extensions', 'entryPoints'], 'markdown-policy');
+  if (policy.schema !== 'PSStyleGuide.MarkdownEntryPointPolicy.v1') {
+    fail('markdown-policy');
+  }
+  expectDeepEqual(policy.extensions, REQUIRED_MARKDOWN_EXTENSIONS, 'markdown-policy');
+  expectExactKeys(policy.entryPoints, [
+    'rootPackageJson',
+    'workflowPackageJson',
+    'nestedLinter',
+    'stagedSelector',
+    'preCommit',
+  ], 'markdown-policy');
+  for (const entry of Object.values(policy.entryPoints)) {
+    if (
+      typeof entry.path !== 'string'
+      || typeof entry.length !== 'number'
+      || !Number.isInteger(entry.length)
+      || entry.length < 1
+      || !/^[0-9a-f]{64}$/u.test(entry.sha256)
+    ) {
+      fail('markdown-policy');
+    }
+  }
+  const { entryPoints } = policy;
+  expectExactKeys(entryPoints.rootPackageJson, ['path', 'length', 'sha256', 'lintScript'], 'markdown-policy');
+  expectExactKeys(entryPoints.workflowPackageJson, ['path', 'length', 'sha256', 'lintScript'], 'markdown-policy');
+  expectExactKeys(entryPoints.nestedLinter, [
+    'path',
+    'length',
+    'sha256',
+    'glob',
+    'includeDotDirectories',
+    'ignoredDirectoryNames',
+    'retainedDotDirectoryNames',
+  ], 'markdown-policy');
+  expectExactKeys(entryPoints.stagedSelector, ['path', 'length', 'sha256', 'pathspecs'], 'markdown-policy');
+  expectExactKeys(entryPoints.preCommit, ['path', 'length', 'sha256', 'extensions', 'linebreakArgument'], 'markdown-policy');
+  if (
+    entryPoints.rootPackageJson.path !== '../../package.json'
+    || entryPoints.rootPackageJson.lintScript !== REQUIRED_ROOT_LINT_SCRIPT
+    || entryPoints.workflowPackageJson.path !== 'package.json'
+    || entryPoints.workflowPackageJson.lintScript !== REQUIRED_WORKFLOW_LINT_SCRIPT
+    || entryPoints.nestedLinter.path !== 'lint-nested-markdown.js'
+    || entryPoints.nestedLinter.glob !== '**/*.{md,mdc}'
+    || entryPoints.nestedLinter.includeDotDirectories !== true
+    || canonicalJson(entryPoints.nestedLinter.ignoredDirectoryNames)
+      !== canonicalJson(REQUIRED_IGNORED_MARKDOWN_DIRECTORIES)
+    || canonicalJson(entryPoints.nestedLinter.retainedDotDirectoryNames)
+      !== canonicalJson(REQUIRED_RETAINED_MARKDOWN_DOT_DIRECTORIES)
+    || entryPoints.stagedSelector.path !== 'lint-staged-markdown.mjs'
+    || canonicalJson(entryPoints.stagedSelector.pathspecs) !== canonicalJson(['*.md', '*.mdc'])
+    || entryPoints.preCommit.path !== '../../.pre-commit-config.yaml'
+    || canonicalJson(entryPoints.preCommit.extensions) !== canonicalJson(REQUIRED_MARKDOWN_EXTENSIONS)
+    || entryPoints.preCommit.linebreakArgument !== '--markdown-linebreak-ext=md,mdc'
+  ) {
+    fail('markdown-policy');
   }
 }
 
@@ -504,6 +573,103 @@ function validateDependabot(value, contract) {
   expectExactKeys(value, ['version', 'updates'], 'dependabot-policy');
   expectExactKeys(value.updates[0], ['package-ecosystem', 'directory', 'schedule'], 'dependabot-policy');
   expectExactKeys(value.updates[0].schedule, ['interval'], 'dependabot-policy');
+}
+
+function readMarkdownEntryPoint(entry, contract) {
+  const bytes = readOrdinaryFile(
+    path.join(SCRIPT_DIRECTORY, entry.path),
+    contract.limits.maximumJsonBytes,
+    'markdown-entry-point',
+  );
+  if (bytes.length !== entry.length || sha256(bytes) !== entry.sha256) {
+    fail('markdown-entry-point-identity');
+  }
+  return bytes;
+}
+
+function strictUtf8Text(bytes, category) {
+  const text = bytes.toString('utf8');
+  if (Buffer.from(text, 'utf8').compare(bytes) !== 0 || text.charCodeAt(0) === 0xfeff) {
+    fail(category);
+  }
+  return text;
+}
+
+function validateMarkdownEntryPoints(contract) {
+  const { entryPoints } = contract.markdownPolicy;
+  const rootPackage = parseStrictJson(
+    readMarkdownEntryPoint(entryPoints.rootPackageJson, contract),
+    contract.limits,
+    'markdown-root-package',
+  );
+  const workflowPackage = parseStrictJson(
+    readMarkdownEntryPoint(entryPoints.workflowPackageJson, contract),
+    contract.limits,
+    'markdown-workflow-package',
+  );
+  if (
+    rootPackage.scripts?.['lint:md'] !== entryPoints.rootPackageJson.lintScript
+    || workflowPackage.scripts?.['lint:md'] !== entryPoints.workflowPackageJson.lintScript
+  ) {
+    fail('markdown-all-files');
+  }
+
+  const nestedLinter = strictUtf8Text(
+    readMarkdownEntryPoint(entryPoints.nestedLinter, contract),
+    'markdown-nested-linter',
+  );
+  const requiredIgnorePatterns = REQUIRED_IGNORED_MARKDOWN_DIRECTORIES.flatMap(
+    (directoryName) => [`${directoryName}/**`, `**/${directoryName}/**`],
+  );
+  const expectedIgnoreSource = [
+    'const markdownIgnore = [',
+    ...requiredIgnorePatterns.map((pattern, index) => (
+      `    '${pattern}'${index === requiredIgnorePatterns.length - 1 ? '' : ','}`
+    )),
+    '];',
+  ].join('\n');
+  if (
+    !nestedLinter.includes(`glob('${entryPoints.nestedLinter.glob}'`)
+    || !nestedLinter.includes('dot: true')
+    || !nestedLinter.replaceAll('\r\n', '\n').includes(expectedIgnoreSource)
+  ) {
+    fail('markdown-nested-linter');
+  }
+
+  const stagedSelector = strictUtf8Text(
+    readMarkdownEntryPoint(entryPoints.stagedSelector, contract),
+    'markdown-staged-selector',
+  );
+  if (
+    !stagedSelector.includes("Object.freeze(['*.md', '*.mdc'])")
+    || !stagedSelector.includes('...stagedMarkdownPathspecs')
+  ) {
+    fail('markdown-staged-selector');
+  }
+
+  const preCommit = parseStrictYaml(
+    readMarkdownEntryPoint(entryPoints.preCommit, contract),
+    contract.limits,
+  ).value;
+  const firstRepositoryHooks = preCommit.repos?.[0]?.hooks;
+  const endOfFile = Array.isArray(firstRepositoryHooks)
+    ? firstRepositoryHooks.find((hook) => hook.id === 'end-of-file-fixer')
+    : undefined;
+  const trailingWhitespace = Array.isArray(firstRepositoryHooks)
+    ? firstRepositoryHooks.find((hook) => hook.id === 'trailing-whitespace')
+    : undefined;
+  const extensionPattern = '.*\\.(md|mdc)';
+  if (
+    typeof endOfFile?.files !== 'string'
+    || !endOfFile.files.includes(extensionPattern)
+    || typeof trailingWhitespace?.files !== 'string'
+    || !trailingWhitespace.files.includes(extensionPattern)
+    || canonicalJson(trailingWhitespace.args) !== canonicalJson([
+      entryPoints.preCommit.linebreakArgument,
+    ])
+  ) {
+    fail('markdown-pre-commit');
+  }
 }
 
 // Raw-byte comparison only, so this is safe to call before any dependency is
@@ -728,7 +894,11 @@ function runCaseCatalog(catalog, workflows, dependabot, contract) {
       ) {
         fail('case-catalog');
       }
-    } else if (testCase.domain === 'contract' || testCase.domain === 'dependabot') {
+    } else if (
+      testCase.domain === 'contract'
+      || testCase.domain === 'markdown-contract'
+      || testCase.domain === 'dependabot'
+    ) {
       if (testCase.operation === null || typeof testCase.operation !== 'object') {
         fail('case-catalog');
       }
@@ -754,6 +924,10 @@ function runCaseCatalog(catalog, workflows, dependabot, contract) {
         const fixture = clone(contract);
         applyOperation(fixture, testCase.operation);
         validateContract(fixture);
+      } else if (testCase.domain === 'markdown-contract') {
+        const fixture = clone(contract.markdownPolicy);
+        applyOperation(fixture, testCase.operation);
+        validateMarkdownContract(fixture);
       } else if (testCase.domain === 'dependabot') {
         const fixture = clone(dependabot);
         applyOperation(fixture, testCase.operation);
@@ -839,6 +1013,7 @@ async function main() {
   ).value;
   validateDependabot(dependabot, contract);
   validatePackageTuple(contract);
+  validateMarkdownEntryPoints(contract);
   validateScriptVersions(contract);
   const passedCases = runCaseCatalog(catalog, workflows, dependabot, contract);
 
