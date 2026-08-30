@@ -21,9 +21,16 @@ $objParentContext = Get-GovernedDocumentParentContext `
     -RepositoryRelativePath 'AGENTS.md' `
     -MaximumBytes $MaximumBytes `
     -Revision $Revision
-if ($objParentContext.ParentRevision -cne "$Revision`^1" -or
+if ($null -eq $objParentContext.ParentRevision) {
+    if ($null -ne $objParentContext.ParentContent -or
+        $objParentContext.ExpectedUtcDate -cne '' -or
+        $objParentContext.IsWorktreeTransition) {
+        throw 'The explicit root revision context is invalid.'
+    }
+}
+elseif ($objParentContext.ParentRevision -cne "$Revision`^1" -or
     [string]::IsNullOrEmpty($objParentContext.ParentContent)) {
-    throw 'The explicit revision parent context is invalid.'
+    throw 'The explicit child revision context is invalid.'
 }
 
 $strRootRevision = [string] (
@@ -53,10 +60,25 @@ $objGuideMetadata = Get-DocumentMetadataContext `
 if ($null -ne $objGuideMetadata.Failure) {
     throw 'The unversioned date fixture metadata is invalid.'
 }
-$strMaximumDate = $objGuideMetadata.UpdatedDate
-if ($strMaximumDate -cne $MaximumMetadataUtcDate) {
-    throw 'The unversioned fixture date differs from the trusted maximum.'
+$strRepositoryDate = $objGuideMetadata.UpdatedDate
+$strRepositoryDateLine = "- **Last Updated:** $strRepositoryDate"
+if ([regex]::Matches(
+        $strGuideContent,
+        '(?m)^' + [regex]::Escape($strRepositoryDateLine) + '$'
+    ).Count -ne 1) {
+    throw 'The unversioned date fixture has no unique metadata date.'
 }
+$strGuideContent = $strGuideContent.Replace(
+    $strRepositoryDateLine,
+    "- **Last Updated:** $MaximumMetadataUtcDate"
+)
+$objGuideMetadata = Get-DocumentMetadataContext `
+    -Content $strGuideContent -RequiresVersion $false
+if ($null -ne $objGuideMetadata.Failure -or
+    $objGuideMetadata.UpdatedDate -cne $MaximumMetadataUtcDate) {
+    throw 'The synthetic unversioned date fixture is invalid.'
+}
+$strMaximumDate = $MaximumMetadataUtcDate
 $strPreviousDate = ([datetime]::ParseExact(
         $strMaximumDate,
         'yyyy-MM-dd',

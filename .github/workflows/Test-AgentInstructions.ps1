@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260830.0
+# Version: 1.7.20260830.1
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -64,6 +64,7 @@ $script:arrOperationalLintGuidePaths = @(
 )
 $script:arrTrustRootPaths = @(
     $script:arrCheckoutAttributePaths
+    '.github/workflows/Test-AgentInstructions.SelfTest.ps1',
     '.github/workflows/Test-AgentInstructions.ps1',
     '.github/workflows/Test-AgentInstructionParserManifest.mjs',
     '.github/workflows/agent-instructions.yml'
@@ -80,6 +81,7 @@ $script:arrPushGovernedExactPaths = @(
     $script:arrOperationalLintGuidePaths
     '.codex/config.toml',
     '.github/workflows/Test-AgentInstructionParserManifest.mjs',
+    '.github/workflows/Test-AgentInstructions.SelfTest.ps1',
     '.github/workflows/Test-AgentInstructions.ps1',
     '.github/workflows/agent-instructions.yml',
     '.gitignore',
@@ -6290,7 +6292,7 @@ if ($SelfTest) {
     $strValidatorSource = [IO.File]::ReadAllText($PSCommandPath)
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260830\.0$'
+            '(?m)^# Version: 1\.7\.20260830\.1$'
         ).Count -ne 1) {
         throw 'The validator script version does not use build date 20260830.'
     }
@@ -6570,6 +6572,16 @@ if ($SelfTest) {
     }
     if (Test-ProhibitedClaudeLocalPath -RepositoryRelativePath 'CLAUDE.local.md.bak') {
         throw 'A Claude local-memory near miss was prohibited.'
+    }
+    $strExtractedSelfTestPath =
+        '.github/workflows/Test-AgentInstructions.SelfTest.ps1'
+    if (@($script:arrTrustRootPaths | Where-Object {
+                $_ -ceq $strExtractedSelfTestPath
+            }).Count -ne 1 -or
+        @($script:arrPushGovernedExactPaths | Where-Object {
+                $_ -ceq $strExtractedSelfTestPath
+            }).Count -ne 1) {
+        throw 'The extracted self-test is outside exact governance.'
     }
     foreach ($strExactValidatorInputPath in $script:arrPushGovernedExactPaths) {
         if (-not (Test-AgentInstructionWorkflowPath `
@@ -10264,6 +10276,10 @@ if ($SelfTest) {
     )
     if ($LASTEXITCODE -ne 0) {
         throw 'Could not inventory changed historical trust roots.'
+    }
+    if ($arrHistoricallyChangedTrustPaths -cnotcontains
+        '.github/workflows/Test-AgentInstructions.SelfTest.ps1') {
+        throw 'The extracted self-test lacks historical trust-root mutation evidence.'
     }
     foreach ($strTrustPath in $arrHistoricallyChangedTrustPaths) {
         if (-not ($arrTrustRootFailures -match
