@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260830.5
+# Version: 1.7.20260830.6
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -3343,6 +3343,12 @@ function Get-LastUpdatedMetadataFreshnessFailure {
     # .PARAMETER TrustedEventUtcDate
     # The authenticated event date in UTC.
     #
+    # .PARAMETER ModifyingCommitUtcDate
+    # The authenticated UTC date of the commit that changes rendered content.
+    #
+    # .PARAMETER AllowSameDateForExactRestoration
+    # Permits a commit-date-matched metadata date for a proved exact path restoration.
+    #
     # .PARAMETER RequireCurrentMaximumDateForRenderedChange
     # Requires changed rendered content to use the latest allowed current date.
     #
@@ -3369,6 +3375,10 @@ function Get-LastUpdatedMetadataFreshnessFailure {
         [Parameter(Mandatory)][string] $CurrentContent,
         [Parameter()][AllowNull()][object] $BaseContent,
         [Parameter(Mandatory)][AllowEmptyString()][string] $TrustedEventUtcDate,
+        [Parameter()][AllowEmptyString()]
+        [ValidatePattern('^(?:|\d{4}-\d{2}-\d{2})$')]
+        [string] $ModifyingCommitUtcDate = '',
+        [Parameter()][bool] $AllowSameDateForExactRestoration = $false,
         [Parameter()][bool] $RequireCurrentMaximumDateForRenderedChange = $false
     )
 
@@ -3388,6 +3398,13 @@ function Get-LastUpdatedMetadataFreshnessFailure {
     if ([string]::CompareOrdinal(
             $strCurrentDate, $script:strMaximumMetadataUtcDate) -gt 0) {
         Write-Output "$Name Last Updated is later than trusted UTC."
+        return
+    }
+    if (-not [string]::IsNullOrEmpty($ModifyingCommitUtcDate) -and
+        -not (Test-MetadataCalendarDatePair `
+                -VersionDate $ModifyingCommitUtcDate.Replace('-', '') `
+                -UpdatedDate $ModifyingCommitUtcDate)) {
+        Write-Output "$Name modifying commit UTC date must contain one real calendar date."
         return
     }
 
@@ -3444,7 +3461,10 @@ function Get-LastUpdatedMetadataFreshnessFailure {
     }
     elseif (-not $RequireCurrentMaximumDateForRenderedChange -and
         $null -ne $objBaseMetadata -and
-        $strCurrentDate -ceq $strBaseDate) {
+        $strCurrentDate -ceq $strBaseDate -and
+        (-not $AllowSameDateForExactRestoration -or
+            $strCurrentDate -cne $ModifyingCommitUtcDate -or
+            [string]::IsNullOrEmpty($ModifyingCommitUtcDate))) {
         Write-Output (
             "$Name Last Updated must advance from $strBaseDate " +
             'after a historical rendered-content change.'
@@ -5722,9 +5742,31 @@ function Get-GovernedDocumentCommitTransitionFailure {
                 "$CommitRevision."
             )
         }
+        $boolRestoresFirstParentBlob = $false
+        $strChangedParentFirstParent = [string] (
+            & git -C $RepositoryRootPath rev-parse --verify `
+                "$($objParentContext.Revision)`^1`^{commit}" 2>$null
+        )
+        if ($LASTEXITCODE -eq 0 -and
+            -not [string]::IsNullOrEmpty($strChangedParentFirstParent.Trim())) {
+            & git -C $RepositoryRootPath diff --quiet --no-ext-diff --no-textconv `
+                $strChangedParentFirstParent.Trim() $CommitRevision -- `
+                $RepositoryRelativePath
+            $intRestorationDiffExitCode = $LASTEXITCODE
+            if ($intRestorationDiffExitCode -eq 0) {
+                $boolRestoresFirstParentBlob = $true
+            }
+            elseif ($intRestorationDiffExitCode -ne 1) {
+                throw (
+                    "Could not verify exact restoration of $RepositoryRelativePath " +
+                    "for metadata range commit $CommitRevision."
+                )
+            }
+        }
         $listChangedParents.Add([pscustomobject]@{
                 Revision = $objParentContext.Revision
                 HasPolicyMarker = $objParentContext.HasPolicyMarker
+                RestoresFirstParentBlob = $boolRestoresFirstParentBlob
             })
     }
     if ($intParentCount -ne 0 -and $listChangedParents.Count -eq 0) {
@@ -5774,6 +5816,7 @@ function Get-GovernedDocumentCommitTransitionFailure {
                 ExpectedUtcDate = $objCommitTimestamp.UtcDateTime.ToString('yyyy-MM-dd')
                 CurrentRevision = $CommitRevision
                 ParentRevision = ''
+                AllowSameDateForExactRestoration = $false
                 RequireExpectedUtcDateForRenderedChange =
                     $RequireExpectedUtcDateForRenderedChange
             })
@@ -5803,6 +5846,8 @@ function Get-GovernedDocumentCommitTransitionFailure {
                 ExpectedUtcDate = $objCommitTimestamp.UtcDateTime.ToString('yyyy-MM-dd')
                 CurrentRevision = $CommitRevision
                 ParentRevision = $objChangedParent.Revision
+                AllowSameDateForExactRestoration =
+                    $objChangedParent.RestoresFirstParentBlob
                 RequireExpectedUtcDateForRenderedChange =
                     $RequireExpectedUtcDateForRenderedChange -and
                     $objChangedParent.HasPolicyMarker -and
@@ -5823,7 +5868,10 @@ function Get-GovernedDocumentCommitTransitionFailure {
             -TrustedEventUtcDate $(if (
                 $objTransition.RequireExpectedUtcDateForRenderedChange) {
                     $objTransition.ExpectedUtcDate
-                } else { '' })
+                } else { '' }) `
+            -ModifyingCommitUtcDate $objTransition.ExpectedUtcDate `
+            -AllowSameDateForExactRestoration `
+                $objTransition.AllowSameDateForExactRestoration
     }
 }
 
@@ -7466,6 +7514,7 @@ foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
 }
 
 $strNoRangeCommitRevision = ''
+$strNoRangeCommitUtcDate = ''
 $boolNoRangeCommitHasParent = $false
 if ([string]::IsNullOrEmpty($RangeBaseRevision) -and
     [string]::IsNullOrEmpty($RangeHeadRevision)) {
@@ -7484,6 +7533,23 @@ if ([string]::IsNullOrEmpty($RangeBaseRevision) -and
     }
     $arrNoRangeCommitAndParents = @($strNoRangeParentLine.Trim() -split '\s+')
     $boolNoRangeCommitHasParent = $arrNoRangeCommitAndParents.Count -gt 1
+    $strNoRangeCommitTimestamp = [string] (
+        & git -C $strRepositoryRootPath show -s --format=%cI `
+            $strNoRangeCommitRevision
+    )
+    $objNoRangeCommitTimestamp = [DateTimeOffset]::MinValue
+    if ($LASTEXITCODE -ne 0 -or
+        -not [DateTimeOffset]::TryParse(
+            $strNoRangeCommitTimestamp.Trim(),
+            [ref] $objNoRangeCommitTimestamp
+        )) {
+        throw "Could not read the no-range validation commit timestamp: $strNoRangeCommitRevision"
+    }
+    if ($objNoRangeCommitTimestamp -gt $script:objMaximumCommitUtcTimestamp) {
+        throw "The no-range validation commit timestamp is later than trusted UTC."
+    }
+    $strNoRangeCommitUtcDate =
+        $objNoRangeCommitTimestamp.UtcDateTime.ToString('yyyy-MM-dd')
 }
 
 $arrRepositoryFailures = @(Get-AgentInstructionFailure `
@@ -7555,17 +7621,24 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
     }
     if ([string]::IsNullOrEmpty($RangeBaseRevision) -and
         [string]::IsNullOrEmpty($RangeHeadRevision)) {
-        if (-not $objDocumentContext.RequiresVersion) {
+        if (-not $objDocumentContext.RequiresVersion -and
+            ($objDocumentContext.IsWorktreeTransition -or
+                -not $boolNoRangeCommitHasParent)) {
             $arrRepositoryFailures += @(Get-LastUpdatedMetadataFreshnessFailure `
                     -Name $objDocumentContext.Path `
                     -CurrentContent $objDocumentContext.Content `
                     -BaseContent $objDocumentContext.ParentContent `
                     -TrustedEventUtcDate $objDocumentContext.ExpectedUtcDate `
+                    -ModifyingCommitUtcDate $(if (
+                        $objDocumentContext.IsWorktreeTransition) {
+                            ''
+                        } else { $strNoRangeCommitUtcDate }) `
                     -RequireCurrentMaximumDateForRenderedChange `
                         $objDocumentContext.IsWorktreeTransition)
         }
-        elseif ($objDocumentContext.IsWorktreeTransition -or
-            -not $boolNoRangeCommitHasParent) {
+        elseif ($objDocumentContext.RequiresVersion -and
+            ($objDocumentContext.IsWorktreeTransition -or
+                -not $boolNoRangeCommitHasParent)) {
             $arrRepositoryFailures += @(Get-DocumentMetadataTransitionFailure `
                     -Name $objDocumentContext.Path `
                     -CurrentContent $objDocumentContext.Content `
@@ -7586,6 +7659,7 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
                     -PolicyRepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
                     -PolicyMaximumBytes $intValidatorMaximumInputBytes `
                     -PolicyMarker $objDocumentContext.PolicyMarker `
+                    -RequiresVersion $objDocumentContext.RequiresVersion `
                     -RequiredDocument $objDocumentContext.RequiredDocument)
         }
     }
@@ -7720,7 +7794,7 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260830\.5$'
+            '(?m)^# Version: 1\.7\.20260830\.6$'
         ).Count -ne 1) {
         throw 'The validator script version does not use build date 20260830.'
     }

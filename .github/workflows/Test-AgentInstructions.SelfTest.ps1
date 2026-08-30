@@ -137,6 +137,23 @@ $arrHistoricalStaleFailures = @(Get-LastUpdatedMetadataFreshnessFailure `
 if (-not ($arrHistoricalStaleFailures -match 'must advance from')) {
     throw 'A historical same-date change did not require advancement.'
 }
+$strHistoricalSameDayChange = $strPreviousGuide +
+    "`nAuthenticated same-day historical change.`n"
+if (@(Get-LastUpdatedMetadataFreshnessFailure `
+            -Name $strGuidePath -CurrentContent $strHistoricalSameDayChange `
+            -BaseContent $strPreviousGuide -TrustedEventUtcDate '' `
+            -ModifyingCommitUtcDate $strPreviousDate `
+            -AllowSameDateForExactRestoration $true).Count -ne 0) {
+    throw 'A commit-date-matched exact restoration was rejected.'
+}
+$arrHistoricalLaterCommitFailures = @(Get-LastUpdatedMetadataFreshnessFailure `
+        -Name $strGuidePath -CurrentContent $strHistoricalSameDayChange `
+        -BaseContent $strPreviousGuide -TrustedEventUtcDate '' `
+        -ModifyingCommitUtcDate $strMaximumDate `
+        -AllowSameDateForExactRestoration $true)
+if (-not ($arrHistoricalLaterCommitFailures -match 'must advance from')) {
+    throw 'A stale date was accepted for a later modifying commit.'
+}
 $strEventMatchedAdvance = $strGuideContent +
     "`nHistorical event-matched advancement.`n"
 if (@(Get-LastUpdatedMetadataFreshnessFailure `
