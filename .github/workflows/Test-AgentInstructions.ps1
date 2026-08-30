@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260830.1
+# Version: 1.7.20260830.2
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -4029,36 +4029,29 @@ function Get-DocumentMetadataContext {
 
 function Get-DocumentMetadataTransitionFailure {
     # .SYNOPSIS
-    # Finds metadata-policy failures in one document transition.
+    # Finds metadata failures in one document transition.
     #
     # .DESCRIPTION
-    # Parses the current and optional parent metadata, validates calendar dates
-    # and version monotonicity, detects rendered-content changes after removing
-    # metadata fields, and enforces the expected UTC date when requested.
-    # Valid transitions produce no output; each detected failure is written as a
-    # diagnostic string.
+    # Validates structure, dates, version order, rendered changes, and the
+    # optional expected UTC date for current and parent content.
     #
     # .PARAMETER Name
-    # The governed document display name used in diagnostic output.
+    # The document name for diagnostics.
     #
     # .PARAMETER CurrentContent
-    # The complete current Markdown content to parse and compare.
+    # The current Markdown content.
     #
     # .PARAMETER ParentContent
-    # The complete parent Markdown content. Null represents a transition without
-    # a governed parent document.
+    # The parent content, or null for creation.
     #
     # .PARAMETER ExpectedUtcDate
-    # The authenticated expected date in yyyy-MM-dd form. It may be empty only
-    # when commit-date enforcement is not required for a rendered change.
+    # The optional authenticated yyyy-MM-dd date.
     #
     # .PARAMETER IsNewDocumentTransition
-    # True when a null ParentContent represents creation of a governed document.
-    # False when the missing parent predates the active metadata policy.
+    # True when null parent content means document creation.
     #
     # .PARAMETER RequireExpectedUtcDateForRenderedChange
-    # True to require Last Updated to equal ExpectedUtcDate after rendered content
-    # changes. False retains version and monotonicity checks without that equality.
+    # True to require the expected date after rendered changes.
     #
     # .EXAMPLE
     # $arrFailure = @(Get-DocumentMetadataTransitionFailure `
@@ -4066,30 +4059,14 @@ function Get-DocumentMetadataTransitionFailure {
     #     -ParentContent $strParent -ExpectedUtcDate '2026-08-27' `
     #     -IsNewDocumentTransition $false)
     #
-    # # Returns no strings when the changed document has matching date and version.
-    #
-    # .EXAMPLE
-    # $arrFailure = @(Get-DocumentMetadataTransitionFailure `
-    #     -Name 'AGENTS.md' -CurrentContent $strBackdated `
-    #     -ParentContent $strParent -ExpectedUtcDate '2026-08-27' `
-    #     -IsNewDocumentTransition $false)
-    #
-    # # Returns a diagnostic when rendered content has stale Last Updated metadata.
-    #
     # .INPUTS
-    # None. You can't pipe objects to this function.
+    # None.
     #
     # .OUTPUTS
-    # [string] Zero or more exact failure diagnostics. No output means the
-    # transition satisfies metadata structure, date, version, and freshness rules.
+    # [string] Zero or more failure diagnostics.
     #
     # .NOTES
-    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
-    # surface. Parameters, return shape, and positional contract may change
-    # without notice.
-    #
-    # Positional parameters are disabled. Internal callers must use named
-    # parameters. Version: 1.1.20260827.0.
+    # Private helper. Positional binding is disabled. Version: 1.2.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4333,55 +4310,37 @@ function Get-DocumentMetadataRangeTransitionFailure {
 
 function Get-TrustRootRangeMutationFailure {
     # .SYNOPSIS
-    # Finds proposed changes to trusted validation files in an exact Git range.
+    # Finds trust-root changes in endpoints and intervening commits.
     #
     # .DESCRIPTION
-    # Authenticates both endpoint commits and compares the requested trust-root
-    # paths without rename detection, external diff drivers, or text conversion.
-    # Each changed trust root produces a failure. Invalid or unavailable Git
-    # state throws so an indeterminate comparison cannot pass.
+    # Authenticates both commits. It checks the endpoint trees and every selected
+    # commit, root, and merge-parent diff. Indeterminate Git state throws.
     #
     # .PARAMETER RepositoryRootPath
-    # The repository root used for immutable Git object and diff operations.
+    # The repository root for immutable Git operations.
     #
     # .PARAMETER BaseRevision
-    # The valid nonzero base commit object ID for the comparison.
+    # The nonzero base commit object ID.
     #
     # .PARAMETER HeadRevision
-    # The valid nonzero head commit object ID for the comparison.
+    # The nonzero head commit object ID.
     #
     # .PARAMETER RepositoryRelativePath
-    # One or more exact repository-relative trusted validation paths to compare.
-    #
-    # .EXAMPLE
-    # $arrFailure = @(Get-TrustRootRangeMutationFailure `
-    #     -RepositoryRootPath $strRoot -BaseRevision $strBase `
-    #     -HeadRevision $strHead `
-    #     -RepositoryRelativePath @('.gitattributes', '.github/workflows/check.yml'))
-    #
-    # # Returns no strings when neither trust-root path changed.
+    # The exact repository-relative trust-root paths.
     #
     # .EXAMPLE
     # Get-TrustRootRangeMutationFailure `
     #     -RepositoryRootPath $strRoot -BaseRevision $strBase `
     #     -HeadRevision $strHead -RepositoryRelativePath '.gitattributes'
     #
-    # # Writes one failure when the range changes .gitattributes.
-    #
     # .INPUTS
-    # None. You can't pipe objects to this function.
+    # None.
     #
     # .OUTPUTS
-    # [string] Zero or more failure diagnostics, one for each changed trust-root
-    # path. No output means the requested paths are unchanged.
+    # [string] One diagnostic per touched trust-root path.
     #
     # .NOTES
-    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
-    # surface. Parameters, return shape, and positional contract may change
-    # without notice.
-    #
-    # Positional parameters are disabled. Internal callers must use named
-    # parameters. Version: 1.1.20260827.0.
+    # Private helper. Positional binding is disabled. Version: 1.2.20260830.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4419,6 +4378,14 @@ function Get-TrustRootRangeMutationFailure {
     )
     if ($LASTEXITCODE -ne 0) {
         throw 'Could not compare the trusted validation paths.'
+    }
+    $arrChangedPaths += @(
+        & git -C $RepositoryRootPath log --format= --name-only --no-renames `
+            --no-ext-diff --no-textconv --diff-merges=separate --root `
+            "$BaseRevision..$HeadRevision" -- $RepositoryRelativePath
+    )
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Could not inspect trusted validation commit history.'
     }
     foreach ($strTrustPath in $RepositoryRelativePath) {
         if ($arrChangedPaths -cnotcontains $strTrustPath) {
@@ -4579,10 +4546,6 @@ function Get-GovernedDocumentCommitTransitionFailure {
         return
     }
 
-    if ($intParentCount -eq 0) {
-        return [string[]] @()
-    }
-
     $listChangedParents = [Collections.Generic.List[pscustomobject]]::new()
     $boolMatchesPolicyActiveParent = $false
     foreach ($objParentContext in $listParentContexts) {
@@ -4606,7 +4569,7 @@ function Get-GovernedDocumentCommitTransitionFailure {
                 HasPolicyMarker = $objParentContext.HasPolicyMarker
             })
     }
-    if ($listChangedParents.Count -eq 0) {
+    if ($intParentCount -ne 0 -and $listChangedParents.Count -eq 0) {
         return [string[]] @()
     }
 
@@ -4646,6 +4609,17 @@ function Get-GovernedDocumentCommitTransitionFailure {
         -MaximumBytes $MaximumBytes `
         -RequireRegularFile
     $listTransitions = [Collections.Generic.List[pscustomobject]]::new()
+    if ($intParentCount -eq 0) {
+        $listTransitions.Add([pscustomobject]@{
+                CurrentContent = $strCurrentContent
+                ParentContent = $null
+                ExpectedUtcDate = $objCommitTimestamp.UtcDateTime.ToString('yyyy-MM-dd')
+                CurrentRevision = $CommitRevision
+                ParentRevision = ''
+                RequireExpectedUtcDateForRenderedChange =
+                    $RequireExpectedUtcDateForRenderedChange
+            })
+    }
     foreach ($objChangedParent in $listChangedParents) {
         $strParentContent = if ($objChangedParent.HasPolicyMarker) {
             & git -C $RepositoryRootPath cat-file -e `
@@ -6292,7 +6266,7 @@ if ($SelfTest) {
     $strValidatorSource = [IO.File]::ReadAllText($PSCommandPath)
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260830\.1$'
+            '(?m)^# Version: 1\.7\.20260830\.2$'
         ).Count -ne 1) {
         throw 'The validator script version does not use build date 20260830.'
     }
@@ -8734,6 +8708,21 @@ if ($SelfTest) {
             return $strFixtureTree
         }
 
+        if (@(& $scriptBlockGetDirectFailure $strMergeBaseCommit).Count -ne 0) {
+            throw 'Valid policy-active root metadata failed.'
+        }
+        $strMalformedRootTree = & $scriptBlockNewFixturePathTree `
+            -BaseTree $strMergeBaseTree -PathContent @{'AGENTS.md' = 'invalid'}
+        $strMalformedRootCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strMalformedRootTree -Parents @() `
+            -Timestamp ($strMergeHistoricalDate + 'T08:00:00Z') `
+            -Message 'malformed policy-active root'
+        if (-not ((@(& $scriptBlockGetDirectFailure $strMalformedRootCommit) -join '; ').Contains(
+                    'must contain exactly one document-level H1',
+                    [StringComparison]::Ordinal))) {
+            throw 'Malformed policy-active root metadata passed.'
+        }
+
         $strIntroducedStaleVersion = $strMergeBaseVersion -replace '\.0$', '.1'
         $strIntroducedRestoredVersion = $strMergeBaseVersion -replace '\.0$', '.2'
         $strIntroducedStaleContent = $strMergeBaseContent.Replace(
@@ -9374,6 +9363,17 @@ if ($SelfTest) {
             -Parents @($strMergeTopicCommit) `
             -Timestamp $strMergeCurrentTimestamp `
             -Message 'merge fixture topic trust-root change'
+        $strTrustMergeCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strMergeTopicTree `
+            -Parents @($strMergeTopicCommit, $strTopicTrustCommit) `
+            -Timestamp $strMergeCurrentTimestamp -Message 'topic trust-root merge restore'
+        $arrRestoredTrustFailures = @(Get-TrustRootRangeMutationFailure `
+                -RepositoryRootPath $strMergeFixtureRoot `
+                -BaseRevision $strMergeTopicCommit -HeadRevision $strTrustMergeCommit `
+                -RepositoryRelativePath @('.gitattributes'))
+        if ($arrRestoredTrustFailures.Count -ne 1) {
+            throw 'A restored merge-parent trust-root mutation passed.'
+        }
         & git -C $strMergeFixtureRoot read-tree $strMergeTopicTree
         $strSynchronizedTopicCommit = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strMergeTopicTree `

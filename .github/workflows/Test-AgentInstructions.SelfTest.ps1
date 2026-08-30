@@ -1,4 +1,5 @@
 [CmdletBinding(PositionalBinding = $false)]
+[OutputType([void])]
 param(
     [Parameter(Mandatory)]
     [string] $RepositoryRootPath,
@@ -14,6 +15,12 @@ param(
     [ValidatePattern('^\d{4}-\d{2}-\d{2}$')]
     [string] $MaximumMetadataUtcDate
 )
+
+$arrDeclaredOutputTypes = @($MyInvocation.MyCommand.OutputType.Name)
+if ($arrDeclaredOutputTypes.Count -ne 1 -or
+    $arrDeclaredOutputTypes[0] -cne 'System.Void') {
+    throw 'The extracted self-test must declare one void output contract.'
+}
 
 $script:strMaximumMetadataUtcDate = $MaximumMetadataUtcDate
 $objParentContext = Get-GovernedDocumentParentContext `
