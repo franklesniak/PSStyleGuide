@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260830.4
+# Version: 1.7.20260830.5
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -34,8 +34,8 @@ $intGitIgnoreMaximumInputBytes = 65536
 $intDocsInstructionsMaximumInputBytes = 131072
 $intInstructionDocumentMaximumInputBytes = 131072
 $intStyleGuideRationaleMaximumInputBytes = 196608
-$intValidatorMaximumInputBytes = 557056
-$intHistoricalPolicyMarkerMaximumBytes = 557056
+$intValidatorMaximumInputBytes = 573440
+$intHistoricalPolicyMarkerMaximumBytes = 573440
 $intGitPathListMaximumBytes = 1048576
 $intMetadataMaximumParents = 64
 $intNewRefMaximumCommitEvidence = 2048
@@ -902,7 +902,7 @@ function Read-GitRangeTouchedPath {
     # The absolute path of the trusted Git repository.
     #
     # .PARAMETER BaseRevision
-    # The authenticated base Git object ID.
+    # The authenticated base Git object IDs to exclude from the topic range.
     #
     # .PARAMETER HeadRevision
     # The authenticated head Git object ID.
@@ -945,8 +945,9 @@ function Read-GitRangeTouchedPath {
         [string] $RepositoryRootPath,
 
         [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
         [AllowEmptyString()]
-        [string] $BaseRevision,
+        [string[]] $BaseRevision,
 
         [Parameter(Mandatory)]
         [string] $HeadRevision,
@@ -982,9 +983,11 @@ function Read-GitRangeTouchedPath {
         throw 'The touched-path range pathspec is invalid.'
     }
 
+    $arrBaseRevisions = @($BaseRevision)
     $arrRevisionArguments = @()
     if ($IsNewRefRange) {
-        if ($BaseRevision -notmatch $strZeroObjectIdPattern) {
+        if ($arrBaseRevisions.Count -ne 1 -or
+            $arrBaseRevisions[0] -notmatch $strZeroObjectIdPattern) {
             throw 'A new-ref touched-path range requires an all-zero base.'
         }
         if (-not $NewRefHasIntroducedCommit) {
@@ -1006,11 +1009,18 @@ function Read-GitRangeTouchedPath {
         }
     }
     else {
-        if ($BaseRevision -notmatch $strObjectIdPattern -or
-            $BaseRevision -match $strZeroObjectIdPattern) {
-            throw 'An existing touched-path range requires a valid base.'
+        if ($arrBaseRevisions.Count -lt 1 -or $arrBaseRevisions.Count -gt 64 -or
+            @($arrBaseRevisions | Sort-Object -Unique).Count -ne
+                $arrBaseRevisions.Count) {
+            throw 'An existing touched-path range requires 1 through 64 unique bases.'
         }
-        $arrRevisionArguments += "$BaseRevision..$HeadRevision"
+        foreach ($strBaseRevision in $arrBaseRevisions) {
+            if ($strBaseRevision -notmatch $strObjectIdPattern -or
+                $strBaseRevision -match $strZeroObjectIdPattern) {
+                throw 'An existing touched-path range contains an invalid base.'
+            }
+        }
+        $arrRevisionArguments += @($HeadRevision, '--not') + $arrBaseRevisions
     }
 
     $objStartInfo = [Diagnostics.ProcessStartInfo]::new('git')
@@ -1121,8 +1131,73 @@ function Read-RepositoryInputData {
         }
     }
 
-    $strResolvedInputPath =
+    if ([IO.Path]::IsPathRooted($RepositoryRelativePath) -or
+        $RepositoryRelativePath.Contains('\', [StringComparison]::Ordinal) -or
+        $RepositoryRelativePath -match '(^|/)\.\.?(/|$)') {
+        throw "$DisplayName has an invalid repository-relative input path."
+    }
+    $strRepositoryRootFullPath = [IO.Path]::GetFullPath(
+        $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
+            $RepositoryRootPath
+        )
+    ).TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar)
+    $strResolvedInputPath = [IO.Path]::GetFullPath(
         $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Path)
+    )
+    $strExpectedInputPath = [IO.Path]::GetFullPath(
+        [IO.Path]::Combine(
+            $strRepositoryRootFullPath,
+            $RepositoryRelativePath.Replace('/', [IO.Path]::DirectorySeparatorChar)
+        )
+    )
+    $objPathComparison = if ([IO.Path]::DirectorySeparatorChar -eq '\') {
+        [StringComparison]::OrdinalIgnoreCase
+    }
+    else {
+        [StringComparison]::Ordinal
+    }
+    $strRepositoryRootPrefix =
+        $strRepositoryRootFullPath + [IO.Path]::DirectorySeparatorChar
+    if (-not [string]::Equals(
+            $strResolvedInputPath,
+            $strExpectedInputPath,
+            $objPathComparison
+        ) -or
+        -not $strResolvedInputPath.StartsWith(
+            $strRepositoryRootPrefix,
+            $objPathComparison
+        )) {
+        throw "$DisplayName must resolve to its exact path beneath the repository root."
+    }
+
+    $listComponentSnapshots = [Collections.Generic.List[pscustomobject]]::new()
+    $strComponentPath = $strRepositoryRootFullPath
+    foreach ($strPathComponent in $RepositoryRelativePath.Split('/')) {
+        $strComponentPath = [IO.Path]::Combine($strComponentPath, $strPathComponent)
+        $objComponentItem = Get-Item -Force -LiteralPath $strComponentPath
+        $objComponentLinkTypeProperty =
+            $objComponentItem.PSObject.Properties['LinkType']
+        $strComponentLinkType = if ($null -eq $objComponentLinkTypeProperty) {
+            ''
+        }
+        else {
+            [string]$objComponentLinkTypeProperty.Value
+        }
+        if (($objComponentItem.Attributes -band
+                [IO.FileAttributes]::ReparsePoint) -ne 0 -or
+            -not [string]::IsNullOrEmpty($strComponentLinkType)) {
+            throw (
+                "$DisplayName has an unsafe linked path component: " +
+                "$strPathComponent."
+            )
+        }
+        $listComponentSnapshots.Add([pscustomobject]@{
+                Path = $strComponentPath
+                Type = $objComponentItem.GetType().FullName
+                CreationTimeUtcTicks = $objComponentItem.CreationTimeUtc.Ticks
+            })
+    }
+
     $objInputItem = Get-Item -Force -LiteralPath $strResolvedInputPath
     $objLinkTypeProperty = $objInputItem.PSObject.Properties['LinkType']
     $strLinkType = if ($null -eq $objLinkTypeProperty) { '' } else { [string] $objLinkTypeProperty.Value }
@@ -1148,14 +1223,34 @@ function Read-RepositoryInputData {
         [System.IO.FileShare]::Read
     )
     try {
-        return Read-BoundedStreamData `
+        $arrInputBytes = [byte[]]@(Read-BoundedStreamData `
             -Stream $objInputStream `
             -MaximumBytes $MaximumBytes `
-            -DisplayName $DisplayName
+            -DisplayName $DisplayName)
     }
     finally {
         $objInputStream.Dispose()
     }
+    foreach ($objComponentSnapshot in $listComponentSnapshots) {
+        $objComponentItem = Get-Item -Force -LiteralPath $objComponentSnapshot.Path
+        $objComponentLinkTypeProperty =
+            $objComponentItem.PSObject.Properties['LinkType']
+        $strComponentLinkType = if ($null -eq $objComponentLinkTypeProperty) {
+            ''
+        }
+        else {
+            [string]$objComponentLinkTypeProperty.Value
+        }
+        if (($objComponentItem.Attributes -band
+                [IO.FileAttributes]::ReparsePoint) -ne 0 -or
+            -not [string]::IsNullOrEmpty($strComponentLinkType) -or
+            $objComponentItem.GetType().FullName -cne $objComponentSnapshot.Type -or
+            $objComponentItem.CreationTimeUtc.Ticks -ne
+                $objComponentSnapshot.CreationTimeUtcTicks) {
+            throw "$DisplayName path components changed during the bounded read."
+        }
+    }
+    return $arrInputBytes
 }
 
 function Read-GitRevisionText {
@@ -5316,7 +5411,7 @@ function Get-TrustRootRangeMutationFailure {
     # The repository root for immutable Git operations.
     #
     # .PARAMETER BaseRevision
-    # The nonzero base commit object ID.
+    # The nonzero base commit object IDs to exclude from the topic range.
     #
     # .PARAMETER HeadRevision
     # The nonzero head commit object ID.
@@ -5347,8 +5442,8 @@ function Get-TrustRootRangeMutationFailure {
         [string] $RepositoryRootPath,
 
         [Parameter(Mandatory)]
-        [AllowEmptyString()]
-        [string] $BaseRevision,
+        [AllowEmptyCollection()]
+        [string[]] $BaseRevision,
 
         [Parameter(Mandatory)]
         [AllowEmptyString()]
@@ -5360,7 +5455,13 @@ function Get-TrustRootRangeMutationFailure {
     )
 
     $strObjectIdPattern = '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$'
-    foreach ($strRevision in @($BaseRevision, $HeadRevision)) {
+    $arrBaseRevisions = @($BaseRevision)
+    if ($arrBaseRevisions.Count -lt 1 -or $arrBaseRevisions.Count -gt 64 -or
+        @($arrBaseRevisions | Sort-Object -Unique).Count -ne
+            $arrBaseRevisions.Count) {
+        throw 'The trusted validation range requires 1 through 64 unique bases.'
+    }
+    foreach ($strRevision in @($arrBaseRevisions) + @($HeadRevision)) {
         if ($strRevision -notmatch $strObjectIdPattern) {
             throw "The trusted validation range contains an invalid object ID: $strRevision"
         }
@@ -5370,19 +5471,23 @@ function Get-TrustRootRangeMutationFailure {
         }
     }
 
-    $arrChangedPaths = @(
-        & git -C $RepositoryRootPath diff --name-only --no-renames `
-            --no-ext-diff --no-textconv $BaseRevision $HeadRevision -- `
-            $RepositoryRelativePath
-    )
-    if ($LASTEXITCODE -ne 0) {
-        throw 'Could not compare the trusted validation paths.'
+    $arrChangedPaths = @()
+    if ($arrBaseRevisions.Count -eq 1) {
+        $arrChangedPaths += @(
+            & git -C $RepositoryRootPath diff --name-only --no-renames `
+                --no-ext-diff --no-textconv $arrBaseRevisions[0] `
+                $HeadRevision -- $RepositoryRelativePath
+        )
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not compare the trusted validation paths.'
+        }
     }
-    $arrChangedPaths += @(
-        & git -C $RepositoryRootPath log --format= --name-only --no-renames `
-            --no-ext-diff --no-textconv --diff-merges=separate --root `
-            "$BaseRevision..$HeadRevision" -- $RepositoryRelativePath
-    )
+    $arrHistoryArguments = @(
+        '-C', $RepositoryRootPath, 'log', '--format=', '--name-only',
+        '--no-renames', '--no-ext-diff', '--no-textconv',
+        '--diff-merges=separate', '--root', $HeadRevision, '--not'
+    ) + $arrBaseRevisions + @('--') + $RepositoryRelativePath
+    $arrChangedPaths += @(& git @arrHistoryArguments)
     if ($LASTEXITCODE -ne 0) {
         throw 'Could not inspect trusted validation commit history.'
     }
@@ -5742,7 +5847,7 @@ function Get-GovernedDocumentRangeTransitionFailure {
     # The maximum permitted output size in bytes.
     #
     # .PARAMETER BaseRevision
-    # The authenticated base Git object ID.
+    # The authenticated base Git object IDs to exclude from the topic range.
     #
     # .PARAMETER HeadRevision
     # The authenticated head Git object ID.
@@ -5807,8 +5912,9 @@ function Get-GovernedDocumentRangeTransitionFailure {
         [int] $MaximumBytes,
 
         [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
         [AllowEmptyString()]
-        [string] $BaseRevision,
+        [string[]] $BaseRevision,
 
         [Parameter(Mandatory)]
         [AllowEmptyString()]
@@ -5845,21 +5951,32 @@ function Get-GovernedDocumentRangeTransitionFailure {
         [bool] $RequiredDocument = $false
     )
 
-    if ([string]::IsNullOrEmpty($BaseRevision) -and
+    $arrBaseRevisions = @($BaseRevision)
+    if ($arrBaseRevisions.Count -eq 1 -and
+        [string]::IsNullOrEmpty($arrBaseRevisions[0])) {
+        $arrBaseRevisions = @()
+    }
+    elseif (@($arrBaseRevisions | Where-Object {
+                [string]::IsNullOrEmpty($_)
+            }).Count -ne 0) {
+        throw 'The metadata event range contains an empty base revision.'
+    }
+    if ($arrBaseRevisions.Count -eq 0 -and
         [string]::IsNullOrEmpty($HeadRevision)) {
         if ($IsNewRefRange) {
             throw 'A new-ref metadata event range must supply base and head revisions.'
         }
         return [string[]] @()
     }
-    if ([string]::IsNullOrEmpty($BaseRevision) -or
+    if ($arrBaseRevisions.Count -eq 0 -or
         [string]::IsNullOrEmpty($HeadRevision)) {
         throw 'The metadata event range must supply both base and head revisions.'
     }
 
     $strObjectIdPattern = '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$'
     $strZeroObjectIdPattern = '^(?:0{40}|0{64})$'
-    $boolBaseIsZeroObjectId = $BaseRevision -match $strZeroObjectIdPattern
+    $boolBaseIsZeroObjectId = $arrBaseRevisions.Count -eq 1 -and
+        $arrBaseRevisions[0] -match $strZeroObjectIdPattern
     if ($IsNewRefRange -and -not $boolBaseIsZeroObjectId) {
         throw 'A new-ref metadata event range requires an all-zero base revision.'
     }
@@ -5870,11 +5987,17 @@ function Get-GovernedDocumentRangeTransitionFailure {
         throw 'The metadata event-range head must not be an all-zero object ID.'
     }
 
-    foreach ($strRevision in @($BaseRevision, $HeadRevision)) {
+    if ($arrBaseRevisions.Count -gt 64 -or
+        @($arrBaseRevisions | Sort-Object -Unique).Count -ne
+            $arrBaseRevisions.Count) {
+        throw 'The metadata event range requires at most 64 unique bases.'
+    }
+    foreach ($strRevision in @($arrBaseRevisions) + @($HeadRevision)) {
         if ($strRevision -notmatch $strObjectIdPattern) {
             throw "The metadata event range contains an invalid object ID: $strRevision"
         }
-        if ($strRevision -eq $BaseRevision -and $boolBaseIsZeroObjectId) {
+        if ($strRevision -eq $arrBaseRevisions[0] -and
+            $boolBaseIsZeroObjectId) {
             continue
         }
         & git -C $RepositoryRootPath cat-file -e "$strRevision`^{commit}" 2>$null
@@ -5901,11 +6024,9 @@ function Get-GovernedDocumentRangeTransitionFailure {
         )) {
         throw "The metadata event-range head does not match the validation revision: $HeadRevision"
     }
-    if ([string]::Equals(
-            $BaseRevision,
-            $HeadRevision,
-            [StringComparison]::OrdinalIgnoreCase
-        )) {
+    if ($arrBaseRevisions.Count -eq 1 -and [string]::Equals(
+            $arrBaseRevisions[0], $HeadRevision,
+            [StringComparison]::OrdinalIgnoreCase)) {
         return [string[]] @()
     }
 
@@ -5920,11 +6041,15 @@ function Get-GovernedDocumentRangeTransitionFailure {
 
     $boolBaseHasPolicyMarker = $false
     if (-not $IsNewRefRange) {
-        $boolBaseHasPolicyMarker = Test-HistoricalPolicyMarker `
-            -RepositoryRootPath $RepositoryRootPath `
-            -Revision $BaseRevision `
-            -RepositoryRelativePath $PolicyRepositoryRelativePath `
-            -Literal $PolicyMarker
+        $boolBaseHasPolicyMarker = @(
+            $arrBaseRevisions | Where-Object {
+                Test-HistoricalPolicyMarker `
+                    -RepositoryRootPath $RepositoryRootPath `
+                    -Revision $_ `
+                    -RepositoryRelativePath $PolicyRepositoryRelativePath `
+                    -Literal $PolicyMarker
+            }
+        ).Count -eq $arrBaseRevisions.Count
     }
     if (-not $boolBaseHasPolicyMarker) {
         if ($IsNewRefRange) {
@@ -5935,11 +6060,11 @@ function Get-GovernedDocumentRangeTransitionFailure {
             )
         }
         else {
-            $arrPolicyPathCommits = @(
-                & git -C $RepositoryRootPath log --reverse --topo-order `
-                    --format=%H "-S$PolicyMarker" "$BaseRevision..$HeadRevision" -- `
-                    $PolicyRepositoryRelativePath 2>&1
-            )
+            $arrPolicyLogArguments = @(
+                '-C', $RepositoryRootPath, 'log', '--reverse', '--topo-order',
+                '--format=%H', "-S$PolicyMarker", $HeadRevision, '--not'
+            ) + $arrBaseRevisions + @('--', $PolicyRepositoryRelativePath)
+            $arrPolicyPathCommits = @(& git @arrPolicyLogArguments 2>&1)
         }
         if ($LASTEXITCODE -ne 0) {
             throw 'Could not enumerate metadata policy-marker changes.'
@@ -5973,31 +6098,40 @@ function Get-GovernedDocumentRangeTransitionFailure {
         }
         $arrPolicyCommitAndParents = @($strPolicyParentLine.Trim() -split ' ')
         if ($arrPolicyCommitAndParents.Count -eq 1 -and $IsNewRefRange) {
-            $strEffectiveBaseRevision = ''
+            $arrEffectiveBaseRevisions = @()
         }
         elseif ($arrPolicyCommitAndParents.Count -lt 2 -or
             $arrPolicyCommitAndParents[1] -notmatch $strObjectIdPattern) {
             throw 'The metadata policy-introduction commit must have a valid first parent.'
         }
         else {
-            $strEffectiveBaseRevision = $arrPolicyCommitAndParents[1]
+            $arrEffectiveBaseRevisions = @(
+                if ($IsNewRefRange) {
+                    $arrPolicyCommitAndParents[1]
+                }
+                else {
+                    @($arrBaseRevisions) + @($arrPolicyCommitAndParents[1]) |
+                        Sort-Object -Unique
+                }
+            )
         }
     }
     else {
-        $strEffectiveBaseRevision = $BaseRevision
+        $arrEffectiveBaseRevisions = @($arrBaseRevisions)
     }
 
-    if ([string]::IsNullOrEmpty($strEffectiveBaseRevision)) {
+    if ($arrEffectiveBaseRevisions.Count -eq 0) {
         $arrRangeCommits = @(
             & git -C $RepositoryRootPath rev-list --reverse --topo-order `
                 $HeadRevision 2>&1
         )
     }
     else {
-        $arrRangeCommits = @(
-            & git -C $RepositoryRootPath rev-list --reverse --topo-order `
-                "$strEffectiveBaseRevision..$HeadRevision" 2>&1
-        )
+        $arrRangeArguments = @(
+            '-C', $RepositoryRootPath, 'rev-list', '--reverse', '--topo-order',
+            $HeadRevision, '--not'
+        ) + $arrEffectiveBaseRevisions
+        $arrRangeCommits = @(& git @arrRangeArguments 2>&1)
     }
     if ($LASTEXITCODE -ne 0) {
         throw 'Could not enumerate the metadata event range.'
@@ -6975,7 +7109,6 @@ $arrGovernedMetadataDocuments += @(
     }
 )
 $strValidatedInputRevision = ''
-$strTrustedEventUtcDate = ''
 $boolEventRangeRequested = -not [string]::IsNullOrEmpty($RangeBaseRevision) -or
     -not [string]::IsNullOrEmpty($RangeHeadRevision)
 $boolCommitDateOnlyEvent = $EventName -ceq 'pull_request_target'
@@ -6999,20 +7132,12 @@ if (-not $boolEventRangeRequested -and
     throw 'Metadata event fields require a complete base and head range.'
 }
 if (-not [string]::IsNullOrEmpty($TrustedEventTimestamp)) {
-    $strTrustedEventUtcDate = (ConvertFrom-TrustedEventTimestamp `
-            -Timestamp $TrustedEventTimestamp).ToString('yyyy-MM-dd')
+    [void](ConvertFrom-TrustedEventTimestamp -Timestamp $TrustedEventTimestamp)
 }
 $arrEventHistoryBaseRevisions = @($RangeBaseRevision)
-$strEventFreshnessBaseRevision = ''
-$arrEventFreshnessBaseRevisions = @()
 $arrNewRefBoundaryRevisions = @()
 $arrNewRefIntroducedCommitRevisions = @()
-$boolEvaluateEventFreshness = $false
 $boolRequireRangeCommitDateFreshness = $false
-$strPreviousTopicBaseRevision = ''
-$strPreviousTopicHeadRevision = ''
-$strCurrentTopicBaseRevision = ''
-$strCurrentTopicHeadRevision = ''
 $boolValidateBackwardPushHead = $false
 if ($boolEventRangeRequested -and
     -not [string]::IsNullOrEmpty($RangeBaseRevision) -and
@@ -7031,11 +7156,6 @@ if ($boolEventRangeRequested -and
     $arrEventHistoryBaseRevisions = @(
         $objMetadataEventRevisionContext.HistoryBaseRevisions
     )
-    $strEventFreshnessBaseRevision = $objMetadataEventRevisionContext.FreshnessBaseRevision
-    $arrEventFreshnessBaseRevisions = @(
-        $objMetadataEventRevisionContext.FreshnessBaseRevisions
-    )
-    $boolEvaluateEventFreshness = $objMetadataEventRevisionContext.EvaluateFreshness
     if ($RangeIsNewRef) {
         $arrNewRefBoundaryRevisions = @(
             $objMetadataEventRevisionContext.NewRefBoundaryRevisions
@@ -7047,13 +7167,6 @@ if ($boolEventRangeRequested -and
     $boolRequireRangeCommitDateFreshness =
         ($EventName -ceq 'push' -and -not $RangeIsNewRef) -or
         $boolCommitDateOnlyEvent
-    if ($boolCommitDateOnlyEvent) {
-        $boolEvaluateEventFreshness = $false
-    }
-    $strPreviousTopicBaseRevision = $objMetadataEventRevisionContext.PreviousTopicBaseRevision
-    $strPreviousTopicHeadRevision = $objMetadataEventRevisionContext.PreviousTopicHeadRevision
-    $strCurrentTopicBaseRevision = $objMetadataEventRevisionContext.CurrentTopicBaseRevision
-    $strCurrentTopicHeadRevision = $objMetadataEventRevisionContext.CurrentTopicHeadRevision
     if ($EventName -ceq 'push' -and -not $RangeIsNewRef -and
         $EventHeadDistinct -ceq 'false' -and
         $RangeBaseRevision -ne $RangeHeadRevision) {
@@ -7106,15 +7219,12 @@ if (-not [string]::IsNullOrEmpty($strValidatedInputRevision) -and
     $arrTrustRootBaseRevisions = if ($EventName -ceq 'pull_request_target') {
         $arrEventHistoryBaseRevisions
     } else { @($RangeBaseRevision) }
-    $arrTrustRootFailures = @(
-        foreach ($strTrustRootBaseRevision in $arrTrustRootBaseRevisions) {
-            Get-TrustRootRangeMutationFailure `
-                -RepositoryRootPath $strRepositoryRootPath `
-                -BaseRevision $strTrustRootBaseRevision `
-                -HeadRevision $RangeHeadRevision `
-                -RepositoryRelativePath $script:arrTrustRootPaths
-        }
-    ) | Sort-Object -Unique
+    $arrTrustRootFailures = @(Get-TrustRootRangeMutationFailure `
+            -RepositoryRootPath $strRepositoryRootPath `
+            -BaseRevision $arrTrustRootBaseRevisions `
+            -HeadRevision $RangeHeadRevision `
+            -RepositoryRelativePath $script:arrTrustRootPaths) |
+        Sort-Object -Unique
     if ($arrTrustRootFailures.Count -gt 0) {
         throw (
             'Trusted validation root changed:' + [Environment]::NewLine + '- ' +
@@ -7129,20 +7239,16 @@ $arrTrackedRepositoryPaths = @(Read-GitTrackedPath `
         -MaximumBytes $intGitPathListMaximumBytes)
 $arrRangeTouchedRepositoryPaths = @()
 if ($boolEventRangeRequested) {
-    $arrRangeTouchedRepositoryPaths = @(
-        foreach ($strEventHistoryBase in $arrEventHistoryBaseRevisions) {
-            Read-GitRangeTouchedPath `
-                -RepositoryRootPath $strRepositoryRootPath `
-                -BaseRevision $strEventHistoryBase `
-                -HeadRevision $RangeHeadRevision `
-                -IsNewRefRange ([bool]$RangeIsNewRef) `
-                -NewRefBoundaryRevision $arrNewRefBoundaryRevisions `
-                -NewRefHasIntroducedCommit `
-                    ($arrNewRefIntroducedCommitRevisions.Count -gt 0) `
-                -RepositoryRelativePathspec ':(top)**' `
-                -MaximumBytes $intGitPathListMaximumBytes
-        }
-    ) | Sort-Object -Unique
+    $arrRangeTouchedRepositoryPaths = @(Read-GitRangeTouchedPath `
+            -RepositoryRootPath $strRepositoryRootPath `
+            -BaseRevision $arrEventHistoryBaseRevisions `
+            -HeadRevision $RangeHeadRevision `
+            -IsNewRefRange ([bool]$RangeIsNewRef) `
+            -NewRefBoundaryRevision $arrNewRefBoundaryRevisions `
+            -NewRefHasIntroducedCommit `
+                ($arrNewRefIntroducedCommitRevisions.Count -gt 0) `
+            -RepositoryRelativePathspec ':(top)**' `
+            -MaximumBytes $intGitPathListMaximumBytes) | Sort-Object -Unique
 }
 $arrRangeTouchedDecisionPaths = @(
     $arrRangeTouchedRepositoryPaths |
@@ -7484,27 +7590,25 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
         }
     }
     $arrRangeTransitionFailures = @(
-        foreach ($strEventHistoryBase in $arrEventHistoryBaseRevisions) {
-            Get-GovernedDocumentRangeTransitionFailure `
-                -Name $objDocumentContext.Path `
-                -RepositoryRootPath $strRepositoryRootPath `
-                -RepositoryRelativePath $objDocumentContext.Path `
-                -MaximumBytes $objDocumentContext.MaximumBytes `
-                -BaseRevision $strEventHistoryBase `
-                -HeadRevision $RangeHeadRevision `
-                -InputRevision $strValidatedInputRevision `
-                -IsNewRefRange ([bool]$RangeIsNewRef) `
-                -PolicyRepositoryRelativePath `
-                    '.github/workflows/Test-AgentInstructions.ps1' `
-                -PolicyMaximumBytes $intValidatorMaximumInputBytes `
-                -PolicyMarker $objDocumentContext.PolicyMarker `
-                -RequireExpectedUtcDateForRenderedChange `
-                    $boolRequireRangeCommitDateFreshness `
-                -CommitDateFreshnessRevision `
-                    $arrNewRefIntroducedCommitRevisions `
-                -RequiresVersion $objDocumentContext.RequiresVersion `
-                -RequiredDocument $objDocumentContext.RequiredDocument
-        }
+        Get-GovernedDocumentRangeTransitionFailure `
+            -Name $objDocumentContext.Path `
+            -RepositoryRootPath $strRepositoryRootPath `
+            -RepositoryRelativePath $objDocumentContext.Path `
+            -MaximumBytes $objDocumentContext.MaximumBytes `
+            -BaseRevision $arrEventHistoryBaseRevisions `
+            -HeadRevision $RangeHeadRevision `
+            -InputRevision $strValidatedInputRevision `
+            -IsNewRefRange ([bool]$RangeIsNewRef) `
+            -PolicyRepositoryRelativePath `
+                '.github/workflows/Test-AgentInstructions.ps1' `
+            -PolicyMaximumBytes $intValidatorMaximumInputBytes `
+            -PolicyMarker $objDocumentContext.PolicyMarker `
+            -RequireExpectedUtcDateForRenderedChange `
+                $boolRequireRangeCommitDateFreshness `
+            -CommitDateFreshnessRevision `
+                $arrNewRefIntroducedCommitRevisions `
+            -RequiresVersion $objDocumentContext.RequiresVersion `
+            -RequiredDocument $objDocumentContext.RequiredDocument
     ) | Sort-Object -Unique
     $arrRepositoryFailures += @($arrRangeTransitionFailures)
     if ($EventName -ceq 'push' -and $EventHeadDistinct -ceq 'false' -and
@@ -7522,62 +7626,6 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
                 -RequiresVersion $objDocumentContext.RequiresVersion `
                 -RequiredDocument $objDocumentContext.RequiredDocument)
     }
-    if ($null -eq $objDocumentContext.Content) {
-        continue
-    }
-    if ($boolEventRangeRequested -and $boolEvaluateEventFreshness) {
-        foreach ($strEventFreshnessBaseRevision in
-            $arrEventFreshnessBaseRevisions) {
-            if ([string]::IsNullOrEmpty($strEventFreshnessBaseRevision) -or
-                -not (Test-HistoricalPolicyMarker `
-                    -RepositoryRootPath $strRepositoryRootPath `
-                    -Revision $strEventFreshnessBaseRevision `
-                    -RepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
-                    -Literal $objDocumentContext.PolicyMarker)) {
-                continue
-            }
-            $boolTopicDeltaUnchanged = $false
-            if (-not [string]::IsNullOrEmpty($strPreviousTopicBaseRevision)) {
-                $boolTopicDeltaUnchanged = Test-TopicOwnedGitPathDeltaEqual `
-                    -RepositoryRootPath $strRepositoryRootPath `
-                    -PreviousBaseRevision $strPreviousTopicBaseRevision `
-                    -PreviousHeadRevision $strPreviousTopicHeadRevision `
-                    -CurrentBaseRevision $strCurrentTopicBaseRevision `
-                    -CurrentHeadRevision $strCurrentTopicHeadRevision `
-                    -RepositoryRelativePath $objDocumentContext.Path
-            }
-            & git -C $strRepositoryRootPath cat-file -e `
-                "$strEventFreshnessBaseRevision`:$($objDocumentContext.Path)" 2>$null
-            $strEventBaseContent = if ($boolTopicDeltaUnchanged) {
-                $objDocumentContext.Content
-            }
-            elseif ($LASTEXITCODE -eq 0) {
-                Read-GitRevisionText `
-                    -RepositoryRootPath $strRepositoryRootPath `
-                    -Revision $strEventFreshnessBaseRevision `
-                    -RepositoryRelativePath $objDocumentContext.Path `
-                    -MaximumBytes $objDocumentContext.MaximumBytes `
-                    -RequireRegularFile
-            }
-            else {
-                $null
-            }
-            if ($objDocumentContext.RequiresVersion) {
-                $arrRepositoryFailures += @(Get-CurrentInputMetadataFreshnessFailure `
-                        -Name $objDocumentContext.Path `
-                        -CurrentContent $objDocumentContext.Content `
-                        -BaseContent $strEventBaseContent `
-                        -TrustedEventUtcDate $strTrustedEventUtcDate)
-            }
-            else {
-                $arrRepositoryFailures += @(Get-LastUpdatedMetadataFreshnessFailure `
-                        -Name $objDocumentContext.Path `
-                        -CurrentContent $objDocumentContext.Content `
-                        -BaseContent $strEventBaseContent `
-                        -TrustedEventUtcDate $strTrustedEventUtcDate)
-            }
-        }
-    }
 }
 if ($arrRepositoryFailures.Count -gt 0) {
     throw "Agent-instruction contract failed:`n- $($arrRepositoryFailures -join "`n- ")"
@@ -7590,9 +7638,9 @@ Write-Output 'Agent-instruction contract passed.'
 if ($SelfTest) {
     #region Mutation self-tests
 
-    if ($intValidatorMaximumInputBytes -ne 557056 -or
-        $intHistoricalPolicyMarkerMaximumBytes -ne 557056) {
-        throw 'The validator and historical policy-marker caps must be 557056 bytes.'
+    if ($intValidatorMaximumInputBytes -ne 573440 -or
+        $intHistoricalPolicyMarkerMaximumBytes -ne 573440) {
+        throw 'The validator and historical policy-marker caps must be 573440 bytes.'
     }
 
     $strValidatorSource = [IO.File]::ReadAllText($PSCommandPath)
@@ -7672,7 +7720,7 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260830\.4$'
+            '(?m)^# Version: 1\.7\.20260830\.5$'
         ).Count -ne 1) {
         throw 'The validator script version does not use build date 20260830.'
     }
@@ -8380,6 +8428,98 @@ if ($SelfTest) {
         -Name 'Unix device mutation' `
         -UnixMode 'crw-rw-rw-' `
         -Failure 'Unix device mutation must have a regular Unix file type.'
+
+    $strPathSafetyTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+    $strPathSafetyRoot = [IO.Path]::Combine(
+        $strPathSafetyTempRoot,
+        'agent-input-path-' + [Guid]::NewGuid().ToString('N')
+    )
+    if (-not $strPathSafetyRoot.StartsWith(
+            $strPathSafetyTempRoot,
+            [StringComparison]::OrdinalIgnoreCase
+        )) {
+        throw 'The repository-input path fixture root is unsafe.'
+    }
+    $strPathSafetyRepository = [IO.Path]::Combine($strPathSafetyRoot, 'repository')
+    $strPathSafetyLinkedDirectory =
+        [IO.Path]::Combine($strPathSafetyRepository, 'linked')
+    $strPathSafetyOutsideDirectory = [IO.Path]::Combine($strPathSafetyRoot, 'outside')
+    $strPathSafetyInput = [IO.Path]::Combine(
+        $strPathSafetyLinkedDirectory,
+        'input.md'
+    )
+    [void][IO.Directory]::CreateDirectory($strPathSafetyLinkedDirectory)
+    [IO.File]::WriteAllText(
+        $strPathSafetyInput,
+        'safe',
+        [Text.UTF8Encoding]::new($false)
+    )
+    try {
+        & git -C $strPathSafetyRepository init --quiet
+        & git -C $strPathSafetyRepository add -- linked/input.md
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not create the repository-input path fixture index.'
+        }
+        $arrSafeRepositoryInput = [byte[]]@(Read-RepositoryInputData `
+                -Path $strPathSafetyInput `
+                -RepositoryRootPath $strPathSafetyRepository `
+                -RepositoryRelativePath 'linked/input.md' `
+                -DisplayName 'safe path fixture' `
+                -MaximumBytes 64)
+        if ([Text.Encoding]::UTF8.GetString($arrSafeRepositoryInput) -cne 'safe') {
+            throw 'The safe repository-input path fixture returned unexpected bytes.'
+        }
+
+        [IO.File]::Delete($strPathSafetyInput)
+        [IO.Directory]::Delete($strPathSafetyLinkedDirectory)
+        [void][IO.Directory]::CreateDirectory($strPathSafetyOutsideDirectory)
+        [IO.File]::WriteAllText(
+            [IO.Path]::Combine($strPathSafetyOutsideDirectory, 'input.md'),
+            'outside',
+            [Text.UTF8Encoding]::new($false)
+        )
+        if ([IO.Path]::DirectorySeparatorChar -eq '\') {
+            [void](New-Item -ItemType Junction `
+                    -Path $strPathSafetyLinkedDirectory `
+                    -Target $strPathSafetyOutsideDirectory)
+        }
+        else {
+            [void](New-Item -ItemType SymbolicLink `
+                    -Path $strPathSafetyLinkedDirectory `
+                    -Target $strPathSafetyOutsideDirectory)
+        }
+        $boolLinkedComponentRejected = $false
+        try {
+            [void](Read-RepositoryInputData `
+                    -Path $strPathSafetyInput `
+                    -RepositoryRootPath $strPathSafetyRepository `
+                    -RepositoryRelativePath 'linked/input.md' `
+                    -DisplayName 'linked path fixture' `
+                    -MaximumBytes 64)
+        }
+        catch {
+            $boolLinkedComponentRejected = $_.Exception.Message.Contains(
+                'unsafe linked path component: linked.',
+                [StringComparison]::Ordinal
+            )
+        }
+        if (-not $boolLinkedComponentRejected) {
+            throw 'An intermediate linked repository-input component was accepted.'
+        }
+    }
+    finally {
+        if (Test-Path -LiteralPath $strPathSafetyLinkedDirectory) {
+            $objLinkedFixtureItem =
+                Get-Item -Force -LiteralPath $strPathSafetyLinkedDirectory
+            if (($objLinkedFixtureItem.Attributes -band
+                    [IO.FileAttributes]::ReparsePoint) -ne 0) {
+                Remove-Item -Force -LiteralPath $strPathSafetyLinkedDirectory
+            }
+        }
+        if ([IO.Directory]::Exists($strPathSafetyRoot)) {
+            Remove-Item -Recurse -Force -LiteralPath $strPathSafetyRoot
+        }
+    }
 
     Assert-OversizedStreamMutationRejected
 
@@ -9904,7 +10044,7 @@ if ($SelfTest) {
             throw 'A historical marker-absent policy was classified as governed.'
         }
         & $scriptBlockAssertHistoryFailure `
-            (& $scriptBlockNewPolicyTree ([byte[]]::new(557057))) 'must not exceed 557056 bytes'
+            (& $scriptBlockNewPolicyTree ([byte[]]::new(573441))) 'must not exceed 573440 bytes'
         & $scriptBlockAssertHistoryFailure `
             (& $scriptBlockNewPolicyTree ([byte[]] @(0xC3, 0x28))) 'valid UTF-8 without a BOM'
         & $scriptBlockAssertHistoryFailure `
@@ -9941,7 +10081,7 @@ if ($SelfTest) {
         }
         $scriptBlockGetMergeRangeFailure = {
             param(
-                [string] $Base,
+                [string[]] $Base,
                 [string] $Head,
                 [bool] $RequireCommitDate = $false,
                 [string] $Path = 'AGENTS.md',
@@ -11135,10 +11275,14 @@ if ($SelfTest) {
             -Tree $strMergeBaseTree -Parents @($strMergeBaseCommit) `
             -Timestamp ($strMergeHistoricalDate + 'T13:00:00Z') `
             -Message 'criss-cross left'
-        $strCrissCrossRight = & $scriptBlockCreateMergeFixtureCommit `
-            -Tree $strMergeBaseTree -Parents @($strMergeBaseCommit) `
+        $strCrissCrossSharedMutation = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strAdvancedTrustBaseTree -Parents @($strMergeBaseCommit) `
             -Timestamp ($strMergeHistoricalDate + 'T13:01:00Z') `
-            -Message 'criss-cross right'
+            -Message 'criss-cross shared-history trust mutation'
+        $strCrissCrossRight = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strMergeBaseTree -Parents @($strCrissCrossSharedMutation) `
+            -Timestamp ($strMergeHistoricalDate + 'T13:01:30Z') `
+            -Message 'criss-cross shared-history trust restore'
         $strCrissCrossMergeLeft = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strMergeBaseTree `
             -Parents @($strCrissCrossLeft, $strCrissCrossRight) `
@@ -11168,6 +11312,39 @@ if ($SelfTest) {
             (@($objCrissCrossOpenedContext.FreshnessBaseRevisions) -join ',') -cne
                 ($arrExpectedCrissCrossBases -join ',')) {
             throw 'A valid opened criss-cross range did not retain every best merge base.'
+        }
+        $arrCrissCrossSharedHistoryTrustFailures = @(
+            Get-TrustRootRangeMutationFailure `
+                -RepositoryRootPath $strMergeFixtureRoot `
+                -BaseRevision $arrExpectedCrissCrossBases `
+                -HeadRevision $strCrissCrossMergeRight `
+                -RepositoryRelativePath @('.gitattributes')
+        )
+        if ($arrCrissCrossSharedHistoryTrustFailures.Count -ne 0) {
+            throw 'A mutation excluded by another best base was attributed to the topic.'
+        }
+        $arrCrissCrossSharedHistoryTouchedPaths = @(Read-GitRangeTouchedPath `
+                -RepositoryRootPath $strMergeFixtureRoot `
+                -BaseRevision $arrExpectedCrissCrossBases `
+                -HeadRevision $strCrissCrossMergeRight `
+                -IsNewRefRange $false `
+                -RepositoryRelativePathspec ':(top)**' `
+                -MaximumBytes $intGitPathListMaximumBytes)
+        if ($arrCrissCrossSharedHistoryTouchedPaths -ccontains '.gitattributes') {
+            throw 'The combined best-base path walk included excluded shared history.'
+        }
+        $strCrissCrossTopicTrustCommit = & $scriptBlockCreateMergeFixtureCommit `
+            -Tree $strAdvancedTrustBaseTree `
+            -Parents @($strCrissCrossMergeRight) `
+            -Timestamp ($strMergeHistoricalDate + 'T13:03:30Z') `
+            -Message 'criss-cross topic trust mutation'
+        $arrCrissCrossTopicTrustFailures = @(Get-TrustRootRangeMutationFailure `
+                -RepositoryRootPath $strMergeFixtureRoot `
+                -BaseRevision $arrExpectedCrissCrossBases `
+                -HeadRevision $strCrissCrossTopicTrustCommit `
+                -RepositoryRelativePath @('.gitattributes'))
+        if ($arrCrissCrossTopicTrustFailures.Count -ne 1) {
+            throw 'A topic-owned mutation after all best bases did not fail closed.'
         }
         $strCrissCrossCurrentHead = & $scriptBlockCreateMergeFixtureCommit `
             -Tree $strMergeBaseTree -Parents @($strCrissCrossMergeRight) `
@@ -11511,6 +11688,13 @@ if ($SelfTest) {
         $strValidatorSourceContent -notmatch
         '\$boolCommitDateOnlyEvent = \$EventName -ceq ''pull_request_target''') {
         throw 'Commit-date range freshness selectors are incomplete.'
+    }
+    if (@($objValidatorAst.FindAll({
+                param($objNode)
+                $objNode -is [Management.Automation.Language.VariableExpressionAst] -and
+                $objNode.VariablePath.UserPath -ceq 'strTrustedEventUtcDate'
+            }, $true)).Count -ne 0) {
+        throw 'A push-event endpoint equality clock remains active.'
     }
     foreach ($objNestedLintDocumentation in @(
             [pscustomobject]@{
