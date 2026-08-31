@@ -79,10 +79,10 @@ jobs:
           $arrDecision = @(
               & ./.github/workflows/Test-AgentInstructions.ps1 `
                   -PushApplicabilityOnly `
-                  -RangeBaseRevision $env:PUSH_BEFORE_SHA `
-                  -RangeHeadRevision $env:PUSH_AFTER_SHA `
-                  -RangeIsNewRef:([bool]::Parse($env:PUSH_CREATED)) `
-                  -RangeIsDeletedRef:([bool]::Parse($env:PUSH_DELETED)) `
+                  -PublishedBaselineRevision $env:PUSH_BEFORE_SHA `
+                  -PublishedFinalRevision $env:PUSH_AFTER_SHA `
+                  -PublishedBaselineAbsent:([bool]::Parse($env:PUSH_CREATED)) `
+                  -PublishedFinalDeleted:([bool]::Parse($env:PUSH_DELETED)) `
                   -EventName 'push'
           )
           if ($arrDecision.Count -ne 1 -or
@@ -122,9 +122,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          PR_ACTION: ${{ github.event.action }}
-          PR_PREVIOUS_HEAD_SHA: >-
-            ${{ github.event.action == 'synchronize' && github.event.before || '' }}
         run: |
           set -euo pipefail
           [[ "${PR_HEAD_SHA}" =~ ^[0-9a-f]{40}$ ]]
@@ -138,21 +135,6 @@ jobs:
           fetched_head="$(git rev-parse --verify \
             'refs/remotes/event/pr-head^{commit}')"
           test "${fetched_head}" = "${PR_HEAD_SHA}"
-          if [[ "${PR_ACTION}" = 'synchronize' ]]; then
-            [[ "${PR_PREVIOUS_HEAD_SHA}" =~ ^[0-9a-f]{40}$ ]]
-            [[ ! "${PR_PREVIOUS_HEAD_SHA}" =~ ^0{40}$ ]]
-            test "${PR_PREVIOUS_HEAD_SHA}" != "${PR_HEAD_SHA}"
-            GIT_CONFIG_COUNT=1 \
-              GIT_CONFIG_KEY_0="http.${GITHUB_SERVER_URL}/.extraheader" \
-              GIT_CONFIG_VALUE_0="Authorization: Basic ${authorization}" \
-              git fetch --no-tags --no-recurse-submodules origin \
-                "${PR_PREVIOUS_HEAD_SHA}:refs/remotes/event/pr-previous-head"
-            fetched_previous_head="$(git rev-parse --verify \
-              'refs/remotes/event/pr-previous-head^{commit}')"
-            test "${fetched_previous_head}" = "${PR_PREVIOUS_HEAD_SHA}"
-          else
-            test -z "${PR_PREVIOUS_HEAD_SHA}"
-          fi
           unset authorization
           git diff --quiet --no-ext-diff
           git diff --cached --quiet --no-ext-diff
@@ -192,60 +174,43 @@ jobs:
             ${{ github.event_name == 'pull_request_target' &&
               github.event.pull_request.head.sha ||
               github.event_name == 'push' && github.event.after || '' }}
-          AGENT_INSTRUCTION_RANGE_BASE: >-
+          AGENT_INSTRUCTION_PUBLISHED_BASELINE: >-
             ${{ github.event_name == 'pull_request_target' &&
               github.event.pull_request.base.sha ||
               github.event_name == 'push' && github.event.before || '' }}
-          AGENT_INSTRUCTION_RANGE_HEAD: >-
+          AGENT_INSTRUCTION_PUBLISHED_FINAL: >-
             ${{ github.event_name == 'pull_request_target' &&
               github.event.pull_request.head.sha ||
               github.event_name == 'push' && github.event.after || '' }}
-          AGENT_INSTRUCTION_RANGE_IS_NEW_REF: >-
+          AGENT_INSTRUCTION_PUBLISHED_BASELINE_ABSENT: >-
             ${{ github.event_name == 'push' && github.event.created || false }}
-          AGENT_INSTRUCTION_RANGE_IS_DELETED_REF: >-
+          AGENT_INSTRUCTION_PUBLISHED_FINAL_DELETED: >-
             ${{ github.event_name == 'push' && github.event.deleted || false }}
           AGENT_INSTRUCTION_TRUSTED_EVENT_TIMESTAMP: >-
             ${{ github.event_name == 'push' &&
-              github.event.repository.pushed_at || '' }}
+              github.event.repository.pushed_at ||
+              github.event_name == 'pull_request_target' &&
+              github.event.pull_request.updated_at || '' }}
           AGENT_INSTRUCTION_EVENT_NAME: >-
             ${{ (github.event_name == 'pull_request_target' ||
               github.event_name == 'push') && github.event_name || '' }}
           AGENT_INSTRUCTION_PULL_REQUEST_ACTION: >-
             ${{ github.event_name == 'pull_request_target' &&
               github.event.action || '' }}
-          AGENT_INSTRUCTION_PREVIOUS_HEAD_REVISION: >-
-            ${{ github.event_name == 'pull_request_target' &&
-              github.event.action == 'synchronize' && github.event.before || '' }}
           AGENT_INSTRUCTION_PULL_REQUEST_BASE_CHANGED: >-
             ${{ github.event_name == 'pull_request_target' &&
               github.event.action == 'edited' &&
               github.event.changes.base.ref.from != '' && 'true' || '' }}
-          AGENT_INSTRUCTION_EVENT_HEAD_REVISION: >-
-            ${{ github.event_name == 'push' &&
-              github.event.head_commit.id || '' }}
-          AGENT_INSTRUCTION_EVENT_HEAD_DISTINCT: >-
-            ${{ github.event_name == 'push' &&
-              toJSON(github.event.head_commit.distinct) || '' }}
-          AGENT_INSTRUCTION_NEW_REF_COMMIT_COUNT: >-
-            ${{ github.event_name == 'push' && github.event.created &&
-              github.event.size || '' }}
-          AGENT_INSTRUCTION_NEW_REF_COMMITS_JSON: >-
-            ${{ github.event_name == 'push' && github.event.created &&
-              toJSON(github.event.commits.*.id) || '' }}
         run: >-
           ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest
           -InputRevision $env:AGENT_INSTRUCTION_INPUT_REVISION
-          -RangeBaseRevision $env:AGENT_INSTRUCTION_RANGE_BASE
-          -RangeHeadRevision $env:AGENT_INSTRUCTION_RANGE_HEAD
-          -RangeIsNewRef:([bool]::Parse($env:AGENT_INSTRUCTION_RANGE_IS_NEW_REF))
-          -RangeIsDeletedRef:([bool]::Parse(
-          $env:AGENT_INSTRUCTION_RANGE_IS_DELETED_REF))
+          -PublishedBaselineRevision $env:AGENT_INSTRUCTION_PUBLISHED_BASELINE
+          -PublishedFinalRevision $env:AGENT_INSTRUCTION_PUBLISHED_FINAL
+          -PublishedBaselineAbsent:([bool]::Parse(
+          $env:AGENT_INSTRUCTION_PUBLISHED_BASELINE_ABSENT))
+          -PublishedFinalDeleted:([bool]::Parse(
+          $env:AGENT_INSTRUCTION_PUBLISHED_FINAL_DELETED))
           -TrustedEventTimestamp $env:AGENT_INSTRUCTION_TRUSTED_EVENT_TIMESTAMP
           -EventName $env:AGENT_INSTRUCTION_EVENT_NAME
           -PullRequestAction $env:AGENT_INSTRUCTION_PULL_REQUEST_ACTION
-          -PreviousHeadRevision $env:AGENT_INSTRUCTION_PREVIOUS_HEAD_REVISION
           -PullRequestBaseChanged $env:AGENT_INSTRUCTION_PULL_REQUEST_BASE_CHANGED
-          -EventHeadRevision $env:AGENT_INSTRUCTION_EVENT_HEAD_REVISION
-          -EventHeadDistinct $env:AGENT_INSTRUCTION_EVENT_HEAD_DISTINCT
-          -NewRefCommitCount $env:AGENT_INSTRUCTION_NEW_REF_COMMIT_COUNT
-          -NewRefCommitEvidenceJson $env:AGENT_INSTRUCTION_NEW_REF_COMMITS_JSON
