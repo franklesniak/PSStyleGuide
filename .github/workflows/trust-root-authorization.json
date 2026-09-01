@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "authorization_id": "issue176-trust-root-repair-51d42f84",
+  "authorization_id": "issue176-trust-root-repair-12fe8085",
   "candidate": {
     "base_commit": "70bf7522233a6c8558809a2c2fc22be83a23a7b9",
-    "head_commit": "51d42f84aaa8fe31cc68c1298aef28c4c90a97c8",
-    "head_tree": "9892ac3e6f0f94e049b51e17c910509e3b3dbdf0",
+    "head_commit": "12fe80851c5c3f9144611d79aa13dc1bfdc3666f",
+    "head_tree": "c2f8b31d7aa1c3b005b94c42d5e740b14e7327b6",
     "parent_commits": [
-      "5b3fd9869a8855edd5150f18c0f0d6b5163810bf"
+      "51d42f84aaa8fe31cc68c1298aef28c4c90a97c8"
     ]
   },
   "limits": {
@@ -31,9 +31,9 @@
     {
       "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
       "mode": "100644",
-      "blob": "30da6a1a404bbbcfa65350191a147a90c0025ea6",
-      "bytes": 26693,
-      "sha256": "a2ff77581782f571888ee64c5250bdd3e5a28750e2162da100610c9aede1359a",
+      "blob": "5f9944628d03eef6f02e9942ef886ca94014e6ec",
+      "bytes": 28613,
+      "sha256": "379e76777bc19aec75db8e31414fdbb7c6a7d76c727a955ed4cdbba63223180a",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
@@ -43,9 +43,9 @@
     {
       "path": ".github/workflows/Test-AgentInstructions.ps1",
       "mode": "100644",
-      "blob": "0d1f794ff2384c7792a53beedad5923ada307778",
-      "bytes": 427109,
-      "sha256": "f442d8d11186007f1125e2fa3be0124d071c064301657d9b578f85cd2c8b11c5",
+      "blob": "ca5c5374252b600f0b9b4571eed403c7ff8b113a",
+      "bytes": 430014,
+      "sha256": "c915ef7896fd80e1527ddc1c10d392116846da570878183d744a96d3dbb587b7",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
