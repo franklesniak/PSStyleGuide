@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "authorization_id": "pr179-trust-root-repair-5b3fd986",
+  "authorization_id": "issue176-trust-root-repair-51d42f84",
   "candidate": {
     "base_commit": "70bf7522233a6c8558809a2c2fc22be83a23a7b9",
-    "head_commit": "5b3fd9869a8855edd5150f18c0f0d6b5163810bf",
-    "head_tree": "90693eb2a9db0915d84cf9d456d10ef96ec11851",
+    "head_commit": "51d42f84aaa8fe31cc68c1298aef28c4c90a97c8",
+    "head_tree": "9892ac3e6f0f94e049b51e17c910509e3b3dbdf0",
     "parent_commits": [
-      "70bf7522233a6c8558809a2c2fc22be83a23a7b9"
+      "5b3fd9869a8855edd5150f18c0f0d6b5163810bf"
     ]
   },
   "limits": {
@@ -31,9 +31,9 @@
     {
       "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
       "mode": "100644",
-      "blob": "9e6c27104b65ec47c860d4693307d9280c392e4d",
-      "bytes": 19268,
-      "sha256": "c25dbd038d91e3a770675e9b4b85785e2fed26fd73141131d83a855ebbbe7fb2",
+      "blob": "30da6a1a404bbbcfa65350191a147a90c0025ea6",
+      "bytes": 26693,
+      "sha256": "a2ff77581782f571888ee64c5250bdd3e5a28750e2162da100610c9aede1359a",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
@@ -43,9 +43,9 @@
     {
       "path": ".github/workflows/Test-AgentInstructions.ps1",
       "mode": "100644",
-      "blob": "5b1b32d927eddf59a8199bb5d90a79124e513849",
-      "bytes": 421064,
-      "sha256": "be5095efbbae220e3902865477323f5fa195b00e82ebda0b87259818d33de03d",
+      "blob": "0d1f794ff2384c7792a53beedad5923ada307778",
+      "bytes": 427109,
+      "sha256": "f442d8d11186007f1125e2fa3be0124d071c064301657d9b578f85cd2c8b11c5",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
@@ -73,9 +73,9 @@
     {
       "path": ".github/workflows/agent-instructions.yml",
       "mode": "100644",
-      "blob": "9c59162e1ad38dda49135cdccec3fe8dbb32ba54",
-      "bytes": 19777,
-      "sha256": "6697e44538819b307a48d925e851b94328152dafc06b14ada1384e40a211ae31",
+      "blob": "27bbc4f93188311437ae316adfeba24bc80743d8",
+      "bytes": 19249,
+      "sha256": "9b495cbaed99d9975a2fecb1765488e48bdc71b9cd98aa06273ec15953d13a1f",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "yaml",
       "semantic_invariants": [
