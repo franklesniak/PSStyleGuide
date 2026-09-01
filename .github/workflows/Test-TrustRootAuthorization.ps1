@@ -354,9 +354,31 @@ function Assert-SemanticInvariant {
             }
         }
         $strAuthorizedFixturePattern =
-            '(?s)\$arrAuthorizedFixtureFailures = @\(\s+' +
+            '(?s)\$script:boolTrustedMaintenanceAuthorizationValidated = ' +
+            '\$true\s+\$arrAuthorizedFixtureFailures = @\(\s+' +
             'Get-TrustRootRangeMutationFailure\s+`.*?' +
-            '-RepositoryRelativePath \$script:arrTrustRootPaths\s+\)'
+            '-RepositoryRelativePath \$strAuthorizationFixtureTrustPath\s+\)'
+        $strHermeticFixturePattern =
+            '(?s)\$strAuthorizationFixtureRoot = \[IO\.Path\]::Combine\(' +
+            '.*?agent-instruction-trust-root-.*?' +
+            '\$strAuthorizationFixtureRepository =.*?' +
+            "commit --quiet --no-gpg-sign -m 'trust-root baseline'.*?" +
+            "commit --quiet --no-gpg-sign -m 'trust-root mutation'.*?" +
+            'git clone --quiet --depth 1 --no-local --no-hardlinks.*?' +
+            '--is-shallow-repository.*?rev-list\s+`\s+' +
+            '--max-parents=0 HEAD.*?' +
+            'The depth-one clone did not reproduce the apparent-root condition\.'
+        $strNoMutationFixturePattern =
+            '(?s)\$arrNoMutationFixtureFailures = @\(\s+' +
+            'Get-TrustRootRangeMutationFailure\s+`.*?' +
+            '-BaseRevision \$strAuthorizationFixtureHead\.Trim\(\)\s+`.*?' +
+            '-HeadRevision \$strAuthorizationFixtureHead\.Trim\(\).*?' +
+            '\$arrNoMutationFixtureFailures\.Count -ne 0'
+        $strFixtureCleanupPattern =
+            '(?s)finally \{\s+' +
+            '\$script:boolTrustedMaintenanceAuthorizationValidated =.*?' +
+            'Remove-Item -LiteralPath \$strAuthorizationFixtureRoot ' +
+            '-Recurse -Force\s+\}\s+\}'
         if ($arrParseErrors.Count -ne 0 -or
             $Text -cnotmatch
                 '(?s)if \(\$ExactAuthorizedMaintenanceProductionCall -and\s+' +
@@ -369,6 +391,7 @@ function Assert-SemanticInvariant {
                 '\{\s+return' -or
             $intProductionSwitchCalls -ne 1 -or
             $intSelfTestSwitchCalls -ne 2 -or
+            $Text -cnotmatch $strHermeticFixturePattern -or
             $Text -cnotmatch $strAuthorizedFixturePattern -or
             ([regex]::Match(
                     $Text,
@@ -377,6 +400,13 @@ function Assert-SemanticInvariant {
                     '-ExactAuthorizedMaintenanceProductionCall',
                     [StringComparison]::Ordinal
                 )) -or
+            $Text -cnotmatch
+                'The hermetic trust-root mutation fixture was not diagnosed\.' -or
+            $Text -cnotmatch $strNoMutationFixturePattern -or
+            $Text -cnotmatch $strFixtureCleanupPattern -or
+            $Text -cmatch
+                '(?s)\$strAuthorizationFixtureBase = \[string\] \(\s+' +
+                '& git -C \$strRepositoryRootPath rev-list --max-parents=0 HEAD' -or
             $Text -cnotmatch
                 'An unauthorized production maintenance call did not fail closed\.') {
             throw "$Path does not satisfy semantic invariant $Invariant."
@@ -472,7 +502,9 @@ function Assert-SemanticInvariant {
         'verifier-reads-trusted-revision-manifest' =
             'ls-tree\s+`?\s*\$TrustedRevision\s+--\s+\$AuthorizationManifestPath'
         'workflow-checkout-is-trusted-sha' =
-            'ref: \$\{\{ github\.sha \}\}'
+            '(?s)ref: \$\{\{ github\.sha \}\}.*?fetch-depth: >-\s+' +
+            "\$\{\{ github\.event_name == 'push' && github\.event\.created " +
+            '&& 1 \|\| 0 \}\}'
         'workflow-permissions-are-read-only' =
             'permissions:\s+contents: read'
         'workflow-persist-credentials-is-false' =

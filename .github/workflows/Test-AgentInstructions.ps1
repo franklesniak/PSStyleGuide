@@ -6659,51 +6659,173 @@ if (-not [string]::IsNullOrEmpty($InputRevision)) {
 }
 
 if ($SelfTest) {
-    $strAuthorizationFixtureBase = [string] (
-        & git -C $strRepositoryRootPath rev-list --max-parents=0 HEAD |
-            Select-Object -First 1
-    )
-    $strAuthorizationFixtureHead = [string] (
-        & git -C $strRepositoryRootPath rev-parse --verify 'HEAD^{commit}'
-    )
-    if ($LASTEXITCODE -ne 0 -or
-        $strAuthorizationFixtureBase.Trim() -notmatch '^[0-9a-fA-F]{40}$' -or
-        $strAuthorizationFixtureHead.Trim() -notmatch '^[0-9a-fA-F]{40}$') {
-        throw 'Could not resolve the production-authorization fixtures.'
-    }
     $boolOriginalExactAuthorization =
         $script:boolTrustedMaintenanceAuthorizationValidated
+    $strAuthorizationFixtureSystemTempRoot =
+        [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+    $strAuthorizationFixtureRoot = [IO.Path]::Combine(
+        $strAuthorizationFixtureSystemTempRoot,
+        'agent-instruction-trust-root-' + [Guid]::NewGuid().ToString('N')
+    )
+    $strAuthorizationFixtureRepository =
+        [IO.Path]::Combine($strAuthorizationFixtureRoot, 'source')
+    $strAuthorizationFixtureDepthOneClone =
+        [IO.Path]::Combine($strAuthorizationFixtureRoot, 'depth-one')
+    $strAuthorizationFixtureTrustPath =
+        '.github/workflows/Test-AgentInstructions.ps1'
+    $strAuthorizationFixtureObjectIdPattern =
+        '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$'
+    [void][IO.Directory]::CreateDirectory($strAuthorizationFixtureRepository)
     try {
+        $objAuthorizationFixtureUtf8 = [Text.UTF8Encoding]::new($false)
+        $strAuthorizationFixtureTrustFile = [IO.Path]::Combine(
+            $strAuthorizationFixtureRepository,
+            $strAuthorizationFixtureTrustPath.Replace(
+                '/',
+                [IO.Path]::DirectorySeparatorChar
+            )
+        )
+        [void][IO.Directory]::CreateDirectory(
+            [IO.Path]::GetDirectoryName($strAuthorizationFixtureTrustFile)
+        )
+        [IO.File]::WriteAllText(
+            $strAuthorizationFixtureTrustFile,
+            "baseline`n",
+            $objAuthorizationFixtureUtf8
+        )
+        & git -C $strAuthorizationFixtureRepository init --quiet `
+            --initial-branch=main
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not initialize the trust-root authorization fixture.'
+        }
+        & git -C $strAuthorizationFixtureRepository add -- `
+            $strAuthorizationFixtureTrustPath
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not stage the trust-root authorization baseline.'
+        }
+        $strAuthorizationFixtureDisabledHooks =
+            [IO.Path]::Combine($strAuthorizationFixtureRoot, 'disabled-hooks')
+        & git -C $strAuthorizationFixtureRepository `
+            -c 'user.name=Agent instruction self-test' `
+            -c 'user.email=agent-instruction-self-test@example.invalid' `
+            -c 'commit.gpgSign=false' `
+            -c "core.hooksPath=$strAuthorizationFixtureDisabledHooks" `
+            commit --quiet --no-gpg-sign -m 'trust-root baseline'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not commit the trust-root authorization baseline.'
+        }
+        $strAuthorizationFixtureBase = [string] (
+            & git -C $strAuthorizationFixtureRepository rev-parse --verify `
+                'HEAD^{commit}'
+        )
+        if ($LASTEXITCODE -ne 0 -or
+            $strAuthorizationFixtureBase.Trim() -notmatch
+                $strAuthorizationFixtureObjectIdPattern) {
+            throw 'Could not resolve the trust-root authorization baseline.'
+        }
+
+        [IO.File]::WriteAllText(
+            $strAuthorizationFixtureTrustFile,
+            "mutated`n",
+            $objAuthorizationFixtureUtf8
+        )
+        & git -C $strAuthorizationFixtureRepository add -- `
+            $strAuthorizationFixtureTrustPath
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not stage the trust-root authorization mutation.'
+        }
+        & git -C $strAuthorizationFixtureRepository `
+            -c 'user.name=Agent instruction self-test' `
+            -c 'user.email=agent-instruction-self-test@example.invalid' `
+            -c 'commit.gpgSign=false' `
+            -c "core.hooksPath=$strAuthorizationFixtureDisabledHooks" `
+            commit --quiet --no-gpg-sign -m 'trust-root mutation'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not commit the trust-root authorization mutation.'
+        }
+        $strAuthorizationFixtureHead = [string] (
+            & git -C $strAuthorizationFixtureRepository rev-parse --verify `
+                'HEAD^{commit}'
+        )
+        if ($LASTEXITCODE -ne 0 -or
+            $strAuthorizationFixtureHead.Trim() -notmatch
+                $strAuthorizationFixtureObjectIdPattern -or
+            $strAuthorizationFixtureHead.Trim() -ceq
+                $strAuthorizationFixtureBase.Trim()) {
+            throw 'Could not resolve the trust-root authorization mutation.'
+        }
+
+        $strAuthorizationFixtureUri =
+            ([Uri] $strAuthorizationFixtureRepository).AbsoluteUri
+        & git clone --quiet --depth 1 --no-local --no-hardlinks -- `
+            $strAuthorizationFixtureUri $strAuthorizationFixtureDepthOneClone
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not create the depth-one trust-root fixture clone.'
+        }
+        $strAuthorizationFixtureShallowState = [string] (
+            & git -C $strAuthorizationFixtureDepthOneClone rev-parse `
+                --is-shallow-repository
+        )
+        $strAuthorizationFixtureApparentRoot = [string] (
+            & git -C $strAuthorizationFixtureDepthOneClone rev-list `
+                --max-parents=0 HEAD | Select-Object -First 1
+        )
+        if ($LASTEXITCODE -ne 0 -or
+            $strAuthorizationFixtureShallowState.Trim() -cne 'true' -or
+            $strAuthorizationFixtureApparentRoot.Trim() -cne
+                $strAuthorizationFixtureHead.Trim() -or
+            $strAuthorizationFixtureApparentRoot.Trim() -ceq
+                $strAuthorizationFixtureBase.Trim()) {
+            throw 'The depth-one clone did not reproduce the apparent-root condition.'
+        }
+
         $script:boolTrustedMaintenanceAuthorizationValidated = $true
-        $arrAuthorizedProductionFailures = @(
+        $arrAuthorizedFixtureFailures = @(
             Get-TrustRootRangeMutationFailure `
-                -RepositoryRootPath $strRepositoryRootPath `
+                -RepositoryRootPath $strAuthorizationFixtureRepository `
                 -BaseRevision $strAuthorizationFixtureBase.Trim() `
                 -HeadRevision $strAuthorizationFixtureHead.Trim() `
-                -RepositoryRelativePath $script:arrTrustRootPaths `
+                -RepositoryRelativePath $strAuthorizationFixtureTrustPath
+        )
+        if ($arrAuthorizedFixtureFailures.Count -ne 1 -or
+            -not $arrAuthorizedFixtureFailures[0].Contains(
+                "changes trusted validation path $strAuthorizationFixtureTrustPath.",
+                [StringComparison]::Ordinal
+            )) {
+            throw 'The hermetic trust-root mutation fixture was not diagnosed.'
+        }
+
+        $arrAuthorizedProductionFailures = @(
+            Get-TrustRootRangeMutationFailure `
+                -RepositoryRootPath $strAuthorizationFixtureRepository `
+                -BaseRevision $strAuthorizationFixtureBase.Trim() `
+                -HeadRevision $strAuthorizationFixtureHead.Trim() `
+                -RepositoryRelativePath $strAuthorizationFixtureTrustPath `
                 -ExactAuthorizedMaintenanceProductionCall
         )
         if ($arrAuthorizedProductionFailures.Count -ne 0) {
             throw 'Exact authorized production maintenance did not bypass one call.'
         }
-        $arrAuthorizedFixtureFailures = @(
+
+        $arrNoMutationFixtureFailures = @(
             Get-TrustRootRangeMutationFailure `
-                -RepositoryRootPath $strRepositoryRootPath `
-                -BaseRevision $strAuthorizationFixtureBase.Trim() `
+                -RepositoryRootPath $strAuthorizationFixtureRepository `
+                -BaseRevision $strAuthorizationFixtureHead.Trim() `
                 -HeadRevision $strAuthorizationFixtureHead.Trim() `
-                -RepositoryRelativePath $script:arrTrustRootPaths
+                -RepositoryRelativePath $strAuthorizationFixtureTrustPath
         )
-        if ($arrAuthorizedFixtureFailures.Count -eq 0) {
-            throw 'An authorized self-test fixture bypassed trust-root mutation checks.'
+        if ($arrNoMutationFixtureFailures.Count -ne 0) {
+            throw 'The no-mutation trust-root fixture returned a false positive.'
         }
+
         $script:boolTrustedMaintenanceAuthorizationValidated = $false
         $boolUnauthorizedProductionRejected = $false
         try {
             [void] @(Get-TrustRootRangeMutationFailure `
-                    -RepositoryRootPath $strRepositoryRootPath `
+                    -RepositoryRootPath $strAuthorizationFixtureRepository `
                     -BaseRevision $strAuthorizationFixtureBase.Trim() `
                     -HeadRevision $strAuthorizationFixtureHead.Trim() `
-                    -RepositoryRelativePath $script:arrTrustRootPaths `
+                    -RepositoryRelativePath $strAuthorizationFixtureTrustPath `
                     -ExactAuthorizedMaintenanceProductionCall)
         }
         catch {
@@ -6719,6 +6841,13 @@ if ($SelfTest) {
     finally {
         $script:boolTrustedMaintenanceAuthorizationValidated =
             $boolOriginalExactAuthorization
+        if ([IO.Directory]::Exists($strAuthorizationFixtureRoot) -and
+            $strAuthorizationFixtureRoot.StartsWith(
+                $strAuthorizationFixtureSystemTempRoot,
+                [StringComparison]::OrdinalIgnoreCase
+            )) {
+            Remove-Item -LiteralPath $strAuthorizationFixtureRoot -Recurse -Force
+        }
     }
 }
 
