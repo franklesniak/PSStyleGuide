@@ -66,11 +66,11 @@
     },
     "advisoryDecision": {
       "decisionOwner": "PSStyleGuide repository owner/administrator",
-      "recordedAtUtc": "2026-08-01T05:30:51.000Z",
-      "expiresAtUtc": "2026-08-30T23:59:59.000Z",
+      "recordedAtUtc": "2026-08-31T18:59:40.600Z",
+      "expiresAtUtc": "2026-10-29T23:59:59.000Z",
       "expiresEarlierOn": "Completion of issue 149",
-      "policy": "Temporarily retain the observed npm findings through issues 145-148; issue 149 owns remediation.",
-      "reason": "Preserve the reviewed slate order and prohibit partial dependency remediation in P1.",
+      "policy": "Temporarily retain the currently accepted npm findings during the approved remediation window; issue 149 owns remediation.",
+      "reason": "Permit 60 more calendar days for remediation while all existing compensating controls remain mandatory.",
       "compensatingControls": [
         "Every P1 workflow is read-only.",
         "npm lifecycle scripts are disabled.",
@@ -78,13 +78,13 @@
         "Dependency changes other than exact yaml@2.9.0 are prohibited."
       ],
       "gateAudit": {
-        "observedAtUtc": "2026-07-31T04:08:24.926Z",
+        "observedAtUtc": "2026-08-31T19:14:13.491Z",
         "command": "npm audit --json",
-        "nodeVersion": "26.5.1",
+        "nodeVersion": "26.8.1",
         "npmVersion": "11.7.0",
         "nativeExit": 1,
-        "stdoutLength": 10339,
-        "stdoutSha256": "0f80ec0c52ce37af29c2a35d81c8ec327a383a0c964d5c262dd51b0ddf2c3387",
+        "stdoutLength": 11515,
+        "stdoutSha256": "da7b0b093a6cd84633728c0c131ec5cf919b19d6097d2212966658524d5d0fda",
         "vulnerabilities": {
           "info": 0,
           "low": 0,
@@ -140,7 +140,7 @@
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "70d506ca41f671fe60e744792cab55f854421bc02306a3af87bc9cce53d787de"
+    "sha256": "9acaec69fedb97566c12ca1ce99618bc1511b662f260e70346c9b10446fb99e2"
   },
   "actions": {
     "checkout": {

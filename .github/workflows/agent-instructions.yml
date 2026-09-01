@@ -182,12 +182,63 @@ jobs:
           npm ci --ignore-scripts --no-audit --fund=false
           --include=dev --package-lock=true
 
+      - name: Validate exact trust-root maintenance as inert data
+        id: trust-root-authorization
+        if: github.event_name == 'pull_request_target'
+        shell: pwsh
+        env:
+          TRUSTED_REVISION: ${{ github.sha }}
+          CANDIDATE_BASE_REVISION: ${{ github.event.pull_request.base.sha }}
+          CANDIDATE_HEAD_REVISION: ${{ github.event.pull_request.head.sha }}
+        run: |
+          $arrApplicability = @(
+              & ./.github/workflows/Test-TrustRootAuthorization.ps1 `
+                  -RepositoryRootPath $PWD `
+                  -TrustedRevision $env:TRUSTED_REVISION `
+                  -BaseRevision $env:CANDIDATE_BASE_REVISION `
+                  -HeadRevision $env:CANDIDATE_HEAD_REVISION `
+                  -AuthorizationApplicabilityOnly
+          )
+          if ($arrApplicability.Count -ne 1 -or
+              $arrApplicability[0] -isnot [bool]) {
+              throw 'Trust-root applicability did not return one exact Boolean.'
+          }
+          $boolAuthorized = $false
+          if ($arrApplicability[0]) {
+              $arrAuthorization = @(
+                  & ./.github/workflows/Test-TrustRootAuthorization.ps1 `
+                      -RepositoryRootPath $PWD `
+                      -TrustedRevision $env:TRUSTED_REVISION `
+                      -BaseRevision $env:CANDIDATE_BASE_REVISION `
+                      -HeadRevision $env:CANDIDATE_HEAD_REVISION
+              )
+              if ($arrAuthorization.Count -ne 1 -or
+                  $arrAuthorization[0] -isnot [bool] -or
+                  -not $arrAuthorization[0]) {
+                  throw 'Trust-root authorization did not return one exact true result.'
+              }
+              $boolAuthorized = $true
+          }
+          [System.IO.File]::AppendAllText(
+              $env:GITHUB_OUTPUT,
+              "authorized=$($boolAuthorized.ToString().ToLowerInvariant())`n",
+              [System.Text.UTF8Encoding]::new($false)
+          )
+
       - name: Validate instruction capacity and capabilities
         if: >-
           github.event_name != 'push' ||
           steps.push-applicability.outputs.required == 'true'
         shell: pwsh
         env:
+          AGENT_INSTRUCTION_AUTHORIZATION_BASE: >-
+            ${{ github.event_name == 'pull_request_target' &&
+              github.event.pull_request.base.sha || '' }}
+          AGENT_INSTRUCTION_AUTHORIZATION_HEAD: >-
+            ${{ github.event_name == 'pull_request_target' &&
+              github.event.pull_request.head.sha || '' }}
+          AGENT_INSTRUCTION_TRUST_MAINTENANCE_AUTHORIZED: >-
+            ${{ steps.trust-root-authorization.outputs.authorized || 'false' }}
           AGENT_INSTRUCTION_INPUT_REVISION: >-
             ${{ github.event_name == 'pull_request_target' &&
               github.event.pull_request.head.sha ||
@@ -234,6 +285,10 @@ jobs:
               toJSON(github.event.commits.*.id) || '' }}
         run: >-
           ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest
+          -AuthorizationBaseRevision $env:AGENT_INSTRUCTION_AUTHORIZATION_BASE
+          -AuthorizationHeadRevision $env:AGENT_INSTRUCTION_AUTHORIZATION_HEAD
+          -TrustedMaintenanceAuthorizationValidated:([bool]::Parse(
+          $env:AGENT_INSTRUCTION_TRUST_MAINTENANCE_AUTHORIZED))
           -InputRevision $env:AGENT_INSTRUCTION_INPUT_REVISION
           -RangeBaseRevision $env:AGENT_INSTRUCTION_RANGE_BASE
           -RangeHeadRevision $env:AGENT_INSTRUCTION_RANGE_HEAD

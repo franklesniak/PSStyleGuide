@@ -8,6 +8,9 @@
 [OutputType([string])]
 param(
     [Parameter()][switch] $SelfTest,
+    [Parameter()][AllowEmptyString()][string] $AuthorizationBaseRevision = '',
+    [Parameter()][AllowEmptyString()][string] $AuthorizationHeadRevision = '',
+    [Parameter()][switch] $TrustedMaintenanceAuthorizationValidated,
     [Parameter()][AllowEmptyString()][string] $InputRevision = '',
     [Parameter()][AllowEmptyString()][string] $RangeBaseRevision = '',
     [Parameter()][AllowEmptyString()][string] $RangeHeadRevision = '',
@@ -27,6 +30,24 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+if ($TrustedMaintenanceAuthorizationValidated) {
+    if ($EventName -cne 'pull_request_target' -or
+        [string]::IsNullOrEmpty($AuthorizationBaseRevision) -or
+        [string]::IsNullOrEmpty($AuthorizationHeadRevision) -or
+        [string]::IsNullOrEmpty($InputRevision) -or
+        $InputRevision -cne $AuthorizationHeadRevision) {
+        throw 'Trusted maintenance authorization requires exact pull request endpoints.'
+    }
+}
+$script:boolTrustedMaintenanceAuthorizationValidated =
+    [bool] $TrustedMaintenanceAuthorizationValidated
+# Trusted-bootstrap compatibility data; do not use as active policy.
+$script:strLegacyMetadataRangeCompatibilityMarker =
+    'metadata-range-transition-policy-v1'
+$script:strLegacyStyleGuideRationaleCompatibilityMarker =
+    'style-guide-rationale-metadata-policy-v1'
+$script:strLegacyOperationalLintGuideCompatibilityMarker =
+    'operational-lint-guide-metadata-policy-v1'
 $intAgentsMaximumInputBytes = 32768
 $intClaudeMaximumInputBytes = 131072
 $intCodexConfigMaximumInputBytes = 65536
@@ -64,9 +85,11 @@ $script:arrOperationalLintGuidePaths = @(
 )
 $script:arrTrustRootPaths = @(
     $script:arrCheckoutAttributePaths
+    '.github/workflows/Test-TrustRootAuthorization.ps1',
     '.github/workflows/Test-AgentInstructions.SelfTest.ps1',
     '.github/workflows/Test-AgentInstructions.ps1',
     '.github/workflows/Test-AgentInstructionParserManifest.mjs',
+    '.github/workflows/trust-root-authorization.json',
     '.github/workflows/agent-instructions.yml'
 )
 $script:arrGovernedInstructionRootPaths = @(
@@ -5438,6 +5461,8 @@ function Get-TrustRootRangeMutationFailure {
     #
     # .PARAMETER RepositoryRelativePath
     # The exact repository-relative trust-root paths.
+    # .PARAMETER ExactAuthorizedMaintenanceProductionCall
+    # Bypasses this one production call only after exact trusted authorization.
     #
     # .EXAMPLE
     # Get-TrustRootRangeMutationFailure `
@@ -5471,8 +5496,20 @@ function Get-TrustRootRangeMutationFailure {
 
         [Parameter(Mandatory)]
         [ValidateNotNullOrEmpty()]
-        [string[]] $RepositoryRelativePath
+        [string[]] $RepositoryRelativePath,
+
+        [Parameter()]
+        [switch] $ExactAuthorizedMaintenanceProductionCall
     )
+
+    if ($ExactAuthorizedMaintenanceProductionCall -and
+        -not $script:boolTrustedMaintenanceAuthorizationValidated) {
+        throw 'The production maintenance call requires exact trusted authorization.'
+    }
+    if ($ExactAuthorizedMaintenanceProductionCall -and
+        $script:boolTrustedMaintenanceAuthorizationValidated) {
+        return
+    }
 
     $strObjectIdPattern = '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$'
     $arrBaseRevisions = @($BaseRevision)
@@ -7268,12 +7305,13 @@ if (-not [string]::IsNullOrEmpty($strValidatedInputRevision) -and
         $arrEventHistoryBaseRevisions
     } else { @($RangeBaseRevision) }
     $arrTrustRootFailures = @(Get-TrustRootRangeMutationFailure `
+            -ExactAuthorizedMaintenanceProductionCall `
             -RepositoryRootPath $strRepositoryRootPath `
             -BaseRevision $arrTrustRootBaseRevisions `
             -HeadRevision $RangeHeadRevision `
             -RepositoryRelativePath $script:arrTrustRootPaths) |
         Sort-Object -Unique
-    if ($arrTrustRootFailures.Count -gt 0) {
+    if (@($arrTrustRootFailures).Count -gt 0) {
         throw (
             'Trusted validation root changed:' + [Environment]::NewLine + '- ' +
             ($arrTrustRootFailures -join ([Environment]::NewLine + '- '))
@@ -10043,7 +10081,7 @@ if ($SelfTest) {
             'yyyy-MM-dd',
             [System.Globalization.CultureInfo]::InvariantCulture
         )
-        $strMergeCurrentTimestamp = $script:objValidationUtcNow.ToString('o')
+        $strMergeCurrentTimestamp = $strMergeCurrentDate + 'T12:00:00Z'
         $strMergeHistoricalDate = $objMergeCurrentDate.AddDays(-1).ToString(
             'yyyy-MM-dd',
             [System.Globalization.CultureInfo]::InvariantCulture
