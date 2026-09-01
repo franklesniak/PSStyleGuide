@@ -164,8 +164,10 @@ jobs:
 
           raw_refs="$(mktemp)"
           raw_refs_after="$(mktemp)"
+          sorted_refs="$(mktemp)"
           evidence_rows="$(mktemp)"
-          trap 'rm -f "${raw_refs}" "${raw_refs_after}" "${evidence_rows}"' EXIT
+          trap 'rm -f "${raw_refs}" "${raw_refs_after}" \
+            "${sorted_refs}" "${evidence_rows}"' EXIT
           authorization="$(printf 'x-access-token:%s' "${GITHUB_TOKEN}" |
             base64 -w 0)"
           set +e
@@ -183,7 +185,41 @@ jobs:
           fi
           test "${pipeline_status[0]}" -eq 0
 
-          mapfile -t remote_rows < <(sort "${raw_refs}")
+          if ! node -e '
+            const fs = require("fs");
+            const { TextDecoder } = require("util");
+            const decoder = new TextDecoder("utf-8", { fatal: true });
+            const text = decoder.decode(fs.readFileSync(process.argv[1]));
+            if (text.includes("\r") ||
+                (text.length > 0 && !text.endsWith("\n"))) {
+              throw new Error("Remote ref evidence has invalid line endings.");
+            }
+            const rows = text.length === 0 ? [] :
+              text.slice(0, -1).split("\n");
+            const seenRefs = new Set();
+            const parsed = rows.map((row) => {
+              const fields = row.split("\t");
+              if (fields.length !== 2 ||
+                  !/^[0-9a-f]{40}$/.test(fields[0]) ||
+                  !/^refs\/(heads|tags)\/.+/.test(fields[1]) ||
+                  seenRefs.has(fields[1])) {
+                throw new Error("Remote ref evidence is malformed or duplicate.");
+              }
+              seenRefs.add(fields[1]);
+              return { object: fields[0], ref: fields[1], row };
+            });
+            const compareOrdinal = (left, right) =>
+              left < right ? -1 : left > right ? 1 : 0;
+            parsed.sort((left, right) =>
+              compareOrdinal(left.ref, right.ref));
+            fs.writeFileSync(process.argv[2],
+              parsed.map((entry) => entry.row).join("\n") +
+              (parsed.length > 0 ? "\n" : ""), "utf8");
+          ' "${raw_refs}" "${sorted_refs}"; then
+            echo 'Remote ref evidence parsing or ordinal sorting failed.' >&2
+            exit 1
+          fi
+          mapfile -t remote_rows <"${sorted_refs}"
           if test "${#remote_rows[@]}" -gt 257; then
             echo 'Remote ref evidence exceeded 256 other refs.' >&2
             exit 1

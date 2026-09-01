@@ -8981,6 +8981,15 @@ if ($SelfTest) {
                 'refs/remotes/event/pr-head',
                 'id: created-push-boundary',
                 'git ls-remote --refs --heads --tags origin',
+                'sorted_refs="$(mktemp)"',
+                "if ! node -e '",
+                'const { TextDecoder } = require("util");',
+                'new TextDecoder("utf-8", { fatal: true })',
+                'seenRefs.has(fields[1])',
+                'const compareOrdinal = (left, right) =>',
+                'left < right ? -1 : left > right ? 1 : 0;',
+                'mapfile -t remote_rows <"${sorted_refs}"',
+                'Remote ref evidence parsing or ordinal sorting failed.',
                 'refs/remotes/event/created-other-%04d',
                 'cmp --silent "${raw_refs}" "${raw_refs_after}"',
                 'AGENT_INSTRUCTION_DESTINATION_REF:',
@@ -9022,6 +9031,14 @@ if ($SelfTest) {
         if ($Content -cmatch '(?m)(^|\s)--force(\s|$)' -or
             $Content -cmatch '"\+[^" ]+:') {
             $listFailures.Add('Event-data fetches must not force a destination ref.')
+        }
+        if ($Content.Contains(
+                'mapfile -t remote_rows < <(sort "${raw_refs}")',
+                [StringComparison]::Ordinal
+            )) {
+            $listFailures.Add(
+                'Remote ref evidence must be parsed and sorted by ordinal ref name.'
+            )
         }
         foreach ($strForbiddenTransitionLiteral in @(
                 'PR_PREVIOUS_HEAD_SHA', 'refs/remotes/event/pr-previous-head',
@@ -9093,6 +9110,35 @@ if ($SelfTest) {
             'Agent workflow contract failed: ' +
             ($arrAgentWorkflowFailures -join '; ')
         )
+    }
+    $arrShaFirstConflictRows = [object[]] @(
+        [pscustomobject]@{
+            Object = '0000000000000000000000000000000000000001'
+            Ref = 'refs/heads/z-sha-first'
+        },
+        [pscustomobject]@{
+            Object = 'ffffffffffffffffffffffffffffffffffffffff'
+            Ref = 'refs/heads/a-name-first'
+        }
+    )
+    $arrShaSortedConflictRows = @(
+        $arrShaFirstConflictRows | Sort-Object -Property Object
+    )
+    $arrOrdinalSortedConflictRows = [object[]] @($arrShaFirstConflictRows)
+    [Array]::Sort(
+        $arrOrdinalSortedConflictRows,
+        [Comparison[object]] {
+            param($objLeft, $objRight)
+            return [string]::CompareOrdinal(
+                [string] $objLeft.Ref,
+                [string] $objRight.Ref
+            )
+        }
+    )
+    if ($arrShaSortedConflictRows[0].Ref -cne 'refs/heads/z-sha-first' -or
+        $arrOrdinalSortedConflictRows[0].Ref -cne 'refs/heads/a-name-first' -or
+        $arrOrdinalSortedConflictRows[1].Ref -cne 'refs/heads/z-sha-first') {
+        throw 'The SHA-first versus ordinal-ref adversarial fixture did not pass.'
     }
     $arrWorkflowMutations = @(
         [pscustomobject]@{
@@ -9174,6 +9220,39 @@ if ($SelfTest) {
                 'toJson(github.event.size)'
             )
             Expected = 'Workflow contract literal is missing: toJson(github.event.commits)'
+        },
+        [pscustomobject]@{
+            Name = 'restored SHA-first whole-row sort'
+            Content = $strAgentWorkflowContent.Replace(
+                'mapfile -t remote_rows <"${sorted_refs}"',
+                'mapfile -t remote_rows < <(sort "${raw_refs}")'
+            )
+            Expected =
+                'Remote ref evidence must be parsed and sorted by ordinal ref name.'
+        },
+        [pscustomobject]@{
+            Name = 'non-ordinal ref comparator'
+            Content = $strAgentWorkflowContent.Replace(
+                'left < right ? -1 : left > right ? 1 : 0;',
+                'left.localeCompare(right);'
+            )
+            Expected = 'Workflow contract literal is missing: left < right'
+        },
+        [pscustomobject]@{
+            Name = 'missing duplicate ref rejection'
+            Content = $strAgentWorkflowContent.Replace(
+                'seenRefs.has(fields[1])',
+                'false'
+            )
+            Expected = 'Workflow contract literal is missing: seenRefs.has(fields[1])'
+        },
+        [pscustomobject]@{
+            Name = 'fail-open ref sorter invocation'
+            Content = $strAgentWorkflowContent.Replace(
+                "if ! node -e '",
+                "if node -e '"
+            )
+            Expected = "Workflow contract literal is missing: if ! node -e '"
         }
     )
     foreach ($objWorkflowMutation in $arrWorkflowMutations) {
