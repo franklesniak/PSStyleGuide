@@ -56,7 +56,8 @@ function ConvertTo-CreatedPushCommitEvidenceObject {
     [OutputType([pscustomobject])]
     param(
         [Parameter(Mandatory)][string] $Id,
-        [Parameter(Mandatory)][bool] $Distinct
+        [Parameter(Mandatory)][bool] $Distinct,
+        [string] $Timestamp = ''
     )
 
     return [pscustomobject]@{
@@ -64,7 +65,7 @@ function ConvertTo-CreatedPushCommitEvidenceObject {
         tree_id = $Id
         distinct = $Distinct
         message = ''
-        timestamp = ''
+        timestamp = $Timestamp
         url = ''
         author = [pscustomobject]@{
             name = ''
@@ -274,6 +275,22 @@ try {
             -EventHeadRevision $strOneCommit `
             -EventHeadDistinct 'true').Count -ne 1) {
         throw 'The Actions-shaped commit fixture was not accepted.'
+    }
+    foreach ($strTimestampFixture in @(
+            '2026-09-01T13:41:43-05:00',
+            '2026-09-01T18:41:43Z',
+            '2026-09-01T13:41:43'
+        )) {
+        $strTimestampPayload = ConvertTo-Json -Depth 4 -Compress -InputObject `
+            ([object[]] @((ConvertTo-CreatedPushCommitEvidenceObject `
+                        -Id $strOneCommit -Distinct $true `
+                        -Timestamp $strTimestampFixture)))
+        if (@(Read-CreatedPushCommitEvidence `
+                -PushCommitEvidenceJson $strTimestampPayload `
+                -EventHeadRevision $strOneCommit `
+                -EventHeadDistinct 'true').Count -ne 1) {
+            throw "The '$strTimestampFixture' timestamp fixture was not accepted."
+        }
     }
     $objForwardCompatibleCommit = ConvertFrom-Json -InputObject (
         ConvertTo-Json -Depth 4 -Compress -InputObject $objOnePayloadCommit
@@ -503,6 +520,18 @@ try {
         -Id ('g' * 40) -Distinct $true
     $objNotDistinctHeadCommit = ConvertTo-CreatedPushCommitEvidenceObject `
         -Id $strOneCommit -Distinct $false
+    $strMalformedTimestampPayload = $strOnePayload.Replace(
+        '"timestamp":""',
+        '"timestamp":0'
+    )
+    $strDuplicatePropertyPayload = $strOnePayload.Replace(
+        '"id":"' + $strOneCommit + '"',
+        '"id":"' + $strOneCommit + '","id":"' + $strOneCommit + '"'
+    )
+    $strMissingPropertyPayload = $strOnePayload.Replace(
+        '"timestamp":"","url"',
+        '"url"'
+    )
     $arrEvidenceParserRejections = @(
         [pscustomobject]@{
             Name = 'malformed JSON'
@@ -514,6 +543,27 @@ try {
         [pscustomobject]@{
             Name = 'malformed commit object'
             Json = '[{}]'
+            Head = $strOneCommit
+            Distinct = 'true'
+            Expected = 'invalid object shape'
+        },
+        [pscustomobject]@{
+            Name = 'malformed timestamp token'
+            Json = $strMalformedTimestampPayload
+            Head = $strOneCommit
+            Distinct = 'true'
+            Expected = 'invalid identity or scalar'
+        },
+        [pscustomobject]@{
+            Name = 'duplicate raw property'
+            Json = $strDuplicatePropertyPayload
+            Head = $strOneCommit
+            Distinct = 'true'
+            Expected = 'duplicate property'
+        },
+        [pscustomobject]@{
+            Name = 'missing required property'
+            Json = $strMissingPropertyPayload
             Head = $strOneCommit
             Distinct = 'true'
             Expected = 'invalid object shape'

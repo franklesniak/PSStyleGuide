@@ -3685,87 +3685,143 @@ function Read-CreatedPushCommitEvidence {
         $intPushCommitEvidenceMaximumBytes) {
         throw "The created-push commit evidence exceeds $intPushCommitEvidenceMaximumBytes bytes."
     }
+    $objJsonOptions = [Text.Json.JsonDocumentOptions]::new()
+    $objJsonOptions.AllowTrailingCommas = $false
+    $objJsonOptions.CommentHandling = [Text.Json.JsonCommentHandling]::Disallow
+    $objJsonOptions.MaxDepth = 8
     try {
-        $objCommitEvidence = ConvertFrom-Json `
-            -InputObject $PushCommitEvidenceJson -NoEnumerate
-        if ($objCommitEvidence -isnot [System.Array]) {
-            throw 'Commit evidence is not an array.'
-        }
-        $arrCommitEvidence = @($objCommitEvidence)
+        $objCommitEvidenceDocument = [Text.Json.JsonDocument]::Parse(
+            $PushCommitEvidenceJson,
+            $objJsonOptions
+        )
     }
     catch {
         throw 'The created-push commit evidence is malformed.'
     }
-    if ($arrCommitEvidence.Count -ge $intMaximumPayloadCommitCount) {
-        throw (
-            'The created-push commit evidence reaches the documented ' +
-            "$intMaximumPayloadCommitCount-object truncation cap."
-        )
-    }
-
-    $strObjectIdPattern = '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$'
-    $strZeroObjectIdPattern = '^(?:0{40}|0{64})$'
-    $arrRequiredCommitProperties = @(
-        'author', 'committer', 'distinct', 'id', 'message', 'timestamp',
-        'tree_id', 'url'
-    )
-    $arrExpectedIdentityProperties = @('email', 'name', 'username')
-    $setCommitIds = [Collections.Generic.HashSet[string]]::new(
-        [StringComparer]::OrdinalIgnoreCase
-    )
-    $listNormalized = [Collections.Generic.List[pscustomobject]]::new()
-    foreach ($objCommit in $arrCommitEvidence) {
-        if ($null -eq $objCommit -or $objCommit -isnot [pscustomobject]) {
-            throw 'The created-push commit evidence has an invalid object shape.'
+    try {
+        $objCommitEvidenceRoot = $objCommitEvidenceDocument.RootElement
+        if ($objCommitEvidenceRoot.ValueKind -ne
+            [Text.Json.JsonValueKind]::Array) {
+            throw 'The created-push commit evidence is not an array.'
         }
-        $arrCommitPropertyNames = @(
-            $objCommit.PSObject.Properties | ForEach-Object Name
+        $intCommitEvidenceCount = $objCommitEvidenceRoot.GetArrayLength()
+        if ($intCommitEvidenceCount -ge $intMaximumPayloadCommitCount) {
+            throw (
+                'The created-push commit evidence reaches the documented ' +
+                "$intMaximumPayloadCommitCount-object truncation cap."
+            )
+        }
+
+        $strObjectIdPattern = '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$'
+        $strZeroObjectIdPattern = '^(?:0{40}|0{64})$'
+        $arrRequiredCommitProperties = @(
+            'author', 'committer', 'distinct', 'id', 'message', 'timestamp',
+            'tree_id', 'url'
         )
-        foreach ($strRequiredCommitProperty in $arrRequiredCommitProperties) {
-            if ($arrCommitPropertyNames -cnotcontains $strRequiredCommitProperty) {
+        $arrExpectedIdentityProperties = @('email', 'name', 'username')
+        $setCommitIds = [Collections.Generic.HashSet[string]]::new(
+            [StringComparer]::OrdinalIgnoreCase
+        )
+        $listNormalized = [Collections.Generic.List[pscustomobject]]::new()
+        foreach ($objCommitElement in $objCommitEvidenceRoot.EnumerateArray()) {
+            if ($objCommitElement.ValueKind -ne
+                [Text.Json.JsonValueKind]::Object) {
                 throw 'The created-push commit evidence has an invalid object shape.'
             }
-        }
-        if ($objCommit.id -isnot [string] -or
-            $objCommit.id -notmatch $strObjectIdPattern -or
-            $objCommit.id -match $strZeroObjectIdPattern -or
-            -not $setCommitIds.Add($objCommit.id) -or
-            $objCommit.tree_id -isnot [string] -or
-            $objCommit.tree_id -notmatch $strObjectIdPattern -or
-            $objCommit.tree_id -match $strZeroObjectIdPattern -or
-            $objCommit.distinct -isnot [bool] -or
-            $objCommit.message -isnot [string] -or
-            $objCommit.timestamp -isnot [string] -or
-            $objCommit.url -isnot [string]) {
-            throw 'The created-push commit evidence has an invalid identity or scalar.'
-        }
-        foreach ($strIdentityName in @('author', 'committer')) {
-            $objIdentity = $objCommit.$strIdentityName
-            if ($null -eq $objIdentity -or $objIdentity -isnot [pscustomobject]) {
-                throw 'The created-push commit evidence has an invalid author or committer.'
+            $mapCommitProperties =
+                [Collections.Generic.Dictionary[string, Text.Json.JsonElement]]::new(
+                    [StringComparer]::Ordinal
+                )
+            foreach ($objCommitProperty in $objCommitElement.EnumerateObject()) {
+                if (-not $mapCommitProperties.TryAdd(
+                        $objCommitProperty.Name,
+                        $objCommitProperty.Value
+                    )) {
+                    throw 'The created-push commit evidence has a duplicate property.'
+                }
             }
-            $arrIdentityPropertyNames = @(
-                $objIdentity.PSObject.Properties | ForEach-Object Name
-            )
-            foreach ($strExpectedIdentityProperty in $arrExpectedIdentityProperties) {
-                if ($arrIdentityPropertyNames -cnotcontains $strExpectedIdentityProperty) {
+            foreach ($strRequiredCommitProperty in $arrRequiredCommitProperties) {
+                if (-not $mapCommitProperties.ContainsKey(
+                        $strRequiredCommitProperty
+                    )) {
+                    throw 'The created-push commit evidence has an invalid object shape.'
+                }
+            }
+            if ($mapCommitProperties['id'].ValueKind -ne
+                [Text.Json.JsonValueKind]::String -or
+                $mapCommitProperties['tree_id'].ValueKind -ne
+                [Text.Json.JsonValueKind]::String -or
+                $mapCommitProperties['distinct'].ValueKind -notin @(
+                    [Text.Json.JsonValueKind]::True,
+                    [Text.Json.JsonValueKind]::False
+                ) -or
+                $mapCommitProperties['message'].ValueKind -ne
+                [Text.Json.JsonValueKind]::String -or
+                $mapCommitProperties['timestamp'].ValueKind -ne
+                [Text.Json.JsonValueKind]::String -or
+                $mapCommitProperties['url'].ValueKind -ne
+                [Text.Json.JsonValueKind]::String) {
+                throw 'The created-push commit evidence has an invalid identity or scalar.'
+            }
+            $strCommitId = $mapCommitProperties['id'].GetString()
+            $strCommitTreeId = $mapCommitProperties['tree_id'].GetString()
+            if ($strCommitId -notmatch $strObjectIdPattern -or
+                $strCommitId -match $strZeroObjectIdPattern -or
+                -not $setCommitIds.Add($strCommitId) -or
+                $strCommitTreeId -notmatch $strObjectIdPattern -or
+                $strCommitTreeId -match $strZeroObjectIdPattern) {
+                throw 'The created-push commit evidence has an invalid identity or scalar.'
+            }
+            foreach ($strIdentityName in @('author', 'committer')) {
+                $objIdentityElement = $mapCommitProperties[$strIdentityName]
+                if ($objIdentityElement.ValueKind -ne
+                    [Text.Json.JsonValueKind]::Object) {
+                    throw 'The created-push commit evidence has an invalid author or committer.'
+                }
+                $mapIdentityProperties =
+                    [Collections.Generic.Dictionary[string, Text.Json.JsonElement]]::new(
+                        [StringComparer]::Ordinal
+                    )
+                foreach ($objIdentityProperty in
+                    $objIdentityElement.EnumerateObject()) {
+                    if (-not $mapIdentityProperties.TryAdd(
+                            $objIdentityProperty.Name,
+                            $objIdentityProperty.Value
+                        )) {
+                        throw 'The created-push commit evidence has a duplicate property.'
+                    }
+                }
+                foreach ($strExpectedIdentityProperty in
+                    $arrExpectedIdentityProperties) {
+                    if (-not $mapIdentityProperties.ContainsKey(
+                            $strExpectedIdentityProperty
+                        )) {
+                        throw 'The created-push commit evidence has an invalid author or committer.'
+                    }
+                }
+                if ($mapIdentityProperties['name'].ValueKind -ne
+                    [Text.Json.JsonValueKind]::String -or
+                    $mapIdentityProperties['email'].ValueKind -ne
+                    [Text.Json.JsonValueKind]::String -or
+                    $mapIdentityProperties['username'].ValueKind -notin @(
+                        [Text.Json.JsonValueKind]::String,
+                        [Text.Json.JsonValueKind]::Null
+                    )) {
                     throw 'The created-push commit evidence has an invalid author or committer.'
                 }
             }
-            if ($objIdentity.name -isnot [string] -or
-                $objIdentity.email -isnot [string] -or
-                ($null -ne $objIdentity.username -and
-                    $objIdentity.username -isnot [string])) {
-                throw 'The created-push commit evidence has an invalid author or committer.'
-            }
+            $listNormalized.Add([pscustomobject]@{
+                    Id = $strCommitId
+                    Distinct = $mapCommitProperties['distinct'].ValueKind -eq
+                    [Text.Json.JsonValueKind]::True
+                })
         }
-        $listNormalized.Add([pscustomobject]@{
-                Id = $objCommit.id
-                Distinct = $objCommit.distinct
-            })
+        $arrNormalized = @($listNormalized.ToArray())
+    }
+    finally {
+        $objCommitEvidenceDocument.Dispose()
     }
 
-    $arrNormalized = @($listNormalized.ToArray())
     if ($arrNormalized.Count -eq 0) {
         if ($EventHeadDistinct -ceq 'true') {
             throw 'The created-push commit evidence omits the distinct event head.'
