@@ -401,15 +401,9 @@ jobs:
           AGENT_INSTRUCTION_EVENT_HEAD_DISTINCT: >-
             ${{ github.event_name == 'push' && github.event.created &&
               toJson(github.event.head_commit.distinct) || '' }}
-          AGENT_INSTRUCTION_PUSH_COMMIT_COUNT: >-
-            ${{ github.event_name == 'push' && github.event.created &&
-              toJson(github.event.size) || '' }}
-          AGENT_INSTRUCTION_PUSH_DISTINCT_COMMIT_COUNT: >-
-            ${{ github.event_name == 'push' && github.event.created &&
-              toJson(github.event.distinct_size) || '' }}
           AGENT_INSTRUCTION_PUSH_COMMIT_EVIDENCE: >-
             ${{ github.event_name == 'push' && github.event.created &&
-              toJson(github.event.commits.*.id) || '' }}
+              toJson(github.event.commits) || '' }}
           AGENT_INSTRUCTION_OTHER_REF_EVIDENCE: >-
             ${{ steps.created-push-boundary.outputs.other_ref_evidence || '' }}
         run: >-
@@ -432,9 +426,6 @@ jobs:
           -DestinationRef $env:AGENT_INSTRUCTION_DESTINATION_REF
           -EventHeadRevision $env:AGENT_INSTRUCTION_EVENT_HEAD_REVISION
           -EventHeadDistinct $env:AGENT_INSTRUCTION_EVENT_HEAD_DISTINCT
-          -PushCommitCount $env:AGENT_INSTRUCTION_PUSH_COMMIT_COUNT
-          -PushDistinctCommitCount `
-          $env:AGENT_INSTRUCTION_PUSH_DISTINCT_COMMIT_COUNT
           -PushCommitEvidenceJson `
           $env:AGENT_INSTRUCTION_PUSH_COMMIT_EVIDENCE
           -OtherRefEvidenceJson `

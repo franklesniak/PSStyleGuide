@@ -51,6 +51,34 @@ if ($arrDeclaredOutputTypes.Count -ne 1 -or
 }
 $script:strMaximumMetadataUtcDate = $MaximumMetadataUtcDate
 
+function ConvertTo-CreatedPushCommitEvidenceObject {
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory)][string] $Id,
+        [Parameter(Mandatory)][bool] $Distinct
+    )
+
+    return [pscustomobject]@{
+        id = $Id
+        tree_id = $Id
+        distinct = $Distinct
+        message = ''
+        timestamp = ''
+        url = ''
+        author = [pscustomobject]@{
+            name = ''
+            email = ''
+            username = $null
+        }
+        committer = [pscustomobject]@{
+            name = ''
+            email = ''
+            username = $null
+        }
+    }
+}
+
 $strBaseline = @(
     '# Endpoint fixture'
     '**Version:** 1.0.20260830.0'
@@ -205,8 +233,7 @@ try {
         -RepositoryRootPath $strTopologyRoot `
         -DestinationRef 'refs/heads/new-zero' `
         -HeadRevision $strRootCommit -EventHeadRevision $strRootCommit `
-        -EventHeadDistinct 'false' -PushCommitCount '0' `
-        -PushDistinctCommitCount '0' -PushCommitEvidenceJson '[]' `
+        -EventHeadDistinct 'false' -PushCommitEvidenceJson '[]' `
         -OtherRefEvidenceJson $strRootEvidence
     if (@($objZeroContext.IntroducedCommitRevisions).Count -ne 0 -or
         @($objZeroContext.BoundaryRevisions).Count -ne 0 -or
@@ -227,14 +254,45 @@ try {
     & git -C $strTopologyRoot add -- one.txt
     & git -C $strTopologyRoot commit --quiet -m one
     $strOneCommit = ([string] (& git -C $strTopologyRoot rev-parse HEAD)).Trim()
-    $strOnePayload = ConvertTo-Json -Compress -InputObject `
-        ([object[]] @($strOneCommit))
+    $objOnePayloadCommit = ConvertTo-CreatedPushCommitEvidenceObject `
+        -Id $strOneCommit -Distinct $true
+    $strOnePayload = ConvertTo-Json -Depth 4 -Compress -InputObject `
+        ([object[]] @($objOnePayloadCommit))
+    $arrLiveShapeProperties = @($objOnePayloadCommit.PSObject.Properties.Name)
+    if ($arrLiveShapeProperties.Count -ne 8 -or
+        @(@('id', 'tree_id', 'distinct', 'message', 'timestamp', 'url',
+                'author', 'committer') | Where-Object {
+                $arrLiveShapeProperties -cnotcontains $_
+            }).Count -ne 0 -or
+        @(@('added', 'removed', 'modified') | Where-Object {
+                $arrLiveShapeProperties -ccontains $_
+            }).Count -ne 0) {
+        throw 'The Actions-shaped commit fixture has an invalid property inventory.'
+    }
+    if (@(Read-CreatedPushCommitEvidence `
+            -PushCommitEvidenceJson $strOnePayload `
+            -EventHeadRevision $strOneCommit `
+            -EventHeadDistinct 'true').Count -ne 1) {
+        throw 'The Actions-shaped commit fixture was not accepted.'
+    }
+    $objForwardCompatibleCommit = ConvertFrom-Json -InputObject (
+        ConvertTo-Json -Depth 4 -Compress -InputObject $objOnePayloadCommit
+    )
+    $objForwardCompatibleCommit | Add-Member -NotePropertyName future_field `
+        -NotePropertyValue 'bounded and ignored'
+    $strForwardCompatiblePayload = ConvertTo-Json -Depth 4 -Compress `
+        -InputObject ([object[]] @($objForwardCompatibleCommit))
+    if (@(Read-CreatedPushCommitEvidence `
+            -PushCommitEvidenceJson $strForwardCompatiblePayload `
+            -EventHeadRevision $strOneCommit `
+            -EventHeadDistinct 'true').Count -ne 1) {
+        throw 'A bounded extra inert commit field was not ignored deliberately.'
+    }
     $objOneContext = Get-CreatedRefBoundaryContext `
         -RepositoryRootPath $strTopologyRoot `
         -DestinationRef 'refs/heads/new-one' `
         -HeadRevision $strOneCommit -EventHeadRevision $strOneCommit `
-        -EventHeadDistinct 'true' -PushCommitCount '1' `
-        -PushDistinctCommitCount '1' -PushCommitEvidenceJson $strOnePayload `
+        -EventHeadDistinct 'true' -PushCommitEvidenceJson $strOnePayload `
         -OtherRefEvidenceJson $strRootEvidence
     $arrOnePaths = @(Read-GitPublishedEndpointChangedPath `
             -RepositoryRootPath $strTopologyRoot `
@@ -259,14 +317,15 @@ try {
     & git -C $strTopologyRoot add -- two.txt
     & git -C $strTopologyRoot commit --quiet -m two
     $strTwoCommit = ([string] (& git -C $strTopologyRoot rev-parse HEAD)).Trim()
-    $strManyPayload = ConvertTo-Json -Compress -InputObject `
-        ([object[]] @($strOneCommit, $strTwoCommit))
+    $objTwoPayloadCommit = ConvertTo-CreatedPushCommitEvidenceObject `
+        -Id $strTwoCommit -Distinct $true
+    $strManyPayload = ConvertTo-Json -Depth 4 -Compress -InputObject `
+        ([object[]] @($objOnePayloadCommit, $objTwoPayloadCommit))
     $objManyContext = Get-CreatedRefBoundaryContext `
         -RepositoryRootPath $strTopologyRoot `
         -DestinationRef 'refs/heads/new-many' `
         -HeadRevision $strTwoCommit -EventHeadRevision $strTwoCommit `
-        -EventHeadDistinct 'true' -PushCommitCount '2' `
-        -PushDistinctCommitCount '2' -PushCommitEvidenceJson $strManyPayload `
+        -EventHeadDistinct 'true' -PushCommitEvidenceJson $strManyPayload `
         -OtherRefEvidenceJson $strRootEvidence
     $arrManyPaths = @(Read-GitPublishedEndpointChangedPath `
             -RepositoryRootPath $strTopologyRoot `
@@ -318,14 +377,14 @@ try {
         }
     )
     $strMergeEvidence = ConvertTo-Json -Compress -InputObject $arrMergeEvidence
-    $strMergePayload = ConvertTo-Json -Compress -InputObject `
-        ([object[]] @($strMergeCommit))
+    $strMergePayload = ConvertTo-Json -Depth 4 -Compress -InputObject `
+        ([object[]] @((ConvertTo-CreatedPushCommitEvidenceObject `
+                    -Id $strMergeCommit -Distinct $true)))
     $objMergeContext = Get-CreatedRefBoundaryContext `
         -RepositoryRootPath $strTopologyRoot `
         -DestinationRef 'refs/heads/new-merge' `
         -HeadRevision $strMergeCommit -EventHeadRevision $strMergeCommit `
-        -EventHeadDistinct 'true' -PushCommitCount '1' `
-        -PushDistinctCommitCount '1' -PushCommitEvidenceJson $strMergePayload `
+        -EventHeadDistinct 'true' -PushCommitEvidenceJson $strMergePayload `
         -OtherRefEvidenceJson $strMergeEvidence
     $arrMergePaths = @(Read-GitPublishedEndpointChangedPath `
             -RepositoryRootPath $strTopologyRoot `
@@ -341,14 +400,14 @@ try {
         throw 'The merge created-ref fixture lost a parent boundary.'
     }
 
-    $strRootPayload = ConvertTo-Json -Compress -InputObject `
-        ([object[]] @($strRootCommit))
+    $strRootPayload = ConvertTo-Json -Depth 4 -Compress -InputObject `
+        ([object[]] @((ConvertTo-CreatedPushCommitEvidenceObject `
+                    -Id $strRootCommit -Distinct $true)))
     $objGenuineRootContext = Get-CreatedRefBoundaryContext `
         -RepositoryRootPath $strTopologyRoot `
         -DestinationRef 'refs/heads/new-root' `
         -HeadRevision $strRootCommit -EventHeadRevision $strRootCommit `
-        -EventHeadDistinct 'true' -PushCommitCount '1' `
-        -PushDistinctCommitCount '1' -PushCommitEvidenceJson $strRootPayload `
+        -EventHeadDistinct 'true' -PushCommitEvidenceJson $strRootPayload `
         -OtherRefEvidenceJson '[]'
     $arrGenuineRootPaths = @(Read-GitPublishedEndpointChangedPath `
             -RepositoryRootPath $strTopologyRoot `
@@ -363,6 +422,8 @@ try {
         throw 'The genuine-root created-ref fixture did not use the final tree.'
     }
 
+    $strTwoOnlyPayload = ConvertTo-Json -Depth 4 -Compress -InputObject `
+        ([object[]] @($objTwoPayloadCommit))
     foreach ($objRejectedFixture in @(
             [pscustomobject]@{
                 Name = 'event head mismatch'
@@ -370,21 +431,17 @@ try {
                 Arguments = @{
                     HeadRevision = $strOneCommit
                     EventHeadRevision = $strRootCommit
-                    PushCommitCount = '1'
-                    PushDistinctCommitCount = '1'
                     PushCommitEvidenceJson = $strOnePayload
                     OtherRefEvidenceJson = $strRootEvidence
                 }
             },
             [pscustomobject]@{
-                Name = 'truncated payload'
-                Expected = 'commit array is truncated'
+                Name = 'graph mismatch'
+                Expected = 'distinct commit set contradicts'
                 Arguments = @{
                     HeadRevision = $strTwoCommit
                     EventHeadRevision = $strTwoCommit
-                    PushCommitCount = '2'
-                    PushDistinctCommitCount = '2'
-                    PushCommitEvidenceJson = $strOnePayload
+                    PushCommitEvidenceJson = $strTwoOnlyPayload
                     OtherRefEvidenceJson = $strRootEvidence
                 }
             },
@@ -394,8 +451,6 @@ try {
                 Arguments = @{
                     HeadRevision = $strOneCommit
                     EventHeadRevision = $strOneCommit
-                    PushCommitCount = '1'
-                    PushDistinctCommitCount = '1'
                     PushCommitEvidenceJson = $strOnePayload
                     OtherRefEvidenceJson = $strRootEvidence
                 }
@@ -417,8 +472,6 @@ try {
                 -HeadRevision $objArguments.HeadRevision `
                 -EventHeadRevision $objArguments.EventHeadRevision `
                 -EventHeadDistinct 'true' `
-                -PushCommitCount $objArguments.PushCommitCount `
-                -PushDistinctCommitCount $objArguments.PushDistinctCommitCount `
                 -PushCommitEvidenceJson $objArguments.PushCommitEvidenceJson `
                 -OtherRefEvidenceJson $objArguments.OtherRefEvidenceJson
             throw "Rejected created-ref fixture passed: $($objRejectedFixture.Name)"
@@ -437,6 +490,144 @@ try {
                 )) {
                 throw "Created-ref rejection '$($objRejectedFixture.Name)' returned: $strRejectedMessage"
             }
+        }
+    }
+
+    $objBoundaryCommand = Get-Command Get-CreatedRefBoundaryContext
+    if ($objBoundaryCommand.Parameters.ContainsKey('PushCommitCount') -or
+        $objBoundaryCommand.Parameters.ContainsKey('PushDistinctCommitCount')) {
+        throw 'Created-ref validation still requires undocumented push count fields.'
+    }
+
+    $objInvalidIdCommit = ConvertTo-CreatedPushCommitEvidenceObject `
+        -Id ('g' * 40) -Distinct $true
+    $objNotDistinctHeadCommit = ConvertTo-CreatedPushCommitEvidenceObject `
+        -Id $strOneCommit -Distinct $false
+    $arrEvidenceParserRejections = @(
+        [pscustomobject]@{
+            Name = 'malformed JSON'
+            Json = '{'
+            Head = $strOneCommit
+            Distinct = 'true'
+            Expected = 'malformed'
+        },
+        [pscustomobject]@{
+            Name = 'malformed commit object'
+            Json = '[{}]'
+            Head = $strOneCommit
+            Distinct = 'true'
+            Expected = 'invalid object shape'
+        },
+        [pscustomobject]@{
+            Name = 'invalid commit ID'
+            Json = ConvertTo-Json -Depth 4 -Compress -InputObject `
+                ([object[]] @($objInvalidIdCommit))
+            Head = $strOneCommit
+            Distinct = 'true'
+            Expected = 'invalid identity or scalar'
+        },
+        [pscustomobject]@{
+            Name = 'duplicate commit ID'
+            Json = ConvertTo-Json -Depth 4 -Compress -InputObject `
+                ([object[]] @($objOnePayloadCommit, $objOnePayloadCommit))
+            Head = $strOneCommit
+            Distinct = 'true'
+            Expected = 'invalid identity or scalar'
+        },
+        [pscustomobject]@{
+            Name = 'head mismatch'
+            Json = $strOnePayload
+            Head = $strTwoCommit
+            Distinct = 'true'
+            Expected = 'does not end at the event head'
+        },
+        [pscustomobject]@{
+            Name = 'head distinct mismatch'
+            Json = ConvertTo-Json -Depth 4 -Compress -InputObject `
+                ([object[]] @($objNotDistinctHeadCommit))
+            Head = $strOneCommit
+            Distinct = 'true'
+            Expected = 'does not end at the event head'
+        },
+        [pscustomobject]@{
+            Name = 'oversized evidence'
+            Json = '[' + (' ' * $intPushCommitEvidenceMaximumBytes) + ']'
+            Head = $strOneCommit
+            Distinct = 'true'
+            Expected = 'exceeds'
+        }
+    )
+    foreach ($objParserRejection in $arrEvidenceParserRejections) {
+        try {
+            $null = @(
+                Read-CreatedPushCommitEvidence `
+                    -PushCommitEvidenceJson $objParserRejection.Json `
+                    -EventHeadRevision $objParserRejection.Head `
+                    -EventHeadDistinct $objParserRejection.Distinct
+            )
+            throw "Rejected evidence parser fixture passed: $($objParserRejection.Name)"
+        }
+        catch {
+            $strRejectedMessage = $_.Exception.Message
+            if ($strRejectedMessage.StartsWith(
+                    'Rejected evidence parser fixture passed:',
+                    [StringComparison]::Ordinal
+                )) {
+                throw
+            }
+            if (-not $strRejectedMessage.Contains(
+                    $objParserRejection.Expected,
+                    [StringComparison]::OrdinalIgnoreCase
+                )) {
+                throw "Evidence parser rejection '$($objParserRejection.Name)' returned: $strRejectedMessage"
+            }
+        }
+    }
+
+    $arrCapCommitEvidence = [object[]] @(
+        for ($intCommitIndex = 1;
+            $intCommitIndex -le $intMaximumPayloadCommitCount;
+            $intCommitIndex++) {
+            ConvertTo-CreatedPushCommitEvidenceObject `
+                -Id ('{0:x40}' -f $intCommitIndex) -Distinct $false
+        }
+    )
+    $arrBelowCapCommitEvidence = [object[]] @(
+        $arrCapCommitEvidence[0..($intMaximumPayloadCommitCount - 2)]
+    )
+    $strBelowCapCommitEvidence = ConvertTo-Json -Depth 4 -Compress `
+        -InputObject $arrBelowCapCommitEvidence
+    $arrBelowCapNormalized = @(
+        Read-CreatedPushCommitEvidence `
+            -PushCommitEvidenceJson $strBelowCapCommitEvidence `
+            -EventHeadRevision $arrBelowCapCommitEvidence[-1].id `
+            -EventHeadDistinct 'false'
+    )
+    if ($arrBelowCapNormalized.Count -ne
+        ($intMaximumPayloadCommitCount - 1)) {
+        throw 'The 2047-object created-push evidence fixture was not preserved.'
+    }
+    $strAtCapCommitEvidence = ConvertTo-Json -Depth 4 -Compress `
+        -InputObject $arrCapCommitEvidence
+    try {
+        $null = @(
+            Read-CreatedPushCommitEvidence `
+                -PushCommitEvidenceJson $strAtCapCommitEvidence `
+                -EventHeadRevision $arrCapCommitEvidence[-1].id `
+                -EventHeadDistinct 'false'
+        )
+        throw 'The 2048-object created-push evidence fixture passed.'
+    }
+    catch {
+        if ($_.Exception.Message -ceq
+            'The 2048-object created-push evidence fixture passed.') {
+            throw
+        }
+        if (-not $_.Exception.Message.Contains(
+                '2048-object truncation cap',
+                [StringComparison]::Ordinal
+            )) {
+            throw "The 2048-object fixture returned: $($_.Exception.Message)"
         }
     }
 }

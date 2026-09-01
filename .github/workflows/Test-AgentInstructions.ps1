@@ -24,8 +24,6 @@ param(
     [Parameter()][AllowEmptyString()][string] $DestinationRef = '',
     [Parameter()][AllowEmptyString()][string] $EventHeadRevision = '',
     [Parameter()][AllowEmptyString()][string] $EventHeadDistinct = '',
-    [Parameter()][AllowEmptyString()][string] $PushCommitCount = '',
-    [Parameter()][AllowEmptyString()][string] $PushDistinctCommitCount = '',
     [Parameter()][AllowEmptyString()][string] $PushCommitEvidenceJson = '',
     [Parameter()][AllowEmptyString()][string] $OtherRefEvidenceJson = ''
 )
@@ -63,6 +61,7 @@ $intMetadataMaximumBoundaries = 64
 $intMaximumOtherRefCount = 256
 $intMaximumIntroducedCommitCount = 4096
 $intMaximumPayloadCommitCount = 2048
+$intPushCommitEvidenceMaximumBytes = 1048576
 $strPythonPrerequisite =
     'Python 3.12 is required to validate .codex/config.toml. On Windows, ' +
     'install the Python launcher for `py -3.12`; otherwise, expose ' +
@@ -3647,6 +3646,142 @@ function Get-AuthenticatedMergeBaseRevision {
     return @($arrMergeBases)
 }
 
+function Read-CreatedPushCommitEvidence {
+    # .SYNOPSIS
+    # Reads bounded complete commit objects from an authenticated push payload.
+    # .DESCRIPTION
+    # Validates inert webhook data without using it as graph authority. GitHub
+    # documents that the commits array contains at most 2048 objects. A payload
+    # at that cap can be truncated, so this helper rejects 2048 objects and
+    # accepts exact graph corroboration only below the cap.
+    # .PARAMETER PushCommitEvidenceJson
+    # The complete webhook commits array serialized as JSON.
+    # .PARAMETER EventHeadRevision
+    # The expanded head commit from the authenticated push event.
+    # .PARAMETER EventHeadDistinct
+    # The lowercase Boolean distinct value for the event head.
+    # .EXAMPLE
+    # Read-CreatedPushCommitEvidence @hashtableArguments
+    #
+    # # Returns normalized inert commit identities and distinct flags.
+    # .INPUTS
+    # None. No pipeline input.
+    # .OUTPUTS
+    # [System.Management.Automation.PSCustomObject[]] Normalized commit evidence.
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260831.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([pscustomobject[]])]
+    param(
+        [Parameter(Mandatory)][string] $PushCommitEvidenceJson,
+        [Parameter(Mandatory)][string] $EventHeadRevision,
+        [Parameter(Mandatory)][string] $EventHeadDistinct
+    )
+
+    if ([Text.Encoding]::UTF8.GetByteCount($PushCommitEvidenceJson) -gt
+        $intPushCommitEvidenceMaximumBytes) {
+        throw "The created-push commit evidence exceeds $intPushCommitEvidenceMaximumBytes bytes."
+    }
+    try {
+        $objCommitEvidence = ConvertFrom-Json `
+            -InputObject $PushCommitEvidenceJson -NoEnumerate
+        if ($objCommitEvidence -isnot [System.Array]) {
+            throw 'Commit evidence is not an array.'
+        }
+        $arrCommitEvidence = @($objCommitEvidence)
+    }
+    catch {
+        throw 'The created-push commit evidence is malformed.'
+    }
+    if ($arrCommitEvidence.Count -ge $intMaximumPayloadCommitCount) {
+        throw (
+            'The created-push commit evidence reaches the documented ' +
+            "$intMaximumPayloadCommitCount-object truncation cap."
+        )
+    }
+
+    $strObjectIdPattern = '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$'
+    $strZeroObjectIdPattern = '^(?:0{40}|0{64})$'
+    $arrRequiredCommitProperties = @(
+        'author', 'committer', 'distinct', 'id', 'message', 'timestamp',
+        'tree_id', 'url'
+    )
+    $arrExpectedIdentityProperties = @('email', 'name', 'username')
+    $setCommitIds = [Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::OrdinalIgnoreCase
+    )
+    $listNormalized = [Collections.Generic.List[pscustomobject]]::new()
+    foreach ($objCommit in $arrCommitEvidence) {
+        if ($null -eq $objCommit -or $objCommit -isnot [pscustomobject]) {
+            throw 'The created-push commit evidence has an invalid object shape.'
+        }
+        $arrCommitPropertyNames = @(
+            $objCommit.PSObject.Properties | ForEach-Object Name
+        )
+        foreach ($strRequiredCommitProperty in $arrRequiredCommitProperties) {
+            if ($arrCommitPropertyNames -cnotcontains $strRequiredCommitProperty) {
+                throw 'The created-push commit evidence has an invalid object shape.'
+            }
+        }
+        if ($objCommit.id -isnot [string] -or
+            $objCommit.id -notmatch $strObjectIdPattern -or
+            $objCommit.id -match $strZeroObjectIdPattern -or
+            -not $setCommitIds.Add($objCommit.id) -or
+            $objCommit.tree_id -isnot [string] -or
+            $objCommit.tree_id -notmatch $strObjectIdPattern -or
+            $objCommit.tree_id -match $strZeroObjectIdPattern -or
+            $objCommit.distinct -isnot [bool] -or
+            $objCommit.message -isnot [string] -or
+            $objCommit.timestamp -isnot [string] -or
+            $objCommit.url -isnot [string]) {
+            throw 'The created-push commit evidence has an invalid identity or scalar.'
+        }
+        foreach ($strIdentityName in @('author', 'committer')) {
+            $objIdentity = $objCommit.$strIdentityName
+            if ($null -eq $objIdentity -or $objIdentity -isnot [pscustomobject]) {
+                throw 'The created-push commit evidence has an invalid author or committer.'
+            }
+            $arrIdentityPropertyNames = @(
+                $objIdentity.PSObject.Properties | ForEach-Object Name
+            )
+            foreach ($strExpectedIdentityProperty in $arrExpectedIdentityProperties) {
+                if ($arrIdentityPropertyNames -cnotcontains $strExpectedIdentityProperty) {
+                    throw 'The created-push commit evidence has an invalid author or committer.'
+                }
+            }
+            if ($objIdentity.name -isnot [string] -or
+                $objIdentity.email -isnot [string] -or
+                ($null -ne $objIdentity.username -and
+                    $objIdentity.username -isnot [string])) {
+                throw 'The created-push commit evidence has an invalid author or committer.'
+            }
+        }
+        $listNormalized.Add([pscustomobject]@{
+                Id = $objCommit.id
+                Distinct = $objCommit.distinct
+            })
+    }
+
+    $arrNormalized = @($listNormalized.ToArray())
+    if ($arrNormalized.Count -eq 0) {
+        if ($EventHeadDistinct -ceq 'true') {
+            throw 'The created-push commit evidence omits the distinct event head.'
+        }
+    }
+    elseif (-not [string]::Equals(
+            $arrNormalized[-1].Id,
+            $EventHeadRevision,
+            [StringComparison]::OrdinalIgnoreCase
+        ) -or $arrNormalized[-1].Distinct -ne
+        ($EventHeadDistinct -ceq 'true')) {
+        throw 'The created-push commit evidence does not end at the event head.'
+    }
+    return $arrNormalized
+}
+
 function Get-CreatedRefBoundaryContext {
     # .SYNOPSIS
     # Authenticates a created-ref push and derives its introduced graph boundary.
@@ -3663,12 +3798,8 @@ function Get-CreatedRefBoundaryContext {
     # The expanded head commit from the authenticated push event.
     # .PARAMETER EventHeadDistinct
     # The lowercase Boolean distinct value for the event head.
-    # .PARAMETER PushCommitCount
-    # The authenticated push size as invariant decimal text.
-    # .PARAMETER PushDistinctCommitCount
-    # The authenticated distinct push size as invariant decimal text.
     # .PARAMETER PushCommitEvidenceJson
-    # The bounded webhook commit ID array serialized as JSON.
+    # The bounded complete webhook commits array serialized as JSON.
     # .PARAMETER OtherRefEvidenceJson
     # The bounded, fetched, authenticated other-ref inventory as JSON.
     # .EXAMPLE
@@ -3692,8 +3823,6 @@ function Get-CreatedRefBoundaryContext {
         [Parameter(Mandatory)][string] $HeadRevision,
         [Parameter(Mandatory)][string] $EventHeadRevision,
         [Parameter(Mandatory)][string] $EventHeadDistinct,
-        [Parameter(Mandatory)][string] $PushCommitCount,
-        [Parameter(Mandatory)][string] $PushDistinctCommitCount,
         [Parameter(Mandatory)][string] $PushCommitEvidenceJson,
         [Parameter(Mandatory)][string] $OtherRefEvidenceJson
     )
@@ -3721,22 +3850,12 @@ function Get-CreatedRefBoundaryContext {
         throw 'The created-push head distinct field must be true or false.'
     }
 
-    $intPushCommitCount = 0
-    $intPushDistinctCommitCount = 0
-    if ($PushCommitCount -cnotmatch '^(?:0|[1-9][0-9]*)$' -or
-        -not [int]::TryParse($PushCommitCount, [ref] $intPushCommitCount)) {
-        throw 'The created-push size is invalid or exceeds a signed 32-bit integer.'
-    }
-    if ($PushDistinctCommitCount -cnotmatch '^(?:0|[1-9][0-9]*)$' -or
-        -not [int]::TryParse(
-            $PushDistinctCommitCount,
-            [ref] $intPushDistinctCommitCount
-        )) {
-        throw 'The created-push distinct size is invalid or exceeds a signed 32-bit integer.'
-    }
-    if ($intPushDistinctCommitCount -gt $intPushCommitCount) {
-        throw 'The created-push distinct size exceeds its size.'
-    }
+    $arrCommitEvidence = @(
+        Read-CreatedPushCommitEvidence `
+            -PushCommitEvidenceJson $PushCommitEvidenceJson `
+            -EventHeadRevision $EventHeadRevision `
+            -EventHeadDistinct $EventHeadDistinct
+    )
 
     try {
         $objOtherRefEvidence = ConvertFrom-Json `
@@ -3851,39 +3970,38 @@ function Get-CreatedRefBoundaryContext {
         }
     }
     $boolHeadIntroduced = $setIntroducedCommits.Contains($HeadRevision)
-    if (($EventHeadDistinct -ceq 'true') -ne $boolHeadIntroduced -or
-        $arrIntroducedCommits.Count -ne $intPushDistinctCommitCount) {
+    if (($EventHeadDistinct -ceq 'true') -ne $boolHeadIntroduced) {
         throw 'The created-push payload contradicts the authenticated introduced graph.'
     }
 
-    try {
-        $objCommitEvidence = ConvertFrom-Json `
-            -InputObject $PushCommitEvidenceJson -NoEnumerate
-        if ($objCommitEvidence -isnot [System.Array]) {
-            throw 'Commit evidence is not an array.'
-        }
-        $arrCommitEvidence = @($objCommitEvidence)
-    }
-    catch {
-        throw 'The created-push commit evidence is malformed.'
-    }
-    $intExpectedEvidenceCount = [Math]::Min(
-        $intPushCommitCount,
-        $intMaximumPayloadCommitCount
-    )
-    if ($arrCommitEvidence.Count -ne $intExpectedEvidenceCount) {
-        throw 'The created-push commit array is truncated or inconsistent.'
-    }
-    $setPayloadCommits = [Collections.Generic.HashSet[string]]::new(
+    $setPayloadDistinctCommits = [Collections.Generic.HashSet[string]]::new(
         [StringComparer]::OrdinalIgnoreCase
     )
     foreach ($objCommit in $arrCommitEvidence) {
-        $strCommit = [string] $objCommit
-        if ($strCommit -notmatch $strObjectIdPattern -or
-            $strCommit -match $strZeroObjectIdPattern -or
-            -not $setPayloadCommits.Add($strCommit) -or
-            -not $setIntroducedCommits.Contains($strCommit)) {
+        & git -C $RepositoryRootPath cat-file -e `
+            "$($objCommit.Id)`^{commit}" 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            throw 'The created-push commit evidence names an unavailable commit.'
+        }
+        & git -C $RepositoryRootPath merge-base --is-ancestor `
+            $objCommit.Id $HeadRevision 2>$null
+        if ($LASTEXITCODE -ne 0) {
             throw 'The created-push commit array contradicts the authenticated graph.'
+        }
+        $boolCommitIntroduced = $setIntroducedCommits.Contains($objCommit.Id)
+        if ($objCommit.Distinct -ne $boolCommitIntroduced) {
+            throw 'The created-push distinct flags contradict the authenticated graph.'
+        }
+        if ($objCommit.Distinct) {
+            [void] $setPayloadDistinctCommits.Add($objCommit.Id)
+        }
+    }
+    if ($setPayloadDistinctCommits.Count -ne $setIntroducedCommits.Count) {
+        throw 'The created-push distinct commit set contradicts the authenticated graph.'
+    }
+    foreach ($strIntroducedCommit in $arrIntroducedCommits) {
+        if (-not $setPayloadDistinctCommits.Contains($strIntroducedCommit)) {
+            throw 'The created-push distinct commit set contradicts the authenticated graph.'
         }
     }
 
@@ -6396,8 +6514,6 @@ if (-not $boolPublishedEndpointsRequested -and
         -not [string]::IsNullOrEmpty($DestinationRef) -or
         -not [string]::IsNullOrEmpty($EventHeadRevision) -or
         -not [string]::IsNullOrEmpty($EventHeadDistinct) -or
-        -not [string]::IsNullOrEmpty($PushCommitCount) -or
-        -not [string]::IsNullOrEmpty($PushDistinctCommitCount) -or
         -not [string]::IsNullOrEmpty($PushCommitEvidenceJson) -or
         -not [string]::IsNullOrEmpty($OtherRefEvidenceJson) -or
         $PublishedBaselineAbsent -or $PublishedFinalDeleted)) {
@@ -6425,16 +6541,12 @@ if ($PublishedBaselineAbsent) {
         -HeadRevision $PublishedFinalRevision `
         -EventHeadRevision $EventHeadRevision `
         -EventHeadDistinct $EventHeadDistinct `
-        -PushCommitCount $PushCommitCount `
-        -PushDistinctCommitCount $PushDistinctCommitCount `
         -PushCommitEvidenceJson $PushCommitEvidenceJson `
         -OtherRefEvidenceJson $OtherRefEvidenceJson
 }
 elseif (-not [string]::IsNullOrEmpty($DestinationRef) -or
     -not [string]::IsNullOrEmpty($EventHeadRevision) -or
     -not [string]::IsNullOrEmpty($EventHeadDistinct) -or
-    -not [string]::IsNullOrEmpty($PushCommitCount) -or
-    -not [string]::IsNullOrEmpty($PushDistinctCommitCount) -or
     -not [string]::IsNullOrEmpty($PushCommitEvidenceJson) -or
     -not [string]::IsNullOrEmpty($OtherRefEvidenceJson)) {
     throw 'Created-push evidence is valid only when the destination ref is new.'
@@ -6986,8 +7098,8 @@ if ($SelfTest) {
         param($objNode)
         $objNode -is [Management.Automation.Language.FunctionDefinitionAst]
     }, $true))
-    if ($arrValidatorFunctionAsts.Count -ne 56) {
-        throw 'The validator function-help inventory must contain exactly 56 functions.'
+    if ($arrValidatorFunctionAsts.Count -ne 57) {
+        throw 'The validator function-help inventory must contain exactly 57 functions.'
     }
     foreach ($objFunctionAst in $arrValidatorFunctionAsts) {
         $objHelp = $objFunctionAst.GetHelpContent()
@@ -8817,6 +8929,7 @@ if ($SelfTest) {
                 'cmp --silent "${raw_refs}" "${raw_refs_after}"',
                 'AGENT_INSTRUCTION_DESTINATION_REF:',
                 'AGENT_INSTRUCTION_PUSH_COMMIT_EVIDENCE:',
+                'toJson(github.event.commits)',
                 '-OtherRefEvidenceJson',
                 'id: trust-root-authorization',
                 '-AuthorizationApplicabilityOnly',
@@ -8856,7 +8969,12 @@ if ($SelfTest) {
         }
         foreach ($strForbiddenTransitionLiteral in @(
                 'PR_PREVIOUS_HEAD_SHA', 'refs/remotes/event/pr-previous-head',
-                'AGENT_INSTRUCTION_NEW_REF_COMMITS_JSON'
+                'AGENT_INSTRUCTION_NEW_REF_COMMITS_JSON',
+                'github.event.size', 'github.event.distinct_size',
+                'github.event.commits.*.id',
+                'AGENT_INSTRUCTION_PUSH_COMMIT_COUNT',
+                'AGENT_INSTRUCTION_PUSH_DISTINCT_COMMIT_COUNT',
+                '-PushCommitCount', '-PushDistinctCommitCount'
             )) {
             if ($Content.Contains(
                     $strForbiddenTransitionLiteral,
@@ -8984,6 +9102,22 @@ if ($SelfTest) {
                 'github.event.pull_request.created_at'
             )
             Expected = 'Workflow contract literal is missing: github.event.pull_request.updated_at'
+        },
+        [pscustomobject]@{
+            Name = 'commit evidence reduced to IDs'
+            Content = $strAgentWorkflowContent.Replace(
+                'toJson(github.event.commits)',
+                'toJson(github.event.commits.*.id)'
+            )
+            Expected = 'Workflow contract literal is missing: toJson(github.event.commits)'
+        },
+        [pscustomobject]@{
+            Name = 'undocumented push size contract'
+            Content = $strAgentWorkflowContent.Replace(
+                'toJson(github.event.commits)',
+                'toJson(github.event.size)'
+            )
+            Expected = 'Workflow contract literal is missing: toJson(github.event.commits)'
         }
     )
     foreach ($objWorkflowMutation in $arrWorkflowMutations) {
