@@ -7,13 +7,13 @@ description: "Documentation standards:  contract-first, traceable, drift-resista
 
 # Documentation Writing Style
 
-**Version:** 1.6.20260830.0
+**Version:** 1.6.20260902.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-08-30
+- **Last Updated:** 2026-09-02
 - **Scope:** Defines documentation standards for Markdown (`**/*.md`) and Cursor Markdown rule (`**/*.mdc`) files in this repository, including specs, design docs, runbooks, ADRs, instruction files, and developer documentation. Does not cover code comments or inline documentation in source files.
 - **Related:** [Repository Copilot Instructions](../copilot-instructions.md)
 
@@ -58,7 +58,7 @@ This repository classifies documents into two tiers based on their primary audie
 
 The metadata header block is **REQUIRED** for documents whose primary purpose is governance, specification, instruction, process, runbook, or ADR-style design rationale. Tier 1 covers, for example:
 
-- Repository-level instruction files matching `.github/instructions/*.instructions.md`. The repository's `.github/copilot-instructions.md` remains governed instruction content but is an explicit exception to the visible metadata-header requirement and MUST remain listed explicitly as `RequiresMetadata = $false` in the validator catalog.
+- Repository-level instruction files matching `.github/instructions/*.instructions.md`. The repository's `.github/copilot-instructions.md` remains governed instruction content but is an explicit exception to the visible metadata-header requirement.
 - Root agent entry-point files such as `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.hermes.md`, and future equivalents.
 - Cursor project rules matching `.cursor/rules/*.mdc`.
 - ADR-style or formal design-decision records, regardless of where they live (`.github/`, `docs/`, or another documented ADR/design-decision location).
@@ -68,7 +68,7 @@ The metadata header block is **REQUIRED** for documents whose primary purpose is
 
 The Tier 1 metadata header block consists of these fields:
 
-- **Status:** Draft | Active | Deprecated **(REQUIRED)**
+- **Status:** Draft | Proposed | Active | Accepted | Superseded | Deprecated **(REQUIRED)**
 - **Owner:** Person or team **(REQUIRED)**
 - **Last Updated:** YYYY-MM-DD **(REQUIRED)**
 - **Scope:** What this doc covers (and does not cover) **(REQUIRED)**
@@ -110,15 +110,23 @@ Tier 2 documents MAY adopt YAML front matter later if a real tool consumes it, s
 
 This subsection applies to Tier 1 documents and to any other document that intentionally carries the metadata header block. The fields referenced in this subsection (`Last Updated`, and the optional `Version` line) are defined in the Tier 1 bullet list above; this subsection adds normative synchronization rules for those fields and does not redefine their semantics.
 
-- When a commit modifies the rendered content or documentation meaning of a document that carries the metadata header block, the `Last Updated` field in that document MUST be bumped to the current UTC date in `YYYY-MM-DD` form as part of the same commit.
-- If the document also carries a `**Version:** <major>.<minor>.<YYYYMMDD>.<revision>` line, the embedded `<YYYYMMDD>` segment MUST be updated in the same commit so that it matches the new `Last Updated` value.
+For this subsection:
+
+- The published baseline is the pre-change version already present on the branch where the change will land. For a pull request, it is the document on the pull request base branch. For a direct push, it is the document at the before revision of the pushed branch.
+- The finalization point is the last author- or agent-controlled update before the change is merged, added to an automated merge queue, or pushed directly to that branch. Metadata is evaluated between the published baseline and the finalization point. Internal topic, work-in-progress, and iteration commits are not separate published transitions. If automated merge machinery changes the target branch after the finalization point, the landed value is not a violation of this rule; correct any resulting metadata drift in a follow-up change.
+
+- When the change modifies the rendered content or documentation meaning of a document that carries the metadata header block, the `Last Updated` field in the final document MUST be the current UTC date in `YYYY-MM-DD` form at the finalization point.
+- If the document also carries a `**Version:** <major>.<minor>.<YYYYMMDD>.<revision>` line, the embedded `<YYYYMMDD>` segment MUST match the final `Last Updated` value.
 - Revision convention for the `<revision>` segment of `**Version:**`:
-  - The `<YYYYMMDD>` value MUST NOT move backward relative to the visible parent commit.
-  - When a same-day commit modifies the document, `<revision>` MUST be greater than the visible parent revision. It SHOULD increment by `1` when the commit history preserves each source change (for example, `...20260502.0` → `...20260502.1`).
-  - When `<YYYYMMDD>` moves to a later date in an ordinary commit, `<revision>` SHOULD reset to `0`.
-  - A squash or another history-rewriting operation MAY preserve a higher terminal revision from the source history. This exception applies when the date moves forward or when multiple same-day source changes become one visible commit.
-  - `<major>` and `<minor>` are out of scope for this synchronization rule and follow the document's own semantic-versioning conventions.
-- Exemption for trivial mechanical changes. The bump MAY be omitted for commits that do not alter rendered content or documentation meaning, including pure file-mode changes, line-ending normalization, end-of-file newline fixes, or trailing-whitespace-only fixes produced by pre-commit hooks. The trailing-whitespace exemption MUST NOT be applied when the change removes or alters a Markdown hard line break (two or more trailing spaces, or a trailing backslash, immediately before a newline), because such whitespace is rendering-significant; in that case the change alters rendered content and the bump is required.
+  - `<revision>` counts published updates relative to the published baseline. It is evaluated at the finalization point, not for each internal commit.
+  - After setting `<major>.<minor>` under the document's own conventions and `<YYYYMMDD>` to the current UTC date, `<revision>` MUST be `0` when the resulting `<major>.<minor>.<YYYYMMDD>` differs from the published baseline's `<major>.<minor>.<YYYYMMDD>`, including when no published baseline exists.
+  - When the published baseline already carries the same `<major>.<minor>.<YYYYMMDD>` at revision `N`, the final `<revision>` MUST be `N + 1`.
+  - Intra-PR iteration commits target the single correct final revision. Re-check the published baseline at the finalization point.
+  - Examples:
+    - Same-day published update that keeps the same `<major>.<minor>`: published baseline `1.6.20260502.0` to final `1.6.20260502.1`.
+    - Next-day update: published baseline `1.6.20260502.1`, change finalized on 2026-05-03 UTC, to final `1.6.20260503.0`.
+  - This synchronization rule does not govern when `<major>` or `<minor>` are incremented. Those segments continue to follow the document's own semantic-versioning conventions. For `<revision>` computation, treat `**Version:**` as an ordered four-segment tuple: `<major>`, `<minor>`, `<YYYYMMDD>`, and `<revision>`. `<revision>` is the lowest-precedence segment and MUST reset to `0` whenever a higher-order segment changes relative to the published baseline.
+- Exemption for trivial mechanical changes. The bump MAY be omitted when the published change does not alter rendered content or documentation meaning, including pure file-mode changes, line-ending normalization, end-of-file newline fixes, or trailing-whitespace-only fixes produced by pre-commit hooks. The trailing-whitespace exemption MUST NOT be applied when the change removes or alters a Markdown hard line break (two or more trailing spaces, or a trailing backslash, immediately before a newline), because such whitespace is rendering-significant; in that case the change alters rendered content and the bump is required.
 - This rule applies to all documents in the repository that carry the metadata header block, including but not limited to `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md`, `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `.hermes.md`, and `.cursor/rules/*.mdc`.
 
 ### Non-Normative Historical Artifacts
@@ -267,7 +275,7 @@ PSStyleGuide does not track request-template files or a placeholder-check workfl
 - When a durable document requires an absolute PSStyleGuide link, the link MUST use `https://github.com/franklesniak/PSStyleGuide/` and MUST identify a real target.
 - The literal example `https://github.com/OWNER/REPO/...` MAY appear only as clearly labeled didactic text in an inline code span or fenced code block. It MUST NOT appear as a live unresolved link target.
 - Placeholder text in copyable shell examples MUST remain literal and safe. The shell rules below prohibit command-substitution metacharacters in such placeholder text.
-- `.github/instructions/docs.instructions.md` owns these documentation rules. `.github/workflows/Test-AgentInstructions.ps1` validates these named owners at the exact input revision and rejects stale repository-specific source or enforcement claims.
+- `.github/instructions/docs.instructions.md` owns these documentation rules.
 
 #### Template-substitution marker boundaries and replacement surfaces
 
@@ -299,13 +307,15 @@ Decision records exist to prevent re-litigating decisions.
 
 - File naming pattern: `docs/decisions/NNNN-short-title.md`
 - Decision records MUST include:
-  - The Tier 1 **Status**, **Owner**, **Last Updated**, and **Scope** metadata fields.
-  - A separate narrative decision status or history, such as Proposed, Accepted, Superseded, or Deprecated.
+  - The single Tier 1 **Status** metadata field. For decision records, its value MUST be Proposed | Accepted | Superseded | Deprecated. A decision record MUST NOT add a separate narrative status field or section.
+  - The Tier 1 **Owner**, **Last Updated**, and **Scope** metadata fields.
   - **Context**
   - **Decision**
   - **Consequences:** positive and negative
   - **Alternatives Considered**
   - **Date:** YYYY-MM-DD
+
+Published legacy decision records that predate this lifecycle rule MAY retain their existing status representation while their bytes remain unchanged. The next change to such a record MUST migrate it to the single Tier 1 Status metadata field and MUST remove each separate narrative status field or section.
 
 ADRs MUST be short and specific. If an ADR grows into a design doc, split it.
 
@@ -413,7 +423,7 @@ Before merging, verify:
   - An explicit `**Assumption:**` labeled entry.
   - A cross-reference to another requirement or section that defines the value.
   This rule applies to unresolved requirements/specification content only. It does not ban legitimate template-substitution placeholders, didactic examples, migration notes, or code-comment TODO examples elsewhere in the repository.
-- Authors and reviewers MUST manually inspect Markdown under `docs/**` for unresolved placeholder forms, including case-insensitive `TBD`, `TODO:`, `FIXME`, `XXX`, `to be determined`, and `(default ... to be determined)`. Remediate normative occurrences with a measurable value, an explicit `**Open Question:**` entry, an explicit `**Assumption:**` entry, or a cross-reference to another requirement. Fenced examples, HTML comments, changelog history, and clearly labeled didactic examples are allowed only when context makes clear that they are not unresolved repository requirements.
+- Remediate normative occurrences with a measurable value, an explicit `**Open Question:**` entry, an explicit `**Assumption:**` entry, or a cross-reference to another requirement. Fenced examples, HTML comments, changelog history, and clearly labeled didactic examples are allowed only when context makes clear that they are not unresolved repository requirements.
 - Contradictory statements between the spec and other docs
 - Vague guarantees without measurable definitions
 - Unowned open questions ("someone should figure out…")
