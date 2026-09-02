@@ -29,7 +29,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.2.20260831.0
+# Version: 1.2.20260902.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -116,8 +116,51 @@ $strHigherTerminalRevision = $strFinal.Replace(
 if (@(Get-PublishedEndpointMetadataFailure `
     -Name 'fixture.md' -CurrentContent $strHigherTerminalRevision `
     -ParentContent $strBaseline -ExpectedUtcDate '2026-08-31' `
+    -IsNewDocumentTransition $false) -cnotcontains
+    ('fixture.md Version revision must be exactly 0 when a published-baseline ' +
+        'major, minor, or date segment changes.')) {
+    throw 'The extracted higher-order revision reset did not fail closed.'
+}
+
+$strSameTupleFinal = $strBaseline.Replace(
+    '**Version:** 1.0.20260830.0',
+    '**Version:** 1.0.20260830.1'
+).Replace('Published baseline.', 'Published final on the same tuple.')
+if (@(Get-PublishedEndpointMetadataFailure `
+    -Name 'fixture.md' -CurrentContent $strSameTupleFinal `
+    -ParentContent $strBaseline -ExpectedUtcDate '2026-08-30' `
     -IsNewDocumentTransition $false).Count -ne 0) {
-    throw 'The extracted higher terminal revision was rejected.'
+    throw 'The extracted exact same-tuple revision increment was rejected.'
+}
+$strSkippedSameTupleRevision = $strSameTupleFinal.Replace(
+    '**Version:** 1.0.20260830.1',
+    '**Version:** 1.0.20260830.2'
+)
+if (@(Get-PublishedEndpointMetadataFailure `
+    -Name 'fixture.md' -CurrentContent $strSkippedSameTupleRevision `
+    -ParentContent $strBaseline -ExpectedUtcDate '2026-08-30' `
+    -IsNewDocumentTransition $false) -cnotcontains
+    ('fixture.md Version revision must be exactly 1 after a rendered-content ' +
+        'change with an unchanged published-baseline major, minor, and date tuple.')) {
+    throw 'The extracted skipped same-tuple revision did not fail closed.'
+}
+
+if (@(Get-PublishedEndpointMetadataFailure -Name 'fixture.md' `
+        -CurrentContent $strFinal -ParentContent $null -ExpectedUtcDate '' `
+        -IsNewDocumentTransition $true `
+        -RequireExpectedUtcDateForRenderedChange $false).Count -ne 0) {
+    throw 'The extracted baseline-absent revision zero was rejected.'
+}
+$strNewDocumentNonzeroRevision = $strFinal.Replace(
+    '**Version:** 1.0.20260831.0',
+    '**Version:** 1.0.20260831.1'
+)
+if (@(Get-PublishedEndpointMetadataFailure -Name 'fixture.md' `
+        -CurrentContent $strNewDocumentNonzeroRevision -ParentContent $null `
+        -ExpectedUtcDate '' -IsNewDocumentTransition $true `
+        -RequireExpectedUtcDateForRenderedChange $false) -cnotcontains
+    'fixture.md Version revision must be exactly 0 when no published baseline exists.') {
+    throw 'The extracted baseline-absent nonzero revision did not fail closed.'
 }
 
 $strSameTupleRollback = $strBaseline.Replace(

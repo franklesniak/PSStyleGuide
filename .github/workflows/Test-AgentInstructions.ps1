@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260831.0
+# Version: 1.7.20260902.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -4827,6 +4827,82 @@ function Get-DocumentationClaimFailure {
     }
 }
 
+function Get-DecisionLifecyclePolicyFailure {
+    # .SYNOPSIS
+    # Finds an invalid decision-record lifecycle policy.
+    #
+    # .DESCRIPTION
+    # Requires one decision-record Status representation, the four retained
+    # lifecycle values, and an explicit prohibition on a second narrative status.
+    #
+    # .PARAMETER Content
+    # The documentation instruction content to inspect.
+    #
+    # .EXAMPLE
+    # Get-DecisionLifecyclePolicyFailure -Content $strDocs
+    #
+    # # Returns one string for each lifecycle-policy failure.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [string] One record for each decision lifecycle policy failure.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260902.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $Content
+    )
+
+    $arrSectionMatches = @([regex]::Matches(
+            $Content,
+            '(?ms)^## Decision Record Standards\s*\r?\n(?<Body>.*?)(?=^## |\z)'
+        ))
+    if ($arrSectionMatches.Count -ne 1) {
+        Write-Output (
+            'Documentation instructions must contain exactly one Decision Record ' +
+            'Standards section.'
+        )
+        return
+    }
+
+    $strSectionBody = $arrSectionMatches[0].Groups['Body'].Value
+    if ([regex]::Matches($strSectionBody, '\*\*Status\*\*').Count -ne 1) {
+        Write-Output (
+            'Decision records must use exactly one Tier 1 Status representation.'
+        )
+    }
+
+    $arrAllowedValuesMatches = @([regex]::Matches(
+            $strSectionBody,
+            'For decision records, its value MUST be ' +
+                '(?<Values>[A-Za-z]+(?: \| [A-Za-z]+)+)\.'
+        ))
+    $strExpectedValues = 'Proposed | Accepted | Superseded | Deprecated'
+    if ($arrAllowedValuesMatches.Count -ne 1 -or
+        $arrAllowedValuesMatches[0].Groups['Values'].Value -cne $strExpectedValues) {
+        Write-Output (
+            'Decision record Status must allow exactly ' + $strExpectedValues + '.'
+        )
+    }
+
+    if ([regex]::Matches(
+            $strSectionBody,
+            'A decision record MUST NOT add a separate narrative status field or section\.'
+        ).Count -ne 1) {
+        Write-Output (
+            'Decision records must prohibit a separate narrative status representation.'
+        )
+    }
+}
+
 function Get-DocumentMetadataContext {
     # .SYNOPSIS
     # Gets validated document-level metadata context.
@@ -5187,20 +5263,19 @@ function Get-PublishedEndpointMetadataFailure {
         if (-not $IsNewDocumentTransition) {
             return
         }
-        if (-not $RequireExpectedUtcDateForRenderedChange) {
-            return
-        }
-        if ([string]::IsNullOrEmpty($ExpectedUtcDate) -or
-            -not (Test-MetadataCalendarDatePair `
-                -VersionDate $ExpectedUtcDate.Replace('-', '') `
-                -UpdatedDate $ExpectedUtcDate)) {
-            Write-Output "The expected UTC date for $Name is unavailable or invalid."
-            return
-        }
-        if ($strCurrentUpdatedDate -cne $ExpectedUtcDate) {
-            Write-Output (
-                "$Name Last Updated must be $ExpectedUtcDate after a rendered-content change."
-            )
+        if ($RequireExpectedUtcDateForRenderedChange) {
+            if ([string]::IsNullOrEmpty($ExpectedUtcDate) -or
+                -not (Test-MetadataCalendarDatePair `
+                    -VersionDate $ExpectedUtcDate.Replace('-', '') `
+                    -UpdatedDate $ExpectedUtcDate)) {
+                Write-Output "The expected UTC date for $Name is unavailable or invalid."
+                return
+            }
+            if ($strCurrentUpdatedDate -cne $ExpectedUtcDate) {
+                Write-Output (
+                    "$Name Last Updated must be $ExpectedUtcDate after a rendered-content change."
+                )
+            }
         }
         if ($intCurrentRevision -ne 0) {
             Write-Output (
@@ -5312,14 +5387,20 @@ function Get-PublishedEndpointMetadataFailure {
             )
             return
         }
-        $intMinimumRevision = $intParentRevision + 1
-        if ($intCurrentRevision -lt $intMinimumRevision) {
+        $intExpectedRevision = $intParentRevision + 1
+        if ($intCurrentRevision -ne $intExpectedRevision) {
             Write-Output (
-                "$Name Version revision must be at least $intMinimumRevision after a " +
+                "$Name Version revision must be exactly $intExpectedRevision after a " +
                 'rendered-content change with an unchanged published-baseline major, ' +
                 'minor, and date tuple.'
             )
         }
+    }
+    elseif ($intCurrentRevision -ne 0) {
+        Write-Output (
+            "$Name Version revision must be exactly 0 when a published-baseline " +
+            'major, minor, or date segment changes.'
+        )
     }
 }
 
@@ -7010,6 +7091,8 @@ elseif (-not (Test-GitIgnorePathEffective `
 $arrRepositoryFailures += @(Get-DocumentationClaimFailure `
         -Content $strDocsInstructionsContent `
         -TrackedPaths $arrTrackedRepositoryPaths)
+$arrRepositoryFailures += @(Get-DecisionLifecyclePolicyFailure `
+        -Content $strDocsInstructionsContent)
 $arrCanonicalDecisionGuideLinks = @(
     '../../STYLE_GUIDE.md',
     '../../STYLE_GUIDE_RATIONALE.md'
@@ -7102,8 +7185,8 @@ if ($SelfTest) {
         param($objNode)
         $objNode -is [Management.Automation.Language.FunctionDefinitionAst]
     }, $true))
-    if ($arrValidatorFunctionAsts.Count -ne 55) {
-        throw 'The validator function-help inventory must contain exactly 55 functions.'
+    if ($arrValidatorFunctionAsts.Count -ne 56) {
+        throw 'The validator function-help inventory must contain exactly 56 functions.'
     }
     foreach ($objFunctionAst in $arrValidatorFunctionAsts) {
         $objHelp = $objFunctionAst.GetHelpContent()
@@ -7141,7 +7224,7 @@ if ($SelfTest) {
             }
             if ([regex]::Matches(
                     $strFunctionNotes,
-                    '(?m)^Version: 1\.0\.202608(?:30|31)\.0\.$'
+                    '(?m)^Version: 1\.0\.(?:202608(?:30|31)|20260902)\.0\.$'
                 ).Count -ne 1) {
                 $listMissingHelp.Add('landing or repair helper Version')
             }
@@ -7163,9 +7246,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260831\.0$'
+            '(?m)^# Version: 1\.7\.20260902\.0$'
         ).Count -ne 1) {
-        throw 'The validator script version does not use build date 20260831.'
+        throw 'The validator script version does not use build date 20260902.'
     }
     $boolSavedWindowsPython = $script:useWindowsPythonLauncher
     $arrSavedPythonNames = $script:pythonPathNames
@@ -7242,26 +7325,45 @@ if ($SelfTest) {
             ($arrDocumentationClaimFailures -join '; ')
         )
     }
-    $strDocumentationOwnerEnforcerRelationship =
-        '`.github/workflows/Test-AgentInstructions.ps1` is a non-owner ' +
-        'enforcement mechanism. It checks the named owner at the exact input ' +
-        'revision and rejects stale repository-specific documentation claims.'
-    if (-not $strDocsInstructionsContent.Contains(
-            $strDocumentationOwnerEnforcerRelationship,
-            [StringComparison]::Ordinal
-        )) {
-        throw 'The documentation owner and non-owner enforcer relationship changed.'
+    $arrDecisionLifecycleFailures = @(Get-DecisionLifecyclePolicyFailure `
+            -Content $strDocsInstructionsContent)
+    if ($arrDecisionLifecycleFailures.Count -ne 0) {
+        throw (
+            'The decision lifecycle baseline failed validation: ' +
+            ($arrDecisionLifecycleFailures -join '; ')
+        )
     }
-    $strDocumentationOwnerEnforcerMutation = $strDocsInstructionsContent.Replace(
-        'is a non-owner enforcement mechanism',
-        'is an owner enforcement mechanism'
+    $strGenericDecisionStatusMutation = $strDocsInstructionsContent.Replace(
+        'Proposed | Accepted | Superseded | Deprecated',
+        'Draft | Proposed | Active | Accepted | Superseded | Deprecated'
     )
-    if ($strDocumentationOwnerEnforcerMutation -ceq $strDocsInstructionsContent -or
-        $strDocumentationOwnerEnforcerMutation.Contains(
-            $strDocumentationOwnerEnforcerRelationship,
-            [StringComparison]::Ordinal
-        )) {
-        throw 'A documentation owner and enforcer mutation was not detected.'
+    if ($strGenericDecisionStatusMutation -ceq $strDocsInstructionsContent -or
+        @(Get-DecisionLifecyclePolicyFailure `
+                -Content $strGenericDecisionStatusMutation) -cnotcontains
+            ('Decision record Status must allow exactly ' +
+                'Proposed | Accepted | Superseded | Deprecated.')) {
+        throw 'A generic decision Status set did not fail closed.'
+    }
+    $strDuplicateDecisionStatusMutation = $strDocsInstructionsContent.Replace(
+        'A decision record MUST NOT add a separate narrative status field or section.',
+        ('A second **Status** representation records decision history. ' +
+            'A decision record MUST NOT add a separate narrative status field or section.')
+    )
+    if ($strDuplicateDecisionStatusMutation -ceq $strDocsInstructionsContent -or
+        @(Get-DecisionLifecyclePolicyFailure `
+                -Content $strDuplicateDecisionStatusMutation) -cnotcontains
+            'Decision records must use exactly one Tier 1 Status representation.') {
+        throw 'A duplicate decision Status representation did not fail closed.'
+    }
+    $strNarrativeDecisionStatusMutation = $strDocsInstructionsContent.Replace(
+        'A decision record MUST NOT add a separate narrative status field or section.',
+        'A decision record MAY add a separate narrative status field or section.'
+    )
+    if ($strNarrativeDecisionStatusMutation -ceq $strDocsInstructionsContent -or
+        @(Get-DecisionLifecyclePolicyFailure `
+                -Content $strNarrativeDecisionStatusMutation) -cnotcontains
+            'Decision records must prohibit a separate narrative status representation.') {
+        throw 'A permitted narrative decision Status did not fail closed.'
     }
     foreach ($strOwnerPath in $script:arrDocumentationClaimOwnerPaths) {
         $arrMissingOwnerFailures = @(Get-DocumentationClaimFailure `
@@ -7394,7 +7496,7 @@ if ($SelfTest) {
             -ExpectedUtcDate $objDocsMetadataContext.UpdatedDate `
             -IsNewDocumentTransition $false)
     if (-not ($arrDocsStaleMetadataFailures -match [regex]::Escape(
-                '.github/instructions/docs.instructions.md Version revision must be at least'
+                '.github/instructions/docs.instructions.md Version revision must be exactly'
             ))) {
         throw 'The docs-only stale-metadata mutation did not fail closed.'
     }
@@ -7422,7 +7524,7 @@ if ($SelfTest) {
                 -ParentContent $objDocumentContext.Content `
                 -ExpectedUtcDate $objMetadataContext.UpdatedDate `
                 -IsNewDocumentTransition $false)
-        $strFailure = "$strNewlyCoveredPath Version revision must be at least"
+        $strFailure = "$strNewlyCoveredPath Version revision must be exactly"
         if (-not ($arrStaleMetadataFailures -match [regex]::Escape(
                     $strFailure
                 ))) {
@@ -7502,9 +7604,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strExtractedSelfTestSource,
-            '(?m)^# Version: 1\.2\.20260831\.0$'
+            '(?m)^# Version: 1\.2\.20260902\.0$'
         ).Count -ne 1) {
-        throw 'The extracted self-test lacks version 1.2.20260831.0.'
+        throw 'The extracted self-test lacks version 1.2.20260902.0.'
     }
     $strExtractedSelfTestRevision = if (
         [string]::IsNullOrEmpty($strValidatedInputRevision)
@@ -7758,7 +7860,7 @@ if ($SelfTest) {
             -ExpectedUtcDate $objDocsMetadataContext.UpdatedDate `
             -IsNewDocumentTransition $false)
     if (-not ($arrNestedGeminiMetadataFailures -match [regex]::Escape(
-                'tools/GEMINI.md Version revision must be at least'
+                'tools/GEMINI.md Version revision must be exactly'
             ))) {
         throw 'A cataloged nested GEMINI.md bypassed rendered metadata transition.'
     }
@@ -8506,7 +8608,7 @@ if ($SelfTest) {
         -AgentsContent $strRenderedAgentsMutation `
         -ParentAgentsContent $strAgentsContent `
         -AgentsExpectedUtcDate $objAgentsUpdatedMatch.Groups['Date'].Value `
-        -Failure ("AGENTS.md Version revision must be at least " +
+        -Failure ("AGENTS.md Version revision must be exactly " +
             "$intNextAgentsRevision after a rendered-content change with an " +
             'unchanged published-baseline major, minor, and date tuple.')
 
@@ -8542,10 +8644,13 @@ if ($SelfTest) {
         $objAgentsVersionMatch.Value,
         $strAgentsVersionStem + $intJumpedAgentsRevision
     )
-    Assert-FixtureAccepted `
+    Assert-Failure `
         -AgentsContent $strSameDayRevisionJump `
         -ParentAgentsContent $strAgentsContent `
-        -AgentsExpectedUtcDate $objAgentsUpdatedMatch.Groups['Date'].Value
+        -AgentsExpectedUtcDate $objAgentsUpdatedMatch.Groups['Date'].Value `
+        -Failure ("AGENTS.md Version revision must be exactly " +
+            "$intNextAgentsRevision after a rendered-content change with an " +
+            'unchanged published-baseline major, minor, and date tuple.')
 
     $objIsoEvent = ConvertFrom-TrustedEventTimestamp -Timestamp `
         ($objAgentsUpdatedMatch.Groups['Date'].Value + 'T00:00:00Z')
@@ -8690,8 +8795,10 @@ if ($SelfTest) {
         -Name 'endpoint-fixture.md' -CurrentContent $strHigherRevisionPublishedFinal `
         -ParentContent $strEndpointBaseline -ExpectedUtcDate '2026-08-31' `
         -IsNewDocumentTransition $false)
-    if ($arrHigherRevisionPublishedFinalFailures.Count -ne 0) {
-        throw 'A higher published final revision was rejected.'
+    if ($arrHigherRevisionPublishedFinalFailures -cnotcontains
+        ('endpoint-fixture.md Version revision must be exactly 0 when a ' +
+            'published-baseline major, minor, or date segment changes.')) {
+        throw 'A nonzero revision after a higher-order change did not fail closed.'
     }
     $strSameTupleFinal = $strEndpointBaseline.Replace(
         '**Version:** 1.0.20260830.0', '**Version:** 1.0.20260830.1'
@@ -8706,8 +8813,11 @@ if ($SelfTest) {
     if (@(Get-PublishedEndpointMetadataFailure -Name 'endpoint-fixture.md' `
             -CurrentContent $strSkippedRevisionFinal `
             -ParentContent $strEndpointBaseline -ExpectedUtcDate '2026-08-30' `
-            -IsNewDocumentTransition $false).Count -ne 0) {
-        throw 'A higher same-tuple published final revision was rejected.'
+            -IsNewDocumentTransition $false) -cnotcontains
+        ('endpoint-fixture.md Version revision must be exactly 1 after a ' +
+            'rendered-content change with an unchanged published-baseline major, ' +
+            'minor, and date tuple.')) {
+        throw 'A skipped same-tuple published final revision did not fail closed.'
     }
     foreach ($strLifecycleStatus in @(
             'Draft', 'Proposed', 'Active', 'Accepted', 'Superseded', 'Deprecated'
@@ -8716,7 +8826,7 @@ if ($SelfTest) {
             '- **Status:** Active', "- **Status:** $strLifecycleStatus")
         if ($null -ne (Get-DocumentMetadataContext `
                 -Content $strLifecycleFixture).Failure) {
-            throw "ADR lifecycle status was rejected: $strLifecycleStatus"
+            throw "A generic Tier 1 lifecycle status was rejected: $strLifecycleStatus"
         }
     }
     Assert-PublishedEndpointContext -RepositoryRootPath $strRepositoryRootPath `
