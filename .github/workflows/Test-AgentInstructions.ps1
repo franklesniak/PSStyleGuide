@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260902.8
+# Version: 1.7.20260902.9
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -7701,9 +7701,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260902\.8$'
+            '(?m)^# Version: 1\.7\.20260902\.9$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.7.20260902.8.'
+        throw 'The validator script version is not 1.7.20260902.9.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
@@ -8279,9 +8279,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strTrustRootAuthorizationSource,
-            '(?m)^# Version: 1\.0\.20260902\.5$'
+            '(?m)^# Version: 1\.0\.20260902\.6$'
         ).Count -ne 1) {
-        throw 'The trust-root authorization script lacks version 1.0.20260902.5.'
+        throw 'The trust-root authorization script lacks version 1.0.20260902.6.'
     }
     & (Join-Path $strRepositoryRootPath $strTrustRootAuthorizationPath) `
         -RepositoryRootPath $strRepositoryRootPath `

@@ -29,7 +29,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.0.20260902.5
+# Version: 1.0.20260902.6
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -63,6 +63,66 @@ $arrTrustRootPaths = @(
     '.github/workflows/trust-root-authorization.json',
     '.github/workflows/agent-instructions.yml'
 )
+$script:arrSpecialSemanticInvariant = @(
+    'exact-maintenance-production-call-is-gated',
+    'legacy-transition-marker-is-inert-data',
+    'published-path-array-binding-is-explicit',
+    'workflow-created-push-history-fetch-is-bounded'
+)
+$script:hashtableSemanticInvariantPattern = @{
+    'adr-lifecycle-migration-is-enforced' =
+        '(?s)function Get-DecisionRecordLifecycleFailure.*?' +
+        'An unchanged published legacy ADR did not remain valid\..*?' +
+        'A changed legacy ADR did not require lifecycle migration'
+    'created-ref-metadata-baseline-is-consumed' =
+        '(?s)function Get-CreatedRefMetadataBaselineRevision.*?' +
+        '\$strCreatedRefMetadataBaselineRevision =\s+' +
+        'Get-CreatedRefMetadataBaselineRevision'
+    'created-ref-paths-use-endpoint-boundary' =
+        '(?s)function Read-GitPublishedEndpointChangedPath.*?' +
+        'elseif \(\$BaselineAbsent -and ' +
+        '\$arrBoundaries\.Count -eq 1\).*?' +
+        '''diff''.*?\$arrBoundaries\[0\], \$FinalRevision.*?' +
+        'A created ref with introduced commits must have one boundary'
+    'docs-policy-owner-boundary' =
+        '(?m)^- `\.github/instructions/docs\.instructions\.md` owns these ' +
+        'documentation rules\.$'
+    'docs-status-lifecycle-values' =
+        'Draft \| Proposed \| Active \| Accepted \| Superseded \| Deprecated'
+    'extracted-self-test-is-invoked' =
+        '& \(Join-Path \$strRepositoryRootPath \$strExtractedSelfTestPath\)'
+    'extracted-self-test-version-and-topology' =
+        '(?s)# Version: 1\.2\.\d{8}\.\d+.*Get-CreatedRefBoundaryContext'
+    'new-ref-boundary-cap-is-64' =
+        '\$intMetadataMaximumBoundaries = 64'
+    'pr-merge-bases-use-all-and-cap' =
+        'merge-base --all'
+    'published-finalization-date-is-enforced' =
+        '(?s)\$strTrustedEventUtcDate = ' +
+        '\$objTrustedEventTimestamp\.ToString\(.*?' +
+        'ExpectedUtcDate = \$strTrustedEventUtcDate.*?' +
+        'IsWorktreeTransition = \$true'
+    'ordinary-pr-uses-normal-trust-audit' =
+        '(?s)if \(\s*\$script:boolTrustedMaintenanceAuthorizationValidated' +
+        '.*?-ExactAuthorizedMaintenanceProductionCall.*?else \{\s+' +
+        '@\(Get-TrustRootRangeMutationFailure'
+    'trusted-maintenance-switch-is-explicit' =
+        '\$TrustedMaintenanceAuthorizationValidated'
+    'verifier-audits-authorized-history' =
+        'The candidate history contains unauthorized path'
+    'verifier-reads-trusted-revision-manifest' =
+        'ls-tree\s+`?\s*\$TrustedRevision\s+--\s+\$AuthorizationManifestPath'
+    'workflow-checkout-is-trusted-sha' =
+        '(?s)ref: \$\{\{ github\.sha \}\}.*?fetch-depth: >-\s+' +
+        "\$\{\{ github\.event_name == 'push' && github\.event\.created " +
+        '&& 1 \|\| 0 \}\}'
+    'workflow-permissions-are-read-only' =
+        'permissions:\s+contents: read'
+    'workflow-persist-credentials-is-false' =
+        'persist-credentials: false'
+    'workflow-uses-trusted-authorization-output' =
+        'TrustedMaintenanceAuthorizationValidated'
+}
 
 function Invoke-BoundedProcessByte {
     # .SYNOPSIS
@@ -756,67 +816,9 @@ function Assert-SemanticInvariant {
         return
     }
 
-    $hashtablePatterns = @{
-        'adr-lifecycle-migration-is-enforced' =
-            '(?s)function Get-DecisionRecordLifecycleFailure.*?' +
-            'An unchanged published legacy ADR did not remain valid\..*?' +
-            'A changed legacy ADR did not require lifecycle migration'
-        'created-ref-metadata-baseline-is-consumed' =
-            '(?s)function Get-CreatedRefMetadataBaselineRevision.*?' +
-            '\$strCreatedRefMetadataBaselineRevision =\s+' +
-            'Get-CreatedRefMetadataBaselineRevision'
-        'created-ref-paths-use-endpoint-boundary' =
-            '(?s)function Read-GitPublishedEndpointChangedPath.*?' +
-            'elseif \(\$BaselineAbsent -and ' +
-            '\$arrBoundaries\.Count -eq 1\).*?' +
-            '''diff''.*?\$arrBoundaries\[0\], \$FinalRevision.*?' +
-            'A created ref with introduced commits must have one boundary'
-        'docs-status-lifecycle-values' =
-            'Draft \| Proposed \| Active \| Accepted \| Superseded \| Deprecated'
-        'docs-owner-enforcer-relationship' =
-            '(?m)^- `\.github/instructions/docs\.instructions\.md` owns these ' +
-            'documentation rules\.$\n^- `\.github/workflows/' +
-            'Test-AgentInstructions\.ps1` is a non-owner enforcement mechanism\. ' +
-            'It checks the named owner at the exact input revision and rejects ' +
-            'stale repository-specific documentation claims\.$'
-        'extracted-self-test-is-invoked' =
-            '& \(Join-Path \$strRepositoryRootPath \$strExtractedSelfTestPath\)'
-        'extracted-self-test-version-and-topology' =
-            '(?s)# Version: 1\.2\.\d{8}\.\d+.*Get-CreatedRefBoundaryContext'
-        'metadata-history-validates-parent-edges' =
-            'function Get-GovernedMetadataHistoryFailure'
-        'new-ref-boundary-cap-is-64' =
-            '\$intMetadataMaximumBoundaries = 64'
-        'pr-merge-bases-use-all-and-cap' =
-            'merge-base --all'
-        'published-finalization-date-is-enforced' =
-            '(?s)\$strTrustedEventUtcDate = ' +
-            '\$objTrustedEventTimestamp\.ToString\(.*?' +
-            'ExpectedUtcDate = \$strTrustedEventUtcDate.*?' +
-            'IsWorktreeTransition = \$true'
-        'ordinary-pr-uses-normal-trust-audit' =
-            '(?s)if \(\s*\$script:boolTrustedMaintenanceAuthorizationValidated' +
-            '.*?-ExactAuthorizedMaintenanceProductionCall.*?else \{\s+' +
-            '@\(Get-TrustRootRangeMutationFailure'
-        'trusted-maintenance-switch-is-explicit' =
-            '\$TrustedMaintenanceAuthorizationValidated'
-        'verifier-audits-authorized-history' =
-            'The candidate history contains unauthorized path'
-        'verifier-reads-trusted-revision-manifest' =
-            'ls-tree\s+`?\s*\$TrustedRevision\s+--\s+\$AuthorizationManifestPath'
-        'workflow-checkout-is-trusted-sha' =
-            '(?s)ref: \$\{\{ github\.sha \}\}.*?fetch-depth: >-\s+' +
-            "\$\{\{ github\.event_name == 'push' && github\.event\.created " +
-            '&& 1 \|\| 0 \}\}'
-        'workflow-permissions-are-read-only' =
-            'permissions:\s+contents: read'
-        'workflow-persist-credentials-is-false' =
-            'persist-credentials: false'
-        'workflow-uses-trusted-authorization-output' =
-            'TrustedMaintenanceAuthorizationValidated'
-    }
-    if (-not $hashtablePatterns.ContainsKey($Invariant) -or
-        $Text -cnotmatch $hashtablePatterns[$Invariant]) {
+    if (-not $script:hashtableSemanticInvariantPattern.ContainsKey($Invariant) -or
+        $Text -cnotmatch
+            $script:hashtableSemanticInvariantPattern[$Invariant]) {
         throw "$Path does not satisfy semantic invariant $Invariant."
     }
 }
@@ -876,6 +878,53 @@ if ($SelfTest) {
                 [StringComparison]::OrdinalIgnoreCase
             )) {
             Remove-Item -LiteralPath $strSelfTestRoot -Recurse -Force
+        }
+    }
+    $strOwnerBoundary =
+        '- `.github/instructions/docs.instructions.md` owns these ' +
+            'documentation rules.'
+    Assert-SemanticInvariant -Invariant 'docs-policy-owner-boundary' `
+        -Text $strOwnerBoundary -Path '.github/instructions/docs.instructions.md'
+    $strOwnerBoundaryMutation = $strOwnerBoundary.Replace(
+        ' owns these ',
+        ' describes these ',
+        [StringComparison]::Ordinal
+    )
+    try {
+        Assert-SemanticInvariant -Invariant 'docs-policy-owner-boundary' `
+            -Text $strOwnerBoundaryMutation `
+            -Path '.github/instructions/docs.instructions.md'
+        throw 'The documentation owner-boundary mutation passed.'
+    }
+    catch {
+        if ($_.Exception.Message -ceq
+            'The documentation owner-boundary mutation passed.' -or
+            -not $_.Exception.Message.Contains(
+                'does not satisfy semantic invariant docs-policy-owner-boundary',
+                [StringComparison]::Ordinal
+            )) {
+            throw
+        }
+    }
+    foreach ($strRemovedInvariant in @(
+            'docs-owner-enforcer-relationship',
+            'metadata-history-validates-parent-edges'
+        )) {
+        try {
+            Assert-SemanticInvariant -Invariant $strRemovedInvariant `
+                -Text $strOwnerBoundary `
+                -Path '.github/instructions/docs.instructions.md'
+            throw "Removed semantic invariant $strRemovedInvariant passed."
+        }
+        catch {
+            if ($_.Exception.Message -ceq
+                "Removed semantic invariant $strRemovedInvariant passed." -or
+                -not $_.Exception.Message.Contains(
+                    "does not satisfy semantic invariant $strRemovedInvariant",
+                    [StringComparison]::Ordinal
+                )) {
+                throw
+            }
         }
     }
     return
@@ -998,6 +1047,9 @@ if ($arrAllowedPaths.Count -lt 1 -or
 $setAllowedPaths = [Collections.Generic.HashSet[string]]::new(
     [StringComparer]::Ordinal
 )
+$setAssignedSemanticInvariants = [Collections.Generic.HashSet[string]]::new(
+    [StringComparer]::Ordinal
+)
 foreach ($objPath in $arrAllowedPaths) {
     Assert-ExactPropertySet -InputObject $objPath -Name 'An authorized path' `
         -PropertyName @(
@@ -1053,6 +1105,9 @@ foreach ($objPath in $arrAllowedPaths) {
         throw "$strPath has missing or duplicate semantic invariants."
     }
     foreach ($strInvariant in $arrInvariants) {
+        if (-not $setAssignedSemanticInvariants.Add($strInvariant)) {
+            throw "Semantic invariant $strInvariant has multiple consumers."
+        }
         Assert-SemanticInvariant -Invariant $strInvariant -Text $strText -Path $strPath
     }
     if ($strPath -ceq $strVerifierPath) {
@@ -1064,6 +1119,17 @@ foreach ($objPath in $arrAllowedPaths) {
             throw 'The candidate verifier differs from the trusted verifier that authorizes it.'
         }
     }
+}
+$arrSupportedSemanticInvariants = @(
+    $script:arrSpecialSemanticInvariant
+    $script:hashtableSemanticInvariantPattern.Keys
+) | Sort-Object
+$arrAssignedSemanticInvariants = @(
+    $setAssignedSemanticInvariants
+) | Sort-Object
+if ([string]::Join("`n", $arrAssignedSemanticInvariants) -cne
+    [string]::Join("`n", $arrSupportedSemanticInvariants)) {
+    throw 'The authorization must consume every supported semantic invariant exactly once.'
 }
 
 $objDiff = Invoke-BoundedProcessByte -FileName 'git' -MaximumBytes 1048576 `
