@@ -23,7 +23,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.0.20260902.2
+# Version: 1.0.20260902.3
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -535,14 +535,14 @@ function Assert-SemanticInvariant {
             'const evidence = process.env.PUSH_COMMIT_EVIDENCE;',
             'Buffer.byteLength(evidence, "utf8") > 1048576',
             'commits = JSON.parse(evidence);',
-            '!Array.isArray(commits) || commits.length > 2048',
+            '!Array.isArray(commits) || commits.length >= 2048',
             '!/^[0-9a-f]{40}$/.test(entry.id)',
             'seenCommitIds.has(entry.id)',
             'if (ids.length > 0 &&',
             'ids[ids.length - 1] !== process.env.PUSH_AFTER_SHA',
             '(ids.length > 0 ? "\n" : ""), "utf8");',
             'fetch_depth=$((push_commit_count + 1))',
-            'test "${fetch_depth}" -le 2049',
+            'test "${fetch_depth}" -le 2048',
             "destination_local_ref='refs/remotes/event/created-destination'",
             '--no-write-fetch-head --no-recurse-submodules origin',
             '"${PUSH_REF}:${destination_local_ref}"',
