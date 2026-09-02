@@ -315,6 +315,8 @@ Decision records exist to prevent re-litigating decisions.
   - **Alternatives Considered**
   - **Date:** YYYY-MM-DD
 
+Published legacy decision records that predate this lifecycle rule MAY retain their existing status representation while their bytes remain unchanged. The next change to such a record MUST migrate it to the single Tier 1 Status metadata field and MUST remove each separate narrative status field or section.
+
 ADRs MUST be short and specific. If an ADR grows into a design doc, split it.
 
 ## Requirements Documentation Standards

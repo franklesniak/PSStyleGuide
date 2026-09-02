@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260902.5
+# Version: 1.7.20260902.6
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -4890,7 +4890,8 @@ function Get-DecisionLifecyclePolicyFailure {
     #
     # .DESCRIPTION
     # Requires one decision-record Status representation, the four retained
-    # lifecycle values, and an explicit prohibition on a second narrative status.
+    # lifecycle values, an explicit prohibition on a second narrative status,
+    # and the unchanged-byte legacy migration boundary.
     #
     # .PARAMETER Content
     # The documentation instruction content to inspect.
@@ -4958,15 +4959,28 @@ function Get-DecisionLifecyclePolicyFailure {
             'Decision records must prohibit a separate narrative status representation.'
         )
     }
+
+    if ([regex]::Matches(
+            $strSectionBody,
+            ('Published legacy decision records that predate this lifecycle rule ' +
+                'MAY retain their existing status representation while their bytes ' +
+                'remain unchanged\. The next change to such a record MUST migrate it ' +
+                'to the single Tier 1 Status metadata field and MUST remove each ' +
+                'separate narrative status field or section\.')
+        ).Count -ne 1) {
+        Write-Output (
+            'Decision records must document the unchanged legacy migration boundary.'
+        )
+    }
 }
 
 function Get-DecisionRecordLifecycleFailure {
     # .SYNOPSIS
     # Finds lifecycle representation failures in one decision record.
     # .DESCRIPTION
-    # Requires one four-state metadata Status and no operative level-two Status
-    # section for a new or changed ADR. An unchanged published legacy ADR remains
-    # valid until its next content change, as required by the migration boundary.
+    # Requires one four-state metadata Status and no separate structured Status
+    # field or section for a new or changed ADR. An unchanged published legacy ADR
+    # remains valid until its next content change under the migration boundary.
     # .PARAMETER Name
     # The repository-relative decision-record path.
     # .PARAMETER CurrentContent
@@ -5012,9 +5026,33 @@ function Get-DecisionRecordLifecycleFailure {
         )
     }
     $objMarkdownContext = Get-OperativeMarkdownContext -Content $CurrentContent
+    $objMetadataHeading = @(
+        $objMarkdownContext.LevelTwoHeadings |
+            Where-Object Text -CEQ 'Metadata'
+    )[0]
+    $intMetadataSectionEnd = $objMarkdownContext.SourceLines.Count
+    foreach ($objLevelTwoHeading in $objMarkdownContext.LevelTwoHeadings) {
+        if ($objLevelTwoHeading.Start -gt $objMetadataHeading.Start) {
+            $intMetadataSectionEnd = $objLevelTwoHeading.Start
+            break
+        }
+    }
     if (@($objMarkdownContext.LevelTwoHeadings |
-            Where-Object Text -CEQ 'Status').Count -ne 0) {
+            Where-Object {
+                $_.Start -ne $objMetadataHeading.Start -and
+                $_.Text -match '(?i)\bStatus\b'
+            }).Count -ne 0) {
         Write-Output "$Name must not contain a separate operative Status section."
+    }
+    if (@($objMarkdownContext.ProseBlocks |
+            Where-Object {
+                ($_.Start -le $objMetadataHeading.Start -or
+                    $_.Start -ge $intMetadataSectionEnd) -and
+                $_.Text -match '(?i)^[^:\r\n]*\bStatus\b\s*:\s*\S'
+            }).Count -ne 0) {
+        Write-Output (
+            "$Name must not contain a separate operative Status field outside Metadata."
+        )
     }
 }
 
@@ -7384,9 +7422,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260902\.5$'
+            '(?m)^# Version: 1\.7\.20260902\.6$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.7.20260902.5.'
+        throw 'The validator script version is not 1.7.20260902.6.'
     }
     $boolSavedWindowsPython = $script:useWindowsPythonLauncher
     $arrSavedPythonNames = $script:pythonPathNames
@@ -7503,6 +7541,26 @@ if ($SelfTest) {
             'Decision records must prohibit a separate narrative status representation.') {
         throw 'A permitted narrative decision Status did not fail closed.'
     }
+    $strPermanentLegacyDecisionMutation = $strDocsInstructionsContent.Replace(
+        'while their bytes remain unchanged.',
+        'without a required migration boundary.'
+    )
+    if ($strPermanentLegacyDecisionMutation -ceq $strDocsInstructionsContent -or
+        @(Get-DecisionLifecyclePolicyFailure `
+                -Content $strPermanentLegacyDecisionMutation) -cnotcontains
+            'Decision records must document the unchanged legacy migration boundary.') {
+        throw 'A permanent legacy decision exception did not fail closed.'
+    }
+    $strOptionalLegacyMigrationMutation = $strDocsInstructionsContent.Replace(
+        'The next change to such a record MUST migrate it',
+        'The next change to such a record MAY migrate it'
+    )
+    if ($strOptionalLegacyMigrationMutation -ceq $strDocsInstructionsContent -or
+        @(Get-DecisionLifecyclePolicyFailure `
+                -Content $strOptionalLegacyMigrationMutation) -cnotcontains
+            'Decision records must document the unchanged legacy migration boundary.') {
+        throw 'An optional legacy decision migration did not fail closed.'
+    }
     $strLegacyDecisionRecord = @(
         '# Decision 0001: Legacy fixture'
         '## Metadata'
@@ -7554,6 +7612,40 @@ if ($SelfTest) {
             -CurrentContent $strCompliantDecisionRecord `
             -BaselineContent $strLegacyDecisionRecord).Count -ne 0) {
         throw 'A changed ADR with one valid lifecycle Status did not pass.'
+    }
+    $strDecisionStatusSectionRecord = $strCompliantDecisionRecord.Replace(
+        "## Context`n",
+        "## Decision Status`nAccepted.`n## Context`n"
+    )
+    if (@(Get-DecisionRecordLifecycleFailure `
+            -Name 'docs/decisions/0001-legacy.md' `
+            -CurrentContent $strDecisionStatusSectionRecord `
+            -BaselineContent $strLegacyDecisionRecord) -cnotcontains
+        ('docs/decisions/0001-legacy.md must not contain a separate operative ' +
+            'Status section.')) {
+        throw 'A Decision Status section escaped lifecycle validation.'
+    }
+    $strDecisionStatusFieldRecord = $strCompliantDecisionRecord.Replace(
+        "## Context`n",
+        "## Context`n- **Decision Status:** Accepted`n"
+    )
+    if (@(Get-DecisionRecordLifecycleFailure `
+            -Name 'docs/decisions/0001-legacy.md' `
+            -CurrentContent $strDecisionStatusFieldRecord `
+            -BaselineContent $strLegacyDecisionRecord) -cnotcontains
+        ('docs/decisions/0001-legacy.md must not contain a separate operative ' +
+            'Status field outside Metadata.')) {
+        throw 'A Decision Status field escaped lifecycle validation.'
+    }
+    $strDecisionStatusProseRecord = $strCompliantDecisionRecord.Replace(
+        'Changed legacy context.',
+        'The decision status remains accepted in ordinary prose.'
+    )
+    if (@(Get-DecisionRecordLifecycleFailure `
+            -Name 'docs/decisions/0001-legacy.md' `
+            -CurrentContent $strDecisionStatusProseRecord `
+            -BaselineContent $strLegacyDecisionRecord).Count -ne 0) {
+        throw 'Ordinary decision status prose was rejected as a second representation.'
     }
     if (@(Get-DecisionRecordLifecycleFailure `
             -Name 'docs/decisions/0003-new.md' `
