@@ -4,8 +4,17 @@ import https from 'node:https';
 
 const maximumPages = 10;
 const maximumResponseBytes = 1048576;
+const maximumRequestPathCharacters = 4096;
 const shaPattern = /^[0-9a-f]{40}$/;
 const repositoryPattern = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
+const workflowRunStatuses = new Set([
+  'completed',
+  'in_progress',
+  'pending',
+  'queued',
+  'requested',
+  'waiting',
+]);
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -27,6 +36,62 @@ function isCurrentPull(pull, ref, expected) {
     pull.head && pull.head.sha === expected.headSha &&
     ref && ref.object && ref.object.type === 'commit' &&
     ref.object.sha === expected.baseSha;
+}
+
+function isAuthenticWorkflowRun(run, expected) {
+  if (!['requested', 'completed'].includes(expected.activity)) return false;
+  if (!(run && String(run.id) === expected.runId && run.event === 'push' &&
+    run.path === '.github/workflows/agent-instructions.yml' &&
+    run.head_branch === expected.branch && run.head_sha === expected.signalSha &&
+    workflowRunStatuses.has(run.status))) return false;
+  return expected.activity === 'requested' || run.status === 'completed';
+}
+
+function normalizeApiRoot(value) {
+  let url;
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error('GitHub API identity is invalid.');
+  }
+  assert(url.protocol === 'https:' && url.username === '' &&
+    url.password === '' && url.search === '' && url.hash === '',
+  'GitHub API identity is invalid.');
+  url.pathname = `${url.pathname.replace(/\/+$/, '')}/`;
+  const basePathname = url.pathname;
+  return { url, origin: url.origin, basePathname };
+}
+
+function resolveApiRequestUrl(apiRoot, relativePath) {
+  assert(typeof relativePath === 'string' && relativePath.length >= 1 &&
+    relativePath.length <= maximumRequestPathCharacters &&
+    !relativePath.startsWith('/') && !relativePath.startsWith('?') &&
+    !/^[A-Za-z][A-Za-z0-9+.-]*:/.test(relativePath) &&
+    !/[\\\u0000-\u001f\u007f#]/.test(relativePath),
+  'GitHub API request path is invalid.');
+  const pathOnly = relativePath.split('?', 1)[0];
+  for (const segment of pathOnly.split('/')) {
+    let decoded;
+    try {
+      decoded = decodeURIComponent(segment);
+    } catch {
+      throw new Error('GitHub API request path is invalid.');
+    }
+    assert(decoded !== '.' && decoded !== '..' &&
+      !decoded.includes('/') && !decoded.includes('\\'),
+    'GitHub API request path is invalid.');
+  }
+  let resolved;
+  try {
+    resolved = new URL(relativePath, apiRoot.url);
+  } catch {
+    throw new Error('GitHub API request path is invalid.');
+  }
+  assert(resolved.origin === apiRoot.origin &&
+    resolved.username === '' && resolved.password === '' &&
+    resolved.pathname.startsWith(apiRoot.basePathname),
+  'GitHub API request path escaped its API root.');
+  return resolved;
 }
 
 function runSelfTest() {
@@ -70,6 +135,67 @@ function runSelfTest() {
   assert(!isCurrentPull(pull,
     { object: { type: 'commit', sha: baselineSha } }, expected),
   'A stale live base must fail finalization.');
+  const workflowRun = {
+    id: 501,
+    event: 'push',
+    path: '.github/workflows/agent-instructions.yml',
+    head_branch: 'main',
+    head_sha: advancedSha,
+    status: 'requested',
+  };
+  const workflowSignal = {
+    activity: 'requested',
+    runId: '501',
+    branch: 'main',
+    signalSha: advancedSha,
+  };
+  assert(isAuthenticWorkflowRun(workflowRun, workflowSignal),
+    'A requested signal must authenticate its initial live state.');
+  assert(isAuthenticWorkflowRun({ ...workflowRun, status: 'completed' },
+    workflowSignal),
+  'A requested signal must accept an advanced live state.');
+  assert(isAuthenticWorkflowRun({ ...workflowRun, status: 'completed' },
+    { ...workflowSignal, activity: 'completed' }),
+  'A completed signal must reconcile completed live state.');
+  assert(!isAuthenticWorkflowRun({ ...workflowRun, status: 'in_progress' },
+    { ...workflowSignal, activity: 'completed' }),
+  'A completed signal must reject nonterminal live state.');
+  assert(!isAuthenticWorkflowRun({ ...workflowRun, head_sha: baselineSha },
+    workflowSignal),
+  'A forged workflow-run signal must fail authentication.');
+  assert(!isAuthenticWorkflowRun(workflowRun,
+    { ...workflowSignal, activity: 'in_progress' }),
+  'An unsupported workflow-run activity must fail authentication.');
+
+  const githubRoot = normalizeApiRoot('https://api.github.com');
+  const githubRequest = resolveApiRequestUrl(githubRoot,
+    'repos/owner/repository/pulls?state=open&base=feature%2Fencoded');
+  assert(githubRequest.origin === 'https://api.github.com' &&
+    githubRequest.pathname === '/repos/owner/repository/pulls' &&
+    githubRequest.search === '?state=open&base=feature%2Fencoded',
+  'A GitHub.com API request must preserve its encoded query.');
+  const enterpriseRoot = normalizeApiRoot('https://github.example/api/v3');
+  const enterpriseRequest = resolveApiRequestUrl(enterpriseRoot,
+    `repos/owner/repository/git/ref/heads/${encodeRef('feature/encoded branch')}`);
+  assert(enterpriseRequest.origin === 'https://github.example' &&
+    enterpriseRequest.pathname ===
+      '/api/v3/repos/owner/repository/git/ref/heads/feature/encoded%20branch',
+  'A GHES API request must preserve its API base and encoded branch path.');
+  let rejectedPath = false;
+  try {
+    resolveApiRequestUrl(enterpriseRoot, '../outside');
+  } catch (error) {
+    rejectedPath = error.message === 'GitHub API request path is invalid.';
+  }
+  assert(rejectedPath, 'A relative traversal must fail API request validation.');
+  let rejectedAbsolute = false;
+  try {
+    resolveApiRequestUrl(githubRoot,
+      'https://api.github.com/repos/owner/repository');
+  } catch (error) {
+    rejectedAbsolute = error.message === 'GitHub API request path is invalid.';
+  }
+  assert(rejectedAbsolute, 'An absolute URL must fail API request validation.');
 }
 
 function getEnvironment(name) {
@@ -91,15 +217,15 @@ function encodeRef(ref) {
 function createClient() {
   const repository = getEnvironment('EXPECTED_REPOSITORY');
   const token = getEnvironment('GITHUB_TOKEN');
-  const apiUrl = new URL(getEnvironment('GITHUB_API_URL'));
-  assert(repositoryPattern.test(repository) && apiUrl.protocol === 'https:',
+  const apiRoot = normalizeApiRoot(getEnvironment('GITHUB_API_URL'));
+  assert(repositoryPattern.test(repository),
     'GitHub API identity is invalid.');
 
   async function request(method, path, body, allowNotFound = false) {
     const payload = body === undefined ? undefined :
       Buffer.from(JSON.stringify(body), 'utf8');
     return await new Promise((resolve, reject) => {
-      const operation = https.request(new URL(path, apiUrl), {
+      const operation = https.request(resolveApiRequestUrl(apiRoot, path), {
         method,
         headers: {
           Accept: 'application/vnd.github+json',
@@ -149,7 +275,7 @@ function createClient() {
   }
 
   async function postStatus(headSha, pullNumber, state, description, targetUrl) {
-    await request('POST', `/repos/${repository}/statuses/${headSha}`, {
+    await request('POST', `repos/${repository}/statuses/${headSha}`, {
       state,
       context: statusContext(pullNumber),
       description,
@@ -177,9 +303,9 @@ async function finalize() {
 
   async function readLiveState() {
     const pull = await client.request('GET',
-      `/repos/${client.repository}/pulls/${pullNumber}`);
+      `repos/${client.repository}/pulls/${pullNumber}`);
     const ref = await client.request('GET',
-      `/repos/${client.repository}/git/ref/heads/${encodeRef(baseRef)}`);
+      `repos/${client.repository}/git/ref/heads/${encodeRef(baseRef)}`);
     return isCurrentPull(pull, ref, expected);
   }
 
@@ -205,22 +331,22 @@ async function finalize() {
 
 async function invalidate() {
   const client = createClient();
+  const activity = getEnvironment('SIGNAL_ACTIVITY');
   const runId = getEnvironment('SIGNAL_RUN_ID');
   const branch = getEnvironment('SIGNAL_HEAD_BRANCH');
   const signalSha = getEnvironment('SIGNAL_HEAD_SHA');
   const targetUrl = getEnvironment('STATUS_TARGET_URL');
-  assert(/^[1-9][0-9]{0,19}$/.test(runId) && validRef(branch) &&
+  assert(['requested', 'completed'].includes(activity) &&
+    /^[1-9][0-9]{0,19}$/.test(runId) && validRef(branch) &&
     shaPattern.test(signalSha) && targetUrl.startsWith('https://'),
   'Invalidation input is invalid.');
   const run = await client.request('GET',
-    `/repos/${client.repository}/actions/runs/${runId}`);
-  assert(run && String(run.id) === runId && run.event === 'push' &&
-    run.path === '.github/workflows/agent-instructions.yml' &&
-    run.head_branch === branch && run.head_sha === signalSha &&
-    run.status === 'completed',
+    `repos/${client.repository}/actions/runs/${runId}`);
+  assert(isAuthenticWorkflowRun(run,
+    { activity, runId, branch, signalSha }),
   'Workflow-run signal does not match its live record.');
   const ref = await client.request('GET',
-    `/repos/${client.repository}/git/ref/heads/${encodeRef(branch)}`,
+    `repos/${client.repository}/git/ref/heads/${encodeRef(branch)}`,
     undefined, true);
   if (ref === null) return;
   assert(ref.object && ref.object.type === 'commit' &&
@@ -231,7 +357,7 @@ async function invalidate() {
   const seenPulls = new Set();
   for (let page = 1; page <= maximumPages; page += 1) {
     const result = await client.request('GET',
-      `/repos/${client.repository}/pulls?state=open&base=` +
+      `repos/${client.repository}/pulls?state=open&base=` +
       `${encodeURIComponent(branch)}&per_page=100&page=${page}`);
     assert(Array.isArray(result) && result.length <= 100,
       'Pull request response is invalid.');
@@ -255,7 +381,7 @@ async function invalidate() {
     const context = statusContext(pull.number);
     for (let page = 1; page <= maximumPages; page += 1) {
       const statuses = await client.request('GET',
-        `/repos/${client.repository}/commits/${pull.head.sha}/statuses` +
+        `repos/${client.repository}/commits/${pull.head.sha}/statuses` +
         `?per_page=100&page=${page}`);
       assert(Array.isArray(statuses) && statuses.length <= 100,
         'Commit status response is invalid.');

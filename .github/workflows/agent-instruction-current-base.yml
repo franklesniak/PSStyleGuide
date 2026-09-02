@@ -5,6 +5,7 @@ on:
     workflows:
       - Agent instruction validation
     types:
+      - requested
       - completed
 
 permissions: {}
@@ -44,6 +45,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           EXPECTED_REPOSITORY: ${{ github.repository }}
+          SIGNAL_ACTIVITY: ${{ github.event.action }}
           SIGNAL_RUN_ID: ${{ github.event.workflow_run.id }}
           SIGNAL_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
           SIGNAL_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}

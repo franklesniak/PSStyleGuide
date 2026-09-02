@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260902.10
+# Version: 1.7.20260902.11
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -7705,9 +7705,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260902\.10$'
+            '(?m)^# Version: 1\.7\.20260902\.11$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.7.20260902.10.'
+        throw 'The validator script version is not 1.7.20260902.11.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
@@ -8283,9 +8283,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strTrustRootAuthorizationSource,
-            '(?m)^# Version: 1\.0\.20260902\.7$'
+            '(?m)^# Version: 1\.0\.20260902\.8$'
         ).Count -ne 1) {
-        throw 'The trust-root authorization script lacks version 1.0.20260902.7.'
+        throw 'The trust-root authorization script lacks version 1.0.20260902.8.'
     }
     & (Join-Path $strRepositoryRootPath $strTrustRootAuthorizationPath) `
         -RepositoryRootPath $strRepositoryRootPath `
@@ -10001,6 +10001,9 @@ if ($SelfTest) {
                 'const { TextDecoder } = require("util");',
                 'new TextDecoder("utf-8", { fatal: true })',
                 'seenRefs.has(fields[1])',
+                'fields.length !== 4',
+                'fields.some((field) => field.length === 0)',
+                'Created-ref evidence row is malformed.',
                 'const compareOrdinal = (left, right) =>',
                 'left < right ? -1 : left > right ? 1 : 0;',
                 'mapfile -t remote_rows <"${sorted_refs}"',
@@ -10344,6 +10347,30 @@ if ($SelfTest) {
                 'false'
             )
             Expected = 'Workflow contract literal is missing: seenRefs.has(fields[1])'
+        },
+        [pscustomobject]@{
+            Name = 'missing created-ref evidence field accepted'
+            Content = $strAgentWorkflowContent.Replace(
+                'fields.length !== 4',
+                'fields.length > 4'
+            )
+            Expected = 'Workflow contract literal is missing: fields.length !== 4'
+        },
+        [pscustomobject]@{
+            Name = 'extra created-ref evidence field accepted'
+            Content = $strAgentWorkflowContent.Replace(
+                'fields.length !== 4',
+                'fields.length < 4'
+            )
+            Expected = 'Workflow contract literal is missing: fields.length !== 4'
+        },
+        [pscustomobject]@{
+            Name = 'empty created-ref evidence field accepted'
+            Content = $strAgentWorkflowContent.Replace(
+                'fields.some((field) => field.length === 0)',
+                'false'
+            )
+            Expected = 'Workflow contract literal is missing: fields.some((field)'
         },
         [pscustomobject]@{
             Name = 'missing push commit byte bound'

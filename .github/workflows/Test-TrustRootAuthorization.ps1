@@ -29,7 +29,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.0.20260902.7
+# Version: 1.0.20260902.8
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -128,12 +128,14 @@ $script:hashtableSemanticInvariantPattern = @{
         'Set-AgentInstructionCurrentBaseStatus\.mjs\s+finalize'
     'workflow-run-current-base-invalidator-is-fail-closed' =
         '(?s)^(?!.*pull_request_target:)(?!.*artifacts/).*?' +
-        'workflow_run:.*?Agent instruction validation.*?completed.*?' +
+        'workflow_run:.*?Agent instruction validation.*?requested.*?completed.*?' +
         "workflow_run\.event == 'push'.*?" +
         'group: agent-instruction-current-base-status.*?' +
+        'cancel-in-progress: false.*?' +
         'actions: read.*?contents: read.*?pull-requests: read.*?' +
         'statuses: write.*?ref: \$\{\{ github\.sha \}\}.*?' +
-        'persist-credentials: false.*?' +
+        'persist-credentials: false.*?SIGNAL_ACTIVITY: ' +
+        '\$\{\{ github\.event\.action \}\}.*?' +
         'Set-AgentInstructionCurrentBaseStatus\.mjs\s+invalidate'
     'workflow-permissions-are-read-only' =
         'permissions:\s+contents: read'
@@ -872,18 +874,29 @@ function Assert-SemanticInvariant {
         foreach ($strRequiredLiteral in @(
                 'const maximumPages = 10;',
                 'const maximumResponseBytes = 1048576;',
+                'const maximumRequestPathCharacters = 4096;',
                 'Agent instruction current base/PR-${pullNumber}',
                 'latest.description === `Validated base ${currentBaseSha}.`',
                 'Both same-baseline pull requests must be invalidated.',
                 'An older workflow-run signal must preserve a newer current success.',
                 'Status contexts must be stable and pull-request-specific.',
                 'A stale live base must fail finalization.',
-                '/pulls/${pullNumber}',
-                '/git/ref/heads/${encodeRef(baseRef)}',
-                '/statuses/${headSha}',
+                'A requested signal must authenticate its initial live state.',
+                'A requested signal must accept an advanced live state.',
+                'A completed signal must reconcile completed live state.',
+                'A completed signal must reject nonterminal live state.',
+                'A forged workflow-run signal must fail authentication.',
+                'An unsupported workflow-run activity must fail authentication.',
+                'A GitHub.com API request must preserve its encoded query.',
+                'A GHES API request must preserve its API base and encoded branch path.',
+                'resolved.origin === apiRoot.origin',
+                'resolved.pathname.startsWith(apiRoot.basePathname)',
+                'repos/${client.repository}/pulls/${pullNumber}',
+                'repos/${client.repository}/git/ref/heads/${encodeRef(baseRef)}',
+                'repos/${repository}/statuses/${headSha}',
                 "run.path === '.github/workflows/agent-instructions.yml'",
-                'run.head_branch === branch && run.head_sha === signalSha',
-                '/pulls?state=open&base=',
+                'run.head_branch === expected.branch && run.head_sha === expected.signalSha',
+                'repos/${client.repository}/pulls?state=open&base=',
                 '?per_page=100&page=${page}',
                 'Pull request pagination exceeded its bound.',
                 'Commit status pagination exceeded its bound.',

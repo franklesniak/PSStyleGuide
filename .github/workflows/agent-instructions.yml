@@ -373,8 +373,12 @@ jobs:
             const fs = require("fs");
             const rows = fs.readFileSync(process.argv[1], "utf8")
               .split("\n").filter(Boolean).map((row) => {
-                const [ref, object, commit, local_ref] = row.split("\t");
-                if (!ref || !object || !commit || !local_ref) throw Error();
+                const fields = row.split("\t");
+                if (fields.length !== 4 ||
+                    fields.some((field) => field.length === 0)) {
+                  throw new Error("Created-ref evidence row is malformed.");
+                }
+                const [ref, object, commit, local_ref] = fields;
                 return { ref, object, commit, local_ref };
               });
             process.stdout.write(JSON.stringify(rows));
