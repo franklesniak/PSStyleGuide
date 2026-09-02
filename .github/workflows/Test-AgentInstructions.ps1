@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260902.2
+# Version: 1.7.20260902.3
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -917,9 +917,9 @@ function Read-GitPublishedEndpointChangedPath {
     # Reads bounded paths changed between the published baseline and final state.
     #
     # .DESCRIPTION
-    # Uses authenticated endpoint trees. A created ref uses its graph-derived
-    # introduced set and outside-parent boundaries. Only a genuine root uses
-    # the complete final tree.
+    # Uses authenticated endpoint trees. A created ref with one authenticated
+    # outside-parent boundary compares that boundary tree with the final tree.
+    # Only a genuine root uses the complete final tree.
     #
     # .PARAMETER RepositoryRootPath
     # The absolute path of the trusted Git repository.
@@ -957,7 +957,7 @@ function Read-GitPublishedEndpointChangedPath {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20260902.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -986,12 +986,15 @@ function Read-GitPublishedEndpointChangedPath {
         @('-C', $RepositoryRootPath, 'ls-tree', '-r', '-z', '--name-only',
             $FinalRevision)
     }
-    elseif ($BaselineAbsent) {
+    elseif ($BaselineAbsent -and $arrBoundaries.Count -eq 1) {
         @(
-            '-C', $RepositoryRootPath, 'log', '--format=', '--name-only', '-z',
-            '-m', '--no-renames', '--no-ext-diff', '--no-textconv',
-            $FinalRevision, '--not'
-        ) + $arrBoundaries + @('--', ':(top)**')
+            '-C', $RepositoryRootPath, 'diff', '--name-only', '-z',
+            '--no-renames', '--no-ext-diff', '--no-textconv',
+            $arrBoundaries[0], $FinalRevision, '--', ':(top)**'
+        )
+    }
+    elseif ($BaselineAbsent) {
+        throw 'A created ref with introduced commits must have one boundary.'
     }
     else {
         @('-C', $RepositoryRootPath, 'diff', '--name-only', '-z',
@@ -1014,8 +1017,7 @@ function Read-GitPublishedEndpointChangedPath {
     if ($objResult.ExitCode -ne 0) {
         throw 'Could not enumerate paths changed between published endpoints.'
     }
-    $arrPaths = @(ConvertFrom-GitPathListData -Bytes $objResult.Bytes `
-            -AllowDuplicatePath:$BaselineAbsent)
+    $arrPaths = @(ConvertFrom-GitPathListData -Bytes $objResult.Bytes)
     return @($arrPaths | Sort-Object -Unique)
 }
 
@@ -7379,9 +7381,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260902\.2$'
+            '(?m)^# Version: 1\.7\.20260902\.3$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.7.20260902.2.'
+        throw 'The validator script version is not 1.7.20260902.3.'
     }
     $boolSavedWindowsPython = $script:useWindowsPythonLauncher
     $arrSavedPythonNames = $script:pythonPathNames
@@ -7795,9 +7797,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strExtractedSelfTestSource,
-            '(?m)^# Version: 1\.2\.20260902\.1$'
+            '(?m)^# Version: 1\.2\.20260902\.2$'
         ).Count -ne 1) {
-        throw 'The extracted self-test lacks version 1.2.20260902.1.'
+        throw 'The extracted self-test lacks version 1.2.20260902.2.'
     }
     $strExtractedSelfTestRevision = if (
         [string]::IsNullOrEmpty($strValidatedInputRevision)

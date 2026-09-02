@@ -23,7 +23,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.0.20260902.1
+# Version: 1.0.20260902.2
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -577,6 +577,12 @@ function Assert-SemanticInvariant {
             '(?s)function Get-CreatedRefMetadataBaselineRevision.*?' +
             '\$strCreatedRefMetadataBaselineRevision =\s+' +
             'Get-CreatedRefMetadataBaselineRevision'
+        'created-ref-paths-use-endpoint-boundary' =
+            '(?s)function Read-GitPublishedEndpointChangedPath.*?' +
+            'elseif \(\$BaselineAbsent -and ' +
+            '\$arrBoundaries\.Count -eq 1\).*?' +
+            '''diff''.*?\$arrBoundaries\[0\], \$FinalRevision.*?' +
+            'A created ref with introduced commits must have one boundary'
         'docs-status-lifecycle-values' =
             'Draft \| Proposed \| Active \| Accepted \| Superseded \| Deprecated'
         'docs-owner-enforcer-relationship' =

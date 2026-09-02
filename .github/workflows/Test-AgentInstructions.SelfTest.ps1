@@ -29,7 +29,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.2.20260902.1
+# Version: 1.2.20260902.2
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -410,6 +410,60 @@ try {
         throw 'The many-introduced created-ref fixture lost changed paths.'
     }
 
+    $strTransientDecisionDirectory = Join-Path $strTopologyRoot 'docs/decisions'
+    [void] [IO.Directory]::CreateDirectory($strTransientDecisionDirectory)
+    $strTransientDecisionPath = Join-Path `
+        $strTransientDecisionDirectory '0002-temp.md'
+    [IO.File]::WriteAllText(
+        $strTransientDecisionPath,
+        "# Decision 0002: Transient fixture`n",
+        $objUtf8
+    )
+    & git -C $strTopologyRoot add -- docs/decisions/0002-temp.md
+    & git -C $strTopologyRoot commit --quiet -m transient-create
+    $strTransientCreateCommit = ([string] (
+            & git -C $strTopologyRoot rev-parse HEAD
+        )).Trim()
+    & git -C $strTopologyRoot rm --quiet -- docs/decisions/0002-temp.md
+    & git -C $strTopologyRoot commit --quiet -m transient-delete
+    $strTransientDeleteCommit = ([string] (
+            & git -C $strTopologyRoot rev-parse HEAD
+        )).Trim()
+    $strTransientPayload = ConvertTo-Json -Depth 4 -Compress -InputObject `
+        ([object[]] @(
+                $objOnePayloadCommit,
+                $objTwoPayloadCommit,
+                (ConvertTo-CreatedPushCommitEvidenceObject `
+                    -Id $strTransientCreateCommit -Distinct $true),
+                (ConvertTo-CreatedPushCommitEvidenceObject `
+                    -Id $strTransientDeleteCommit -Distinct $true)
+            ))
+    $objTransientContext = Get-CreatedRefBoundaryContext `
+        -RepositoryRootPath $strTopologyRoot `
+        -DestinationRef 'refs/heads/new-transient' `
+        -HeadRevision $strTransientDeleteCommit `
+        -EventHeadRevision $strTransientDeleteCommit `
+        -EventHeadDistinct 'true' `
+        -PushCommitEvidenceJson $strTransientPayload `
+        -OtherRefEvidenceJson $strRootEvidence
+    $arrTransientPaths = @(Read-GitPublishedEndpointChangedPath `
+            -RepositoryRootPath $strTopologyRoot `
+            -BaselineRevision ('0' * 40) `
+            -FinalRevision $strTransientDeleteCommit `
+            -BaselineAbsent $true `
+            -NewRefBoundaryRevision $objTransientContext.BoundaryRevisions `
+            -NewRefIntroducedCommitRevision `
+                $objTransientContext.IntroducedCommitRevisions `
+            -MaximumBytes $MaximumBytes)
+    if (@($objTransientContext.IntroducedCommitRevisions).Count -ne 4 -or
+        @($objTransientContext.BoundaryRevisions).Count -ne 1 -or
+        (Get-CreatedRefMetadataBaselineRevision `
+            -Context $objTransientContext `
+            -HeadRevision $strTransientDeleteCommit) -cne $strRootCommit -or
+        [string]::Join("`n", $arrTransientPaths) -cne "one.txt`ntwo.txt") {
+        throw 'A transient created-ref path escaped the published endpoint diff.'
+    }
+
     & git -C $strTopologyRoot checkout --quiet -b left $strRootCommit
     [IO.File]::WriteAllText(
         (Join-Path $strTopologyRoot 'left.txt'), "left`n", $objUtf8
@@ -455,18 +509,28 @@ try {
         -HeadRevision $strMergeCommit -EventHeadRevision $strMergeCommit `
         -EventHeadDistinct 'true' -PushCommitEvidenceJson $strMergePayload `
         -OtherRefEvidenceJson $strMergeEvidence
-    $arrMergePaths = @(Read-GitPublishedEndpointChangedPath `
-            -RepositoryRootPath $strTopologyRoot `
-            -BaselineRevision ('0' * 40) -FinalRevision $strMergeCommit `
-            -BaselineAbsent $true `
-            -NewRefBoundaryRevision $objMergeContext.BoundaryRevisions `
-            -NewRefIntroducedCommitRevision `
-                $objMergeContext.IntroducedCommitRevisions `
-            -MaximumBytes $MaximumBytes)
     if (@($objMergeContext.IntroducedCommitRevisions).Count -ne 1 -or
-        @($objMergeContext.BoundaryRevisions).Count -ne 2 -or
-        [string]::Join("`n", $arrMergePaths) -cne "left.txt`nright.txt") {
-        throw 'The merge created-ref fixture lost a parent boundary.'
+        @($objMergeContext.BoundaryRevisions).Count -ne 2) {
+        throw 'The merge created-ref fixture lost a graph boundary.'
+    }
+    try {
+        [void] @(Read-GitPublishedEndpointChangedPath `
+                -RepositoryRootPath $strTopologyRoot `
+                -BaselineRevision ('0' * 40) -FinalRevision $strMergeCommit `
+                -BaselineAbsent $true `
+                -NewRefBoundaryRevision $objMergeContext.BoundaryRevisions `
+                -NewRefIntroducedCommitRevision `
+                    $objMergeContext.IntroducedCommitRevisions `
+                -MaximumBytes $MaximumBytes)
+        throw 'A multi-boundary created-ref path range was accepted.'
+    }
+    catch {
+        if (-not $_.Exception.Message.Contains(
+                'must have one boundary',
+                [StringComparison]::Ordinal
+            )) {
+            throw
+        }
     }
     try {
         [void] (Get-CreatedRefMetadataBaselineRevision `
