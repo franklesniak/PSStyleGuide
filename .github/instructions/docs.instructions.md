@@ -7,13 +7,13 @@ description: "Documentation standards:  contract-first, traceable, drift-resista
 
 # Documentation Writing Style
 
-**Version:** 1.6.20260831.0
+**Version:** 1.6.20260901.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-08-31
+- **Last Updated:** 2026-09-01
 - **Scope:** Defines documentation standards for Markdown (`**/*.md`) and Cursor Markdown rule (`**/*.mdc`) files in this repository, including specs, design docs, runbooks, ADRs, instruction files, and developer documentation. Does not cover code comments or inline documentation in source files.
 - **Related:** [Repository Copilot Instructions](../copilot-instructions.md)
 
@@ -268,6 +268,7 @@ PSStyleGuide does not track request-template files or a placeholder-check workfl
 - The literal example `https://github.com/OWNER/REPO/...` MAY appear only as clearly labeled didactic text in an inline code span or fenced code block. It MUST NOT appear as a live unresolved link target.
 - Placeholder text in copyable shell examples MUST remain literal and safe. The shell rules below prohibit command-substitution metacharacters in such placeholder text.
 - `.github/instructions/docs.instructions.md` owns these documentation rules.
+- `.github/workflows/Test-AgentInstructions.ps1` is a non-owner enforcement mechanism. It checks the named owner at the exact input revision and rejects stale repository-specific documentation claims.
 
 #### Template-substitution marker boundaries and replacement surfaces
 
