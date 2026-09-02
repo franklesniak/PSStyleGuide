@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "authorization_id": "issue176-trust-root-repair-3a36e2d5",
+  "authorization_id": "issue176-trust-root-repair-adbcaf32",
   "candidate": {
     "base_commit": "70bf7522233a6c8558809a2c2fc22be83a23a7b9",
-    "head_commit": "3a36e2d5dfd7bacff2abef871fab0c20a9de21e6",
-    "head_tree": "484e2fcb801edd12d0178b215395c3c0b319a64d",
+    "head_commit": "adbcaf3274cf4ec148207b1d3aeb7ee0dbc7750d",
+    "head_tree": "958290e36cc06f19fec04e79e2df5da803dc1496",
     "parent_commits": [
-      "94a90a7e136d75cb038a530e42ec78b98c832ad0"
+      "3a36e2d5dfd7bacff2abef871fab0c20a9de21e6"
     ]
   },
   "limits": {
@@ -43,9 +43,9 @@
     {
       "path": ".github/workflows/Test-AgentInstructions.ps1",
       "mode": "100644",
-      "blob": "dada680e4f25a88316dda723df1aed1dde6a53ab",
-      "bytes": 447299,
-      "sha256": "f3032c5a01926114b5ce7a1d6e41c4f36b51d70d24f8e10b142dbbbb89dd21d7",
+      "blob": "cc3b674f8a4530634dc8735c29e19f642df5b786",
+      "bytes": 458184,
+      "sha256": "c2e6309ff4d26dc8dcca6203282b16eeec1f5a1f66440b325a5477975c79a964",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
@@ -62,9 +62,9 @@
     {
       "path": ".github/workflows/Test-TrustRootAuthorization.ps1",
       "mode": "100644",
-      "blob": "53758c0802a1e59660163612ba93eec10235d246",
-      "bytes": 33914,
-      "sha256": "ada3186ac798e7076ca85a5d4532218c11ab2b1732fccc1044084e2c31a71898",
+      "blob": "fab0aee1bdd1368336e6b055d5946db5d0b1fcac",
+      "bytes": 35702,
+      "sha256": "72b3038df0d1ecc081a52c7d17c1e6451f6cc534347442d063e7ed2e493740ab",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
@@ -74,13 +74,14 @@
     {
       "path": ".github/workflows/agent-instructions.yml",
       "mode": "100644",
-      "blob": "bba3882881a2ad8f4d7503de08cd942a70759a63",
-      "bytes": 20938,
-      "sha256": "a5204946994d5281870921de48b9de5a8cafd1b772fa4d03a3b06bab72efff96",
+      "blob": "2c88b968d5eb9562c9419acb40a19c495ec08429",
+      "bytes": 24272,
+      "sha256": "4033b6bbfd8ec90bb300f3bcfe926b7b761edacd64e91df073c1cb122babcf59",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "yaml",
       "semantic_invariants": [
         "workflow-checkout-is-trusted-sha",
+        "workflow-created-push-history-fetch-is-bounded",
         "workflow-permissions-are-read-only",
         "workflow-persist-credentials-is-false",
         "workflow-uses-trusted-authorization-output"
