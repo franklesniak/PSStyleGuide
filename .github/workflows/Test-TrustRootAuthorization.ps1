@@ -16,6 +16,8 @@
 # When this switch is set, the script checks only whether the authorization
 # applies to the candidate. It returns one Boolean value and does not perform
 # the full authorization validation.
+# .PARAMETER SelfTest
+# Runs focused verifier helper tests and returns before authorization evaluation.
 # .PARAMETER AuthorizationManifestPath
 # The fixed trusted-revision authorization path.
 # .EXAMPLE
@@ -27,7 +29,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.0.20260902.4
+# Version: 1.0.20260902.5
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -37,6 +39,7 @@ param(
     [Parameter(Mandatory)][string] $BaseRevision,
     [Parameter(Mandatory)][string] $HeadRevision,
     [Parameter()][switch] $AuthorizationApplicabilityOnly,
+    [Parameter()][switch] $SelfTest,
     [Parameter()][string] $AuthorizationManifestPath =
         '.github/workflows/trust-root-authorization.json'
 )
@@ -62,6 +65,33 @@ $arrTrustRootPaths = @(
 )
 
 function Invoke-BoundedProcessByte {
+    # .SYNOPSIS
+    # Runs one process with bounded output and execution time.
+    # .DESCRIPTION
+    # Starts the requested executable without a shell, captures standard output
+    # as bytes, captures bounded error text, and stops on size or time overflow.
+    # .PARAMETER FileName
+    # The executable name or absolute executable path.
+    # .PARAMETER ArgumentList
+    # The exact ordered arguments supplied without shell interpolation.
+    # .PARAMETER MaximumBytes
+    # The positive maximum permitted standard-output byte count.
+    # .PARAMETER TimeoutMilliseconds
+    # The process time limit in milliseconds.
+    # .EXAMPLE
+    # Invoke-BoundedProcessByte -FileName 'git' -ArgumentList $arrArgs `
+    #     -MaximumBytes 1024
+    #
+    # # Returns the exit code, output bytes, and bounded error text.
+    # .INPUTS
+    # None. This helper does not accept pipeline input.
+    # .OUTPUTS
+    # [System.Management.Automation.PSCustomObject] One bounded process result.
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260902.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -138,6 +168,30 @@ function Invoke-BoundedProcessByte {
 }
 
 function ConvertFrom-StrictUtf8Text {
+    # .SYNOPSIS
+    # Decodes bytes as strict UTF-8 text.
+    # .DESCRIPTION
+    # Rejects a byte-order mark, prohibited control bytes, carriage returns,
+    # and invalid UTF-8 before returning decoded text.
+    # .PARAMETER Bytes
+    # The byte sequence to validate and decode. An empty sequence is permitted.
+    # .PARAMETER Name
+    # The diagnostic name for the byte sequence.
+    # .PARAMETER AllowNul
+    # Permits NUL separators for bounded Git path-list output.
+    # .EXAMPLE
+    # ConvertFrom-StrictUtf8Text -Bytes $arrBytes -Name 'manifest'
+    #
+    # # Returns strict decoded text.
+    # .INPUTS
+    # None. This helper does not accept pipeline input.
+    # .OUTPUTS
+    # [System.String] The decoded text.
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260902.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -167,6 +221,32 @@ function ConvertFrom-StrictUtf8Text {
 }
 
 function Read-GitBlobByte {
+    # .SYNOPSIS
+    # Reads one exact Git blob within a byte limit.
+    # .DESCRIPTION
+    # Verifies the object size before reading it. A verified zero-byte blob
+    # returns an explicit empty byte array without calling the positive-limit
+    # process helper.
+    # .PARAMETER RepositoryRootPath
+    # The repository that contains the blob object.
+    # .PARAMETER BlobId
+    # The full exact Git blob object ID.
+    # .PARAMETER MaximumBytes
+    # The maximum permitted blob byte count, including zero.
+    # .EXAMPLE
+    # Read-GitBlobByte -RepositoryRootPath $strRoot -BlobId $strBlob `
+    #     -MaximumBytes 65536
+    #
+    # # Returns the exact blob bytes.
+    # .INPUTS
+    # None. This helper does not accept pipeline input.
+    # .OUTPUTS
+    # [System.Byte] Zero or more bytes from the exact blob.
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260902.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([byte])]
     param(
@@ -182,8 +262,12 @@ function Read-GitBlobByte {
     $intSize = 0
     if ($objSizeResult.ExitCode -ne 0 -or
         -not [int]::TryParse($strSize, [ref] $intSize) -or
+        $intSize -lt 0 -or
         $intSize -gt $MaximumBytes) {
         throw "Authorized blob $BlobId exceeds its byte limit."
+    }
+    if ($intSize -eq 0) {
+        return [byte[]]::new(0)
     }
     $objResult = Invoke-BoundedProcessByte -FileName 'git' `
         -ArgumentList @('-C', $RepositoryRootPath, 'cat-file', 'blob', $BlobId) `
@@ -195,6 +279,26 @@ function Read-GitBlobByte {
 }
 
 function Assert-NoDuplicateJsonProperty {
+    # .SYNOPSIS
+    # Rejects duplicate JSON object properties recursively.
+    # .DESCRIPTION
+    # Walks one parsed JSON element and throws when an object contains the same
+    # property name more than once under ordinal comparison.
+    # .PARAMETER Element
+    # The JSON element to inspect recursively.
+    # .EXAMPLE
+    # Assert-NoDuplicateJsonProperty -Element $objDocument.RootElement
+    #
+    # # Returns only when the JSON property inventory is unique.
+    # .INPUTS
+    # None. This helper does not accept pipeline input.
+    # .OUTPUTS
+    # None. This helper returns no output.
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260902.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param([Parameter(Mandatory)][System.Text.Json.JsonElement] $Element)
@@ -218,6 +322,31 @@ function Assert-NoDuplicateJsonProperty {
 }
 
 function Assert-ExactPropertySet {
+    # .SYNOPSIS
+    # Requires one object to have an exact property set.
+    # .DESCRIPTION
+    # Compares actual and expected property names with ordinal values after
+    # sorting and throws when a property is missing or unexpected.
+    # .PARAMETER InputObject
+    # The object whose properties are inspected.
+    # .PARAMETER PropertyName
+    # The complete expected property-name set.
+    # .PARAMETER Name
+    # The diagnostic name for the inspected object.
+    # .EXAMPLE
+    # Assert-ExactPropertySet -InputObject $objValue `
+    #     -PropertyName @('a', 'b') -Name 'value'
+    #
+    # # Returns only when the property set is exact.
+    # .INPUTS
+    # None. This helper does not accept pipeline input.
+    # .OUTPUTS
+    # None. This helper returns no output.
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260902.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -236,11 +365,35 @@ function Assert-ExactPropertySet {
 }
 
 function Assert-CandidateSyntax {
+    # .SYNOPSIS
+    # Validates candidate text for its declared syntax class.
+    # .DESCRIPTION
+    # Parses PowerShell or YAML candidate text with trusted parsers. Markdown is
+    # accepted as inert text, and unknown syntax classes fail closed.
+    # .PARAMETER Syntax
+    # The declared syntax class: powershell, yaml, or markdown.
+    # .PARAMETER Text
+    # The strict UTF-8 candidate text to parse.
+    # .PARAMETER Path
+    # The repository-relative path used in diagnostics and parser context.
+    # .EXAMPLE
+    # Assert-CandidateSyntax -Syntax 'powershell' -Text $strText -Path $strPath
+    #
+    # # Returns only when the declared syntax is valid.
+    # .INPUTS
+    # None. This helper does not accept pipeline input.
+    # .OUTPUTS
+    # None. This helper returns no output.
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260902.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
         [Parameter(Mandatory)][string] $Syntax,
-        [Parameter(Mandatory)][string] $Text,
+        [Parameter(Mandatory)][AllowEmptyString()][string] $Text,
         [Parameter(Mandatory)][string] $Path
     )
 
@@ -305,11 +458,36 @@ process.stdin.on('end', () => {
 }
 
 function Assert-SemanticInvariant {
+    # .SYNOPSIS
+    # Validates one named trust-root semantic invariant.
+    # .DESCRIPTION
+    # Applies the trusted structural or exact-text check for one authorized
+    # candidate path and rejects unknown or unsatisfied invariant names.
+    # .PARAMETER Invariant
+    # The exact trusted semantic-invariant identifier.
+    # .PARAMETER Text
+    # The strict UTF-8 candidate text to inspect as inert data.
+    # .PARAMETER Path
+    # The repository-relative path used in failure diagnostics.
+    # .EXAMPLE
+    # Assert-SemanticInvariant -Invariant $strInvariant `
+    #     -Text $strText -Path $strPath
+    #
+    # # Returns only when the named invariant is satisfied.
+    # .INPUTS
+    # None. This helper does not accept pipeline input.
+    # .OUTPUTS
+    # None. This helper returns no output.
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260902.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
         [Parameter(Mandatory)][string] $Invariant,
-        [Parameter(Mandatory)][string] $Text,
+        [Parameter(Mandatory)][AllowEmptyString()][string] $Text,
         [Parameter(Mandatory)][string] $Path
     )
 
@@ -562,7 +740,13 @@ function Assert-SemanticInvariant {
                 throw "$Path does not satisfy semantic invariant $Invariant."
             }
         }
-        if ($Text -cmatch '(?m)(^|\s)--force(\s|$)' -or
+        $strBoundedFetchLiteral =
+            'timeout 60s git fetch --depth="${fetch_depth}" --no-tags'
+        if ([regex]::Matches(
+                $Text,
+                [regex]::Escape($strBoundedFetchLiteral)
+            ).Count -ne 2 -or
+            $Text -cmatch '(?m)(^|\s)--force(\s|$)' -or
             $Text.Contains(
                 '"+${PUSH_REF}:${destination_local_ref}"',
                 [StringComparison]::Ordinal
@@ -635,6 +819,66 @@ function Assert-SemanticInvariant {
         $Text -cnotmatch $hashtablePatterns[$Invariant]) {
         throw "$Path does not satisfy semantic invariant $Invariant."
     }
+}
+
+if ($SelfTest) {
+    $strSelfTestSystemTempRoot = [IO.Path]::GetFullPath(
+        [IO.Path]::GetTempPath()
+    )
+    $strSelfTestRoot = [IO.Path]::Combine(
+        $strSelfTestSystemTempRoot,
+        'trust-root-empty-blob-' + [Guid]::NewGuid().ToString('N')
+    )
+    [void] [IO.Directory]::CreateDirectory($strSelfTestRoot)
+    try {
+        & git -C $strSelfTestRoot init --quiet --object-format=sha1
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not initialize the empty-blob self-test repository.'
+        }
+        $strEmptyPath = Join-Path $strSelfTestRoot 'empty.md'
+        [IO.File]::WriteAllBytes($strEmptyPath, [byte[]]::new(0))
+        $strEmptyBlob = ([string] (& git -C $strSelfTestRoot `
+                    hash-object -w -- empty.md)).Trim()
+        if ($LASTEXITCODE -ne 0 -or
+            $strEmptyBlob -cne 'e69de29bb2d1d6434b8b29ae775ad8c2e48c5391') {
+            throw 'Could not create the canonical empty Git blob.'
+        }
+        $arrEmptyBytes = @(Read-GitBlobByte `
+                -RepositoryRootPath $strSelfTestRoot `
+                -BlobId $strEmptyBlob -MaximumBytes 0)
+        if ($arrEmptyBytes.Count -ne 0) {
+            throw 'A verified empty Git blob did not return an empty byte array.'
+        }
+        $strEmptyText = ConvertFrom-StrictUtf8Text `
+            -Bytes ([byte[]]::new(0)) -Name 'empty.md'
+        Assert-CandidateSyntax -Syntax 'markdown' -Text $strEmptyText `
+            -Path 'empty.md'
+        try {
+            Assert-SemanticInvariant -Invariant 'docs-status-lifecycle-values' `
+                -Text $strEmptyText -Path 'empty.md'
+            throw 'An empty governed document passed its content invariant.'
+        }
+        catch {
+            if ($_.Exception.Message -ceq
+                'An empty governed document passed its content invariant.' -or
+                -not $_.Exception.Message.Contains(
+                    'does not satisfy semantic invariant docs-status-lifecycle-values',
+                    [StringComparison]::Ordinal
+                )) {
+                throw
+            }
+        }
+    }
+    finally {
+        if ([IO.Directory]::Exists($strSelfTestRoot) -and
+            $strSelfTestRoot.StartsWith(
+                $strSelfTestSystemTempRoot,
+                [StringComparison]::OrdinalIgnoreCase
+            )) {
+            Remove-Item -LiteralPath $strSelfTestRoot -Recurse -Force
+        }
+    }
+    return
 }
 
 if ($AuthorizationManifestPath -cne $strAuthorizationPath) {
