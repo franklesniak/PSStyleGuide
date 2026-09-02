@@ -7,7 +7,7 @@ description: "Documentation standards:  contract-first, traceable, drift-resista
 
 # Documentation Writing Style
 
-**Version:** 1.6.20260902.0
+**Version:** 1.6.20260902.1
 
 ## Metadata
 
