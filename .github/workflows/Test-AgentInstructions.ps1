@@ -972,6 +972,13 @@ function Read-GitPublishedEndpointChangedPath {
 
     $arrBoundaries = @($NewRefBoundaryRevision)
     $arrIntroducedCommits = @($NewRefIntroducedCommitRevision)
+    $strObjectIdPattern = '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$'
+    foreach ($strRevision in @($arrBoundaries + $arrIntroducedCommits)) {
+        if ([string]::IsNullOrEmpty($strRevision) -or
+            $strRevision -notmatch $strObjectIdPattern) {
+            throw 'The created-ref path range contains an invalid revision.'
+        }
+    }
     $arrArguments = if ($BaselineAbsent -and $arrIntroducedCommits.Count -eq 0) {
         return [string[]] @()
     }
@@ -6887,6 +6894,16 @@ $arrTrackedRepositoryPaths = @(Read-GitTrackedPath `
 $arrPublishedBaselinePaths = @()
 $arrPublishedChangedPaths = @()
 if ($boolPublishedEndpointsRequested) {
+    [string[]] $arrPublishedNewRefBoundaryRevisions = @()
+    [string[]] $arrPublishedNewRefIntroducedCommitRevisions = @()
+    if ($null -ne $objCreatedRefContext) {
+        $arrPublishedNewRefBoundaryRevisions = [string[]] @(
+            $objCreatedRefContext.BoundaryRevisions
+        )
+        $arrPublishedNewRefIntroducedCommitRevisions = [string[]] @(
+            $objCreatedRefContext.IntroducedCommitRevisions
+        )
+    }
     if (-not $PublishedBaselineAbsent) {
         $arrPublishedBaselinePaths = @(Read-GitTrackedPath `
             -RepositoryRootPath $strRepositoryRootPath `
@@ -6898,12 +6915,9 @@ if ($boolPublishedEndpointsRequested) {
         -BaselineRevision $PublishedBaselineRevision `
         -FinalRevision $PublishedFinalRevision `
         -BaselineAbsent ([bool]$PublishedBaselineAbsent) `
-        -NewRefBoundaryRevision $(if ($null -eq $objCreatedRefContext) {
-                @()
-            } else { @($objCreatedRefContext.BoundaryRevisions) }) `
-        -NewRefIntroducedCommitRevision $(if ($null -eq $objCreatedRefContext) {
-                @()
-            } else { @($objCreatedRefContext.IntroducedCommitRevisions) }) `
+        -NewRefBoundaryRevision $arrPublishedNewRefBoundaryRevisions `
+        -NewRefIntroducedCommitRevision `
+            $arrPublishedNewRefIntroducedCommitRevisions `
         -MaximumBytes $intGitPathListMaximumBytes) | Sort-Object -Unique
 }
 $arrPublishedDecisionPaths = @(
@@ -8916,6 +8930,163 @@ if ($SelfTest) {
             -FinalRevision $strCheckedOutRevision -BaselineAbsent $false `
             -MaximumBytes $intGitPathListMaximumBytes).Count -ne 0) {
         throw 'Identical published endpoint trees reported changed paths.'
+    }
+    [string[]] $arrPublishedPathEmptyRevisions = @()
+    [string[]] $arrPublishedPathHeadRevision = @($strCheckedOutRevision)
+    $arrNoIntroducedPublishedPaths = @(Read-GitPublishedEndpointChangedPath `
+        -RepositoryRootPath $strRepositoryRootPath `
+        -BaselineRevision '' -FinalRevision $strCheckedOutRevision `
+        -BaselineAbsent $true `
+        -NewRefBoundaryRevision $arrPublishedPathEmptyRevisions `
+        -NewRefIntroducedCommitRevision $arrPublishedPathEmptyRevisions `
+        -MaximumBytes $intGitPathListMaximumBytes)
+    if ($arrNoIntroducedPublishedPaths.Count -ne 0) {
+        throw 'A created ref with no introduced commits reported changed paths.'
+    }
+    $arrRootIntroductionPublishedPaths = @(Read-GitPublishedEndpointChangedPath `
+        -RepositoryRootPath $strRepositoryRootPath `
+        -BaselineRevision '' -FinalRevision $strCheckedOutRevision `
+        -BaselineAbsent $true `
+        -NewRefBoundaryRevision $arrPublishedPathEmptyRevisions `
+        -NewRefIntroducedCommitRevision $arrPublishedPathHeadRevision `
+        -MaximumBytes $intGitPathListMaximumBytes)
+    [string[]] $arrExpectedRootIntroductionPublishedPaths = @(
+        Read-GitTrackedPath -RepositoryRootPath $strRepositoryRootPath `
+            -Revision $strCheckedOutRevision `
+            -MaximumBytes $intGitPathListMaximumBytes
+    )
+    [string[]] $arrActualRootIntroductionPublishedPaths =
+        @($arrRootIntroductionPublishedPaths)
+    [Array]::Sort(
+        $arrExpectedRootIntroductionPublishedPaths,
+        [StringComparer]::Ordinal
+    )
+    [Array]::Sort(
+        $arrActualRootIntroductionPublishedPaths,
+        [StringComparer]::Ordinal
+    )
+    $boolRootIntroductionPathSetMatches =
+        $arrActualRootIntroductionPublishedPaths.Count -eq
+            $arrExpectedRootIntroductionPublishedPaths.Count
+    for ($intPathIndex = 0;
+        $boolRootIntroductionPathSetMatches -and
+            $intPathIndex -lt $arrExpectedRootIntroductionPublishedPaths.Count;
+        $intPathIndex++) {
+        $boolRootIntroductionPathSetMatches =
+            $arrActualRootIntroductionPublishedPaths[$intPathIndex] -ceq
+                $arrExpectedRootIntroductionPublishedPaths[$intPathIndex]
+    }
+    if (-not $boolRootIntroductionPathSetMatches) {
+        throw 'A zero-boundary created ref returned an incorrect final-tree path set.'
+    }
+    $strPublishedPathParentRevision = ([string] (
+            & git -C $strRepositoryRootPath rev-parse --verify 'HEAD^1^{commit}'
+        )).Trim()
+    if ($LASTEXITCODE -ne 0 -or
+        $strPublishedPathParentRevision -notmatch
+            '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$') {
+        throw 'Could not resolve the nonzero-boundary path fixture.'
+    }
+    $objExpectedBoundedPathStartInfo = [Diagnostics.ProcessStartInfo]::new('git')
+    $objExpectedBoundedPathStartInfo.UseShellExecute = $false
+    $objExpectedBoundedPathStartInfo.CreateNoWindow = $true
+    $objExpectedBoundedPathStartInfo.RedirectStandardOutput = $true
+    $objExpectedBoundedPathStartInfo.RedirectStandardError = $true
+    foreach ($strExpectedBoundedPathArgument in @(
+            '-C', $strRepositoryRootPath, 'diff', '--name-only', '-z',
+            '--no-renames', '--no-ext-diff', '--no-textconv',
+            $strPublishedPathParentRevision, $strCheckedOutRevision,
+            '--', ':(top)**'
+        )) {
+        $objExpectedBoundedPathStartInfo.ArgumentList.Add(
+            $strExpectedBoundedPathArgument
+        )
+    }
+    $objExpectedBoundedPathProcess = [Diagnostics.Process]::new()
+    $objExpectedBoundedPathProcess.StartInfo = $objExpectedBoundedPathStartInfo
+    $objExpectedBoundedPathResult = Read-BoundedProcessData `
+        -Process $objExpectedBoundedPathProcess `
+        -MaximumBytes $intGitPathListMaximumBytes `
+        -TimeoutMilliseconds 10000 `
+        -DisplayName 'Independent nonzero-boundary path fixture'
+    if ($objExpectedBoundedPathResult.ExitCode -ne 0) {
+        throw 'Could not derive the expected nonzero-boundary path set.'
+    }
+    [string[]] $arrExpectedBoundedIntroductionPublishedPaths = @(
+        ConvertFrom-GitPathListData -Bytes $objExpectedBoundedPathResult.Bytes
+    )
+    [string[]] $arrPublishedPathParentRevision =
+        @($strPublishedPathParentRevision)
+    $arrBoundedIntroductionPublishedPaths = @(
+        Read-GitPublishedEndpointChangedPath `
+            -RepositoryRootPath $strRepositoryRootPath `
+            -BaselineRevision '' -FinalRevision $strCheckedOutRevision `
+            -BaselineAbsent $true `
+            -NewRefBoundaryRevision $arrPublishedPathParentRevision `
+            -NewRefIntroducedCommitRevision $arrPublishedPathHeadRevision `
+            -MaximumBytes $intGitPathListMaximumBytes
+    )
+    [string[]] $arrActualBoundedIntroductionPublishedPaths =
+        @($arrBoundedIntroductionPublishedPaths)
+    [Array]::Sort(
+        $arrExpectedBoundedIntroductionPublishedPaths,
+        [StringComparer]::Ordinal
+    )
+    [Array]::Sort(
+        $arrActualBoundedIntroductionPublishedPaths,
+        [StringComparer]::Ordinal
+    )
+    $boolBoundedIntroductionPathSetMatches =
+        $arrActualBoundedIntroductionPublishedPaths.Count -eq
+            $arrExpectedBoundedIntroductionPublishedPaths.Count
+    for ($intPathIndex = 0;
+        $boolBoundedIntroductionPathSetMatches -and
+            $intPathIndex -lt $arrExpectedBoundedIntroductionPublishedPaths.Count;
+        $intPathIndex++) {
+        $boolBoundedIntroductionPathSetMatches =
+            $arrActualBoundedIntroductionPublishedPaths[$intPathIndex] -ceq
+                $arrExpectedBoundedIntroductionPublishedPaths[$intPathIndex]
+    }
+    if (-not $boolBoundedIntroductionPathSetMatches) {
+        throw 'A nonzero-boundary created ref returned an incorrect changed-path set.'
+    }
+    foreach ($objMalformedPublishedPathRange in @(
+            [pscustomobject]@{
+                Name = 'null boundary'
+                Boundary = [string[]]::new(1)
+                Introduced = $arrPublishedPathHeadRevision
+            },
+            [pscustomobject]@{
+                Name = 'empty boundary'
+                Boundary = [string[]] @('')
+                Introduced = $arrPublishedPathHeadRevision
+            },
+            [pscustomobject]@{
+                Name = 'invalid introduced revision'
+                Boundary = $arrPublishedPathEmptyRevisions
+                Introduced = [string[]] @('not-an-object-id')
+            }
+        )) {
+        try {
+            [void] @(Read-GitPublishedEndpointChangedPath `
+                    -RepositoryRootPath $strRepositoryRootPath `
+                    -BaselineRevision '' -FinalRevision $strCheckedOutRevision `
+                    -BaselineAbsent $true `
+                    -NewRefBoundaryRevision `
+                        $objMalformedPublishedPathRange.Boundary `
+                    -NewRefIntroducedCommitRevision `
+                        $objMalformedPublishedPathRange.Introduced `
+                    -MaximumBytes $intGitPathListMaximumBytes)
+            throw "A $($objMalformedPublishedPathRange.Name) was accepted."
+        }
+        catch {
+            if (-not $_.Exception.Message.Contains(
+                    'created-ref path range contains an invalid revision',
+                    [StringComparison]::Ordinal
+                )) {
+                throw
+            }
+        }
     }
     $strNewRefTestHead = $strCheckedOutRevision
     $strNewRefZeroRevision = '0' * $strNewRefTestHead.Length

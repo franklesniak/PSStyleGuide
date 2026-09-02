@@ -414,6 +414,57 @@ function Assert-SemanticInvariant {
         return
     }
 
+    if ($Invariant -ceq 'published-path-array-binding-is-explicit') {
+        $arrTokens = $null
+        $arrParseErrors = $null
+        [void] [Management.Automation.Language.Parser]::ParseInput(
+            $Text,
+            [ref] $arrTokens,
+            [ref] $arrParseErrors
+        )
+        $strExplicitCallPattern =
+            '(?s)\[string\[\]\] ' +
+            '\$arrPublishedNewRefBoundaryRevisions = @\(\).*?' +
+            '\[string\[\]\] ' +
+            '\$arrPublishedNewRefIntroducedCommitRevisions = @\(\).*?' +
+            '-NewRefBoundaryRevision ' +
+            '\$arrPublishedNewRefBoundaryRevisions\s+`.*?' +
+            '-NewRefIntroducedCommitRevision\s+`\s+' +
+            '\$arrPublishedNewRefIntroducedCommitRevisions\s+`'
+        $strHelperValidationPattern =
+            '(?s)\$arrBoundaries = @\(\$NewRefBoundaryRevision\)\s+' +
+            '\$arrIntroducedCommits = ' +
+            '@\(\$NewRefIntroducedCommitRevision\).*?' +
+            'foreach \(\$strRevision in ' +
+            '@\(\$arrBoundaries \+ \$arrIntroducedCommits\)\).*?' +
+            '\[string\]::IsNullOrEmpty\(\$strRevision\).*?' +
+            "throw 'The created-ref path range contains an invalid revision\.'"
+        if ($arrParseErrors.Count -ne 0 -or
+            $Text -cnotmatch $strExplicitCallPattern -or
+            $Text -cnotmatch $strHelperValidationPattern -or
+            $Text -cmatch
+                '(?s)-NewRefBoundaryRevision\s+\$\(' -or
+            $Text -cmatch
+                '(?s)-NewRefIntroducedCommitRevision\s+\$\(' -or
+            $Text -cnotmatch
+                'A created ref with no introduced commits reported changed paths\.' -or
+            $Text -cnotmatch
+                'A zero-boundary created ref returned an incorrect ' +
+                'final-tree path set\.' -or
+            $Text -cnotmatch
+                'A nonzero-boundary created ref returned an incorrect ' +
+                'changed-path set\.' -or
+            $Text -cnotmatch
+                "Name = 'null boundary'" -or
+            $Text -cnotmatch
+                "Name = 'empty boundary'" -or
+            $Text -cnotmatch
+                "Name = 'invalid introduced revision'") {
+            throw "$Path does not satisfy semantic invariant $Invariant."
+        }
+        return
+    }
+
     if ($Invariant -ceq 'legacy-transition-marker-is-inert-data') {
         $arrTokens = $null
         $arrParseErrors = $null
