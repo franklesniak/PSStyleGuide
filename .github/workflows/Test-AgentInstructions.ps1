@@ -6762,10 +6762,28 @@ if ($SelfTest) {
             throw 'Could not resolve the trust-root authorization mutation.'
         }
 
-        $strAuthorizationFixtureUri =
-            ([Uri] $strAuthorizationFixtureRepository).AbsoluteUri
+        $strAuthorizationFixtureCloneSource =
+            [IO.Path]::GetFullPath($strAuthorizationFixtureRepository)
+        $strAuthorizationFixtureResolvedSource = [IO.Path]::GetFullPath(
+            (Get-Item -LiteralPath $strAuthorizationFixtureCloneSource `
+                    -ErrorAction Stop).FullName
+        )
+        if ([string]::IsNullOrWhiteSpace(
+                $strAuthorizationFixtureCloneSource
+            ) -or
+            -not [IO.Path]::IsPathFullyQualified(
+                $strAuthorizationFixtureCloneSource
+            ) -or
+            -not [string]::Equals(
+                $strAuthorizationFixtureCloneSource,
+                $strAuthorizationFixtureResolvedSource,
+                [StringComparison]::Ordinal
+            )) {
+            throw 'The trust-root fixture clone source path is invalid.'
+        }
         & git clone --quiet --depth 1 --no-local --no-hardlinks -- `
-            $strAuthorizationFixtureUri $strAuthorizationFixtureDepthOneClone
+            $strAuthorizationFixtureCloneSource `
+            $strAuthorizationFixtureDepthOneClone
         if ($LASTEXITCODE -ne 0) {
             throw 'Could not create the depth-one trust-root fixture clone.'
         }
@@ -9161,6 +9179,66 @@ if ($SelfTest) {
         [IO.Path]::Combine($PSScriptRoot, 'agent-instructions.yml')
     )
     $strValidatorSourceContent = [IO.File]::ReadAllText($PSCommandPath)
+    $scriptBlockGetFixtureCloneSourceFailure = {
+        param([Parameter(Mandatory)][string] $Content)
+
+        $listFailures = [Collections.Generic.List[string]]::new()
+        $strForbiddenUriConversion =
+            '([Uri] $strAuthorizationFixtureRepository).' + 'AbsoluteUri'
+        if ($Content.Contains(
+                $strForbiddenUriConversion,
+                [StringComparison]::Ordinal
+            )) {
+            $listFailures.Add(
+                'The fixture clone source must not use URI conversion.'
+            )
+        }
+        if ($Content -notmatch (
+                '(?s)\$strAuthorizationFixtureCloneSource\s*=\s*' +
+                '\[IO\.Path\]::GetFullPath\(' +
+                '\$strAuthorizationFixtureRepository\).*?' +
+                '\[IO\.Path\]::IsPathFullyQualified\(\s*' +
+                '\$strAuthorizationFixtureCloneSource\s*\).*?' +
+                '\[string\]::Equals\(\s*' +
+                '\$strAuthorizationFixtureCloneSource,\s*' +
+                '\$strAuthorizationFixtureResolvedSource,\s*' +
+                '\[StringComparison\]::Ordinal\s*\).*?' +
+                'git clone --quiet --depth 1 --no-local --no-hardlinks --' +
+                '\s*`?\s*\$strAuthorizationFixtureCloneSource\s*`?\s*' +
+                '\$strAuthorizationFixtureDepthOneClone'
+            )) {
+            $listFailures.Add(
+                'The fixture clone source path contract is incomplete.'
+            )
+        }
+        return $listFailures.ToArray()
+    }
+    $arrFixtureCloneSourceFailures = @(
+        & $scriptBlockGetFixtureCloneSourceFailure `
+            -Content $strValidatorSourceContent
+    )
+    if ($arrFixtureCloneSourceFailures.Count -ne 0) {
+        throw (
+            'Fixture clone source contract failed: ' +
+            ($arrFixtureCloneSourceFailures -join '; ')
+        )
+    }
+    $strOldFixtureUriConversion =
+        '([Uri] $strAuthorizationFixtureRepository).' + 'AbsoluteUri'
+    $strMutatedFixtureCloneSource = $strValidatorSourceContent.Replace(
+        '[IO.Path]::GetFullPath($strAuthorizationFixtureRepository)',
+        $strOldFixtureUriConversion
+    )
+    $arrMutatedFixtureCloneSourceFailures = @(
+        & $scriptBlockGetFixtureCloneSourceFailure `
+            -Content $strMutatedFixtureCloneSource
+    )
+    if ($strMutatedFixtureCloneSource -ceq $strValidatorSourceContent -or
+        $arrMutatedFixtureCloneSourceFailures.Count -lt 1 -or
+        $arrMutatedFixtureCloneSourceFailures -cnotcontains
+            'The fixture clone source must not use URI conversion.') {
+        throw 'The unsafe fixture clone source mutation was not rejected.'
+    }
     $arrLegacyCompatibilityVariableName = @(
         'script:strLegacyMetadataRangeCompatibilityMarker',
         'script:strLegacyStyleGuideRationaleCompatibilityMarker',
