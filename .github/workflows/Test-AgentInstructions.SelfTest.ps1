@@ -1,18 +1,18 @@
 # .SYNOPSIS
-# Runs the extracted agent-instruction validator self-tests.
+# Runs the extracted published-endpoint metadata self-tests.
 #
 # .DESCRIPTION
-# Validates explicit revision-parent behavior and day-precision metadata
-# freshness with functions loaded by Test-AgentInstructions.ps1.
+# Validates final-state metadata arithmetic and authenticated endpoint handling
+# with functions loaded by Test-AgentInstructions.ps1.
 #
 # .PARAMETER RepositoryRootPath
 # The absolute path of the repository that supplies Git and document fixtures.
 #
 # .PARAMETER Revision
-# The exact Git commit to use for revision-parent tests.
+# The exact Git commit used as an authenticated endpoint fixture.
 #
 # .PARAMETER MaximumBytes
-# The maximum permitted byte count for governed document reads.
+# The maximum permitted byte count for bounded Git path reads.
 #
 # .PARAMETER MaximumMetadataUtcDate
 # The latest trusted UTC calendar date permitted in metadata fixtures.
@@ -29,21 +29,16 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.0.20260830.0
+# Version: 1.2.20260831.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param(
-    [Parameter(Mandatory)]
-    [string] $RepositoryRootPath,
-
-    [Parameter(Mandatory)]
-    [string] $Revision,
-
+    [Parameter(Mandatory)][string] $RepositoryRootPath,
+    [Parameter(Mandatory)][string] $Revision,
     [Parameter(Mandatory)]
     [ValidateRange(1, 2147483646)]
     [int] $MaximumBytes,
-
     [Parameter(Mandatory)]
     [ValidatePattern('^\d{4}-\d{2}-\d{2}$')]
     [string] $MaximumMetadataUtcDate
@@ -54,203 +49,644 @@ if ($arrDeclaredOutputTypes.Count -ne 1 -or
     $arrDeclaredOutputTypes[0] -cne 'System.Void') {
     throw 'The extracted self-test must declare one void output contract.'
 }
-
 $script:strMaximumMetadataUtcDate = $MaximumMetadataUtcDate
-$objParentContext = Get-GovernedDocumentParentContext `
-    -RepositoryRootPath $RepositoryRootPath `
-    -RepositoryRelativePath 'AGENTS.md' `
-    -MaximumBytes $MaximumBytes `
-    -Revision $Revision
-if ($null -eq $objParentContext.ParentRevision) {
-    if ($null -ne $objParentContext.ParentContent -or
-        $objParentContext.ExpectedUtcDate -cne '' -or
-        $objParentContext.IsWorktreeTransition) {
-        throw 'The explicit root revision context is invalid.'
+
+function ConvertTo-CreatedPushCommitEvidenceObject {
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory)][string] $Id,
+        [Parameter(Mandatory)][bool] $Distinct,
+        [string] $Timestamp = ''
+    )
+
+    return [pscustomobject]@{
+        id = $Id
+        tree_id = $Id
+        distinct = $Distinct
+        message = ''
+        timestamp = $Timestamp
+        url = ''
+        author = [pscustomobject]@{
+            name = ''
+            email = ''
+            username = $null
+        }
+        committer = [pscustomobject]@{
+            name = ''
+            email = ''
+            username = $null
+        }
     }
 }
-elseif ($objParentContext.ParentRevision -cne "$Revision`^1" -or
-    [string]::IsNullOrEmpty($objParentContext.ParentContent)) {
-    throw 'The explicit child revision context is invalid.'
+
+$strBaseline = @(
+    '# Endpoint fixture'
+    '**Version:** 1.0.20260830.0'
+    '## Metadata'
+    '- **Status:** Active'
+    '- **Owner:** Repository Maintainers'
+    '- **Last Updated:** 2026-08-30'
+    '- **Scope:** Extracted final-state regression.'
+    '## Content'
+    'Published baseline.'
+) -join "`n"
+$strFinal = @(
+    '# Endpoint fixture'
+    '**Version:** 1.0.20260831.0'
+    '## Metadata'
+    '- **Status:** Accepted'
+    '- **Owner:** Repository Maintainers'
+    '- **Last Updated:** 2026-08-31'
+    '- **Scope:** Extracted final-state regression.'
+    '## Content'
+    'Corrected published final.'
+) -join "`n"
+if (@(Get-PublishedEndpointMetadataFailure -Name 'fixture.md' `
+        -CurrentContent $strFinal -ParentContent $strBaseline `
+        -ExpectedUtcDate '2026-08-31' `
+        -IsNewDocumentTransition $false).Count -ne 0) {
+    throw 'The extracted published-final regression was rejected.'
 }
 
-$strRootRevision = [string] (
-    & git -C $RepositoryRootPath rev-list --max-parents=0 -n 1 $Revision
+$strHigherTerminalRevision = $strFinal.Replace(
+    '**Version:** 1.0.20260831.0',
+    '**Version:** 1.0.20260831.3'
 )
-if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrEmpty($strRootRevision.Trim())) {
-    throw 'Could not resolve a zero-parent revision.'
-}
-$objRootParentContext = Get-GovernedDocumentParentContext `
-    -RepositoryRootPath $RepositoryRootPath `
-    -RepositoryRelativePath 'AGENTS.md' `
-    -MaximumBytes $MaximumBytes `
-    -Revision $strRootRevision.Trim()
-if ($null -ne $objRootParentContext.ParentRevision -or
-    $null -ne $objRootParentContext.ParentContent -or
-    $objRootParentContext.ExpectedUtcDate -cne '' -or
-    $objRootParentContext.IsWorktreeTransition) {
-    throw 'The zero-parent revision context is invalid.'
+if (@(Get-PublishedEndpointMetadataFailure `
+    -Name 'fixture.md' -CurrentContent $strHigherTerminalRevision `
+    -ParentContent $strBaseline -ExpectedUtcDate '2026-08-31' `
+    -IsNewDocumentTransition $false).Count -ne 0) {
+    throw 'The extracted higher terminal revision was rejected.'
 }
 
-$strGuidePath = '.github/workflows/scripts-README.md'
-$strGuideContent = Get-Content -LiteralPath (
-    Join-Path $RepositoryRootPath $strGuidePath
-) -Raw
-$objGuideMetadata = Get-DocumentMetadataContext `
-    -Content $strGuideContent -RequiresVersion $false
-if ($null -ne $objGuideMetadata.Failure) {
-    throw 'The unversioned date fixture metadata is invalid.'
-}
-$strRepositoryDate = $objGuideMetadata.UpdatedDate
-$strRepositoryDateLine = "- **Last Updated:** $strRepositoryDate"
-if ([regex]::Matches(
-        $strGuideContent,
-        '(?m)^' + [regex]::Escape($strRepositoryDateLine) + '$'
-    ).Count -ne 1) {
-    throw 'The unversioned date fixture has no unique metadata date.'
-}
-$strGuideContent = $strGuideContent.Replace(
-    $strRepositoryDateLine,
-    "- **Last Updated:** $MaximumMetadataUtcDate"
+$strSameTupleRollback = $strBaseline.Replace(
+    '**Version:** 1.0.20260830.0',
+    '**Version:** 1.0.20260830.4'
 )
-$objGuideMetadata = Get-DocumentMetadataContext `
-    -Content $strGuideContent -RequiresVersion $false
-if ($null -ne $objGuideMetadata.Failure -or
-    $objGuideMetadata.UpdatedDate -cne $MaximumMetadataUtcDate) {
-    throw 'The synthetic unversioned date fixture is invalid.'
-}
-$strMaximumDate = $MaximumMetadataUtcDate
-$strPreviousDate = ([datetime]::ParseExact(
-        $strMaximumDate,
-        'yyyy-MM-dd',
-        [Globalization.CultureInfo]::InvariantCulture
-    )).AddDays(-1).ToString('yyyy-MM-dd')
-$strFutureDate = ([datetime]::ParseExact(
-        $strMaximumDate,
-        'yyyy-MM-dd',
-        [Globalization.CultureInfo]::InvariantCulture
-    )).AddDays(1).ToString('yyyy-MM-dd')
-$strRenderedGuide = $strGuideContent + "`nRepeated same-day change.`n"
-if (@(Get-LastUpdatedMetadataFreshnessFailure `
-            -Name $strGuidePath -CurrentContent $strRenderedGuide `
-            -BaseContent $strGuideContent -TrustedEventUtcDate '' `
-            -RequireCurrentMaximumDateForRenderedChange $true).Count -ne 0) {
-    throw 'A valid repeated same-day unversioned change was rejected.'
+$arrRollbackFailures = @(Get-PublishedEndpointMetadataFailure `
+    -Name 'fixture.md' -CurrentContent $strBaseline `
+    -ParentContent $strSameTupleRollback -ExpectedUtcDate '2026-08-30' `
+    -IsNewDocumentTransition $false)
+if ($arrRollbackFailures -cnotcontains
+    'fixture.md Version revision must not decrease from 4 to 0.') {
+    throw 'The extracted same-tuple revision rollback did not fail closed.'
 }
 
-$strPreviousGuide = $strGuideContent.Replace(
-    "- **Last Updated:** $strMaximumDate",
-    "- **Last Updated:** $strPreviousDate"
+$strDateRollback = $strFinal.Replace(
+    '**Version:** 1.0.20260831.0',
+    '**Version:** 2.0.20260829.0'
+).Replace('- **Last Updated:** 2026-08-31',
+    '- **Last Updated:** 2026-08-29')
+if (-not (@(Get-PublishedEndpointMetadataFailure `
+        -Name 'fixture.md' -CurrentContent $strDateRollback `
+        -ParentContent $strBaseline -ExpectedUtcDate '2026-08-29' `
+        -IsNewDocumentTransition $false) -match
+        'Version date must not move backward')) {
+    throw 'The extracted independent date rollback did not fail closed.'
+}
+
+$strTupleRollback = $strFinal.Replace(
+    '**Version:** 1.0.20260831.0',
+    '**Version:** 0.9.20260831.0'
 )
-$strFutureGuide = $strGuideContent.Replace(
-    "- **Last Updated:** $strMaximumDate",
-    "- **Last Updated:** $strFutureDate"
+if (-not (@(Get-PublishedEndpointMetadataFailure `
+        -Name 'fixture.md' -CurrentContent $strTupleRollback `
+        -ParentContent $strBaseline -ExpectedUtcDate '2026-08-31' `
+        -IsNewDocumentTransition $false) -match
+        'Version major and minor tuple must not move backward')) {
+    throw 'The extracted independent major/minor rollback did not fail closed.'
+}
+
+$strUnversionedBaseline = @(
+    '# Unversioned endpoint fixture'
+    '## Metadata'
+    '- **Status:** Active'
+    '- **Owner:** Repository Maintainers'
+    '- **Last Updated:** 2026-08-30'
+    '- **Scope:** Extracted unversioned final-state regression.'
+    '## Content'
+    'Published baseline.'
+) -join "`n"
+$strUnversionedFinal = $strUnversionedBaseline.Replace(
+    '- **Last Updated:** 2026-08-30',
+    '- **Last Updated:** 2026-08-31'
+).Replace('Published baseline.', 'Published final.')
+if (@(Get-PublishedEndpointLastUpdatedFailure -Name 'fixture.md' `
+        -CurrentContent $strUnversionedFinal `
+        -BaseContent $strUnversionedBaseline `
+        -TrustedEventUtcDate '2026-08-31' `
+        -RequireCurrentMaximumDateForRenderedChange $false).Count -ne 0) {
+    throw 'The extracted unversioned published-final regression was rejected.'
+}
+$arrStaleFailures = @(Get-PublishedEndpointLastUpdatedFailure `
+    -Name 'fixture.md' `
+    -CurrentContent ($strUnversionedBaseline + "`nRendered final change.") `
+    -BaseContent $strUnversionedBaseline `
+    -TrustedEventUtcDate '2026-08-31')
+if (-not ($arrStaleFailures -match 'Last Updated must be 2026-08-31')) {
+    throw 'The extracted stale unversioned final did not fail closed.'
+}
+
+Assert-PublishedEndpointContext -RepositoryRootPath $RepositoryRootPath `
+    -EventName 'push' -PullRequestAction '' `
+    -BaselineRevision $Revision -FinalRevision $Revision `
+    -BaselineAbsent $false -PullRequestBaseChanged ''
+if (@(Read-GitPublishedEndpointChangedPath `
+        -RepositoryRootPath $RepositoryRootPath `
+        -BaselineRevision $Revision -FinalRevision $Revision `
+        -BaselineAbsent $false -MaximumBytes $MaximumBytes).Count -ne 0) {
+    throw 'Identical extracted endpoint trees reported changed paths.'
+}
+
+$strTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+$strTopologyRoot = [IO.Path]::Combine(
+    $strTempRoot,
+    'agent-instruction-created-ref-' + [Guid]::NewGuid().ToString('N')
 )
-$strMissingDateGuide = $strGuideContent.Replace(
-    "- **Last Updated:** $strMaximumDate`r`n",
-    ''
-).Replace(
-    "- **Last Updated:** $strMaximumDate`n",
-    ''
-)
-$strHistoricalAdoption = $strPreviousGuide + "`nHistorical adoption.`n"
-if (@(Get-LastUpdatedMetadataFreshnessFailure `
-            -Name $strGuidePath -CurrentContent $strHistoricalAdoption `
-            -BaseContent $null -TrustedEventUtcDate '').Count -ne 0) {
-    throw 'A valid parentless historical adoption was rejected.'
-}
-if (@(Get-LastUpdatedMetadataFreshnessFailure `
-            -Name $strGuidePath -CurrentContent $strRenderedGuide `
-            -BaseContent $strPreviousGuide -TrustedEventUtcDate '').Count -ne 0) {
-    throw 'A valid historical date advance was rejected.'
-}
-$arrHistoricalStaleFailures = @(Get-LastUpdatedMetadataFreshnessFailure `
-        -Name $strGuidePath `
-        -CurrentContent ($strPreviousGuide + "`nHistorical stale change.`n") `
-        -BaseContent $strPreviousGuide -TrustedEventUtcDate '')
-if (-not ($arrHistoricalStaleFailures -match 'must advance from')) {
-    throw 'A historical same-date change did not require advancement.'
-}
-$strHistoricalSameDayChange = $strPreviousGuide +
-    "`nAuthenticated same-day historical change.`n"
-if (@(Get-LastUpdatedMetadataFreshnessFailure `
-            -Name $strGuidePath -CurrentContent $strHistoricalSameDayChange `
-            -BaseContent $strPreviousGuide -TrustedEventUtcDate '' `
-            -ModifyingCommitUtcDate $strPreviousDate `
-            -AllowSameDateForExactRestoration $true).Count -ne 0) {
-    throw 'A commit-date-matched exact restoration was rejected.'
-}
-$arrHistoricalLaterCommitFailures = @(Get-LastUpdatedMetadataFreshnessFailure `
-        -Name $strGuidePath -CurrentContent $strHistoricalSameDayChange `
-        -BaseContent $strPreviousGuide -TrustedEventUtcDate '' `
-        -ModifyingCommitUtcDate $strMaximumDate `
-        -AllowSameDateForExactRestoration $true)
-if (-not ($arrHistoricalLaterCommitFailures -match 'must advance from')) {
-    throw 'A stale date was accepted for a later modifying commit.'
-}
-$strEventMatchedAdvance = $strGuideContent +
-    "`nHistorical event-matched advancement.`n"
-if (@(Get-LastUpdatedMetadataFreshnessFailure `
-            -Name $strGuidePath -CurrentContent $strEventMatchedAdvance `
-            -BaseContent $strPreviousGuide `
-            -TrustedEventUtcDate $strMaximumDate).Count -ne 0) {
-    throw 'A valid event-matched historical advancement was rejected.'
-}
-$arrEventMatchedStaleFailures = @(Get-LastUpdatedMetadataFreshnessFailure `
-        -Name $strGuidePath `
-        -CurrentContent ($strPreviousGuide + "`nEvent-matched stale change.`n") `
-        -BaseContent $strPreviousGuide `
-        -TrustedEventUtcDate $strPreviousDate)
-if (-not ($arrEventMatchedStaleFailures -match 'must advance from')) {
-    throw 'An event-matched historical same-date change did not require advancement.'
-}
-$arrDateNegativeCases = @(
-    [pscustomobject]@{
-        Name = 'stale no-event date'
-        Current = $strPreviousGuide + "`nStale change.`n"
-        Base = $strPreviousGuide
-        Event = ''
-        Failure = "must be $strMaximumDate"
-    },
-    [pscustomobject]@{
-        Name = 'future date'
-        Current = $strFutureGuide
-        Base = $strGuideContent
-        Event = ''
-        Failure = 'later than trusted UTC'
-    },
-    [pscustomobject]@{
-        Name = 'backward date'
-        Current = $strPreviousGuide
-        Base = $strGuideContent
-        Event = ''
-        Failure = 'must not move backward'
-    },
-    [pscustomobject]@{
-        Name = 'missing Last Updated'
-        Current = $strMissingDateGuide
-        Base = $strGuideContent
-        Event = ''
-        Failure = 'must contain one exact top-level Last Updated list item'
-    },
-    [pscustomobject]@{
-        Name = 'trusted-event mismatch'
-        Current = $strRenderedGuide
-        Base = $strGuideContent
-        Event = $strPreviousDate
-        Failure = "must be $strPreviousDate"
+[void] [IO.Directory]::CreateDirectory($strTopologyRoot)
+try {
+    $objUtf8 = [Text.UTF8Encoding]::new($false)
+    & git -C $strTopologyRoot init --quiet
+    & git -C $strTopologyRoot config user.name 'Created-ref self-test'
+    & git -C $strTopologyRoot config user.email 'created-ref@example.invalid'
+    [IO.File]::WriteAllText(
+        (Join-Path $strTopologyRoot 'root.txt'),
+        "root`n",
+        $objUtf8
+    )
+    & git -C $strTopologyRoot add -- root.txt
+    & git -C $strTopologyRoot commit --quiet -m root
+    $strRootCommit = ([string] (& git -C $strTopologyRoot rev-parse HEAD)).Trim()
+
+    & git -C $strTopologyRoot update-ref `
+        refs/remotes/event/created-other-0000 $strRootCommit
+    $arrRootEvidence = [object[]] @(
+        [pscustomobject]@{
+            ref = 'refs/heads/existing'
+            object = $strRootCommit
+            commit = $strRootCommit
+            local_ref = 'refs/remotes/event/created-other-0000'
+        }
+    )
+    $strRootEvidence = ConvertTo-Json -Compress -InputObject $arrRootEvidence
+    $objZeroContext = Get-CreatedRefBoundaryContext `
+        -RepositoryRootPath $strTopologyRoot `
+        -DestinationRef 'refs/heads/new-zero' `
+        -HeadRevision $strRootCommit -EventHeadRevision $strRootCommit `
+        -EventHeadDistinct 'false' -PushCommitEvidenceJson '[]' `
+        -OtherRefEvidenceJson $strRootEvidence
+    if (@($objZeroContext.IntroducedCommitRevisions).Count -ne 0 -or
+        @($objZeroContext.BoundaryRevisions).Count -ne 0 -or
+        @(Read-GitPublishedEndpointChangedPath `
+            -RepositoryRootPath $strTopologyRoot `
+            -BaselineRevision ('0' * 40) -FinalRevision $strRootCommit `
+            -BaselineAbsent $true -NewRefBoundaryRevision @() `
+            -NewRefIntroducedCommitRevision @() `
+            -MaximumBytes $MaximumBytes).Count -ne 0) {
+        throw 'The zero-introduced created-ref fixture widened its baseline.'
     }
-)
-foreach ($objDateNegativeCase in $arrDateNegativeCases) {
-    $strDateFailures = @(Get-LastUpdatedMetadataFreshnessFailure `
-            -Name $strGuidePath `
-            -CurrentContent $objDateNegativeCase.Current `
-            -BaseContent $objDateNegativeCase.Base `
-            -TrustedEventUtcDate $objDateNegativeCase.Event `
-            -RequireCurrentMaximumDateForRenderedChange $true) -join '; '
-    if (-not $strDateFailures.Contains(
-            $objDateNegativeCase.Failure,
-            [StringComparison]::Ordinal
+
+    [IO.File]::WriteAllText(
+        (Join-Path $strTopologyRoot 'one.txt'),
+        "one`n",
+        $objUtf8
+    )
+    & git -C $strTopologyRoot add -- one.txt
+    & git -C $strTopologyRoot commit --quiet -m one
+    $strOneCommit = ([string] (& git -C $strTopologyRoot rev-parse HEAD)).Trim()
+    $objOnePayloadCommit = ConvertTo-CreatedPushCommitEvidenceObject `
+        -Id $strOneCommit -Distinct $true
+    $strOnePayload = ConvertTo-Json -Depth 4 -Compress -InputObject `
+        ([object[]] @($objOnePayloadCommit))
+    $arrLiveShapeProperties = @($objOnePayloadCommit.PSObject.Properties.Name)
+    if ($arrLiveShapeProperties.Count -ne 8 -or
+        @(@('id', 'tree_id', 'distinct', 'message', 'timestamp', 'url',
+                'author', 'committer') | Where-Object {
+                $arrLiveShapeProperties -cnotcontains $_
+            }).Count -ne 0 -or
+        @(@('added', 'removed', 'modified') | Where-Object {
+                $arrLiveShapeProperties -ccontains $_
+            }).Count -ne 0) {
+        throw 'The Actions-shaped commit fixture has an invalid property inventory.'
+    }
+    if (@(Read-CreatedPushCommitEvidence `
+            -PushCommitEvidenceJson $strOnePayload `
+            -EventHeadRevision $strOneCommit `
+            -EventHeadDistinct 'true').Count -ne 1) {
+        throw 'The Actions-shaped commit fixture was not accepted.'
+    }
+    foreach ($strTimestampFixture in @(
+            '2026-09-01T13:41:43-05:00',
+            '2026-09-01T18:41:43Z',
+            '2026-09-01T13:41:43'
         )) {
-        throw "$($objDateNegativeCase.Name) did not fail closed."
+        $strTimestampPayload = ConvertTo-Json -Depth 4 -Compress -InputObject `
+            ([object[]] @((ConvertTo-CreatedPushCommitEvidenceObject `
+                        -Id $strOneCommit -Distinct $true `
+                        -Timestamp $strTimestampFixture)))
+        if (@(Read-CreatedPushCommitEvidence `
+                -PushCommitEvidenceJson $strTimestampPayload `
+                -EventHeadRevision $strOneCommit `
+                -EventHeadDistinct 'true').Count -ne 1) {
+            throw "The '$strTimestampFixture' timestamp fixture was not accepted."
+        }
+    }
+    $objForwardCompatibleCommit = ConvertFrom-Json -InputObject (
+        ConvertTo-Json -Depth 4 -Compress -InputObject $objOnePayloadCommit
+    )
+    $objForwardCompatibleCommit | Add-Member -NotePropertyName future_field `
+        -NotePropertyValue 'bounded and ignored'
+    $strForwardCompatiblePayload = ConvertTo-Json -Depth 4 -Compress `
+        -InputObject ([object[]] @($objForwardCompatibleCommit))
+    if (@(Read-CreatedPushCommitEvidence `
+            -PushCommitEvidenceJson $strForwardCompatiblePayload `
+            -EventHeadRevision $strOneCommit `
+            -EventHeadDistinct 'true').Count -ne 1) {
+        throw 'A bounded extra inert commit field was not ignored deliberately.'
+    }
+    $objOneContext = Get-CreatedRefBoundaryContext `
+        -RepositoryRootPath $strTopologyRoot `
+        -DestinationRef 'refs/heads/new-one' `
+        -HeadRevision $strOneCommit -EventHeadRevision $strOneCommit `
+        -EventHeadDistinct 'true' -PushCommitEvidenceJson $strOnePayload `
+        -OtherRefEvidenceJson $strRootEvidence
+    $arrOnePaths = @(Read-GitPublishedEndpointChangedPath `
+            -RepositoryRootPath $strTopologyRoot `
+            -BaselineRevision ('0' * 40) -FinalRevision $strOneCommit `
+            -BaselineAbsent $true `
+            -NewRefBoundaryRevision $objOneContext.BoundaryRevisions `
+            -NewRefIntroducedCommitRevision `
+                $objOneContext.IntroducedCommitRevisions `
+            -MaximumBytes $MaximumBytes)
+    if (@($objOneContext.IntroducedCommitRevisions).Count -ne 1 -or
+        @($objOneContext.BoundaryRevisions).Count -ne 1 -or
+        $objOneContext.BoundaryRevisions[0] -cne $strRootCommit -or
+        $arrOnePaths.Count -ne 1 -or $arrOnePaths[0] -cne 'one.txt') {
+        throw 'The one-introduced created-ref fixture found an incorrect boundary.'
+    }
+
+    [IO.File]::WriteAllText(
+        (Join-Path $strTopologyRoot 'two.txt'),
+        "two`n",
+        $objUtf8
+    )
+    & git -C $strTopologyRoot add -- two.txt
+    & git -C $strTopologyRoot commit --quiet -m two
+    $strTwoCommit = ([string] (& git -C $strTopologyRoot rev-parse HEAD)).Trim()
+    $objTwoPayloadCommit = ConvertTo-CreatedPushCommitEvidenceObject `
+        -Id $strTwoCommit -Distinct $true
+    $strManyPayload = ConvertTo-Json -Depth 4 -Compress -InputObject `
+        ([object[]] @($objOnePayloadCommit, $objTwoPayloadCommit))
+    $objManyContext = Get-CreatedRefBoundaryContext `
+        -RepositoryRootPath $strTopologyRoot `
+        -DestinationRef 'refs/heads/new-many' `
+        -HeadRevision $strTwoCommit -EventHeadRevision $strTwoCommit `
+        -EventHeadDistinct 'true' -PushCommitEvidenceJson $strManyPayload `
+        -OtherRefEvidenceJson $strRootEvidence
+    $arrManyPaths = @(Read-GitPublishedEndpointChangedPath `
+            -RepositoryRootPath $strTopologyRoot `
+            -BaselineRevision ('0' * 40) -FinalRevision $strTwoCommit `
+            -BaselineAbsent $true `
+            -NewRefBoundaryRevision $objManyContext.BoundaryRevisions `
+            -NewRefIntroducedCommitRevision `
+                $objManyContext.IntroducedCommitRevisions `
+            -MaximumBytes $MaximumBytes)
+    if (@($objManyContext.IntroducedCommitRevisions).Count -ne 2 -or
+        @($objManyContext.BoundaryRevisions).Count -ne 1 -or
+        [string]::Join("`n", $arrManyPaths) -cne "one.txt`ntwo.txt") {
+        throw 'The many-introduced created-ref fixture lost changed paths.'
+    }
+
+    & git -C $strTopologyRoot checkout --quiet -b left $strRootCommit
+    [IO.File]::WriteAllText(
+        (Join-Path $strTopologyRoot 'left.txt'), "left`n", $objUtf8
+    )
+    & git -C $strTopologyRoot add -- left.txt
+    & git -C $strTopologyRoot commit --quiet -m left
+    $strLeftCommit = ([string] (& git -C $strTopologyRoot rev-parse HEAD)).Trim()
+    & git -C $strTopologyRoot checkout --quiet -b right $strRootCommit
+    [IO.File]::WriteAllText(
+        (Join-Path $strTopologyRoot 'right.txt'), "right`n", $objUtf8
+    )
+    & git -C $strTopologyRoot add -- right.txt
+    & git -C $strTopologyRoot commit --quiet -m right
+    $strRightCommit = ([string] (& git -C $strTopologyRoot rev-parse HEAD)).Trim()
+    & git -C $strTopologyRoot checkout --quiet left
+    & git -C $strTopologyRoot merge --quiet --no-ff right -m merge
+    $strMergeCommit = ([string] (& git -C $strTopologyRoot rev-parse HEAD)).Trim()
+    & git -C $strTopologyRoot update-ref `
+        refs/remotes/event/created-other-0000 $strLeftCommit
+    & git -C $strTopologyRoot update-ref `
+        refs/remotes/event/created-other-0001 $strRightCommit
+    $arrMergeEvidence = [object[]] @(
+        [pscustomobject]@{
+            ref = 'refs/heads/left'
+            object = $strLeftCommit
+            commit = $strLeftCommit
+            local_ref = 'refs/remotes/event/created-other-0000'
+        },
+        [pscustomobject]@{
+            ref = 'refs/heads/right'
+            object = $strRightCommit
+            commit = $strRightCommit
+            local_ref = 'refs/remotes/event/created-other-0001'
+        }
+    )
+    $strMergeEvidence = ConvertTo-Json -Compress -InputObject $arrMergeEvidence
+    $strMergePayload = ConvertTo-Json -Depth 4 -Compress -InputObject `
+        ([object[]] @((ConvertTo-CreatedPushCommitEvidenceObject `
+                    -Id $strMergeCommit -Distinct $true)))
+    $objMergeContext = Get-CreatedRefBoundaryContext `
+        -RepositoryRootPath $strTopologyRoot `
+        -DestinationRef 'refs/heads/new-merge' `
+        -HeadRevision $strMergeCommit -EventHeadRevision $strMergeCommit `
+        -EventHeadDistinct 'true' -PushCommitEvidenceJson $strMergePayload `
+        -OtherRefEvidenceJson $strMergeEvidence
+    $arrMergePaths = @(Read-GitPublishedEndpointChangedPath `
+            -RepositoryRootPath $strTopologyRoot `
+            -BaselineRevision ('0' * 40) -FinalRevision $strMergeCommit `
+            -BaselineAbsent $true `
+            -NewRefBoundaryRevision $objMergeContext.BoundaryRevisions `
+            -NewRefIntroducedCommitRevision `
+                $objMergeContext.IntroducedCommitRevisions `
+            -MaximumBytes $MaximumBytes)
+    if (@($objMergeContext.IntroducedCommitRevisions).Count -ne 1 -or
+        @($objMergeContext.BoundaryRevisions).Count -ne 2 -or
+        [string]::Join("`n", $arrMergePaths) -cne "left.txt`nright.txt") {
+        throw 'The merge created-ref fixture lost a parent boundary.'
+    }
+
+    $strRootPayload = ConvertTo-Json -Depth 4 -Compress -InputObject `
+        ([object[]] @((ConvertTo-CreatedPushCommitEvidenceObject `
+                    -Id $strRootCommit -Distinct $true)))
+    $objGenuineRootContext = Get-CreatedRefBoundaryContext `
+        -RepositoryRootPath $strTopologyRoot `
+        -DestinationRef 'refs/heads/new-root' `
+        -HeadRevision $strRootCommit -EventHeadRevision $strRootCommit `
+        -EventHeadDistinct 'true' -PushCommitEvidenceJson $strRootPayload `
+        -OtherRefEvidenceJson '[]'
+    $arrGenuineRootPaths = @(Read-GitPublishedEndpointChangedPath `
+            -RepositoryRootPath $strTopologyRoot `
+            -BaselineRevision ('0' * 40) -FinalRevision $strRootCommit `
+            -BaselineAbsent $true -NewRefBoundaryRevision @() `
+            -NewRefIntroducedCommitRevision `
+                $objGenuineRootContext.IntroducedCommitRevisions `
+            -MaximumBytes $MaximumBytes)
+    if (-not $objGenuineRootContext.IsGenuineRootIntroduction -or
+        $arrGenuineRootPaths.Count -ne 1 -or
+        $arrGenuineRootPaths[0] -cne 'root.txt') {
+        throw 'The genuine-root created-ref fixture did not use the final tree.'
+    }
+
+    $strTwoOnlyPayload = ConvertTo-Json -Depth 4 -Compress -InputObject `
+        ([object[]] @($objTwoPayloadCommit))
+    foreach ($objRejectedFixture in @(
+            [pscustomobject]@{
+                Name = 'event head mismatch'
+                Expected = 'expanded event head'
+                Arguments = @{
+                    HeadRevision = $strOneCommit
+                    EventHeadRevision = $strRootCommit
+                    PushCommitEvidenceJson = $strOnePayload
+                    OtherRefEvidenceJson = $strRootEvidence
+                }
+            },
+            [pscustomobject]@{
+                Name = 'graph mismatch'
+                Expected = 'distinct commit set contradicts'
+                Arguments = @{
+                    HeadRevision = $strTwoCommit
+                    EventHeadRevision = $strTwoCommit
+                    PushCommitEvidenceJson = $strTwoOnlyPayload
+                    OtherRefEvidenceJson = $strRootEvidence
+                }
+            },
+            [pscustomobject]@{
+                Name = 'other-ref drift'
+                Expected = 'other-ref object changed'
+                Arguments = @{
+                    HeadRevision = $strOneCommit
+                    EventHeadRevision = $strOneCommit
+                    PushCommitEvidenceJson = $strOnePayload
+                    OtherRefEvidenceJson = $strRootEvidence
+                }
+            }
+        )) {
+        if ($objRejectedFixture.Name -ceq 'other-ref drift') {
+            & git -C $strTopologyRoot update-ref `
+                refs/remotes/event/created-other-0000 $strOneCommit
+        }
+        else {
+            & git -C $strTopologyRoot update-ref `
+                refs/remotes/event/created-other-0000 $strRootCommit
+        }
+        try {
+            $objArguments = $objRejectedFixture.Arguments
+            $null = Get-CreatedRefBoundaryContext `
+                -RepositoryRootPath $strTopologyRoot `
+                -DestinationRef 'refs/heads/new-rejected' `
+                -HeadRevision $objArguments.HeadRevision `
+                -EventHeadRevision $objArguments.EventHeadRevision `
+                -EventHeadDistinct 'true' `
+                -PushCommitEvidenceJson $objArguments.PushCommitEvidenceJson `
+                -OtherRefEvidenceJson $objArguments.OtherRefEvidenceJson
+            throw "Rejected created-ref fixture passed: $($objRejectedFixture.Name)"
+        }
+        catch {
+            $strRejectedMessage = $_.Exception.Message
+            if ($strRejectedMessage.StartsWith(
+                    'Rejected created-ref fixture passed:',
+                    [StringComparison]::Ordinal
+                )) {
+                throw
+            }
+            if (-not $strRejectedMessage.Contains(
+                    $objRejectedFixture.Expected,
+                    [StringComparison]::OrdinalIgnoreCase
+                )) {
+                throw "Created-ref rejection '$($objRejectedFixture.Name)' returned: $strRejectedMessage"
+            }
+        }
+    }
+
+    $objBoundaryCommand = Get-Command Get-CreatedRefBoundaryContext
+    if ($objBoundaryCommand.Parameters.ContainsKey('PushCommitCount') -or
+        $objBoundaryCommand.Parameters.ContainsKey('PushDistinctCommitCount')) {
+        throw 'Created-ref validation still requires undocumented push count fields.'
+    }
+
+    $objInvalidIdCommit = ConvertTo-CreatedPushCommitEvidenceObject `
+        -Id ('g' * 40) -Distinct $true
+    $objNotDistinctHeadCommit = ConvertTo-CreatedPushCommitEvidenceObject `
+        -Id $strOneCommit -Distinct $false
+    $strMalformedTimestampPayload = $strOnePayload.Replace(
+        '"timestamp":""',
+        '"timestamp":0'
+    )
+    $strDuplicatePropertyPayload = $strOnePayload.Replace(
+        '"id":"' + $strOneCommit + '"',
+        '"id":"' + $strOneCommit + '","id":"' + $strOneCommit + '"'
+    )
+    $strMissingPropertyPayload = $strOnePayload.Replace(
+        '"timestamp":"","url"',
+        '"url"'
+    )
+    $arrEvidenceParserRejections = @(
+        [pscustomobject]@{
+            Name = 'malformed JSON'
+            Json = '{'
+            Head = $strOneCommit
+            Distinct = 'true'
+            Expected = 'malformed'
+        },
+        [pscustomobject]@{
+            Name = 'malformed commit object'
+            Json = '[{}]'
+            Head = $strOneCommit
+            Distinct = 'true'
+            Expected = 'invalid object shape'
+        },
+        [pscustomobject]@{
+            Name = 'malformed timestamp token'
+            Json = $strMalformedTimestampPayload
+            Head = $strOneCommit
+            Distinct = 'true'
+            Expected = 'invalid identity or scalar'
+        },
+        [pscustomobject]@{
+            Name = 'duplicate raw property'
+            Json = $strDuplicatePropertyPayload
+            Head = $strOneCommit
+            Distinct = 'true'
+            Expected = 'duplicate property'
+        },
+        [pscustomobject]@{
+            Name = 'missing required property'
+            Json = $strMissingPropertyPayload
+            Head = $strOneCommit
+            Distinct = 'true'
+            Expected = 'invalid object shape'
+        },
+        [pscustomobject]@{
+            Name = 'invalid commit ID'
+            Json = ConvertTo-Json -Depth 4 -Compress -InputObject `
+                ([object[]] @($objInvalidIdCommit))
+            Head = $strOneCommit
+            Distinct = 'true'
+            Expected = 'invalid identity or scalar'
+        },
+        [pscustomobject]@{
+            Name = 'duplicate commit ID'
+            Json = ConvertTo-Json -Depth 4 -Compress -InputObject `
+                ([object[]] @($objOnePayloadCommit, $objOnePayloadCommit))
+            Head = $strOneCommit
+            Distinct = 'true'
+            Expected = 'invalid identity or scalar'
+        },
+        [pscustomobject]@{
+            Name = 'head mismatch'
+            Json = $strOnePayload
+            Head = $strTwoCommit
+            Distinct = 'true'
+            Expected = 'does not end at the event head'
+        },
+        [pscustomobject]@{
+            Name = 'head distinct mismatch'
+            Json = ConvertTo-Json -Depth 4 -Compress -InputObject `
+                ([object[]] @($objNotDistinctHeadCommit))
+            Head = $strOneCommit
+            Distinct = 'true'
+            Expected = 'does not end at the event head'
+        },
+        [pscustomobject]@{
+            Name = 'oversized evidence'
+            Json = '[' + (' ' * $intPushCommitEvidenceMaximumBytes) + ']'
+            Head = $strOneCommit
+            Distinct = 'true'
+            Expected = 'exceeds'
+        }
+    )
+    foreach ($objParserRejection in $arrEvidenceParserRejections) {
+        try {
+            $null = @(
+                Read-CreatedPushCommitEvidence `
+                    -PushCommitEvidenceJson $objParserRejection.Json `
+                    -EventHeadRevision $objParserRejection.Head `
+                    -EventHeadDistinct $objParserRejection.Distinct
+            )
+            throw "Rejected evidence parser fixture passed: $($objParserRejection.Name)"
+        }
+        catch {
+            $strRejectedMessage = $_.Exception.Message
+            if ($strRejectedMessage.StartsWith(
+                    'Rejected evidence parser fixture passed:',
+                    [StringComparison]::Ordinal
+                )) {
+                throw
+            }
+            if (-not $strRejectedMessage.Contains(
+                    $objParserRejection.Expected,
+                    [StringComparison]::OrdinalIgnoreCase
+                )) {
+                throw "Evidence parser rejection '$($objParserRejection.Name)' returned: $strRejectedMessage"
+            }
+        }
+    }
+
+    $arrCapCommitEvidence = [object[]] @(
+        for ($intCommitIndex = 1;
+            $intCommitIndex -le $intMaximumPayloadCommitCount;
+            $intCommitIndex++) {
+            ConvertTo-CreatedPushCommitEvidenceObject `
+                -Id ('{0:x40}' -f $intCommitIndex) -Distinct $false
+        }
+    )
+    $arrBelowCapCommitEvidence = [object[]] @(
+        $arrCapCommitEvidence[0..($intMaximumPayloadCommitCount - 2)]
+    )
+    $strBelowCapCommitEvidence = ConvertTo-Json -Depth 4 -Compress `
+        -InputObject $arrBelowCapCommitEvidence
+    $arrBelowCapNormalized = @(
+        Read-CreatedPushCommitEvidence `
+            -PushCommitEvidenceJson $strBelowCapCommitEvidence `
+            -EventHeadRevision $arrBelowCapCommitEvidence[-1].id `
+            -EventHeadDistinct 'false'
+    )
+    if ($arrBelowCapNormalized.Count -ne
+        ($intMaximumPayloadCommitCount - 1)) {
+        throw 'The 2047-object created-push evidence fixture was not preserved.'
+    }
+    $strAtCapCommitEvidence = ConvertTo-Json -Depth 4 -Compress `
+        -InputObject $arrCapCommitEvidence
+    try {
+        $null = @(
+            Read-CreatedPushCommitEvidence `
+                -PushCommitEvidenceJson $strAtCapCommitEvidence `
+                -EventHeadRevision $arrCapCommitEvidence[-1].id `
+                -EventHeadDistinct 'false'
+        )
+        throw 'The 2048-object created-push evidence fixture passed.'
+    }
+    catch {
+        if ($_.Exception.Message -ceq
+            'The 2048-object created-push evidence fixture passed.') {
+            throw
+        }
+        if (-not $_.Exception.Message.Contains(
+                '2048-object truncation cap',
+                [StringComparison]::Ordinal
+            )) {
+            throw "The 2048-object fixture returned: $($_.Exception.Message)"
+        }
+    }
+}
+finally {
+    if ([IO.Directory]::Exists($strTopologyRoot) -and
+        $strTopologyRoot.StartsWith(
+            $strTempRoot,
+            [StringComparison]::OrdinalIgnoreCase
+        )) {
+        Remove-Item -LiteralPath $strTopologyRoot -Recurse -Force
     }
 }
