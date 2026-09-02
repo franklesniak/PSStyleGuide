@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "authorization_id": "issue176-trust-root-repair-2ff3adc2",
+  "authorization_id": "issue176-table-status-repair-eca453ed",
   "candidate": {
     "base_commit": "70bf7522233a6c8558809a2c2fc22be83a23a7b9",
-    "head_commit": "2ff3adc246f24eb2d3557fb28b64366e43b2e9d5",
-    "head_tree": "33474bf38dadaab89e4c670922d3d4d7d660e9c4",
+    "head_commit": "eca453edf39c9b3e9c705ae68929c9fff214503c",
+    "head_tree": "24160117814d7bd4cab932c9c5a85949bac5f7de",
     "parent_commits": [
-      "69d901352b4ba55c4b2544b2a7bacabe43caf190"
+      "2ff3adc246f24eb2d3557fb28b64366e43b2e9d5"
     ]
   },
   "limits": {
@@ -42,9 +42,9 @@
     {
       "path": ".github/workflows/Test-AgentInstructions.ps1",
       "mode": "100644",
-      "blob": "6e945760f000d9c35d800d1ed7e84066c9212b65",
-      "bytes": 472625,
-      "sha256": "9ad2a8ff6008f3e7689ffed0995fec1a049518d3785be0aded445689baafebee",
+      "blob": "abfe2acade185e3245921fccc3809b2919a5208c",
+      "bytes": 483227,
+      "sha256": "1d9a4d5b9ed8107821b1894d2f4a439f53eb30493dbd14926c585cb6fe42d8c9",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
