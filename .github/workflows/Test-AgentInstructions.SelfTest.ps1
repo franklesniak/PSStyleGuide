@@ -29,7 +29,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.2.20260902.2
+# Version: 1.2.20260902.3
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -122,6 +122,55 @@ if (@(Get-PublishedEndpointMetadataFailure `
     throw 'The extracted higher-order revision reset did not fail closed.'
 }
 
+$strMetadataOnlyHigherRevision = $strBaseline.Replace(
+    '**Version:** 1.0.20260830.0',
+    '**Version:** 1.0.20260902.5'
+).Replace(
+    '- **Last Updated:** 2026-08-30',
+    '- **Last Updated:** 2026-09-02'
+)
+if (@(Get-PublishedEndpointMetadataFailure `
+    -Name 'fixture.md' -CurrentContent $strMetadataOnlyHigherRevision `
+    -ParentContent $strBaseline -ExpectedUtcDate '2026-09-02' `
+    -IsNewDocumentTransition $false) -cnotcontains
+    ('fixture.md Version revision must be exactly 0 when a published-baseline ' +
+        'major, minor, or date segment changes.')) {
+    throw 'The extracted metadata-only higher-order reset did not fail closed.'
+}
+$strMetadataOnlyHigherReset = $strMetadataOnlyHigherRevision.Replace(
+    '**Version:** 1.0.20260902.5',
+    '**Version:** 1.0.20260902.0'
+)
+if (@(Get-PublishedEndpointMetadataFailure `
+        -Name 'fixture.md' -CurrentContent $strMetadataOnlyHigherReset `
+        -ParentContent $strBaseline -ExpectedUtcDate '2026-09-02' `
+        -IsNewDocumentTransition $false).Count -ne 0) {
+    throw 'The extracted metadata-only higher-order reset was rejected.'
+}
+
+$strMetadataOnlySameTupleIncrement = $strBaseline.Replace(
+    '**Version:** 1.0.20260830.0',
+    '**Version:** 1.0.20260830.1'
+)
+if (@(Get-PublishedEndpointMetadataFailure `
+        -Name 'fixture.md' -CurrentContent $strMetadataOnlySameTupleIncrement `
+        -ParentContent $strBaseline -ExpectedUtcDate '2026-08-30' `
+        -IsNewDocumentTransition $false).Count -ne 0) {
+    throw 'The extracted metadata-only same-tuple increment was rejected.'
+}
+$strMetadataOnlySameTupleSkip = $strMetadataOnlySameTupleIncrement.Replace(
+    '**Version:** 1.0.20260830.1',
+    '**Version:** 1.0.20260830.2'
+)
+if (@(Get-PublishedEndpointMetadataFailure `
+    -Name 'fixture.md' -CurrentContent $strMetadataOnlySameTupleSkip `
+    -ParentContent $strBaseline -ExpectedUtcDate '2026-08-30' `
+    -IsNewDocumentTransition $false) -cnotcontains
+    ('fixture.md Version revision must be exactly 1 after a published change ' +
+        'with an unchanged published-baseline major, minor, and date tuple.')) {
+    throw 'The extracted metadata-only same-tuple skip did not fail closed.'
+}
+
 $strSameTupleFinal = $strBaseline.Replace(
     '**Version:** 1.0.20260830.0',
     '**Version:** 1.0.20260830.1'
@@ -140,8 +189,8 @@ if (@(Get-PublishedEndpointMetadataFailure `
     -Name 'fixture.md' -CurrentContent $strSkippedSameTupleRevision `
     -ParentContent $strBaseline -ExpectedUtcDate '2026-08-30' `
     -IsNewDocumentTransition $false) -cnotcontains
-    ('fixture.md Version revision must be exactly 1 after a rendered-content ' +
-        'change with an unchanged published-baseline major, minor, and date tuple.')) {
+    ('fixture.md Version revision must be exactly 1 after a published change ' +
+        'with an unchanged published-baseline major, minor, and date tuple.')) {
     throw 'The extracted skipped same-tuple revision did not fail closed.'
 }
 

@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260902.3
+# Version: 1.7.20260902.4
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -5478,6 +5478,31 @@ function Get-PublishedEndpointMetadataFailure {
         return
     }
 
+    $boolRevisionChanged = $intCurrentRevision -ne $intParentRevision
+    if ($boolSameVersionTuple -and
+        ($boolRenderedContentChanged -or $boolRevisionChanged)) {
+        if ($intParentRevision -eq [int64]::MaxValue) {
+            Write-Output (
+                "The published baseline $Name Version revision cannot be incremented safely."
+            )
+            return
+        }
+        $intExpectedRevision = $intParentRevision + 1
+        if ($intCurrentRevision -ne $intExpectedRevision) {
+            Write-Output (
+                "$Name Version revision must be exactly $intExpectedRevision after a " +
+                'published change with an unchanged published-baseline major, minor, ' +
+                'and date tuple.'
+            )
+        }
+    }
+    elseif (-not $boolSameVersionTuple -and $intCurrentRevision -ne 0) {
+        Write-Output (
+            "$Name Version revision must be exactly 0 when a published-baseline " +
+            'major, minor, or date segment changes.'
+        )
+    }
+
     if (-not $boolRenderedContentChanged) {
         return
     }
@@ -5496,28 +5521,6 @@ function Get-PublishedEndpointMetadataFailure {
         }
     }
 
-    if ($boolSameVersionTuple) {
-        if ($intParentRevision -eq [int64]::MaxValue) {
-            Write-Output (
-                "The published baseline $Name Version revision cannot be incremented safely."
-            )
-            return
-        }
-        $intExpectedRevision = $intParentRevision + 1
-        if ($intCurrentRevision -ne $intExpectedRevision) {
-            Write-Output (
-                "$Name Version revision must be exactly $intExpectedRevision after a " +
-                'rendered-content change with an unchanged published-baseline major, ' +
-                'minor, and date tuple.'
-            )
-        }
-    }
-    elseif ($intCurrentRevision -ne 0) {
-        Write-Output (
-            "$Name Version revision must be exactly 0 when a published-baseline " +
-            'major, minor, or date segment changes.'
-        )
-    }
 }
 
 function Get-TrustRootRangeMutationFailure {
@@ -7381,9 +7384,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260902\.3$'
+            '(?m)^# Version: 1\.7\.20260902\.4$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.7.20260902.3.'
+        throw 'The validator script version is not 1.7.20260902.4.'
     }
     $boolSavedWindowsPython = $script:useWindowsPythonLauncher
     $arrSavedPythonNames = $script:pythonPathNames
@@ -7797,9 +7800,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strExtractedSelfTestSource,
-            '(?m)^# Version: 1\.2\.20260902\.2$'
+            '(?m)^# Version: 1\.2\.20260902\.3$'
         ).Count -ne 1) {
-        throw 'The extracted self-test lacks version 1.2.20260902.2.'
+        throw 'The extracted self-test lacks version 1.2.20260902.3.'
     }
     $strExtractedSelfTestRevision = if (
         [string]::IsNullOrEmpty($strValidatedInputRevision)
@@ -8802,7 +8805,7 @@ if ($SelfTest) {
         -ParentAgentsContent $strAgentsContent `
         -AgentsExpectedUtcDate $objAgentsUpdatedMatch.Groups['Date'].Value `
         -Failure ("AGENTS.md Version revision must be exactly " +
-            "$intNextAgentsRevision after a rendered-content change with an " +
+            "$intNextAgentsRevision after a published change with an " +
             'unchanged published-baseline major, minor, and date tuple.')
 
     $strHigherRevisionParent = $strAgentsContent.Replace(
@@ -8842,7 +8845,7 @@ if ($SelfTest) {
         -ParentAgentsContent $strAgentsContent `
         -AgentsExpectedUtcDate $objAgentsUpdatedMatch.Groups['Date'].Value `
         -Failure ("AGENTS.md Version revision must be exactly " +
-            "$intNextAgentsRevision after a rendered-content change with an " +
+            "$intNextAgentsRevision after a published change with an " +
             'unchanged published-baseline major, minor, and date tuple.')
 
     $objIsoEvent = ConvertFrom-TrustedEventTimestamp -Timestamp `
@@ -9008,7 +9011,7 @@ if ($SelfTest) {
             -ParentContent $strEndpointBaseline -ExpectedUtcDate '2026-08-30' `
             -IsNewDocumentTransition $false) -cnotcontains
         ('endpoint-fixture.md Version revision must be exactly 1 after a ' +
-            'rendered-content change with an unchanged published-baseline major, ' +
+            'published change with an unchanged published-baseline major, ' +
             'minor, and date tuple.')) {
         throw 'A skipped same-tuple published final revision did not fail closed.'
     }
@@ -9455,7 +9458,7 @@ if ($SelfTest) {
                 'const evidence = process.env.PUSH_COMMIT_EVIDENCE;',
                 'Buffer.byteLength(evidence, "utf8") > 1048576',
                 'commits = JSON.parse(evidence);',
-                '!Array.isArray(commits) || commits.length > 2048',
+                '!Array.isArray(commits) || commits.length >= 2048',
                 '!/^[0-9a-f]{40}$/.test(entry.id)',
                 'seenCommitIds.has(entry.id)',
                 'if (ids.length > 0 &&',
@@ -9463,7 +9466,7 @@ if ($SelfTest) {
                 '(ids.length > 0 ? "\n" : ""), "utf8");',
                 'mapfile -t push_commit_ids <"${push_commit_ids_file}"',
                 'fetch_depth=$((push_commit_count + 1))',
-                'test "${fetch_depth}" -le 2049',
+                'test "${fetch_depth}" -le 2048',
                 "destination_local_ref='refs/remotes/event/created-destination'",
                 '--no-write-fetch-head --no-recurse-submodules origin',
                 '"${PUSH_REF}:${destination_local_ref}"',
@@ -9743,10 +9746,18 @@ if ($SelfTest) {
             Expected = 'Workflow contract literal is missing: Buffer.byteLength'
         },
         [pscustomobject]@{
-            Name = 'missing push commit array and count bound'
+            Name = 'missing push commit array and truncation-cap bound'
             Content = $strAgentWorkflowContent.Replace(
-                '!Array.isArray(commits) || commits.length > 2048',
+                '!Array.isArray(commits) || commits.length >= 2048',
                 'false'
+            )
+            Expected = 'Workflow contract literal is missing: !Array.isArray(commits)'
+        },
+        [pscustomobject]@{
+            Name = 'weakened push commit truncation-cap comparison'
+            Content = $strAgentWorkflowContent.Replace(
+                '!Array.isArray(commits) || commits.length >= 2048',
+                '!Array.isArray(commits) || commits.length > 2048'
             )
             Expected = 'Workflow contract literal is missing: !Array.isArray(commits)'
         },
@@ -9797,6 +9808,14 @@ if ($SelfTest) {
                 'fetch_depth=2147483647'
             )
             Expected = 'Workflow contract literal is missing: fetch_depth=$((push_commit_count + 1))'
+        },
+        [pscustomobject]@{
+            Name = 'weakened destination history fetch cap'
+            Content = $strAgentWorkflowContent.Replace(
+                'test "${fetch_depth}" -le 2048',
+                'test "${fetch_depth}" -le 2049'
+            )
+            Expected = 'Workflow contract literal is missing: test "${fetch_depth}" -le 2048'
         },
         [pscustomobject]@{
             Name = 'forcing created destination fetch'
