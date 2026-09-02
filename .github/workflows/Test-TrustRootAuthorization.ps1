@@ -529,6 +529,45 @@ function Assert-SemanticInvariant {
         return
     }
 
+    if ($Invariant -ceq 'workflow-created-push-history-fetch-is-bounded') {
+        $arrRequiredLiteral = @(
+            'PUSH_COMMIT_EVIDENCE: ${{ toJson(github.event.commits) }}',
+            'const evidence = process.env.PUSH_COMMIT_EVIDENCE;',
+            'Buffer.byteLength(evidence, "utf8") > 1048576',
+            'commits = JSON.parse(evidence);',
+            '!Array.isArray(commits) || commits.length > 2048',
+            '!/^[0-9a-f]{40}$/.test(entry.id)',
+            'seenCommitIds.has(entry.id)',
+            'if (ids.length > 0 &&',
+            'ids[ids.length - 1] !== process.env.PUSH_AFTER_SHA',
+            '(ids.length > 0 ? "\n" : ""), "utf8");',
+            'fetch_depth=$((push_commit_count + 1))',
+            'test "${fetch_depth}" -le 2049',
+            "destination_local_ref='refs/remotes/event/created-destination'",
+            '--no-write-fetch-head --no-recurse-submodules origin',
+            '"${PUSH_REF}:${destination_local_ref}"',
+            'test "${fetched_destination}" = "${PUSH_AFTER_SHA}"',
+            'git cat-file -e "${push_commit_id}^{commit}"',
+            'cmp --silent "${raw_refs}" "${raw_refs_after}"'
+        )
+        foreach ($strRequiredLiteral in $arrRequiredLiteral) {
+            if (-not $Text.Contains(
+                    $strRequiredLiteral,
+                    [StringComparison]::Ordinal
+                )) {
+                throw "$Path does not satisfy semantic invariant $Invariant."
+            }
+        }
+        if ($Text -cmatch '(?m)(^|\s)--force(\s|$)' -or
+            $Text.Contains(
+                '"+${PUSH_REF}:${destination_local_ref}"',
+                [StringComparison]::Ordinal
+            )) {
+            throw "$Path does not satisfy semantic invariant $Invariant."
+        }
+        return
+    }
+
     $hashtablePatterns = @{
         'docs-status-lifecycle-values' =
             'Draft \| Proposed \| Active \| Accepted \| Superseded \| Deprecated'

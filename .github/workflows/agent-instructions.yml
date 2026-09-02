@@ -151,6 +151,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           PUSH_REF: ${{ github.ref }}
           PUSH_AFTER_SHA: ${{ github.event.after }}
+          PUSH_COMMIT_EVIDENCE: ${{ toJson(github.event.commits) }}
         run: |
           set -euo pipefail
           export LC_ALL=C
@@ -166,8 +167,57 @@ jobs:
           raw_refs_after="$(mktemp)"
           sorted_refs="$(mktemp)"
           evidence_rows="$(mktemp)"
+          push_commit_ids_file="$(mktemp)"
+          push_commit_count_file="$(mktemp)"
           trap 'rm -f "${raw_refs}" "${raw_refs_after}" \
-            "${sorted_refs}" "${evidence_rows}"' EXIT
+            "${sorted_refs}" "${evidence_rows}" \
+            "${push_commit_ids_file}" "${push_commit_count_file}"' EXIT
+          if ! node -e '
+            const fs = require("fs");
+            const evidence = process.env.PUSH_COMMIT_EVIDENCE;
+            if (typeof evidence !== "string" ||
+                Buffer.byteLength(evidence, "utf8") > 1048576) {
+              throw new Error("Push commit evidence is missing or oversized.");
+            }
+            let commits;
+            try {
+              commits = JSON.parse(evidence);
+            } catch {
+              throw new Error("Push commit evidence is malformed JSON.");
+            }
+            if (!Array.isArray(commits) || commits.length > 2048) {
+              throw new Error("Push commit evidence is not a bounded array.");
+            }
+            const seenCommitIds = new Set();
+            const ids = commits.map((entry) => {
+              if (entry === null || typeof entry !== "object" ||
+                  Array.isArray(entry) ||
+                  typeof entry.id !== "string" ||
+                  !/^[0-9a-f]{40}$/.test(entry.id) ||
+                  seenCommitIds.has(entry.id)) {
+                throw new Error("Push commit evidence has an invalid or duplicate ID.");
+              }
+              seenCommitIds.add(entry.id);
+              return entry.id;
+            });
+            if (ids.length > 0 &&
+                ids[ids.length - 1] !== process.env.PUSH_AFTER_SHA) {
+              throw new Error("Push commit evidence does not end at the event head.");
+            }
+            fs.writeFileSync(process.argv[1], ids.join("\n") +
+              (ids.length > 0 ? "\n" : ""), "utf8");
+            fs.writeFileSync(process.argv[2], `${ids.length}\n`, "utf8");
+          ' "${push_commit_ids_file}" "${push_commit_count_file}"; then
+            echo 'Push commit evidence parsing failed.' >&2
+            exit 1
+          fi
+          mapfile -t push_commit_ids <"${push_commit_ids_file}"
+          IFS= read -r push_commit_count <"${push_commit_count_file}"
+          [[ "${push_commit_count}" =~ ^[0-9]+$ ]]
+          test "${push_commit_count}" -eq "${#push_commit_ids[@]}"
+          fetch_depth=$((push_commit_count + 1))
+          test "${fetch_depth}" -ge 1
+          test "${fetch_depth}" -le 2049
           authorization="$(printf 'x-access-token:%s' "${GITHUB_TOKEN}" |
             base64 -w 0)"
           set +e
@@ -253,6 +303,24 @@ jobs:
           done
           test "${destination_count}" -eq 1
           test "${#remote_names[@]}" -le 256
+
+          destination_local_ref='refs/remotes/event/created-destination'
+          if git show-ref --verify --quiet "${destination_local_ref}"; then
+            echo 'The created destination evidence ref already exists.' >&2
+            exit 1
+          fi
+          GIT_CONFIG_COUNT=1 \
+            GIT_CONFIG_KEY_0="http.${GITHUB_SERVER_URL}/.extraheader" \
+            GIT_CONFIG_VALUE_0="Authorization: Basic ${authorization}" \
+            timeout 60s git fetch --depth="${fetch_depth}" --no-tags \
+              --no-write-fetch-head --no-recurse-submodules origin \
+              "${PUSH_REF}:${destination_local_ref}"
+          fetched_destination="$(git rev-parse --verify \
+            "${destination_local_ref}^{commit}")"
+          test "${fetched_destination}" = "${PUSH_AFTER_SHA}"
+          for push_commit_id in "${push_commit_ids[@]}"; do
+            git cat-file -e "${push_commit_id}^{commit}"
+          done
 
           if test "${#fetch_arguments[@]}" -gt 0; then
             GIT_CONFIG_COUNT=1 \

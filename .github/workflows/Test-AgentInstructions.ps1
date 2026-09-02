@@ -9280,7 +9280,25 @@ if ($SelfTest) {
                 'refs/remotes/event/push-base',
                 'refs/remotes/event/pr-head',
                 'id: created-push-boundary',
+                'PUSH_COMMIT_EVIDENCE: ${{ toJson(github.event.commits) }}',
                 'git ls-remote --refs --heads --tags origin',
+                'const evidence = process.env.PUSH_COMMIT_EVIDENCE;',
+                'Buffer.byteLength(evidence, "utf8") > 1048576',
+                'commits = JSON.parse(evidence);',
+                '!Array.isArray(commits) || commits.length > 2048',
+                '!/^[0-9a-f]{40}$/.test(entry.id)',
+                'seenCommitIds.has(entry.id)',
+                'if (ids.length > 0 &&',
+                'ids[ids.length - 1] !== process.env.PUSH_AFTER_SHA',
+                '(ids.length > 0 ? "\n" : ""), "utf8");',
+                'mapfile -t push_commit_ids <"${push_commit_ids_file}"',
+                'fetch_depth=$((push_commit_count + 1))',
+                'test "${fetch_depth}" -le 2049',
+                "destination_local_ref='refs/remotes/event/created-destination'",
+                '--no-write-fetch-head --no-recurse-submodules origin',
+                '"${PUSH_REF}:${destination_local_ref}"',
+                'test "${fetched_destination}" = "${PUSH_AFTER_SHA}"',
+                'git cat-file -e "${push_commit_id}^{commit}"',
                 'sorted_refs="$(mktemp)"',
                 "if ! node -e '",
                 'const { TextDecoder } = require("util");',
@@ -9547,6 +9565,86 @@ if ($SelfTest) {
             Expected = 'Workflow contract literal is missing: seenRefs.has(fields[1])'
         },
         [pscustomobject]@{
+            Name = 'missing push commit byte bound'
+            Content = $strAgentWorkflowContent.Replace(
+                'Buffer.byteLength(evidence, "utf8") > 1048576',
+                'false'
+            )
+            Expected = 'Workflow contract literal is missing: Buffer.byteLength'
+        },
+        [pscustomobject]@{
+            Name = 'missing push commit array and count bound'
+            Content = $strAgentWorkflowContent.Replace(
+                '!Array.isArray(commits) || commits.length > 2048',
+                'false'
+            )
+            Expected = 'Workflow contract literal is missing: !Array.isArray(commits)'
+        },
+        [pscustomobject]@{
+            Name = 'missing push commit ID validation'
+            Content = $strAgentWorkflowContent.Replace(
+                '!/^[0-9a-f]{40}$/.test(entry.id)',
+                'false'
+            )
+            Expected = 'Workflow contract literal is missing: !/^[0-9a-f]{40}$/'
+        },
+        [pscustomobject]@{
+            Name = 'missing duplicate push commit rejection'
+            Content = $strAgentWorkflowContent.Replace(
+                'seenCommitIds.has(entry.id)',
+                'false'
+            )
+            Expected = 'Workflow contract literal is missing: seenCommitIds.has(entry.id)'
+        },
+        [pscustomobject]@{
+            Name = 'empty push commit array rejected by producer'
+            Content = $strAgentWorkflowContent.Replace(
+                'if (ids.length > 0 &&',
+                'if (ids.length === 0 ||'
+            )
+            Expected = 'Workflow contract literal is missing: if (ids.length > 0 &&'
+        },
+        [pscustomobject]@{
+            Name = 'empty push commit array serialized as one blank record'
+            Content = $strAgentWorkflowContent.Replace(
+                '(ids.length > 0 ? "\n" : ""), "utf8");',
+                '"\n", "utf8");'
+            )
+            Expected = 'Workflow contract literal is missing: (ids.length > 0 ?'
+        },
+        [pscustomobject]@{
+            Name = 'missing push commit head agreement'
+            Content = $strAgentWorkflowContent.Replace(
+                'ids[ids.length - 1] !== process.env.PUSH_AFTER_SHA',
+                'false'
+            )
+            Expected = 'Workflow contract literal is missing: ids[ids.length - 1]'
+        },
+        [pscustomobject]@{
+            Name = 'unbounded destination history fetch'
+            Content = $strAgentWorkflowContent.Replace(
+                'fetch_depth=$((push_commit_count + 1))',
+                'fetch_depth=2147483647'
+            )
+            Expected = 'Workflow contract literal is missing: fetch_depth=$((push_commit_count + 1))'
+        },
+        [pscustomobject]@{
+            Name = 'forcing created destination fetch'
+            Content = $strAgentWorkflowContent.Replace(
+                '"${PUSH_REF}:${destination_local_ref}"',
+                '"+${PUSH_REF}:${destination_local_ref}"'
+            )
+            Expected = 'Event-data fetches must not force a destination ref.'
+        },
+        [pscustomobject]@{
+            Name = 'missing payload commit availability proof'
+            Content = $strAgentWorkflowContent.Replace(
+                'git cat-file -e "${push_commit_id}^{commit}"',
+                'git cat-file -t "${push_commit_id}^{commit}"'
+            )
+            Expected = 'Workflow contract literal is missing: git cat-file -e'
+        },
+        [pscustomobject]@{
             Name = 'fail-open ref sorter invocation'
             Content = $strAgentWorkflowContent.Replace(
                 "if ! node -e '",
@@ -9574,71 +9672,212 @@ if ($SelfTest) {
         }
     }
 
-    $arrUnchangedFailures = @(
-        Get-TrustRootRangeMutationFailure `
-            -RepositoryRootPath $strRepositoryRootPath `
-            -BaseRevision $strNewRefTestHead `
-            -HeadRevision $strNewRefTestHead `
-            -RepositoryRelativePath $script:arrTrustRootPaths |
-            Sort-Object -Unique
+    $strArrayFixtureSystemTempRoot =
+        [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+    $strArrayFixtureRoot = [IO.Path]::Combine(
+        $strArrayFixtureSystemTempRoot,
+        'agent-instruction-trust-array-' + [Guid]::NewGuid().ToString('N')
     )
-    if ($arrUnchangedFailures -isnot [array] -or
-        $arrUnchangedFailures.Count -ne 0) {
-        throw 'The zero-result trust-root array regression did not pass.'
-    }
-    $strTrustRootBase = [string] (
-        & git -C $strRepositoryRootPath rev-list --max-parents=0 HEAD |
-            Select-Object -First 1
+    $strArrayFixtureRepository =
+        [IO.Path]::Combine($strArrayFixtureRoot, 'source')
+    $strArrayFixtureDisabledHooks =
+        [IO.Path]::Combine($strArrayFixtureRoot, 'disabled-hooks')
+    [string[]] $arrArrayFixturePaths = @(
+        '.gitattributes',
+        '.github/workflows/Test-AgentInstructions.SelfTest.ps1',
+        '.github/workflows/Test-TrustRootAuthorization.ps1'
     )
-    $arrTrustRootFailures = @(
-        Get-TrustRootRangeMutationFailure `
-            -RepositoryRootPath $strRepositoryRootPath `
-            -BaseRevision $strTrustRootBase.Trim() `
-            -HeadRevision $strNewRefTestHead `
-            -RepositoryRelativePath $script:arrTrustRootPaths |
-            Sort-Object -Unique
-    )
-    if ($LASTEXITCODE -ne 0) {
-        throw 'The trusted validation mutation query leaked a nonzero native status.'
-    }
-    if ($arrTrustRootFailures -isnot [array] -or
-        $arrTrustRootFailures.Count -le 1) {
-        throw 'The many-result trust-root array regression did not pass.'
-    }
-    $arrHistoricallyChangedTrustPaths = @(
-        & git -C $strRepositoryRootPath diff --name-only --no-renames `
-            --no-ext-diff --no-textconv $strTrustRootBase.Trim() `
-            $strNewRefTestHead -- $script:arrTrustRootPaths
-    )
-    if ($LASTEXITCODE -ne 0) {
-        throw 'Could not inventory changed historical trust roots.'
-    }
-    if ($arrHistoricallyChangedTrustPaths -cnotcontains
-        '.github/workflows/Test-AgentInstructions.SelfTest.ps1') {
-        throw 'The extracted self-test lacks historical trust-root mutation evidence.'
-    }
-    foreach ($strTrustPath in $arrHistoricallyChangedTrustPaths) {
-        if (-not ($arrTrustRootFailures -match
-                [regex]::Escape("changes trusted validation path $strTrustPath."))) {
-            throw "A changed trusted validation path did not fail closed: $strTrustPath"
+    $boolArrayFixtureOriginalAuthorization =
+        $script:boolTrustedMaintenanceAuthorizationValidated
+    [void][IO.Directory]::CreateDirectory($strArrayFixtureRepository)
+    try {
+        $objArrayFixtureUtf8 = [Text.UTF8Encoding]::new($false)
+        foreach ($strArrayFixturePath in $arrArrayFixturePaths) {
+            $strArrayFixtureFile = [IO.Path]::Combine(
+                $strArrayFixtureRepository,
+                $strArrayFixturePath.Replace(
+                    '/',
+                    [IO.Path]::DirectorySeparatorChar
+                )
+            )
+            [void][IO.Directory]::CreateDirectory(
+                [IO.Path]::GetDirectoryName($strArrayFixtureFile)
+            )
+            [IO.File]::WriteAllText(
+                $strArrayFixtureFile,
+                $(if ($strArrayFixturePath -ceq '.gitattributes') {
+                        "* text=auto`n"
+                    } else { "baseline $strArrayFixturePath`n" }),
+                $objArrayFixtureUtf8
+            )
+        }
+        & git -C $strArrayFixtureRepository init --quiet --initial-branch=main
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not initialize the trust-root array fixture.'
+        }
+        & git -C $strArrayFixtureRepository add -- $arrArrayFixturePaths
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not stage the trust-root array baseline.'
+        }
+        & git -C $strArrayFixtureRepository `
+            -c 'user.name=Agent instruction self-test' `
+            -c 'user.email=agent-instruction-self-test@example.invalid' `
+            -c 'commit.gpgSign=false' `
+            -c "core.hooksPath=$strArrayFixtureDisabledHooks" `
+            commit --quiet --no-gpg-sign -m 'trust-root array baseline'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not commit the trust-root array baseline.'
+        }
+        $strArrayFixtureBase = ([string] (& git -C $strArrayFixtureRepository `
+                    rev-parse --verify 'HEAD^{commit}')).Trim()
+
+        [IO.File]::WriteAllText(
+            [IO.Path]::Combine($strArrayFixtureRepository, '.gitattributes'),
+            "one-path mutation`n",
+            $objArrayFixtureUtf8
+        )
+        & git -C $strArrayFixtureRepository add -- '.gitattributes'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not stage the one-path trust-root mutation.'
+        }
+        & git -C $strArrayFixtureRepository `
+            -c 'user.name=Agent instruction self-test' `
+            -c 'user.email=agent-instruction-self-test@example.invalid' `
+            -c 'commit.gpgSign=false' `
+            -c "core.hooksPath=$strArrayFixtureDisabledHooks" `
+            commit --quiet --no-gpg-sign -m 'one trust-root mutation'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not commit the one-path trust-root mutation.'
+        }
+        $strArrayFixtureOne = ([string] (& git -C $strArrayFixtureRepository `
+                    rev-parse --verify 'HEAD^{commit}')).Trim()
+
+        foreach ($strArrayFixturePath in $arrArrayFixturePaths) {
+            $strArrayFixtureFile = [IO.Path]::Combine(
+                $strArrayFixtureRepository,
+                $strArrayFixturePath.Replace(
+                    '/',
+                    [IO.Path]::DirectorySeparatorChar
+                )
+            )
+            [IO.File]::WriteAllText(
+                $strArrayFixtureFile,
+                $(if ($strArrayFixturePath -ceq '.gitattributes') {
+                        "* -text`n"
+                    } else { "many-path mutation $strArrayFixturePath`n" }),
+                $objArrayFixtureUtf8
+            )
+        }
+        & git -C $strArrayFixtureRepository add -- $arrArrayFixturePaths
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not stage the many-path trust-root mutation.'
+        }
+        & git -C $strArrayFixtureRepository `
+            -c 'user.name=Agent instruction self-test' `
+            -c 'user.email=agent-instruction-self-test@example.invalid' `
+            -c 'commit.gpgSign=false' `
+            -c "core.hooksPath=$strArrayFixtureDisabledHooks" `
+            commit --quiet --no-gpg-sign -m 'many trust-root mutations'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not commit the many-path trust-root mutation.'
+        }
+        $strArrayFixtureMany = ([string] (& git -C $strArrayFixtureRepository `
+                    rev-parse --verify 'HEAD^{commit}')).Trim()
+        foreach ($strArrayFixtureRevision in @(
+                $strArrayFixtureBase,
+                $strArrayFixtureOne,
+                $strArrayFixtureMany
+            )) {
+            if ($strArrayFixtureRevision -cnotmatch
+                '^(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})$') {
+                throw 'Could not resolve a trust-root array fixture commit.'
+            }
+        }
+
+        $arrUnchangedFailures = @(
+            Get-TrustRootRangeMutationFailure `
+                -RepositoryRootPath $strArrayFixtureRepository `
+                -BaseRevision $strArrayFixtureOne `
+                -HeadRevision $strArrayFixtureOne `
+                -RepositoryRelativePath $arrArrayFixturePaths |
+                Sort-Object -Unique
+        )
+        if ($arrUnchangedFailures -isnot [array] -or
+            $arrUnchangedFailures.Count -ne 0) {
+            throw 'The zero-result trust-root array regression did not pass.'
+        }
+
+        $strTrustRootFailureSuffix =
+            ' Update this trust root only through an authorized trusted-base maintenance path.'
+        [string[]] $arrExpectedOneFailures = @(
+            'Pull request changes trusted validation path .gitattributes.' +
+                $strTrustRootFailureSuffix
+        )
+        $arrAttributeOnlyFailures = @(
+            Get-TrustRootRangeMutationFailure `
+                -RepositoryRootPath $strArrayFixtureRepository `
+                -BaseRevision $strArrayFixtureBase `
+                -HeadRevision $strArrayFixtureOne `
+                -RepositoryRelativePath $arrArrayFixturePaths |
+                Sort-Object -Unique
+        )
+        if ($arrAttributeOnlyFailures -isnot [array] -or
+            $arrAttributeOnlyFailures.Count -ne 1 -or
+            $arrAttributeOnlyFailures[0] -cne $arrExpectedOneFailures[0]) {
+            throw 'The one-result trust-root array regression did not fail closed.'
+        }
+
+        [string[]] $arrExpectedManyFailures = @(
+            (
+                'Pull request changes trusted validation path .gitattributes.' +
+                    $strTrustRootFailureSuffix
+            ),
+            (
+                'Pull request changes trusted validation path ' +
+                    '.github/workflows/Test-AgentInstructions.SelfTest.ps1.' +
+                    $strTrustRootFailureSuffix
+            ),
+            (
+                'Pull request changes trusted validation path ' +
+                    '.github/workflows/Test-TrustRootAuthorization.ps1.' +
+                    $strTrustRootFailureSuffix
+            )
+        )
+        $arrTrustRootFailures = @(
+            Get-TrustRootRangeMutationFailure `
+                -RepositoryRootPath $strArrayFixtureRepository `
+                -BaseRevision $strArrayFixtureOne `
+                -HeadRevision $strArrayFixtureMany `
+                -RepositoryRelativePath $arrArrayFixturePaths |
+                Sort-Object -Unique
+        )
+        if ($LASTEXITCODE -ne 0 -or $arrTrustRootFailures -isnot [array] -or
+            $arrTrustRootFailures.Count -ne $arrExpectedManyFailures.Count) {
+            throw 'The many-result trust-root array regression did not pass.'
+        }
+        for ($intArrayFailureIndex = 0;
+            $intArrayFailureIndex -lt $arrExpectedManyFailures.Count;
+            $intArrayFailureIndex++) {
+            if ($arrTrustRootFailures[$intArrayFailureIndex] -cne
+                $arrExpectedManyFailures[$intArrayFailureIndex]) {
+                throw 'The many-result trust-root array path set is not exact.'
+            }
+        }
+        if ($arrTrustRootFailures -cnotcontains
+            $arrExpectedManyFailures[1]) {
+            throw 'The extracted self-test lacks hermetic trust-root mutation evidence.'
         }
     }
-    if ($arrTrustRootFailures.Count -ne $arrHistoricallyChangedTrustPaths.Count) {
-        throw 'The trusted validation mutation test returned an unexpected failure count.'
-    }
-    $arrAttributeOnlyFailures = @(
-        Get-TrustRootRangeMutationFailure `
-            -RepositoryRootPath $strRepositoryRootPath `
-            -BaseRevision $strTrustRootBase.Trim() `
-            -HeadRevision $strNewRefTestHead `
-            -RepositoryRelativePath @('.gitattributes') |
-            Sort-Object -Unique
-    )
-    if ($arrAttributeOnlyFailures -isnot [array] -or
-        $arrAttributeOnlyFailures.Count -ne 1 -or
-        -not ($arrAttributeOnlyFailures -match
-            [regex]::Escape('changes trusted validation path .gitattributes.'))) {
-        throw 'The one-result trust-root array regression did not fail closed.'
+    finally {
+        $script:boolTrustedMaintenanceAuthorizationValidated =
+            $boolArrayFixtureOriginalAuthorization
+        if ([IO.Directory]::Exists($strArrayFixtureRoot) -and
+            $strArrayFixtureRoot.StartsWith(
+                $strArrayFixtureSystemTempRoot,
+                [StringComparison]::OrdinalIgnoreCase
+            )) {
+            Remove-Item -LiteralPath $strArrayFixtureRoot -Recurse -Force
+        }
     }
 
     $strMetadataNormalizationBase = @(
