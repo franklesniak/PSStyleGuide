@@ -5323,200 +5323,6 @@ function Get-PublishedEndpointMetadataFailure {
     }
 }
 
-function Read-GitIntroducedCommitRevision {
-    # .SYNOPSIS
-    # Reads a bounded authenticated introduced commit set.
-    # .DESCRIPTION
-    # Returns commits reachable from one exact head and not reachable from any
-    # authenticated base. The result fails closed above the configured cap.
-    # .PARAMETER RepositoryRootPath
-    # The absolute path of the trusted Git repository.
-    # .PARAMETER HeadRevision
-    # The exact authenticated head commit.
-    # .PARAMETER BaseRevision
-    # One through 64 authenticated commits that bound the introduced history.
-    # .EXAMPLE
-    # Read-GitIntroducedCommitRevision @hashtableArguments
-    #
-    # # Returns commits reachable from the head and outside every base.
-    # .INPUTS
-    # None. No pipeline input.
-    # .OUTPUTS
-    # [string] Zero or more commit IDs.
-    # .NOTES
-    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Parameters, return shape, and positional contract can change without notice.
-    # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260831.0.
-    [CmdletBinding(PositionalBinding = $false)]
-    [OutputType([string])]
-    param(
-        [Parameter(Mandatory)][string] $RepositoryRootPath,
-        [Parameter(Mandatory)][string] $HeadRevision,
-        [Parameter(Mandatory)][AllowEmptyCollection()][string[]] $BaseRevision
-    )
-
-    $arrBases = @($BaseRevision)
-    if ($arrBases.Count -lt 1 -or
-        $arrBases.Count -gt $intMetadataMaximumBoundaries) {
-        throw 'Introduced history requires 1 through 64 authenticated bases.'
-    }
-    $arrArguments = @(
-        '-C', $RepositoryRootPath, 'rev-list', '--topo-order',
-        "--max-count=$($intMaximumIntroducedCommitCount + 1)",
-        $HeadRevision, '--not'
-    ) + $arrBases
-    $arrCommits = @(
-        & git @arrArguments 2>$null |
-            ForEach-Object { ([string] $_).Trim() }
-    )
-    if ($LASTEXITCODE -ne 0) {
-        throw 'Could not enumerate authenticated introduced history.'
-    }
-    if ($arrCommits.Count -gt $intMaximumIntroducedCommitCount) {
-        throw "Authenticated introduced history exceeds $intMaximumIntroducedCommitCount commits."
-    }
-    return @($arrCommits)
-}
-
-function Get-GovernedMetadataHistoryFailure {
-    # .SYNOPSIS
-    # Validates every introduced commit transition for one governed document.
-    # .DESCRIPTION
-    # Reads Git blobs as inert data and applies metadata policy to each changed
-    # parent edge. Candidate scripts or workflows are never invoked.
-    # .PARAMETER Name
-    # The trusted document name for diagnostics.
-    # .PARAMETER RepositoryRootPath
-    # The absolute path of the trusted Git repository.
-    # .PARAMETER RepositoryRelativePath
-    # The exact governed document path.
-    # .PARAMETER MaximumBytes
-    # The maximum permitted document byte count.
-    # .PARAMETER CommitRevision
-    # The bounded introduced commit set to validate.
-    # .PARAMETER RequiresVersion
-    # True when the document must contain Version metadata.
-    # .PARAMETER RequiredDocument
-    # True when deletion of the document is prohibited.
-    # .EXAMPLE
-    # Get-GovernedMetadataHistoryFailure @hashtableArguments
-    #
-    # # Returns one diagnostic for each invalid commit transition.
-    # .INPUTS
-    # None. No pipeline input.
-    # .OUTPUTS
-    # [string] Zero or more validation diagnostics.
-    # .NOTES
-    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Parameters, return shape, and positional contract can change without notice.
-    # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260831.0.
-    [CmdletBinding(PositionalBinding = $false)]
-    [OutputType([string])]
-    param(
-        [Parameter(Mandatory)][string] $Name,
-        [Parameter(Mandatory)][string] $RepositoryRootPath,
-        [Parameter(Mandatory)][string] $RepositoryRelativePath,
-        [Parameter(Mandatory)][ValidateRange(1, 2147483646)][int] $MaximumBytes,
-        [Parameter(Mandatory)][AllowEmptyCollection()][string[]] $CommitRevision,
-        [Parameter(Mandatory)][bool] $RequiresVersion,
-        [Parameter(Mandatory)][bool] $RequiredDocument
-    )
-
-    foreach ($strCommit in @($CommitRevision)) {
-        $strCommitAndParents = [string] (& git -C $RepositoryRootPath `
-                rev-list --parents -n 1 $strCommit 2>$null)
-        if ($LASTEXITCODE -ne 0) {
-            throw "Could not inspect metadata transition commit $strCommit."
-        }
-        $arrCommitAndParents = @($strCommitAndParents.Trim() -split '\s+')
-        if ($arrCommitAndParents.Count -lt 1 -or
-            $arrCommitAndParents.Count -gt ($intMetadataMaximumBoundaries + 1) -or
-            $arrCommitAndParents[0] -cne $strCommit) {
-            throw "Git returned invalid metadata parents for $strCommit."
-        }
-        $arrParents = @($arrCommitAndParents | Select-Object -Skip 1)
-        if ($arrParents.Count -eq 0) {
-            $arrParents = @('')
-        }
-        foreach ($strParent in $arrParents) {
-            & git -C $RepositoryRootPath cat-file -e `
-                "$strCommit`:$RepositoryRelativePath" 2>$null
-            $boolCurrentExists = $LASTEXITCODE -eq 0
-            $boolParentExists = $false
-            if (-not [string]::IsNullOrEmpty($strParent)) {
-                & git -C $RepositoryRootPath cat-file -e `
-                    "$strParent`:$RepositoryRelativePath" 2>$null
-                $boolParentExists = $LASTEXITCODE -eq 0
-            }
-            if (-not $boolCurrentExists -and -not $boolParentExists) {
-                continue
-            }
-            $strCurrentBlob = if ($boolCurrentExists) {
-                [string] (& git -C $RepositoryRootPath rev-parse --verify `
-                        "$strCommit`:$RepositoryRelativePath" 2>$null)
-            } else { '' }
-            if ($boolCurrentExists -and $LASTEXITCODE -ne 0) {
-                throw "Could not resolve $Name at $strCommit."
-            }
-            $strParentBlob = if ($boolParentExists) {
-                [string] (& git -C $RepositoryRootPath rev-parse --verify `
-                        "$strParent`:$RepositoryRelativePath" 2>$null)
-            } else { '' }
-            if ($boolParentExists -and $LASTEXITCODE -ne 0) {
-                throw "Could not resolve the parent of $Name at $strCommit."
-            }
-            if ($strCurrentBlob.Trim() -ceq $strParentBlob.Trim()) {
-                continue
-            }
-            if (-not $boolCurrentExists) {
-                if ($RequiredDocument) {
-                    Write-Output "$Name is required and must not be deleted by $strCommit."
-                }
-                continue
-            }
-            $strCurrentContent = Read-GitRevisionText `
-                -RepositoryRootPath $RepositoryRootPath `
-                -Revision $strCommit `
-                -RepositoryRelativePath $RepositoryRelativePath `
-                -MaximumBytes $MaximumBytes `
-                -RequireRegularFile
-            $strParentContent = if ($boolParentExists) {
-                Read-GitRevisionText `
-                    -RepositoryRootPath $RepositoryRootPath `
-                    -Revision $strParent `
-                    -RepositoryRelativePath $RepositoryRelativePath `
-                    -MaximumBytes $MaximumBytes `
-                    -RequireRegularFile
-            } else { $null }
-            $strCommitEpoch = [string] (& git -C $RepositoryRootPath show `
-                    -s --format=%ct $strCommit 2>$null)
-            if ($LASTEXITCODE -ne 0 -or $strCommitEpoch.Trim() -cnotmatch '^\d+$') {
-                throw "Could not read the trusted commit date for $strCommit."
-            }
-            $strCommitUtcDate = (
-                ConvertFrom-TrustedEventTimestamp -Timestamp $strCommitEpoch.Trim()
-            ).ToString('yyyy-MM-dd')
-            if ($RequiresVersion) {
-                Get-PublishedEndpointMetadataFailure `
-                    -Name $Name `
-                    -CurrentContent $strCurrentContent `
-                    -ParentContent $strParentContent `
-                    -ExpectedUtcDate $strCommitUtcDate `
-                    -IsNewDocumentTransition (-not $boolParentExists)
-            }
-            else {
-                Get-PublishedEndpointLastUpdatedFailure `
-                    -Name $Name `
-                    -CurrentContent $strCurrentContent `
-                    -BaseContent $strParentContent `
-                    -TrustedEventUtcDate $strCommitUtcDate
-            }
-        }
-    }
-}
-
 function Get-TrustRootRangeMutationFailure {
     # .SYNOPSIS
     # Finds trust-root changes in endpoints and intervening commits.
@@ -6615,13 +6421,9 @@ elseif (-not [string]::IsNullOrEmpty($DestinationRef) -or
     throw 'Created-push evidence is valid only when the destination ref is new.'
 }
 $arrPublishedGraphBases = @()
-$arrPublishedIntroducedCommits = @()
 if ($boolPublishedEndpointsRequested) {
     if ($PublishedBaselineAbsent) {
         $arrPublishedGraphBases = @($objCreatedRefContext.BoundaryRevisions)
-        $arrPublishedIntroducedCommits = @(
-            $objCreatedRefContext.IntroducedCommitRevisions
-        )
     }
     else {
         $arrPublishedGraphBases = if ($EventName -ceq 'pull_request_target') {
@@ -6631,10 +6433,6 @@ if ($boolPublishedEndpointsRequested) {
                     -RightRevision $PublishedFinalRevision)
         }
         else { @($PublishedBaselineRevision) }
-        $arrPublishedIntroducedCommits = @(Read-GitIntroducedCommitRevision `
-                -RepositoryRootPath $strRepositoryRootPath `
-                -HeadRevision $PublishedFinalRevision `
-                -BaseRevision $arrPublishedGraphBases)
     }
 }
 
@@ -7272,17 +7070,6 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
                 -RequireCurrentMaximumDateForRenderedChange `
                     $objDocumentContext.IsWorktreeTransition)
     }
-    if ($boolPublishedEndpointsRequested -and
-        $arrPublishedIntroducedCommits.Count -gt 0) {
-        $arrRepositoryFailures += @(Get-GovernedMetadataHistoryFailure `
-                -Name $objDocumentContext.Path `
-                -RepositoryRootPath $strRepositoryRootPath `
-                -RepositoryRelativePath $objDocumentContext.Path `
-                -MaximumBytes $objDocumentContext.MaximumBytes `
-                -CommitRevision $arrPublishedIntroducedCommits `
-                -RequiresVersion $objDocumentContext.RequiresVersion `
-                -RequiredDocument $objDocumentContext.RequiredDocument)
-    }
 }
 if ($arrRepositoryFailures.Count -gt 0) {
     throw "Agent-instruction contract failed:`n- $($arrRepositoryFailures -join "`n- ")"
@@ -7315,8 +7102,8 @@ if ($SelfTest) {
         param($objNode)
         $objNode -is [Management.Automation.Language.FunctionDefinitionAst]
     }, $true))
-    if ($arrValidatorFunctionAsts.Count -ne 57) {
-        throw 'The validator function-help inventory must contain exactly 57 functions.'
+    if ($arrValidatorFunctionAsts.Count -ne 55) {
+        throw 'The validator function-help inventory must contain exactly 55 functions.'
     }
     foreach ($objFunctionAst in $arrValidatorFunctionAsts) {
         $objHelp = $objFunctionAst.GetHelpContent()
@@ -9311,7 +9098,9 @@ if ($SelfTest) {
             ('PreviousHead' + 'Revision'), ('NewRefCommit' + 'Count'),
             ('NewRefCommitEvidence' + 'Json'),
             ('Test-HistoricalPolicy' + 'Marker'),
-            ('Get-MetadataEventRevision' + 'Context')
+            ('Get-MetadataEventRevision' + 'Context'),
+            ('Read-GitIntroducedCommit' + 'Revision'),
+            ('Get-GovernedMetadataHistory' + 'Failure')
         )) {
         if ($strValidatorSourceContent.Contains(
                 $strRemovedTransitionIdentity,
