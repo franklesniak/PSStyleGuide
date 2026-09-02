@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "authorization_id": "issue176-trust-root-repair-7a1b8147",
+  "authorization_id": "issue176-trust-root-repair-f90f1178",
   "candidate": {
     "base_commit": "70bf7522233a6c8558809a2c2fc22be83a23a7b9",
-    "head_commit": "7a1b81472328cb7a8bebfdcd140dbb87ea67c804",
-    "head_tree": "32f0f387a9fa84a702e7753652e3a28de121f72a",
+    "head_commit": "f90f1178208a671c2eadbe8f5643a3ae66e3e1d1",
+    "head_tree": "363d4e183abf3a87bf74907551aee7743f5daa12",
     "parent_commits": [
-      "aa5c292126265b13b5d5d15847ed708b1b091d7e"
+      "7a1b81472328cb7a8bebfdcd140dbb87ea67c804"
     ]
   },
   "limits": {
@@ -30,9 +30,9 @@
     {
       "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
       "mode": "100644",
-      "blob": "f1316549d8260209c72621e546019abdf5d7c9d2",
-      "bytes": 30742,
-      "sha256": "57b6b5f13c4d68965ebdc2e4218880a14c00690367fb25e8f36febf0fdec83df",
+      "blob": "6a57fa7994506df711201e7beee0bd706e2487c3",
+      "bytes": 31818,
+      "sha256": "abd52585dcc70baf3afa630470e0980f46d8c9c51cb256fc427aaeed91b6c84c",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
@@ -42,17 +42,21 @@
     {
       "path": ".github/workflows/Test-AgentInstructions.ps1",
       "mode": "100644",
-      "blob": "e9fbf717874d40b476084a89ef81eed1e750e9bd",
-      "bytes": 456932,
-      "sha256": "5c8aafea398cf9eb598ec94255d60d8b5598a7d4236892baab784ae367c0df8a",
+      "blob": "eceb33177b2effb5e19cccb716b827cd3f221831",
+      "bytes": 465016,
+      "sha256": "414751445b21cd60eb501b77f3b74bb9fa0fd0b6b4622e91e996de4d3723126b",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
+        "adr-lifecycle-migration-is-enforced",
+        "created-ref-metadata-baseline-is-consumed",
         "exact-maintenance-production-call-is-gated",
         "extracted-self-test-is-invoked",
         "legacy-transition-marker-is-inert-data",
         "new-ref-boundary-cap-is-64",
+        "ordinary-pr-uses-normal-trust-audit",
         "published-path-array-binding-is-explicit",
+        "published-finalization-date-is-enforced",
         "pr-merge-bases-use-all-and-cap",
         "trusted-maintenance-switch-is-explicit"
       ]
@@ -60,12 +64,13 @@
     {
       "path": ".github/workflows/Test-TrustRootAuthorization.ps1",
       "mode": "100644",
-      "blob": "246753d32748e7cdbcefb9a565f6a6bb27cd1612",
-      "bytes": 35701,
-      "sha256": "e5909d6fff0d082bca4fab0ea88e9443bfd94c8fad0515e32f1e7ae763800e96",
+      "blob": "bdb79e806867f78f9bffb4b0b1ca883bfed5974e",
+      "bytes": 37672,
+      "sha256": "b5d5231b21861814877fb766907be4aa3b5b290e1c4da2de5add7df98362c8b6",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
+        "verifier-audits-authorized-history",
         "verifier-reads-trusted-revision-manifest"
       ]
     },

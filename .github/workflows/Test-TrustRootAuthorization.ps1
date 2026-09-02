@@ -23,7 +23,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.0.20260902.0
+# Version: 1.0.20260902.1
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -569,6 +569,14 @@ function Assert-SemanticInvariant {
     }
 
     $hashtablePatterns = @{
+        'adr-lifecycle-migration-is-enforced' =
+            '(?s)function Get-DecisionRecordLifecycleFailure.*?' +
+            'An unchanged published legacy ADR did not remain valid\..*?' +
+            'A changed legacy ADR did not require lifecycle migration'
+        'created-ref-metadata-baseline-is-consumed' =
+            '(?s)function Get-CreatedRefMetadataBaselineRevision.*?' +
+            '\$strCreatedRefMetadataBaselineRevision =\s+' +
+            'Get-CreatedRefMetadataBaselineRevision'
         'docs-status-lifecycle-values' =
             'Draft \| Proposed \| Active \| Accepted \| Superseded \| Deprecated'
         'docs-owner-enforcer-relationship' =
@@ -587,8 +595,19 @@ function Assert-SemanticInvariant {
             '\$intMetadataMaximumBoundaries = 64'
         'pr-merge-bases-use-all-and-cap' =
             'merge-base --all'
+        'published-finalization-date-is-enforced' =
+            '(?s)\$strTrustedEventUtcDate = ' +
+            '\$objTrustedEventTimestamp\.ToString\(.*?' +
+            'ExpectedUtcDate = \$strTrustedEventUtcDate.*?' +
+            'IsWorktreeTransition = \$true'
+        'ordinary-pr-uses-normal-trust-audit' =
+            '(?s)if \(\s*\$script:boolTrustedMaintenanceAuthorizationValidated' +
+            '.*?-ExactAuthorizedMaintenanceProductionCall.*?else \{\s+' +
+            '@\(Get-TrustRootRangeMutationFailure'
         'trusted-maintenance-switch-is-explicit' =
             '\$TrustedMaintenanceAuthorizationValidated'
+        'verifier-audits-authorized-history' =
+            'The candidate history contains unauthorized path'
         'verifier-reads-trusted-revision-manifest' =
             'ls-tree\s+`?\s*\$TrustedRevision\s+--\s+\$AuthorizationManifestPath'
         'workflow-checkout-is-trusted-sha' =
@@ -822,6 +841,27 @@ if ($setChangedPaths.Count -ne $setAllowedPaths.Count) {
 foreach ($strChangedPath in $setChangedPaths) {
     if (-not $setAllowedPaths.Contains($strChangedPath)) {
         throw "The candidate contains unauthorized path $strChangedPath."
+    }
+}
+
+$objHistory = Invoke-BoundedProcessByte -FileName 'git' -MaximumBytes 1048576 `
+    -ArgumentList @(
+        '-C', $RepositoryRootPath, 'log', '--format=', '--name-only', '-z',
+        '--no-renames', '--no-ext-diff', '--no-textconv',
+        '--diff-merges=separate', '--root', $HeadRevision, '--not',
+        $BaseRevision, '--'
+    )
+if ($objHistory.ExitCode -ne 0) {
+    throw 'Could not enumerate the authorized candidate history.'
+}
+$strHistory = ConvertFrom-StrictUtf8Text -Bytes $objHistory.Bytes `
+    -Name 'The candidate history path list' -AllowNul
+$arrHistoryPaths = @(
+    $strHistory -split "`0" | Where-Object { $_ -cne '' }
+)
+foreach ($strHistoryPath in $arrHistoryPaths) {
+    if (-not $setAllowedPaths.Contains($strHistoryPath)) {
+        throw "The candidate history contains unauthorized path $strHistoryPath."
     }
 }
 
