@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260902.6
+# Version: 1.7.20260902.7
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -2161,7 +2161,7 @@ function Get-MarkdownParseContext {
     # .DESCRIPTION
     # Uses the repository-locked markdown-it package to identify code-block ranges,
     # prose blocks with operative code spans and link destinations, top-level
-    # blocks, top-level list items, and level-two headings.
+    # blocks, table rows and cells, top-level list items, and level-two headings.
     # It validates all parser output before returning it.
     #
     # .PARAMETER Content
@@ -2185,7 +2185,7 @@ function Get-MarkdownParseContext {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20260902.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -2228,6 +2228,7 @@ function Get-MarkdownParseContext {
         '  const deletionStack = [];'
         '  const htmlContainerStack = [];'
         '  const output = [];'
+        '  const renderedOutput = [];'
         '  const code = [];'
         '  const links = [];'
         '  for (const child of children) {'
@@ -2259,16 +2260,26 @@ function Get-MarkdownParseContext {
         '      if (typeof href !== "string") throw new Error("Invalid Markdown link destination.");'
         '      links.push(href);'
         '    }'
-        '    if (child.type === "text" || child.type === "text_special") output.push(child.content);'
-        '    else if (child.type === "softbreak" || child.type === "hardbreak") output.push("\n");'
-        '    else if (child.type === "code_inline") code.push(child.content);'
+        '    if (child.type === "text" || child.type === "text_special") {'
+        '      output.push(child.content);'
+        '      renderedOutput.push(child.content);'
+        '    } else if (child.type === "softbreak" || child.type === "hardbreak") {'
+        '      output.push("\n");'
+        '      renderedOutput.push("\n");'
+        '    } else if (child.type === "code_inline") {'
+        '      code.push(child.content);'
+        '      renderedOutput.push(child.content);'
+        '    }'
         '  }'
         '  if (deletionStack.length > 0) throw new Error("Unclosed deletion container.");'
         '  if (htmlContainerStack.length > 0) throw new Error("Unclosed inline HTML container.");'
-        '  return { text: output.join(""), code, links };'
+        '  return { text: output.join(""), renderedText: renderedOutput.join(""), code, links };'
         '};'
         'const codeBlockRanges = tokens.filter((token) => token.type === "fence" || token.type === "code_block").map((token) => token.map);'
-        'const proseBlocks = tokens.filter((token) => token.type === "inline" && Array.isArray(token.map) && Array.isArray(token.children)).map((token) => ({ range: token.map, ...getOperativeInlineContext(token.children) }));'
+        'const proseBlocks = tokens.filter((token) => token.type === "inline" && Array.isArray(token.map) && Array.isArray(token.children)).map((token) => {'
+        '  const context = getOperativeInlineContext(token.children);'
+        '  return { range: token.map, text: context.text, code: context.code, links: context.links };'
+        '});'
         'const topLevelBlocks = tokens.flatMap((token, index) => {'
         '  if (token.level !== 0 || !Array.isArray(token.map) || (token.nesting !== 0 && token.nesting !== 1)) return [];'
         '  let text = null;'
@@ -2292,7 +2303,25 @@ function Get-MarkdownParseContext {
         '  const inlineToken = tokens[index + 1];'
         '  return [{ range: token.map, text: inlineToken?.type === "inline" ? inlineToken.content : null }];'
         '});'
-        'process.stdout.write(JSON.stringify({ codeBlockRanges, proseBlocks, topLevelBlocks, topLevelListItems, levelTwoHeadings }));'
+        'const tableRows = tokens.flatMap((token, index) => {'
+        '  if (token.type !== "tr_open" || token.tag !== "tr" || token.nesting !== 1 || !Array.isArray(token.map)) return [];'
+        '  const closeIndex = tokens.findIndex((candidate, candidateIndex) => candidateIndex > index && candidate.type === "tr_close" && candidate.tag === "tr" && candidate.nesting === -1 && candidate.level === token.level);'
+        '  if (closeIndex < 0) throw new Error("Unclosed Markdown table row.");'
+        '  const cells = [];'
+        '  for (let cellIndex = index + 1; cellIndex < closeIndex; cellIndex += 1) {'
+        '    const cellToken = tokens[cellIndex];'
+        '    if (cellToken.type !== "th_open" && cellToken.type !== "td_open") continue;'
+        '    if ((cellToken.tag !== "th" && cellToken.tag !== "td") || cellToken.nesting !== 1) throw new Error("Invalid Markdown table cell.");'
+        '    const inlineToken = tokens[cellIndex + 1];'
+        '    const closeToken = tokens[cellIndex + 2];'
+        '    if (inlineToken?.type !== "inline" || !Array.isArray(inlineToken.children) || closeToken?.type !== `${cellToken.tag}_close` || closeToken.tag !== cellToken.tag || closeToken.nesting !== -1) throw new Error("Invalid Markdown table-cell container.");'
+        '    const context = getOperativeInlineContext(inlineToken.children);'
+        '    cells.push({ tag: cellToken.tag, text: context.renderedText, code: context.code, links: context.links });'
+        '  }'
+        '  if (cells.length === 0) throw new Error("Markdown table row has no cells.");'
+        '  return [{ range: token.map, cells }];'
+        '});'
+        'process.stdout.write(JSON.stringify({ codeBlockRanges, proseBlocks, tableRows, topLevelBlocks, topLevelListItems, levelTwoHeadings }));'
     ) -join "`n"
 
     $objStartInfo = [System.Diagnostics.ProcessStartInfo]::new()
@@ -2328,6 +2357,7 @@ function Get-MarkdownParseContext {
     if ($null -eq $objRawContext -or
         $null -eq $objRawContext.codeBlockRanges -or
         $null -eq $objRawContext.proseBlocks -or
+        $null -eq $objRawContext.tableRows -or
         $null -eq $objRawContext.topLevelBlocks -or
         $null -eq $objRawContext.topLevelListItems -or
         $null -eq $objRawContext.levelTwoHeadings) {
@@ -2389,6 +2419,58 @@ function Get-MarkdownParseContext {
                 Code = [string[]]@($objRawProseBlock.code)
                 Links = [string[]]@($objRawProseBlock.links)
             })
+    }
+
+    $listTableRows = [Collections.Generic.List[pscustomobject]]::new()
+    $intPreviousTableRowEnd = 0
+    foreach ($objRawTableRow in @($objRawContext.tableRows)) {
+        if ($null -eq $objRawTableRow -or
+            $objRawTableRow.range -isnot [array] -or
+            $objRawTableRow.range.Count -ne 2 -or
+            $objRawTableRow.cells -isnot [array] -or
+            $objRawTableRow.cells.Count -eq 0) {
+            throw 'The locked Markdown parser returned a malformed table row.'
+        }
+
+        $intStart = [int64] 0
+        $intEnd = [int64] 0
+        if (-not [int64]::TryParse([string]$objRawTableRow.range[0], [ref]$intStart) -or
+            -not [int64]::TryParse([string]$objRawTableRow.range[1], [ref]$intEnd) -or
+            $intStart -lt $intPreviousTableRowEnd -or
+            $intStart -lt 0 -or
+            $intEnd -le $intStart -or
+            $intEnd -gt $LineCount) {
+            throw 'The locked Markdown parser returned an invalid table-row range.'
+        }
+
+        $listCells = [Collections.Generic.List[pscustomobject]]::new()
+        foreach ($objRawCell in @($objRawTableRow.cells)) {
+            if ($null -eq $objRawCell -or
+                $objRawCell.tag -isnot [string] -or
+                @('th', 'td') -cnotcontains $objRawCell.tag -or
+                $objRawCell.text -isnot [string] -or
+                $objRawCell.code -isnot [array] -or
+                @($objRawCell.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or
+                $objRawCell.links -isnot [array] -or
+                @($objRawCell.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {
+                throw 'The locked Markdown parser returned a malformed table cell.'
+            }
+            $listCells.Add([pscustomobject]@{
+                    Tag = [string]$objRawCell.tag
+                    Start = [int]$intStart
+                    End = [int]$intEnd
+                    Text = [string]$objRawCell.text
+                    Code = [string[]]@($objRawCell.code)
+                    Links = [string[]]@($objRawCell.links)
+                })
+        }
+
+        $listTableRows.Add([pscustomobject]@{
+                Start = [int]$intStart
+                End = [int]$intEnd
+                Cells = [pscustomobject[]]$listCells.ToArray()
+            })
+        $intPreviousTableRowEnd = [int]$intEnd
     }
 
     $listTopLevelBlocks = [Collections.Generic.List[pscustomobject]]::new()
@@ -2501,6 +2583,7 @@ function Get-MarkdownParseContext {
     return [pscustomobject]@{
         CodeBlockRanges = [pscustomobject[]]$listRanges.ToArray()
         ProseBlocks = [pscustomobject[]]$listProseBlocks.ToArray()
+        TableRows = [pscustomobject[]]$listTableRows.ToArray()
         TopLevelBlocks = [pscustomobject[]]$listTopLevelBlocks.ToArray()
         TopLevelListItems = [pscustomobject[]]$listTopLevelListItems.ToArray()
         LevelTwoHeadings = [pscustomobject[]]$listLevelTwoHeadings.ToArray()
@@ -2529,7 +2612,7 @@ function Assert-MarkdownParserExactContext {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20260902.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param()
@@ -2544,6 +2627,7 @@ function Assert-MarkdownParserExactContext {
     $strExpected = '{"CodeBlockRanges":[],"ProseBlocks":[' +
         '{"Start":0,"End":1,"Text":"Transport","Code":[],"Links":[]},' +
         '{"Start":2,"End":3,"Text":"Paragraph .","Code":["code"],"Links":[]}],' +
+        '"TableRows":[],' +
         '"TopLevelBlocks":[' +
         '{"Type":"heading_open","Tag":"h2","Start":0,"End":1,"Text":"Transport"},' +
         '{"Type":"paragraph_open","Tag":"p","Start":2,"End":3,"Text":"Paragraph ."}],' +
@@ -2551,6 +2635,28 @@ function Assert-MarkdownParserExactContext {
         '{"Start":0,"End":1,"Text":"Transport"}]}'
     if ($strActual -cne $strExpected) {
         throw "Self-test 'ordinary exact Markdown parser context' changed output."
+    }
+
+    $strTableMarkdown = @(
+        '| **Decision** `Status` | Value |'
+        '| :--- | ---: |'
+        '| Field | *Accepted* |'
+    ) -join "`n"
+    $objTableContext = Get-MarkdownParseContext `
+        -Content $strTableMarkdown -LineCount 3
+    if ($objTableContext.TableRows.Count -ne 2 -or
+        $objTableContext.TableRows[0].Start -ne 0 -or
+        $objTableContext.TableRows[0].End -ne 1 -or
+        $objTableContext.TableRows[0].Cells.Count -ne 2 -or
+        $objTableContext.TableRows[0].Cells[0].Tag -cne 'th' -or
+        $objTableContext.TableRows[0].Cells[0].Text -cne 'Decision Status' -or
+        $objTableContext.TableRows[0].Cells[0].Code.Count -ne 1 -or
+        $objTableContext.TableRows[0].Cells[0].Code[0] -cne 'Status' -or
+        $objTableContext.TableRows[1].Start -ne 2 -or
+        $objTableContext.TableRows[1].End -ne 3 -or
+        $objTableContext.TableRows[1].Cells[1].Tag -cne 'td' -or
+        $objTableContext.TableRows[1].Cells[1].Text -cne 'Accepted') {
+        throw "Self-test 'exact Markdown table context' changed output."
     }
 }
 
@@ -2580,7 +2686,7 @@ function Get-OperativeMarkdownContext {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20260902.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -2617,6 +2723,7 @@ function Get-OperativeMarkdownContext {
         SourceLines = [string[]]$arrLines
         CodeBlockLines = [bool[]]$arrCodeBlockLines
         ProseBlocks = [pscustomobject[]]$objParseContext.ProseBlocks
+        TableRows = [pscustomobject[]]$objParseContext.TableRows
         TopLevelListItems = [pscustomobject[]]$objParseContext.TopLevelListItems
         LevelTwoHeadings = [pscustomobject[]]$objParseContext.LevelTwoHeadings
     }
@@ -5054,6 +5161,37 @@ function Get-DecisionRecordLifecycleFailure {
             "$Name must not contain a separate operative Status field outside Metadata."
         )
     }
+    if (@($objMarkdownContext.TableRows |
+            Where-Object {
+                $boolOutsideMetadata =
+                    $_.Start -le $objMetadataHeading.Start -or
+                    $_.Start -ge $intMetadataSectionEnd
+                $boolHasStatusField = $false
+                if ($boolOutsideMetadata) {
+                    for ($intCell = 0; $intCell -lt $_.Cells.Count - 1; $intCell++) {
+                        $strLabel = [regex]::Replace(
+                            $_.Cells[$intCell].Text.Trim(),
+                            '\s+',
+                            ' '
+                        )
+                        $strValue = [regex]::Replace(
+                            $_.Cells[$intCell + 1].Text.Trim(),
+                            '\s+',
+                            ' '
+                        )
+                        if ($strLabel -match '(?i)^(?:Decision\s+)?Status$' -and
+                            -not [string]::IsNullOrWhiteSpace($strValue)) {
+                            $boolHasStatusField = $true
+                            break
+                        }
+                    }
+                }
+                $boolHasStatusField
+            }).Count -ne 0) {
+        Write-Output (
+            "$Name must not contain a separate operative Status field outside Metadata."
+        )
+    }
 }
 
 function Get-DocumentMetadataContext {
@@ -7422,9 +7560,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260902\.6$'
+            '(?m)^# Version: 1\.7\.20260902\.7$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.7.20260902.6.'
+        throw 'The validator script version is not 1.7.20260902.7.'
     }
     $boolSavedWindowsPython = $script:useWindowsPythonLauncher
     $arrSavedPythonNames = $script:pythonPathNames
@@ -7636,6 +7774,97 @@ if ($SelfTest) {
         ('docs/decisions/0001-legacy.md must not contain a separate operative ' +
             'Status field outside Metadata.')) {
         throw 'A Decision Status field escaped lifecycle validation.'
+    }
+    $arrTableStatusFailureFixtures = @(
+        [pscustomobject]@{
+            Name = 'header Status field'
+            Content = $strCompliantDecisionRecord.Replace(
+                "## Context`n",
+                "## Context`n| STATUS | Accepted |`n| --- | --- |`n"
+            )
+        },
+        [pscustomobject]@{
+            Name = 'body Decision Status field with alignment and inline formatting'
+            Content = $strCompliantDecisionRecord.Replace(
+                "## Context`n",
+                (@(
+                        '## Context'
+                        '| Field | Value |'
+                        '| :--- | ---: |'
+                        '| **decision** `status` | *Accepted* |'
+                    ) -join "`n") + "`n"
+            )
+        }
+    )
+    foreach ($objTableStatusFixture in $arrTableStatusFailureFixtures) {
+        if (@(Get-DecisionRecordLifecycleFailure `
+                -Name 'docs/decisions/0001-legacy.md' `
+                -CurrentContent $objTableStatusFixture.Content `
+                -BaselineContent $strLegacyDecisionRecord) -cnotcontains
+            ('docs/decisions/0001-legacy.md must not contain a separate operative ' +
+                'Status field outside Metadata.')) {
+            throw "$($objTableStatusFixture.Name) escaped lifecycle validation."
+        }
+    }
+    $arrTableStatusAcceptedFixtures = @(
+        [pscustomobject]@{
+            Name = 'fenced table example'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '```markdown'
+                        '| Status | Accepted |'
+                        '| --- | --- |'
+                        '```'
+                    ) -join "`n")
+            )
+        },
+        [pscustomobject]@{
+            Name = 'commented table example'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '<!--'
+                        '| Status | Accepted |'
+                        '| --- | --- |'
+                        '-->'
+                    ) -join "`n")
+            )
+        },
+        [pscustomobject]@{
+            Name = 'unrelated table'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '| State | Owner |'
+                        '| --- | --- |'
+                        '| Accepted | Maintainers |'
+                    ) -join "`n")
+            )
+        },
+        [pscustomobject]@{
+            Name = 'empty Status table value'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '| Field | Value |'
+                        '| --- | --- |'
+                        '| Status | |'
+                    ) -join "`n")
+            )
+        }
+    )
+    foreach ($objTableStatusFixture in $arrTableStatusAcceptedFixtures) {
+        if (@(Get-DecisionRecordLifecycleFailure `
+                -Name 'docs/decisions/0001-legacy.md' `
+                -CurrentContent $objTableStatusFixture.Content `
+                -BaselineContent $strLegacyDecisionRecord).Count -ne 0) {
+            throw "$($objTableStatusFixture.Name) caused a false lifecycle finding."
+        }
     }
     $strDecisionStatusProseRecord = $strCompliantDecisionRecord.Replace(
         'Changed legacy context.',
