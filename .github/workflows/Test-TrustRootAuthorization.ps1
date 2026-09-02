@@ -12,6 +12,10 @@
 # The exact authorized candidate base commit.
 # .PARAMETER HeadRevision
 # The exact authorized candidate head commit.
+# .PARAMETER AuthorizationApplicabilityOnly
+# When this switch is set, the script checks only whether the authorization
+# applies to the candidate. It returns one Boolean value and does not perform
+# the full authorization validation.
 # .PARAMETER AuthorizationManifestPath
 # The fixed trusted-revision authorization path.
 # .EXAMPLE
@@ -23,7 +27,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.0.20260902.3
+# Version: 1.0.20260902.4
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]

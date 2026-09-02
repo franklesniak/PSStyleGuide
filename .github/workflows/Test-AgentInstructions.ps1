@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260902.4
+# Version: 1.7.20260902.5
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -7384,9 +7384,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260902\.4$'
+            '(?m)^# Version: 1\.7\.20260902\.5$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.7.20260902.4.'
+        throw 'The validator script version is not 1.7.20260902.5.'
     }
     $boolSavedWindowsPython = $script:useWindowsPythonLauncher
     $arrSavedPythonNames = $script:pythonPathNames
@@ -7762,6 +7762,55 @@ if ($SelfTest) {
     }
     if (Test-ProhibitedClaudeLocalPath -RepositoryRelativePath 'CLAUDE.local.md.bak') {
         throw 'A Claude local-memory near miss was prohibited.'
+    }
+    $strTrustRootAuthorizationPath =
+        '.github/workflows/Test-TrustRootAuthorization.ps1'
+    $strTrustRootAuthorizationSource = [IO.File]::ReadAllText(
+        (Join-Path $strRepositoryRootPath $strTrustRootAuthorizationPath),
+        [Text.UTF8Encoding]::new($false)
+    )
+    $arrTrustRootAuthorizationTokens = $null
+    $arrTrustRootAuthorizationParseErrors = $null
+    $objTrustRootAuthorizationAst =
+        [Management.Automation.Language.Parser]::ParseInput(
+            $strTrustRootAuthorizationSource,
+            [ref] $arrTrustRootAuthorizationTokens,
+            [ref] $arrTrustRootAuthorizationParseErrors
+        )
+    if (@($arrTrustRootAuthorizationParseErrors).Count -ne 0 -or
+        $null -eq $objTrustRootAuthorizationAst.ParamBlock) {
+        throw 'The trust-root authorization script parameter inventory is invalid.'
+    }
+    $strTrustRootAuthorizationHelpSource =
+        $strTrustRootAuthorizationSource.Substring(
+            0,
+            $objTrustRootAuthorizationAst.ParamBlock.Extent.StartOffset
+        )
+    $arrTrustRootAuthorizationParameterNames = @(
+        $objTrustRootAuthorizationAst.ParamBlock.Parameters |
+            ForEach-Object { $_.Name.VariablePath.UserPath }
+    )
+    $arrTrustRootAuthorizationHelpMatches = @(
+        [regex]::Matches(
+            $strTrustRootAuthorizationHelpSource,
+            '(?m)^# \.PARAMETER ([A-Za-z][A-Za-z0-9]*)$'
+        )
+    )
+    if ($arrTrustRootAuthorizationHelpMatches.Count -ne
+        $arrTrustRootAuthorizationParameterNames.Count) {
+        throw 'The trust-root authorization script parameter help inventory is incomplete.'
+    }
+    foreach ($strTrustRootAuthorizationParameterName in
+        $arrTrustRootAuthorizationParameterNames) {
+        if (@($arrTrustRootAuthorizationHelpMatches | Where-Object {
+                    $_.Groups[1].Value -ceq
+                        $strTrustRootAuthorizationParameterName
+                }).Count -ne 1) {
+            throw (
+                'The trust-root authorization script lacks exactly one help ' +
+                    "entry for $strTrustRootAuthorizationParameterName."
+            )
+        }
     }
     $strExtractedSelfTestPath =
         '.github/workflows/Test-AgentInstructions.SelfTest.ps1'
