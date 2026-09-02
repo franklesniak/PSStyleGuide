@@ -1,16 +1,17 @@
 {
   "schema_version": 1,
-  "authorization_id": "issue176-trust-root-repair-8d36d4f1",
+  "authorization_id": "issue176-trust-root-repair-c5b7b4ab",
   "candidate": {
-    "base_commit": "70bf7522233a6c8558809a2c2fc22be83a23a7b9",
-    "head_commit": "8d36d4f19e2dc3d5dde9d18fb11b2222eeb05b10",
-    "head_tree": "24d8f2df787fd6e9832ace2f9df8afaeebf0717d",
+    "base_commit": "bb40044e5193b64777b432c88c264f072933e0bd",
+    "head_commit": "c5b7b4ab1a6c187a00bb0269caaaf82e945d0a2d",
+    "head_tree": "8ebe1386ad089ca9f71309f2a9041e0d61321723",
     "parent_commits": [
-      "019b38183267f79b188893306e1b474b7156f785"
+      "8d36d4f19e2dc3d5dde9d18fb11b2222eeb05b10",
+      "bb40044e5193b64777b432c88c264f072933e0bd"
     ]
   },
   "limits": {
-    "maximum_paths": 5,
+    "maximum_paths": 2,
     "maximum_blob_bytes": 573440,
     "maximum_manifest_bytes": 65536
   },
@@ -29,18 +30,6 @@
       ]
     },
     {
-      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
-      "mode": "100644",
-      "blob": "5f9944628d03eef6f02e9942ef886ca94014e6ec",
-      "bytes": 28613,
-      "sha256": "379e76777bc19aec75db8e31414fdbb7c6a7d76c727a955ed4cdbba63223180a",
-      "encoding": "utf-8-no-bom-lf",
-      "syntax": "powershell",
-      "semantic_invariants": [
-        "extracted-self-test-version-and-topology"
-      ]
-    },
-    {
       "path": ".github/workflows/Test-AgentInstructions.ps1",
       "mode": "100644",
       "blob": "26592ae142be9e6b48a46e251f87393ee10cb591",
@@ -56,34 +45,6 @@
         "published-path-array-binding-is-explicit",
         "pr-merge-bases-use-all-and-cap",
         "trusted-maintenance-switch-is-explicit"
-      ]
-    },
-    {
-      "path": ".github/workflows/Test-TrustRootAuthorization.ps1",
-      "mode": "100644",
-      "blob": "fab0aee1bdd1368336e6b055d5946db5d0b1fcac",
-      "bytes": 35702,
-      "sha256": "72b3038df0d1ecc081a52c7d17c1e6451f6cc534347442d063e7ed2e493740ab",
-      "encoding": "utf-8-no-bom-lf",
-      "syntax": "powershell",
-      "semantic_invariants": [
-        "verifier-reads-trusted-revision-manifest"
-      ]
-    },
-    {
-      "path": ".github/workflows/agent-instructions.yml",
-      "mode": "100644",
-      "blob": "2c88b968d5eb9562c9419acb40a19c495ec08429",
-      "bytes": 24272,
-      "sha256": "4033b6bbfd8ec90bb300f3bcfe926b7b761edacd64e91df073c1cb122babcf59",
-      "encoding": "utf-8-no-bom-lf",
-      "syntax": "yaml",
-      "semantic_invariants": [
-        "workflow-checkout-is-trusted-sha",
-        "workflow-created-push-history-fetch-is-bounded",
-        "workflow-permissions-are-read-only",
-        "workflow-persist-credentials-is-false",
-        "workflow-uses-trusted-authorization-output"
       ]
     }
   ]
