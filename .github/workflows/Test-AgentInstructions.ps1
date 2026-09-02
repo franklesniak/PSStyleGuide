@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260902.0
+# Version: 1.7.20260902.1
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -7246,9 +7246,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260902\.0$'
+            '(?m)^# Version: 1\.7\.20260902\.1$'
         ).Count -ne 1) {
-        throw 'The validator script version does not use build date 20260902.'
+        throw 'The validator script version is not 1.7.20260902.1.'
     }
     $boolSavedWindowsPython = $script:useWindowsPythonLauncher
     $arrSavedPythonNames = $script:pythonPathNames
