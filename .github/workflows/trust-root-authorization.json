@@ -1,12 +1,13 @@
 {
   "schema_version": 1,
-  "authorization_id": "issue176-trust-root-repair-eaf07c77",
+  "authorization_id": "issue176-trust-root-repair-019b3818",
   "candidate": {
     "base_commit": "70bf7522233a6c8558809a2c2fc22be83a23a7b9",
-    "head_commit": "eaf07c778d186593ecee44e8cd29f4f84e6d7921",
+    "head_commit": "019b38183267f79b188893306e1b474b7156f785",
     "head_tree": "ea546735355b22b1cd20f15a64fdb29d6e9f1826",
     "parent_commits": [
-      "adbcaf3274cf4ec148207b1d3aeb7ee0dbc7750d"
+      "6febed3f1a51aa5f113b59f3d583bed87712ba37",
+      "eaf07c778d186593ecee44e8cd29f4f84e6d7921"
     ]
   },
   "limits": {
