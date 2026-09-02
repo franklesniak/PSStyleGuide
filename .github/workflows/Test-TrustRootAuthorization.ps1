@@ -29,7 +29,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.0.20260902.6
+# Version: 1.0.20260902.7
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -60,14 +60,17 @@ $arrTrustRootPaths = @(
     '.github/workflows/Test-AgentInstructions.SelfTest.ps1',
     '.github/workflows/Test-AgentInstructions.ps1',
     '.github/workflows/Test-AgentInstructionParserManifest.mjs',
+    '.github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs',
     '.github/workflows/trust-root-authorization.json',
+    '.github/workflows/agent-instruction-current-base.yml',
     '.github/workflows/agent-instructions.yml'
 )
 $script:arrSpecialSemanticInvariant = @(
     'exact-maintenance-production-call-is-gated',
     'legacy-transition-marker-is-inert-data',
     'published-path-array-binding-is-explicit',
-    'workflow-created-push-history-fetch-is-bounded'
+    'workflow-created-push-history-fetch-is-bounded',
+    'current-base-status-helper-is-fail-closed'
 )
 $script:hashtableSemanticInvariantPattern = @{
     'adr-lifecycle-migration-is-enforced' =
@@ -116,6 +119,22 @@ $script:hashtableSemanticInvariantPattern = @{
         '(?s)ref: \$\{\{ github\.sha \}\}.*?fetch-depth: >-\s+' +
         "\$\{\{ github\.event_name == 'push' && github\.event\.created " +
         '&& 1 \|\| 0 \}\}'
+    'workflow-current-base-finalizer-is-fail-closed' =
+        '(?s)^(?!.*contents: write)(?!.*pull-requests: write).*?' +
+        'publish-current-base-status:.*?validate-agent-instructions.*?' +
+        'group: agent-instruction-current-base-status.*?' +
+        'statuses: write.*?ref: \$\{\{ github\.sha \}\}.*?' +
+        'persist-credentials: false.*?' +
+        'Set-AgentInstructionCurrentBaseStatus\.mjs\s+finalize'
+    'workflow-run-current-base-invalidator-is-fail-closed' =
+        '(?s)^(?!.*pull_request_target:)(?!.*artifacts/).*?' +
+        'workflow_run:.*?Agent instruction validation.*?completed.*?' +
+        "workflow_run\.event == 'push'.*?" +
+        'group: agent-instruction-current-base-status.*?' +
+        'actions: read.*?contents: read.*?pull-requests: read.*?' +
+        'statuses: write.*?ref: \$\{\{ github\.sha \}\}.*?' +
+        'persist-credentials: false.*?' +
+        'Set-AgentInstructionCurrentBaseStatus\.mjs\s+invalidate'
     'workflow-permissions-are-read-only' =
         'permissions:\s+contents: read'
     'workflow-persist-credentials-is-false' =
@@ -428,10 +447,10 @@ function Assert-CandidateSyntax {
     # .SYNOPSIS
     # Validates candidate text for its declared syntax class.
     # .DESCRIPTION
-    # Parses PowerShell or YAML candidate text with trusted parsers. Markdown is
-    # accepted as inert text, and unknown syntax classes fail closed.
+    # Parses PowerShell, JavaScript, or YAML candidate text with trusted parsers.
+    # Markdown is accepted as inert text, and unknown syntax classes fail closed.
     # .PARAMETER Syntax
-    # The declared syntax class: powershell, yaml, or markdown.
+    # The declared syntax class: powershell, javascript, yaml, or markdown.
     # .PARAMETER Text
     # The strict UTF-8 candidate text to parse.
     # .PARAMETER Path
@@ -468,6 +487,39 @@ function Assert-CandidateSyntax {
         )
         if ($arrErrors.Count -gt 0) {
             throw "$Path has invalid PowerShell syntax."
+        }
+        return
+    }
+    if ($Syntax -ceq 'javascript') {
+        $objStartInfo = [Diagnostics.ProcessStartInfo]::new('node')
+        $objStartInfo.UseShellExecute = $false
+        $objStartInfo.CreateNoWindow = $true
+        $objStartInfo.RedirectStandardInput = $true
+        $objStartInfo.RedirectStandardOutput = $true
+        $objStartInfo.RedirectStandardError = $true
+        $objStartInfo.ArgumentList.Add('--input-type=module')
+        $objStartInfo.ArgumentList.Add('--check')
+        $objProcess = [Diagnostics.Process]::new()
+        $objProcess.StartInfo = $objStartInfo
+        if (-not $objProcess.Start()) {
+            throw 'Could not start the trusted JavaScript parser.'
+        }
+        $objOutputTask = $objProcess.StandardOutput.ReadToEndAsync()
+        $objErrorTask = $objProcess.StandardError.ReadToEndAsync()
+        $objProcess.StandardInput.Write($Text)
+        $objProcess.StandardInput.Close()
+        if (-not $objProcess.WaitForExit(10000)) {
+            $objProcess.Kill($true)
+            throw 'The trusted JavaScript parser exceeded its time limit.'
+        }
+        $strOutput = $objOutputTask.GetAwaiter().GetResult()
+        $strError = $objErrorTask.GetAwaiter().GetResult()
+        if ([Text.Encoding]::UTF8.GetByteCount($strOutput + $strError) -gt
+            65536) {
+            throw 'The trusted JavaScript parser output exceeded 65536 bytes.'
+        }
+        if ($objProcess.ExitCode -ne 0) {
+            throw "$Path has invalid JavaScript syntax."
         }
         return
     }
@@ -816,6 +868,43 @@ function Assert-SemanticInvariant {
         return
     }
 
+    if ($Invariant -ceq 'current-base-status-helper-is-fail-closed') {
+        foreach ($strRequiredLiteral in @(
+                'const maximumPages = 10;',
+                'const maximumResponseBytes = 1048576;',
+                'Agent instruction current base/PR-${pullNumber}',
+                'latest.description === `Validated base ${currentBaseSha}.`',
+                'Both same-baseline pull requests must be invalidated.',
+                'An older workflow-run signal must preserve a newer current success.',
+                'Status contexts must be stable and pull-request-specific.',
+                'A stale live base must fail finalization.',
+                '/pulls/${pullNumber}',
+                '/git/ref/heads/${encodeRef(baseRef)}',
+                '/statuses/${headSha}',
+                "run.path === '.github/workflows/agent-instructions.yml'",
+                'run.head_branch === branch && run.head_sha === signalSha',
+                '/pulls?state=open&base=',
+                '?per_page=100&page=${page}',
+                'Pull request pagination exceeded its bound.',
+                'Commit status pagination exceeded its bound.',
+                'Base advanced to ${currentBaseSha}; revalidate PR #${pull.number}.',
+                "if (mode === 'self-test') process.exit(0);"
+            )) {
+            if (-not $Text.Contains(
+                    $strRequiredLiteral,
+                    [StringComparison]::Ordinal
+                )) {
+                throw "$Path does not satisfy semantic invariant $Invariant."
+            }
+        }
+        if ([regex]::Matches(
+                $Text,
+                [regex]::Escape('if (!await readLiveState())')
+            ).Count -ne 2) {
+            throw "$Path does not satisfy semantic invariant $Invariant."
+        }
+        return
+    }
     if (-not $script:hashtableSemanticInvariantPattern.ContainsKey($Invariant) -or
         $Text -cnotmatch
             $script:hashtableSemanticInvariantPattern[$Invariant]) {
@@ -878,6 +967,23 @@ if ($SelfTest) {
                 [StringComparison]::OrdinalIgnoreCase
             )) {
             Remove-Item -LiteralPath $strSelfTestRoot -Recurse -Force
+        }
+    }
+    Assert-CandidateSyntax -Syntax 'javascript' `
+        -Text "import https from 'node:https';`nvoid https;`n" `
+        -Path 'valid.mjs'
+    try {
+        Assert-CandidateSyntax -Syntax 'javascript' `
+            -Text "import from 'node:https';`n" -Path 'invalid.mjs'
+        throw 'Invalid JavaScript syntax passed.'
+    }
+    catch {
+        if ($_.Exception.Message -ceq 'Invalid JavaScript syntax passed.' -or
+            -not $_.Exception.Message.Contains(
+                'has invalid JavaScript syntax.',
+                [StringComparison]::Ordinal
+            )) {
+            throw
         }
     }
     $strOwnerBoundary =
