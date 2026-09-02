@@ -535,3 +535,53 @@ jobs:
           $env:AGENT_INSTRUCTION_PUSH_COMMIT_EVIDENCE
           -OtherRefEvidenceJson `
           $env:AGENT_INSTRUCTION_OTHER_REF_EVIDENCE
+
+  publish-current-base-status:
+    name: Publish current-base status
+    needs:
+      - validate-agent-instructions
+    if: >-
+      always() && github.event_name == 'pull_request_target' &&
+      (github.event.action != 'edited' ||
+      github.event.changes.base.ref.from != '')
+    concurrency:
+      group: agent-instruction-current-base-status
+      cancel-in-progress: false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+      statuses: write
+    steps:
+      - name: Check out trusted current-base helper
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ github.sha }}
+          token: ${{ github.token }}
+          persist-credentials: false
+          clean: true
+          fetch-depth: 1
+          fetch-tags: false
+          show-progress: true
+          lfs: false
+          submodules: false
+          set-safe-directory: true
+          allow-unsafe-pr-checkout: false
+
+      - name: Publish status after live base and head verification
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          EXPECTED_REPOSITORY: ${{ github.repository }}
+          EXPECTED_PULL_NUMBER: ${{ github.event.pull_request.number }}
+          EXPECTED_BASE_REF: ${{ github.event.pull_request.base.ref }}
+          EXPECTED_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          EXPECTED_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          VALIDATION_RESULT: ${{ needs.validate-agent-instructions.result }}
+          STATUS_TARGET_URL: >-
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{
+              github.run_id }}
+        run: >-
+          node .github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs
+          finalize

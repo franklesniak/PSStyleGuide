@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260902.9
+# Version: 1.7.20260902.10
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -86,7 +86,9 @@ $script:arrTrustRootPaths = @(
     '.github/workflows/Test-AgentInstructions.SelfTest.ps1',
     '.github/workflows/Test-AgentInstructions.ps1',
     '.github/workflows/Test-AgentInstructionParserManifest.mjs',
+    '.github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs',
     '.github/workflows/trust-root-authorization.json',
+    '.github/workflows/agent-instruction-current-base.yml',
     '.github/workflows/agent-instructions.yml'
 )
 $script:arrGovernedInstructionRootPaths = @(
@@ -104,7 +106,9 @@ $script:arrPushGovernedExactPaths = @(
     '.github/workflows/Test-TrustRootAuthorization.ps1',
     '.github/workflows/Test-AgentInstructions.SelfTest.ps1',
     '.github/workflows/Test-AgentInstructions.ps1',
+    '.github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs',
     '.github/workflows/trust-root-authorization.json',
+    '.github/workflows/agent-instruction-current-base.yml',
     '.github/workflows/agent-instructions.yml',
     '.gitignore',
     '.npmrc',
@@ -7701,9 +7705,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260902\.9$'
+            '(?m)^# Version: 1\.7\.20260902\.10$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.7.20260902.9.'
+        throw 'The validator script version is not 1.7.20260902.10.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
@@ -8279,9 +8283,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strTrustRootAuthorizationSource,
-            '(?m)^# Version: 1\.0\.20260902\.6$'
+            '(?m)^# Version: 1\.0\.20260902\.7$'
         ).Count -ne 1) {
-        throw 'The trust-root authorization script lacks version 1.0.20260902.6.'
+        throw 'The trust-root authorization script lacks version 1.0.20260902.7.'
     }
     & (Join-Path $strRepositoryRootPath $strTrustRootAuthorizationPath) `
         -RepositoryRootPath $strRepositoryRootPath `
@@ -10017,6 +10021,19 @@ if ($SelfTest) {
                 "github.event.changes.base.ref.from != ''",
                 'AGENT_INSTRUCTION_PULL_REQUEST_BASE_CHANGED:',
                 '-PullRequestBaseChanged $env:AGENT_INSTRUCTION_PULL_REQUEST_BASE_CHANGED',
+                'publish-current-base-status:',
+                'needs:',
+                '      - validate-agent-instructions',
+                'always() && github.event_name == ''pull_request_target'' &&',
+                'group: agent-instruction-current-base-status',
+                '      contents: read',
+                '      pull-requests: read',
+                '      statuses: write',
+                'VALIDATION_RESULT: ${{ needs.validate-agent-instructions.result }}',
+                'ref: ${{ github.sha }}',
+                'persist-credentials: false',
+                'node .github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs',
+                'finalize',
                 'test "${fetched_base}" = "${PUSH_BASE_SHA}"',
                 'test "${fetched_head}" = "${PR_HEAD_SHA}"',
                 'AGENT_INSTRUCTION_PUBLISHED_BASELINE:',
@@ -10088,6 +10105,36 @@ if ($SelfTest) {
                 'All six expensive validation steps require the applicability gate.'
             )
         }
+        if ([regex]::Matches(
+                $Content,
+                '(?m)^      statuses: write$'
+            ).Count -ne 1) {
+            $listFailures.Add(
+                'Only the current-base status job may receive status write permission.'
+            )
+        }
+        $objStatusJobMatch = [regex]::Match(
+            $Content,
+            '(?ms)^  publish-current-base-status:\r?\n(?<Body>.*)\z'
+        )
+        if (-not $objStatusJobMatch.Success -or
+            [regex]::Matches(
+                $objStatusJobMatch.Groups['Body'].Value,
+                '(?m)^\s+uses: ' +
+                    'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1'
+            ).Count -ne 1 -or
+            $objStatusJobMatch.Groups['Body'].Value.Contains(
+                'contents: write',
+                [StringComparison]::Ordinal
+            ) -or
+            $objStatusJobMatch.Groups['Body'].Value.Contains(
+                'pull-requests: write',
+                [StringComparison]::Ordinal
+            )) {
+            $listFailures.Add(
+                'The current-base status writer exceeds its trusted job boundary.'
+            )
+        }
 
         foreach ($strTrigger in @('push', 'pull_request_target')) {
             $objTriggerMatch = [regex]::Match(
@@ -10131,6 +10178,13 @@ if ($SelfTest) {
             'Agent workflow contract failed: ' +
             ($arrAgentWorkflowFailures -join '; ')
         )
+    }
+    & node ([IO.Path]::Combine(
+            $PSScriptRoot,
+            'Set-AgentInstructionCurrentBaseStatus.mjs'
+        )) self-test
+    if ($LASTEXITCODE -ne 0) {
+        throw 'The current-base helper self-test failed.'
     }
     $arrShaFirstConflictRows = [object[]] @(
         [pscustomobject]@{
