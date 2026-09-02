@@ -23,7 +23,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.0.20260901.0
+# Version: 1.0.20260902.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -580,7 +580,7 @@ function Assert-SemanticInvariant {
         'extracted-self-test-is-invoked' =
             '& \(Join-Path \$strRepositoryRootPath \$strExtractedSelfTestPath\)'
         'extracted-self-test-version-and-topology' =
-            '(?s)# Version: 1\.2\.20260831\.0.*Get-CreatedRefBoundaryContext'
+            '(?s)# Version: 1\.2\.\d{8}\.\d+.*Get-CreatedRefBoundaryContext'
         'metadata-history-validates-parent-edges' =
             'function Get-GovernedMetadataHistoryFailure'
         'new-ref-boundary-cap-is-64' =

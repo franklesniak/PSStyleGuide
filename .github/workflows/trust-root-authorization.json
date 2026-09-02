@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "authorization_id": "issue176-trust-root-repair-8d36d4f1",
+  "authorization_id": "issue176-trust-root-repair-aa5c2921",
   "candidate": {
     "base_commit": "70bf7522233a6c8558809a2c2fc22be83a23a7b9",
-    "head_commit": "8d36d4f19e2dc3d5dde9d18fb11b2222eeb05b10",
-    "head_tree": "24d8f2df787fd6e9832ace2f9df8afaeebf0717d",
+    "head_commit": "aa5c292126265b13b5d5d15847ed708b1b091d7e",
+    "head_tree": "698a045054a0ffe8f00a1a458e8bb9526e47825c",
     "parent_commits": [
-      "019b38183267f79b188893306e1b474b7156f785"
+      "8e710114dd9f4a58be27ea0ee73fc75e57bddc91"
     ]
   },
   "limits": {
@@ -18,22 +18,21 @@
     {
       "path": ".github/instructions/docs.instructions.md",
       "mode": "100644",
-      "blob": "15bdf982525ac57d6c59a503471458dd5aecb95e",
-      "bytes": 44476,
-      "sha256": "6c70b970460c6028996dcb09cc595128299eacb86e6712c606b8dfcd1715ca66",
+      "blob": "c5646eeef9d315aacacf2c2776d8bd6153ccd10f",
+      "bytes": 45921,
+      "sha256": "fde0bd84f3d494f0c51eaf30dcbada1143e7ae7ffef716590ffaefb9897de2f6",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "markdown",
       "semantic_invariants": [
-        "docs-owner-enforcer-relationship",
         "docs-status-lifecycle-values"
       ]
     },
     {
       "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
       "mode": "100644",
-      "blob": "5f9944628d03eef6f02e9942ef886ca94014e6ec",
-      "bytes": 28613,
-      "sha256": "379e76777bc19aec75db8e31414fdbb7c6a7d76c727a955ed4cdbba63223180a",
+      "blob": "f1316549d8260209c72621e546019abdf5d7c9d2",
+      "bytes": 30742,
+      "sha256": "57b6b5f13c4d68965ebdc2e4218880a14c00690367fb25e8f36febf0fdec83df",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
@@ -43,9 +42,9 @@
     {
       "path": ".github/workflows/Test-AgentInstructions.ps1",
       "mode": "100644",
-      "blob": "26592ae142be9e6b48a46e251f87393ee10cb591",
-      "bytes": 452108,
-      "sha256": "6fb380bd1ca1e34ddc37ab290ae582c3dda4431f7f0c5b6944b69449718176ed",
+      "blob": "3f489cedbbb0ec4ef5ac0aef55822ce09998cdd4",
+      "bytes": 456943,
+      "sha256": "56a1e1659be63f5ddfba5e29e63dfd26efe67961ab2946af666f6b1a0b62a219",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
@@ -61,9 +60,9 @@
     {
       "path": ".github/workflows/Test-TrustRootAuthorization.ps1",
       "mode": "100644",
-      "blob": "fab0aee1bdd1368336e6b055d5946db5d0b1fcac",
-      "bytes": 35702,
-      "sha256": "72b3038df0d1ecc081a52c7d17c1e6451f6cc534347442d063e7ed2e493740ab",
+      "blob": "246753d32748e7cdbcefb9a565f6a6bb27cd1612",
+      "bytes": 35701,
+      "sha256": "e5909d6fff0d082bca4fab0ea88e9443bfd94c8fad0515e32f1e7ae763800e96",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
