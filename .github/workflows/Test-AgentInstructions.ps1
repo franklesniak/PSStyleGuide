@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260831.0
+# Version: 1.7.20260902.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -7163,9 +7163,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260831\.0$'
+            '(?m)^# Version: 1\.7\.20260902\.0$'
         ).Count -ne 1) {
-        throw 'The validator script version does not use build date 20260831.'
+        throw 'The validator script version does not use build date 20260902.'
     }
     $boolSavedWindowsPython = $script:useWindowsPythonLauncher
     $arrSavedPythonNames = $script:pythonPathNames
@@ -7241,58 +7241,6 @@ if ($SelfTest) {
             'The documentation claim baseline failed validation: ' +
             ($arrDocumentationClaimFailures -join '; ')
         )
-    }
-    # Temporary trusted-bootstrap compatibility. The candidate keeps only the
-    # first relationship. This trusted bridge must also test the exact current
-    # main text without landing the candidate policy document before review.
-    $arrDocumentationOwnerEnforcerRelationships = @(
-        (
-            '`.github/workflows/Test-AgentInstructions.ps1` is a non-owner ' +
-                'enforcement mechanism. It checks the named owner at the exact ' +
-                'input revision and rejects stale repository-specific ' +
-                'documentation claims.'
-        ),
-        (
-            '`.github/instructions/docs.instructions.md` owns these ' +
-                'documentation rules. `.github/workflows/' +
-                'Test-AgentInstructions.ps1` validates these named owners at ' +
-                'the exact input revision and rejects stale repository-specific ' +
-                'source or enforcement claims.'
-        )
-    )
-    $arrActiveOwnerEnforcerRelationships = @(
-        $arrDocumentationOwnerEnforcerRelationships |
-            Where-Object {
-                $strDocsInstructionsContent.Contains(
-                    $_,
-                    [StringComparison]::Ordinal
-                )
-            }
-    )
-    if ($arrActiveOwnerEnforcerRelationships.Count -ne 1) {
-        throw 'The documentation owner and non-owner enforcer relationship changed.'
-    }
-    $strDocumentationOwnerEnforcerMutation = if (
-        $arrActiveOwnerEnforcerRelationships[0] -ceq
-            $arrDocumentationOwnerEnforcerRelationships[0]
-    ) {
-        $strDocsInstructionsContent.Replace(
-            'is a non-owner enforcement mechanism',
-            'is an owner enforcement mechanism'
-        )
-    }
-    else {
-        $strDocsInstructionsContent.Replace(
-            'validates these named owners',
-            'owns these documentation rules'
-        )
-    }
-    if ($strDocumentationOwnerEnforcerMutation -ceq $strDocsInstructionsContent -or
-        $strDocumentationOwnerEnforcerMutation.Contains(
-            $arrActiveOwnerEnforcerRelationships[0],
-            [StringComparison]::Ordinal
-        )) {
-        throw 'A documentation owner and enforcer mutation was not detected.'
     }
     foreach ($strOwnerPath in $script:arrDocumentationClaimOwnerPaths) {
         $arrMissingOwnerFailures = @(Get-DocumentationClaimFailure `
