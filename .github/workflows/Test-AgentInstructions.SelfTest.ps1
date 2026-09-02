@@ -29,7 +29,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.2.20260902.0
+# Version: 1.2.20260902.1
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -281,6 +281,9 @@ try {
         -OtherRefEvidenceJson $strRootEvidence
     if (@($objZeroContext.IntroducedCommitRevisions).Count -ne 0 -or
         @($objZeroContext.BoundaryRevisions).Count -ne 0 -or
+        (Get-CreatedRefMetadataBaselineRevision `
+            -Context $objZeroContext -HeadRevision $strRootCommit) -cne
+            $strRootCommit -or
         @(Read-GitPublishedEndpointChangedPath `
             -RepositoryRootPath $strTopologyRoot `
             -BaselineRevision ('0' * 40) -FinalRevision $strRootCommit `
@@ -365,6 +368,9 @@ try {
     if (@($objOneContext.IntroducedCommitRevisions).Count -ne 1 -or
         @($objOneContext.BoundaryRevisions).Count -ne 1 -or
         $objOneContext.BoundaryRevisions[0] -cne $strRootCommit -or
+        (Get-CreatedRefMetadataBaselineRevision `
+            -Context $objOneContext -HeadRevision $strOneCommit) -cne
+            $strRootCommit -or
         $arrOnePaths.Count -ne 1 -or $arrOnePaths[0] -cne 'one.txt') {
         throw 'The one-introduced created-ref fixture found an incorrect boundary.'
     }
@@ -397,6 +403,9 @@ try {
             -MaximumBytes $MaximumBytes)
     if (@($objManyContext.IntroducedCommitRevisions).Count -ne 2 -or
         @($objManyContext.BoundaryRevisions).Count -ne 1 -or
+        (Get-CreatedRefMetadataBaselineRevision `
+            -Context $objManyContext -HeadRevision $strTwoCommit) -cne
+            $strRootCommit -or
         [string]::Join("`n", $arrManyPaths) -cne "one.txt`ntwo.txt") {
         throw 'The many-introduced created-ref fixture lost changed paths.'
     }
@@ -459,6 +468,19 @@ try {
         [string]::Join("`n", $arrMergePaths) -cne "left.txt`nright.txt") {
         throw 'The merge created-ref fixture lost a parent boundary.'
     }
+    try {
+        [void] (Get-CreatedRefMetadataBaselineRevision `
+                -Context $objMergeContext -HeadRevision $strMergeCommit)
+        throw 'An ambiguous multi-boundary metadata baseline was accepted.'
+    }
+    catch {
+        if (-not $_.Exception.Message.Contains(
+                'lacks one unambiguous metadata baseline',
+                [StringComparison]::Ordinal
+            )) {
+            throw
+        }
+    }
 
     $strRootPayload = ConvertTo-Json -Depth 4 -Compress -InputObject `
         ([object[]] @((ConvertTo-CreatedPushCommitEvidenceObject `
@@ -477,6 +499,10 @@ try {
                 $objGenuineRootContext.IntroducedCommitRevisions `
             -MaximumBytes $MaximumBytes)
     if (-not $objGenuineRootContext.IsGenuineRootIntroduction -or
+        -not [string]::IsNullOrEmpty(
+            (Get-CreatedRefMetadataBaselineRevision `
+                -Context $objGenuineRootContext -HeadRevision $strRootCommit)
+        ) -or
         $arrGenuineRootPaths.Count -ne 1 -or
         $arrGenuineRootPaths[0] -cne 'root.txt') {
         throw 'The genuine-root created-ref fixture did not use the final tree.'

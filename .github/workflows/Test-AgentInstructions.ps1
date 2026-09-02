@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260902.1
+# Version: 1.7.20260902.2
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -4127,6 +4127,61 @@ function Get-CreatedRefBoundaryContext {
     }
 }
 
+function Get-CreatedRefMetadataBaselineRevision {
+    # .SYNOPSIS
+    # Selects the authenticated metadata baseline for one created ref.
+    # .DESCRIPTION
+    # Reuses the exact head when the ref introduces no commits, uses the sole
+    # outside-parent boundary for introduced non-root history, returns no
+    # baseline for a genuine root, and rejects ambiguous multi-boundary history.
+    # .PARAMETER Context
+    # The authenticated context returned by Get-CreatedRefBoundaryContext.
+    # .PARAMETER HeadRevision
+    # The exact created-ref final commit.
+    # .EXAMPLE
+    # Get-CreatedRefMetadataBaselineRevision @hashtableArguments
+    #
+    # # Returns the authenticated metadata baseline.
+    # .INPUTS
+    # None. No pipeline input.
+    # .OUTPUTS
+    # [string] The baseline commit, or an empty string for a genuine root.
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260902.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][pscustomobject] $Context,
+        [Parameter(Mandatory)][string] $HeadRevision
+    )
+
+    $arrIntroduced = @($Context.IntroducedCommitRevisions)
+    $arrBoundaries = @($Context.BoundaryRevisions)
+    $strEffectiveBaseline = [string] $Context.EffectiveBaselineRevision
+    if ($Context.IsGenuineRootIntroduction) {
+        if ($arrIntroduced.Count -lt 1 -or $arrBoundaries.Count -ne 0 -or
+            -not [string]::IsNullOrEmpty($strEffectiveBaseline)) {
+            throw 'The genuine-root created-ref metadata context is inconsistent.'
+        }
+        return ''
+    }
+    if ($arrIntroduced.Count -eq 0) {
+        if ($arrBoundaries.Count -ne 0 -or
+            $strEffectiveBaseline -cne $HeadRevision) {
+            throw 'The zero-introduction created-ref metadata context is inconsistent.'
+        }
+        return $HeadRevision
+    }
+    if ($arrBoundaries.Count -eq 1 -and
+        $strEffectiveBaseline -ceq $arrBoundaries[0]) {
+        return $strEffectiveBaseline
+    }
+    throw 'An introduced created ref lacks one unambiguous metadata baseline.'
+}
+
 function Test-GovernedInstructionPath {
     # .SYNOPSIS
     # Tests whether a repository-relative path is a governed instruction path.
@@ -4903,6 +4958,64 @@ function Get-DecisionLifecyclePolicyFailure {
     }
 }
 
+function Get-DecisionRecordLifecycleFailure {
+    # .SYNOPSIS
+    # Finds lifecycle representation failures in one decision record.
+    # .DESCRIPTION
+    # Requires one four-state metadata Status and no operative level-two Status
+    # section for a new or changed ADR. An unchanged published legacy ADR remains
+    # valid until its next content change, as required by the migration boundary.
+    # .PARAMETER Name
+    # The repository-relative decision-record path.
+    # .PARAMETER CurrentContent
+    # The final decision-record content.
+    # .PARAMETER BaselineContent
+    # The published baseline content, or null when no baseline document exists.
+    # .EXAMPLE
+    # Get-DecisionRecordLifecycleFailure @hashtableArguments
+    #
+    # # Returns lifecycle failures for one changed decision record.
+    # .INPUTS
+    # None. No pipeline input.
+    # .OUTPUTS
+    # [string] Zero or more lifecycle diagnostics.
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260902.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][string] $Name,
+        [Parameter(Mandatory)][string] $CurrentContent,
+        [Parameter()][AllowNull()][string] $BaselineContent
+    )
+
+    if ($null -ne $BaselineContent -and
+        $CurrentContent -ceq $BaselineContent) {
+        return
+    }
+    $objMetadata = Get-DocumentMetadataContext `
+        -Content $CurrentContent -RequiresVersion $false
+    if ($null -ne $objMetadata.Failure) {
+        return
+    }
+    $arrAllowedStatuses = @(
+        'Proposed', 'Accepted', 'Superseded', 'Deprecated'
+    )
+    if ($arrAllowedStatuses -cnotcontains $objMetadata.Status) {
+        Write-Output (
+            "$Name Status must be Proposed, Accepted, Superseded, or Deprecated."
+        )
+    }
+    $objMarkdownContext = Get-OperativeMarkdownContext -Content $CurrentContent
+    if (@($objMarkdownContext.LevelTwoHeadings |
+            Where-Object Text -CEQ 'Status').Count -ne 0) {
+        Write-Output "$Name must not contain a separate operative Status section."
+    }
+}
+
 function Get-DocumentMetadataContext {
     # .SYNOPSIS
     # Gets validated document-level metadata context.
@@ -5147,6 +5260,7 @@ function Get-DocumentMetadataContext {
 
     return [pscustomobject]@{
         Failure = $null
+        Status = $hashtableFieldMatches['Status'].Groups['Value'].Value
         Major = if ($RequiresVersion) {$objVersionMatch.Groups['Major'].Value} else {$null}
         Minor = if ($RequiresVersion) {$objVersionMatch.Groups['Minor'].Value} else {$null}
         VersionDate = if ($RequiresVersion) {$objVersionMatch.Groups['Date'].Value} else {$null}
@@ -6469,9 +6583,14 @@ if (-not $boolPublishedEndpointsRequested -and
         $PublishedBaselineAbsent -or $PublishedFinalDeleted)) {
     throw 'Metadata event fields require complete published endpoints.'
 }
+$objTrustedEventTimestamp = $null
+$strTrustedEventUtcDate = ''
 if (-not [string]::IsNullOrEmpty($TrustedEventTimestamp)) {
-    [void] (
+    $objTrustedEventTimestamp =
         ConvertFrom-TrustedEventTimestamp -Timestamp $TrustedEventTimestamp
+    $strTrustedEventUtcDate = $objTrustedEventTimestamp.ToString(
+        'yyyy-MM-dd',
+        [Globalization.CultureInfo]::InvariantCulture
     )
 }
 if ($boolPublishedEndpointsRequested) {
@@ -6484,6 +6603,7 @@ if ($boolPublishedEndpointsRequested) {
         -PullRequestBaseChanged $PullRequestBaseChanged
 }
 $objCreatedRefContext = $null
+$strCreatedRefMetadataBaselineRevision = ''
 if ($PublishedBaselineAbsent) {
     $objCreatedRefContext = Get-CreatedRefBoundaryContext `
         -RepositoryRootPath $strRepositoryRootPath `
@@ -6493,6 +6613,10 @@ if ($PublishedBaselineAbsent) {
         -EventHeadDistinct $EventHeadDistinct `
         -PushCommitEvidenceJson $PushCommitEvidenceJson `
         -OtherRefEvidenceJson $OtherRefEvidenceJson
+    $strCreatedRefMetadataBaselineRevision =
+        Get-CreatedRefMetadataBaselineRevision `
+            -Context $objCreatedRefContext `
+            -HeadRevision $PublishedFinalRevision
 }
 elseif (-not [string]::IsNullOrEmpty($DestinationRef) -or
     -not [string]::IsNullOrEmpty($EventHeadRevision) -or
@@ -6769,13 +6893,24 @@ if (-not [string]::IsNullOrEmpty($strValidatedInputRevision) -and
         [StringComparison]::OrdinalIgnoreCase
     )) {
     $arrTrustRootBaseRevisions = @($arrPublishedGraphBases)
-    $arrTrustRootFailures = @(Get-TrustRootRangeMutationFailure `
-            -ExactAuthorizedMaintenanceProductionCall `
-            -RepositoryRootPath $strRepositoryRootPath `
-            -BaseRevision $arrTrustRootBaseRevisions `
-            -HeadRevision $PublishedFinalRevision `
-            -RepositoryRelativePath $script:arrTrustRootPaths) |
-        Sort-Object -Unique
+    $arrTrustRootFailures = if (
+        $script:boolTrustedMaintenanceAuthorizationValidated
+    ) {
+        @(Get-TrustRootRangeMutationFailure `
+                -ExactAuthorizedMaintenanceProductionCall `
+                -RepositoryRootPath $strRepositoryRootPath `
+                -BaseRevision $arrTrustRootBaseRevisions `
+                -HeadRevision $PublishedFinalRevision `
+                -RepositoryRelativePath $script:arrTrustRootPaths)
+    }
+    else {
+        @(Get-TrustRootRangeMutationFailure `
+                -RepositoryRootPath $strRepositoryRootPath `
+                -BaseRevision $arrTrustRootBaseRevisions `
+                -HeadRevision $PublishedFinalRevision `
+                -RepositoryRelativePath $script:arrTrustRootPaths)
+    }
+    $arrTrustRootFailures = @($arrTrustRootFailures | Sort-Object -Unique)
     if (@($arrTrustRootFailures).Count -gt 0) {
         throw (
             'Trusted validation root changed:' + [Environment]::NewLine + '- ' +
@@ -7000,20 +7135,18 @@ $listGovernedDocumentContexts = [Collections.Generic.List[pscustomobject]]::new(
 foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
     $objParentContext = if ($boolPublishedEndpointsRequested) {
         $strPublishedBaselineContent = $null
-        $boolGenuineRootIntroduction = $PublishedBaselineAbsent -and
-            $null -ne $objCreatedRefContext -and
-            $objCreatedRefContext.IsGenuineRootIntroduction
-        if ($PublishedBaselineAbsent -and -not $boolGenuineRootIntroduction) {
-            $strPublishedBaselineContent =
-                $hashtableGovernedInstructionContent[$objDocumentSpec.Path]
+        $strMetadataBaselineRevision = if ($PublishedBaselineAbsent) {
+            $strCreatedRefMetadataBaselineRevision
+        } else {
+            $PublishedBaselineRevision
         }
-        elseif (-not $PublishedBaselineAbsent) {
+        if (-not [string]::IsNullOrEmpty($strMetadataBaselineRevision)) {
             & git -C $strRepositoryRootPath cat-file -e `
-                "$PublishedBaselineRevision`:$($objDocumentSpec.Path)" 2>$null
+                "$strMetadataBaselineRevision`:$($objDocumentSpec.Path)" 2>$null
             if ($LASTEXITCODE -eq 0) {
                 $strPublishedBaselineContent = Read-GitRevisionText `
                     -RepositoryRootPath $strRepositoryRootPath `
-                    -Revision $PublishedBaselineRevision `
+                    -Revision $strMetadataBaselineRevision `
                     -RepositoryRelativePath $objDocumentSpec.Path `
                     -MaximumBytes $objDocumentSpec.MaximumBytes `
                     -RequireRegularFile
@@ -7021,13 +7154,9 @@ foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
         }
         [pscustomobject]@{
             ParentContent = $strPublishedBaselineContent
-            ExpectedUtcDate = ''
-            ParentRevision = if ($PublishedBaselineAbsent) {
-                $null
-            } else {
-                $PublishedBaselineRevision
-            }
-            IsWorktreeTransition = $false
+            ExpectedUtcDate = $strTrustedEventUtcDate
+            ParentRevision = $strMetadataBaselineRevision
+            IsWorktreeTransition = $true
         }
     }
     elseif ([string]::IsNullOrEmpty($strValidatedInputRevision)) {
@@ -7106,6 +7235,10 @@ foreach ($objDecisionContext in @(
     if ($null -eq $objDecisionContext.Content) {
         continue
     }
+    $arrRepositoryFailures += @(Get-DecisionRecordLifecycleFailure `
+            -Name $objDecisionContext.Path `
+            -CurrentContent $objDecisionContext.Content `
+            -BaselineContent $objDecisionContext.ParentContent)
     $objDecisionMarkdownContext = Get-OperativeMarkdownContext `
         -Content $objDecisionContext.Content
     $arrDecisionLinks = [string[]]@(
@@ -7185,8 +7318,8 @@ if ($SelfTest) {
         param($objNode)
         $objNode -is [Management.Automation.Language.FunctionDefinitionAst]
     }, $true))
-    if ($arrValidatorFunctionAsts.Count -ne 56) {
-        throw 'The validator function-help inventory must contain exactly 56 functions.'
+    if ($arrValidatorFunctionAsts.Count -ne 58) {
+        throw 'The validator function-help inventory must contain exactly 58 functions.'
     }
     foreach ($objFunctionAst in $arrValidatorFunctionAsts) {
         $objHelp = $objFunctionAst.GetHelpContent()
@@ -7246,9 +7379,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260902\.1$'
+            '(?m)^# Version: 1\.7\.20260902\.2$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.7.20260902.1.'
+        throw 'The validator script version is not 1.7.20260902.2.'
     }
     $boolSavedWindowsPython = $script:useWindowsPythonLauncher
     $arrSavedPythonNames = $script:pythonPathNames
@@ -7364,6 +7497,64 @@ if ($SelfTest) {
                 -Content $strNarrativeDecisionStatusMutation) -cnotcontains
             'Decision records must prohibit a separate narrative status representation.') {
         throw 'A permitted narrative decision Status did not fail closed.'
+    }
+    $strLegacyDecisionRecord = @(
+        '# Decision 0001: Legacy fixture'
+        '## Metadata'
+        '- **Status:** Active'
+        '- **Owner:** Repository Maintainers'
+        '- **Last Updated:** 2026-08-30'
+        '- **Scope:** Tests transition-aware ADR lifecycle enforcement.'
+        '## Status'
+        'Accepted before the lifecycle migration.'
+        '## Context'
+        'Legacy context.'
+    ) -join "`n"
+    if (@(Get-DecisionRecordLifecycleFailure `
+            -Name 'docs/decisions/0001-legacy.md' `
+            -CurrentContent $strLegacyDecisionRecord `
+            -BaselineContent $strLegacyDecisionRecord).Count -ne 0) {
+        throw 'An unchanged published legacy ADR did not remain valid.'
+    }
+    $strChangedLegacyDecisionRecord = $strLegacyDecisionRecord.Replace(
+        'Legacy context.',
+        'Changed legacy context.'
+    )
+    $arrChangedLegacyDecisionFailures = @(Get-DecisionRecordLifecycleFailure `
+            -Name 'docs/decisions/0001-legacy.md' `
+            -CurrentContent $strChangedLegacyDecisionRecord `
+            -BaselineContent $strLegacyDecisionRecord)
+    foreach ($strExpectedFailure in @(
+            ('docs/decisions/0001-legacy.md Status must be Proposed, Accepted, ' +
+                'Superseded, or Deprecated.'),
+            ('docs/decisions/0001-legacy.md must not contain a separate operative ' +
+                'Status section.')
+        )) {
+        if ($arrChangedLegacyDecisionFailures -cnotcontains $strExpectedFailure) {
+            throw (
+                'A changed legacy ADR did not require lifecycle migration: ' +
+                ($arrChangedLegacyDecisionFailures -join '; ')
+            )
+        }
+    }
+    $strCompliantDecisionRecord = $strChangedLegacyDecisionRecord.Replace(
+        '- **Status:** Active',
+        '- **Status:** Accepted'
+    ).Replace(
+        "## Status`nAccepted before the lifecycle migration.`n",
+        ''
+    )
+    if (@(Get-DecisionRecordLifecycleFailure `
+            -Name 'docs/decisions/0001-legacy.md' `
+            -CurrentContent $strCompliantDecisionRecord `
+            -BaselineContent $strLegacyDecisionRecord).Count -ne 0) {
+        throw 'A changed ADR with one valid lifecycle Status did not pass.'
+    }
+    if (@(Get-DecisionRecordLifecycleFailure `
+            -Name 'docs/decisions/0003-new.md' `
+            -CurrentContent $strLegacyDecisionRecord `
+            -BaselineContent $null).Count -ne 2) {
+        throw 'A new ADR accepted the legacy two-status representation.'
     }
     foreach ($strOwnerPath in $script:arrDocumentationClaimOwnerPaths) {
         $arrMissingOwnerFailures = @(Get-DocumentationClaimFailure `
@@ -7604,9 +7795,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strExtractedSelfTestSource,
-            '(?m)^# Version: 1\.2\.20260902\.0$'
+            '(?m)^# Version: 1\.2\.20260902\.1$'
         ).Count -ne 1) {
-        throw 'The extracted self-test lacks version 1.2.20260902.0.'
+        throw 'The extracted self-test lacks version 1.2.20260902.1.'
     }
     $strExtractedSelfTestRevision = if (
         [string]::IsNullOrEmpty($strValidatedInputRevision)
