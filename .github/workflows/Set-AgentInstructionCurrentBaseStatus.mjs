@@ -6,6 +6,8 @@ import { TextDecoder } from 'node:util';
 // One invalidation run supports one complete page of at most 20 open pull
 // requests. In the all-write case it makes 25 API requests: one run read, one
 // base-ref read, one PR-page read, two 10-context reads, and 20 status writes.
+// A success/race finalizer makes at most 11 requests, including both
+// authenticated provenance reads and its reserved fail-closed error write.
 const maximumPullRequests = 20;
 const pullRequestPageSize = maximumPullRequests;
 const statusContextBatchSize = 10;
@@ -273,6 +275,7 @@ function createStatusContextRequest(repository, pulls) {
             context
             state
             description
+            targetUrl
           }
         }
       }
@@ -316,11 +319,13 @@ function parseStatusContextResponse(result, pulls) {
     assert(latest.context === statusContext(pulls[index].number) &&
       ['ERROR', 'EXPECTED', 'FAILURE', 'PENDING', 'SUCCESS'].includes(
         latest.state) &&
-      (latest.description === null || typeof latest.description === 'string'),
+      (latest.description === null || typeof latest.description === 'string') &&
+      (latest.targetUrl === null || typeof latest.targetUrl === 'string'),
     'GraphQL status-context response entry is invalid.');
     statuses.push({
       state: latest.state.toLowerCase(),
       description: latest.description,
+      targetUrl: latest.targetUrl,
     });
   }
   return statuses;
@@ -351,13 +356,19 @@ async function expectRejected(operation, expectedMessage, failureMessage) {
 async function runSelfTest() {
   const baselineSha = '1'.repeat(40);
   const advancedSha = '2'.repeat(40);
+  const sourceRunUrl =
+    'https://example.invalid/owner/repository/actions/runs/600';
+  const newerRunUrl =
+    'https://example.invalid/owner/repository/actions/runs/601';
   const staleStatus = {
     state: 'success',
     description: `Validated base ${baselineSha}.`,
+    targetUrl: sourceRunUrl,
   };
   const currentStatus = {
     state: 'success',
     description: `Validated base ${advancedSha}.`,
+    targetUrl: newerRunUrl,
   };
   const sameBaselinePulls = [
     { number: 101, head: { sha: '3'.repeat(40) } },
@@ -511,6 +522,7 @@ async function runSelfTest() {
             context,
             state: latest.state.toUpperCase(),
             description: latest.description,
+            targetUrl: latest.targetUrl,
           },
         },
       };
@@ -600,6 +612,7 @@ async function runSelfTest() {
     'query ExactStatusContexts(') &&
     exactStatusRequest.query.includes('latest: context(name: $context0)') &&
     exactStatusRequest.query.includes('latest: context(name: $context1)') &&
+    exactStatusRequest.query.includes('targetUrl') &&
     exactStatusRequest.variables.oid0 === sameBaselinePulls[0].head.sha &&
     exactStatusRequest.variables.context0 === statusContext(101) &&
     exactStatusRequest.variables.oid1 === sameBaselinePulls[1].head.sha &&
@@ -614,6 +627,7 @@ async function runSelfTest() {
           context: statusContext(101),
           state: 'SUCCESS',
           description: `Validated base ${advancedSha}.`,
+          targetUrl: newerRunUrl,
         } },
       },
       status1: {
@@ -716,47 +730,184 @@ async function runSelfTest() {
   'A finalization race must replace transient success with an error.');
 
   const oldExpected = { ...expected, baseSha: baselineSha };
-  const newerSuccessClient = {
+  const pullRequestRun = (id, runNumber, runAttempt, endpoints,
+    status = 'completed') => ({
+    id,
+    run_number: runNumber,
+    run_attempt: runAttempt,
+    event: 'pull_request_target',
+    path: '.github/workflows/agent-instructions.yml',
+    status,
+    head_sha: endpoints.headSha,
+    repository: { full_name: 'owner/repository' },
+    pull_requests: [{
+      number: endpoints.pullNumber,
+      base: {
+        ref: endpoints.baseRef,
+        sha: endpoints.baseSha,
+        repo: { full_name: 'owner/repository' },
+      },
+      head: {
+        sha: endpoints.headSha,
+        repo: { full_name: 'owner/repository' },
+      },
+    }],
+  });
+  const sourceOldRun = pullRequestRun(600, 50, 1, oldExpected);
+  const sourceCurrentRun = pullRequestRun(600, 50, 1, expected);
+  const newerCurrentRun = pullRequestRun(601, 51, 1, expected);
+  const createFreshnessClient = ({
+    sourceRun = sourceOldRun,
+    candidateRun = newerCurrentRun,
+    latest = currentStatus,
+    reservation = () => {},
+    failCandidateRead = false,
+  } = {}) => ({
     ...exactLiveClient,
     request: async (method, path) => {
       assert(method === 'GET', 'Freshness reads must use GET.');
       if (path.endsWith('/pulls/101')) return pull;
+      if (path.includes('/actions/runs/600')) return sourceRun;
+      if (path.includes('/actions/runs/601')) {
+        if (failCandidateRead) throw new Error('simulated API failure');
+        return candidateRun;
+      }
       return { object: { type: 'commit', sha: advancedSha } };
     },
-    graphql: async (request) => statusPage(request, () => currentStatus),
-  };
-  const oldFailureWrites = [];
+    graphql: async (request) => statusPage(request, () => latest),
+    assertCanMutate: reservation,
+  });
+
+  const sameEndpointWrites = [];
   await expectRejected(async () => finalizeStatus({
-    ...newerSuccessClient,
+    ...createFreshnessClient({ sourceRun: sourceCurrentRun }),
+    postStatus: async (...arguments_) => sameEndpointWrites.push(arguments_),
+  }, expected, 'failure', sourceRunUrl),
+  'Agent-instruction validation did not succeed.',
+  'A failed older run on the same endpoint must remain failed.');
+  assert(sameEndpointWrites.length === 0,
+    'A strictly newer authenticated same-endpoint success must be preserved.');
+
+  const newerSuccessClient = createFreshnessClient();
+  assert(parseActionsRunTarget(sourceRunUrl, 'owner/repository').runId ===
+    '600' && isAuthenticPullRequestWorkflowRun(sourceOldRun,
+    { ...oldExpected, repository: 'owner/repository' }, '600') &&
+    isStrictlyLaterWorkflowRun(newerCurrentRun, sourceOldRun),
+  'Actions-run provenance must authenticate before freshness comparison.');
+  await expectRejected(async () => parseActionsRunTarget(
+    'https://evil.invalid/owner/repository/actions/runs/601',
+    'owner/repository', 'https://example.invalid'),
+  'Status target does not identify an Actions run.',
+  'A cross-origin Actions-run target must fail closed.');
+
+  const oldFailureWrites = [];
+  const oldFailureReservations = [];
+  await expectRejected(async () => finalizeStatus({
+    ...createFreshnessClient({
+      reservation: (count) => oldFailureReservations.push(count),
+    }),
     postStatus: async (...arguments_) => oldFailureWrites.push(arguments_),
-  }, oldExpected, 'failure', 'https://example.invalid/run'),
+  }, oldExpected, 'failure', sourceRunUrl),
   'Agent-instruction validation did not succeed.',
   'An old failure finalizer must still terminate as failed.');
-  assert(oldFailureWrites.length === 0,
-    'An old failure finalizer must preserve newer exact-base success.');
+  assert(oldFailureWrites.length === 0 &&
+    oldFailureReservations.length === 1 && oldFailureReservations[0] === 3,
+  'An old finalizer must reserve both run reads and preserve newer success.');
 
   const oldMismatchWrites = [];
   await expectRejected(async () => finalizeStatus({
     ...newerSuccessClient,
     postStatus: async (...arguments_) => oldMismatchWrites.push(arguments_),
-  }, oldExpected, 'success', 'https://example.invalid/run'),
+  }, oldExpected, 'success', sourceRunUrl),
   'The pull request no longer has the validated base and head.',
   'An old success-path mismatch must terminate as stale.');
   assert(oldMismatchWrites.length === 0,
-    'An old success-path mismatch must preserve newer exact-base success.');
+  'An old success-path mismatch must preserve newer authenticated success.');
+
+  const olderSuccessWrites = [];
+  await expectRejected(async () => finalizeStatus({
+    ...createFreshnessClient({
+      candidateRun: pullRequestRun(601, 49, 3, expected),
+    }),
+    postStatus: async (...arguments_) => olderSuccessWrites.push(arguments_),
+  }, oldExpected, 'failure', sourceRunUrl),
+  'Agent-instruction validation did not succeed.',
+  'An older claimed success must not preserve status.');
+  assert(olderSuccessWrites.length === 1 &&
+    olderSuccessWrites[0][2] === 'error',
+  'An older authenticated run must fail closed with an error status.');
+
+  const newerFailureWrites = [];
+  await expectRejected(async () => finalizeStatus({
+    ...createFreshnessClient({
+      latest: { ...currentStatus, state: 'failure' },
+    }),
+    postStatus: async (...arguments_) => newerFailureWrites.push(arguments_),
+  }, oldExpected, 'failure', sourceRunUrl),
+  'Agent-instruction validation did not succeed.',
+  'A newer failure must not preserve an earlier success.');
+  assert(newerFailureWrites.length === 1 &&
+    newerFailureWrites[0][2] === 'error',
+  'A newer failure must publish a fail-closed error.');
+
+  const malformedProvenanceWrites = [];
+  await expectRejected(async () => finalizeStatus({
+    ...createFreshnessClient({
+      latest: { ...currentStatus, targetUrl: 'https://example.invalid/run' },
+    }),
+    postStatus: async (...arguments_) =>
+      malformedProvenanceWrites.push(arguments_),
+  }, oldExpected, 'failure', sourceRunUrl),
+  'Agent-instruction validation did not succeed.',
+  'Malformed status provenance must not preserve success.');
+  assert(malformedProvenanceWrites.length === 1 &&
+    malformedProvenanceWrites[0][2] === 'error',
+  'Malformed status provenance must fail closed with an error status.');
+
+  const changedBaseRunWrites = [];
+  await expectRejected(async () => finalizeStatus({
+    ...createFreshnessClient({
+      candidateRun: pullRequestRun(601, 51, 1,
+        { ...expected, baseSha: baselineSha }),
+    }),
+    postStatus: async (...arguments_) => changedBaseRunWrites.push(arguments_),
+  }, oldExpected, 'failure', sourceRunUrl),
+  'Agent-instruction validation did not succeed.',
+  'A candidate run for a different base must not preserve status.');
+  assert(changedBaseRunWrites.length === 1 &&
+    changedBaseRunWrites[0][2] === 'error',
+  'A run whose base provenance changed must fail closed.');
 
   const freshnessApiFailureWrites = [];
   await expectRejected(async () => finalizeStatus({
-    ...exactLiveClient,
-    request: async () => { throw new Error('simulated API failure'); },
+    ...createFreshnessClient({ failCandidateRead: true }),
     postStatus: async (...arguments_) =>
       freshnessApiFailureWrites.push(arguments_),
-  }, oldExpected, 'failure', 'https://example.invalid/run'),
+  }, oldExpected, 'failure', sourceRunUrl),
   'Agent-instruction validation did not succeed.',
   'A freshness API failure must keep the finalizer failed.');
   assert(freshnessApiFailureWrites.length === 1 &&
     freshnessApiFailureWrites[0][2] === 'error',
-  'An indeterminate freshness read must fail closed with an error status.');
+  'An indeterminate run read must fail closed with an error status.');
+
+  for (const exhaustedMessage of [
+    'GitHub API request budget would be exceeded.',
+    'GitHub API deadline cannot accommodate the remaining requests.',
+  ]) {
+    const exhaustedWrites = [];
+    await expectRejected(async () => finalizeStatus({
+      ...createFreshnessClient({
+        reservation: (count) => {
+          if (count === 3) throw new Error(exhaustedMessage);
+        },
+      }),
+      postStatus: async (...arguments_) => exhaustedWrites.push(arguments_),
+    }, oldExpected, 'failure', sourceRunUrl),
+    'Agent-instruction validation did not succeed.',
+    'A failed freshness reservation must keep the finalizer failed.');
+    assert(exhaustedWrites.length === 1 && exhaustedWrites[0][2] === 'error',
+      'Request or deadline exhaustion must fail closed with an error status.');
+  };
 
   const noNewerSuccessWrites = [];
   await expectRejected(async () => finalizeStatus({
@@ -764,7 +915,7 @@ async function runSelfTest() {
     graphql: async (request) => statusPage(request, () => staleStatus),
     postStatus: async (...arguments_) =>
       noNewerSuccessWrites.push(arguments_),
-  }, oldExpected, 'failure', 'https://example.invalid/run'),
+  }, oldExpected, 'failure', sourceRunUrl),
   'Agent-instruction validation did not succeed.',
   'A finalizer without newer success must terminate as failed.');
   assert(noNewerSuccessWrites.length === 1 &&
@@ -1008,6 +1159,82 @@ async function start() {
     getEnvironment('STATUS_TARGET_URL'));
 }
 
+function parseActionsRunTarget(value, repository, expectedOrigin) {
+  let target;
+  try {
+    target = new URL(value);
+  } catch {
+    throw new Error('Status target does not identify an Actions run.');
+  }
+  assert(repositoryPattern.test(repository) && target.protocol === 'https:' &&
+    target.username === '' && target.password === '' && target.search === '' &&
+    target.hash === '' &&
+    (expectedOrigin === undefined || target.origin === expectedOrigin),
+  'Status target does not identify an Actions run.');
+  const prefix = `/${repository}/actions/runs/`;
+  assert(target.pathname.startsWith(prefix),
+    'Status target does not identify an Actions run.');
+  const runId = target.pathname.slice(prefix.length);
+  assert(/^[1-9][0-9]{0,19}$/.test(runId),
+    'Status target does not identify an Actions run.');
+  return { origin: target.origin, runId };
+}
+
+function isAuthenticPullRequestWorkflowRun(run, expected, runId) {
+  if (!(isRecord(run) && String(run.id) === runId &&
+    Number.isInteger(run.run_number) && run.run_number >= 1 &&
+    Number.isInteger(run.run_attempt) && run.run_attempt >= 1 &&
+    run.event === 'pull_request_target' &&
+    run.path === '.github/workflows/agent-instructions.yml' &&
+    workflowRunStatuses.has(run.status) &&
+    isRecord(run.repository) &&
+    run.repository.full_name === expected.repository &&
+    run.head_sha === expected.headSha &&
+    Array.isArray(run.pull_requests) && run.pull_requests.length === 1)) {
+    return false;
+  }
+  const pull = run.pull_requests[0];
+  return isRecord(pull) && pull.number === expected.pullNumber &&
+    isRecord(pull.base) && pull.base.ref === expected.baseRef &&
+    pull.base.sha === expected.baseSha && isRecord(pull.base.repo) &&
+    pull.base.repo.full_name === expected.repository &&
+    isRecord(pull.head) && pull.head.sha === expected.headSha &&
+    isRecord(pull.head.repo) &&
+    repositoryPattern.test(pull.head.repo.full_name);
+}
+
+function isStrictlyLaterWorkflowRun(candidate, source) {
+  return candidate.run_number > source.run_number ||
+    (candidate.run_number === source.run_number &&
+      candidate.run_attempt > source.run_attempt);
+}
+
+async function hasAuthenticatedNewerSuccess(client, expected, live, latest,
+  sourceTargetUrl) {
+  if (live.headSha !== expected.headSha ||
+    requiresInvalidation(latest, live.baseSha)) return false;
+  const sourceTarget = parseActionsRunTarget(sourceTargetUrl,
+    client.repository);
+  const candidateTarget = parseActionsRunTarget(latest.targetUrl,
+    client.repository, sourceTarget.origin);
+  if (sourceTarget.runId === candidateTarget.runId) return false;
+
+  // Reserve both authenticated run reads and the fail-closed error write before
+  // either read. A rejected reservation is indeterminate and cannot preserve.
+  assertCanMutate(client, 3);
+  const sourceRun = await client.request('GET',
+    `repos/${client.repository}/actions/runs/${sourceTarget.runId}`);
+  const candidateRun = await client.request('GET',
+    `repos/${client.repository}/actions/runs/${candidateTarget.runId}`);
+  const sourceExpected = { ...expected, repository: client.repository };
+  const candidateExpected = { ...live, repository: client.repository };
+  return isAuthenticPullRequestWorkflowRun(sourceRun, sourceExpected,
+    sourceTarget.runId) &&
+    isAuthenticPullRequestWorkflowRun(candidateRun, candidateExpected,
+      candidateTarget.runId) &&
+    isStrictlyLaterWorkflowRun(candidateRun, sourceRun);
+}
+
 async function publishFinalizerError(client, expected, description, targetUrl) {
   let preserveNewerSuccess = false;
   try {
@@ -1016,9 +1243,8 @@ async function publishFinalizerError(client, expected, description, targetUrl) {
       number: live.pullNumber,
       head: { sha: live.headSha },
     }]))[0];
-    preserveNewerSuccess = live.headSha === expected.headSha &&
-      live.baseSha !== expected.baseSha &&
-      !requiresInvalidation(latest, live.baseSha);
+    preserveNewerSuccess = await hasAuthenticatedNewerSuccess(client,
+      expected, live, latest, targetUrl);
   } catch {
     // An indeterminate freshness read cannot prove a newer current-base success.
   }

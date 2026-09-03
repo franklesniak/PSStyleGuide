@@ -1,0 +1,11 @@
+{
+  "schema_version": 2,
+  "authorization_id": "no-active-trust-root-maintenance",
+  "limits": {
+    "maximum_paths": 16,
+    "maximum_blob_bytes": 573440,
+    "maximum_manifest_bytes": 65536,
+    "maximum_commits": 64
+  },
+  "allowed_paths": []
+}

@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260902.13
+# Version: 1.7.20260903.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -6810,6 +6810,12 @@ elseif (-not [string]::IsNullOrEmpty($DestinationRef) -or
     -not [string]::IsNullOrEmpty($OtherRefEvidenceJson)) {
     throw 'Created-push evidence is valid only when the destination ref is new.'
 }
+$strEffectivePublishedBaselineRevision = if ($PublishedBaselineAbsent) {
+    $strCreatedRefMetadataBaselineRevision
+}
+else {
+    $PublishedBaselineRevision
+}
 $arrPublishedGraphBases = @()
 if ($boolPublishedEndpointsRequested) {
     if ($PublishedBaselineAbsent) {
@@ -7121,10 +7127,12 @@ if ($boolPublishedEndpointsRequested) {
             $objCreatedRefContext.IntroducedCommitRevisions
         )
     }
-    if (-not $PublishedBaselineAbsent) {
+    if (-not [string]::IsNullOrEmpty(
+            $strEffectivePublishedBaselineRevision
+        )) {
         $arrPublishedBaselinePaths = @(Read-GitTrackedPath `
             -RepositoryRootPath $strRepositoryRootPath `
-            -Revision $PublishedBaselineRevision `
+            -Revision $strEffectivePublishedBaselineRevision `
             -MaximumBytes $intGitPathListMaximumBytes)
     }
     $arrPublishedChangedPaths = @(Read-GitPublishedEndpointChangedPath `
@@ -7320,11 +7328,8 @@ $listGovernedDocumentContexts = [Collections.Generic.List[pscustomobject]]::new(
 foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
     $objParentContext = if ($boolPublishedEndpointsRequested) {
         $strPublishedBaselineContent = $null
-        $strMetadataBaselineRevision = if ($PublishedBaselineAbsent) {
-            $strCreatedRefMetadataBaselineRevision
-        } else {
-            $PublishedBaselineRevision
-        }
+        $strMetadataBaselineRevision =
+            $strEffectivePublishedBaselineRevision
         if (-not [string]::IsNullOrEmpty($strMetadataBaselineRevision)) {
             & git -C $strRepositoryRootPath cat-file -e `
                 "$strMetadataBaselineRevision`:$($objDocumentSpec.Path)" 2>$null
@@ -7705,9 +7710,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260902\.13$'
+            '(?m)^# Version: 1\.7\.20260903\.0$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.7.20260902.13.'
+        throw 'The validator script version is not 1.7.20260903.0.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
@@ -8283,9 +8288,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strTrustRootAuthorizationSource,
-            '(?m)^# Version: 1\.0\.20260902\.10$'
+            '(?m)^# Version: 1\.1\.20260903\.0$'
         ).Count -ne 1) {
-        throw 'The trust-root authorization script lacks version 1.0.20260902.10.'
+        throw 'The trust-root authorization script lacks version 1.1.20260903.0.'
     }
     & (Join-Path $strRepositoryRootPath $strTrustRootAuthorizationPath) `
         -RepositoryRootPath $strRepositoryRootPath `
@@ -9684,6 +9689,119 @@ if ($SelfTest) {
     }
     if (-not $boolBoundedIntroductionPathSetMatches) {
         throw 'A nonzero-boundary created ref returned an incorrect changed-path set.'
+    }
+    $objRootMetadataContext = [pscustomobject]@{
+        IntroducedCommitRevisions = @($strCheckedOutRevision)
+        BoundaryRevisions = @()
+        EffectiveBaselineRevision = ''
+        IsGenuineRootIntroduction = $true
+    }
+    if ((Get-CreatedRefMetadataBaselineRevision `
+            -Context $objRootMetadataContext `
+            -HeadRevision $strCheckedOutRevision) -cne '') {
+        throw 'A genuine-root introduction did not keep an empty inventory baseline.'
+    }
+    $objBoundaryMetadataContext = [pscustomobject]@{
+        IntroducedCommitRevisions = @($strCheckedOutRevision)
+        BoundaryRevisions = @($strPublishedPathParentRevision)
+        EffectiveBaselineRevision = $strPublishedPathParentRevision
+        IsGenuineRootIntroduction = $false
+    }
+    $strEffectiveInventoryFixtureRevision =
+        Get-CreatedRefMetadataBaselineRevision `
+            -Context $objBoundaryMetadataContext `
+            -HeadRevision $strCheckedOutRevision
+    $arrEffectiveInventoryFixture = @(Read-GitTrackedPath `
+            -RepositoryRootPath $strRepositoryRootPath `
+            -Revision $strEffectiveInventoryFixtureRevision `
+            -MaximumBytes $intGitPathListMaximumBytes)
+    $strOptionalDecisionFixture =
+        'docs/decisions/0001-accept-in-repository-trust-root.md'
+    if ($arrEffectiveInventoryFixture -cnotcontains $strOptionalDecisionFixture -or
+        $arrEffectiveInventoryFixture -cnotcontains 'AGENTS.md') {
+        throw 'The effective created-ref baseline inventory fixture is incomplete.'
+    }
+    $arrDeletionFixtureFinal = @(
+        $arrEffectiveInventoryFixture |
+            Where-Object { $_ -cne $strOptionalDecisionFixture }
+    )
+    $boolOptionalDecisionWasDeleted =
+        $arrEffectiveInventoryFixture -ccontains $strOptionalDecisionFixture -and
+        $arrDeletionFixtureFinal -cnotcontains $strOptionalDecisionFixture
+    $strOptionalDecisionFinalContent = if ($boolOptionalDecisionWasDeleted) {
+        $null
+    }
+    else {
+        'unexpected retained content'
+    }
+    if (-not $boolOptionalDecisionWasDeleted -or
+        $null -ne $strOptionalDecisionFinalContent) {
+        throw 'A created-ref optional decision-record deletion was not retained as null final content.'
+    }
+    $strRenamedDecisionFixture = 'docs/decisions/0002-renamed-trust-root.md'
+    $arrRenameFixtureFinal = @(
+        $arrDeletionFixtureFinal + $strRenamedDecisionFixture |
+            Sort-Object -Unique
+    )
+    if ($arrEffectiveInventoryFixture -cnotcontains $strOptionalDecisionFixture -or
+        $arrRenameFixtureFinal -ccontains $strOptionalDecisionFixture -or
+        $arrRenameFixtureFinal -cnotcontains $strRenamedDecisionFixture) {
+        throw 'A created-ref decision-record rename did not retain both inventory endpoints.'
+    }
+    $arrRequiredDeletionFixtureFinal = @(
+        $arrEffectiveInventoryFixture | Where-Object { $_ -cne 'AGENTS.md' }
+    )
+    if (-not ($arrEffectiveInventoryFixture -ccontains 'AGENTS.md' -and
+            $arrRequiredDeletionFixtureFinal -cnotcontains 'AGENTS.md')) {
+        throw 'A created-ref required-document deletion did not fail its inventory fixture.'
+    }
+    $objRequiredDeletionFixtureSpec = @(
+        $listGovernedDocumentContexts |
+            Where-Object { $_.Path -ceq 'AGENTS.md' }
+    )[0]
+    $listRequiredDeletionFixtureFailure =
+        [Collections.Generic.List[string]]::new()
+    $strRequiredDeletionFixtureContent = $null
+    if ($null -eq $strRequiredDeletionFixtureContent -and
+        $objRequiredDeletionFixtureSpec.RequiredDocument) {
+        $listRequiredDeletionFixtureFailure.Add(
+            'AGENTS.md is required in the published final state.'
+        )
+    }
+    if ($listRequiredDeletionFixtureFailure.Count -ne 1 -or
+        $listRequiredDeletionFixtureFailure[0] -cne
+            'AGENTS.md is required in the published final state.') {
+        throw 'A created-ref required-document deletion did not fail closed.'
+    }
+    $strEffectiveInventorySource = [IO.File]::ReadAllText($PSCommandPath)
+    $scriptblockAssertEffectiveInventory = {
+        param([Parameter(Mandatory)][string] $Content)
+        if (-not $Content.Contains(
+                '$strEffectivePublishedBaselineRevision = if ($PublishedBaselineAbsent)',
+                [StringComparison]::Ordinal
+            ) -or -not $Content.Contains(
+                '-Revision $strEffectivePublishedBaselineRevision',
+                [StringComparison]::Ordinal
+            )) {
+            throw 'The created-ref effective-baseline inventory binding is missing.'
+        }
+    }
+    & $scriptblockAssertEffectiveInventory -Content $strEffectiveInventorySource
+    $strRemovedEffectiveInventoryMutation =
+        $strEffectiveInventorySource.Replace(
+            '-Revision $strEffectivePublishedBaselineRevision',
+            '-Revision $PublishedBaselineRevision'
+        )
+    try {
+        & $scriptblockAssertEffectiveInventory `
+            -Content $strRemovedEffectiveInventoryMutation
+        throw 'Removing the effective-baseline inventory binding was accepted.'
+    }
+    catch {
+        if ($_.Exception.Message -cne
+            'The created-ref effective-baseline inventory binding is missing.') {
+            throw
+        }
     }
     foreach ($objMalformedPublishedPathRange in @(
             [pscustomobject]@{

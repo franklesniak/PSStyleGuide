@@ -1,17 +1,19 @@
 # .SYNOPSIS
-# Validates one exact trust-root maintenance candidate as inert Git data.
+# Validates one bounded trust-root maintenance candidate as inert Git data.
 # .DESCRIPTION
 # Reads the authorization manifest only from the authenticated trusted revision.
-# Candidate blobs are decoded and parsed, but never sourced, imported, invoked,
-# built, installed, or executed.
+# Schema 2 authorizes exact content on a descendant of that revision without an
+# unborn commit identity. Schema 1 is retained only for the detached-base
+# transition that lands the inactive schema 2 manifest. Candidate blobs are
+# decoded and parsed, but never sourced, imported, invoked, built, or executed.
 # .PARAMETER RepositoryRootPath
 # The trusted repository worktree.
 # .PARAMETER TrustedRevision
 # The exact checked-out default-branch commit that owns the verifier and manifest.
 # .PARAMETER BaseRevision
-# The exact authorized candidate base commit.
+# The event base. Schema 2 requires this commit to equal TrustedRevision.
 # .PARAMETER HeadRevision
-# The exact authorized candidate head commit.
+# The descendant candidate head, or the exact schema 1 transition head.
 # .PARAMETER AuthorizationApplicabilityOnly
 # When this switch is set, the script checks only whether the authorization
 # applies to the candidate. It returns one Boolean value and does not perform
@@ -23,13 +25,13 @@
 # .EXAMPLE
 # ./Test-TrustRootAuthorization.ps1 @hashtableArguments
 #
-# # Validates an exact candidate and writes one Boolean result.
+# # Validates a bounded candidate and writes one Boolean result.
 # .INPUTS
 # None. This script does not accept pipeline input.
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.0.20260902.10
+# Version: 1.1.20260903.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -49,6 +51,7 @@ $ErrorActionPreference = 'Stop'
 $intManifestMaximumBytes = 65536
 $intCandidateMaximumPaths = 16
 $intCandidateMaximumBlobBytes = 573440
+$intCandidateMaximumCommits = 64
 $strObjectIdPattern = '^[0-9a-f]{40}$'
 $strAuthorizationPath = '.github/workflows/trust-root-authorization.json'
 $strVerifierPath = '.github/workflows/Test-TrustRootAuthorization.ps1'
@@ -80,7 +83,10 @@ $script:hashtableSemanticInvariantPattern = @{
     'created-ref-metadata-baseline-is-consumed' =
         '(?s)function Get-CreatedRefMetadataBaselineRevision.*?' +
         '\$strCreatedRefMetadataBaselineRevision =\s+' +
-        'Get-CreatedRefMetadataBaselineRevision'
+        'Get-CreatedRefMetadataBaselineRevision.*?' +
+        '\$strEffectivePublishedBaselineRevision = if ' +
+        '\(\$PublishedBaselineAbsent\).*?' +
+        '-Revision \$strEffectivePublishedBaselineRevision'
     'created-ref-paths-use-endpoint-boundary' =
         '(?s)function Read-GitPublishedEndpointChangedPath.*?' +
         'elseif \(\$BaselineAbsent -and ' +
@@ -458,8 +464,8 @@ function Assert-CandidateSyntax {
     # .SYNOPSIS
     # Validates candidate text for its declared syntax class.
     # .DESCRIPTION
-    # Parses PowerShell, JavaScript, or YAML candidate text with trusted parsers.
-    # Markdown is accepted as inert text, and unknown syntax classes fail closed.
+    # Parses PowerShell, JavaScript, YAML, or JSON candidate text with trusted
+    # parsers. Markdown is accepted as inert text, and unknown classes fail.
     # .PARAMETER Syntax
     # The declared syntax class: powershell, javascript, yaml, or markdown.
     # .PARAMETER Text
@@ -572,6 +578,23 @@ process.stdin.on('end', () => {
         }
         if ($objProcess.ExitCode -ne 0) {
             throw "$Path has invalid YAML syntax."
+        }
+        return
+    }
+    if ($Syntax -ceq 'json') {
+        $objJsonDocument = $null
+        try {
+            $objJsonDocument = [System.Text.Json.JsonDocument]::Parse($Text)
+            Assert-NoDuplicateJsonProperty -Element $objJsonDocument.RootElement
+            [void] (ConvertFrom-Json -InputObject $Text)
+        }
+        catch {
+            throw "$Path has invalid JSON syntax."
+        }
+        finally {
+            if ($null -ne $objJsonDocument) {
+                $objJsonDocument.Dispose()
+            }
         }
         return
     }
@@ -923,6 +946,7 @@ function Assert-SemanticInvariant {
                 'Open pull request count exceeds the supported limit of',
                 'query: `query ExactStatusContexts(',
                 'latest: context(name: $context${index})',
+                'targetUrl',
                 'const requestBudget = createRequestBudget();',
                 'requestBudget.beginRequest();',
                 'assertCanMutate(client, invalidations.length);',
@@ -975,10 +999,20 @@ function Assert-SemanticInvariant {
                 'A live prerequisite mismatch must not write a status.',
                 'A base advance after success publication must fail closed.',
                 'A finalization race must replace transient success with an error.',
-                'An old failure finalizer must preserve newer exact-base success.',
-                'An old success-path mismatch must preserve newer exact-base success.',
-                'An indeterminate freshness read must fail closed with an error status.',
+                'A strictly newer authenticated same-endpoint success must be preserved.',
+                'An old finalizer must reserve both run reads and preserve newer success.',
+                'An old success-path mismatch must preserve newer authenticated success.',
+                'An older authenticated run must fail closed with an error status.',
+                'A newer failure must publish a fail-closed error.',
+                'Malformed status provenance must fail closed with an error status.',
+                'A run whose base provenance changed must fail closed.',
+                'An indeterminate run read must fail closed with an error status.',
+                'Request or deadline exhaustion must fail closed with an error status.',
                 'A stale status must not suppress a finalizer error.',
+                'run.event === ''pull_request_target''',
+                'run.run_number',
+                'run.run_attempt',
+                'assertCanMutate(client, 3);',
                 'The all-write one-page workload must fit its disclosed 25-request bound.',
                 'A PR count above the supported limit must fail before any write.',
                 "mode === 'start' ? start :",
@@ -1133,6 +1167,499 @@ if ($SelfTest) {
             }
         }
     }
+    Assert-CandidateSyntax -Syntax 'json' `
+        -Text '{"schema_version":2}' -Path 'valid.json'
+    try {
+        Assert-CandidateSyntax -Syntax 'json' `
+            -Text '{"schema_version":2,"schema_version":2}' `
+            -Path 'duplicate.json'
+        throw 'Duplicate JSON syntax passed.'
+    }
+    catch {
+        if ($_.Exception.Message -ceq 'Duplicate JSON syntax passed.' -or
+            -not $_.Exception.Message.Contains(
+                'has invalid JSON syntax.',
+                [StringComparison]::Ordinal
+            )) {
+            throw
+        }
+    }
+
+    $strSchemaSystemTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+    $strSchemaFixtureRoot = [IO.Path]::Combine(
+        $strSchemaSystemTempRoot,
+        'trust-root-schema2-' + [Guid]::NewGuid().ToString('N')
+    )
+    [void] [IO.Directory]::CreateDirectory($strSchemaFixtureRoot)
+    try {
+        & git -C $strSchemaFixtureRoot init --quiet --object-format=sha1
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not initialize the schema 2 self-test repository.'
+        }
+        $arrSchemaPathSpec = @(
+            [pscustomobject]@{
+                Path = '.github/instructions/docs.instructions.md'
+                Syntax = 'markdown'
+                Invariants = @(
+                    'docs-policy-owner-boundary',
+                    'docs-status-lifecycle-values'
+                )
+            },
+            [pscustomobject]@{
+                Path = '.github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs'
+                Syntax = 'javascript'
+                Invariants = @('current-base-status-helper-is-fail-closed')
+            },
+            [pscustomobject]@{
+                Path = '.github/workflows/Test-AgentInstructions.SelfTest.ps1'
+                Syntax = 'powershell'
+                Invariants = @('extracted-self-test-version-and-topology')
+            },
+            [pscustomobject]@{
+                Path = '.github/workflows/Test-AgentInstructions.ps1'
+                Syntax = 'powershell'
+                Invariants = @(
+                    'adr-lifecycle-migration-is-enforced',
+                    'created-ref-metadata-baseline-is-consumed',
+                    'created-ref-paths-use-endpoint-boundary',
+                    'exact-maintenance-production-call-is-gated',
+                    'extracted-self-test-is-invoked',
+                    'legacy-transition-marker-is-inert-data',
+                    'new-ref-boundary-cap-is-64',
+                    'ordinary-pr-uses-normal-trust-audit',
+                    'published-path-array-binding-is-explicit',
+                    'published-finalization-date-is-enforced',
+                    'pr-merge-bases-use-all-and-cap',
+                    'trusted-maintenance-switch-is-explicit'
+                )
+            },
+            [pscustomobject]@{
+                Path = '.github/workflows/Test-TrustRootAuthorization.ps1'
+                Syntax = 'powershell'
+                Invariants = @(
+                    'verifier-audits-authorized-history',
+                    'verifier-reads-trusted-revision-manifest'
+                )
+            },
+            [pscustomobject]@{
+                Path = '.github/workflows/agent-instruction-current-base.yml'
+                Syntax = 'yaml'
+                Invariants = @(
+                    'workflow-run-current-base-invalidator-is-fail-closed'
+                )
+            },
+            [pscustomobject]@{
+                Path = '.github/workflows/agent-instructions.yml'
+                Syntax = 'yaml'
+                Invariants = @(
+                    'workflow-checkout-is-trusted-sha',
+                    'workflow-created-push-history-fetch-is-bounded',
+                    'workflow-current-base-finalizer-is-fail-closed',
+                    'workflow-permissions-are-read-only',
+                    'workflow-persist-credentials-is-false',
+                    'workflow-uses-trusted-authorization-output'
+                )
+            }
+        )
+        $listSchemaAllowedPath = [Collections.Generic.List[object]]::new()
+        foreach ($objSchemaPath in $arrSchemaPathSpec) {
+            $strSchemaSourcePath = Join-Path $RepositoryRootPath $objSchemaPath.Path
+            $arrSchemaBytes = [IO.File]::ReadAllBytes($strSchemaSourcePath)
+            $strSchemaBlob = ([string] (& git -C $strSchemaFixtureRoot `
+                        hash-object -w -- $strSchemaSourcePath)).Trim()
+            if ($LASTEXITCODE -ne 0 -or
+                $strSchemaBlob -cnotmatch $strObjectIdPattern) {
+                throw 'Could not hash a schema 2 candidate fixture blob.'
+            }
+            $strSchemaSha256 = [Convert]::ToHexString(
+                [Security.Cryptography.SHA256]::HashData($arrSchemaBytes)
+            ).ToLowerInvariant()
+            $listSchemaAllowedPath.Add([ordered]@{
+                    path = $objSchemaPath.Path
+                    mode = '100644'
+                    blob = $strSchemaBlob
+                    bytes = $arrSchemaBytes.Length
+                    sha256 = $strSchemaSha256
+                    encoding = 'utf-8-no-bom-lf'
+                    syntax = $objSchemaPath.Syntax
+                    semantic_invariants = @($objSchemaPath.Invariants)
+                })
+            $strSchemaBaselinePath =
+                Join-Path $strSchemaFixtureRoot $objSchemaPath.Path
+            [void] [IO.Directory]::CreateDirectory(
+                [IO.Path]::GetDirectoryName($strSchemaBaselinePath)
+            )
+            [IO.File]::WriteAllText(
+                $strSchemaBaselinePath,
+                "baseline placeholder for $($objSchemaPath.Path)`n",
+                [Text.UTF8Encoding]::new($false)
+            )
+        }
+        $objSchemaManifest = [ordered]@{
+            schema_version = 2
+            authorization_id = 'self-test-content-exact'
+            limits = [ordered]@{
+                maximum_paths = 16
+                maximum_blob_bytes = 573440
+                maximum_manifest_bytes = 65536
+                maximum_commits = 64
+            }
+            allowed_paths = @($listSchemaAllowedPath)
+        }
+        $strSchemaManifestPath =
+            Join-Path $strSchemaFixtureRoot $strAuthorizationPath
+        [IO.File]::WriteAllText(
+            $strSchemaManifestPath,
+            ((ConvertTo-Json -InputObject $objSchemaManifest -Depth 8) `
+                -replace "`r`n", "`n") + "`n",
+            [Text.UTF8Encoding]::new($false)
+        )
+        & git -C $strSchemaFixtureRoot add -- .
+        & git -C $strSchemaFixtureRoot `
+            -c 'user.name=Trust root schema self-test' `
+            -c 'user.email=trust-root-schema@example.invalid' `
+            -c 'commit.gpgSign=false' `
+            -c 'core.hooksPath=NUL' `
+            commit --quiet --no-gpg-sign -m 'schema 2 trusted baseline'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not commit the schema 2 trusted baseline.'
+        }
+        $strSchemaTrusted = ([string] (& git -C $strSchemaFixtureRoot `
+                    rev-parse --verify 'HEAD^{commit}')).Trim()
+        foreach ($objSchemaPath in $arrSchemaPathSpec) {
+            [IO.File]::Copy(
+                (Join-Path $RepositoryRootPath $objSchemaPath.Path),
+                (Join-Path $strSchemaFixtureRoot $objSchemaPath.Path),
+                $true
+            )
+        }
+        & git -C $strSchemaFixtureRoot add -- .
+        & git -C $strSchemaFixtureRoot `
+            -c 'user.name=Trust root schema self-test' `
+            -c 'user.email=trust-root-schema@example.invalid' `
+            -c 'commit.gpgSign=false' `
+            -c 'core.hooksPath=NUL' `
+            commit --quiet --no-gpg-sign -m 'schema 2 valid candidate'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not commit the schema 2 valid candidate.'
+        }
+        $strSchemaCandidate = ([string] (& git -C $strSchemaFixtureRoot `
+                    rev-parse --verify 'HEAD^{commit}')).Trim()
+        & git -C $strSchemaFixtureRoot switch --quiet --detach $strSchemaTrusted
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not restore the schema 2 trusted checkout.'
+        }
+        $arrSchemaAuthorizationResult = @(& $PSCommandPath `
+                -RepositoryRootPath $strSchemaFixtureRoot `
+                -TrustedRevision $strSchemaTrusted `
+                -BaseRevision $strSchemaTrusted `
+                -HeadRevision $strSchemaCandidate)
+        if ($arrSchemaAuthorizationResult.Count -ne 1 -or
+            $arrSchemaAuthorizationResult[0] -isnot [bool] -or
+            -not $arrSchemaAuthorizationResult[0]) {
+            throw 'A constructible content-exact schema 2 candidate was rejected.'
+        }
+
+        $scriptblockExpectSchemaRejection = {
+            param(
+                [Parameter(Mandatory)][string] $Base,
+                [Parameter(Mandatory)][string] $Head,
+                [Parameter(Mandatory)][string] $ExpectedMessage
+            )
+            try {
+                [void] @(& $PSCommandPath `
+                        -RepositoryRootPath $strSchemaFixtureRoot `
+                        -TrustedRevision $strSchemaTrusted `
+                        -BaseRevision $Base -HeadRevision $Head)
+                throw "Schema 2 mutation passed: $ExpectedMessage"
+            }
+            catch {
+                if ($_.Exception.Message -ceq
+                    "Schema 2 mutation passed: $ExpectedMessage" -or
+                    -not $_.Exception.Message.Contains(
+                        $ExpectedMessage,
+                        [StringComparison]::Ordinal
+                    )) {
+                    throw
+                }
+            }
+        }
+        & $scriptblockExpectSchemaRejection -Base $strSchemaCandidate `
+            -Head $strSchemaCandidate `
+            -ExpectedMessage 'base must equal the trusted revision'
+
+        & git -C $strSchemaFixtureRoot switch --quiet --detach $strSchemaCandidate
+        [IO.File]::AppendAllText(
+            $strSchemaManifestPath,
+            " `n",
+            [Text.UTF8Encoding]::new($false)
+        )
+        & git -C $strSchemaFixtureRoot add -- $strAuthorizationPath
+        & git -C $strSchemaFixtureRoot `
+            -c 'user.name=Trust root schema self-test' `
+            -c 'user.email=trust-root-schema@example.invalid' `
+            -c 'commit.gpgSign=false' `
+            -c 'core.hooksPath=NUL' `
+            commit --quiet --no-gpg-sign -m 'changed manifest mutation'
+        $strChangedManifestHead = ([string] (& git -C $strSchemaFixtureRoot `
+                    rev-parse --verify 'HEAD^{commit}')).Trim()
+        & git -C $strSchemaFixtureRoot switch --quiet --detach $strSchemaTrusted
+        & $scriptblockExpectSchemaRejection -Base $strSchemaTrusted `
+            -Head $strChangedManifestHead `
+            -ExpectedMessage 'changed the trusted authorization manifest'
+
+        & git -C $strSchemaFixtureRoot switch --quiet --detach $strSchemaCandidate
+        $strUnexpectedPath = Join-Path $strSchemaFixtureRoot 'unexpected.txt'
+        [IO.File]::WriteAllText(
+            $strUnexpectedPath,
+            "unexpected final path`n",
+            [Text.UTF8Encoding]::new($false)
+        )
+        & git -C $strSchemaFixtureRoot add -- unexpected.txt
+        & git -C $strSchemaFixtureRoot `
+            -c 'user.name=Trust root schema self-test' `
+            -c 'user.email=trust-root-schema@example.invalid' `
+            -c 'commit.gpgSign=false' `
+            -c 'core.hooksPath=NUL' `
+            commit --quiet --no-gpg-sign -m 'changed path-set mutation'
+        $strChangedPathSetHead = ([string] (& git -C $strSchemaFixtureRoot `
+                    rev-parse --verify 'HEAD^{commit}')).Trim()
+        & git -C $strSchemaFixtureRoot switch --quiet --detach $strSchemaTrusted
+        & $scriptblockExpectSchemaRejection -Base $strSchemaTrusted `
+            -Head $strChangedPathSetHead `
+            -ExpectedMessage 'changed-path count does not match'
+
+        & git -C $strSchemaFixtureRoot switch --quiet --detach $strSchemaCandidate
+        $strBadFinalPath = Join-Path $strSchemaFixtureRoot $arrSchemaPathSpec[0].Path
+        [IO.File]::AppendAllText(
+            $strBadFinalPath,
+            "wrong final blob`n",
+            [Text.UTF8Encoding]::new($false)
+        )
+        & git -C $strSchemaFixtureRoot add -- $arrSchemaPathSpec[0].Path
+        & git -C $strSchemaFixtureRoot `
+            -c 'user.name=Trust root schema self-test' `
+            -c 'user.email=trust-root-schema@example.invalid' `
+            -c 'commit.gpgSign=false' `
+            -c 'core.hooksPath=NUL' `
+            commit --quiet --no-gpg-sign -m 'wrong final blob mutation'
+        $strBadFinalHead = ([string] (& git -C $strSchemaFixtureRoot `
+                    rev-parse --verify 'HEAD^{commit}')).Trim()
+        & git -C $strSchemaFixtureRoot switch --quiet --detach $strSchemaTrusted
+        & $scriptblockExpectSchemaRejection -Base $strSchemaTrusted `
+            -Head $strBadFinalHead `
+            -ExpectedMessage 'mismatched Git identity'
+
+        & git -C $strSchemaFixtureRoot switch --quiet --detach $strSchemaTrusted
+        [IO.File]::WriteAllText(
+            $strUnexpectedPath,
+            "unexpected intermediate path`n",
+            [Text.UTF8Encoding]::new($false)
+        )
+        & git -C $strSchemaFixtureRoot add -- unexpected.txt
+        & git -C $strSchemaFixtureRoot `
+            -c 'user.name=Trust root schema self-test' `
+            -c 'user.email=trust-root-schema@example.invalid' `
+            -c 'commit.gpgSign=false' `
+            -c 'core.hooksPath=NUL' `
+            commit --quiet --no-gpg-sign -m 'unexpected intermediate path'
+        foreach ($objSchemaPath in $arrSchemaPathSpec) {
+            [IO.File]::Copy(
+                (Join-Path $RepositoryRootPath $objSchemaPath.Path),
+                (Join-Path $strSchemaFixtureRoot $objSchemaPath.Path),
+                $true
+            )
+        }
+        Remove-Item -LiteralPath $strUnexpectedPath -Force
+        & git -C $strSchemaFixtureRoot add -- .
+        & git -C $strSchemaFixtureRoot `
+            -c 'user.name=Trust root schema self-test' `
+            -c 'user.email=trust-root-schema@example.invalid' `
+            -c 'commit.gpgSign=false' `
+            -c 'core.hooksPath=NUL' `
+            commit --quiet --no-gpg-sign -m 'hidden intermediate path mutation'
+        $strIntermediatePathHead = ([string] (& git -C $strSchemaFixtureRoot `
+                    rev-parse --verify 'HEAD^{commit}')).Trim()
+        & git -C $strSchemaFixtureRoot switch --quiet --detach $strSchemaTrusted
+        & $scriptblockExpectSchemaRejection -Base $strSchemaTrusted `
+            -Head $strIntermediatePathHead `
+            -ExpectedMessage 'history contains unauthorized path'
+
+        $strTransitionIndex = Join-Path $strSchemaFixtureRoot 'transition.index'
+        $strOriginalIndexFile = [Environment]::GetEnvironmentVariable(
+            'GIT_INDEX_FILE'
+        )
+        try {
+            [Environment]::SetEnvironmentVariable(
+                'GIT_INDEX_FILE',
+                $strTransitionIndex
+            )
+            & git -C $strSchemaFixtureRoot read-tree --empty
+            $strPlaceholderPath = Join-Path $strSchemaFixtureRoot 'placeholder'
+            [IO.File]::WriteAllText(
+                $strPlaceholderPath,
+                "transition baseline placeholder`n",
+                [Text.UTF8Encoding]::new($false)
+            )
+            $strPlaceholderBlob = ([string] (& git -C $strSchemaFixtureRoot `
+                        hash-object -w -- $strPlaceholderPath)).Trim()
+            foreach ($objSchemaPath in $arrSchemaPathSpec) {
+                & git -C $strSchemaFixtureRoot update-index --add `
+                    --cacheinfo "100644,$strPlaceholderBlob,$($objSchemaPath.Path)"
+            }
+            $strTransitionBaseTree = ([string] (& git -C $strSchemaFixtureRoot `
+                        write-tree)).Trim()
+            $strTransitionBase = ([string] (
+                    "transition base`n" | git -C $strSchemaFixtureRoot `
+                        -c 'user.name=Trust root schema self-test' `
+                        -c 'user.email=trust-root-schema@example.invalid' `
+                        commit-tree $strTransitionBaseTree
+                )).Trim()
+            & git -C $strSchemaFixtureRoot read-tree $strTransitionBase
+            foreach ($objSchemaPath in $listSchemaAllowedPath) {
+                & git -C $strSchemaFixtureRoot update-index --add `
+                    --cacheinfo "100644,$($objSchemaPath.blob),$($objSchemaPath.path)"
+            }
+            $strInactiveManifestSource =
+                Join-Path $RepositoryRootPath $strAuthorizationPath
+            $arrInactiveManifestBytes =
+                [IO.File]::ReadAllBytes($strInactiveManifestSource)
+            $strInactiveManifestBlob = ([string] (
+                    & git -C $strSchemaFixtureRoot hash-object -w -- `
+                        $strInactiveManifestSource
+                )).Trim()
+            & git -C $strSchemaFixtureRoot update-index --add `
+                --cacheinfo `
+                "100644,$strInactiveManifestBlob,$strAuthorizationPath"
+            $strTransitionCandidateTree = ([string] (
+                    & git -C $strSchemaFixtureRoot write-tree
+                )).Trim()
+            $strTransitionCandidate = ([string] (
+                    "transition candidate`n" | git -C $strSchemaFixtureRoot `
+                        -c 'user.name=Trust root schema self-test' `
+                        -c 'user.email=trust-root-schema@example.invalid' `
+                        commit-tree $strTransitionCandidateTree `
+                        -p $strTransitionBase
+                )).Trim()
+            $strInactiveManifestSha256 = [Convert]::ToHexString(
+                [Security.Cryptography.SHA256]::HashData(
+                    $arrInactiveManifestBytes
+                )
+            ).ToLowerInvariant()
+            $arrTransitionAllowedPath = @($listSchemaAllowedPath) + @(
+                [ordered]@{
+                    path = $strAuthorizationPath
+                    mode = '100644'
+                    blob = $strInactiveManifestBlob
+                    bytes = $arrInactiveManifestBytes.Length
+                    sha256 = $strInactiveManifestSha256
+                    encoding = 'utf-8-no-bom-lf'
+                    syntax = 'json'
+                    semantic_invariants = @()
+                }
+            )
+            $objTransitionManifest = [ordered]@{
+                schema_version = 1
+                authorization_id = 'self-test-detached-transition'
+                candidate = [ordered]@{
+                    base_commit = $strTransitionBase
+                    head_commit = $strTransitionCandidate
+                    head_tree = $strTransitionCandidateTree
+                    parent_commits = @($strTransitionBase)
+                }
+                limits = [ordered]@{
+                    maximum_paths = 8
+                    maximum_blob_bytes = 573440
+                    maximum_manifest_bytes = 65536
+                }
+                allowed_paths = $arrTransitionAllowedPath
+            }
+            $strTransitionManifestFile =
+                Join-Path $strSchemaFixtureRoot 'transition-manifest.json'
+            [IO.File]::WriteAllText(
+                $strTransitionManifestFile,
+                ((ConvertTo-Json -InputObject $objTransitionManifest -Depth 8) `
+                    -replace "`r`n", "`n") + "`n",
+                [Text.UTF8Encoding]::new($false)
+            )
+            $strTransitionManifestBlob = ([string] (
+                    & git -C $strSchemaFixtureRoot hash-object -w -- `
+                        $strTransitionManifestFile
+                )).Trim()
+            & git -C $strSchemaFixtureRoot read-tree --empty
+            $objVerifierEntry = @($listSchemaAllowedPath | Where-Object {
+                    $_.path -ceq $strVerifierPath
+                })[0]
+            & git -C $strSchemaFixtureRoot update-index --add `
+                --cacheinfo "100644,$($objVerifierEntry.blob),$strVerifierPath"
+            & git -C $strSchemaFixtureRoot update-index --add `
+                --cacheinfo `
+                "100644,$strTransitionManifestBlob,$strAuthorizationPath"
+            $strTransitionTrustedTree = ([string] (
+                    & git -C $strSchemaFixtureRoot write-tree
+                )).Trim()
+            $strTransitionTrusted = ([string] (
+                    "transition trusted root`n" | git -C $strSchemaFixtureRoot `
+                        -c 'user.name=Trust root schema self-test' `
+                        -c 'user.email=trust-root-schema@example.invalid' `
+                        commit-tree $strTransitionTrustedTree
+                )).Trim()
+        }
+        finally {
+            if ([string]::IsNullOrEmpty($strOriginalIndexFile)) {
+                Remove-Item -LiteralPath 'Env:GIT_INDEX_FILE' `
+                    -ErrorAction SilentlyContinue
+            }
+            else {
+                [Environment]::SetEnvironmentVariable(
+                    'GIT_INDEX_FILE',
+                    $strOriginalIndexFile
+                )
+            }
+        }
+        & git -C $strSchemaFixtureRoot update-ref --no-deref HEAD `
+            $strTransitionTrusted
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not select the detached transition trust root.'
+        }
+        $arrTransitionResult = @(& $PSCommandPath `
+                -RepositoryRootPath $strSchemaFixtureRoot `
+                -TrustedRevision $strTransitionTrusted `
+                -BaseRevision $strTransitionBase `
+                -HeadRevision $strTransitionCandidate)
+        if ($arrTransitionResult.Count -ne 1 -or
+            $arrTransitionResult[0] -isnot [bool] -or
+            -not $arrTransitionResult[0]) {
+            throw 'The bounded detached-base schema 1 transition was rejected.'
+        }
+        try {
+            [void] @(& $PSCommandPath `
+                    -RepositoryRootPath $strSchemaFixtureRoot `
+                    -TrustedRevision $strTransitionTrusted `
+                    -BaseRevision $strTransitionTrusted `
+                    -HeadRevision $strTransitionCandidate)
+            throw 'A same-base schema 1 authorization was accepted.'
+        }
+        catch {
+            if ($_.Exception.Message -ceq
+                'A same-base schema 1 authorization was accepted.' -or
+                -not $_.Exception.Message.Contains(
+                    'Schema 1 is valid only for the detached-base transition',
+                    [StringComparison]::Ordinal
+                )) {
+                throw
+            }
+        }
+    }
+    finally {
+        if ([IO.Directory]::Exists($strSchemaFixtureRoot) -and
+            $strSchemaFixtureRoot.StartsWith(
+                $strSchemaSystemTempRoot,
+                [StringComparison]::OrdinalIgnoreCase
+            )) {
+            Remove-Item -LiteralPath $strSchemaFixtureRoot -Recurse -Force
+        }
+    }
     return
 }
 
@@ -1199,45 +1726,100 @@ try {
 catch {
     throw 'The trusted authorization manifest is malformed JSON.'
 }
-Assert-ExactPropertySet -InputObject $objManifest -Name 'The authorization manifest' `
-    -PropertyName @(
-        'schema_version', 'authorization_id', 'candidate', 'limits',
-        'allowed_paths'
-    )
-if ($objManifest.schema_version -ne 1 -or
+if ($objManifest.schema_version -notin @(1, 2) -or
     [string] $objManifest.authorization_id -cnotmatch
         '^[a-z0-9][a-z0-9-]{0,127}$') {
     throw 'The authorization manifest identity is invalid.'
 }
-Assert-ExactPropertySet -InputObject $objManifest.candidate -Name 'The candidate identity' `
-    -PropertyName @('base_commit', 'head_commit', 'head_tree', 'parent_commits')
-if ($objManifest.candidate.base_commit -cne $BaseRevision -or
-    $objManifest.candidate.head_commit -cne $HeadRevision -or
-    [string] $objManifest.candidate.head_tree -cnotmatch $strObjectIdPattern) {
-    throw 'The event commits do not match the exact authorization.'
+$boolTransitionAuthorization = $objManifest.schema_version -eq 1
+$strHistoryBaseRevision = $BaseRevision
+$intEffectiveCommitLimit = $intCandidateMaximumCommits
+if ($boolTransitionAuthorization) {
+    Assert-ExactPropertySet -InputObject $objManifest `
+        -Name 'The transition authorization manifest' `
+        -PropertyName @(
+            'schema_version', 'authorization_id', 'candidate', 'limits',
+            'allowed_paths'
+        )
+    if ($BaseRevision -ceq $TrustedRevision) {
+        throw 'Schema 1 is valid only for the detached-base transition.'
+    }
+    Assert-ExactPropertySet -InputObject $objManifest.candidate `
+        -Name 'The candidate identity' `
+        -PropertyName @(
+            'base_commit', 'head_commit', 'head_tree', 'parent_commits'
+        )
+    if ($objManifest.candidate.base_commit -cne $BaseRevision -or
+        $objManifest.candidate.head_commit -cne $HeadRevision -or
+        [string] $objManifest.candidate.head_tree -cnotmatch
+            $strObjectIdPattern) {
+        throw 'The event commits do not match the exact transition authorization.'
+    }
+    $strHeadTree = [string] (& git -C $RepositoryRootPath rev-parse `
+            --verify "$HeadRevision`^{tree}")
+    if ($LASTEXITCODE -ne 0 -or
+        $strHeadTree.Trim() -cne $objManifest.candidate.head_tree) {
+        throw 'The candidate tree does not match the exact transition authorization.'
+    }
+    $arrActualParents = @(
+        ([string] (& git -C $RepositoryRootPath rev-list --parents -n 1 `
+                    $HeadRevision)).Trim() -split '\s+' |
+            Select-Object -Skip 1
+    )
+    $arrAuthorizedParents = @($objManifest.candidate.parent_commits)
+    if ($arrAuthorizedParents.Count -gt 64 -or
+        @($arrAuthorizedParents | Where-Object {
+                [string] $_ -cnotmatch $strObjectIdPattern
+            }).Count -gt 0) {
+        throw 'The authorized parent commit list is invalid.'
+    }
+    if ([string]::Join("`n", $arrActualParents) -cne
+        [string]::Join("`n", $arrAuthorizedParents)) {
+        throw 'The candidate parents do not match the transition authorization.'
+    }
+    Assert-ExactPropertySet -InputObject $objManifest.limits `
+        -Name 'The transition authorization limits' `
+        -PropertyName @(
+            'maximum_paths', 'maximum_blob_bytes', 'maximum_manifest_bytes'
+        )
 }
-$strHeadTree = [string] (& git -C $RepositoryRootPath rev-parse `
-        --verify "$HeadRevision`^{tree}")
-if ($LASTEXITCODE -ne 0 -or $strHeadTree.Trim() -cne $objManifest.candidate.head_tree) {
-    throw 'The candidate tree does not match the exact authorization.'
+else {
+    Assert-ExactPropertySet -InputObject $objManifest `
+        -Name 'The content-exact authorization manifest' `
+        -PropertyName @(
+            'schema_version', 'authorization_id', 'limits', 'allowed_paths'
+        )
+    Assert-ExactPropertySet -InputObject $objManifest.limits `
+        -Name 'The content-exact authorization limits' `
+        -PropertyName @(
+            'maximum_paths', 'maximum_blob_bytes', 'maximum_manifest_bytes',
+            'maximum_commits'
+        )
+    if ($BaseRevision -cne $TrustedRevision) {
+        throw 'The content-exact authorization base must equal the trusted revision.'
+    }
+    & git -C $RepositoryRootPath merge-base --is-ancestor `
+        $TrustedRevision $HeadRevision 2>$null
+    if ($LASTEXITCODE -eq 1) {
+        throw 'The candidate head does not descend from the trusted revision.'
+    }
+    if ($LASTEXITCODE -ne 0) {
+        throw 'The candidate ancestry is indeterminate.'
+    }
+    $strCandidateManifestEntry = [string] (& git -C $RepositoryRootPath `
+            ls-tree $HeadRevision -- $AuthorizationManifestPath)
+    if ($LASTEXITCODE -ne 0 -or
+        $strCandidateManifestEntry -cne $strManifestEntry) {
+        throw 'The candidate changed the trusted authorization manifest.'
+    }
+    if ($objManifest.limits.maximum_commits -gt
+        $intCandidateMaximumCommits -or
+        $objManifest.limits.maximum_commits -lt 1) {
+        throw 'The authorization commit limit exceeds the trusted verifier limit.'
+    }
+    $intEffectiveCommitLimit = [int] $objManifest.limits.maximum_commits
+    $strHistoryBaseRevision = $TrustedRevision
 }
-$arrActualParents = @(
-    ([string] (& git -C $RepositoryRootPath rev-list --parents -n 1 $HeadRevision)).Trim() `
-        -split '\s+' | Select-Object -Skip 1
-)
-$arrAuthorizedParents = @($objManifest.candidate.parent_commits)
-if ($arrAuthorizedParents.Count -gt 64 -or
-    @($arrAuthorizedParents | Where-Object {
-            [string] $_ -cnotmatch $strObjectIdPattern
-        }).Count -gt 0) {
-    throw 'The authorized parent commit list is invalid.'
-}
-if ([string]::Join("`n", $arrActualParents) -cne
-    [string]::Join("`n", $arrAuthorizedParents)) {
-    throw 'The candidate parent commits do not match the exact authorization.'
-}
-Assert-ExactPropertySet -InputObject $objManifest.limits -Name 'The authorization limits' `
-    -PropertyName @('maximum_paths', 'maximum_blob_bytes', 'maximum_manifest_bytes')
 if ($objManifest.limits.maximum_paths -gt $intCandidateMaximumPaths -or
     $objManifest.limits.maximum_paths -lt 1 -or
     $objManifest.limits.maximum_blob_bytes -gt $intCandidateMaximumBlobBytes -or
@@ -1268,7 +1850,8 @@ foreach ($objPath in $arrAllowedPaths) {
         $strPath -match '(^|/)\.\.?(/|$)' -or
         $strPath.IndexOfAny([char[]] @("`0", "`r", "`n", "`t")) -ge 0 -or
         -not $setAllowedPaths.Add($strPath) -or
-        $strPath -ceq $AuthorizationManifestPath) {
+        ($strPath -ceq $AuthorizationManifestPath -and
+            -not $boolTransitionAuthorization)) {
         throw 'The authorization contains an unsafe, duplicate, or self-authorizing path.'
     }
     if ($objPath.mode -cne '100644' -or
@@ -1303,7 +1886,11 @@ foreach ($objPath in $arrAllowedPaths) {
     $strText = ConvertFrom-StrictUtf8Text -Bytes $arrBlobBytes -Name $strPath
     Assert-CandidateSyntax -Syntax $objPath.syntax -Text $strText -Path $strPath
     $arrInvariants = @($objPath.semantic_invariants)
-    if ($arrInvariants.Count -lt 1 -or
+    $boolTransitionManifestPath =
+        $boolTransitionAuthorization -and
+        $strPath -ceq $AuthorizationManifestPath
+    if (($arrInvariants.Count -lt 1 -and -not $boolTransitionManifestPath) -or
+        ($arrInvariants.Count -ne 0 -and $boolTransitionManifestPath) -or
         @($arrInvariants | Where-Object {
                 $_ -isnot [string] -or [string]::IsNullOrWhiteSpace($_)
             }).Count -gt 0 -or
@@ -1316,7 +1903,51 @@ foreach ($objPath in $arrAllowedPaths) {
         }
         Assert-SemanticInvariant -Invariant $strInvariant -Text $strText -Path $strPath
     }
-    if ($strPath -ceq $strVerifierPath) {
+    if ($boolTransitionManifestPath) {
+        $objCandidateManifestDocument = $null
+        try {
+            $objCandidateManifestDocument =
+                [System.Text.Json.JsonDocument]::Parse($strText)
+            Assert-NoDuplicateJsonProperty `
+                -Element $objCandidateManifestDocument.RootElement
+            $objCandidateManifest = ConvertFrom-Json -InputObject $strText
+            Assert-ExactPropertySet -InputObject $objCandidateManifest `
+                -Name 'The landed content-exact authorization manifest' `
+                -PropertyName @(
+                    'schema_version', 'authorization_id', 'limits',
+                    'allowed_paths'
+                )
+            Assert-ExactPropertySet -InputObject $objCandidateManifest.limits `
+                -Name 'The landed content-exact authorization limits' `
+                -PropertyName @(
+                    'maximum_paths', 'maximum_blob_bytes',
+                    'maximum_manifest_bytes', 'maximum_commits'
+                )
+            if ($objCandidateManifest.schema_version -ne 2 -or
+                $objCandidateManifest.authorization_id -cne
+                    'no-active-trust-root-maintenance' -or
+                $objCandidateManifest.limits.maximum_paths -ne
+                    $intCandidateMaximumPaths -or
+                $objCandidateManifest.limits.maximum_blob_bytes -ne
+                    $intCandidateMaximumBlobBytes -or
+                $objCandidateManifest.limits.maximum_manifest_bytes -ne
+                    $intManifestMaximumBytes -or
+                $objCandidateManifest.limits.maximum_commits -ne
+                    $intCandidateMaximumCommits -or
+                @($objCandidateManifest.allowed_paths).Count -ne 0) {
+                throw 'The landed content-exact authorization manifest is active or invalid.'
+            }
+        }
+        catch {
+            throw 'The transition does not land the exact inactive schema 2 manifest.'
+        }
+        finally {
+            if ($null -ne $objCandidateManifestDocument) {
+                $objCandidateManifestDocument.Dispose()
+            }
+        }
+    }
+    if ($boolTransitionAuthorization -and $strPath -ceq $strVerifierPath) {
         $strTrustedVerifierEntry = [string] (& git -C $RepositoryRootPath ls-tree `
                 $TrustedRevision -- $strVerifierPath)
         if ($LASTEXITCODE -ne 0 -or
@@ -1370,12 +2001,24 @@ foreach ($strChangedPath in $setChangedPaths) {
     }
 }
 
+$objCommitCount = Invoke-BoundedProcessByte -FileName 'git' -MaximumBytes 64 `
+    -ArgumentList @(
+        '-C', $RepositoryRootPath, 'rev-list', '--count',
+        "--max-count=$($intEffectiveCommitLimit + 1)", $HeadRevision,
+        '--not', $strHistoryBaseRevision
+    )
+$strCommitCount = ConvertFrom-StrictUtf8Text -Bytes $objCommitCount.Bytes `
+    -Name 'The candidate history commit count'
+if ($objCommitCount.ExitCode -ne 0 -or $strCommitCount.Trim() -cnotmatch '^\d+$' -or
+    [int] $strCommitCount.Trim() -gt $intEffectiveCommitLimit) {
+    throw 'The complete candidate history exceeds its commit limit.'
+}
 $objHistory = Invoke-BoundedProcessByte -FileName 'git' -MaximumBytes 1048576 `
     -ArgumentList @(
         '-C', $RepositoryRootPath, 'log', '--format=', '--name-only', '-z',
         '--no-renames', '--no-ext-diff', '--no-textconv',
         '--diff-merges=separate', '--root', $HeadRevision, '--not',
-        $BaseRevision, '--'
+        $strHistoryBaseRevision, '--'
     )
 if ($objHistory.ExitCode -ne 0) {
     throw 'Could not enumerate the authorized candidate history.'
