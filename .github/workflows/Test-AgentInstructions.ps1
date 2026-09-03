@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260902.12
+# Version: 1.7.20260902.13
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -7705,9 +7705,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260902\.12$'
+            '(?m)^# Version: 1\.7\.20260902\.13$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.7.20260902.12.'
+        throw 'The validator script version is not 1.7.20260902.13.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
@@ -8283,9 +8283,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strTrustRootAuthorizationSource,
-            '(?m)^# Version: 1\.0\.20260902\.9$'
+            '(?m)^# Version: 1\.0\.20260902\.10$'
         ).Count -ne 1) {
-        throw 'The trust-root authorization script lacks version 1.0.20260902.9.'
+        throw 'The trust-root authorization script lacks version 1.0.20260902.10.'
     }
     & (Join-Path $strRepositoryRootPath $strTrustRootAuthorizationPath) `
         -RepositoryRootPath $strRepositoryRootPath `
@@ -9985,6 +9985,12 @@ if ($SelfTest) {
                 'id: created-push-boundary',
                 'PUSH_COMMIT_EVIDENCE: ${{ toJson(github.event.commits) }}',
                 'git ls-remote --sort=refname --refs --heads --tags origin',
+                'Initial remote ref snapshot output bounding failed.',
+                'Initial authenticated remote ref query failed.',
+                'Final remote ref snapshot output bounding failed.',
+                'Final remote ref evidence exceeded 1048576 bytes.',
+                'Final authenticated remote ref query failed.',
+                'Remote ref evidence changed during authentication.',
                 'const evidence = process.env.PUSH_COMMIT_EVIDENCE;',
                 'Buffer.byteLength(evidence, "utf8") > 1048576',
                 'commits = JSON.parse(evidence);',
@@ -10367,6 +10373,66 @@ if ($SelfTest) {
         'timeout 60s git fetch --no-tags'
     )
     $arrWorkflowMutations = @(
+        [pscustomobject]@{
+            Name = 'missing initial snapshot output-bound diagnostic'
+            Content = $strAgentWorkflowContent.Replace(
+                'Initial remote ref snapshot output bounding failed.',
+                'Initial remote ref snapshot failed.'
+            )
+            Expected =
+                'Workflow contract literal is missing: ' +
+                'Initial remote ref snapshot output bounding failed.'
+        },
+        [pscustomobject]@{
+            Name = 'missing initial authenticated-query diagnostic'
+            Content = $strAgentWorkflowContent.Replace(
+                'Initial authenticated remote ref query failed.',
+                'Initial remote ref query failed.'
+            )
+            Expected =
+                'Workflow contract literal is missing: ' +
+                'Initial authenticated remote ref query failed.'
+        },
+        [pscustomobject]@{
+            Name = 'missing final snapshot output-bound diagnostic'
+            Content = $strAgentWorkflowContent.Replace(
+                'Final remote ref snapshot output bounding failed.',
+                'Final remote ref snapshot failed.'
+            )
+            Expected =
+                'Workflow contract literal is missing: ' +
+                'Final remote ref snapshot output bounding failed.'
+        },
+        [pscustomobject]@{
+            Name = 'missing final snapshot size diagnostic'
+            Content = $strAgentWorkflowContent.Replace(
+                'Final remote ref evidence exceeded 1048576 bytes.',
+                'Final remote ref evidence was too large.'
+            )
+            Expected =
+                'Workflow contract literal is missing: ' +
+                'Final remote ref evidence exceeded 1048576 bytes.'
+        },
+        [pscustomobject]@{
+            Name = 'missing final authenticated-query diagnostic'
+            Content = $strAgentWorkflowContent.Replace(
+                'Final authenticated remote ref query failed.',
+                'Final remote ref query failed.'
+            )
+            Expected =
+                'Workflow contract literal is missing: ' +
+                'Final authenticated remote ref query failed.'
+        },
+        [pscustomobject]@{
+            Name = 'missing remote snapshot-change diagnostic'
+            Content = $strAgentWorkflowContent.Replace(
+                'Remote ref evidence changed during authentication.',
+                'Remote ref evidence changed.'
+            )
+            Expected =
+                'Workflow contract literal is missing: ' +
+                'Remote ref evidence changed during authentication.'
+        },
         [pscustomobject]@{
             Name = 'unsorted remote ref snapshots'
             Content = $strAgentWorkflowContent.Replace(

@@ -280,12 +280,18 @@ jobs:
             head -c 1048577 >"${raw_refs}"
           pipeline_status=("${PIPESTATUS[@]}")
           set -e
-          test "${pipeline_status[1]}" -eq 0
+          if test "${pipeline_status[1]}" -ne 0; then
+            echo 'Initial remote ref snapshot output bounding failed.' >&2
+            exit 1
+          fi
           if test "$(wc -c <"${raw_refs}")" -gt 1048576; then
             echo 'Remote ref evidence exceeded 1048576 bytes.' >&2
             exit 1
           fi
-          test "${pipeline_status[0]}" -eq 0
+          if test "${pipeline_status[0]}" -ne 0; then
+            echo 'Initial authenticated remote ref query failed.' >&2
+            exit 1
+          fi
 
           if ! node -e '
             const fs = require("fs");
@@ -390,10 +396,22 @@ jobs:
             head -c 1048577 >"${raw_refs_after}"
           pipeline_status=("${PIPESTATUS[@]}")
           set -e
-          test "${pipeline_status[1]}" -eq 0
-          test "$(wc -c <"${raw_refs_after}")" -le 1048576
-          test "${pipeline_status[0]}" -eq 0
-          cmp --silent "${raw_refs}" "${raw_refs_after}"
+          if test "${pipeline_status[1]}" -ne 0; then
+            echo 'Final remote ref snapshot output bounding failed.' >&2
+            exit 1
+          fi
+          if test "$(wc -c <"${raw_refs_after}")" -gt 1048576; then
+            echo 'Final remote ref evidence exceeded 1048576 bytes.' >&2
+            exit 1
+          fi
+          if test "${pipeline_status[0]}" -ne 0; then
+            echo 'Final authenticated remote ref query failed.' >&2
+            exit 1
+          fi
+          if ! cmp --silent "${raw_refs}" "${raw_refs_after}"; then
+            echo 'Remote ref evidence changed during authentication.' >&2
+            exit 1
+          fi
           unset authorization
 
           evidence_index=0

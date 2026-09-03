@@ -3,9 +3,15 @@
 import https from 'node:https';
 import { TextDecoder } from 'node:util';
 
-const maximumPages = 10;
-const pullRequestPageSize = 100;
-const maximumPullRequests = maximumPages * pullRequestPageSize;
+// One invalidation run supports one complete page of at most 20 open pull
+// requests. In the all-write case it makes 25 API requests: one run read, one
+// base-ref read, one PR-page read, two 10-context reads, and 20 status writes.
+const maximumPullRequests = 20;
+const pullRequestPageSize = maximumPullRequests;
+const statusContextBatchSize = 10;
+const maximumApiRequests = 25;
+const maximumOperationMilliseconds = 240000;
+const requestTimeoutMilliseconds = 8000;
 const maximumResponseBytes = 1048576;
 const maximumRequestPathCharacters = 4096;
 const shaPattern = /^[0-9a-f]{40}$/;
@@ -22,13 +28,11 @@ const openPullRequestsQuery = `query OpenPullRequests(
   $owner: String!
   $name: String!
   $baseRefName: String!
-  $cursor: String
   $pageSize: Int!
 ) {
   repository(owner: $owner, name: $name) {
     pullRequests(
       first: $pageSize
-      after: $cursor
       states: OPEN
       baseRefName: $baseRefName
       orderBy: {field: CREATED_AT, direction: ASC}
@@ -45,7 +49,6 @@ const openPullRequestsQuery = `query OpenPullRequests(
       }
       pageInfo {
         hasNextPage
-        endCursor
       }
     }
   }
@@ -67,6 +70,36 @@ function statusContext(pullNumber) {
 function requiresInvalidation(latest, currentBaseSha) {
   return !(latest && latest.state === 'success' &&
     latest.description === `Validated base ${currentBaseSha}.`);
+}
+
+function createRequestBudget(now = Date.now) {
+  assert(typeof now === 'function', 'GitHub API budget clock is invalid.');
+  const startedAt = now();
+  assert(Number.isFinite(startedAt), 'GitHub API budget clock is invalid.');
+  const deadline = startedAt + maximumOperationMilliseconds;
+  let requestCount = 0;
+
+  function assertCanComplete(additionalRequests) {
+    assert(Number.isInteger(additionalRequests) && additionalRequests >= 0,
+      'GitHub API request reservation is invalid.');
+    assert(requestCount + additionalRequests <= maximumApiRequests,
+      'GitHub API request budget would be exceeded.');
+    const currentTime = now();
+    assert(Number.isFinite(currentTime) &&
+      currentTime + additionalRequests * requestTimeoutMilliseconds <= deadline,
+    'GitHub API deadline cannot accommodate the remaining requests.');
+  }
+
+  function beginRequest() {
+    assertCanComplete(1);
+    requestCount += 1;
+  }
+
+  return {
+    assertCanComplete,
+    beginRequest,
+    get requestCount() { return requestCount; },
+  };
 }
 
 function isCurrentPull(pull, ref, expected) {
@@ -165,27 +198,26 @@ function decodeApiResponse(statusCode, body, allowNotFound = false) {
   }
 }
 
-function parsePullRequestPage(result, expected, seenPulls, expectedTotalCount) {
+function parsePullRequestPage(result, expected) {
   assert(isRecord(result) && !Object.hasOwn(result, 'errors') &&
     isRecord(result.data) && isRecord(result.data.repository) &&
     isRecord(result.data.repository.pullRequests),
   'GraphQL pull request response is invalid.');
   const connection = result.data.repository.pullRequests;
   assert(Number.isInteger(connection.totalCount) &&
-    connection.totalCount >= 0 &&
-    connection.totalCount <= maximumPullRequests &&
-    (expectedTotalCount === null ||
-      connection.totalCount === expectedTotalCount) &&
-    Array.isArray(connection.nodes) &&
+    connection.totalCount >= 0,
+  'GraphQL pull request connection is invalid.');
+  assert(connection.totalCount <= maximumPullRequests,
+    `Open pull request count exceeds the supported limit of ` +
+      `${maximumPullRequests}.`);
+  assert(Array.isArray(connection.nodes) &&
+    connection.nodes.length === connection.totalCount &&
     connection.nodes.length <= pullRequestPageSize &&
     isRecord(connection.pageInfo) &&
-    typeof connection.pageInfo.hasNextPage === 'boolean' &&
-    (connection.pageInfo.endCursor === null ||
-      (typeof connection.pageInfo.endCursor === 'string' &&
-        connection.pageInfo.endCursor.length >= 1 &&
-        connection.pageInfo.endCursor.length <= 1024)),
+    connection.pageInfo.hasNextPage === false,
   'GraphQL pull request connection is invalid.');
   const pulls = [];
+  const seenPulls = new Set();
   for (const pull of connection.nodes) {
     assert(isRecord(pull) && Number.isInteger(pull.number) &&
       pull.number >= 1 && !seenPulls.has(pull.number) &&
@@ -197,51 +229,113 @@ function parsePullRequestPage(result, expected, seenPulls, expectedTotalCount) {
     seenPulls.add(pull.number);
     pulls.push({ number: pull.number, head: { sha: pull.headRefOid } });
   }
-  return {
-    pulls,
-    totalCount: connection.totalCount,
-    hasNextPage: connection.pageInfo.hasNextPage,
-    endCursor: connection.pageInfo.endCursor,
-  };
+  return pulls;
 }
 
 async function listOpenPullRequests(client, branch) {
   const [owner, name] = client.repository.split('/');
-  const pulls = [];
-  const seenPulls = new Set();
-  const seenCursors = new Set();
-  let cursor = null;
-  let expectedTotalCount = null;
-  for (let page = 1; page <= maximumPages; page += 1) {
-    const result = await client.graphql({
-      query: openPullRequestsQuery,
-      variables: {
-        owner,
-        name,
-        baseRefName: branch,
-        cursor,
-        pageSize: pullRequestPageSize,
-      },
-    });
-    const parsed = parsePullRequestPage(result,
-      { repository: client.repository, branch }, seenPulls,
-      expectedTotalCount);
-    expectedTotalCount ??= parsed.totalCount;
-    pulls.push(...parsed.pulls);
-    assert(pulls.length <= expectedTotalCount,
-      'GraphQL pull request cardinality is invalid.');
-    if (!parsed.hasNextPage) {
-      assert(pulls.length === expectedTotalCount,
-        'GraphQL pull request cardinality is invalid.');
-      return pulls;
-    }
-    assert(page < maximumPages && pulls.length < expectedTotalCount &&
-      parsed.endCursor !== null && !seenCursors.has(parsed.endCursor),
-    'GraphQL pull request pagination exceeded its bound.');
-    seenCursors.add(parsed.endCursor);
-    cursor = parsed.endCursor;
+  const result = await client.graphql({
+    query: openPullRequestsQuery,
+    variables: {
+      owner,
+      name,
+      baseRefName: branch,
+      pageSize: pullRequestPageSize,
+    },
+  });
+  return parsePullRequestPage(result,
+    { repository: client.repository, branch });
+}
+
+function createStatusContextRequest(repository, pulls) {
+  assert(repositoryPattern.test(repository) && Array.isArray(pulls) &&
+    pulls.length >= 1 && pulls.length <= statusContextBatchSize,
+  'Status-context batch is invalid.');
+  const [owner, name] = repository.split('/');
+  const declarations = ['$owner: String!', '$name: String!'];
+  const selections = [];
+  const variables = { owner, name };
+  for (let index = 0; index < pulls.length; index += 1) {
+    const pull = pulls[index];
+    assert(isRecord(pull) && Number.isInteger(pull.number) &&
+      pull.number >= 1 && isRecord(pull.head) &&
+      shaPattern.test(pull.head.sha), 'Status-context batch is invalid.');
+    declarations.push(`$oid${index}: GitObjectID!`);
+    declarations.push(`$context${index}: String!`);
+    variables[`oid${index}`] = pull.head.sha;
+    variables[`context${index}`] = statusContext(pull.number);
+    selections.push(`status${index}: object(oid: $oid${index}) {
+      __typename
+      ... on Commit {
+        oid
+        status {
+          latest: context(name: $context${index}) {
+            context
+            state
+            description
+          }
+        }
+      }
+    }`);
   }
-  throw new Error('GraphQL pull request pagination exceeded its bound.');
+  return {
+    query: `query ExactStatusContexts(
+  ${declarations.join('\n  ')}
+) {
+  repository(owner: $owner, name: $name) {
+    ${selections.join('\n    ')}
+  }
+}`,
+    variables,
+  };
+}
+
+function parseStatusContextResponse(result, pulls) {
+  assert(isRecord(result) && !Object.hasOwn(result, 'errors') &&
+    isRecord(result.data) && isRecord(result.data.repository),
+  'GraphQL status-context response is invalid.');
+  const statuses = [];
+  for (let index = 0; index < pulls.length; index += 1) {
+    const item = result.data.repository[`status${index}`];
+    assert(isRecord(item) && item.__typename === 'Commit' &&
+      item.oid === pulls[index].head.sha &&
+      (item.status === null || isRecord(item.status)),
+    'GraphQL status-context response entry is invalid.');
+    if (item.status === null) {
+      statuses.push(null);
+      continue;
+    }
+    assert(Object.hasOwn(item.status, 'latest') &&
+      (item.status.latest === null || isRecord(item.status.latest)),
+    'GraphQL status-context response entry is invalid.');
+    const latest = item.status.latest;
+    if (latest === null) {
+      statuses.push(null);
+      continue;
+    }
+    assert(latest.context === statusContext(pulls[index].number) &&
+      ['ERROR', 'EXPECTED', 'FAILURE', 'PENDING', 'SUCCESS'].includes(
+        latest.state) &&
+      (latest.description === null || typeof latest.description === 'string'),
+    'GraphQL status-context response entry is invalid.');
+    statuses.push({
+      state: latest.state.toLowerCase(),
+      description: latest.description,
+    });
+  }
+  return statuses;
+}
+
+async function readLatestStatuses(client, pulls) {
+  const statuses = [];
+  for (let offset = 0; offset < pulls.length;
+    offset += statusContextBatchSize) {
+    const batch = pulls.slice(offset, offset + statusContextBatchSize);
+    const result = await client.graphql(
+      createStatusContextRequest(client.repository, batch));
+    statuses.push(...parseStatusContextResponse(result, batch));
+  }
+  return statuses;
 }
 
 async function expectRejected(operation, expectedMessage, failureMessage) {
@@ -376,8 +470,10 @@ async function runSelfTest() {
     openPullRequestsQuery.includes('nameWithOwner') &&
     openPullRequestsQuery.includes('headRefOid') &&
     openPullRequestsQuery.includes('pageInfo') &&
+    !openPullRequestsQuery.includes('$cursor') &&
+    !openPullRequestsQuery.includes('endCursor') &&
     !/\bbody(?:HTML|Text)?\b/.test(openPullRequestsQuery),
-  'The open-pull-request query must project only bounded helper fields.');
+  'The one-page pull-request query must project only bounded helper fields.');
 
   const firstPull = {
     number: 101,
@@ -393,39 +489,78 @@ async function runSelfTest() {
     baseRepository: { nameWithOwner: 'owner/repository' },
     headRefOid: '4'.repeat(40),
   };
-  const pullPage = (nodes, totalCount, hasNextPage = false,
-    endCursor = null) => ({
+  const pullPage = (nodes, totalCount, hasNextPage = false) => ({
     data: { repository: { pullRequests: {
       totalCount,
       nodes,
-      pageInfo: { hasNextPage, endCursor },
+      pageInfo: { hasNextPage },
     } } },
   });
+  const statusPage = (request, getLatest = () => null) => {
+    const repository = {};
+    for (let index = 0;
+      Object.hasOwn(request.variables, `oid${index}`); index += 1) {
+      const context = request.variables[`context${index}`];
+      const pullNumber = Number(context.split('/PR-')[1]);
+      const latest = getLatest(pullNumber);
+      repository[`status${index}`] = {
+        __typename: 'Commit',
+        oid: request.variables[`oid${index}`],
+        status: latest === null ? null : {
+          latest: {
+            context,
+            state: latest.state.toUpperCase(),
+            description: latest.description,
+          },
+        },
+      };
+    }
+    return { data: { repository } };
+  };
   const graphqlRequests = [];
-  const graphqlPages = [
-    pullPage([firstPull], 2, true, 'cursor-1'),
-    pullPage([secondPull], 2),
-  ];
   const projectedPulls = await listOpenPullRequests({
     repository: 'owner/repository',
     graphql: async (payload) => {
       graphqlRequests.push(payload);
-      return graphqlPages.shift();
+      return pullPage([firstPull, secondPull], 2);
     },
   }, 'main');
   assert(projectedPulls.length === 2 &&
     projectedPulls[0].head.sha === firstPull.headRefOid &&
     projectedPulls[1].head.sha === secondPull.headRefOid &&
-    graphqlRequests.length === 2 &&
-    graphqlRequests.every((entry) =>
-      entry.query === openPullRequestsQuery &&
-      entry.variables.owner === 'owner' &&
-      entry.variables.name === 'repository' &&
-      entry.variables.baseRefName === 'main' &&
-      entry.variables.pageSize === pullRequestPageSize) &&
-    graphqlRequests[0].variables.cursor === null &&
-    graphqlRequests[1].variables.cursor === 'cursor-1',
-  'GraphQL query variables and cursor pagination must remain exact.');
+    graphqlRequests.length === 1 &&
+    graphqlRequests[0].query === openPullRequestsQuery &&
+    graphqlRequests[0].variables.owner === 'owner' &&
+    graphqlRequests[0].variables.name === 'repository' &&
+    graphqlRequests[0].variables.baseRefName === 'main' &&
+    graphqlRequests[0].variables.pageSize === pullRequestPageSize &&
+    !Object.hasOwn(graphqlRequests[0].variables, 'cursor'),
+  'The complete one-page GraphQL query variables must remain exact.');
+
+  let simulatedChurnRequests = 0;
+  const churnResult = await listOpenPullRequests({
+    repository: 'owner/repository',
+    graphql: async () => {
+      simulatedChurnRequests += 1;
+      return simulatedChurnRequests === 1 ?
+        pullPage([firstPull, secondPull], 2) :
+        pullPage([firstPull], 1);
+    },
+  }, 'main');
+  assert(churnResult.length === 2 && simulatedChurnRequests === 1,
+    'A complete one-page read must have no cross-page churn dependency.');
+
+  const cappedPulls = Array.from({ length: maximumPullRequests },
+    (_, index) => ({
+      ...firstPull,
+      number: index + 1,
+      headRefOid: (index + 1).toString(16).padStart(40, '0'),
+    }));
+  assert((await listOpenPullRequests({
+    repository: 'owner/repository',
+    graphql: async () => pullPage(cappedPulls, maximumPullRequests),
+  }, 'main')).length === maximumPullRequests,
+  'The disclosed one-page pull-request limit must be accepted.');
 
   await expectRejected(async () => listOpenPullRequests({
     repository: 'owner/repository',
@@ -448,20 +583,71 @@ async function runSelfTest() {
   'A duplicate GraphQL pull request must fail closed.');
   await expectRejected(async () => listOpenPullRequests({
     repository: 'owner/repository',
-    graphql: async () => pullPage([], maximumPullRequests + 1),
-  }, 'main'), 'GraphQL pull request connection is invalid.',
-  'An excessive GraphQL pull request cardinality must fail closed.');
-  let boundPage = 0;
+    graphql: async () => pullPage(cappedPulls,
+      maximumPullRequests + 1, true),
+  }, 'main'), `Open pull request count exceeds the supported limit of ` +
+    `${maximumPullRequests}.`,
+  'The one-page pull-request limit plus one must fail closed.');
   await expectRejected(async () => listOpenPullRequests({
     repository: 'owner/repository',
-    graphql: async () => {
-      boundPage += 1;
-      return pullPage([{ ...firstPull, number: 200 + boundPage,
-        headRefOid: boundPage.toString(16).padStart(40, '0') }],
-      maximumPages + 1, true, `bound-cursor-${boundPage}`);
-    },
-  }, 'main'), 'GraphQL pull request pagination exceeded its bound.',
-  'GraphQL pagination beyond the maximum page count must fail closed.');
+    graphql: async () => pullPage([firstPull], 1, true),
+  }, 'main'), 'GraphQL pull request connection is invalid.',
+  'A partial or paginated pull-request page must fail closed.');
+
+  const exactStatusRequest = createStatusContextRequest(
+    'owner/repository', sameBaselinePulls);
+  assert(exactStatusRequest.query.startsWith(
+    'query ExactStatusContexts(') &&
+    exactStatusRequest.query.includes('latest: context(name: $context0)') &&
+    exactStatusRequest.query.includes('latest: context(name: $context1)') &&
+    exactStatusRequest.variables.oid0 === sameBaselinePulls[0].head.sha &&
+    exactStatusRequest.variables.context0 === statusContext(101) &&
+    exactStatusRequest.variables.oid1 === sameBaselinePulls[1].head.sha &&
+    exactStatusRequest.variables.context1 === statusContext(102),
+  'Status reads must batch only exact PR-specific contexts.');
+  const exactStatusResult = {
+    data: { repository: {
+      status0: {
+        __typename: 'Commit',
+        oid: sameBaselinePulls[0].head.sha,
+        status: { latest: {
+          context: statusContext(101),
+          state: 'SUCCESS',
+          description: `Validated base ${advancedSha}.`,
+        } },
+      },
+      status1: {
+        __typename: 'Commit',
+        oid: sameBaselinePulls[1].head.sha,
+        status: null,
+      },
+    } },
+  };
+  const exactStatuses = parseStatusContextResponse(
+    exactStatusResult, sameBaselinePulls);
+  assert(!requiresInvalidation(exactStatuses[0], advancedSha) &&
+    exactStatuses[1] === null,
+  'Exact status-context responses must preserve only current success.');
+  await expectRejected(async () => parseStatusContextResponse({
+    ...exactStatusResult,
+    errors: [{ message: 'denied' }],
+  }, sameBaselinePulls), 'GraphQL status-context response is invalid.',
+  'A GraphQL status-context error must fail closed.');
+
+  const exhaustedBudget = createRequestBudget(() => 0);
+  for (let request = 0; request < maximumApiRequests; request += 1) {
+    exhaustedBudget.beginRequest();
+  }
+  await expectRejected(async () => exhaustedBudget.beginRequest(),
+    'GitHub API request budget would be exceeded.',
+    'An exhausted global request budget must fail closed.');
+  let virtualTime = 0;
+  const slowBudget = createRequestBudget(() => virtualTime);
+  slowBudget.beginRequest();
+  virtualTime = maximumOperationMilliseconds - requestTimeoutMilliseconds + 1;
+  await expectRejected(async () => slowBudget.beginRequest(),
+    'GitHub API deadline cannot accommodate the remaining requests.',
+    'A slow request sequence must fail before its deadline is exhausted.');
 
   assert(decodeApiResponse(200, Buffer.from('{"ok":true}')).ok === true,
     'A bounded JSON API response must parse.');
@@ -483,7 +669,9 @@ async function runSelfTest() {
       if (path.endsWith('/pulls/101')) return pull;
       return { object: { type: 'commit', sha: advancedSha } };
     },
+    graphql: async (request) => statusPage(request),
     postStatus: async (...arguments_) => pendingWrites.push(arguments_),
+    assertCanMutate: () => {},
     repository: 'owner/repository',
   };
   await publishPending(exactLiveClient, expected, 'https://example.invalid/run');
@@ -526,6 +714,131 @@ async function runSelfTest() {
   assert(raceWrites.length === 2 && raceWrites[0][2] === 'success' &&
     raceWrites[1][2] === 'error',
   'A finalization race must replace transient success with an error.');
+
+  const oldExpected = { ...expected, baseSha: baselineSha };
+  const newerSuccessClient = {
+    ...exactLiveClient,
+    request: async (method, path) => {
+      assert(method === 'GET', 'Freshness reads must use GET.');
+      if (path.endsWith('/pulls/101')) return pull;
+      return { object: { type: 'commit', sha: advancedSha } };
+    },
+    graphql: async (request) => statusPage(request, () => currentStatus),
+  };
+  const oldFailureWrites = [];
+  await expectRejected(async () => finalizeStatus({
+    ...newerSuccessClient,
+    postStatus: async (...arguments_) => oldFailureWrites.push(arguments_),
+  }, oldExpected, 'failure', 'https://example.invalid/run'),
+  'Agent-instruction validation did not succeed.',
+  'An old failure finalizer must still terminate as failed.');
+  assert(oldFailureWrites.length === 0,
+    'An old failure finalizer must preserve newer exact-base success.');
+
+  const oldMismatchWrites = [];
+  await expectRejected(async () => finalizeStatus({
+    ...newerSuccessClient,
+    postStatus: async (...arguments_) => oldMismatchWrites.push(arguments_),
+  }, oldExpected, 'success', 'https://example.invalid/run'),
+  'The pull request no longer has the validated base and head.',
+  'An old success-path mismatch must terminate as stale.');
+  assert(oldMismatchWrites.length === 0,
+    'An old success-path mismatch must preserve newer exact-base success.');
+
+  const freshnessApiFailureWrites = [];
+  await expectRejected(async () => finalizeStatus({
+    ...exactLiveClient,
+    request: async () => { throw new Error('simulated API failure'); },
+    postStatus: async (...arguments_) =>
+      freshnessApiFailureWrites.push(arguments_),
+  }, oldExpected, 'failure', 'https://example.invalid/run'),
+  'Agent-instruction validation did not succeed.',
+  'A freshness API failure must keep the finalizer failed.');
+  assert(freshnessApiFailureWrites.length === 1 &&
+    freshnessApiFailureWrites[0][2] === 'error',
+  'An indeterminate freshness read must fail closed with an error status.');
+
+  const noNewerSuccessWrites = [];
+  await expectRejected(async () => finalizeStatus({
+    ...newerSuccessClient,
+    graphql: async (request) => statusPage(request, () => staleStatus),
+    postStatus: async (...arguments_) =>
+      noNewerSuccessWrites.push(arguments_),
+  }, oldExpected, 'failure', 'https://example.invalid/run'),
+  'Agent-instruction validation did not succeed.',
+  'A finalizer without newer success must terminate as failed.');
+  assert(noNewerSuccessWrites.length === 1 &&
+    noNewerSuccessWrites[0][2] === 'error',
+  'A stale status must not suppress a finalizer error.');
+
+  let invalidationRequestCount = 0;
+  let invalidationReservation = null;
+  const invalidationWrites = [];
+  await invalidateStatuses({
+    repository: 'owner/repository',
+    request: async (method, path) => {
+      invalidationRequestCount += 1;
+      assert(method === 'GET', 'Invalidation REST reads must use GET.');
+      if (path.includes('/actions/runs/501')) return workflowRun;
+      return { object: { type: 'commit', sha: advancedSha } };
+    },
+    graphql: async (request) => {
+      invalidationRequestCount += 1;
+      return request.query === openPullRequestsQuery ?
+        pullPage(cappedPulls, maximumPullRequests) :
+        statusPage(request, () => staleStatus);
+    },
+    assertCanMutate: (count) => {
+      invalidationReservation = {
+        count,
+        requestCount: invalidationRequestCount,
+      };
+      assert(invalidationRequestCount + count <= maximumApiRequests,
+        'The invalidation fixture exceeded the global request budget.');
+    },
+    postStatus: async (...arguments_) => {
+      invalidationRequestCount += 1;
+      invalidationWrites.push(arguments_);
+    },
+  }, {
+    activity: 'requested',
+    runId: '501',
+    branch: 'main',
+    signalSha: advancedSha,
+    targetUrl: 'https://example.invalid/run',
+  });
+  assert(invalidationReservation !== null &&
+    invalidationReservation.count === maximumPullRequests &&
+    invalidationReservation.requestCount === 5 &&
+    invalidationWrites.length === maximumPullRequests &&
+    invalidationRequestCount === maximumApiRequests,
+  'The all-write one-page workload must fit its disclosed 25-request bound.');
+
+  let excessiveWrites = 0;
+  await expectRejected(async () => invalidateStatuses({
+    repository: 'owner/repository',
+    request: async (method, path) => {
+      assert(method === 'GET', 'Invalidation REST reads must use GET.');
+      if (path.includes('/actions/runs/501')) return workflowRun;
+      return { object: { type: 'commit', sha: advancedSha } };
+    },
+    graphql: async () => pullPage(cappedPulls,
+      maximumPullRequests + 1, true),
+    assertCanMutate: () => {
+      throw new Error('Mutation budget must not be reached.');
+    },
+    postStatus: async () => { excessiveWrites += 1; },
+  }, {
+    activity: 'requested',
+    runId: '501',
+    branch: 'main',
+    signalSha: advancedSha,
+    targetUrl: 'https://example.invalid/run',
+  }), `Open pull request count exceeds the supported limit of ` +
+    `${maximumPullRequests}.`,
+  'The supported PR limit plus one must abort invalidation.');
+  assert(excessiveWrites === 0,
+    'A PR count above the supported limit must fail before any write.');
 }
 
 function getEnvironment(name) {
@@ -552,9 +865,11 @@ function createClient() {
     getEnvironment('GITHUB_GRAPHQL_URL'));
   assert(repositoryPattern.test(repository),
     'GitHub API identity is invalid.');
+  const requestBudget = createRequestBudget();
 
   async function requestAtRoot(root, method, path, body,
     allowNotFound = false) {
+    requestBudget.beginRequest();
     const payload = body === undefined ? undefined :
       Buffer.from(JSON.stringify(body), 'utf8');
     return await new Promise((resolve, reject) => {
@@ -591,8 +906,10 @@ function createClient() {
           }
         });
       });
-      operation.setTimeout(30000, () =>
-        operation.destroy(new Error('GitHub API request timed out.')));
+      const timeout = setTimeout(() =>
+        operation.destroy(new Error('GitHub API request timed out.')),
+      requestTimeoutMilliseconds);
+      operation.on('close', () => clearTimeout(timeout));
       operation.on('error', reject);
       if (payload !== undefined) operation.write(payload);
       operation.end();
@@ -616,7 +933,13 @@ function createClient() {
     });
   }
 
-  return { repository, request, graphql, postStatus };
+  return {
+    repository,
+    request,
+    graphql,
+    postStatus,
+    assertCanMutate: requestBudget.assertCanComplete,
+  };
 }
 
 function getExpectedPullRequest() {
@@ -635,6 +958,27 @@ function getExpectedPullRequest() {
   };
 }
 
+async function readLivePullState(client, pullNumber) {
+  const pull = await client.request('GET',
+    `repos/${client.repository}/pulls/${pullNumber}`);
+  assert(isRecord(pull) && pull.number === pullNumber && pull.state === 'open' &&
+    isRecord(pull.base) && validRef(pull.base.ref) &&
+    shaPattern.test(pull.base.sha) && isRecord(pull.head) &&
+    shaPattern.test(pull.head.sha),
+  'Live pull request response is invalid.');
+  const ref = await client.request('GET',
+    `repos/${client.repository}/git/ref/heads/${encodeRef(pull.base.ref)}`);
+  assert(isRecord(ref) && isRecord(ref.object) &&
+    ref.object.type === 'commit' && ref.object.sha === pull.base.sha,
+  'Live pull request base response is invalid.');
+  return {
+    pullNumber,
+    baseRef: pull.base.ref,
+    baseSha: pull.base.sha,
+    headSha: pull.head.sha,
+  };
+}
+
 async function readLiveState(client, expected) {
   const pull = await client.request('GET',
     `repos/${client.repository}/pulls/${expected.pullNumber}`);
@@ -643,11 +987,18 @@ async function readLiveState(client, expected) {
   return isCurrentPull(pull, ref, expected);
 }
 
+function assertCanMutate(client, count) {
+  assert(typeof client.assertCanMutate === 'function',
+    'GitHub API mutation budget is unavailable.');
+  client.assertCanMutate(count);
+}
+
 async function publishPending(client, expected, targetUrl) {
   assert(targetUrl.startsWith('https://'),
     'Prerequisite status input is invalid.');
   assert(await readLiveState(client, expected),
     'The pull request no longer has the expected base and head.');
+  assertCanMutate(client, 1);
   await client.postStatus(expected.headSha, expected.pullNumber, 'pending',
     `Validating base ${expected.baseSha}.`, targetUrl);
 }
@@ -657,26 +1008,48 @@ async function start() {
     getEnvironment('STATUS_TARGET_URL'));
 }
 
+async function publishFinalizerError(client, expected, description, targetUrl) {
+  let preserveNewerSuccess = false;
+  try {
+    const live = await readLivePullState(client, expected.pullNumber);
+    const latest = (await readLatestStatuses(client, [{
+      number: live.pullNumber,
+      head: { sha: live.headSha },
+    }]))[0];
+    preserveNewerSuccess = live.headSha === expected.headSha &&
+      live.baseSha !== expected.baseSha &&
+      !requiresInvalidation(latest, live.baseSha);
+  } catch {
+    // An indeterminate freshness read cannot prove a newer current-base success.
+  }
+  if (preserveNewerSuccess) return false;
+  assertCanMutate(client, 1);
+  await client.postStatus(expected.headSha, expected.pullNumber, 'error',
+    description, targetUrl);
+  return true;
+}
+
 async function finalizeStatus(client, expected, validationResult, targetUrl) {
   assert(['success', 'failure', 'cancelled', 'skipped'].includes(
     validationResult) && targetUrl.startsWith('https://'),
   'Finalization input is invalid.');
 
   if (validationResult !== 'success') {
-    await client.postStatus(expected.headSha, expected.pullNumber, 'error',
+    await publishFinalizerError(client, expected,
       `Validation result is ${validationResult}; revalidate PR ` +
         `#${expected.pullNumber}.`, targetUrl);
     throw new Error('Agent-instruction validation did not succeed.');
   }
   if (!await readLiveState(client, expected)) {
-    await client.postStatus(expected.headSha, expected.pullNumber, 'error',
+    await publishFinalizerError(client, expected,
       `Base or head changed; revalidate PR #${expected.pullNumber}.`, targetUrl);
     throw new Error('The pull request no longer has the validated base and head.');
   }
+  assertCanMutate(client, 1);
   await client.postStatus(expected.headSha, expected.pullNumber, 'success',
     `Validated base ${expected.baseSha}.`, targetUrl);
   if (!await readLiveState(client, expected)) {
-    await client.postStatus(expected.headSha, expected.pullNumber, 'error',
+    await publishFinalizerError(client, expected,
       `Base or head changed; revalidate PR #${expected.pullNumber}.`, targetUrl);
     throw new Error('The pull request changed while status was published.');
   }
@@ -687,13 +1060,9 @@ async function finalize() {
     getEnvironment('VALIDATION_RESULT'), getEnvironment('STATUS_TARGET_URL'));
 }
 
-async function invalidate() {
-  const client = createClient();
-  const activity = getEnvironment('SIGNAL_ACTIVITY');
-  const runId = getEnvironment('SIGNAL_RUN_ID');
-  const branch = getEnvironment('SIGNAL_HEAD_BRANCH');
-  const signalSha = getEnvironment('SIGNAL_HEAD_SHA');
-  const targetUrl = getEnvironment('STATUS_TARGET_URL');
+async function invalidateStatuses(client, {
+  activity, runId, branch, signalSha, targetUrl,
+}) {
   assert(['requested', 'completed'].includes(activity) &&
     /^[1-9][0-9]{0,19}$/.test(runId) && validRef(branch) &&
     shaPattern.test(signalSha) && targetUrl.startsWith('https://'),
@@ -712,27 +1081,25 @@ async function invalidate() {
   const currentBaseSha = ref.object.sha;
 
   const pulls = await listOpenPullRequests(client, branch);
-
-  for (const pull of pulls) {
-    let latest = null;
-    const context = statusContext(pull.number);
-    for (let page = 1; page <= maximumPages; page += 1) {
-      const statuses = await client.request('GET',
-        `repos/${client.repository}/commits/${pull.head.sha}/statuses` +
-        `?per_page=100&page=${page}`);
-      assert(Array.isArray(statuses) && statuses.length <= 100,
-        'Commit status response is invalid.');
-      latest = statuses.find((status) =>
-        status && status.context === context) ?? null;
-      if (latest || statuses.length < 100) break;
-      assert(page < maximumPages,
-        'Commit status pagination exceeded its bound.');
-    }
-    if (!requiresInvalidation(latest, currentBaseSha)) continue;
+  const latestStatuses = await readLatestStatuses(client, pulls);
+  const invalidations = pulls.filter((pull, index) =>
+    requiresInvalidation(latestStatuses[index], currentBaseSha));
+  assertCanMutate(client, invalidations.length);
+  for (const pull of invalidations) {
     await client.postStatus(pull.head.sha, pull.number, 'error',
       `Base advanced to ${currentBaseSha}; revalidate PR #${pull.number}.`,
       targetUrl);
   }
+}
+
+async function invalidate() {
+  await invalidateStatuses(createClient(), {
+    activity: getEnvironment('SIGNAL_ACTIVITY'),
+    runId: getEnvironment('SIGNAL_RUN_ID'),
+    branch: getEnvironment('SIGNAL_HEAD_BRANCH'),
+    signalSha: getEnvironment('SIGNAL_HEAD_SHA'),
+    targetUrl: getEnvironment('STATUS_TARGET_URL'),
+  });
 }
 
 async function main() {
