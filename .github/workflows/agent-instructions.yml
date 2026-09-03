@@ -270,6 +270,7 @@ jobs:
           fetch_depth=$((push_commit_count + 1))
           test "${fetch_depth}" -ge 1
           test "${fetch_depth}" -le 2048
+          comparison_ref_fetch_depth=2048
           authorization="$(printf 'x-access-token:%s' "${GITHUB_TOKEN}" |
             base64 -w 0)"
           set +e
@@ -381,6 +382,7 @@ jobs:
           done
 
           if test "${#fetch_arguments[@]}" -gt 0; then
+            fetch_depth="${comparison_ref_fetch_depth}"
             GIT_CONFIG_COUNT=1 \
               GIT_CONFIG_KEY_0="http.${GITHUB_SERVER_URL}/.extraheader" \
               GIT_CONFIG_VALUE_0="Authorization: Basic ${authorization}" \
