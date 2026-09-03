@@ -29,7 +29,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.0.20260902.9
+# Version: 1.0.20260902.10
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -854,7 +854,13 @@ function Assert-SemanticInvariant {
             'test "${fetched_destination}" = "${PUSH_AFTER_SHA}"',
             'git cat-file -e "${push_commit_id}^{commit}"',
             'git ls-remote --sort=refname --refs --heads --tags origin',
-            'cmp --silent "${raw_refs}" "${raw_refs_after}"'
+            'Initial remote ref snapshot output bounding failed.',
+            'Initial authenticated remote ref query failed.',
+            'Final remote ref snapshot output bounding failed.',
+            'Final remote ref evidence exceeded 1048576 bytes.',
+            'Final authenticated remote ref query failed.',
+            'cmp --silent "${raw_refs}" "${raw_refs_after}"',
+            'Remote ref evidence changed during authentication.'
         )
         foreach ($strRequiredLiteral in $arrRequiredLiteral) {
             if (-not $Text.Contains(
@@ -892,16 +898,18 @@ function Assert-SemanticInvariant {
 
     if ($Invariant -ceq 'current-base-status-helper-is-fail-closed') {
         foreach ($strRequiredLiteral in @(
-                'const maximumPages = 10;',
-                'const pullRequestPageSize = 100;',
-                'const maximumPullRequests = maximumPages * pullRequestPageSize;',
+                'const maximumPullRequests = 20;',
+                'const pullRequestPageSize = maximumPullRequests;',
+                'const statusContextBatchSize = 10;',
+                'const maximumApiRequests = 25;',
+                'const maximumOperationMilliseconds = 240000;',
+                'const requestTimeoutMilliseconds = 8000;',
                 'const maximumResponseBytes = 1048576;',
                 'const maximumRequestPathCharacters = 4096;',
                 'const openPullRequestsQuery = `query OpenPullRequests(',
                 '$owner: String!',
                 '$name: String!',
                 '$baseRefName: String!',
-                '$cursor: String',
                 '$pageSize: Int!',
                 'states: OPEN',
                 'baseRefName: $baseRefName',
@@ -910,6 +918,14 @@ function Assert-SemanticInvariant {
                 'nameWithOwner',
                 'headRefOid',
                 'pageInfo {',
+                'connection.nodes.length === connection.totalCount',
+                'connection.pageInfo.hasNextPage === false',
+                'Open pull request count exceeds the supported limit of',
+                'query: `query ExactStatusContexts(',
+                'latest: context(name: $context${index})',
+                'const requestBudget = createRequestBudget();',
+                'requestBudget.beginRequest();',
+                'assertCanMutate(client, invalidations.length);',
                 'Agent instruction current base/PR-${pullNumber}',
                 'latest.description === `Validated base ${currentBaseSha}.`',
                 'Both same-baseline pull requests must be invalidated.',
@@ -939,20 +955,32 @@ function Assert-SemanticInvariant {
                 'GraphQL pull request response is invalid.',
                 'GraphQL pull request connection is invalid.',
                 'GraphQL pull request response entry is invalid.',
-                'GraphQL pull request cardinality is invalid.',
-                'GraphQL pull request pagination exceeded its bound.',
-                'GraphQL query variables and cursor pagination must remain exact.',
+                'The complete one-page GraphQL query variables must remain exact.',
+                'A complete one-page read must have no cross-page churn dependency.',
+                'The disclosed one-page pull-request limit must be accepted.',
+                'The one-page pull-request limit plus one must fail closed.',
+                'A partial or paginated pull-request page must fail closed.',
                 'A malformed GraphQL connection must fail closed.',
                 'A duplicate GraphQL pull request must fail closed.',
-                'An excessive GraphQL pull request cardinality must fail closed.',
+                'Status reads must batch only exact PR-specific contexts.',
+                'GraphQL status-context response is invalid.',
+                'GraphQL status-context response entry is invalid.',
+                'A GraphQL status-context error must fail closed.',
+                'An exhausted global request budget must fail closed.',
+                'A slow request sequence must fail before its deadline is exhausted.',
                 'An oversized API response must fail closed.',
-                'Commit status pagination exceeded its bound.',
                 'Base advanced to ${currentBaseSha}; revalidate PR #${pull.number}.',
                 'The prerequisite writer must publish one pending exact-base status.',
                 'A base edit before prerequisite publication must fail closed.',
                 'A live prerequisite mismatch must not write a status.',
                 'A base advance after success publication must fail closed.',
                 'A finalization race must replace transient success with an error.',
+                'An old failure finalizer must preserve newer exact-base success.',
+                'An old success-path mismatch must preserve newer exact-base success.',
+                'An indeterminate freshness read must fail closed with an error status.',
+                'A stale status must not suppress a finalizer error.',
+                'The all-write one-page workload must fit its disclosed 25-request bound.',
+                'A PR count above the supported limit must fail before any write.',
                 "mode === 'start' ? start :",
                 'Expected start, finalize, or invalidate mode.'
             )) {
@@ -967,6 +995,12 @@ function Assert-SemanticInvariant {
                 $Text,
                 [regex]::Escape('if (!await readLiveState(client, expected))')
             ).Count -ne 2) {
+            throw "$Path does not satisfy semantic invariant $Invariant."
+        }
+        if ([regex]::Matches(
+                $Text,
+                [regex]::Escape('await publishFinalizerError(client, expected,')
+            ).Count -ne 3) {
             throw "$Path does not satisfy semantic invariant $Invariant."
         }
         return
