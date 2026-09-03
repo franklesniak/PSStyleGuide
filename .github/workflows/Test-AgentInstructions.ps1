@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260903.3
+# Version: 1.8.20260903.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -2165,8 +2165,8 @@ function Get-MarkdownParseContext {
     # .DESCRIPTION
     # Uses the repository-locked markdown-it package to identify code-block ranges,
     # prose blocks with operative code spans and link destinations, top-level
-    # blocks, table rows and cells, top-level list items, all headings, and
-    # level-two headings.
+    # blocks, table rows and cells, top-level list items, all top-level headings,
+    # and level-two headings.
     # It validates all parser output before returning it.
     #
     # .PARAMETER Content
@@ -2304,7 +2304,7 @@ function Get-MarkdownParseContext {
         '  return [{ range: token.map, text: context?.text ?? null, code: context?.code ?? [], links: context?.links ?? [] }];'
         '});'
         'const headings = tokens.flatMap((token, index) => {'
-        '  if (token.type !== "heading_open") return [];'
+        '  if (token.type !== "heading_open" || token.level !== 0) return [];'
         '  if (!/^h[1-6]$/.test(token.tag) || token.nesting !== 1 || !Array.isArray(token.map)) throw new Error("Invalid Markdown heading.");'
         '  const inlineToken = tokens[index + 1];'
         '  const closeToken = tokens[index + 2];'
@@ -2725,6 +2725,50 @@ function Assert-MarkdownParserExactContext {
         $objHeadingContext.LevelTwoHeadings.Count -ne 1 -or
         $objHeadingContext.LevelTwoHeadings[0].Text -cne 'Context') {
         throw "Self-test 'all Markdown headings context' changed output."
+    }
+
+    $strNestedHeadingMarkdown = @(
+        '## Context'
+        '> ### Decision Status'
+        '- Item'
+        '  #### Status'
+        '```markdown'
+        '##### Status'
+        '```'
+        '<!--'
+        '###### Decision Status'
+        '-->'
+        '##### Decision Status'
+    ) -join "`n"
+    $objNestedHeadingContext = Get-MarkdownParseContext `
+        -Content $strNestedHeadingMarkdown -LineCount 11
+    $strNestedHeadingActual = [pscustomobject]@{
+        CodeBlockRanges = $objNestedHeadingContext.CodeBlockRanges
+        Headings = $objNestedHeadingContext.Headings
+        LevelTwoHeadings = $objNestedHeadingContext.LevelTwoHeadings
+    } | ConvertTo-Json -Depth 5 -Compress
+    $strNestedHeadingExpected = '{"CodeBlockRanges":[' +
+        '{"Start":4,"End":7}],"Headings":[' +
+        '{"Tag":"h2","Start":0,"End":1,"Text":"Context"},' +
+        '{"Tag":"h5","Start":10,"End":11,"Text":"Decision Status"}],' +
+        '"LevelTwoHeadings":[{"Start":0,"End":1,"Text":"Context"}]}'
+    if ($strNestedHeadingActual -cne $strNestedHeadingExpected) {
+        throw "Self-test 'top-level Markdown headings context' changed output."
+    }
+
+    $strParserSource = [IO.File]::ReadAllText($PSCommandPath)
+    $strTopLevelHeadingGuard =
+        'if (token.type !== "heading_open" || token.level !== 0) return [];'
+    $strNestedHeadingMutation = $strParserSource.Replace(
+        $strTopLevelHeadingGuard,
+        'if (token.type !== "heading_open") return [];'
+    )
+    if ($strNestedHeadingMutation -ceq $strParserSource -or
+        $strNestedHeadingMutation.Contains(
+            $strTopLevelHeadingGuard,
+            [StringComparison]::Ordinal
+        )) {
+        throw 'The top-level heading collector mutation was not detected.'
     }
 }
 
@@ -5150,6 +5194,42 @@ function Get-DecisionLifecyclePolicyFailure {
     }
 }
 
+function Test-DecisionLifecycleStatusLabel {
+    # .SYNOPSIS
+    # Tests one normalized decision lifecycle label.
+    # .DESCRIPTION
+    # Returns true only for Status or Decision Status after trimming and
+    # collapsing whitespace. Comparison is case-insensitive.
+    # .PARAMETER Label
+    # The heading or field label to test.
+    # .EXAMPLE
+    # Test-DecisionLifecycleStatusLabel -Label 'Decision Status'
+    #
+    # # Returns true.
+    # .INPUTS
+    # None. No pipeline input.
+    # .OUTPUTS
+    # [bool] True only for one exact supported lifecycle label.
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260903.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)]
+        [AllowEmptyString()]
+        [string] $Label
+    )
+
+    $strNormalizedLabel = [regex]::Replace($Label.Trim(), '\s+', ' ')
+    return (
+        $strNormalizedLabel -ieq 'Status' -or
+        $strNormalizedLabel -ieq 'Decision Status'
+    )
+}
+
 function Get-DecisionRecordLifecycleFailure {
     # .SYNOPSIS
     # Finds lifecycle representation failures in one decision record.
@@ -5217,15 +5297,23 @@ function Get-DecisionRecordLifecycleFailure {
             Where-Object {
                 $_.Tag -cne 'h1' -and
                 $_.Start -ne $objMetadataHeading.Start -and
-                $_.Text -match '(?i)\bStatus\b'
+                (Test-DecisionLifecycleStatusLabel -Label $_.Text)
             }).Count -ne 0) {
         Write-Output "$Name must not contain a separate operative Status section."
     }
     if (@($objMarkdownContext.ProseBlocks |
             Where-Object {
-                ($_.Start -le $objMetadataHeading.Start -or
-                    $_.Start -ge $intMetadataSectionEnd) -and
-                $_.Text -match '(?i)^[^:\r\n]*\bStatus\b\s*:\s*\S'
+                $boolOutsideMetadata =
+                    $_.Start -le $objMetadataHeading.Start -or
+                    $_.Start -ge $intMetadataSectionEnd
+                $objFieldMatch = [regex]::Match(
+                    $_.Text,
+                    '^\s*(?<Label>[^:\r\n]+?)\s*:\s*\S'
+                )
+                $boolOutsideMetadata -and
+                    $objFieldMatch.Success -and
+                    (Test-DecisionLifecycleStatusLabel `
+                        -Label $objFieldMatch.Groups['Label'].Value)
             }).Count -ne 0) {
         Write-Output (
             "$Name must not contain a separate operative Status field outside Metadata."
@@ -5241,18 +5329,14 @@ function Get-DecisionRecordLifecycleFailure {
                     $_.Cells.Count -eq 2 -and
                     $_.Cells[0].Tag -ceq 'td' -and
                     $_.Cells[1].Tag -ceq 'td') {
-                    $strLabel = [regex]::Replace(
-                        $_.Cells[0].Text.Trim(),
-                        '\s+',
-                        ' '
-                    )
                     $strValue = [regex]::Replace(
                         $_.Cells[1].Text.Trim(),
                         '\s+',
                         ' '
                     )
                     $boolHasStatusField =
-                        $strLabel -match '(?i)^(?:Decision\s+)?Status$' -and
+                        (Test-DecisionLifecycleStatusLabel `
+                            -Label $_.Cells[0].Text) -and
                         -not [string]::IsNullOrWhiteSpace($strValue)
                 }
                 $boolHasStatusField
@@ -7664,7 +7748,7 @@ if ($SelfTest) {
                 }
                 if ([regex]::Matches(
                         $strFunctionNotes,
-                        '(?m)^Version: 1\.0\.(?:202608(?:30|31)|20260902)\.0\.$'
+                        '(?m)^Version: 1\.0\.(?:202608(?:30|31)|2026090(?:2|3))\.0\.$'
                     ).Count -ne 1) {
                     $listMissingHelp.Add('landing or repair helper Version')
                 }
@@ -7699,7 +7783,7 @@ if ($SelfTest) {
             [pscustomobject]@{
                 Source = $strValidatorSource
                 Path = '.github/workflows/Test-AgentInstructions.ps1'
-                ExpectedFunctionCount = 58
+                ExpectedFunctionCount = 59
             },
             [pscustomobject]@{
                 Source = $strTrustRootAuthorizationSource
@@ -7775,9 +7859,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260903\.3$'
+            '(?m)^# Version: 1\.8\.20260903\.0$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.7.20260903.3.'
+        throw 'The validator script version is not 1.8.20260903.0.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
@@ -7975,6 +8059,22 @@ if ($SelfTest) {
             -BaselineContent $strLegacyDecisionRecord).Count -ne 0) {
         throw 'A changed ADR with one valid lifecycle Status did not pass.'
     }
+    foreach ($strAcceptedStatusLabel in @(
+            'Status', 'status', 'Decision Status', " Decision`tStatus "
+        )) {
+        if (-not (Test-DecisionLifecycleStatusLabel `
+                -Label $strAcceptedStatusLabel)) {
+            throw "Exact lifecycle label was rejected: $strAcceptedStatusLabel"
+        }
+    }
+    foreach ($strRejectedStatusLabel in @(
+            '', 'HTTP Status Codes', 'Deployment Status',
+            'Deployment Status Checks', 'Status Check'
+        )) {
+        if (Test-DecisionLifecycleStatusLabel -Label $strRejectedStatusLabel) {
+            throw "Unrelated lifecycle label was accepted: $strRejectedStatusLabel"
+        }
+    }
     $strDecisionStatusSectionRecord = $strCompliantDecisionRecord.Replace(
         "## Context`n",
         "## Decision Status`nAccepted.`n## Context`n"
@@ -8023,7 +8123,29 @@ if ($SelfTest) {
             throw "$($objStatusSectionFixture.Name) escaped lifecycle validation."
         }
     }
+    foreach ($strUnrelatedStatusHeading in @(
+            '### HTTP Status Codes', '#### Deployment Status Checks'
+        )) {
+        $strUnrelatedStatusHeadingRecord = $strCompliantDecisionRecord.Replace(
+            'Changed legacy context.',
+            "Changed legacy context.`n$strUnrelatedStatusHeading`nNo lifecycle field."
+        )
+        if (@(Get-DecisionRecordLifecycleFailure `
+                -Name 'docs/decisions/0001-legacy.md' `
+                -CurrentContent $strUnrelatedStatusHeadingRecord `
+                -BaselineContent $strLegacyDecisionRecord).Count -ne 0) {
+            throw "Unrelated heading caused a lifecycle finding: $strUnrelatedStatusHeading"
+        }
+    }
     $arrNonOperativeStatusHeadingFixtures = @(
+        [pscustomobject]@{
+            Name = 'quoted level-three Status heading'
+            Payload = '> ### Decision Status'
+        },
+        [pscustomobject]@{
+            Name = 'listed level-four Status heading'
+            Payload = "- Example`n  #### Status"
+        },
         [pscustomobject]@{
             Name = 'fenced level-three Status heading example'
             Payload = @(
@@ -8072,6 +8194,18 @@ if ($SelfTest) {
         ('docs/decisions/0001-legacy.md must not contain a separate operative ' +
             'Status field outside Metadata.')) {
         throw 'A Decision Status field escaped lifecycle validation.'
+    }
+    $strStatusFieldRecord = $strCompliantDecisionRecord.Replace(
+        'Changed legacy context.',
+        'Status: Accepted'
+    )
+    if (@(Get-DecisionRecordLifecycleFailure `
+            -Name 'docs/decisions/0001-legacy.md' `
+            -CurrentContent $strStatusFieldRecord `
+            -BaselineContent $strLegacyDecisionRecord) -cnotcontains
+        ('docs/decisions/0001-legacy.md must not contain a separate operative ' +
+            'Status field outside Metadata.')) {
+        throw 'A Status prose field escaped lifecycle validation.'
     }
     $arrTableStatusFailureFixtures = @(
         [pscustomobject]@{
@@ -8184,6 +8318,18 @@ if ($SelfTest) {
             )
         },
         [pscustomobject]@{
+            Name = 'unrelated exact two-cell Deployment Status data row'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '| Field | Value |'
+                        '| --- | --- |'
+                        '| Deployment Status | healthy |'
+                    ) -join "`n")
+            )
+        },
+        [pscustomobject]@{
             Name = 'empty Status table value'
             Content = $strCompliantDecisionRecord.Replace(
                 'Changed legacy context.',
@@ -8213,6 +8359,20 @@ if ($SelfTest) {
             -CurrentContent $strDecisionStatusProseRecord `
             -BaselineContent $strLegacyDecisionRecord).Count -ne 0) {
         throw 'Ordinary decision status prose was rejected as a second representation.'
+    }
+    foreach ($strUnrelatedStatusField in @(
+            'Deployment Status: healthy', 'HTTP Status Codes: 200 and 204'
+        )) {
+        $strUnrelatedStatusFieldRecord = $strCompliantDecisionRecord.Replace(
+            'Changed legacy context.',
+            $strUnrelatedStatusField
+        )
+        if (@(Get-DecisionRecordLifecycleFailure `
+                -Name 'docs/decisions/0001-legacy.md' `
+                -CurrentContent $strUnrelatedStatusFieldRecord `
+                -BaselineContent $strLegacyDecisionRecord).Count -ne 0) {
+            throw "Unrelated prose field caused a lifecycle finding: $strUnrelatedStatusField"
+        }
     }
     if (@(Get-DecisionRecordLifecycleFailure `
             -Name 'docs/decisions/0003-new.md' `
@@ -10099,6 +10259,12 @@ if ($SelfTest) {
         )
     )
     $strValidatorSourceContent = [IO.File]::ReadAllText($PSCommandPath)
+    $strParserManifestValidationCall =
+        'node .github/workflows/Test-AgentInstructionParserManifest.mjs'
+    $strLockedDependencyInstallCall =
+        'npm ci --ignore-scripts --no-audit --fund=false'
+    $strTrustRootAuthorizationCall =
+        '& ./.github/workflows/Test-TrustRootAuthorization.ps1'
     $scriptBlockGetFixtureCloneSourceFailure = {
         param([Parameter(Mandatory)][string] $Content)
 
@@ -10489,6 +10655,26 @@ if ($SelfTest) {
                 'Remote ref evidence must be parsed and sorted by ordinal ref name.'
             )
         }
+        $intParserManifestValidation = $Content.IndexOf(
+            $strParserManifestValidationCall,
+            [StringComparison]::Ordinal
+        )
+        $intLockedDependencyInstall = $Content.IndexOf(
+            $strLockedDependencyInstallCall,
+            [StringComparison]::Ordinal
+        )
+        $intTrustRootAuthorization = $Content.IndexOf(
+            $strTrustRootAuthorizationCall,
+            [StringComparison]::Ordinal
+        )
+        if ($intParserManifestValidation -lt 0 -or
+            $intLockedDependencyInstall -le $intParserManifestValidation -or
+            $intTrustRootAuthorization -le $intLockedDependencyInstall) {
+            $listFailures.Add(
+                'The executable parser closure must be validated before its ' +
+                    'trusted installation and privileged trust-root use.'
+            )
+        }
         foreach ($strForbiddenTransitionLiteral in @(
                 'PR_PREVIOUS_HEAD_SHA', 'refs/remotes/event/pr-previous-head',
                 'AGENT_INSTRUCTION_NEW_REF_COMMITS_JSON',
@@ -10673,6 +10859,26 @@ if ($SelfTest) {
             'Agent workflow contract failed: ' +
             ($arrAgentWorkflowFailures -join '; ')
         )
+    }
+    $strUnsafeParserOrderMutation = $strAgentWorkflowContent.Replace(
+        $strParserManifestValidationCall,
+        '__PARSER_MANIFEST_VALIDATION_CALL__'
+    ).Replace(
+        $strTrustRootAuthorizationCall,
+        $strParserManifestValidationCall
+    ).Replace(
+        '__PARSER_MANIFEST_VALIDATION_CALL__',
+        $strTrustRootAuthorizationCall
+    )
+    $arrUnsafeParserOrderFailures = @(
+        & $scriptBlockGetAgentWorkflowFailure `
+            -Content $strUnsafeParserOrderMutation
+    )
+    if ($strUnsafeParserOrderMutation -ceq $strAgentWorkflowContent -or
+        $arrUnsafeParserOrderFailures -cnotcontains
+            ('The executable parser closure must be validated before its ' +
+                'trusted installation and privileged trust-root use.')) {
+        throw 'An unsafe executable parser validation order did not fail closed.'
     }
 
     $strCreatedRefDepthSystemTempRoot =
