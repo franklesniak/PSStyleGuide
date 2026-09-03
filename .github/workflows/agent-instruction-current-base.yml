@@ -16,6 +16,7 @@ jobs:
     if: github.event.workflow_run.event == 'push'
     concurrency:
       group: agent-instruction-current-base-status
+      queue: max
       cancel-in-progress: false
     runs-on: ubuntu-24.04
     timeout-minutes: 5

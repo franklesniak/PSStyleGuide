@@ -16,12 +16,64 @@ permissions:
   contents: read
 
 jobs:
+  mark-current-base-pending:
+    name: Mark current-base validation pending
+    if: >-
+      github.event_name == 'pull_request_target' &&
+      (github.event.action != 'edited' ||
+      github.event.changes.base.ref.from != '')
+    concurrency:
+      group: agent-instruction-current-base-status
+      queue: max
+      cancel-in-progress: false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+      statuses: write
+    steps:
+      - name: Check out trusted current-base helper
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ github.sha }}
+          token: ${{ github.token }}
+          persist-credentials: false
+          clean: true
+          fetch-depth: 1
+          fetch-tags: false
+          show-progress: true
+          lfs: false
+          submodules: false
+          set-safe-directory: true
+          allow-unsafe-pr-checkout: false
+
+      - name: Authenticate live base and head before marking pending
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          EXPECTED_REPOSITORY: ${{ github.repository }}
+          EXPECTED_PULL_NUMBER: ${{ github.event.pull_request.number }}
+          EXPECTED_BASE_REF: ${{ github.event.pull_request.base.ref }}
+          EXPECTED_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          EXPECTED_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          STATUS_TARGET_URL: >-
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{
+              github.run_id }}
+        run: >-
+          node .github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs
+          start
+
   validate-agent-instructions:
     name: Validate agent instructions
+    needs:
+      - mark-current-base-pending
     if: >-
-      github.event_name != 'pull_request_target' ||
-      github.event.action != 'edited' ||
-      github.event.changes.base.ref.from != ''
+      always() &&
+      (github.event_name != 'pull_request_target' ||
+      ((github.event.action != 'edited' ||
+      github.event.changes.base.ref.from != '') &&
+      needs.mark-current-base-pending.result == 'success'))
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -224,7 +276,7 @@ jobs:
           GIT_CONFIG_COUNT=1 \
             GIT_CONFIG_KEY_0="http.${GITHUB_SERVER_URL}/.extraheader" \
             GIT_CONFIG_VALUE_0="Authorization: Basic ${authorization}" \
-            timeout 30s git ls-remote --refs --heads --tags origin |
+            timeout 30s git ls-remote --sort=refname --refs --heads --tags origin |
             head -c 1048577 >"${raw_refs}"
           pipeline_status=("${PIPESTATUS[@]}")
           set -e
@@ -334,7 +386,7 @@ jobs:
           GIT_CONFIG_COUNT=1 \
             GIT_CONFIG_KEY_0="http.${GITHUB_SERVER_URL}/.extraheader" \
             GIT_CONFIG_VALUE_0="Authorization: Basic ${authorization}" \
-            timeout 30s git ls-remote --refs --heads --tags origin |
+            timeout 30s git ls-remote --sort=refname --refs --heads --tags origin |
             head -c 1048577 >"${raw_refs_after}"
           pipeline_status=("${PIPESTATUS[@]}")
           set -e
@@ -543,13 +595,16 @@ jobs:
   publish-current-base-status:
     name: Publish current-base status
     needs:
+      - mark-current-base-pending
       - validate-agent-instructions
     if: >-
       always() && github.event_name == 'pull_request_target' &&
       (github.event.action != 'edited' ||
-      github.event.changes.base.ref.from != '')
+      github.event.changes.base.ref.from != '') &&
+      needs.mark-current-base-pending.result == 'success'
     concurrency:
       group: agent-instruction-current-base-status
+      queue: max
       cancel-in-progress: false
     runs-on: ubuntu-24.04
     timeout-minutes: 5

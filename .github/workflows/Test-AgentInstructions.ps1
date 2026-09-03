@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260902.11
+# Version: 1.7.20260902.12
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -7705,9 +7705,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260902\.11$'
+            '(?m)^# Version: 1\.7\.20260902\.12$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.7.20260902.11.'
+        throw 'The validator script version is not 1.7.20260902.12.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
@@ -8283,9 +8283,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strTrustRootAuthorizationSource,
-            '(?m)^# Version: 1\.0\.20260902\.8$'
+            '(?m)^# Version: 1\.0\.20260902\.9$'
         ).Count -ne 1) {
-        throw 'The trust-root authorization script lacks version 1.0.20260902.8.'
+        throw 'The trust-root authorization script lacks version 1.0.20260902.9.'
     }
     & (Join-Path $strRepositoryRootPath $strTrustRootAuthorizationPath) `
         -RepositoryRootPath $strRepositoryRootPath `
@@ -9795,6 +9795,12 @@ if ($SelfTest) {
     $strAgentWorkflowContent = [IO.File]::ReadAllText(
         [IO.Path]::Combine($PSScriptRoot, 'agent-instructions.yml')
     )
+    $strCurrentBaseWorkflowContent = [IO.File]::ReadAllText(
+        [IO.Path]::Combine(
+            $PSScriptRoot,
+            'agent-instruction-current-base.yml'
+        )
+    )
     $strValidatorSourceContent = [IO.File]::ReadAllText($PSCommandPath)
     $scriptBlockGetFixtureCloneSourceFailure = {
         param([Parameter(Mandatory)][string] $Content)
@@ -9978,7 +9984,7 @@ if ($SelfTest) {
                 'refs/remotes/event/pr-head',
                 'id: created-push-boundary',
                 'PUSH_COMMIT_EVIDENCE: ${{ toJson(github.event.commits) }}',
-                'git ls-remote --refs --heads --tags origin',
+                'git ls-remote --sort=refname --refs --heads --tags origin',
                 'const evidence = process.env.PUSH_COMMIT_EVIDENCE;',
                 'Buffer.byteLength(evidence, "utf8") > 1048576',
                 'commits = JSON.parse(evidence);',
@@ -10024,18 +10030,26 @@ if ($SelfTest) {
                 "github.event.changes.base.ref.from != ''",
                 'AGENT_INSTRUCTION_PULL_REQUEST_BASE_CHANGED:',
                 '-PullRequestBaseChanged $env:AGENT_INSTRUCTION_PULL_REQUEST_BASE_CHANGED',
+                'mark-current-base-pending:',
+                'name: Mark current-base validation pending',
+                '      - mark-current-base-pending',
+                "needs.mark-current-base-pending.result == 'success'",
                 'publish-current-base-status:',
                 'needs:',
                 '      - validate-agent-instructions',
                 'always() && github.event_name == ''pull_request_target'' &&',
                 'group: agent-instruction-current-base-status',
+                'queue: max',
+                'cancel-in-progress: false',
                 '      contents: read',
                 '      pull-requests: read',
                 '      statuses: write',
+                'Authenticate live base and head before marking pending',
                 'VALIDATION_RESULT: ${{ needs.validate-agent-instructions.result }}',
                 'ref: ${{ github.sha }}',
                 'persist-credentials: false',
                 'node .github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs',
+                'start',
                 'finalize',
                 'test "${fetched_base}" = "${PUSH_BASE_SHA}"',
                 'test "${fetched_head}" = "${PR_HEAD_SHA}"',
@@ -10067,6 +10081,24 @@ if ($SelfTest) {
             ).Count -ne 2) {
             $listFailures.Add(
                 'Both created-ref history fetches must use the exact bounded depth.'
+            )
+        }
+        $strSortedRemoteSnapshotLiteral =
+            'git ls-remote --sort=refname --refs --heads --tags origin'
+        if ([regex]::Matches(
+                $Content,
+                [regex]::Escape($strSortedRemoteSnapshotLiteral)
+            ).Count -ne 2 -or
+            [regex]::Matches(
+                $Content,
+                '(?m)git ls-remote[^\r\n|]*origin'
+            ).Count -ne 2 -or
+            $Content.Contains(
+                'git ls-remote --refs --heads --tags origin',
+                [StringComparison]::Ordinal
+            )) {
+            $listFailures.Add(
+                'Both remote snapshots must use exactly the sorted ls-remote form.'
             )
         }
         if ($Content -cmatch '(?m)(^|\s)--force(\s|$)' -or
@@ -10111,31 +10143,57 @@ if ($SelfTest) {
         if ([regex]::Matches(
                 $Content,
                 '(?m)^      statuses: write$'
-            ).Count -ne 1) {
+            ).Count -ne 2) {
             $listFailures.Add(
-                'Only the current-base status job may receive status write permission.'
+                'Only the two current-base status jobs may receive status write permission.'
             )
         }
-        $objStatusJobMatch = [regex]::Match(
+        $objPendingStatusJobMatch = [regex]::Match(
+            $Content,
+            '(?ms)^  mark-current-base-pending:\r?\n' +
+                '(?<Body>.*?)(?=^  validate-agent-instructions:)'
+        )
+        $objFinalStatusJobMatch = [regex]::Match(
             $Content,
             '(?ms)^  publish-current-base-status:\r?\n(?<Body>.*)\z'
         )
-        if (-not $objStatusJobMatch.Success -or
-            [regex]::Matches(
-                $objStatusJobMatch.Groups['Body'].Value,
-                '(?m)^\s+uses: ' +
-                    'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1'
-            ).Count -ne 1 -or
-            $objStatusJobMatch.Groups['Body'].Value.Contains(
-                'contents: write',
-                [StringComparison]::Ordinal
-            ) -or
-            $objStatusJobMatch.Groups['Body'].Value.Contains(
-                'pull-requests: write',
-                [StringComparison]::Ordinal
+        foreach ($objStatusJobMatch in @(
+                $objPendingStatusJobMatch,
+                $objFinalStatusJobMatch
             )) {
+            if (-not $objStatusJobMatch.Success -or
+                [regex]::Matches(
+                    $objStatusJobMatch.Groups['Body'].Value,
+                    '(?m)^\s+uses: ' +
+                        'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1'
+                ).Count -ne 1 -or
+                $objStatusJobMatch.Groups['Body'].Value.Contains(
+                    'contents: write',
+                    [StringComparison]::Ordinal
+                ) -or
+                $objStatusJobMatch.Groups['Body'].Value.Contains(
+                    'pull-requests: write',
+                    [StringComparison]::Ordinal
+                )) {
+                $listFailures.Add(
+                    'A current-base status writer exceeds its trusted job boundary.'
+                )
+            }
+        }
+        if ([regex]::Matches(
+                $Content,
+                '(?m)^      group: agent-instruction-current-base-status\r?$'
+            ).Count -ne 2 -or
+            [regex]::Matches(
+                $Content,
+                '(?m)^      queue: max\r?$'
+            ).Count -ne 2 -or
+            [regex]::Matches(
+                $Content,
+                '(?m)^      cancel-in-progress: false\r?$'
+            ).Count -ne 2) {
             $listFailures.Add(
-                'The current-base status writer exceeds its trusted job boundary.'
+                'Both current-base status writers must use the bounded shared queue.'
             )
         }
 
@@ -10181,6 +10239,72 @@ if ($SelfTest) {
             'Agent workflow contract failed: ' +
             ($arrAgentWorkflowFailures -join '; ')
         )
+    }
+    $scriptBlockGetCurrentBaseWorkflowFailure = {
+        param([Parameter(Mandatory)][string] $Content)
+
+        $listFailures = [Collections.Generic.List[string]]::new()
+        $strInvalidatorPattern =
+            '(?s)^(?!.*pull_request_target:)(?!.*contents: write)' +
+            '(?!.*pull-requests: write).*?workflow_run:.*?requested.*?' +
+            "completed.*?workflow_run\.event == 'push'.*?" +
+            'group: agent-instruction-current-base-status.*?queue: max.*?' +
+            'cancel-in-progress: false.*?actions: read.*?contents: read.*?' +
+            'pull-requests: read.*?statuses: write.*?' +
+            'ref: \$\{\{ github\.sha \}\}.*?persist-credentials: false.*?' +
+            'SIGNAL_ACTIVITY: \$\{\{ github\.event\.action \}\}.*?' +
+            'Set-AgentInstructionCurrentBaseStatus\.mjs\s+invalidate'
+        if ($Content -cnotmatch $strInvalidatorPattern -or
+            [regex]::Matches(
+                $Content,
+                '(?m)^      (?:group: agent-instruction-current-base-status|' +
+                    'queue: max|cancel-in-progress: false)\r?$'
+            ).Count -ne 3) {
+            $listFailures.Add(
+                'The current-base invalidator must use the bounded shared queue.'
+            )
+        }
+        return $listFailures.ToArray()
+    }
+    $arrCurrentBaseWorkflowFailures = @(
+        & $scriptBlockGetCurrentBaseWorkflowFailure `
+            -Content $strCurrentBaseWorkflowContent
+    )
+    if ($arrCurrentBaseWorkflowFailures.Count -ne 0) {
+        throw (
+            'Current-base invalidator workflow contract failed: ' +
+            ($arrCurrentBaseWorkflowFailures -join '; ')
+        )
+    }
+    foreach ($objInvalidatorMutation in @(
+            [pscustomobject]@{
+                Name = 'single pending invalidator queue'
+                Content = $strCurrentBaseWorkflowContent.Replace(
+                    'queue: max',
+                    'queue: single'
+                )
+                Expected = 'The current-base invalidator must use the bounded shared queue.'
+            },
+            [pscustomobject]@{
+                Name = 'cancelling invalidator queue'
+                Content = $strCurrentBaseWorkflowContent.Replace(
+                    'cancel-in-progress: false',
+                    'cancel-in-progress: true'
+                )
+                Expected = 'The current-base invalidator must use the bounded shared queue.'
+            }
+        )) {
+        if ($objInvalidatorMutation.Content -ceq $strCurrentBaseWorkflowContent) {
+            throw "Invalidator mutation changed zero bytes: $($objInvalidatorMutation.Name)"
+        }
+        $arrInvalidatorMutationFailures = @(
+            & $scriptBlockGetCurrentBaseWorkflowFailure `
+                -Content $objInvalidatorMutation.Content
+        )
+        if ($arrInvalidatorMutationFailures -cnotcontains
+            $objInvalidatorMutation.Expected) {
+            throw "Invalidator workflow mutation passed: $($objInvalidatorMutation.Name)"
+        }
     }
     & node ([IO.Path]::Combine(
             $PSScriptRoot,
@@ -10243,6 +10367,41 @@ if ($SelfTest) {
         'timeout 60s git fetch --no-tags'
     )
     $arrWorkflowMutations = @(
+        [pscustomobject]@{
+            Name = 'unsorted remote ref snapshots'
+            Content = $strAgentWorkflowContent.Replace(
+                'git ls-remote --sort=refname --refs --heads --tags origin',
+                'git ls-remote --refs --heads --tags origin'
+            )
+            Expected =
+                'Both remote snapshots must use exactly the sorted ls-remote form.'
+        },
+        [pscustomobject]@{
+            Name = 'single pending status-writer queue'
+            Content = $strAgentWorkflowContent.Replace(
+                'queue: max',
+                'queue: single'
+            )
+            Expected =
+                'Both current-base status writers must use the bounded shared queue.'
+        },
+        [pscustomobject]@{
+            Name = 'cancelling status-writer queue'
+            Content = $strAgentWorkflowContent.Replace(
+                'cancel-in-progress: false',
+                'cancel-in-progress: true'
+            )
+            Expected =
+                'Both current-base status writers must use the bounded shared queue.'
+        },
+        [pscustomobject]@{
+            Name = 'validation bypasses pending prerequisite'
+            Content = $strAgentWorkflowContent.Replace(
+                "needs.mark-current-base-pending.result == 'success'",
+                'true'
+            )
+            Expected = 'Workflow contract literal is missing: needs.mark-current-base-pending.result'
+        },
         [pscustomobject]@{
             Name = 'push path filter'
             Content = $strAgentWorkflowContent.Replace(

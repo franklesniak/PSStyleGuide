@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 
 import https from 'node:https';
+import { TextDecoder } from 'node:util';
 
 const maximumPages = 10;
+const pullRequestPageSize = 100;
+const maximumPullRequests = maximumPages * pullRequestPageSize;
 const maximumResponseBytes = 1048576;
 const maximumRequestPathCharacters = 4096;
 const shaPattern = /^[0-9a-f]{40}$/;
@@ -15,9 +18,46 @@ const workflowRunStatuses = new Set([
   'requested',
   'waiting',
 ]);
+const openPullRequestsQuery = `query OpenPullRequests(
+  $owner: String!
+  $name: String!
+  $baseRefName: String!
+  $cursor: String
+  $pageSize: Int!
+) {
+  repository(owner: $owner, name: $name) {
+    pullRequests(
+      first: $pageSize
+      after: $cursor
+      states: OPEN
+      baseRefName: $baseRefName
+      orderBy: {field: CREATED_AT, direction: ASC}
+    ) {
+      totalCount
+      nodes {
+        number
+        state
+        baseRefName
+        baseRepository {
+          nameWithOwner
+        }
+        headRefOid
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+}`;
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
+}
+
+function isRecord(value) {
+  return value !== null && typeof value === 'object' &&
+    !Array.isArray(value);
 }
 
 function statusContext(pullNumber) {
@@ -94,7 +134,127 @@ function resolveApiRequestUrl(apiRoot, relativePath) {
   return resolved;
 }
 
-function runSelfTest() {
+function normalizeGraphqlApiRoot(value) {
+  let endpoint;
+  try {
+    endpoint = new URL(value);
+  } catch {
+    throw new Error('GitHub GraphQL API identity is invalid.');
+  }
+  assert(endpoint.protocol === 'https:' && endpoint.username === '' &&
+    endpoint.password === '' && endpoint.search === '' &&
+    endpoint.hash === '' && endpoint.pathname.endsWith('/graphql'),
+  'GitHub GraphQL API identity is invalid.');
+  const root = normalizeApiRoot(new URL('.', endpoint).href);
+  assert(resolveApiRequestUrl(root, 'graphql').href === endpoint.href,
+    'GitHub GraphQL API identity is invalid.');
+  return root;
+}
+
+function decodeApiResponse(statusCode, body, allowNotFound = false) {
+  assert(Buffer.isBuffer(body) && body.length <= maximumResponseBytes,
+    'GitHub API response is oversized.');
+  if (allowNotFound && statusCode === 404) return null;
+  assert(Number.isInteger(statusCode) && statusCode >= 200 && statusCode < 300,
+    `GitHub API returned ${statusCode}.`);
+  if (body.length === 0) return null;
+  try {
+    return JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(body));
+  } catch {
+    throw new Error('GitHub API returned malformed JSON.');
+  }
+}
+
+function parsePullRequestPage(result, expected, seenPulls, expectedTotalCount) {
+  assert(isRecord(result) && !Object.hasOwn(result, 'errors') &&
+    isRecord(result.data) && isRecord(result.data.repository) &&
+    isRecord(result.data.repository.pullRequests),
+  'GraphQL pull request response is invalid.');
+  const connection = result.data.repository.pullRequests;
+  assert(Number.isInteger(connection.totalCount) &&
+    connection.totalCount >= 0 &&
+    connection.totalCount <= maximumPullRequests &&
+    (expectedTotalCount === null ||
+      connection.totalCount === expectedTotalCount) &&
+    Array.isArray(connection.nodes) &&
+    connection.nodes.length <= pullRequestPageSize &&
+    isRecord(connection.pageInfo) &&
+    typeof connection.pageInfo.hasNextPage === 'boolean' &&
+    (connection.pageInfo.endCursor === null ||
+      (typeof connection.pageInfo.endCursor === 'string' &&
+        connection.pageInfo.endCursor.length >= 1 &&
+        connection.pageInfo.endCursor.length <= 1024)),
+  'GraphQL pull request connection is invalid.');
+  const pulls = [];
+  for (const pull of connection.nodes) {
+    assert(isRecord(pull) && Number.isInteger(pull.number) &&
+      pull.number >= 1 && !seenPulls.has(pull.number) &&
+      pull.state === 'OPEN' && pull.baseRefName === expected.branch &&
+      isRecord(pull.baseRepository) &&
+      pull.baseRepository.nameWithOwner === expected.repository &&
+      shaPattern.test(pull.headRefOid),
+    'GraphQL pull request response entry is invalid.');
+    seenPulls.add(pull.number);
+    pulls.push({ number: pull.number, head: { sha: pull.headRefOid } });
+  }
+  return {
+    pulls,
+    totalCount: connection.totalCount,
+    hasNextPage: connection.pageInfo.hasNextPage,
+    endCursor: connection.pageInfo.endCursor,
+  };
+}
+
+async function listOpenPullRequests(client, branch) {
+  const [owner, name] = client.repository.split('/');
+  const pulls = [];
+  const seenPulls = new Set();
+  const seenCursors = new Set();
+  let cursor = null;
+  let expectedTotalCount = null;
+  for (let page = 1; page <= maximumPages; page += 1) {
+    const result = await client.graphql({
+      query: openPullRequestsQuery,
+      variables: {
+        owner,
+        name,
+        baseRefName: branch,
+        cursor,
+        pageSize: pullRequestPageSize,
+      },
+    });
+    const parsed = parsePullRequestPage(result,
+      { repository: client.repository, branch }, seenPulls,
+      expectedTotalCount);
+    expectedTotalCount ??= parsed.totalCount;
+    pulls.push(...parsed.pulls);
+    assert(pulls.length <= expectedTotalCount,
+      'GraphQL pull request cardinality is invalid.');
+    if (!parsed.hasNextPage) {
+      assert(pulls.length === expectedTotalCount,
+        'GraphQL pull request cardinality is invalid.');
+      return pulls;
+    }
+    assert(page < maximumPages && pulls.length < expectedTotalCount &&
+      parsed.endCursor !== null && !seenCursors.has(parsed.endCursor),
+    'GraphQL pull request pagination exceeded its bound.');
+    seenCursors.add(parsed.endCursor);
+    cursor = parsed.endCursor;
+  }
+  throw new Error('GraphQL pull request pagination exceeded its bound.');
+}
+
+async function expectRejected(operation, expectedMessage, failureMessage) {
+  let rejected = false;
+  try {
+    await operation();
+  } catch (error) {
+    rejected = error.message === expectedMessage;
+  }
+  assert(rejected, failureMessage);
+}
+
+async function runSelfTest() {
   const baselineSha = '1'.repeat(40);
   const advancedSha = '2'.repeat(40);
   const staleStatus = {
@@ -196,6 +356,176 @@ function runSelfTest() {
     rejectedAbsolute = error.message === 'GitHub API request path is invalid.';
   }
   assert(rejectedAbsolute, 'An absolute URL must fail API request validation.');
+
+  const githubGraphqlRoot = normalizeGraphqlApiRoot(
+    'https://api.github.com/graphql');
+  assert(resolveApiRequestUrl(githubGraphqlRoot, 'graphql').href ===
+    'https://api.github.com/graphql',
+  'A GitHub.com GraphQL request must resolve relative to its API root.');
+  const enterpriseGraphqlRoot = normalizeGraphqlApiRoot(
+    'https://github.example/api/graphql');
+  assert(resolveApiRequestUrl(enterpriseGraphqlRoot, 'graphql').href ===
+    'https://github.example/api/graphql',
+  'A GHES GraphQL request must resolve relative to its API root.');
+  assert(openPullRequestsQuery.includes('pullRequests(') &&
+    openPullRequestsQuery.includes('baseRefName: $baseRefName') &&
+    openPullRequestsQuery.includes('states: OPEN') &&
+    openPullRequestsQuery.includes('number') &&
+    openPullRequestsQuery.includes('state') &&
+    openPullRequestsQuery.includes('baseRepository') &&
+    openPullRequestsQuery.includes('nameWithOwner') &&
+    openPullRequestsQuery.includes('headRefOid') &&
+    openPullRequestsQuery.includes('pageInfo') &&
+    !/\bbody(?:HTML|Text)?\b/.test(openPullRequestsQuery),
+  'The open-pull-request query must project only bounded helper fields.');
+
+  const firstPull = {
+    number: 101,
+    state: 'OPEN',
+    baseRefName: 'main',
+    baseRepository: { nameWithOwner: 'owner/repository' },
+    headRefOid: '3'.repeat(40),
+  };
+  const secondPull = {
+    number: 102,
+    state: 'OPEN',
+    baseRefName: 'main',
+    baseRepository: { nameWithOwner: 'owner/repository' },
+    headRefOid: '4'.repeat(40),
+  };
+  const pullPage = (nodes, totalCount, hasNextPage = false,
+    endCursor = null) => ({
+    data: { repository: { pullRequests: {
+      totalCount,
+      nodes,
+      pageInfo: { hasNextPage, endCursor },
+    } } },
+  });
+  const graphqlRequests = [];
+  const graphqlPages = [
+    pullPage([firstPull], 2, true, 'cursor-1'),
+    pullPage([secondPull], 2),
+  ];
+  const projectedPulls = await listOpenPullRequests({
+    repository: 'owner/repository',
+    graphql: async (payload) => {
+      graphqlRequests.push(payload);
+      return graphqlPages.shift();
+    },
+  }, 'main');
+  assert(projectedPulls.length === 2 &&
+    projectedPulls[0].head.sha === firstPull.headRefOid &&
+    projectedPulls[1].head.sha === secondPull.headRefOid &&
+    graphqlRequests.length === 2 &&
+    graphqlRequests.every((entry) =>
+      entry.query === openPullRequestsQuery &&
+      entry.variables.owner === 'owner' &&
+      entry.variables.name === 'repository' &&
+      entry.variables.baseRefName === 'main' &&
+      entry.variables.pageSize === pullRequestPageSize) &&
+    graphqlRequests[0].variables.cursor === null &&
+    graphqlRequests[1].variables.cursor === 'cursor-1',
+  'GraphQL query variables and cursor pagination must remain exact.');
+
+  await expectRejected(async () => listOpenPullRequests({
+    repository: 'owner/repository',
+    graphql: async () => ({ errors: [{ message: 'denied' }], data: null }),
+  }, 'main'), 'GraphQL pull request response is invalid.',
+  'A GraphQL error response must fail closed.');
+  await expectRejected(async () => listOpenPullRequests({
+    repository: 'owner/repository',
+    graphql: async () => ({ data: { repository: { pullRequests: {
+      totalCount: 1,
+      nodes: 'not-an-array',
+      pageInfo: { hasNextPage: false, endCursor: null },
+    } } } }),
+  }, 'main'), 'GraphQL pull request connection is invalid.',
+  'A malformed GraphQL connection must fail closed.');
+  await expectRejected(async () => listOpenPullRequests({
+    repository: 'owner/repository',
+    graphql: async () => pullPage([firstPull, firstPull], 2),
+  }, 'main'), 'GraphQL pull request response entry is invalid.',
+  'A duplicate GraphQL pull request must fail closed.');
+  await expectRejected(async () => listOpenPullRequests({
+    repository: 'owner/repository',
+    graphql: async () => pullPage([], maximumPullRequests + 1),
+  }, 'main'), 'GraphQL pull request connection is invalid.',
+  'An excessive GraphQL pull request cardinality must fail closed.');
+  let boundPage = 0;
+  await expectRejected(async () => listOpenPullRequests({
+    repository: 'owner/repository',
+    graphql: async () => {
+      boundPage += 1;
+      return pullPage([{ ...firstPull, number: 200 + boundPage,
+        headRefOid: boundPage.toString(16).padStart(40, '0') }],
+      maximumPages + 1, true, `bound-cursor-${boundPage}`);
+    },
+  }, 'main'), 'GraphQL pull request pagination exceeded its bound.',
+  'GraphQL pagination beyond the maximum page count must fail closed.');
+
+  assert(decodeApiResponse(200, Buffer.from('{"ok":true}')).ok === true,
+    'A bounded JSON API response must parse.');
+  await expectRejected(async () => decodeApiResponse(200,
+    Buffer.from('{')), 'GitHub API returned malformed JSON.',
+  'Malformed API JSON must fail closed.');
+  await expectRejected(async () => decodeApiResponse(503,
+    Buffer.from('{}')), 'GitHub API returned 503.',
+  'An API error response must fail closed.');
+  await expectRejected(async () => decodeApiResponse(200,
+    Buffer.alloc(maximumResponseBytes + 1)),
+  'GitHub API response is oversized.',
+  'An oversized API response must fail closed.');
+
+  const pendingWrites = [];
+  const exactLiveClient = {
+    request: async (method, path) => {
+      assert(method === 'GET', 'Live-state reads must use GET.');
+      if (path.endsWith('/pulls/101')) return pull;
+      return { object: { type: 'commit', sha: advancedSha } };
+    },
+    postStatus: async (...arguments_) => pendingWrites.push(arguments_),
+    repository: 'owner/repository',
+  };
+  await publishPending(exactLiveClient, expected, 'https://example.invalid/run');
+  assert(pendingWrites.length === 1 &&
+    pendingWrites[0][0] === expected.headSha &&
+    pendingWrites[0][2] === 'pending' &&
+    pendingWrites[0][3] === `Validating base ${expected.baseSha}.`,
+  'The prerequisite writer must publish one pending exact-base status.');
+  let mismatchWrites = 0;
+  await expectRejected(async () => publishPending({
+    ...exactLiveClient,
+    request: async (method, path) => {
+      assert(method === 'GET', 'Live-state reads must use GET.');
+      if (path.endsWith('/pulls/101')) {
+        return { ...pull, base: { ref: 'release', sha: advancedSha } };
+      }
+      return { object: { type: 'commit', sha: advancedSha } };
+    },
+    postStatus: async () => { mismatchWrites += 1; },
+  }, expected, 'https://example.invalid/run'),
+  'The pull request no longer has the expected base and head.',
+  'A base edit before prerequisite publication must fail closed.');
+  assert(mismatchWrites === 0,
+    'A live prerequisite mismatch must not write a status.');
+  let refReadCount = 0;
+  const raceWrites = [];
+  await expectRejected(async () => finalizeStatus({
+    ...exactLiveClient,
+    request: async (method, path) => {
+      assert(method === 'GET', 'Live-state reads must use GET.');
+      if (path.endsWith('/pulls/101')) return pull;
+      refReadCount += 1;
+      return { object: { type: 'commit', sha:
+        refReadCount === 1 ? advancedSha : baselineSha } };
+    },
+    postStatus: async (...arguments_) => raceWrites.push(arguments_),
+  }, expected, 'success', 'https://example.invalid/run'),
+  'The pull request changed while status was published.',
+  'A base advance after success publication must fail closed.');
+  assert(raceWrites.length === 2 && raceWrites[0][2] === 'success' &&
+    raceWrites[1][2] === 'error',
+  'A finalization race must replace transient success with an error.');
 }
 
 function getEnvironment(name) {
@@ -218,14 +548,17 @@ function createClient() {
   const repository = getEnvironment('EXPECTED_REPOSITORY');
   const token = getEnvironment('GITHUB_TOKEN');
   const apiRoot = normalizeApiRoot(getEnvironment('GITHUB_API_URL'));
+  const graphqlApiRoot = normalizeGraphqlApiRoot(
+    getEnvironment('GITHUB_GRAPHQL_URL'));
   assert(repositoryPattern.test(repository),
     'GitHub API identity is invalid.');
 
-  async function request(method, path, body, allowNotFound = false) {
+  async function requestAtRoot(root, method, path, body,
+    allowNotFound = false) {
     const payload = body === undefined ? undefined :
       Buffer.from(JSON.stringify(body), 'utf8');
     return await new Promise((resolve, reject) => {
-      const operation = https.request(resolveApiRequestUrl(apiRoot, path), {
+      const operation = https.request(resolveApiRequestUrl(root, path), {
         method,
         headers: {
           Accept: 'application/vnd.github+json',
@@ -250,19 +583,11 @@ function createClient() {
           }
         });
         response.on('end', () => {
-          if (allowNotFound && response.statusCode === 404) {
-            resolve(null);
-            return;
-          }
-          if (response.statusCode < 200 || response.statusCode >= 300) {
-            reject(new Error(`GitHub API returned ${response.statusCode}.`));
-            return;
-          }
-          const text = Buffer.concat(chunks).toString('utf8');
           try {
-            resolve(text.length === 0 ? null : JSON.parse(text));
-          } catch {
-            reject(new Error('GitHub API returned malformed JSON.'));
+            resolve(decodeApiResponse(response.statusCode,
+              Buffer.concat(chunks), allowNotFound));
+          } catch (error) {
+            reject(error);
           }
         });
       });
@@ -274,6 +599,14 @@ function createClient() {
     });
   }
 
+  async function request(method, path, body, allowNotFound = false) {
+    return await requestAtRoot(apiRoot, method, path, body, allowNotFound);
+  }
+
+  async function graphql(body) {
+    return await requestAtRoot(graphqlApiRoot, 'POST', 'graphql', body);
+  }
+
   async function postStatus(headSha, pullNumber, state, description, targetUrl) {
     await request('POST', `repos/${repository}/statuses/${headSha}`, {
       state,
@@ -283,50 +616,75 @@ function createClient() {
     });
   }
 
-  return { repository, request, postStatus };
+  return { repository, request, graphql, postStatus };
 }
 
-async function finalize() {
-  const client = createClient();
+function getExpectedPullRequest() {
   const pullNumberText = getEnvironment('EXPECTED_PULL_NUMBER');
   const baseRef = getEnvironment('EXPECTED_BASE_REF');
   const baseSha = getEnvironment('EXPECTED_BASE_SHA');
   const headSha = getEnvironment('EXPECTED_HEAD_SHA');
-  const validationResult = getEnvironment('VALIDATION_RESULT');
-  const targetUrl = getEnvironment('STATUS_TARGET_URL');
   assert(/^[1-9][0-9]{0,9}$/.test(pullNumberText) && validRef(baseRef) &&
-    shaPattern.test(baseSha) && shaPattern.test(headSha) &&
-    ['success', 'failure', 'cancelled', 'skipped'].includes(validationResult) &&
-    targetUrl.startsWith('https://'), 'Finalization input is invalid.');
-  const pullNumber = Number(pullNumberText);
-  const expected = { pullNumber, baseRef, baseSha, headSha };
+    shaPattern.test(baseSha) && shaPattern.test(headSha),
+  'Pull request status input is invalid.');
+  return {
+    pullNumber: Number(pullNumberText),
+    baseRef,
+    baseSha,
+    headSha,
+  };
+}
 
-  async function readLiveState() {
-    const pull = await client.request('GET',
-      `repos/${client.repository}/pulls/${pullNumber}`);
-    const ref = await client.request('GET',
-      `repos/${client.repository}/git/ref/heads/${encodeRef(baseRef)}`);
-    return isCurrentPull(pull, ref, expected);
-  }
+async function readLiveState(client, expected) {
+  const pull = await client.request('GET',
+    `repos/${client.repository}/pulls/${expected.pullNumber}`);
+  const ref = await client.request('GET',
+    `repos/${client.repository}/git/ref/heads/${encodeRef(expected.baseRef)}`);
+  return isCurrentPull(pull, ref, expected);
+}
+
+async function publishPending(client, expected, targetUrl) {
+  assert(targetUrl.startsWith('https://'),
+    'Prerequisite status input is invalid.');
+  assert(await readLiveState(client, expected),
+    'The pull request no longer has the expected base and head.');
+  await client.postStatus(expected.headSha, expected.pullNumber, 'pending',
+    `Validating base ${expected.baseSha}.`, targetUrl);
+}
+
+async function start() {
+  await publishPending(createClient(), getExpectedPullRequest(),
+    getEnvironment('STATUS_TARGET_URL'));
+}
+
+async function finalizeStatus(client, expected, validationResult, targetUrl) {
+  assert(['success', 'failure', 'cancelled', 'skipped'].includes(
+    validationResult) && targetUrl.startsWith('https://'),
+  'Finalization input is invalid.');
 
   if (validationResult !== 'success') {
-    await client.postStatus(headSha, pullNumber, 'error',
-      `Validation result is ${validationResult}; revalidate PR #${pullNumber}.`,
-      targetUrl);
+    await client.postStatus(expected.headSha, expected.pullNumber, 'error',
+      `Validation result is ${validationResult}; revalidate PR ` +
+        `#${expected.pullNumber}.`, targetUrl);
     throw new Error('Agent-instruction validation did not succeed.');
   }
-  if (!await readLiveState()) {
-    await client.postStatus(headSha, pullNumber, 'error',
-      `Base or head changed; revalidate PR #${pullNumber}.`, targetUrl);
+  if (!await readLiveState(client, expected)) {
+    await client.postStatus(expected.headSha, expected.pullNumber, 'error',
+      `Base or head changed; revalidate PR #${expected.pullNumber}.`, targetUrl);
     throw new Error('The pull request no longer has the validated base and head.');
   }
-  await client.postStatus(headSha, pullNumber, 'success',
-    `Validated base ${baseSha}.`, targetUrl);
-  if (!await readLiveState()) {
-    await client.postStatus(headSha, pullNumber, 'error',
-      `Base or head changed; revalidate PR #${pullNumber}.`, targetUrl);
+  await client.postStatus(expected.headSha, expected.pullNumber, 'success',
+    `Validated base ${expected.baseSha}.`, targetUrl);
+  if (!await readLiveState(client, expected)) {
+    await client.postStatus(expected.headSha, expected.pullNumber, 'error',
+      `Base or head changed; revalidate PR #${expected.pullNumber}.`, targetUrl);
     throw new Error('The pull request changed while status was published.');
   }
+}
+
+async function finalize() {
+  await finalizeStatus(createClient(), getExpectedPullRequest(),
+    getEnvironment('VALIDATION_RESULT'), getEnvironment('STATUS_TARGET_URL'));
 }
 
 async function invalidate() {
@@ -353,28 +711,7 @@ async function invalidate() {
     shaPattern.test(ref.object.sha), 'Live base ref response is invalid.');
   const currentBaseSha = ref.object.sha;
 
-  const pulls = [];
-  const seenPulls = new Set();
-  for (let page = 1; page <= maximumPages; page += 1) {
-    const result = await client.request('GET',
-      `repos/${client.repository}/pulls?state=open&base=` +
-      `${encodeURIComponent(branch)}&per_page=100&page=${page}`);
-    assert(Array.isArray(result) && result.length <= 100,
-      'Pull request response is invalid.');
-    for (const pull of result) {
-      assert(pull && Number.isInteger(pull.number) && pull.number >= 1 &&
-        !seenPulls.has(pull.number) && pull.state === 'open' &&
-        pull.base && pull.base.ref === branch && pull.base.repo &&
-        pull.base.repo.full_name === client.repository && pull.head &&
-        shaPattern.test(pull.head.sha),
-      'Pull request response entry is invalid.');
-      seenPulls.add(pull.number);
-      pulls.push(pull);
-    }
-    if (result.length < 100) break;
-    assert(page < maximumPages,
-      'Pull request pagination exceeded its bound.');
-  }
+  const pulls = await listOpenPullRequests(client, branch);
 
   for (const pull of pulls) {
     let latest = null;
@@ -398,13 +735,18 @@ async function invalidate() {
   }
 }
 
-runSelfTest();
-const mode = process.argv[2];
-if (mode === 'self-test') process.exit(0);
-const operation = mode === 'finalize' ? finalize :
-  mode === 'invalidate' ? invalidate : null;
-assert(operation !== null, 'Expected finalize or invalidate mode.');
-operation().catch((error) => {
+async function main() {
+  await runSelfTest();
+  const mode = process.argv[2];
+  if (mode === 'self-test') return;
+  const operation = mode === 'start' ? start :
+    mode === 'finalize' ? finalize :
+      mode === 'invalidate' ? invalidate : null;
+  assert(operation !== null, 'Expected start, finalize, or invalidate mode.');
+  await operation();
+}
+
+main().catch((error) => {
   console.error(error.message);
   process.exitCode = 1;
 });
