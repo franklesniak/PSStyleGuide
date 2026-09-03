@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260903.0
+# Version: 1.7.20260903.1
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -7710,9 +7710,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260903\.0$'
+            '(?m)^# Version: 1\.7\.20260903\.1$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.7.20260903.0.'
+        throw 'The validator script version is not 1.7.20260903.1.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
@@ -10277,6 +10277,11 @@ if ($SelfTest) {
             '(?ms)^  mark-current-base-pending:\r?\n' +
                 '(?<Body>.*?)(?=^  validate-agent-instructions:)'
         )
+        $objValidationJobMatch = [regex]::Match(
+            $Content,
+            '(?ms)^  validate-agent-instructions:\r?\n' +
+                '(?<Body>.*?)(?=^  publish-current-base-status:)'
+        )
         $objFinalStatusJobMatch = [regex]::Match(
             $Content,
             '(?ms)^  publish-current-base-status:\r?\n(?<Body>.*)\z'
@@ -10303,6 +10308,59 @@ if ($SelfTest) {
                     'A current-base status writer exceeds its trusted job boundary.'
                 )
             }
+        }
+        $strValidationGatePattern =
+            '(?m)^    needs:\r?\n' +
+            '      - mark-current-base-pending\r?\n' +
+            '    if: >-\r?\n' +
+            '      always\(\) &&\r?\n' +
+            "      \(github\.event_name != 'pull_request_target' \|\|\r?\n" +
+            "      \(\(github\.event\.action != 'edited' \|\|\r?\n" +
+            "      github\.event\.changes\.base\.ref\.from != ''\) &&\r?\n" +
+            "      needs\.mark-current-base-pending\.result == 'success'\)\)\r?$"
+        if (-not $objValidationJobMatch.Success -or
+            [regex]::Matches(
+                $objValidationJobMatch.Groups['Body'].Value,
+                $strValidationGatePattern
+            ).Count -ne 1 -or
+            [regex]::Matches(
+                $objValidationJobMatch.Groups['Body'].Value,
+                '(?m)^    if:'
+            ).Count -ne 1) {
+            $listFailures.Add(
+                'Validation must remain gated on successful pending status publication.'
+            )
+        }
+        $strFinalStatusGatePattern =
+            '(?m)^    needs:\r?\n' +
+            '      - mark-current-base-pending\r?\n' +
+            '      - validate-agent-instructions\r?\n' +
+            '    if: >-\r?\n' +
+            "      always\(\) && github\.event_name == 'pull_request_target' &&\r?\n" +
+            "      \(github\.event\.action != 'edited' \|\|\r?\n" +
+            "      github\.event\.changes\.base\.ref\.from != ''\)\r?$"
+        $strFinalStatusJobBody =
+            $objFinalStatusJobMatch.Groups['Body'].Value
+        if (-not $objFinalStatusJobMatch.Success -or
+            [regex]::Matches(
+                $strFinalStatusJobBody,
+                $strFinalStatusGatePattern
+            ).Count -ne 1 -or
+            [regex]::Matches(
+                $strFinalStatusJobBody,
+                '(?m)^    if:'
+            ).Count -ne 1 -or
+            $strFinalStatusJobBody.Contains(
+                "needs.mark-current-base-pending.result == 'success'",
+                [StringComparison]::Ordinal
+            ) -or
+            -not $strFinalStatusJobBody.Contains(
+                'VALIDATION_RESULT: ${{ needs.validate-agent-instructions.result }}',
+                [StringComparison]::Ordinal
+            )) {
+            $listFailures.Add(
+                'Final status publication must run after every completed prerequisite result.'
+            )
         }
         if ([regex]::Matches(
                 $Content,
@@ -10490,6 +10548,32 @@ if ($SelfTest) {
         $intSecondBoundedFetch,
         'timeout 60s git fetch --no-tags'
     )
+    $intFinalStatusJobIndex = $strAgentWorkflowContent.IndexOf(
+        '  publish-current-base-status:',
+        [StringComparison]::Ordinal
+    )
+    if ($intFinalStatusJobIndex -lt 0) {
+        throw 'Could not locate the final current-base status job for mutation tests.'
+    }
+    $strWorkflowNewLine = if ($strAgentWorkflowContent.Contains("`r`n")) {
+        "`r`n"
+    }
+    else {
+        "`n"
+    }
+    $strFinalStatusWorkflowPrefix =
+        $strAgentWorkflowContent.Substring(0, $intFinalStatusJobIndex)
+    $strFinalStatusWorkflowBody =
+        $strAgentWorkflowContent.Substring($intFinalStatusJobIndex)
+    $strFinalStatusGateTail =
+        "      github.event.changes.base.ref.from != '')"
+    $strBadFinalStatusWorkflowBody = $strFinalStatusWorkflowBody.Replace(
+        $strFinalStatusGateTail,
+        $strFinalStatusGateTail + ' &&' + $strWorkflowNewLine +
+            "      needs.mark-current-base-pending.result == 'success'"
+    )
+    $strBadFinalStatusWorkflow =
+        $strFinalStatusWorkflowPrefix + $strBadFinalStatusWorkflowBody
     $arrWorkflowMutations = @(
         [pscustomobject]@{
             Name = 'missing initial snapshot output-bound diagnostic'
@@ -10585,6 +10669,12 @@ if ($SelfTest) {
                 'true'
             )
             Expected = 'Workflow contract literal is missing: needs.mark-current-base-pending.result'
+        },
+        [pscustomobject]@{
+            Name = 'finalizer skips after failed pending prerequisite'
+            Content = $strBadFinalStatusWorkflow
+            Expected =
+                'Final status publication must run after every completed prerequisite result.'
         },
         [pscustomobject]@{
             Name = 'push path filter'

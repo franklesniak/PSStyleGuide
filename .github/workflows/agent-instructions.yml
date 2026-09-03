@@ -618,8 +618,7 @@ jobs:
     if: >-
       always() && github.event_name == 'pull_request_target' &&
       (github.event.action != 'edited' ||
-      github.event.changes.base.ref.from != '') &&
-      needs.mark-current-base-pending.result == 'success'
+      github.event.changes.base.ref.from != '')
     concurrency:
       group: agent-instruction-current-base-status
       queue: max
