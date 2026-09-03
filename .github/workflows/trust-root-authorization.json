@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "authorization_id": "issue176-review-repair-21d3857d",
+  "authorization_id": "issue176-schema2-transition-ef8fbeb0",
   "candidate": {
     "base_commit": "70bf7522233a6c8558809a2c2fc22be83a23a7b9",
-    "head_commit": "21d3857d2e70e23024d7af9838a2a605b45ff54f",
-    "head_tree": "1e4f369d6966698b83a195809fa2baf699eb7adf",
+    "head_commit": "ef8fbeb01f6baab61596cba603f4c387720cdc07",
+    "head_tree": "3f98cf54ccfb0f487b8b6e87e251a8ef5625f33a",
     "parent_commits": [
-      "987bcc316389d3b4e2223c47190276f99675d482"
+      "21d3857d2e70e23024d7af9838a2a605b45ff54f"
     ]
   },
   "limits": {
-    "maximum_paths": 7,
+    "maximum_paths": 8,
     "maximum_blob_bytes": 573440,
     "maximum_manifest_bytes": 65536
   },
@@ -31,9 +31,9 @@
     {
       "path": ".github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs",
       "mode": "100644",
-      "blob": "092f38e254a9390f961c54641ce748a0f40ae1c1",
-      "bytes": 43004,
-      "sha256": "479368f3df1ca4ad57fefcbfc52860cc724da5994907479c41210d6774f4f7ed",
+      "blob": "13b68119d5ef0689ea22a0394d16b71af7fc2700",
+      "bytes": 52785,
+      "sha256": "eebf086a1ec11a47dcb979c6420db5eb08596c2cda2a2b60671dedffee2e93c2",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "javascript",
       "semantic_invariants": [
@@ -55,9 +55,9 @@
     {
       "path": ".github/workflows/Test-AgentInstructions.ps1",
       "mode": "100644",
-      "blob": "eb35ed5c37205979b5e6c38d283a351ac40aab07",
-      "bytes": 504105,
-      "sha256": "e871dc8e9bdb28ba30f2b5c7a04fa568a9ff7a0bcea47c124e2cb846a5f29029",
+      "blob": "e07fb59a2ebe33f103ce43f6e70f26fcb21364ba",
+      "bytes": 509475,
+      "sha256": "086e21e8a6250a838e7dae791ae39a5a746267f0eb2788fe6afbf69cbd3a7626",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
@@ -78,9 +78,9 @@
     {
       "path": ".github/workflows/Test-TrustRootAuthorization.ps1",
       "mode": "100644",
-      "blob": "c29f79d6440a7cfda8a4bdc5f0362b246249b467",
-      "bytes": 62302,
-      "sha256": "767821a9c9d0e254ad7a313a379a2e9382907d84ca585adfa3c7476a831a4195",
+      "blob": "d279f34065b167cd6f0d5c8106afe4fc0cf0b71d",
+      "bytes": 92342,
+      "sha256": "b8936ef6d612d1560731db9da57eac217f837cbcea0cf2f843858838c592ca78",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
@@ -116,6 +116,16 @@
         "workflow-persist-credentials-is-false",
         "workflow-uses-trusted-authorization-output"
       ]
+    },
+    {
+      "path": ".github/workflows/trust-root-authorization.json",
+      "mode": "100644",
+      "blob": "f99062d9984498ae36d170e2287d2ad1a9691053",
+      "bytes": 248,
+      "sha256": "d30601d4b8c40672ac9e91414b88a88efcb50a32e168c473a128549fdf2d65f4",
+      "encoding": "utf-8-no-bom-lf",
+      "syntax": "json",
+      "semantic_invariants": []
     }
   ]
 }
