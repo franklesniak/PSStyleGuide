@@ -29,7 +29,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.0.20260902.8
+# Version: 1.0.20260902.9
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -121,8 +121,16 @@ $script:hashtableSemanticInvariantPattern = @{
         '&& 1 \|\| 0 \}\}'
     'workflow-current-base-finalizer-is-fail-closed' =
         '(?s)^(?!.*contents: write)(?!.*pull-requests: write).*?' +
-        'publish-current-base-status:.*?validate-agent-instructions.*?' +
-        'group: agent-instruction-current-base-status.*?' +
+        'mark-current-base-pending:.*?' +
+        'group: agent-instruction-current-base-status.*?queue: max.*?' +
+        'cancel-in-progress: false.*?statuses: write.*?' +
+        'Set-AgentInstructionCurrentBaseStatus\.mjs\s+start.*?' +
+        'validate-agent-instructions:.*?mark-current-base-pending.*?' +
+        'needs\.mark-current-base-pending\.result == ''success''.*?' +
+        'publish-current-base-status:.*?mark-current-base-pending.*?' +
+        'validate-agent-instructions.*?' +
+        'group: agent-instruction-current-base-status.*?queue: max.*?' +
+        'cancel-in-progress: false.*?' +
         'statuses: write.*?ref: \$\{\{ github\.sha \}\}.*?' +
         'persist-credentials: false.*?' +
         'Set-AgentInstructionCurrentBaseStatus\.mjs\s+finalize'
@@ -131,6 +139,7 @@ $script:hashtableSemanticInvariantPattern = @{
         'workflow_run:.*?Agent instruction validation.*?requested.*?completed.*?' +
         "workflow_run\.event == 'push'.*?" +
         'group: agent-instruction-current-base-status.*?' +
+        'queue: max.*?' +
         'cancel-in-progress: false.*?' +
         'actions: read.*?contents: read.*?pull-requests: read.*?' +
         'statuses: write.*?ref: \$\{\{ github\.sha \}\}.*?' +
@@ -844,6 +853,7 @@ function Assert-SemanticInvariant {
             '"${PUSH_REF}:${destination_local_ref}"',
             'test "${fetched_destination}" = "${PUSH_AFTER_SHA}"',
             'git cat-file -e "${push_commit_id}^{commit}"',
+            'git ls-remote --sort=refname --refs --heads --tags origin',
             'cmp --silent "${raw_refs}" "${raw_refs_after}"'
         )
         foreach ($strRequiredLiteral in $arrRequiredLiteral) {
@@ -860,6 +870,16 @@ function Assert-SemanticInvariant {
                 $Text,
                 [regex]::Escape($strBoundedFetchLiteral)
             ).Count -ne 2 -or
+            [regex]::Matches(
+                $Text,
+                [regex]::Escape(
+                    'git ls-remote --sort=refname --refs --heads --tags origin'
+                )
+            ).Count -ne 2 -or
+            $Text.Contains(
+                'git ls-remote --refs --heads --tags origin',
+                [StringComparison]::Ordinal
+            ) -or
             $Text -cmatch '(?m)(^|\s)--force(\s|$)' -or
             $Text.Contains(
                 '"+${PUSH_REF}:${destination_local_ref}"',
@@ -873,8 +893,23 @@ function Assert-SemanticInvariant {
     if ($Invariant -ceq 'current-base-status-helper-is-fail-closed') {
         foreach ($strRequiredLiteral in @(
                 'const maximumPages = 10;',
+                'const pullRequestPageSize = 100;',
+                'const maximumPullRequests = maximumPages * pullRequestPageSize;',
                 'const maximumResponseBytes = 1048576;',
                 'const maximumRequestPathCharacters = 4096;',
+                'const openPullRequestsQuery = `query OpenPullRequests(',
+                '$owner: String!',
+                '$name: String!',
+                '$baseRefName: String!',
+                '$cursor: String',
+                '$pageSize: Int!',
+                'states: OPEN',
+                'baseRefName: $baseRefName',
+                'totalCount',
+                'baseRepository {',
+                'nameWithOwner',
+                'headRefOid',
+                'pageInfo {',
                 'Agent instruction current base/PR-${pullNumber}',
                 'latest.description === `Validated base ${currentBaseSha}.`',
                 'Both same-baseline pull requests must be invalidated.',
@@ -889,19 +924,37 @@ function Assert-SemanticInvariant {
                 'An unsupported workflow-run activity must fail authentication.',
                 'A GitHub.com API request must preserve its encoded query.',
                 'A GHES API request must preserve its API base and encoded branch path.',
+                'A GitHub.com GraphQL request must resolve relative to its API root.',
+                'A GHES GraphQL request must resolve relative to its API root.',
                 'resolved.origin === apiRoot.origin',
                 'resolved.pathname.startsWith(apiRoot.basePathname)',
-                'repos/${client.repository}/pulls/${pullNumber}',
-                'repos/${client.repository}/git/ref/heads/${encodeRef(baseRef)}',
+                "getEnvironment('GITHUB_GRAPHQL_URL')",
+                "requestAtRoot(graphqlApiRoot, 'POST', 'graphql', body)",
+                'repos/${client.repository}/pulls/${expected.pullNumber}',
+                'repos/${client.repository}/git/ref/heads/${encodeRef(expected.baseRef)}',
                 'repos/${repository}/statuses/${headSha}',
                 "run.path === '.github/workflows/agent-instructions.yml'",
                 'run.head_branch === expected.branch && run.head_sha === expected.signalSha',
-                'repos/${client.repository}/pulls?state=open&base=',
-                '?per_page=100&page=${page}',
-                'Pull request pagination exceeded its bound.',
+                '!Object.hasOwn(result, ''errors'')',
+                'GraphQL pull request response is invalid.',
+                'GraphQL pull request connection is invalid.',
+                'GraphQL pull request response entry is invalid.',
+                'GraphQL pull request cardinality is invalid.',
+                'GraphQL pull request pagination exceeded its bound.',
+                'GraphQL query variables and cursor pagination must remain exact.',
+                'A malformed GraphQL connection must fail closed.',
+                'A duplicate GraphQL pull request must fail closed.',
+                'An excessive GraphQL pull request cardinality must fail closed.',
+                'An oversized API response must fail closed.',
                 'Commit status pagination exceeded its bound.',
                 'Base advanced to ${currentBaseSha}; revalidate PR #${pull.number}.',
-                "if (mode === 'self-test') process.exit(0);"
+                'The prerequisite writer must publish one pending exact-base status.',
+                'A base edit before prerequisite publication must fail closed.',
+                'A live prerequisite mismatch must not write a status.',
+                'A base advance after success publication must fail closed.',
+                'A finalization race must replace transient success with an error.',
+                "mode === 'start' ? start :",
+                'Expected start, finalize, or invalidate mode.'
             )) {
             if (-not $Text.Contains(
                     $strRequiredLiteral,
@@ -912,7 +965,7 @@ function Assert-SemanticInvariant {
         }
         if ([regex]::Matches(
                 $Text,
-                [regex]::Escape('if (!await readLiveState())')
+                [regex]::Escape('if (!await readLiveState(client, expected))')
             ).Count -ne 2) {
             throw "$Path does not satisfy semantic invariant $Invariant."
         }
