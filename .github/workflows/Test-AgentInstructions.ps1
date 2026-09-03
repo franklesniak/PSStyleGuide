@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260903.2
+# Version: 1.7.20260903.3
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -2165,7 +2165,8 @@ function Get-MarkdownParseContext {
     # .DESCRIPTION
     # Uses the repository-locked markdown-it package to identify code-block ranges,
     # prose blocks with operative code spans and link destinations, top-level
-    # blocks, table rows and cells, top-level list items, and level-two headings.
+    # blocks, table rows and cells, top-level list items, all headings, and
+    # level-two headings.
     # It validates all parser output before returning it.
     #
     # .PARAMETER Content
@@ -2302,6 +2303,14 @@ function Get-MarkdownParseContext {
         '  const context = inlineToken ? getOperativeInlineContext(inlineToken.children) : null;'
         '  return [{ range: token.map, text: context?.text ?? null, code: context?.code ?? [], links: context?.links ?? [] }];'
         '});'
+        'const headings = tokens.flatMap((token, index) => {'
+        '  if (token.type !== "heading_open") return [];'
+        '  if (!/^h[1-6]$/.test(token.tag) || token.nesting !== 1 || !Array.isArray(token.map)) throw new Error("Invalid Markdown heading.");'
+        '  const inlineToken = tokens[index + 1];'
+        '  const closeToken = tokens[index + 2];'
+        '  if (inlineToken?.type !== "inline" || !Array.isArray(inlineToken.children) || closeToken?.type !== "heading_close" || closeToken.tag !== token.tag || closeToken.nesting !== -1) throw new Error("Invalid Markdown heading container.");'
+        '  return [{ tag: token.tag, range: token.map, text: getOperativeInlineContext(inlineToken.children).text }];'
+        '});'
         'const levelTwoHeadings = tokens.flatMap((token, index) => {'
         '  if (token.type !== "heading_open" || token.tag !== "h2" || token.level !== 0) return [];'
         '  const inlineToken = tokens[index + 1];'
@@ -2325,7 +2334,7 @@ function Get-MarkdownParseContext {
         '  if (cells.length === 0) throw new Error("Markdown table row has no cells.");'
         '  return [{ range: token.map, cells }];'
         '});'
-        'process.stdout.write(JSON.stringify({ codeBlockRanges, proseBlocks, tableRows, topLevelBlocks, topLevelListItems, levelTwoHeadings }));'
+        'process.stdout.write(JSON.stringify({ codeBlockRanges, proseBlocks, tableRows, topLevelBlocks, topLevelListItems, headings, levelTwoHeadings }));'
     ) -join "`n"
 
     $objStartInfo = [System.Diagnostics.ProcessStartInfo]::new()
@@ -2364,6 +2373,7 @@ function Get-MarkdownParseContext {
         $null -eq $objRawContext.tableRows -or
         $null -eq $objRawContext.topLevelBlocks -or
         $null -eq $objRawContext.topLevelListItems -or
+        $null -eq $objRawContext.headings -or
         $null -eq $objRawContext.levelTwoHeadings) {
         throw 'The locked Markdown parser returned incomplete context data.'
     }
@@ -2555,6 +2565,38 @@ function Get-MarkdownParseContext {
         $intPreviousTopLevelListItemEnd = [int]$intEnd
     }
 
+    $listHeadings = [Collections.Generic.List[pscustomobject]]::new()
+    $intPreviousHeadingEnd = 0
+    foreach ($objRawHeading in @($objRawContext.headings)) {
+        if ($null -eq $objRawHeading -or
+            $objRawHeading.tag -isnot [string] -or
+            $objRawHeading.tag -cnotmatch '^h[1-6]$' -or
+            $objRawHeading.range -isnot [array] -or
+            $objRawHeading.range.Count -ne 2 -or
+            $objRawHeading.text -isnot [string]) {
+            throw 'The locked Markdown parser returned a malformed heading.'
+        }
+
+        $intStart = [int64] 0
+        $intEnd = [int64] 0
+        if (-not [int64]::TryParse([string]$objRawHeading.range[0], [ref]$intStart) -or
+            -not [int64]::TryParse([string]$objRawHeading.range[1], [ref]$intEnd) -or
+            $intStart -lt $intPreviousHeadingEnd -or
+            $intStart -lt 0 -or
+            $intEnd -le $intStart -or
+            $intEnd -gt $LineCount) {
+            throw 'The locked Markdown parser returned an invalid heading range.'
+        }
+
+        $listHeadings.Add([pscustomobject]@{
+                Tag = [string]$objRawHeading.tag
+                Start = [int]$intStart
+                End = [int]$intEnd
+                Text = [string]$objRawHeading.text
+            })
+        $intPreviousHeadingEnd = [int]$intEnd
+    }
+
     $listLevelTwoHeadings = [Collections.Generic.List[pscustomobject]]::new()
     $intPreviousHeadingEnd = 0
     foreach ($objRawHeading in @($objRawContext.levelTwoHeadings)) {
@@ -2590,6 +2632,7 @@ function Get-MarkdownParseContext {
         TableRows = [pscustomobject[]]$listTableRows.ToArray()
         TopLevelBlocks = [pscustomobject[]]$listTopLevelBlocks.ToArray()
         TopLevelListItems = [pscustomobject[]]$listTopLevelListItems.ToArray()
+        Headings = [pscustomobject[]]$listHeadings.ToArray()
         LevelTwoHeadings = [pscustomobject[]]$listLevelTwoHeadings.ToArray()
     }
 }
@@ -2635,7 +2678,9 @@ function Assert-MarkdownParserExactContext {
         '"TopLevelBlocks":[' +
         '{"Type":"heading_open","Tag":"h2","Start":0,"End":1,"Text":"Transport"},' +
         '{"Type":"paragraph_open","Tag":"p","Start":2,"End":3,"Text":"Paragraph ."}],' +
-        '"TopLevelListItems":[],"LevelTwoHeadings":[' +
+        '"TopLevelListItems":[],"Headings":[' +
+        '{"Tag":"h2","Start":0,"End":1,"Text":"Transport"}],' +
+        '"LevelTwoHeadings":[' +
         '{"Start":0,"End":1,"Text":"Transport"}]}'
     if ($strActual -cne $strExpected) {
         throw "Self-test 'ordinary exact Markdown parser context' changed output."
@@ -2661,6 +2706,25 @@ function Assert-MarkdownParserExactContext {
         $objTableContext.TableRows[1].Cells[1].Tag -cne 'td' -or
         $objTableContext.TableRows[1].Cells[1].Text -cne 'Accepted') {
         throw "Self-test 'exact Markdown table context' changed output."
+    }
+
+    $strHeadingMarkdown = @(
+        '## Context'
+        '### Decision **Status**'
+        '#### `Status`'
+    ) -join "`n"
+    $objHeadingContext = Get-MarkdownParseContext `
+        -Content $strHeadingMarkdown -LineCount 3
+    if ($objHeadingContext.Headings.Count -ne 3 -or
+        $objHeadingContext.Headings[0].Tag -cne 'h2' -or
+        $objHeadingContext.Headings[0].Text -cne 'Context' -or
+        $objHeadingContext.Headings[1].Tag -cne 'h3' -or
+        $objHeadingContext.Headings[1].Text -cne 'Decision Status' -or
+        $objHeadingContext.Headings[2].Tag -cne 'h4' -or
+        $objHeadingContext.Headings[2].Text -cne '' -or
+        $objHeadingContext.LevelTwoHeadings.Count -ne 1 -or
+        $objHeadingContext.LevelTwoHeadings[0].Text -cne 'Context') {
+        throw "Self-test 'all Markdown headings context' changed output."
     }
 }
 
@@ -2729,6 +2793,7 @@ function Get-OperativeMarkdownContext {
         ProseBlocks = [pscustomobject[]]$objParseContext.ProseBlocks
         TableRows = [pscustomobject[]]$objParseContext.TableRows
         TopLevelListItems = [pscustomobject[]]$objParseContext.TopLevelListItems
+        Headings = [pscustomobject[]]$objParseContext.Headings
         LevelTwoHeadings = [pscustomobject[]]$objParseContext.LevelTwoHeadings
     }
 }
@@ -5148,8 +5213,9 @@ function Get-DecisionRecordLifecycleFailure {
             break
         }
     }
-    if (@($objMarkdownContext.LevelTwoHeadings |
+    if (@($objMarkdownContext.Headings |
             Where-Object {
+                $_.Tag -cne 'h1' -and
                 $_.Start -ne $objMetadataHeading.Start -and
                 $_.Text -match '(?i)\bStatus\b'
             }).Count -ne 0) {
@@ -5171,24 +5237,23 @@ function Get-DecisionRecordLifecycleFailure {
                     $_.Start -le $objMetadataHeading.Start -or
                     $_.Start -ge $intMetadataSectionEnd
                 $boolHasStatusField = $false
-                if ($boolOutsideMetadata) {
-                    for ($intCell = 0; $intCell -lt $_.Cells.Count - 1; $intCell++) {
-                        $strLabel = [regex]::Replace(
-                            $_.Cells[$intCell].Text.Trim(),
-                            '\s+',
-                            ' '
-                        )
-                        $strValue = [regex]::Replace(
-                            $_.Cells[$intCell + 1].Text.Trim(),
-                            '\s+',
-                            ' '
-                        )
-                        if ($strLabel -match '(?i)^(?:Decision\s+)?Status$' -and
-                            -not [string]::IsNullOrWhiteSpace($strValue)) {
-                            $boolHasStatusField = $true
-                            break
-                        }
-                    }
+                if ($boolOutsideMetadata -and
+                    $_.Cells.Count -eq 2 -and
+                    $_.Cells[0].Tag -ceq 'td' -and
+                    $_.Cells[1].Tag -ceq 'td') {
+                    $strLabel = [regex]::Replace(
+                        $_.Cells[0].Text.Trim(),
+                        '\s+',
+                        ' '
+                    )
+                    $strValue = [regex]::Replace(
+                        $_.Cells[1].Text.Trim(),
+                        '\s+',
+                        ' '
+                    )
+                    $boolHasStatusField =
+                        $strLabel -match '(?i)^(?:Decision\s+)?Status$' -and
+                        -not [string]::IsNullOrWhiteSpace($strValue)
                 }
                 $boolHasStatusField
             }).Count -ne 0) {
@@ -7710,9 +7775,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260903\.2$'
+            '(?m)^# Version: 1\.7\.20260903\.3$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.7.20260903.2.'
+        throw 'The validator script version is not 1.7.20260903.3.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
@@ -7922,6 +7987,80 @@ if ($SelfTest) {
             'Status section.')) {
         throw 'A Decision Status section escaped lifecycle validation.'
     }
+    $arrSubordinateStatusSectionFixtures = @(
+        [pscustomobject]@{
+            Name = 'level-three Decision Status section'
+            Heading = '### Decision Status'
+        },
+        [pscustomobject]@{
+            Name = 'formatted level-three Decision Status section'
+            Heading = '### Decision **Status**'
+        },
+        [pscustomobject]@{
+            Name = 'linked level-four Status section'
+            Heading = '#### Decision [Status](https://example.invalid/status)'
+        },
+        [pscustomobject]@{
+            Name = 'level-five Status section'
+            Heading = '##### Status'
+        },
+        [pscustomobject]@{
+            Name = 'level-six Decision Status section'
+            Heading = '###### Decision Status'
+        }
+    )
+    foreach ($objStatusSectionFixture in $arrSubordinateStatusSectionFixtures) {
+        $strSubordinateStatusSectionRecord = $strCompliantDecisionRecord.Replace(
+            'Changed legacy context.',
+            "Changed legacy context.`n$($objStatusSectionFixture.Heading)`nAccepted."
+        )
+        if (@(Get-DecisionRecordLifecycleFailure `
+                -Name 'docs/decisions/0001-legacy.md' `
+                -CurrentContent $strSubordinateStatusSectionRecord `
+                -BaselineContent $strLegacyDecisionRecord) -cnotcontains
+            ('docs/decisions/0001-legacy.md must not contain a separate operative ' +
+                'Status section.')) {
+            throw "$($objStatusSectionFixture.Name) escaped lifecycle validation."
+        }
+    }
+    $arrNonOperativeStatusHeadingFixtures = @(
+        [pscustomobject]@{
+            Name = 'fenced level-three Status heading example'
+            Payload = @(
+                '```markdown'
+                '### Decision Status'
+                '```'
+            ) -join "`n"
+        },
+        [pscustomobject]@{
+            Name = 'indented level-three Status heading example'
+            Payload = '    ### Decision Status'
+        },
+        [pscustomobject]@{
+            Name = 'commented level-three Status heading example'
+            Payload = '<!-- ### Decision Status -->'
+        },
+        [pscustomobject]@{
+            Name = 'inline-code-only level-three Status heading example'
+            Payload = '### `Decision Status`'
+        },
+        [pscustomobject]@{
+            Name = 'raw-HTML-only level-three Status heading example'
+            Payload = '### <span>Decision Status</span>'
+        }
+    )
+    foreach ($objStatusHeadingFixture in $arrNonOperativeStatusHeadingFixtures) {
+        $strNonOperativeStatusHeadingRecord = $strCompliantDecisionRecord.Replace(
+            'Changed legacy context.',
+            "Changed legacy context.`n$($objStatusHeadingFixture.Payload)"
+        )
+        if (@(Get-DecisionRecordLifecycleFailure `
+                -Name 'docs/decisions/0001-legacy.md' `
+                -CurrentContent $strNonOperativeStatusHeadingRecord `
+                -BaselineContent $strLegacyDecisionRecord).Count -ne 0) {
+            throw "$($objStatusHeadingFixture.Name) caused a false lifecycle finding."
+        }
+    }
     $strDecisionStatusFieldRecord = $strCompliantDecisionRecord.Replace(
         "## Context`n",
         "## Context`n- **Decision Status:** Accepted`n"
@@ -7936,10 +8075,15 @@ if ($SelfTest) {
     }
     $arrTableStatusFailureFixtures = @(
         [pscustomobject]@{
-            Name = 'header Status field'
+            Name = 'exact two-cell Status data row'
             Content = $strCompliantDecisionRecord.Replace(
                 "## Context`n",
-                "## Context`n| STATUS | Accepted |`n| --- | --- |`n"
+                (@(
+                        '## Context'
+                        '| Field | Value |'
+                        '| --- | --- |'
+                        '| Status | Accepted |'
+                    ) -join "`n") + "`n"
             )
         },
         [pscustomobject]@{
@@ -7966,6 +8110,41 @@ if ($SelfTest) {
         }
     }
     $arrTableStatusAcceptedFixtures = @(
+        [pscustomobject]@{
+            Name = 'header-only Status row'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '| STATUS | Accepted |'
+                        '| --- | --- |'
+                    ) -join "`n")
+            )
+        },
+        [pscustomobject]@{
+            Name = 'ordinary three-column option table'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '| Option | Status | Rationale |'
+                        '| --- | --- | --- |'
+                        '| Keep | Accepted | Least churn |'
+                    ) -join "`n")
+            )
+        },
+        [pscustomobject]@{
+            Name = 'multi-column Status data row'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '| Field | Value | Rationale |'
+                        '| --- | --- | --- |'
+                        '| Status | Accepted | Current decision |'
+                    ) -join "`n")
+            )
+        },
         [pscustomobject]@{
             Name = 'fenced table example'
             Content = $strCompliantDecisionRecord.Replace(
