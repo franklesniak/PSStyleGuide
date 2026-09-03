@@ -52,6 +52,7 @@ jobs:
       - name: Authenticate live base and head before marking pending
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
           EXPECTED_REPOSITORY: ${{ github.repository }}
           EXPECTED_PULL_NUMBER: ${{ github.event.pull_request.number }}
           EXPECTED_BASE_REF: ${{ github.event.pull_request.base.ref }}
@@ -651,6 +652,7 @@ jobs:
       - name: Publish status after live base and head verification
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
           EXPECTED_REPOSITORY: ${{ github.repository }}
           EXPECTED_PULL_NUMBER: ${{ github.event.pull_request.number }}
           EXPECTED_BASE_REF: ${{ github.event.pull_request.base.ref }}

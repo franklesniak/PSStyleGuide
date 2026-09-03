@@ -31,7 +31,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.2.20260903.0
+# Version: 1.2.20260903.1
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -163,16 +163,25 @@ $script:hashtableSemanticInvariantPattern = @{
         'persist-credentials: false.*?' +
         'Set-AgentInstructionCurrentBaseStatus\.mjs\s+finalize'
     'workflow-run-current-base-invalidator-is-fail-closed' =
-        '(?s)^(?!.*pull_request_target:)(?!.*artifacts/).*?' +
+        '(?s)^(?!.*pull_request_target:)(?!.*workflow_dispatch:)' +
+        '(?!.*actions: write)(?!.*artifacts/).*?repository_dispatch:.*?' +
+        'agent-instruction-current-base-continuation-v1.*?' +
+        'agent-instruction-current-base-bootstrap-v1.*?' +
         'workflow_run:.*?Agent instruction validation.*?requested.*?completed.*?' +
-        "workflow_run\.event == 'push'.*?" +
+        'run-name:.*?Agent current-base continuation:.*?github\.sha.*?' +
+        "workflow_run\.event == 'push'.*?repository_dispatch.*?" +
         'group: agent-instruction-current-base-status.*?' +
         'queue: max.*?' +
         'cancel-in-progress: false.*?' +
-        'actions: read.*?contents: read.*?pull-requests: read.*?' +
+        'actions: read.*?contents: write.*?pull-requests: read.*?' +
         'statuses: write.*?ref: \$\{\{ github\.sha \}\}.*?' +
-        'persist-credentials: false.*?SIGNAL_ACTIVITY: ' +
-        '\$\{\{ github\.event\.action \}\}.*?' +
+        'persist-credentials: false.*?GITHUB_SERVER_URL: ' +
+        '\$\{\{ github\.server_url \}\}.*?SWEEP_EVENT_NAME:.*?' +
+        'SWEEP_RUN_REF: \$\{\{ github\.ref_name \}\}.*?' +
+        'SWEEP_RUN_SHA: \$\{\{ github\.sha \}\}.*?' +
+        'SWEEP_EVENT_TYPE: \$\{\{ github\.event\.action \}\}.*?' +
+        'SWEEP_CLIENT_PAYLOAD: ' +
+        '\$\{\{ toJson\(github\.event\.client_payload\) \}\}.*?' +
         'Set-AgentInstructionCurrentBaseStatus\.mjs\s+invalidate'
     'workflow-permissions-are-read-only' =
         'permissions:\s+contents: read'
@@ -1880,39 +1889,65 @@ function Assert-SemanticInvariant {
 
     if ($Invariant -ceq 'current-base-status-helper-is-fail-closed') {
         foreach ($strRequiredLiteral in @(
-                'const maximumPullRequests = 20;',
-                'const pullRequestPageSize = maximumPullRequests;',
+                'const pullRequestPageSize = 10;',
                 'const statusContextBatchSize = 10;',
+                'const maximumPullRequestsPerSweep = 100;',
                 'const maximumApiRequests = 25;',
                 'const maximumOperationMilliseconds = 240000;',
                 'const requestTimeoutMilliseconds = 8000;',
                 'const maximumResponseBytes = 1048576;',
                 'const maximumRequestPathCharacters = 4096;',
+                'const maximumCursorCharacters = 1024;',
+                'const maximumDispatchPayloadBytes = 4096;',
+                'const maximumSweepRestarts = 2;',
+                'const dispatchProtocol = ''agent-instruction-current-base/v1'';',
+                'agent-instruction-current-base-continuation-v1',
+                'agent-instruction-current-base-bootstrap-v1',
+                'const currentBaseWorkflowPath =',
+                'const validationWorkflowPath =',
+                'const initialSnapshotDigest = createHash(''sha256'')',
                 'const openPullRequestsQuery = `query OpenPullRequests(',
                 '$owner: String!',
                 '$name: String!',
                 '$baseRefName: String!',
                 '$pageSize: Int!',
+                '$cursor: String',
+                'after: $cursor',
                 'states: OPEN',
                 'baseRefName: $baseRefName',
+                'orderBy: {field: CREATED_AT, direction: ASC}',
                 'totalCount',
                 'baseRepository {',
                 'nameWithOwner',
                 'headRefOid',
+                'createdAt',
                 'pageInfo {',
-                'connection.nodes.length === connection.totalCount',
-                'connection.pageInfo.hasNextPage === false',
-                'Open pull request count exceeds the supported limit of',
+                'endCursor',
+                'connection.nodes.length <= pullRequestPageSize',
+                'hasNextPage: connection.pageInfo.hasNextPage,',
+                'endCursor: connection.pageInfo.endCursor,',
                 'query: `query ExactStatusContexts(',
                 'latest: context(name: $context${index})',
                 'targetUrl',
+                'creator {',
+                'creatorLogin: latest.creator === null ? null : latest.creator.login,',
                 'const requestBudget = createRequestBudget();',
                 'requestBudget.beginRequest();',
-                'assertCanMutate(client, invalidations.length);',
+                'assertCanMutate(client, invalidations.length + followupRequests);',
                 'Agent instruction current base/PR-${pullNumber}',
+                'Agent instruction current base sweep/${branchDigest}',
                 'latest.description === `Validated base ${currentBaseSha}.`',
+                'statusHasActionsCreator(latest)',
+                'function guardAllowsMergeControl(guard, currentBaseSha, runAuthenticated)',
+                'function mergeControlAccepts(latest, guard, currentBaseSha,',
+                'guardAllowsMergeControl(guard, currentBaseSha, guardRunAuthenticated)',
+                'Sweep pending base ${baseSha}; state ${token}.',
+                'Sweep complete base ${baseSha}; state ${token}.',
+                'Agent current-base continuation: branch=${branch}; base=${baseSha}; ',
                 'Both same-baseline pull requests must be invalidated.',
                 'An older workflow-run signal must preserve a newer current success.',
+                'Merge control must reject old success while the live-base guard is pending, ',
+                'stale, or unauthenticated.',
                 'Status contexts must be stable and pull-request-specific.',
                 'A stale live base must fail finalization.',
                 'A requested signal must authenticate its initial live state.',
@@ -1920,29 +1955,37 @@ function Assert-SemanticInvariant {
                 'A completed signal must reconcile completed live state.',
                 'A completed signal must reject nonterminal live state.',
                 'A forged workflow-run signal must fail authentication.',
+                'A cross-repository workflow-run signal must fail authentication.',
                 'An unsupported workflow-run activity must fail authentication.',
+                'A successful continuation run must authenticate.',
+                'A failed continuation parent must not authenticate.',
                 'A GitHub.com API request must preserve its encoded query.',
                 'A GHES API request must preserve its API base and encoded branch path.',
                 'A GitHub.com GraphQL request must resolve relative to its API root.',
                 'A GHES GraphQL request must resolve relative to its API root.',
                 'resolved.origin === apiRoot.origin',
                 'resolved.pathname.startsWith(apiRoot.basePathname)',
+                "getEnvironment('GITHUB_SERVER_URL')",
                 "getEnvironment('GITHUB_GRAPHQL_URL')",
                 "requestAtRoot(graphqlApiRoot, 'POST', 'graphql', body)",
+                '`repos/${repository}/dispatches`',
+                'event_type: eventType,',
+                'client_payload: clientPayload,',
                 'repos/${client.repository}/pulls/${expected.pullNumber}',
                 'repos/${client.repository}/git/ref/heads/${encodeRef(expected.baseRef)}',
                 'repos/${repository}/statuses/${headSha}',
-                "run.path === '.github/workflows/agent-instructions.yml'",
-                'run.head_branch === expected.branch && run.head_sha === expected.signalSha',
+                'run.path === validationWorkflowPath',
+                'run.path === currentBaseWorkflowPath',
+                'run.repository.full_name === expected.repository',
+                'run.head_branch === expected.defaultBranch &&',
+                'run.head_sha === expected.defaultSha &&',
                 '!Object.hasOwn(result, ''errors'')',
                 'GraphQL pull request response is invalid.',
                 'GraphQL pull request connection is invalid.',
                 'GraphQL pull request response entry is invalid.',
-                'The complete one-page GraphQL query variables must remain exact.',
-                'A complete one-page read must have no cross-page churn dependency.',
-                'The disclosed one-page pull-request limit must be accepted.',
-                'The one-page pull-request limit plus one must fail closed.',
-                'A partial or paginated pull-request page must fail closed.',
+                'The first paginated GraphQL query variables must remain exact.',
+                'A 21-plus inventory must return one bounded continuation page.',
+                'A non-full continuation page must fail closed.',
                 'A malformed GraphQL connection must fail closed.',
                 'A duplicate GraphQL pull request must fail closed.',
                 'Status reads must batch only exact PR-specific contexts.',
@@ -1952,14 +1995,17 @@ function Assert-SemanticInvariant {
                 'An exhausted global request budget must fail closed.',
                 'A slow request sequence must fail before its deadline is exhausted.',
                 'An oversized API response must fail closed.',
-                'Base advanced to ${currentBaseSha}; revalidate PR #${pull.number}.',
+                'Base advanced to ${currentBaseSha}; revalidate PR #${pullNumber}.',
                 'The prerequisite writer must publish one pending exact-base status.',
+                'A pending or missing guard must not block validation from starting.',
+                'Validation must not publish success before the guard succeeds.',
+                'A validation rerun may publish success after the guard succeeds.',
                 'A base edit before prerequisite publication must fail closed.',
                 'A live prerequisite mismatch must not write a status.',
                 'A base advance after success publication must fail closed.',
                 'A finalization race must replace transient success with an error.',
                 'A strictly newer authenticated same-endpoint success must be preserved.',
-                'An old finalizer must reserve both run reads and preserve newer success.',
+                'An old finalizer must reserve guard and run reads and preserve newer success.',
                 'An old success-path mismatch must preserve newer authenticated success.',
                 'An older authenticated run must fail closed with an error status.',
                 'A newer failure must publish a fail-closed error.',
@@ -1971,17 +2017,49 @@ function Assert-SemanticInvariant {
                 'run.event === ''pull_request_target''',
                 'run.run_number',
                 'run.run_attempt',
-                'assertCanMutate(client, 3);',
-                'The all-write one-page workload must fit its disclosed 25-request bound.',
-                'A PR count above the supported limit must fail before any write.',
+                'assertCanMutate(client, 6);',
+                'await postPendingGuard(client, session, token, signal.targetUrl);',
+                'await processSweepBatch(client, session, progress, {',
+                'Continuation parent run does not match its live record.',
+                'The continuation base is stale.',
+                'Continuation state is stale or replayed.',
+                'The live base changed during the sweep.',
+                'The live base changed before sweep completion.',
+                'The sweep guard changed before completion.',
+                'Pull request inventory did not stabilize within the restart limit.',
+                'A 21-PR sweep must invalidate every stale status in bounded continuations.',
+                'Guard success must bind the exact final repository-dispatch run and state.',
+                'A bootstrap must sweep an existing 21-plus PR base without a prior guard.',
+                'A repeated bootstrap must preserve an authenticated completed guard.',
+                'A bootstrap for a deleted branch must fail closed.',
+                'A cross-repository bootstrap run must fail authentication.',
+                'Malformed, extra, missing, or oversized continuation state must fail.',
+                'A dispatch failure must leave the live-base guard incomplete.',
+                'An API timeout must not publish invalidation or guard success.',
+                'A partial batch failure must never publish guard success.',
+                'A stale-base continuation must not publish guard success.',
+                'A replayed continuation must not publish guard success.',
+                'Pagination churn must trigger a bounded sweep restart.',
+                'Repeated pagination churn must stop at the restart bound.',
+                'async function verifyMergeEvidence(client, pullNumber) {',
+                'const first = await readMergeSnapshot(client, pullNumber);',
+                'assert(await authenticateMergeSnapshot(client, first),',
+                'const second = await readMergeSnapshot(client, pullNumber);',
+                'assert(mergeSnapshotsMatch(first, second),',
+                'async function verifyMerge() {',
+                'await verifyMergeEvidence(createClient(), Number(pullNumberText));',
                 "mode === 'start' ? start :",
-                'Expected start, finalize, or invalidate mode.'
+                "mode === 'verify-merge' ? verifyMerge : null;",
+                'Expected start, finalize, invalidate, or verify-merge mode.'
             )) {
             if (-not $Text.Contains(
                     $strRequiredLiteral,
                     [StringComparison]::Ordinal
                 )) {
-                throw "$Path does not satisfy semantic invariant $Invariant."
+                throw (
+                    "$Path does not satisfy semantic invariant ${Invariant}: " +
+                        "missing literal $strRequiredLiteral."
+                )
             }
         }
         if ([regex]::Matches(
@@ -1993,7 +2071,29 @@ function Assert-SemanticInvariant {
         if ([regex]::Matches(
                 $Text,
                 [regex]::Escape('await publishFinalizerError(client, expected,')
-            ).Count -ne 3) {
+            ).Count -ne 4) {
+            throw "$Path does not satisfy semantic invariant $Invariant."
+        }
+        $objVerifyMergeFunctionMatch = [regex]::Match(
+            $Text,
+            '(?s)async function verifyMergeEvidence\(client, pullNumber\) \{' +
+                '(?<Body>.*?)\n\}\n\nasync function verifyMerge\('
+        )
+        if (-not $objVerifyMergeFunctionMatch.Success -or
+            $objVerifyMergeFunctionMatch.Groups['Body'].Value -cmatch
+                'postStatus|dispatchRepository|request\(''POST''') {
+            throw "$Path does not satisfy semantic invariant $Invariant."
+        }
+        $objPublishPendingFunctionMatch = [regex]::Match(
+            $Text,
+            '(?s)async function publishPending\(client, expected, targetUrl\) \{' +
+                '(?<Body>.*?)\n\}\n\nasync function start\('
+        )
+        if (-not $objPublishPendingFunctionMatch.Success -or
+            $objPublishPendingFunctionMatch.Groups['Body'].Value -cnotmatch
+                "postStatus\(expected\.headSha, expected\.pullNumber, 'pending'" -or
+            $objPublishPendingFunctionMatch.Groups['Body'].Value -cmatch
+                'hasAuthenticatedSweepGuard') {
             throw "$Path does not satisfy semantic invariant $Invariant."
         }
         return

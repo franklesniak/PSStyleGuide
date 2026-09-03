@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.9.20260903.0
+# Version: 1.9.20260903.1
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -7859,9 +7859,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.9\.20260903\.0$'
+            '(?m)^# Version: 1\.9\.20260903\.1$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.9.20260903.0.'
+        throw 'The validator script version is not 1.9.20260903.1.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
@@ -8627,9 +8627,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strTrustRootAuthorizationSource,
-            '(?m)^# Version: 1\.2\.20260903\.0$'
+            '(?m)^# Version: 1\.2\.20260903\.1$'
         ).Count -ne 1) {
-        throw 'The trust-root authorization script lacks version 1.2.20260903.0.'
+        throw 'The trust-root authorization script lacks version 1.2.20260903.1.'
     }
     & (Join-Path $strRepositoryRootPath $strTrustRootAuthorizationPath) `
         -RepositoryRootPath $strRepositoryRootPath `
@@ -10511,6 +10511,7 @@ if ($SelfTest) {
                 '      contents: read',
                 '      pull-requests: read',
                 '      statuses: write',
+                'GITHUB_SERVER_URL: ${{ github.server_url }}',
                 'Authenticate live base and head before marking pending',
                 'VALIDATION_RESULT: ${{ needs.validate-agent-instructions.result }}',
                 'ref: ${{ github.sha }}',
@@ -11185,14 +11186,24 @@ if ($SelfTest) {
 
         $listFailures = [Collections.Generic.List[string]]::new()
         $strInvalidatorPattern =
-            '(?s)^(?!.*pull_request_target:)(?!.*contents: write)' +
-            '(?!.*pull-requests: write).*?workflow_run:.*?requested.*?' +
-            "completed.*?workflow_run\.event == 'push'.*?" +
+            '(?s)^(?!.*pull_request_target:)(?!.*workflow_dispatch:)' +
+            '(?!.*actions: write)(?!.*pull-requests: write).*?' +
+            'repository_dispatch:.*?types:.*?' +
+            'agent-instruction-current-base-continuation-v1.*?' +
+            'agent-instruction-current-base-bootstrap-v1.*?workflow_run:.*?' +
+            'requested.*?completed.*?run-name:.*?' +
+            'Agent current-base continuation:.*?github\.sha.*?' +
+            "workflow_run\.event == 'push'.*?repository_dispatch.*?" +
             'group: agent-instruction-current-base-status.*?queue: max.*?' +
-            'cancel-in-progress: false.*?actions: read.*?contents: read.*?' +
+            'cancel-in-progress: false.*?actions: read.*?contents: write.*?' +
             'pull-requests: read.*?statuses: write.*?' +
             'ref: \$\{\{ github\.sha \}\}.*?persist-credentials: false.*?' +
-            'SIGNAL_ACTIVITY: \$\{\{ github\.event\.action \}\}.*?' +
+            'GITHUB_SERVER_URL: \$\{\{ github\.server_url \}\}.*?' +
+            'SWEEP_RUN_REF: \$\{\{ github\.ref_name \}\}.*?' +
+            'SWEEP_RUN_SHA: \$\{\{ github\.sha \}\}.*?' +
+            'SWEEP_EVENT_TYPE: \$\{\{ github\.event\.action \}\}.*?' +
+            'SWEEP_CLIENT_PAYLOAD: ' +
+            '\$\{\{ toJson\(github\.event\.client_payload\) \}\}.*?' +
             'Set-AgentInstructionCurrentBaseStatus\.mjs\s+invalidate'
         if ($Content -cnotmatch $strInvalidatorPattern -or
             [regex]::Matches(
@@ -11201,7 +11212,7 @@ if ($SelfTest) {
                     'queue: max|cancel-in-progress: false)\r?$'
             ).Count -ne 3) {
             $listFailures.Add(
-                'The current-base invalidator must use the bounded shared queue.'
+                'The current-base invalidator contract is not fail closed.'
             )
         }
         return $listFailures.ToArray()
@@ -11223,7 +11234,7 @@ if ($SelfTest) {
                     'queue: max',
                     'queue: single'
                 )
-                Expected = 'The current-base invalidator must use the bounded shared queue.'
+                Expected = 'The current-base invalidator contract is not fail closed.'
             },
             [pscustomobject]@{
                 Name = 'cancelling invalidator queue'
@@ -11231,7 +11242,55 @@ if ($SelfTest) {
                     'cancel-in-progress: false',
                     'cancel-in-progress: true'
                 )
-                Expected = 'The current-base invalidator must use the bounded shared queue.'
+                Expected = 'The current-base invalidator contract is not fail closed.'
+            },
+            [pscustomobject]@{
+                Name = 'write-capable Actions permission'
+                Content = $strCurrentBaseWorkflowContent.Replace(
+                    '      actions: read',
+                    '      actions: write'
+                )
+                Expected = 'The current-base invalidator contract is not fail closed.'
+            },
+            [pscustomobject]@{
+                Name = 'read-only repository dispatch permission'
+                Content = $strCurrentBaseWorkflowContent.Replace(
+                    '      contents: write',
+                    '      contents: read'
+                )
+                Expected = 'The current-base invalidator contract is not fail closed.'
+            },
+            [pscustomobject]@{
+                Name = 'branch-selectable continuation trigger'
+                Content = $strCurrentBaseWorkflowContent.Replace(
+                    '  repository_dispatch:',
+                    '  workflow_dispatch:'
+                )
+                Expected = 'The current-base invalidator contract is not fail closed.'
+            },
+            [pscustomobject]@{
+                Name = 'broad continuation event type'
+                Content = $strCurrentBaseWorkflowContent.Replace(
+                    'agent-instruction-current-base-continuation-v1',
+                    'agent-instruction-current-base-continuation'
+                )
+                Expected = 'The current-base invalidator contract is not fail closed.'
+            },
+            [pscustomobject]@{
+                Name = 'projected continuation payload'
+                Content = $strCurrentBaseWorkflowContent.Replace(
+                    '${{ toJson(github.event.client_payload) }}',
+                    '${{ github.event.client_payload.session }}'
+                )
+                Expected = 'The current-base invalidator contract is not fail closed.'
+            },
+            [pscustomobject]@{
+                Name = 'non-default current run ref'
+                Content = $strCurrentBaseWorkflowContent.Replace(
+                    '          SWEEP_RUN_REF: ${{ github.ref_name }}',
+                    '          SWEEP_RUN_REF: ${{ github.event.ref }}'
+                )
+                Expected = 'The current-base invalidator contract is not fail closed.'
             }
         )) {
         if ($objInvalidatorMutation.Content -ceq $strCurrentBaseWorkflowContent) {
