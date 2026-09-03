@@ -31,7 +31,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.1.20260903.0
+# Version: 1.2.20260903.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -69,12 +69,34 @@ $arrTrustRootPaths = @(
     '.github/workflows/agent-instructions.yml'
 )
 $script:arrSpecialSemanticInvariant = @(
+    'agent-instruction-heading-status-and-bootstrap-order-is-exact',
     'exact-maintenance-production-call-is-gated',
     'legacy-transition-marker-is-inert-data',
+    'package-lock-parser-closure-is-exact',
+    'package-parser-roots-are-exact',
+    'parser-manifest-direct-roots-and-closure-is-exact',
     'published-path-array-binding-is-explicit',
+    'workflow-policy-contract-identities-and-structure-are-exact',
+    'workflow-policy-preflight-authenticates-deferred-yaml-import',
     'workflow-created-push-history-fetch-is-bounded',
     'current-base-status-helper-is-fail-closed'
 )
+$script:hashtableSemanticInvariantPath = @{
+    'agent-instruction-heading-status-and-bootstrap-order-is-exact' =
+        '.github/workflows/Test-AgentInstructions.ps1'
+    'package-lock-parser-closure-is-exact' = 'package-lock.json'
+    'package-parser-roots-are-exact' = 'package.json'
+    'parser-manifest-direct-roots-and-closure-is-exact' =
+        '.github/workflows/Test-AgentInstructionParserManifest.mjs'
+    'workflow-policy-contract-identities-and-structure-are-exact' =
+        '.github/workflows/workflow-policy-contract.json'
+    'workflow-policy-preflight-authenticates-deferred-yaml-import' =
+        '.github/workflows/Validate-WorkflowPolicy.mjs'
+}
+$script:objCanonicalJsonOptions =
+    [System.Text.Json.JsonSerializerOptions]::new()
+$script:objCanonicalJsonOptions.Encoder =
+    [System.Text.Encodings.Web.JavaScriptEncoder]::UnsafeRelaxedJsonEscaping
 $script:hashtableSemanticInvariantPattern = @{
     'adr-lifecycle-migration-is-enforced' =
         '(?s)function Get-DecisionRecordLifecycleFailure.*?' +
@@ -460,6 +482,179 @@ function Assert-ExactPropertySet {
     }
 }
 
+$script:scriptblockConvertFromStrictJsonHashtable = {
+    # .SYNOPSIS
+    # Parses one JSON text as a dictionary with unique properties.
+    # .DESCRIPTION
+    # Uses the trusted JSON parser to reject duplicate properties recursively,
+    # then returns dictionaries that preserve otherwise-valid empty-name keys.
+    # .PARAMETER Text
+    # The inert JSON text to parse.
+    # .PARAMETER Name
+    # The diagnostic name for the JSON value.
+    # .EXAMPLE
+    # ConvertFrom-StrictJsonHashtable -Text '{"value":1}' -Name 'fixture'
+    #
+    # # Returns one dictionary.
+    # .INPUTS
+    # None. This helper does not accept pipeline input.
+    # .OUTPUTS
+    # [System.Collections.IDictionary] The parsed JSON dictionary.
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260903.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([Collections.IDictionary])]
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string] $Text,
+        [Parameter(Mandatory)][string] $Name
+    )
+
+    $objJsonDocument = $null
+    try {
+        $objJsonDocument = [System.Text.Json.JsonDocument]::Parse($Text)
+        Assert-NoDuplicateJsonProperty -Element $objJsonDocument.RootElement
+        $objValue = ConvertFrom-Json -InputObject $Text -AsHashtable
+        if ($objValue -isnot [Collections.IDictionary]) {
+            throw "$Name must be one JSON object."
+        }
+        return $objValue
+    }
+    catch {
+        throw "$Name is malformed JSON."
+    }
+    finally {
+        if ($null -ne $objJsonDocument) {
+            $objJsonDocument.Dispose()
+        }
+    }
+}
+
+$script:scriptblockAssertExactDictionaryKeySet = {
+    # .SYNOPSIS
+    # Requires one dictionary to have an exact ordinal key set.
+    # .DESCRIPTION
+    # Sorts the actual and expected string keys with ordinal comparison and
+    # rejects missing, duplicate, non-string, or unexpected keys.
+    # .PARAMETER Dictionary
+    # The dictionary whose keys are inspected.
+    # .PARAMETER Key
+    # The complete expected string-key set.
+    # .PARAMETER Name
+    # The diagnostic name for the dictionary.
+    # .EXAMPLE
+    # Assert-ExactDictionaryKeySet -Dictionary $objValue -Key @('a') `
+    #     -Name 'value'
+    #
+    # # Returns only when the key set is exact.
+    # .INPUTS
+    # None. This helper does not accept pipeline input.
+    # .OUTPUTS
+    # None. This helper returns no output.
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260903.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param(
+        [Parameter(Mandatory)][Collections.IDictionary] $Dictionary,
+        [Parameter(Mandatory)][AllowEmptyCollection()][string[]] $Key,
+        [Parameter(Mandatory)][string] $Name
+    )
+
+    $arrActual = [string[]] @($Dictionary.Keys)
+    $arrExpected = [string[]] @($Key)
+    [Array]::Sort($arrActual, [StringComparer]::Ordinal)
+    [Array]::Sort($arrExpected, [StringComparer]::Ordinal)
+    if ($arrActual.Count -ne $arrExpected.Count -or
+        [string]::Join("`n", $arrActual) -cne
+            [string]::Join("`n", $arrExpected)) {
+        throw "$Name has an unexpected key set."
+    }
+}
+
+$script:scriptblockConvertToCanonicalJsonText = {
+    # .SYNOPSIS
+    # Serializes one parsed JSON value with recursively sorted object keys.
+    # .DESCRIPTION
+    # Emits a deterministic compact JSON representation for dictionaries,
+    # arrays, strings, Boolean values, and JSON numbers parsed by PowerShell.
+    # .PARAMETER Value
+    # The parsed JSON value to serialize.
+    # .EXAMPLE
+    # ConvertTo-CanonicalJsonText -Value ([ordered]@{ value = 1 })
+    #
+    # # Returns {"value":1}.
+    # .INPUTS
+    # None. This helper does not accept pipeline input.
+    # .OUTPUTS
+    # [System.String] The compact canonical JSON text.
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260903.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param([Parameter()][AllowNull()][object] $Value)
+
+    if ($null -eq $Value) {
+        return 'null'
+    }
+    if ($Value -is [Collections.IDictionary]) {
+        $arrKeys = [string[]] @($Value.Keys)
+        [Array]::Sort($arrKeys, [StringComparer]::Ordinal)
+        $arrMembers = foreach ($strKey in $arrKeys) {
+            $strEncodedKey = [System.Text.Json.JsonSerializer]::Serialize(
+                [object] ([string] $strKey),
+                [string],
+                $script:objCanonicalJsonOptions
+            )
+            $strEncodedValue =
+                & $script:scriptblockConvertToCanonicalJsonText `
+                    -Value $Value[$strKey]
+            $strEncodedKey + ':' + $strEncodedValue
+        }
+        return '{' + [string]::Join(',', [string[]] $arrMembers) + '}'
+    }
+    if ($Value -is [Collections.IEnumerable] -and
+        $Value -isnot [string]) {
+        $arrItems = foreach ($objItem in $Value) {
+            & $script:scriptblockConvertToCanonicalJsonText -Value $objItem
+        }
+        return '[' + [string]::Join(',', [string[]] $arrItems) + ']'
+    }
+    if ($Value -is [string]) {
+        return [System.Text.Json.JsonSerializer]::Serialize(
+            [object] ([string] $Value),
+            [string],
+            $script:objCanonicalJsonOptions
+        )
+    }
+    if ($Value -is [bool]) {
+        if ($Value) {
+            return 'true'
+        }
+        return 'false'
+    }
+    if ($Value -is [byte] -or $Value -is [sbyte] -or
+        $Value -is [int16] -or $Value -is [uint16] -or
+        $Value -is [int32] -or $Value -is [uint32] -or
+        $Value -is [int64] -or $Value -is [uint64] -or
+        $Value -is [single] -or $Value -is [double] -or
+        $Value -is [decimal]) {
+        return [Convert]::ToString(
+            $Value,
+            [Globalization.CultureInfo]::InvariantCulture
+        )
+    }
+    throw 'Canonical JSON received an unsupported value type.'
+}
+
 function Assert-CandidateSyntax {
     # .SYNOPSIS
     # Validates candidate text for its declared syntax class.
@@ -586,7 +781,7 @@ process.stdin.on('end', () => {
         try {
             $objJsonDocument = [System.Text.Json.JsonDocument]::Parse($Text)
             Assert-NoDuplicateJsonProperty -Element $objJsonDocument.RootElement
-            [void] (ConvertFrom-Json -InputObject $Text)
+            [void] (ConvertFrom-Json -InputObject $Text -AsHashtable)
         }
         catch {
             throw "$Path has invalid JSON syntax."
@@ -636,6 +831,770 @@ function Assert-SemanticInvariant {
         [Parameter(Mandatory)][AllowEmptyString()][string] $Text,
         [Parameter(Mandatory)][string] $Path
     )
+
+    if ($script:hashtableSemanticInvariantPath.ContainsKey($Invariant) -and
+        $Path -cne $script:hashtableSemanticInvariantPath[$Invariant]) {
+        throw "$Path does not satisfy semantic invariant $Invariant."
+    }
+
+    if ($Invariant -ceq
+        'parser-manifest-direct-roots-and-closure-is-exact') {
+        $arrRequiredLiteral = @(
+            'const EXECUTABLE_PARSER_NAMES = ["js-yaml", "markdown-it"];',
+            'const EXECUTABLE_PARSER_PATHS = EXECUTABLE_PARSER_NAMES.map(',
+            'function resolveDependencyPath(packages, packagePath, dependencyName) {',
+            'function getDependencyNames(descriptor) {',
+            'function getParserClosure(lock, name) {',
+            'const queue = [...EXECUTABLE_PARSER_PATHS];',
+            'queue.push(resolveDependencyPath(packages, packagePath, dependencyName));',
+            'const trustedPaths = [...trustedClosure.keys()].sort();',
+            'const inputPaths = [...inputClosure.keys()].sort();',
+            'if (stableJson(inputPaths) !== stableJson(trustedPaths)) {',
+            'if (stableJson(inputClosure.get(packagePath)) !== stableJson(trustedClosure.get(packagePath))) {',
+            '["direct deletion", (pkg) => delete pkg.devDependencies["markdown-it"], "must declare"],',
+            '["direct drift", (pkg) => (pkg.devDependencies["markdown-it"] = "14.2.1"), "must declare"],',
+            '["js-yaml direct deletion", (pkg) => delete pkg.devDependencies["js-yaml"], "must declare"],',
+            '["js-yaml direct drift", (pkg) => (pkg.devDependencies["js-yaml"] = "5.2.1"), "must declare"],',
+            '"js-yaml root lock drift",',
+            '"parser integrity drift",',
+            '"js-yaml version drift",',
+            '"js-yaml resolved drift",',
+            '"js-yaml integrity drift",',
+            '"js-yaml dependency edge drift",',
+            '"transitive version drift",',
+            '"transitive resolved drift",',
+            '"transitive integrity drift",',
+            '"closure deletion",',
+            '"closure shadowing",',
+            'const unrelatedPackage = clone(inputPackage);',
+            'const unrelatedLock = clone(inputLock);',
+            'unrelatedLock.packages["node_modules/unrelated"] = {',
+            'validateContract(trustedPackage, trustedLock, unrelatedPackage, unrelatedLock);'
+        )
+        foreach ($strRequiredLiteral in $arrRequiredLiteral) {
+            if (-not $Text.Contains(
+                    $strRequiredLiteral,
+                    [StringComparison]::Ordinal
+                )) {
+                throw "$Path does not satisfy semantic invariant $Invariant."
+            }
+        }
+        if ([regex]::Matches(
+                $Text,
+                [regex]::Escape(
+                    'const EXECUTABLE_PARSER_NAMES = ["js-yaml", "markdown-it"];'
+                )
+            ).Count -ne 1 -or
+            $Text.Contains('const PARSER_NAME =', [StringComparison]::Ordinal) -or
+            $Text.Contains('const PARSER_PATH =', [StringComparison]::Ordinal) -or
+            $Text -cnotmatch
+                '(?s)for \(const parserName of EXECUTABLE_PARSER_NAMES\) \{.*?' +
+                'trustedDevDependencies\[parserName\] !== expectedVersion.*?' +
+                'trustedRootDevDependencies\[parserName\] !== expectedVersion.*?' +
+                'inputDevDependencies\[parserName\] !== expectedVersion.*?' +
+                'inputRootDevDependencies\[parserName\] !== expectedVersion.*?' +
+                '\n  \}') {
+            throw "$Path does not satisfy semantic invariant $Invariant."
+        }
+        return
+    }
+
+    if ($Invariant -ceq
+        'agent-instruction-heading-status-and-bootstrap-order-is-exact') {
+        $arrTokens = $null
+        $arrParseErrors = $null
+        $objAst = [Management.Automation.Language.Parser]::ParseInput(
+            $Text,
+            $Path,
+            [ref] $arrTokens,
+            [ref] $arrParseErrors
+        )
+        $arrPredicateFunctions = @($objAst.FindAll({
+                    param($objNode)
+                    $objNode -is
+                        [Management.Automation.Language.FunctionDefinitionAst] -and
+                    $objNode.Name -ceq 'Test-DecisionLifecycleStatusLabel'
+                }, $true))
+        $arrPredicateCalls = @($objAst.FindAll({
+                    param($objNode)
+                    $objNode -is [Management.Automation.Language.CommandAst] -and
+                    $objNode.GetCommandName() -ceq
+                        'Test-DecisionLifecycleStatusLabel'
+                }, $true))
+        $intLifecycleConsumerCalls = 0
+        foreach ($objPredicateCall in $arrPredicateCalls) {
+            $objParent = $objPredicateCall.Parent
+            while ($null -ne $objParent -and
+                $objParent -isnot
+                    [Management.Automation.Language.FunctionDefinitionAst]) {
+                $objParent = $objParent.Parent
+            }
+            if ($null -ne $objParent -and
+                $objParent.Name -ceq 'Get-DecisionRecordLifecycleFailure') {
+                $intLifecycleConsumerCalls++
+            }
+        }
+        $arrRequiredLiteral = @(
+            'if (token.type !== "heading_open" || token.level !== 0) return [];',
+            '$strNormalizedLabel = [regex]::Replace($Label.Trim(), ''\s+'', '' '')',
+            '$strNormalizedLabel -ieq ''Status'' -or',
+            '$strNormalizedLabel -ieq ''Decision Status''',
+            '$objMarkdownContext.Headings |',
+            'Test-DecisionLifecycleStatusLabel -Label $_.Text',
+            'Test-DecisionLifecycleStatusLabel `',
+            'Name = ''quoted level-three Status heading''',
+            'Name = ''listed level-four Status heading''',
+            'Name = ''fenced level-three Status heading example''',
+            'Name = ''indented level-three Status heading example''',
+            'Name = ''commented level-three Status heading example''',
+            'Name = ''inline-code-only level-three Status heading example''',
+            'Name = ''raw-HTML-only level-three Status heading example''',
+            '''### Decision **Status**''',
+            '''#### Decision [Status](https://example.invalid/status)''',
+            '''##### Status''',
+            '''###### Decision Status''',
+            '''HTTP Status Codes'', ''Deployment Status'',',
+            '''Deployment Status Checks'', ''Status Check''',
+            'throw ''A Decision Status section escaped lifecycle validation.''',
+            'throw ''A Decision Status field escaped lifecycle validation.''',
+            'throw ''A Status prose field escaped lifecycle validation.''',
+            'Name = ''body Decision Status field with alignment and inline formatting''',
+            'Name = ''unrelated exact two-cell Deployment Status data row''',
+            '$strParserManifestValidationCall =',
+            '''node .github/workflows/Test-AgentInstructionParserManifest.mjs''',
+            '$strLockedDependencyInstallCall =',
+            '''npm ci --ignore-scripts --no-audit --fund=false''',
+            '$strTrustRootAuthorizationCall =',
+            '''& ./.github/workflows/Test-TrustRootAuthorization.ps1''',
+            '$intLockedDependencyInstall -le $intParserManifestValidation -or',
+            '$intTrustRootAuthorization -le $intLockedDependencyInstall',
+            '$strUnsafeParserOrderMutation = $strAgentWorkflowContent.Replace(',
+            'throw ''An unsafe executable parser validation order did not fail closed.'''
+        )
+        foreach ($strRequiredLiteral in $arrRequiredLiteral) {
+            if (-not $Text.Contains(
+                    $strRequiredLiteral,
+                    [StringComparison]::Ordinal
+                )) {
+                throw "$Path does not satisfy semantic invariant $Invariant."
+            }
+        }
+        if ($arrParseErrors.Count -ne 0 -or
+            $arrPredicateFunctions.Count -ne 1 -or
+            $arrPredicateCalls.Count -ne 5 -or
+            $intLifecycleConsumerCalls -ne 3 -or
+            [regex]::Matches(
+                $Text,
+                [regex]::Escape(
+                    'if (token.type !== "heading_open" || token.level !== 0) return [];'
+                )
+            ).Count -ne 2) {
+            throw "$Path does not satisfy semantic invariant $Invariant."
+        }
+        return
+    }
+
+    if ($Invariant -ceq
+        'workflow-policy-preflight-authenticates-deferred-yaml-import') {
+        $arrStaticImports = @([regex]::Matches(
+                $Text,
+                "(?m)^import .+ from '(?<Source>[^']+)';$"
+            ))
+        $arrRequiredLiteral = @(
+            "import crypto from 'node:crypto';",
+            "import fs from 'node:fs';",
+            "import path from 'node:path';",
+            "import process from 'node:process';",
+            "import { fileURLToPath } from 'node:url';",
+            "} = await import('yaml'));",
+            "const VALIDATOR_VERSION = '1.2.2';",
+            "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '3b1b0eb57730601de0f2a2673db8bd21230fde25a5f21d78d73c12fda7360679';",
+            "const VALIDATOR_FILE_NAME = 'Validate-WorkflowPolicy.mjs';",
+            'function readContractWithoutDependencies() {',
+            "path.join(SCRIPT_DIRECTORY, 'workflow-policy-contract.json'),",
+            "const text = bytes.toString('utf8');",
+            "contract = JSON.parse(text);",
+            "expectExactKeys(contract.validatorIdentity, ['path', 'sha256'], 'contract-shape');",
+            'contract.validatorIdentity.path !== VALIDATOR_FILE_NAME',
+            'sha256(canonicalJson(contractIdentityView(contract))) !== EXPECTED_CONTRACT_CANONICAL_SHA256',
+            'function verifyValidatorIdentity(contract) {',
+            'sha256(validatorBytes) !== contract.validatorIdentity.sha256',
+            'function verifyPackageDigests(contract) {',
+            'sha256(packageJsonBytes) !== contract.supplyFreeze.reviewedWorkingBytes.packageJson.sha256',
+            'sha256(packageLockBytes) !== contract.supplyFreeze.reviewedWorkingBytes.packageLockJson.sha256',
+            'function preflight() {',
+            'const contract = readContractWithoutDependencies();',
+            'verifyValidatorIdentity(contract);',
+            'verifyPackageDigests(contract);',
+            'validatorVersion: VALIDATOR_VERSION,',
+            'async function main() {',
+            'const bootstrapContract = readContractWithoutDependencies();',
+            'verifyValidatorIdentity(bootstrapContract);',
+            'verifyPackageDigests(bootstrapContract);',
+            'await loadYamlBindings();',
+            'validateContract(contract);',
+            'const isPreflight = canonicalJson(process.argv.slice(2)) === canonicalJson(PREFLIGHT_ARGUMENTS);',
+            'process.stdout.write(`${JSON.stringify(isPreflight ? preflight() : await main())}\n`);'
+        )
+        foreach ($strRequiredLiteral in $arrRequiredLiteral) {
+            if (-not $Text.Contains(
+                    $strRequiredLiteral,
+                    [StringComparison]::Ordinal
+                )) {
+                throw "$Path does not satisfy semantic invariant $Invariant."
+            }
+        }
+        $boolBuiltInOnly = $arrStaticImports.Count -eq 5
+        foreach ($objImport in $arrStaticImports) {
+            if (-not $objImport.Groups['Source'].Value.StartsWith(
+                    'node:',
+                    [StringComparison]::Ordinal
+                )) {
+                $boolBuiltInOnly = $false
+            }
+        }
+        $intMainStart = $Text.IndexOf(
+            'async function main() {',
+            [StringComparison]::Ordinal
+        )
+        $intMainContract = $Text.IndexOf(
+            'const bootstrapContract = readContractWithoutDependencies();',
+            $intMainStart,
+            [StringComparison]::Ordinal
+        )
+        $intMainValidator = $Text.IndexOf(
+            'verifyValidatorIdentity(bootstrapContract);',
+            $intMainContract,
+            [StringComparison]::Ordinal
+        )
+        $intMainPackages = $Text.IndexOf(
+            'verifyPackageDigests(bootstrapContract);',
+            $intMainValidator,
+            [StringComparison]::Ordinal
+        )
+        $intMainImport = $Text.IndexOf(
+            'await loadYamlBindings();',
+            $intMainPackages,
+            [StringComparison]::Ordinal
+        )
+        if (-not $boolBuiltInOnly -or
+            [regex]::Matches($Text, "(?<!await )import\('").Count -ne 0 -or
+            [regex]::Matches(
+                $Text,
+                [regex]::Escape("await import('yaml')")
+            ).Count -ne 1 -or
+            $intMainStart -lt 0 -or $intMainContract -le $intMainStart -or
+            $intMainValidator -le $intMainContract -or
+            $intMainPackages -le $intMainValidator -or
+            $intMainImport -le $intMainPackages) {
+            throw "$Path does not satisfy semantic invariant $Invariant."
+        }
+        return
+    }
+
+    if ($Invariant -ceq
+        'workflow-policy-contract-identities-and-structure-are-exact') {
+        try {
+            $objContract = & $script:scriptblockConvertFromStrictJsonHashtable `
+                -Text $Text -Name $Path
+            & $script:scriptblockAssertExactDictionaryKeySet `
+                -Dictionary $objContract -Name 'contract' `
+                -Key @(
+                    'schema', 'contractVersion', 'limits', 'supplyFreeze',
+                    'scriptVersions', 'caseCatalog', 'validatorIdentity',
+                    'actions', 'workflowPolicy', 'markdownPolicy', 'dependabot',
+                    'reciprocalFoundation'
+                )
+            if ($objContract.schema -cne
+                    'PSStyleGuide.WorkflowPolicyContract.v1' -or
+                $objContract.contractVersion -ne 1) {
+                throw 'The workflow contract version is invalid.'
+            }
+            foreach ($strDictionaryName in @(
+                    'limits', 'supplyFreeze', 'scriptVersions', 'caseCatalog',
+                    'validatorIdentity', 'actions', 'workflowPolicy',
+                    'markdownPolicy', 'dependabot', 'reciprocalFoundation'
+                )) {
+                if ($objContract[$strDictionaryName] -isnot
+                    [Collections.IDictionary]) {
+                    throw "The workflow contract $strDictionaryName is invalid."
+                }
+            }
+            & $script:scriptblockAssertExactDictionaryKeySet `
+                -Dictionary $objContract.limits `
+                -Name 'contract limits' -Key @(
+                    'maximumWorkflowBytes', 'maximumJsonBytes', 'maximumNodes',
+                    'maximumDepth'
+                )
+            if ($objContract.limits.maximumWorkflowBytes -ne 131072 -or
+                $objContract.limits.maximumJsonBytes -ne 524288 -or
+                $objContract.limits.maximumNodes -ne 5000 -or
+                $objContract.limits.maximumDepth -ne 32) {
+                throw 'The workflow contract limits are invalid.'
+            }
+            & $script:scriptblockAssertExactDictionaryKeySet `
+                -Dictionary $objContract.validatorIdentity `
+                -Name 'validator identity' -Key @('path', 'sha256')
+            if ($objContract.validatorIdentity.path -cne
+                    'Validate-WorkflowPolicy.mjs' -or
+                $objContract.validatorIdentity.sha256 -cne
+                    '948d54724d9c0374fb2d643d3626be8e23a37b59c7108fe113b3756d953ebcd7') {
+                throw 'The workflow validator identity is invalid.'
+            }
+            & $script:scriptblockAssertExactDictionaryKeySet `
+                -Dictionary $objContract.markdownPolicy `
+                -Name 'Markdown policy' -Key @(
+                    'schema', 'extensions', 'entryPoints'
+                )
+            if ($objContract.markdownPolicy.schema -cne
+                    'PSStyleGuide.MarkdownEntryPointPolicy.v1' -or
+                $objContract.markdownPolicy.entryPoints -isnot
+                    [Collections.IDictionary]) {
+                throw 'The Markdown entry-point policy is invalid.'
+            }
+            & $script:scriptblockAssertExactDictionaryKeySet `
+                -Dictionary $objContract.markdownPolicy.entryPoints `
+                -Name 'Markdown entry points' -Key @(
+                    'rootPackageJson', 'workflowPackageJson', 'nestedLinter',
+                    'stagedSelector', 'preCommit'
+                )
+            $objRootPackage =
+                $objContract.markdownPolicy.entryPoints.rootPackageJson
+            if ($objRootPackage -isnot [Collections.IDictionary]) {
+                throw 'The root package identity is invalid.'
+            }
+            & $script:scriptblockAssertExactDictionaryKeySet `
+                -Dictionary $objRootPackage `
+                -Name 'root package identity' `
+                -Key @('path', 'length', 'sha256', 'lintScript')
+            $strRootLint =
+                'markdownlint-cli2 "**/*.md" "**/*.mdc" "#node_modules" ' +
+                '"#.github/workflows/node_modules" --config ' +
+                '.github/workflows/.markdownlint.jsonc'
+            if ($objRootPackage.path -cne '../../package.json' -or
+                $objRootPackage.length -ne 1188 -or
+                $objRootPackage.sha256 -cne
+                    '1b77a3a08d12639c3534272409afd263b0fbcf7d802abad689dd137e1278eea4' -or
+                $objRootPackage.lintScript -cne $strRootLint) {
+                throw 'The root package identity is invalid.'
+            }
+        }
+        catch {
+            throw (
+                "$Path does not satisfy semantic invariant ${Invariant}: " +
+                    $_.Exception.Message
+            )
+        }
+        return
+    }
+
+    if ($Invariant -ceq 'package-parser-roots-are-exact') {
+        try {
+            $objPackage = & $script:scriptblockConvertFromStrictJsonHashtable `
+                -Text $Text -Name $Path
+            & $script:scriptblockAssertExactDictionaryKeySet `
+                -Dictionary $objPackage -Name 'package' `
+                -Key @(
+                    'name', 'version', 'private', 'description', 'license',
+                    'engines', 'packageManager', 'scripts', 'repository',
+                    'devDependencies'
+                )
+            if ($objPackage.name -cne 'psstyleguide' -or
+                $objPackage.version -cne '1.0.0' -or
+                $objPackage.private -ne $true -or
+                $objPackage.license -cne 'MIT' -or
+                $objPackage.packageManager -cne 'npm@11.16.0') {
+                throw 'The root package identity is invalid.'
+            }
+            & $script:scriptblockAssertExactDictionaryKeySet `
+                -Dictionary $objPackage.engines `
+                -Name 'package engines' -Key @('node', 'npm')
+            if ($objPackage.engines.node -cne '24.18.0' -or
+                $objPackage.engines.npm -cne '11.16.0') {
+                throw 'The package runtime identity is invalid.'
+            }
+            & $script:scriptblockAssertExactDictionaryKeySet `
+                -Dictionary $objPackage.scripts `
+                -Name 'package scripts' -Key @(
+                    'bootstrap:agent-instructions', 'lint:md',
+                    'lint:md:nested', 'test:agent-instructions'
+                )
+            $hashtableExpectedScript = @{
+                'bootstrap:agent-instructions' =
+                    'npm ci --ignore-scripts --no-audit --fund=false ' +
+                    '--include=dev --package-lock=true && npm --prefix ' +
+                    '.github/workflows ci --ignore-scripts --no-audit ' +
+                    '--fund=false --include=dev --package-lock=true'
+                'lint:md' =
+                    'markdownlint-cli2 "**/*.md" "**/*.mdc" ' +
+                    '"#node_modules" "#.github/workflows/node_modules" ' +
+                    '--config .github/workflows/.markdownlint.jsonc'
+                'lint:md:nested' =
+                    'npm --prefix .github/workflows run lint:md:nested'
+                'test:agent-instructions' =
+                    'pwsh -NoLogo -NoProfile -NonInteractive -File ' +
+                    '.github/workflows/Test-AgentInstructions.ps1 -SelfTest'
+            }
+            foreach ($strScriptName in $hashtableExpectedScript.Keys) {
+                if ($objPackage.scripts[$strScriptName] -cne
+                    $hashtableExpectedScript[$strScriptName]) {
+                    throw "The package script $strScriptName is invalid."
+                }
+            }
+            & $script:scriptblockAssertExactDictionaryKeySet `
+                -Dictionary $objPackage.devDependencies `
+                -Name 'package development dependencies' -Key @(
+                    'glob', 'js-yaml', 'jsonc-parser', 'markdown-it',
+                    'markdownlint', 'markdownlint-cli2'
+                )
+            $hashtableExpectedDependency = @{
+                'glob' = '10.5.0'
+                'js-yaml' = '5.2.2'
+                'jsonc-parser' = '3.3.1'
+                'markdown-it' = '14.2.0'
+                'markdownlint' = '0.41.0'
+                'markdownlint-cli2' = '0.23.2'
+            }
+            foreach ($strDependencyName in
+                $hashtableExpectedDependency.Keys) {
+                if ($objPackage.devDependencies[$strDependencyName] -cne
+                    $hashtableExpectedDependency[$strDependencyName]) {
+                    throw "The package dependency $strDependencyName is invalid."
+                }
+            }
+        }
+        catch {
+            throw "$Path does not satisfy semantic invariant $Invariant."
+        }
+        return
+    }
+
+    if ($Invariant -ceq 'package-lock-parser-closure-is-exact') {
+        try {
+            $objLock = & $script:scriptblockConvertFromStrictJsonHashtable `
+                -Text $Text -Name $Path
+            & $script:scriptblockAssertExactDictionaryKeySet `
+                -Dictionary $objLock -Name 'lockfile' `
+                -Key @(
+                    'name', 'version', 'lockfileVersion', 'requires', 'packages'
+                )
+            if ($objLock.name -cne 'psstyleguide' -or
+                $objLock.version -cne '1.0.0' -or
+                $objLock.lockfileVersion -ne 3 -or
+                $objLock.requires -ne $true -or
+                $objLock.packages -isnot [Collections.IDictionary] -or
+                -not $objLock.packages.Contains('')) {
+                throw 'The lockfile identity is invalid.'
+            }
+            $objRoot = $objLock.packages['']
+            if ($objRoot -isnot [Collections.IDictionary]) {
+                throw 'The lockfile root is invalid.'
+            }
+            & $script:scriptblockAssertExactDictionaryKeySet `
+                -Dictionary $objRoot `
+                -Name 'lockfile root' -Key @(
+                    'name', 'version', 'license', 'devDependencies', 'engines'
+                )
+            if ($objRoot.name -cne 'psstyleguide' -or
+                $objRoot.version -cne '1.0.0' -or
+                $objRoot.license -cne 'MIT' -or
+                $objRoot.devDependencies -isnot [Collections.IDictionary] -or
+                $objRoot.engines -isnot [Collections.IDictionary]) {
+                throw 'The lockfile root identity is invalid.'
+            }
+            & $script:scriptblockAssertExactDictionaryKeySet `
+                -Dictionary $objRoot.devDependencies `
+                -Name 'lockfile root development dependencies' -Key @(
+                    'glob', 'js-yaml', 'jsonc-parser', 'markdown-it',
+                    'markdownlint', 'markdownlint-cli2'
+                )
+            $hashtableExpectedRootDependency = @{
+                'glob' = '10.5.0'
+                'js-yaml' = '5.2.2'
+                'jsonc-parser' = '3.3.1'
+                'markdown-it' = '14.2.0'
+                'markdownlint' = '0.41.0'
+                'markdownlint-cli2' = '0.23.2'
+            }
+            foreach ($strDependencyName in
+                $hashtableExpectedRootDependency.Keys) {
+                if ($objRoot.devDependencies[$strDependencyName] -cne
+                    $hashtableExpectedRootDependency[$strDependencyName]) {
+                    throw 'The lockfile root dependency identity is invalid.'
+                }
+            }
+            & $script:scriptblockAssertExactDictionaryKeySet `
+                -Dictionary $objRoot.engines `
+                -Name 'lockfile root engines' -Key @('node', 'npm')
+            if ($objRoot.engines.node -cne '24.18.0' -or
+                $objRoot.engines.npm -cne '11.16.0') {
+                throw 'The lockfile root runtime identity is invalid.'
+            }
+
+            $arrParserRootPath = @(
+                'node_modules/js-yaml',
+                'node_modules/markdown-it'
+            )
+            $queuePath = [Collections.Generic.Queue[string]]::new()
+            foreach ($strParserRootPath in $arrParserRootPath) {
+                $queuePath.Enqueue($strParserRootPath)
+            }
+            $setClosurePath = [Collections.Generic.HashSet[string]]::new(
+                [StringComparer]::Ordinal
+            )
+            while ($queuePath.Count -gt 0) {
+                $strPackagePath = $queuePath.Dequeue()
+                if (-not $setClosurePath.Add($strPackagePath)) {
+                    continue
+                }
+                if (-not $objLock.packages.Contains($strPackagePath) -or
+                    $objLock.packages[$strPackagePath] -isnot
+                        [Collections.IDictionary]) {
+                    throw "The parser closure lacks $strPackagePath."
+                }
+                $objDescriptor = $objLock.packages[$strPackagePath]
+                $setDependencyName =
+                    [Collections.Generic.HashSet[string]]::new(
+                        [StringComparer]::Ordinal
+                    )
+                foreach ($strDependencyField in @(
+                        'dependencies', 'optionalDependencies'
+                    )) {
+                    if ($objDescriptor.Contains($strDependencyField)) {
+                        $objDependencies = $objDescriptor[$strDependencyField]
+                        if ($objDependencies -isnot [Collections.IDictionary]) {
+                            throw 'A parser dependency field is invalid.'
+                        }
+                        foreach ($strDependencyName in $objDependencies.Keys) {
+                            if ($objDependencies[$strDependencyName] -isnot
+                                    [string] -or
+                                [string]::IsNullOrEmpty(
+                                    $objDependencies[$strDependencyName]
+                                )) {
+                                throw 'A parser dependency edge is invalid.'
+                            }
+                            [void] $setDependencyName.Add($strDependencyName)
+                        }
+                    }
+                }
+                if ($objDescriptor.Contains('peerDependencies')) {
+                    $objPeerDependencies = $objDescriptor.peerDependencies
+                    if ($objPeerDependencies -isnot [Collections.IDictionary]) {
+                        throw 'A parser peer dependency field is invalid.'
+                    }
+                    $objPeerMetadata = if (
+                        $objDescriptor.Contains('peerDependenciesMeta')
+                    ) {
+                        $objDescriptor.peerDependenciesMeta
+                    }
+                    else {
+                        @{}
+                    }
+                    if ($objPeerMetadata -isnot [Collections.IDictionary]) {
+                        throw 'Parser peer dependency metadata is invalid.'
+                    }
+                    foreach ($strDependencyName in $objPeerDependencies.Keys) {
+                        $boolOptional =
+                            $objPeerMetadata.Contains($strDependencyName) -and
+                            $objPeerMetadata[$strDependencyName] -is
+                                [Collections.IDictionary] -and
+                            $objPeerMetadata[$strDependencyName].optional -eq
+                                $true
+                        if (-not $boolOptional) {
+                            [void] $setDependencyName.Add($strDependencyName)
+                        }
+                    }
+                }
+                $arrDependencyName = [string[]] @($setDependencyName)
+                [Array]::Sort($arrDependencyName, [StringComparer]::Ordinal)
+                foreach ($strDependencyName in $arrDependencyName) {
+                    $strScope = $strPackagePath
+                    $strResolvedPath = $null
+                    while ($true) {
+                        $strCandidatePath = if (
+                            [string]::IsNullOrEmpty($strScope)
+                        ) {
+                            "node_modules/$strDependencyName"
+                        }
+                        else {
+                            "$strScope/node_modules/$strDependencyName"
+                        }
+                        if ($objLock.packages.Contains($strCandidatePath)) {
+                            $strResolvedPath = $strCandidatePath
+                            break
+                        }
+                        if ([string]::IsNullOrEmpty($strScope)) {
+                            break
+                        }
+                        $intParentIndex = $strScope.LastIndexOf(
+                            '/node_modules/',
+                            [StringComparison]::Ordinal
+                        )
+                        $strScope = if ($intParentIndex -lt 0) {
+                            ''
+                        }
+                        else {
+                            $strScope.Substring(0, $intParentIndex)
+                        }
+                    }
+                    if ($null -eq $strResolvedPath) {
+                        throw 'A parser dependency edge cannot resolve.'
+                    }
+                    $queuePath.Enqueue($strResolvedPath)
+                }
+            }
+
+            $hashtableExpectedDescriptor = @{
+                'node_modules/argparse' = @{
+                    Version = '2.0.1'
+                    Resolved =
+                        'https://registry.npmjs.org/argparse/-/argparse-2.0.1.tgz'
+                    Integrity =
+                        'sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q=='
+                    Dependencies = @{}
+                    CanonicalSha256 =
+                        '1aba76231b810723f6fbc4dfcdc5c7356fd9d53f665a7f07192d357beb9c04cd'
+                }
+                'node_modules/entities' = @{
+                    Version = '4.5.0'
+                    Resolved =
+                        'https://registry.npmjs.org/entities/-/entities-4.5.0.tgz'
+                    Integrity =
+                        'sha512-V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw=='
+                    Dependencies = @{}
+                    CanonicalSha256 =
+                        'b63f780bdba314f86d01ec39124ffe7bc4f55ad75e59c937cb552d45f93ed74d'
+                }
+                'node_modules/js-yaml' = @{
+                    Version = '5.2.2'
+                    Resolved =
+                        'https://registry.npmjs.org/js-yaml/-/js-yaml-5.2.2.tgz'
+                    Integrity =
+                        'sha512-dayzUzKkJ1MkuUtZglSebU43utNXH0OWQByK9rKOOuYIO8M5TV1y+n8ALMdG0rdzBnfNkOmZEqrURepb0ejqBw=='
+                    Dependencies = @{
+                        'argparse' = '^2.0.1'
+                    }
+                    CanonicalSha256 =
+                        'e11a9c3513389f92aec2c8f6e30d7e04ef86a142038a2835b941d32e1acb69d6'
+                }
+                'node_modules/linkify-it' = @{
+                    Version = '5.0.2'
+                    Resolved =
+                        'https://registry.npmjs.org/linkify-it/-/linkify-it-5.0.2.tgz'
+                    Integrity =
+                        'sha512-ONTm2jCMAVZjgQa/Fy1kScXsuOoF5NPTsoFBdE1KVIZ2vAh/r9+Bqo+0jINCBYnavTPQZz38QzFTme79ENoN3Q=='
+                    Dependencies = @{
+                        'uc.micro' = '^2.0.0'
+                    }
+                    CanonicalSha256 =
+                        'd36f93a608fcd49b1b8b3852be1c4e4012f6eabe679df9e8d24e6487ad623d2e'
+                }
+                'node_modules/markdown-it' = @{
+                    Version = '14.2.0'
+                    Resolved =
+                        'https://registry.npmjs.org/markdown-it/-/markdown-it-14.2.0.tgz'
+                    Integrity =
+                        'sha512-1TGiQiJVRQ3NPmZH6sx5Cfnmg6GQm9jvC1ch4TK511NjSJvjzKLzn5pPfZRNZkRPZP0HqCioSndqH8v2nRaWVQ=='
+                    Dependencies = @{
+                        'argparse' = '^2.0.1'
+                        'entities' = '^4.4.0'
+                        'linkify-it' = '^5.0.1'
+                        'mdurl' = '^2.0.0'
+                        'punycode.js' = '^2.3.1'
+                        'uc.micro' = '^2.1.0'
+                    }
+                    CanonicalSha256 =
+                        'ed483c71df83e03d1663ca22bc1d7a9bc4f076a7733c6e1bb0a7baa5e03929b0'
+                }
+                'node_modules/mdurl' = @{
+                    Version = '2.0.0'
+                    Resolved =
+                        'https://registry.npmjs.org/mdurl/-/mdurl-2.0.0.tgz'
+                    Integrity =
+                        'sha512-Lf+9+2r+Tdp5wXDXC4PcIBjTDtq4UKjCPMQhKIuzpJNW0b96kVqSwW0bT7FhRSfmAiFYgP+SCRvdrDozfh0U5w=='
+                    Dependencies = @{}
+                    CanonicalSha256 =
+                        'a9e897eaa7c653dd7e5f6586803fceaac685c9768b9577c94649665975dc26bb'
+                }
+                'node_modules/punycode.js' = @{
+                    Version = '2.3.1'
+                    Resolved =
+                        'https://registry.npmjs.org/punycode.js/-/punycode.js-2.3.1.tgz'
+                    Integrity =
+                        'sha512-uxFIHU0YlHYhDQtV4R9J6a52SLx28BCjT+4ieh7IGbgwVJWO+km431c4yRlREUAsAmt/uMjQUyQHNEPf0M39CA=='
+                    Dependencies = @{}
+                    CanonicalSha256 =
+                        '86c6ac2b7abd1950959542228952af635ff2e32d487302f6f2b6d7f6e5faca6c'
+                }
+                'node_modules/uc.micro' = @{
+                    Version = '2.1.0'
+                    Resolved =
+                        'https://registry.npmjs.org/uc.micro/-/uc.micro-2.1.0.tgz'
+                    Integrity =
+                        'sha512-ARDJmphmdvUk6Glw7y9DQ2bFkKBHwQHLi2lsaH6PPmz/Ka9sFOBsBluozhDltWmnv9u/cF6Rt87znRTPV+yp/A=='
+                    Dependencies = @{}
+                    CanonicalSha256 =
+                        '7327a8851245320355f66321a0caf097089786fa1a52af07eb519ac6d07119d0'
+                }
+            }
+            $arrClosurePath = [string[]] @($setClosurePath)
+            $arrExpectedClosurePath =
+                [string[]] @($hashtableExpectedDescriptor.Keys)
+            [Array]::Sort($arrClosurePath, [StringComparer]::Ordinal)
+            [Array]::Sort($arrExpectedClosurePath, [StringComparer]::Ordinal)
+            if ([string]::Join("`n", $arrClosurePath) -cne
+                [string]::Join("`n", $arrExpectedClosurePath)) {
+                throw 'The executable parser closure is invalid.'
+            }
+            foreach ($strPackagePath in $arrExpectedClosurePath) {
+                $objDescriptor = $objLock.packages[$strPackagePath]
+                $objExpected = $hashtableExpectedDescriptor[$strPackagePath]
+                $objActualDependencies = if (
+                    $objDescriptor.Contains('dependencies')
+                ) {
+                    $objDescriptor.dependencies
+                }
+                else {
+                    @{}
+                }
+                if ($objActualDependencies -isnot [Collections.IDictionary]) {
+                    throw 'A parser dependency descriptor is invalid.'
+                }
+                & $script:scriptblockAssertExactDictionaryKeySet `
+                    -Dictionary $objActualDependencies `
+                    -Key ([string[]] @($objExpected.Dependencies.Keys)) `
+                    -Name "$strPackagePath dependencies"
+                foreach ($strDependencyName in
+                    $objExpected.Dependencies.Keys) {
+                    if ($objActualDependencies[$strDependencyName] -cne
+                        $objExpected.Dependencies[$strDependencyName]) {
+                        throw 'A parser dependency edge is invalid.'
+                    }
+                }
+                $strCanonicalDescriptor =
+                    & $script:scriptblockConvertToCanonicalJsonText `
+                    -Value $objDescriptor
+                $strDescriptorSha256 = [Convert]::ToHexString(
+                    [Security.Cryptography.SHA256]::HashData(
+                        [Text.Encoding]::UTF8.GetBytes($strCanonicalDescriptor)
+                    )
+                ).ToLowerInvariant()
+                if ($objDescriptor.version -cne $objExpected.Version -or
+                    $objDescriptor.resolved -cne $objExpected.Resolved -or
+                    $objDescriptor.integrity -cne $objExpected.Integrity -or
+                    $strDescriptorSha256 -cne $objExpected.CanonicalSha256) {
+                    throw 'A parser dependency descriptor is invalid.'
+                }
+            }
+        }
+        catch {
+            throw (
+                "$Path does not satisfy semantic invariant ${Invariant}: " +
+                    $_.Exception.Message
+            )
+        }
+        return
+    }
 
     if ($Invariant -ceq 'exact-maintenance-production-call-is-gated') {
         $arrTokens = $null
@@ -1185,6 +2144,131 @@ if ($SelfTest) {
         }
     }
 
+    $scriptblockExpectInvariantRejection = {
+        param(
+            [Parameter(Mandatory)][string] $Invariant,
+            [Parameter(Mandatory)][string] $Text,
+            [Parameter(Mandatory)][string] $Path,
+            [Parameter(Mandatory)][string] $Name
+        )
+        try {
+            Assert-SemanticInvariant -Invariant $Invariant `
+                -Text $Text -Path $Path
+            throw "Semantic invariant mutation passed: $Name"
+        }
+        catch {
+            if ($_.Exception.Message -ceq
+                "Semantic invariant mutation passed: $Name" -or
+                -not $_.Exception.Message.Contains(
+                    "does not satisfy semantic invariant $Invariant",
+                    [StringComparison]::Ordinal
+                )) {
+                throw
+            }
+        }
+    }
+    $arrNewInvariantSpec = @(
+        [pscustomobject]@{
+            Path = '.github/workflows/Test-AgentInstructionParserManifest.mjs'
+            Syntax = 'javascript'
+            Invariant =
+                'parser-manifest-direct-roots-and-closure-is-exact'
+            MutationFrom =
+                'const EXECUTABLE_PARSER_NAMES = ["js-yaml", "markdown-it"];'
+            MutationTo =
+                'const EXECUTABLE_PARSER_NAMES = ["markdown-it", "js-yaml"];'
+        },
+        [pscustomobject]@{
+            Path = '.github/workflows/Test-AgentInstructions.ps1'
+            Syntax = 'powershell'
+            Invariant =
+                'agent-instruction-heading-status-and-bootstrap-order-is-exact'
+            MutationFrom =
+                'if (token.type !== "heading_open" || token.level !== 0) return [];'
+            MutationTo =
+                'if (token.type !== "heading_open") return [];'
+        },
+        [pscustomobject]@{
+            Path = '.github/workflows/Validate-WorkflowPolicy.mjs'
+            Syntax = 'javascript'
+            Invariant =
+                'workflow-policy-preflight-authenticates-deferred-yaml-import'
+            MutationFrom = "const VALIDATOR_VERSION = '1.2.2';"
+            MutationTo = "const VALIDATOR_VERSION = '1.2.3';"
+        },
+        [pscustomobject]@{
+            Path = '.github/workflows/workflow-policy-contract.json'
+            Syntax = 'json'
+            Invariant =
+                'workflow-policy-contract-identities-and-structure-are-exact'
+            MutationFrom = '"path": "Validate-WorkflowPolicy.mjs"'
+            MutationTo = '"path": "Other-Validator.mjs"'
+        },
+        [pscustomobject]@{
+            Path = 'package.json'
+            Syntax = 'json'
+            Invariant = 'package-parser-roots-are-exact'
+            MutationFrom = '"js-yaml": "5.2.2"'
+            MutationTo = '"js-yaml": "5.2.1"'
+        },
+        [pscustomobject]@{
+            Path = 'package-lock.json'
+            Syntax = 'json'
+            Invariant = 'package-lock-parser-closure-is-exact'
+            MutationFrom =
+                'sha512-dayzUzKkJ1MkuUtZglSebU43utNXH0OWQByK9rKOOuYIO8M5TV1y+n8ALMdG0rdzBnfNkOmZEqrURepb0ejqBw=='
+            MutationTo = 'sha512-corrupted-parser-integrity'
+        }
+    )
+    $hashtableNewInvariantText = @{}
+    foreach ($objInvariantSpec in $arrNewInvariantSpec) {
+        $strInvariantSourcePath =
+            Join-Path $RepositoryRootPath $objInvariantSpec.Path
+        $arrInvariantBytes = [IO.File]::ReadAllBytes($strInvariantSourcePath)
+        $strInvariantText = ConvertFrom-StrictUtf8Text `
+            -Bytes $arrInvariantBytes -Name $objInvariantSpec.Path
+        $hashtableNewInvariantText[$objInvariantSpec.Path] = $strInvariantText
+        Assert-CandidateSyntax -Syntax $objInvariantSpec.Syntax `
+            -Text $strInvariantText -Path $objInvariantSpec.Path
+        Assert-SemanticInvariant -Invariant $objInvariantSpec.Invariant `
+            -Text $strInvariantText -Path $objInvariantSpec.Path
+        & $scriptblockExpectInvariantRejection `
+            -Invariant $objInvariantSpec.Invariant -Text $strInvariantText `
+            -Path "wrong/$($objInvariantSpec.Path)" `
+            -Name "$($objInvariantSpec.Invariant) wrong path"
+        $strMutation = $strInvariantText.Replace(
+            $objInvariantSpec.MutationFrom,
+            $objInvariantSpec.MutationTo,
+            [StringComparison]::Ordinal
+        )
+        if ($strMutation -ceq $strInvariantText) {
+            throw "$($objInvariantSpec.Invariant) mutation fixture did not change."
+        }
+        & $scriptblockExpectInvariantRejection `
+            -Invariant $objInvariantSpec.Invariant -Text $strMutation `
+            -Path $objInvariantSpec.Path `
+            -Name "$($objInvariantSpec.Invariant) targeted corruption"
+    }
+    $objShadowLock = & $script:scriptblockConvertFromStrictJsonHashtable `
+        -Text $hashtableNewInvariantText['package-lock.json'] `
+        -Name 'package-lock shadow mutation'
+    $objShadowDescriptor =
+        & $script:scriptblockConvertFromStrictJsonHashtable `
+        -Text (ConvertTo-Json `
+            -InputObject $objShadowLock.packages['node_modules/argparse'] `
+            -Depth 16 -Compress) `
+        -Name 'package-lock shadow descriptor'
+    $objShadowDescriptor.version = '2.0.2'
+    $objShadowLock.packages[
+        'node_modules/js-yaml/node_modules/argparse'
+    ] = $objShadowDescriptor
+    $strShadowLock = ConvertTo-Json `
+        -InputObject $objShadowLock -Depth 100 -Compress
+    & $scriptblockExpectInvariantRejection `
+        -Invariant 'package-lock-parser-closure-is-exact' `
+        -Text $strShadowLock -Path 'package-lock.json' `
+        -Name 'package-lock parser shadowing'
+
     $strSchemaSystemTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
     $strSchemaFixtureRoot = [IO.Path]::Combine(
         $strSchemaSystemTempRoot,
@@ -1211,6 +2295,13 @@ if ($SelfTest) {
                 Invariants = @('current-base-status-helper-is-fail-closed')
             },
             [pscustomobject]@{
+                Path = '.github/workflows/Test-AgentInstructionParserManifest.mjs'
+                Syntax = 'javascript'
+                Invariants = @(
+                    'parser-manifest-direct-roots-and-closure-is-exact'
+                )
+            },
+            [pscustomobject]@{
                 Path = '.github/workflows/Test-AgentInstructions.SelfTest.ps1'
                 Syntax = 'powershell'
                 Invariants = @('extracted-self-test-version-and-topology')
@@ -1230,7 +2321,8 @@ if ($SelfTest) {
                     'published-path-array-binding-is-explicit',
                     'published-finalization-date-is-enforced',
                     'pr-merge-bases-use-all-and-cap',
-                    'trusted-maintenance-switch-is-explicit'
+                    'trusted-maintenance-switch-is-explicit',
+                    'agent-instruction-heading-status-and-bootstrap-order-is-exact'
                 )
             },
             [pscustomobject]@{
@@ -1239,6 +2331,13 @@ if ($SelfTest) {
                 Invariants = @(
                     'verifier-audits-authorized-history',
                     'verifier-reads-trusted-revision-manifest'
+                )
+            },
+            [pscustomobject]@{
+                Path = '.github/workflows/Validate-WorkflowPolicy.mjs'
+                Syntax = 'javascript'
+                Invariants = @(
+                    'workflow-policy-preflight-authenticates-deferred-yaml-import'
                 )
             },
             [pscustomobject]@{
@@ -1259,6 +2358,23 @@ if ($SelfTest) {
                     'workflow-persist-credentials-is-false',
                     'workflow-uses-trusted-authorization-output'
                 )
+            },
+            [pscustomobject]@{
+                Path = '.github/workflows/workflow-policy-contract.json'
+                Syntax = 'json'
+                Invariants = @(
+                    'workflow-policy-contract-identities-and-structure-are-exact'
+                )
+            },
+            [pscustomobject]@{
+                Path = 'package-lock.json'
+                Syntax = 'json'
+                Invariants = @('package-lock-parser-closure-is-exact')
+            },
+            [pscustomobject]@{
+                Path = 'package.json'
+                Syntax = 'json'
+                Invariants = @('package-parser-roots-are-exact')
             }
         )
         $listSchemaAllowedPath = [Collections.Generic.List[object]]::new()
@@ -1568,7 +2684,7 @@ if ($SelfTest) {
                     parent_commits = @($strTransitionBase)
                 }
                 limits = [ordered]@{
-                    maximum_paths = 8
+                    maximum_paths = 13
                     maximum_blob_bytes = 573440
                     maximum_manifest_bytes = 65536
                 }
