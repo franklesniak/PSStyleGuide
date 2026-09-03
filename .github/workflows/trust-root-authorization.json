@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "authorization_id": "issue176-adr-lifecycle-parser-3df29514",
+  "authorization_id": "issue176-parser-trust-closure-0660f2c0",
   "candidate": {
     "base_commit": "70bf7522233a6c8558809a2c2fc22be83a23a7b9",
-    "head_commit": "3df295142bb81288d9cb937c0610d28ef94cfb6a",
-    "head_tree": "02fee914dffb6f660aa5d473f0f29722d1ea049e",
+    "head_commit": "0660f2c05343f8140ab8bafcdff50745b9145c92",
+    "head_tree": "c8abe5d6b0f6c7d82b4469604ae806470e14d6f7",
     "parent_commits": [
-      "8e9b467f4151ab8f53d45e00c68d27c52194b63f"
+      "dcff53a540811c3223311a794e36d50bbe5a5586"
     ]
   },
   "limits": {
-    "maximum_paths": 8,
+    "maximum_paths": 13,
     "maximum_blob_bytes": 573440,
     "maximum_manifest_bytes": 65536
   },
@@ -41,6 +41,18 @@
       ]
     },
     {
+      "path": ".github/workflows/Test-AgentInstructionParserManifest.mjs",
+      "mode": "100644",
+      "blob": "5559eea7323b04e982ad921ed7163cc57aa698f7",
+      "bytes": 42081,
+      "sha256": "58c9d4579cf7237b047097682ac50ca01707ed180e98b132781f979d8c52027f",
+      "encoding": "utf-8-no-bom-lf",
+      "syntax": "javascript",
+      "semantic_invariants": [
+        "parser-manifest-direct-roots-and-closure-is-exact"
+      ]
+    },
+    {
       "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
       "mode": "100644",
       "blob": "7a18f681106914d72dcbea091a0815e047b70cc6",
@@ -55,9 +67,9 @@
     {
       "path": ".github/workflows/Test-AgentInstructions.ps1",
       "mode": "100644",
-      "blob": "09e22c7554e65b8a11942a8bd032c23d4dec623d",
-      "bytes": 540824,
-      "sha256": "b323d8966d8a71a7b1d18b3d1b509a8318e8c888a464a2999751ae55af2e7ac0",
+      "blob": "71397f3a174b094537475d3b291d62e14b11b9d1",
+      "bytes": 549427,
+      "sha256": "73589e8f7fe252c4286e89c1f8b85fb77fde5883cb1c5daa6f01fce6a26a2693",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
@@ -72,20 +84,33 @@
         "published-path-array-binding-is-explicit",
         "published-finalization-date-is-enforced",
         "pr-merge-bases-use-all-and-cap",
-        "trusted-maintenance-switch-is-explicit"
+        "trusted-maintenance-switch-is-explicit",
+        "agent-instruction-heading-status-and-bootstrap-order-is-exact"
       ]
     },
     {
       "path": ".github/workflows/Test-TrustRootAuthorization.ps1",
       "mode": "100644",
-      "blob": "d279f34065b167cd6f0d5c8106afe4fc0cf0b71d",
-      "bytes": 92342,
-      "sha256": "b8936ef6d612d1560731db9da57eac217f837cbcea0cf2f843858838c592ca78",
+      "blob": "141a1fa0211e3219836c968a267f651f6b64a203",
+      "bytes": 144667,
+      "sha256": "8264fc1110247a401dc71b4265aebf46a91f136f368159e5e407527d7a3e682a",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
         "verifier-audits-authorized-history",
         "verifier-reads-trusted-revision-manifest"
+      ]
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "mode": "100644",
+      "blob": "1b3051f65806b9239924a6eedfd461d76d1d516c",
+      "bytes": 38901,
+      "sha256": "948d54724d9c0374fb2d643d3626be8e23a37b59c7108fe113b3756d953ebcd7",
+      "encoding": "utf-8-no-bom-lf",
+      "syntax": "javascript",
+      "semantic_invariants": [
+        "workflow-policy-preflight-authenticates-deferred-yaml-import"
       ]
     },
     {
@@ -126,6 +151,42 @@
       "encoding": "utf-8-no-bom-lf",
       "syntax": "json",
       "semantic_invariants": []
+    },
+    {
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "mode": "100644",
+      "blob": "13b5026d59e1aed372c211d5df1823d2878e20e6",
+      "bytes": 21933,
+      "sha256": "744c13609403651dfa65f65290902ead4bf85551be768f5c1788f1f818003fb5",
+      "encoding": "utf-8-no-bom-lf",
+      "syntax": "json",
+      "semantic_invariants": [
+        "workflow-policy-contract-identities-and-structure-are-exact"
+      ]
+    },
+    {
+      "path": "package-lock.json",
+      "mode": "100644",
+      "blob": "263021865bccec329a0a07b825a5b01f33ae3b34",
+      "bytes": 68514,
+      "sha256": "ed30edbafc89b8a952492e8ed6e9da9e1c24dc77821f8471afba3facd75ac252",
+      "encoding": "utf-8-no-bom-lf",
+      "syntax": "json",
+      "semantic_invariants": [
+        "package-lock-parser-closure-is-exact"
+      ]
+    },
+    {
+      "path": "package.json",
+      "mode": "100644",
+      "blob": "14d856a27cd45b9a18f2a2789ec1581c655fbf6c",
+      "bytes": 1188,
+      "sha256": "1b77a3a08d12639c3534272409afd263b0fbcf7d802abad689dd137e1278eea4",
+      "encoding": "utf-8-no-bom-lf",
+      "syntax": "json",
+      "semantic_invariants": [
+        "package-parser-roots-are-exact"
+      ]
     }
   ]
 }
