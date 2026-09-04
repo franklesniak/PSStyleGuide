@@ -1,11 +1,183 @@
 {
   "schema_version": 2,
-  "authorization_id": "no-active-trust-root-maintenance",
+  "authorization_id": "pr183-main-target-and-verifier-repair-29a0eb27",
   "limits": {
-    "maximum_paths": 16,
+    "maximum_paths": 15,
     "maximum_blob_bytes": 573440,
     "maximum_manifest_bytes": 65536,
     "maximum_commits": 64
   },
-  "allowed_paths": []
+  "allowed_paths": [
+    {
+      "path": ".github/actionlint.yaml",
+      "mode": "100644",
+      "blob": "7350402d0fc7b0989fd8f6d17dfd0d28466e1516",
+      "bytes": 509,
+      "sha256": "f2ab1077832622edc5edb3861f6053e6bc1b7c19add7da7f654bb8e7100ae901",
+      "encoding": "utf-8-no-bom-lf",
+      "syntax": "yaml",
+      "semantic_invariants": ["actionlint-queue-schema-exceptions-are-exact"]
+    },
+    {
+      "path": ".github/instructions/docs.instructions.md",
+      "mode": "100644",
+      "blob": "0b0c1ddc83938cfa9706418d45f619b1bfa03ffd",
+      "bytes": 46230,
+      "sha256": "d44a17724478620b5b47ca4c9990a1dc9850707c2460a3117f96157b9d58978b",
+      "encoding": "utf-8-no-bom-lf",
+      "syntax": "markdown",
+      "semantic_invariants": ["docs-policy-owner-boundary", "docs-status-lifecycle-values"]
+    },
+    {
+      "path": ".github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs",
+      "mode": "100644",
+      "blob": "2b3e5e1b7af2d03660bd972c0ea320c5b008fe5b",
+      "bytes": 163573,
+      "sha256": "ff008cae3f4e2174017e7657efe70abc1184d502a803cd6c5a8dc219c3c8d822",
+      "encoding": "utf-8-no-bom-lf",
+      "syntax": "javascript",
+      "semantic_invariants": ["current-base-status-helper-is-fail-closed"]
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructionParserManifest.mjs",
+      "mode": "100644",
+      "blob": "5559eea7323b04e982ad921ed7163cc57aa698f7",
+      "bytes": 42081,
+      "sha256": "58c9d4579cf7237b047097682ac50ca01707ed180e98b132781f979d8c52027f",
+      "encoding": "utf-8-no-bom-lf",
+      "syntax": "javascript",
+      "semantic_invariants": ["parser-manifest-direct-roots-and-closure-is-exact"]
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "blob": "7a18f681106914d72dcbea091a0815e047b70cc6",
+      "bytes": 39702,
+      "sha256": "a4290e6a963ed01ba9501660833f60efa9e43da004ff3bc620ca1cc7513c8a11",
+      "encoding": "utf-8-no-bom-lf",
+      "syntax": "powershell",
+      "semantic_invariants": ["extracted-self-test-version-and-topology"]
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "blob": "634644bbf6cd9d5f939b59984506d4c97d082905",
+      "bytes": 562359,
+      "sha256": "447f5095da1f71aa47e29432595a977473d2f256ac53a5099ab882bb815fa163",
+      "encoding": "utf-8-no-bom-lf",
+      "syntax": "powershell",
+      "semantic_invariants": [
+        "adr-lifecycle-migration-is-enforced",
+        "created-ref-metadata-baseline-is-consumed",
+        "created-ref-paths-use-endpoint-boundary",
+        "exact-maintenance-production-call-is-gated",
+        "extracted-self-test-is-invoked",
+        "legacy-transition-marker-is-inert-data",
+        "new-ref-boundary-cap-is-64",
+        "ordinary-pr-uses-normal-trust-audit",
+        "published-path-array-binding-is-explicit",
+        "published-finalization-date-is-enforced",
+        "pr-merge-bases-use-all-and-cap",
+        "trusted-maintenance-switch-is-explicit",
+        "agent-instruction-heading-status-and-bootstrap-order-is-exact"
+      ]
+    },
+    {
+      "path": ".github/workflows/Test-TrustRootAuthorization.ps1",
+      "mode": "100644",
+      "blob": "82ddf4c076704f5adb952d48cbbd7f1f7a98ec5c",
+      "bytes": 169185,
+      "sha256": "7d8b242b25444d00012844333f184b977cf0d2c29edeb6eb3b21cee8e6784c1b",
+      "encoding": "utf-8-no-bom-lf",
+      "syntax": "powershell",
+      "semantic_invariants": ["verifier-audits-authorized-history", "verifier-reads-trusted-revision-manifest"]
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "mode": "100644",
+      "blob": "596b98654871fd72181223cb242de78964ef8a5d",
+      "bytes": 38901,
+      "sha256": "33554c001f6613be74db3644aa097e18322c2cf9ab7e064e721006ba456a58a9",
+      "encoding": "utf-8-no-bom-lf",
+      "syntax": "javascript",
+      "semantic_invariants": ["workflow-policy-preflight-authenticates-deferred-yaml-import"]
+    },
+    {
+      "path": ".github/workflows/agent-instruction-current-base.yml",
+      "mode": "100644",
+      "blob": "ba73e9c250f9b275b680b7479c8a18ffe154d985",
+      "bytes": 3260,
+      "sha256": "62061ce9b0c1af1ec05c2f2627f43483de5ea046051f60160eba24aca0b54c33",
+      "encoding": "utf-8-no-bom-lf",
+      "syntax": "yaml",
+      "semantic_invariants": ["workflow-run-current-base-invalidator-is-fail-closed"]
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "mode": "100644",
+      "blob": "fc0e4da343d6714453b7825f722ae2606b57949c",
+      "bytes": 29212,
+      "sha256": "c3db7e088661e593d52500d8e0ff915b6875b5b2ce569f633d4fc71f04d5f7d6",
+      "encoding": "utf-8-no-bom-lf",
+      "syntax": "yaml",
+      "semantic_invariants": [
+        "workflow-checkout-is-trusted-sha",
+        "workflow-created-push-history-fetch-is-bounded",
+        "workflow-current-base-finalizer-is-fail-closed",
+        "workflow-permissions-are-read-only",
+        "workflow-persist-credentials-is-false",
+        "workflow-uses-trusted-authorization-output"
+      ]
+    },
+    {
+      "path": ".github/workflows/trust-root-authorization.json",
+      "mode": "100644",
+      "blob": "f99062d9984498ae36d170e2287d2ad1a9691053",
+      "bytes": 248,
+      "sha256": "d30601d4b8c40672ac9e91414b88a88efcb50a32e168c473a128549fdf2d65f4",
+      "encoding": "utf-8-no-bom-lf",
+      "syntax": "json",
+      "semantic_invariants": []
+    },
+    {
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "mode": "100644",
+      "blob": "5dd83485710899bd831a6a748a352a99c713e3d8",
+      "bytes": 21933,
+      "sha256": "a8215320d50792997ea4a5e779a1339ceadb5f2eadf4b8ad21b52fd6387fdaf0",
+      "encoding": "utf-8-no-bom-lf",
+      "syntax": "json",
+      "semantic_invariants": ["workflow-policy-contract-identities-and-structure-are-exact"]
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "mode": "100644",
+      "blob": "d7c2cd90d5bed87342478dd5f1c2cf1c42cd7a44",
+      "bytes": 3261,
+      "sha256": "a4a7e28184356c8d6e337533aadfcec88d17debd78bf5d74dcf09a2bb3f7c8da",
+      "encoding": "utf-8-no-bom-lf",
+      "syntax": "yaml",
+      "semantic_invariants": ["pre-commit-actionlint-gate-is-exact"]
+    },
+    {
+      "path": "package-lock.json",
+      "mode": "100644",
+      "blob": "263021865bccec329a0a07b825a5b01f33ae3b34",
+      "bytes": 68514,
+      "sha256": "ed30edbafc89b8a952492e8ed6e9da9e1c24dc77821f8471afba3facd75ac252",
+      "encoding": "utf-8-no-bom-lf",
+      "syntax": "json",
+      "semantic_invariants": ["package-lock-parser-closure-is-exact"]
+    },
+    {
+      "path": "package.json",
+      "mode": "100644",
+      "blob": "14d856a27cd45b9a18f2a2789ec1581c655fbf6c",
+      "bytes": 1188,
+      "sha256": "1b77a3a08d12639c3534272409afd263b0fbcf7d802abad689dd137e1278eea4",
+      "encoding": "utf-8-no-bom-lf",
+      "syntax": "json",
+      "semantic_invariants": ["package-parser-roots-are-exact"]
+    }
+  ]
 }
