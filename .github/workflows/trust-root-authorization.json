@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "authorization_id": "issue176-same-base-deactivation-96a7d738",
+  "authorization_id": "issue176-same-base-deactivation-2bbfb247",
   "limits": {
     "maximum_paths": 15,
     "maximum_blob_bytes": 573440,
@@ -23,9 +23,9 @@
     {
       "path": ".github/instructions/docs.instructions.md",
       "mode": "100644",
-      "blob": "7ef00733a14645658d7e2d19ba6d1254c2a1afe8",
+      "blob": "0b0c1ddc83938cfa9706418d45f619b1bfa03ffd",
       "bytes": 46230,
-      "sha256": "22d0d153cec56d5b26a5dc28ae3e7ae7dc621288937ca15cb19296bf54820307",
+      "sha256": "d44a17724478620b5b47ca4c9990a1dc9850707c2460a3117f96157b9d58978b",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "markdown",
       "semantic_invariants": [
@@ -36,9 +36,9 @@
     {
       "path": ".github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs",
       "mode": "100644",
-      "blob": "ed662c5eee32cab86d6b6de0ad058f3ac7e3d3a0",
-      "bytes": 116524,
-      "sha256": "4140db75ea2d71ae6b19a62a708c6e959d26f2f448efdcf7de0482734c253421",
+      "blob": "7c33504b5ef6cb6179425b8a7a940664d04f0d24",
+      "bytes": 122170,
+      "sha256": "a83a282a36a9f192b24bab7451dca989ff9549ec7d368666e26c48159836eb80",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "javascript",
       "semantic_invariants": [
