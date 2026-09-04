@@ -5,12 +5,14 @@ import { createHash } from 'node:crypto';
 import { TextDecoder } from 'node:util';
 
 // Each invalidation run handles one page of at most 10 pull requests and then
-// dispatches an authenticated continuation. Even a continuation that replaces
-// all 10 statuses, claims its guard, and dispatches its successor stays within
-// the 25-request and four-minute operation budgets. A sweep accepts at most 100
-// pull requests, two passes, and two complete restarts: at most 60 page runs,
-// 1,500 API requests, and 240 minutes at the per-run deadline.
+// dispatches an authenticated continuation. A final reconciliation pass uses
+// pages of two because each pending validation needs live pull, workflow-run,
+// and race-check requests. A sweep accepts at most 100 pull requests, two main
+// passes, two complete restarts, and one reconciliation pass per attempt: at
+// most 210 page runs, 5,250 API requests, and 840 minutes at the per-run
+// deadline.
 const pullRequestPageSize = 10;
+const reconciliationPageSize = 2;
 const statusContextBatchSize = 10;
 const maximumPullRequestsPerSweep = 100;
 const maximumApiRequests = 25;
@@ -312,10 +314,36 @@ function statusMatchesBase(latest, currentBaseSha) {
     statusHasActionsCreator(latest);
 }
 
+function pendingValidationMatchesBase(latest, currentBaseSha) {
+  return latest && latest.state === 'pending' &&
+    latest.description === `Validating base ${currentBaseSha}.` &&
+    typeof latest.targetUrl === 'string' && statusHasActionsCreator(latest);
+}
+
+function incompleteValidationMatchesPull(latest, pullNumber) {
+  return latest && latest.state === 'error' &&
+    latest.description ===
+      `Base sweep incomplete; revalidate PR #${pullNumber}.` &&
+    typeof latest.targetUrl === 'string' && statusHasActionsCreator(latest);
+}
+
+function requiresReconciliation(latest, currentBaseSha, pullNumber) {
+  return pendingValidationMatchesBase(latest, currentBaseSha) ||
+    incompleteValidationMatchesPull(latest, pullNumber);
+}
+
 function successfulGuardToken(latest, currentBaseSha) {
   if (!(latest && latest.state === 'success' &&
     statusHasActionsCreator(latest))) return null;
   const match = /^Sweep complete base ([0-9a-f]{40}); state ([0-9a-f]{64})\.$/
+    .exec(latest.description);
+  return match && match[1] === currentBaseSha ? match[2] : null;
+}
+
+function pendingGuardToken(latest, currentBaseSha) {
+  if (!(latest && latest.state === 'pending' &&
+    statusHasActionsCreator(latest))) return null;
+  const match = /^Sweep pending base ([0-9a-f]{40}); state ([0-9a-f]{64})\.$/
     .exec(latest.description);
   return match && match[1] === currentBaseSha ? match[2] : null;
 }
@@ -344,9 +372,10 @@ function invalidationDescription(currentBaseSha, pullNumber) {
 }
 
 function requiresSweepInvalidation(latest, currentBaseSha, pullNumber) {
-  return !statusMatchesBase(latest, currentBaseSha) && !(latest &&
-    latest.state === 'error' &&
-    latest.description === invalidationDescription(currentBaseSha, pullNumber));
+  return !statusMatchesBase(latest, currentBaseSha) &&
+    !requiresReconciliation(latest, currentBaseSha, pullNumber) && !(latest &&
+      latest.state === 'error' && latest.description ===
+        invalidationDescription(currentBaseSha, pullNumber));
 }
 
 function createRequestBudget(now = Date.now) {
@@ -508,6 +537,7 @@ function parsePullRequestPage(result, expected) {
   'GraphQL pull request connection is invalid.');
   assert(Array.isArray(connection.nodes) &&
     connection.nodes.length <= pullRequestPageSize &&
+    connection.nodes.length <= expected.pageSize &&
     connection.nodes.length <= connection.totalCount &&
     isRecord(connection.pageInfo) &&
     typeof connection.pageInfo.hasNextPage === 'boolean' &&
@@ -517,7 +547,7 @@ function parsePullRequestPage(result, expected) {
       (connection.nodes.length >= 1 &&
         validCursor(connection.pageInfo.endCursor))) &&
     (!connection.pageInfo.hasNextPage ||
-      connection.nodes.length === pullRequestPageSize),
+      connection.nodes.length === expected.pageSize),
   'GraphQL pull request connection is invalid.');
   const pulls = [];
   const seenPulls = new Set();
@@ -547,9 +577,12 @@ function parsePullRequestPage(result, expected) {
   };
 }
 
-async function listOpenPullRequestPage(client, branch, cursor) {
+async function listOpenPullRequestPage(client, branch, cursor,
+  pageSize = pullRequestPageSize) {
   assert(cursor === null || validCursor(cursor),
     'Pull request page cursor is invalid.');
+  assert(Number.isInteger(pageSize) && pageSize >= 1 &&
+    pageSize <= pullRequestPageSize, 'Pull request page size is invalid.');
   const [owner, name] = client.repository.split('/');
   const result = await client.graphql({
     query: openPullRequestsQuery,
@@ -557,12 +590,12 @@ async function listOpenPullRequestPage(client, branch, cursor) {
       owner,
       name,
       baseRefName: branch,
-      pageSize: pullRequestPageSize,
+      pageSize,
       cursor,
     },
   });
   return parsePullRequestPage(result,
-    { repository: client.repository, branch });
+    { repository: client.repository, branch, pageSize });
 }
 
 function createExactStatusContextRequest(repository, entries) {
@@ -732,7 +765,7 @@ function assertSweepProgress(progress) {
   assert(hasExactProperties(progress, ['phase', 'cursor', 'totalCount',
     'seenCount', 'digest', 'expectedTotalCount', 'expectedDigest',
     'restartCount', 'repaired']) &&
-    ['invalidate', 'verify'].includes(progress.phase) &&
+    ['invalidate', 'verify', 'reconcile'].includes(progress.phase) &&
     (progress.cursor === null || validCursor(progress.cursor)) &&
     (progress.totalCount === null ||
       (Number.isInteger(progress.totalCount) && progress.totalCount >= 0 &&
@@ -759,6 +792,10 @@ function assertSweepProgress(progress) {
       typeof progress.expectedDigest === 'string' &&
       digestPattern.test(progress.expectedDigest),
     'Sweep verification state is invalid.');
+    if (progress.phase === 'reconcile') {
+      assert(progress.repaired === false,
+        'Sweep reconciliation state is invalid.');
+    }
   }
 }
 
@@ -787,13 +824,16 @@ function sweepStateToken(session, progress, parentRunId, parentRunSha,
 function extendSnapshotDigest(digest, pulls) {
   assert(digestPattern.test(digest) && Array.isArray(pulls),
     'Sweep snapshot input is invalid.');
-  const rows = pulls.map((pull) => ({
-    number: pull.number,
-    headSha: pull.head.sha,
-    createdAt: pull.createdAt,
-  }));
-  return createHash('sha256').update(`${digest}\n${JSON.stringify(rows)}\n`,
-    'utf8').digest('hex');
+  for (const pull of pulls) {
+    const row = {
+      number: pull.number,
+      headSha: pull.head.sha,
+      createdAt: pull.createdAt,
+    };
+    digest = createHash('sha256').update(
+      `${digest}\n${JSON.stringify(row)}\n`, 'utf8').digest('hex');
+  }
+  return digest;
 }
 
 function continuationPayload(session, progress, parentRunId, parentRunSha,
@@ -851,6 +891,12 @@ async function runSelfTest() {
     targetUrl: newerRunUrl,
     creatorLogin: 'github-actions',
   };
+  const pendingValidationStatus = {
+    state: 'pending',
+    description: `Validating base ${advancedSha}.`,
+    targetUrl: newerRunUrl,
+    creatorLogin: 'github-actions',
+  };
   const sameBaselinePulls = [
     { number: 101, head: { sha: '3'.repeat(40) } },
     { number: 102, head: { sha: '4'.repeat(40) } },
@@ -860,6 +906,17 @@ async function runSelfTest() {
   'Both same-baseline pull requests must be invalidated.');
   assert(!requiresInvalidation(currentStatus, advancedSha),
     'An older workflow-run signal must preserve a newer current success.');
+  assert(!requiresSweepInvalidation(pendingValidationStatus, advancedSha, 101) &&
+    !requiresSweepInvalidation({
+      ...pendingValidationStatus,
+      state: 'error',
+      description: 'Base sweep incomplete; revalidate PR #101.',
+    }, advancedSha, 101) &&
+    requiresSweepInvalidation({
+      ...pendingValidationStatus,
+      description: `Validating base ${baselineSha}.`,
+    }, advancedSha, 101),
+  'A sweep must preserve only exact reconcilable validation evidence.');
   const pendingGuard = {
     state: 'pending',
     description: pendingGuardDescription(advancedSha, guardToken),
@@ -1319,17 +1376,65 @@ async function runSelfTest() {
   'A finalization race must replace transient success with an error.');
 
   const incompleteGuardFinalWrites = [];
-  await expectRejected(async () => finalizeStatus({
+  const deferredResult = await finalizeStatus({
     ...exactLiveClient,
     graphql: async (request) => statusPage(request, (_pullNumber, context) =>
       context === sweepGuardContext('main') ? pendingGuard : currentStatus),
     postStatus: async (...arguments_) =>
       incompleteGuardFinalWrites.push(arguments_),
+  }, expected, 'success', newerRunUrl);
+  assert(deferredResult === 'deferred' &&
+    incompleteGuardFinalWrites.length === 0,
+  'An authenticated pending guard must defer finalization without writing error.');
+  assert(!incompleteGuardFinalWrites.some((write) => write[2] === 'success'),
+    'Validation must not publish success before the guard succeeds.');
+
+  const activeReconciliationWrites = [];
+  const activeReconciliationResult = await finalizeStatus({
+    ...exactLiveClient,
+    request: async (method, path) => {
+      assert(method === 'GET', 'Live-state reads must use GET.');
+      if (path === 'repos/owner/repository') {
+        return { full_name: 'owner/repository', default_branch: 'main' };
+      }
+      if (path.endsWith('/pulls/101')) return pull;
+      if (path.includes('/actions/runs/700')) {
+        return { ...currentBaseRun, status: 'in_progress', conclusion: null };
+      }
+      return { object: { type: 'commit', sha: advancedSha } };
+    },
+    postStatus: async (...arguments_) =>
+      activeReconciliationWrites.push(arguments_),
+  }, expected, 'success', newerRunUrl);
+  assert(activeReconciliationResult === 'published' &&
+    activeReconciliationWrites.length === 1 &&
+    activeReconciliationWrites[0][2] === 'success',
+  'An authenticated active reconciliation must allow current validation success.');
+
+  const unauthenticatedPendingWrites = [];
+  await expectRejected(async () => finalizeStatus({
+    ...exactLiveClient,
+    request: async (method, path) => {
+      assert(method === 'GET', 'Live-state reads must use GET.');
+      if (path === 'repos/owner/repository') {
+        return { full_name: 'owner/repository', default_branch: 'main' };
+      }
+      if (path.endsWith('/pulls/101')) return pull;
+      if (path.includes('/actions/runs/700')) {
+        return { ...currentBaseRun, conclusion: 'failure' };
+      }
+      return { object: { type: 'commit', sha: advancedSha } };
+    },
+    graphql: async (request) => statusPage(request, (_pullNumber, context) =>
+      context === sweepGuardContext('main') ? pendingGuard : currentStatus),
+    postStatus: async (...arguments_) =>
+      unauthenticatedPendingWrites.push(arguments_),
   }, expected, 'success', newerRunUrl),
   'The live-base sweep guard is not successful.',
-  'Validation must not publish success before the guard succeeds.');
-  assert(!incompleteGuardFinalWrites.some((write) => write[2] === 'success'),
-    'An incomplete guard must prevent per-PR success publication.');
+  'An unauthenticated pending guard must fail closed.');
+  assert(unauthenticatedPendingWrites.length === 1 &&
+    unauthenticatedPendingWrites[0][2] === 'error',
+  'An unauthenticated pending guard must publish a fail-closed error.');
 
   const completedGuardFinalWrites = [];
   await finalizeStatus({
@@ -2109,7 +2214,8 @@ async function runSelfTest() {
   }));
   const createSweepHarness = ({ pulls = sweepPulls,
     dispatchFailureAt = null, openQueryFailure = false,
-    statusFailureAt = null, deletedBranch = false } = {}) => {
+    statusFailureAt = null, deletedBranch = false,
+    headRaceOnSuccess = false, baseRaceOnSuccess = false } = {}) => {
     const state = {
       pulls: [...pulls],
       baseSha: advancedSha,
@@ -2123,6 +2229,7 @@ async function runSelfTest() {
       guardWrites: [],
       statusWrites: [],
       statuses: new Map(pulls.map((item) => [item.number, staleStatus])),
+      raceTriggered: false,
     };
     state.runs.set('501', { ...workflowRun });
 
@@ -2144,6 +2251,10 @@ async function runSelfTest() {
     const completeRun = (id) => {
       const run = state.runs.get(id);
       state.runs.set(id, { ...run, status: 'completed', conclusion: 'success' });
+    };
+    const failRun = (id) => {
+      const run = state.runs.get(id);
+      state.runs.set(id, { ...run, status: 'completed', conclusion: 'failure' });
     };
     const createInvocationClient = () => {
       let requestCount = 0;
@@ -2182,6 +2293,28 @@ async function runSelfTest() {
             if (deletedBranch) return null;
             return { object: { type: 'commit', sha: state.baseSha } };
           }
+          if (path.includes('/pulls/')) {
+            const pullNumber = Number(path.split('/').at(-1));
+            const item = state.pulls.find((candidate) =>
+              candidate.number === pullNumber);
+            assert(item !== undefined, 'The sweep requested an unknown pull.');
+            return {
+              number: pullNumber,
+              state: 'open',
+              base: {
+                ref: 'main',
+                sha: state.baseSha,
+                repo: { ...baseRepository, full_name: 'owner/repository' },
+              },
+              head: {
+                sha: item.headRefOid,
+                repo: {
+                  ...headRepository,
+                  full_name: 'contributor/repository-fork',
+                },
+              },
+            };
+          }
           throw new Error('The sweep requested an unexpected REST resource.');
         },
         graphql: async (request) => {
@@ -2191,7 +2324,8 @@ async function runSelfTest() {
             if (openQueryFailure) throw new Error('GitHub API request timed out.');
             const cursor = request.variables.cursor;
             const offset = cursor === null ? 0 : Number(cursor.split('-')[1]);
-            const nodes = state.pulls.slice(offset, offset + pullRequestPageSize);
+            const pageSize = request.variables.pageSize;
+            const nodes = state.pulls.slice(offset, offset + pageSize);
             const nextOffset = offset + nodes.length;
             return pullPage(nodes, state.pulls.length,
               nextOffset < state.pulls.length,
@@ -2217,6 +2351,16 @@ async function runSelfTest() {
           state.statuses.set(pullNumber, latest);
           state.statusWrites.push({ headSha, pullNumber, ...latest });
           state.events.push(`status:${pullNumber}:${status}`);
+          if (status === 'success' && !state.raceTriggered &&
+            (headRaceOnSuccess || baseRaceOnSuccess)) {
+            state.raceTriggered = true;
+            if (headRaceOnSuccess) {
+              const item = state.pulls.find((candidate) =>
+                candidate.number === pullNumber);
+              item.headRefOid = 'f'.repeat(40);
+            }
+            if (baseRaceOnSuccess) state.baseSha = baselineSha;
+          }
         },
         postStatusAtContext: async (sha, context, status, description,
           targetUrl) => {
@@ -2280,12 +2424,40 @@ async function runSelfTest() {
         targetUrl: `https://example.invalid/owner/repository/actions/runs/${runId}`,
       };
     };
+    const addPendingValidation = (pullNumber, runId = '790') => {
+      const item = state.pulls.find((candidate) =>
+        candidate.number === pullNumber);
+      assert(item !== undefined, 'Pending validation pull is unavailable.');
+      const expectedPull = {
+        pullNumber,
+        baseRef: 'main',
+        baseSha: state.baseSha,
+        headSha: item.headRefOid,
+        baseRepository,
+        headRepository,
+      };
+      state.runs.set(runId, {
+        ...pullRequestRun(Number(runId), 70, 1, expectedPull),
+        conclusion: 'success',
+      });
+      const targetUrl =
+        `https://example.invalid/owner/repository/actions/runs/${runId}`;
+      state.statuses.set(pullNumber, {
+        state: 'pending',
+        description: `Validating base ${state.baseSha}.`,
+        targetUrl,
+        creatorLogin: 'github-actions',
+      });
+      return { expectedPull, targetUrl };
+    };
     return {
       state,
       completeRun,
+      failRun,
       createInvocationClient,
       rootSignal,
       signalFromDispatch,
+      addPendingValidation,
     };
   };
 
@@ -2308,12 +2480,11 @@ async function runSelfTest() {
     }
   }
   assert(completeHarness.state.statusWrites.length === 21 &&
-    completeHarness.state.dispatches.length === 6 &&
-    invocationRequestCounts.length === 7 &&
+    completeHarness.state.dispatches.length === 17 &&
+    invocationRequestCounts.length === 18 &&
     invocationRequestCounts.every((count) => count <= maximumApiRequests) &&
     completeHarness.state.events.indexOf('guard:pending') <
       completeHarness.state.events.indexOf('enumerate') &&
-    completeHarness.state.events.at(-1) === 'guard:success' &&
     completeHarness.state.guard.state === 'success' &&
     guardMatchesBase(completeHarness.state.guard, advancedSha) &&
     [...completeHarness.state.statuses.values()].every((latest) =>
@@ -2330,6 +2501,115 @@ async function runSelfTest() {
     isSuccessfulSweepRun(completedGuardRun, completedGuardTarget.runId,
       'owner/repository', 'main', advancedSha, completedGuardToken, 'main'),
   'Guard success must bind the exact final repository-dispatch run and state.');
+
+  const interleavedHarness = createSweepHarness({
+    pulls: sweepPulls.slice(0, 5),
+  });
+  const pendingValidation = interleavedHarness.addPendingValidation(1, '790');
+  let interleavedSignal = interleavedHarness.rootSignal('1000');
+  let interleavedDispatchIndex = 0;
+  let deferredBoundaries = 0;
+  let publishedBoundaries = 0;
+  while (interleavedSignal !== null) {
+    await invalidateStatuses(interleavedHarness.createInvocationClient(),
+      interleavedSignal);
+    interleavedHarness.completeRun(interleavedSignal.currentRunId);
+    if (interleavedDispatchIndex <
+      interleavedHarness.state.dispatches.length) {
+      interleavedHarness.addPendingValidation(1, '790');
+      const guardWasPending = interleavedHarness.state.guard.state === 'pending';
+      const result = await finalizeStatus(
+        interleavedHarness.createInvocationClient(),
+        pendingValidation.expectedPull, 'success', pendingValidation.targetUrl);
+      assert(result === (guardWasPending ? 'deferred' : 'published'),
+        'A finalizer between sweep continuations must follow guard state.');
+      if (result === 'deferred') deferredBoundaries += 1;
+      else publishedBoundaries += 1;
+      const dispatch = interleavedHarness.state.dispatches[
+        interleavedDispatchIndex];
+      interleavedDispatchIndex += 1;
+      interleavedSignal = interleavedHarness.signalFromDispatch(dispatch,
+        String(1000 + interleavedDispatchIndex));
+    } else {
+      interleavedSignal = null;
+    }
+  }
+  assert(deferredBoundaries >= 1 && publishedBoundaries >= 1 &&
+    deferredBoundaries + publishedBoundaries ===
+      interleavedHarness.state.dispatches.length &&
+    interleavedHarness.state.statuses.get(1).state === 'success' &&
+    interleavedHarness.state.statuses.get(1).targetUrl ===
+      pendingValidation.targetUrl &&
+    guardMatchesBase(interleavedHarness.state.guard, advancedSha),
+  'Terminal reconciliation must recover a finalizer at every continuation gap.');
+
+  const runUntilReconciliation = async (harness, firstRunId) => {
+    let signal = harness.rootSignal(firstRunId);
+    let dispatchIndex = 0;
+    while (true) {
+      await invalidateStatuses(harness.createInvocationClient(), signal);
+      harness.completeRun(signal.currentRunId);
+      const dispatch = harness.state.dispatches[dispatchIndex];
+      assert(dispatch !== undefined,
+        'The mutation harness did not reach reconciliation.');
+      dispatchIndex += 1;
+      const nextRunId = String(Number(firstRunId) + dispatchIndex);
+      signal = harness.signalFromDispatch(dispatch, nextRunId);
+      if (dispatch.payload.progress?.phase === 'reconcile') return signal;
+    }
+  };
+
+  const legacyErrorHarness = createSweepHarness({
+    pulls: sweepPulls.slice(0, 1),
+  });
+  const legacyValidation = legacyErrorHarness.addPendingValidation(1, '794');
+  legacyErrorHarness.state.statuses.set(1, {
+    state: 'error',
+    description: 'Base sweep incomplete; revalidate PR #1.',
+    targetUrl: legacyValidation.targetUrl,
+    creatorLogin: 'github-actions',
+  });
+  const legacyErrorSignal = await runUntilReconciliation(
+    legacyErrorHarness, '1050');
+  await invalidateStatuses(legacyErrorHarness.createInvocationClient(),
+    legacyErrorSignal);
+  legacyErrorHarness.completeRun(legacyErrorSignal.currentRunId);
+  assert(legacyErrorHarness.state.statuses.get(1).state === 'success' &&
+    guardMatchesBase(legacyErrorHarness.state.guard, advancedSha),
+  'Reconciliation must recover a successful legacy incomplete-guard error.');
+
+  const headRaceHarness = createSweepHarness({
+    pulls: sweepPulls.slice(0, 1),
+    headRaceOnSuccess: true,
+  });
+  headRaceHarness.addPendingValidation(1, '791');
+  const headRaceSignal = await runUntilReconciliation(headRaceHarness, '1100');
+  await invalidateStatuses(headRaceHarness.createInvocationClient(),
+    headRaceSignal);
+  const headRaceRestart = headRaceHarness.state.dispatches.at(-1);
+  assert(headRaceHarness.state.statuses.get(1).state === 'error' &&
+    headRaceRestart.payload.progress.phase === 'invalidate' &&
+    headRaceRestart.payload.progress.restart_count === 1 &&
+    headRaceHarness.state.guard.state === 'pending',
+  'Head churn during reconciliation must revoke success and restart the sweep.');
+
+  const baseRaceHarness = createSweepHarness({
+    pulls: sweepPulls.slice(0, 1),
+    baseRaceOnSuccess: true,
+  });
+  baseRaceHarness.addPendingValidation(1, '792');
+  const baseRaceSignal = await runUntilReconciliation(baseRaceHarness, '1200');
+  await expectRejected(async () => invalidateStatuses(
+    baseRaceHarness.createInvocationClient(), baseRaceSignal),
+  'The live base changed during reconciliation.',
+  'Base churn during reconciliation must fail closed.');
+  baseRaceHarness.failRun(baseRaceSignal.currentRunId);
+  const failedReconciliationGuardState =
+    await readAuthenticatedSweepGuardState(
+      baseRaceHarness.createInvocationClient(), 'main', advancedSha, 'main');
+  assert(baseRaceHarness.state.statuses.get(1).state === 'error' &&
+    failedReconciliationGuardState === 'invalid',
+  'Base churn must revoke transient success and keep the guard incomplete.');
 
   const bootstrapHarness = createSweepHarness();
   const bootstrapRequest = {
@@ -2522,6 +2802,23 @@ async function runSelfTest() {
   assert(!replayHarness.state.guardWrites.some((write) =>
     write.state === 'success'),
   'A replayed continuation must not publish guard success.');
+
+  const reconciliationReplayHarness = createSweepHarness({
+    pulls: sweepPulls.slice(0, 1),
+  });
+  reconciliationReplayHarness.addPendingValidation(1, '793');
+  const reconciliationReplaySignal = await runUntilReconciliation(
+    reconciliationReplayHarness, '1300');
+  await invalidateStatuses(
+    reconciliationReplayHarness.createInvocationClient(),
+    reconciliationReplaySignal);
+  await expectRejected(async () => invalidateStatuses(
+    reconciliationReplayHarness.createInvocationClient(),
+    reconciliationReplaySignal),
+  'Continuation state is stale or replayed.',
+  'A replayed reconciliation continuation must fail its exact guard claim.');
+  assert(reconciliationReplayHarness.state.statuses.get(1).state === 'success',
+    'A replay attempt must not undo an authenticated reconciliation result.');
 
   const churnHarness = createSweepHarness({ pulls: sweepPulls.slice(0, 11) });
   const churnRoot = churnHarness.rootSignal('950');
@@ -2789,9 +3086,7 @@ function getExpectedPullRequest() {
   };
 }
 
-async function readLivePullState(client, pullNumber) {
-  const pull = await client.request('GET',
-    `repos/${client.repository}/pulls/${pullNumber}`);
+function parseLivePullState(client, pull, pullNumber) {
   assert(isRecord(pull) && pull.number === pullNumber && pull.state === 'open' &&
     isRecord(pull.base) && validRef(pull.base.ref) &&
     shaPattern.test(pull.base.sha) && isRecord(pull.base.repo) &&
@@ -2801,11 +3096,6 @@ async function readLivePullState(client, pullNumber) {
   const baseRepository = repositoryIdentity(pull.base.repo,
     client.repository);
   const headRepository = repositoryIdentity(pull.head.repo);
-  const ref = await client.request('GET',
-    `repos/${client.repository}/git/ref/heads/${encodeRef(pull.base.ref)}`);
-  assert(isRecord(ref) && isRecord(ref.object) &&
-    ref.object.type === 'commit' && ref.object.sha === pull.base.sha,
-  'Live pull request base response is invalid.');
   return {
     pullNumber,
     baseRef: pull.base.ref,
@@ -2814,6 +3104,22 @@ async function readLivePullState(client, pullNumber) {
     baseRepository,
     headRepository,
   };
+}
+
+async function readLivePullSnapshot(client, pullNumber) {
+  const pull = await client.request('GET',
+    `repos/${client.repository}/pulls/${pullNumber}`);
+  return parseLivePullState(client, pull, pullNumber);
+}
+
+async function readLivePullState(client, pullNumber) {
+  const live = await readLivePullSnapshot(client, pullNumber);
+  const ref = await client.request('GET',
+    `repos/${client.repository}/git/ref/heads/${encodeRef(live.baseRef)}`);
+  assert(isRecord(ref) && isRecord(ref.object) &&
+    ref.object.type === 'commit' && ref.object.sha === live.baseSha,
+  'Live pull request base response is invalid.');
+  return live;
 }
 
 async function readLiveState(client, expected) {
@@ -2865,18 +3171,69 @@ function isSuccessfulSweepRun(run, runId, repository, branch, baseSha,
     });
 }
 
-async function hasAuthenticatedSweepGuard(client, branch, baseSha,
+function isAuthenticReconciliationSweepRun(run, runId, repository, branch,
+  baseSha, token, defaultBranch) {
+  return isRecord(run) && shaPattern.test(run.head_sha) &&
+    isAuthenticCurrentBaseRun(run, {
+      runId,
+      eventName: 'repository_dispatch',
+      defaultBranch,
+      defaultSha: run.head_sha,
+      displayTitle: continuationRunTitle(branch, baseSha, token, run.head_sha),
+      repository,
+      requireSuccess: false,
+    }) && (run.status !== 'completed' || run.conclusion === 'success');
+}
+
+function isAuthenticPendingSweepRun(run, runId, repository, branch, baseSha,
+  defaultBranch) {
+  if (!(isRecord(run) && shaPattern.test(run.head_sha) &&
+    ['workflow_run', 'repository_dispatch'].includes(run.event) &&
+    isAuthenticCurrentBaseRun(run, {
+      runId,
+      eventName: run.event,
+      defaultBranch,
+      defaultSha: run.head_sha,
+      repository,
+      requireSuccess: false,
+    }) && (run.status !== 'completed' || run.conclusion === 'success'))) {
+    return false;
+  }
+  if (run.event === 'workflow_run') return true;
+  if (run.display_title === bootstrapRunTitle(branch, run.head_sha)) return true;
+  const prefix = `Agent current-base continuation: branch=${branch}; ` +
+    `base=${baseSha}; state=`;
+  const suffix = `; code=${run.head_sha}`;
+  return typeof run.display_title === 'string' &&
+    run.display_title.startsWith(prefix) && run.display_title.endsWith(suffix) &&
+    digestPattern.test(run.display_title.slice(prefix.length, -suffix.length));
+}
+
+async function readAuthenticatedSweepGuardState(client, branch, baseSha,
   defaultBranch) {
   const guard = await readSweepGuard(client, branch, baseSha);
-  const token = successfulGuardToken(guard, baseSha);
-  if (token === null) return false;
+  const successToken = successfulGuardToken(guard, baseSha);
+  const pendingToken = pendingGuardToken(guard, baseSha);
+  if (successToken === null && pendingToken === null) return 'invalid';
   const target = parseActionsRunTarget(guard.targetUrl, client.repository,
     client.serverOrigin);
   const run = await client.request('GET',
     `repos/${client.repository}/actions/runs/${target.runId}`);
-  return guardAllowsMergeControl(guard, baseSha,
+  if (successToken !== null && guardAllowsMergeControl(guard, baseSha,
     isSuccessfulSweepRun(run, target.runId, client.repository, branch,
-      baseSha, token, defaultBranch));
+      baseSha, successToken, defaultBranch))) return 'success';
+  if (successToken !== null && isAuthenticReconciliationSweepRun(run,
+    target.runId, client.repository, branch, baseSha, successToken,
+    defaultBranch)) return 'reconciling';
+  if (pendingToken !== null && isAuthenticPendingSweepRun(run, target.runId,
+    client.repository, branch, baseSha, defaultBranch)) return 'pending';
+  return 'invalid';
+}
+
+async function hasAuthenticatedSweepGuard(client, branch, baseSha,
+  defaultBranch) {
+  return await readAuthenticatedSweepGuardState(client, branch, baseSha,
+    defaultBranch) === 'success';
 }
 
 function assertCanMutate(client, count) {
@@ -3032,15 +3389,16 @@ async function finalizeStatus(client, expected, validationResult, targetUrl) {
       `Base or head changed; revalidate PR #${expected.pullNumber}.`, targetUrl);
     throw new Error('The pull request no longer has the validated base and head.');
   }
-  let guardAccepted = false;
+  let guardState = 'invalid';
   try {
     const defaultBranch = await readRepositoryDefaultBranch(client);
-    guardAccepted = await hasAuthenticatedSweepGuard(client,
+    guardState = await readAuthenticatedSweepGuardState(client,
       expected.baseRef, expected.baseSha, defaultBranch);
   } catch {
     // An unavailable or malformed guard cannot authorize success publication.
   }
-  if (!guardAccepted) {
+  if (guardState === 'pending') return 'deferred';
+  if (!['success', 'reconciling'].includes(guardState)) {
     await publishFinalizerError(client, expected,
       `Base sweep incomplete; revalidate PR #${expected.pullNumber}.`, targetUrl);
     throw new Error('The live-base sweep guard is not successful.');
@@ -3053,6 +3411,7 @@ async function finalizeStatus(client, expected, validationResult, targetUrl) {
       `Base or head changed; revalidate PR #${expected.pullNumber}.`, targetUrl);
     throw new Error('The pull request changed while status was published.');
   }
+  return 'published';
 }
 
 async function finalize() {
@@ -3199,8 +3558,12 @@ function expectedRunUrl(client, runId) {
 }
 
 function guardIsExpectedPending(guard, baseSha, token, targetUrl) {
-  return guard && guard.state === 'pending' &&
-    guard.description === pendingGuardDescription(baseSha, token) &&
+  return pendingGuardToken(guard, baseSha) === token &&
+    guard.targetUrl === targetUrl && statusHasActionsCreator(guard);
+}
+
+function guardIsExpectedSuccess(guard, baseSha, token, targetUrl) {
+  return successfulGuardToken(guard, baseSha) === token &&
     guard.targetUrl === targetUrl && statusHasActionsCreator(guard);
 }
 
@@ -3231,6 +3594,14 @@ async function dispatchContinuation(client, session, progress, currentRun,
   await client.dispatchRepository(continuationEventType, payload);
 }
 
+async function dispatchReconciliationContinuation(client, session, progress,
+  currentRun) {
+  const payload = continuationPayload(session, progress, currentRun.runId,
+    currentRun.runSha, currentRun.stateToken);
+  assertCanMutate(client, 1);
+  await client.dispatchRepository(continuationEventType, payload);
+}
+
 async function restartSweep(client, session, progress, currentRun,
   targetUrl) {
   assert(progress.restartCount < maximumSweepRestarts,
@@ -3240,12 +3611,102 @@ async function restartSweep(client, session, progress, currentRun,
     currentRun, targetUrl);
 }
 
+function livePullMatchesSweepPage(live, pull, session) {
+  return live.pullNumber === pull.number && live.baseRef === session.branch &&
+    live.baseSha === session.baseSha && live.headSha === pull.head.sha;
+}
+
+function reconciliationSuccessMatches(latest, baseSha, targetUrl) {
+  return statusMatchesBase(latest, baseSha) && latest.targetUrl === targetUrl;
+}
+
+async function rollbackReconciliationSuccesses(client, session, successes) {
+  if (successes.length === 0) return;
+  const latestStatuses = await readLatestStatuses(client,
+    successes.map(({ pull }) => pull));
+  for (let index = 0; index < successes.length; index += 1) {
+    const success = successes[index];
+    if (!reconciliationSuccessMatches(latestStatuses[index], session.baseSha,
+      success.targetUrl)) continue;
+    await client.postStatus(success.pull.head.sha, success.pull.number, 'error',
+      `Base or head changed; revalidate PR #${success.pull.number}.`,
+      success.targetUrl);
+  }
+}
+
+async function reconcileValidationResults(client, session, page,
+  latestStatuses, targetUrl) {
+  const candidates = page.pulls.map((pull, index) => ({
+    pull,
+    latest: latestStatuses[index],
+  })).filter(({ pull, latest }) =>
+    requiresReconciliation(latest, session.baseSha, pull.number));
+  assert(candidates.length <= reconciliationPageSize,
+    'Reconciliation page exceeds its request bound.');
+  // Reserve live/run/status requests, the post-write race readback, possible
+  // rollback writes, and the continuation or terminal guard operations.
+  assertCanMutate(client, candidates.length * 5 + 5);
+  const successes = [];
+  let inventoryChanged = false;
+  for (const { pull, latest } of candidates) {
+    const live = await readLivePullSnapshot(client, pull.number);
+    if (!livePullMatchesSweepPage(live, pull, session)) {
+      inventoryChanged = true;
+      continue;
+    }
+    let target = null;
+    try {
+      target = parseActionsRunTarget(latest.targetUrl, client.repository,
+        client.serverOrigin);
+    } catch {
+      // Malformed evidence is replaced by a fail-closed status below.
+    }
+    let authenticated = false;
+    if (target !== null) {
+      const run = await client.request('GET',
+        `repos/${client.repository}/actions/runs/${target.runId}`);
+      authenticated = isSuccessfulPullRequestWorkflowRun(run, {
+        ...live,
+        repository: client.repository,
+      }, target.runId);
+    }
+    if (!authenticated) {
+      await client.postStatus(pull.head.sha, pull.number, 'error',
+        `Validation evidence is not successful; revalidate PR #${pull.number}.`,
+        target === null ? targetUrl : latest.targetUrl);
+      continue;
+    }
+    await client.postStatus(pull.head.sha, pull.number, 'success',
+      `Validated base ${session.baseSha}.`, latest.targetUrl);
+    successes.push({ pull, live, targetUrl: latest.targetUrl });
+  }
+
+  for (const success of successes) {
+    const live = await readLivePullSnapshot(client, success.pull.number);
+    if (!livePullMatchesSweepPage(live, success.pull, session) ||
+      JSON.stringify(live) !== JSON.stringify(success.live)) {
+      inventoryChanged = true;
+    }
+  }
+  const finalBaseSha = await readLiveBaseSha(client, session.branch);
+  if (inventoryChanged || finalBaseSha !== session.baseSha) {
+    await rollbackReconciliationSuccesses(client, session, successes);
+    if (finalBaseSha !== session.baseSha) {
+      throw new Error('The live base changed during reconciliation.');
+    }
+    return false;
+  }
+  return true;
+}
+
 async function processSweepBatch(client, session, progress, currentRun,
   targetUrl) {
   assertSweepSession(session);
   assertSweepProgress(progress);
+  const pageSize = progress.phase === 'reconcile' ?
+    reconciliationPageSize : pullRequestPageSize;
   const page = await listOpenPullRequestPage(client, session.branch,
-    progress.cursor);
+    progress.cursor, pageSize);
   if (progress.totalCount !== null &&
     page.totalCount !== progress.totalCount) {
     await restartSweep(client, session, progress, currentRun, targetUrl);
@@ -3263,12 +3724,44 @@ async function processSweepBatch(client, session, progress, currentRun,
   const digest = extendSnapshotDigest(progress.digest, page.pulls);
   const latestStatuses = page.pulls.length === 0 ? [] :
     await readLatestStatuses(client, page.pulls);
-  const invalidations = page.pulls.filter((pull, index) =>
-    requiresSweepInvalidation(latestStatuses[index], session.baseSha,
-      pull.number));
   const liveBaseSha = await readLiveBaseSha(client, session.branch);
   assert(liveBaseSha === session.baseSha,
     'The live base changed during the sweep.');
+
+  if (progress.phase === 'reconcile') {
+    if (totalCount !== progress.expectedTotalCount ||
+      (!page.hasNextPage && digest !== progress.expectedDigest)) {
+      await restartSweep(client, session, progress, currentRun, targetUrl);
+      return;
+    }
+    if (!await reconcileValidationResults(client, session, page,
+      latestStatuses, targetUrl)) {
+      await restartSweep(client, session, progress, currentRun, targetUrl);
+      return;
+    }
+    if (page.hasNextPage) {
+      await dispatchReconciliationContinuation(client, session, {
+        ...progress,
+        cursor: page.endCursor,
+        totalCount,
+        seenCount,
+        digest,
+      }, currentRun);
+      return;
+    }
+    const finalBaseSha = await readLiveBaseSha(client, session.branch);
+    assert(finalBaseSha === session.baseSha,
+      'The live base changed before sweep completion.');
+    const guard = await readSweepGuard(client, session.branch, session.baseSha);
+    assert(digestPattern.test(currentRun.stateToken) &&
+      guardIsExpectedSuccess(guard, session.baseSha, currentRun.stateToken,
+        targetUrl), 'The sweep guard changed before completion.');
+    return;
+  }
+
+  const invalidations = page.pulls.filter((pull, index) =>
+    requiresSweepInvalidation(latestStatuses[index], session.baseSha,
+      pull.number));
 
   const repaired = progress.phase === 'verify' &&
     (progress.repaired || invalidations.length > 0);
@@ -3276,8 +3769,7 @@ async function processSweepBatch(client, session, progress, currentRun,
     !page.hasNextPage && (repaired ||
       totalCount !== progress.expectedTotalCount ||
       digest !== progress.expectedDigest);
-  const followupRequests = page.hasNextPage ||
-    progress.phase === 'invalidate' || verificationChanged ? 2 : 3;
+  const followupRequests = 2;
   assertCanMutate(client, invalidations.length + followupRequests);
   for (const pull of invalidations) {
     await client.postStatus(pull.head.sha, pull.number, 'error',
@@ -3305,15 +3797,9 @@ async function processSweepBatch(client, session, progress, currentRun,
     await restartSweep(client, session, progress, currentRun, targetUrl);
     return;
   }
-
-  const finalBaseSha = await readLiveBaseSha(client, session.branch);
-  assert(finalBaseSha === session.baseSha,
-    'The live base changed before sweep completion.');
-  const guard = await readSweepGuard(client, session.branch, session.baseSha);
-  assert(digestPattern.test(currentRun.stateToken) &&
-    guardIsExpectedPending(guard, session.baseSha, currentRun.stateToken,
-      targetUrl),
-    'The sweep guard changed before completion.');
+  await dispatchReconciliationContinuation(client, session,
+    createInitialProgress('reconcile', progress.restartCount, totalCount,
+      digest), currentRun);
   await client.postStatusAtContext(session.baseSha,
     sweepGuardContext(session.branch), 'success',
     successfulGuardDescription(session.baseSha, currentRun.stateToken),
@@ -3434,6 +3920,23 @@ async function invalidateStatuses(client, signal) {
   assert(baseSha === session.baseSha,
     'The continuation base is stale.');
   const guard = await readSweepGuard(client, session.branch, session.baseSha);
+  if (progress.phase === 'reconcile') {
+    assert(parent.stateToken !== null &&
+      guardIsExpectedSuccess(guard, session.baseSha, parent.stateToken,
+        expectedRunUrl(client, parent.runId)),
+    'Continuation state is stale or replayed.');
+    assertCanMutate(client, 1);
+    await client.postStatusAtContext(session.baseSha,
+      sweepGuardContext(session.branch), 'success',
+      successfulGuardDescription(session.baseSha, stateToken),
+      signal.targetUrl);
+    await processSweepBatch(client, session, progress, {
+      runId: signal.currentRunId,
+      runSha: signal.currentRunSha,
+      stateToken,
+    }, signal.targetUrl);
+    return;
+  }
   assert(guardIsExpectedPending(guard, session.baseSha, stateToken,
     expectedRunUrl(client, parent.runId)),
     'Continuation state is stale or replayed.');
