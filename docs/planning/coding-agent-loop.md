@@ -30,6 +30,8 @@ The instruction to execute the numbered plan is also standing authority for an o
 
 Ask the operator when a merge is not on-plan, the task assigns a material decision to a human, or the work expands scope. Never infer permission for a force push, deletion, settings change, credential or permission change, protection change, administrator override, or gate bypass. These exceptional R3 actions require separate explicit authority even when a task names them.
 
+Notify the operator as soon as a future exceptional action and its readiness conditions are known. The notification is not a stop condition. While authority is pending, continue every safe in-scope action that does not cross that boundary, including implementation, local validation, non-force topic publication, PR correction, CI diagnosis, review requests, finding repair, and final readiness work. Enter `waiting_human` only when the next concrete action requires the operator and no independent safe in-scope work remains. If the exceptional action is itself necessary to clear one final gate, complete every independent gate, identify the exact residual gate and cause, and do not weaken or bypass it.
+
 ## Risk tiers
 
 Use the highest tier that applies to any action in the task.
@@ -52,7 +54,7 @@ pending -> active -> validating -> ready -> complete
                          |           |
                          |           +-> waiting_external -> ready
                          +-> active
-any nonterminal state -> waiting_human
+no-safe-work human boundary -> waiting_human
 any nonterminal state -> blocked
 ```
 
@@ -61,7 +63,7 @@ any nonterminal state -> blocked
 - `validating`: The final applicable gate set is running.
 - `ready`: Validation passed and the next planned mutation can run.
 - `waiting_external`: A CI, review, or other external result is pending.
-- `waiting_human`: One exact decision or exceptional action requires a human.
+- `waiting_human`: The next concrete action needs one exact human decision or exceptional authority, and no independent safe in-scope work remains.
 - `complete`: The task's `Complete when` condition is true.
 - `blocked`: The same genuine blocker has persisted after the required retry or decision process, and no safe work remains.
 
@@ -166,6 +168,8 @@ Preserve both Codex result channels: submitted-review objects and attributable `
 
 The deterministic planning-only policy and scenarios are in `docs/planning/review-loop-policy.json`, `docs/planning/review-loop-policy.mjs`, and `docs/planning/review-loop-policy.test.mjs`. They validate decisions and transport. They do not perform GitHub writes.
 
+An anticipated approval boundary does not defer CI or review work that can run safely before that boundary. Request the approval early, continue toward a clean reviewed head, and stop only at the exact action that needs the approval. When that action is required before one final check can become green, finish all other checks and reviews and report that single dependency precisely.
+
 Immediately before an on-plan merge, repeat the final readiness check against the live PR and target ref. Use head-commit matching when the merge tool supports it. Stop for drift, new material feedback, an incomplete or failed required gate, an off-plan target or scope, a required human decision, or any need for an administrator override or bypass. Do not stop only to obtain another approval for a merge that still satisfies the on-plan definition.
 
 Do not request duplicate AI reviews on an unchanged head without a material reason. Do not require two named AI reviewers and a separate fresh-agent pass for routine low-risk work unless repository policy or the task names that gate.
@@ -176,7 +180,7 @@ Diagnose every failed gate. Apply the finding decision process before a non-mech
 
 Continue after ordinary code, test, tool, or infrastructure failures while a safe repair or alternative exists. A new commit identity is progress, not a human blocker.
 
-Use `waiting_external` only when an external result is genuinely pending and no independent work remains. Use `waiting_human` only for one exact human decision or exceptional action. State the minimum requested decision in plain English. Use `blocked` only after the same blocker has persisted through the applicable retry or decision process and no safe progress remains.
+Use `waiting_external` only when an external result is genuinely pending and no independent work remains. Use `waiting_human` only when the next concrete action needs one exact human decision or exceptional authority and no independent safe in-scope work remains. Notify the operator early, state the minimum requested decision in plain English, and continue safe preparation until that exact boundary. Use `blocked` only after the same blocker has persisted through the applicable retry or decision process and no safe progress remains.
 
 Provide short user updates at meaningful boundaries. Do not create persistent 15-second or 60-second monitoring records. A quiet, live test is not stalled.
 
