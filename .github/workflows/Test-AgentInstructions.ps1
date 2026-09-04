@@ -2838,6 +2838,7 @@ function Get-OperativeMarkdownContext {
         CodeBlockLines = [bool[]]$arrCodeBlockLines
         ProseBlocks = [pscustomobject[]]$objParseContext.ProseBlocks
         TableRows = [pscustomobject[]]$objParseContext.TableRows
+        TopLevelBlocks = [pscustomobject[]]$objParseContext.TopLevelBlocks
         TopLevelListItems = [pscustomobject[]]$objParseContext.TopLevelListItems
         Headings = [pscustomobject[]]$objParseContext.Headings
         LevelTwoHeadings = [pscustomobject[]]$objParseContext.LevelTwoHeadings
@@ -5303,7 +5304,12 @@ function Get-DecisionRecordLifecycleFailure {
             }).Count -ne 0) {
         Write-Output "$Name must not contain a separate operative Status section."
     }
-    if (@($objMarkdownContext.ProseBlocks |
+    $arrTopLevelLifecycleFieldBlocks = @(
+        $objMarkdownContext.TopLevelBlocks |
+            Where-Object { $_.Type -ceq 'paragraph_open' }
+        $objMarkdownContext.TopLevelListItems
+    )
+    if (@($arrTopLevelLifecycleFieldBlocks |
             Where-Object {
                 $boolOutsideMetadata =
                     $_.Start -le $objMetadataHeading.Start -or
@@ -8208,6 +8214,16 @@ if ($SelfTest) {
         ('docs/decisions/0001-legacy.md must not contain a separate operative ' +
             'Status field outside Metadata.')) {
         throw 'A Status prose field escaped lifecycle validation.'
+    }
+    $strQuotedStatusFieldRecord = $strCompliantDecisionRecord.Replace(
+        'Changed legacy context.',
+        '> **Status:** Proposed'
+    )
+    if (@(Get-DecisionRecordLifecycleFailure `
+            -Name 'docs/decisions/0001-legacy.md' `
+            -CurrentContent $strQuotedStatusFieldRecord `
+            -BaselineContent $strLegacyDecisionRecord).Count -ne 0) {
+        throw 'A blockquoted Status example caused a false lifecycle finding.'
     }
     $arrTableStatusFailureFixtures = @(
         [pscustomobject]@{

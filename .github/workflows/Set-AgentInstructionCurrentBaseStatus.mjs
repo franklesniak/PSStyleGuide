@@ -28,6 +28,28 @@ const bootstrapEventType = 'agent-instruction-current-base-bootstrap-v1';
 const currentBaseWorkflowPath =
   '.github/workflows/agent-instruction-current-base.yml';
 const validationWorkflowPath = '.github/workflows/agent-instructions.yml';
+const currentBaseStatusHelperPath =
+  '.github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs';
+const trustRootAuthorizationPath =
+  '.github/workflows/trust-root-authorization.json';
+const inactiveAuthorizationId = 'no-active-trust-root-maintenance';
+const bootstrapArtifactPaths = [
+  currentBaseStatusHelperPath,
+  currentBaseWorkflowPath,
+  trustRootAuthorizationPath,
+];
+const canonicalInactiveAuthorizationText = `{
+  "schema_version": 2,
+  "authorization_id": "no-active-trust-root-maintenance",
+  "limits": {
+    "maximum_paths": 16,
+    "maximum_blob_bytes": 573440,
+    "maximum_manifest_bytes": 65536,
+    "maximum_commits": 64
+  },
+  "allowed_paths": []
+}
+`;
 const initialSnapshotDigest = createHash('sha256')
   .update('PSStyleGuide current-base sweep snapshot v1\n', 'utf8')
   .digest('hex');
@@ -90,6 +112,136 @@ function isRecord(value) {
 function hasExactProperties(value, properties) {
   return isRecord(value) && Object.keys(value).sort().join('\n') ===
     [...properties].sort().join('\n');
+}
+
+function gitBlobId(bytes) {
+  assert(Buffer.isBuffer(bytes), 'Initial-install merge evidence is unavailable.');
+  return createHash('sha1')
+    .update(`blob ${bytes.length}\0`, 'utf8')
+    .update(bytes)
+    .digest('hex');
+}
+
+function decodeRepositoryFile(file, expectedPath, maximumBytes) {
+  const message = 'Initial-install merge evidence is unavailable.';
+  assert(isRecord(file) && file.type === 'file' &&
+    file.path === expectedPath && file.encoding === 'base64' &&
+    typeof file.content === 'string' &&
+    file.content.length <= maximumBytes * 2 &&
+    Number.isSafeInteger(file.size) && file.size >= 1 &&
+    file.size <= maximumBytes && shaPattern.test(file.sha), message);
+  const encoded = file.content.replace(/\n/g, '');
+  assert(encoded.length >= 4 && encoded.length % 4 === 0 &&
+    /^[A-Za-z0-9+/]*={0,2}$/.test(encoded), message);
+  const bytes = Buffer.from(encoded, 'base64');
+  assert(bytes.length === file.size && bytes.toString('base64') === encoded &&
+    gitBlobId(bytes) === file.sha, message);
+  return bytes;
+}
+
+function parseAuthorizationJson(file) {
+  const message = 'Initial-install merge evidence is unavailable.';
+  const bytes = decodeRepositoryFile(file, trustRootAuthorizationPath, 65536);
+  let text;
+  let manifest;
+  try {
+    text = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+    assert(!text.startsWith('\uFEFF') && !/[\r\u0000]/.test(text) &&
+      text.endsWith('\n'), message);
+    manifest = JSON.parse(text);
+  } catch {
+    throw new Error(message);
+  }
+  return { bytes, file, manifest, text };
+}
+
+function parseActiveBootstrapAuthorization(file) {
+  const message = 'Initial-install merge evidence is unavailable.';
+  const parsed = parseAuthorizationJson(file);
+  const manifest = parsed.manifest;
+  assert(hasExactProperties(manifest, [
+    'schema_version', 'authorization_id', 'limits', 'allowed_paths',
+  ]) && manifest.schema_version === 2 &&
+    typeof manifest.authorization_id === 'string' &&
+    /^[a-z0-9][a-z0-9-]{0,127}$/.test(manifest.authorization_id) &&
+    manifest.authorization_id !== inactiveAuthorizationId &&
+    hasExactProperties(manifest.limits, [
+      'maximum_paths', 'maximum_blob_bytes', 'maximum_manifest_bytes',
+      'maximum_commits',
+    ]) && manifest.limits.maximum_blob_bytes === 573440 &&
+    manifest.limits.maximum_manifest_bytes === 65536 &&
+    manifest.limits.maximum_commits === 64 &&
+    Number.isSafeInteger(manifest.limits.maximum_paths) &&
+    manifest.limits.maximum_paths >= bootstrapArtifactPaths.length &&
+    manifest.limits.maximum_paths <= 16 &&
+    Array.isArray(manifest.allowed_paths) &&
+    manifest.allowed_paths.length === manifest.limits.maximum_paths, message);
+  const seen = new Set();
+  const entries = new Map();
+  for (const entry of manifest.allowed_paths) {
+    assert(hasExactProperties(entry, [
+      'path', 'mode', 'blob', 'bytes', 'sha256', 'encoding', 'syntax',
+      'semantic_invariants',
+    ]) && typeof entry.path === 'string' && !seen.has(entry.path) &&
+      entry.mode === '100644' && shaPattern.test(entry.blob) &&
+      Number.isSafeInteger(entry.bytes) && entry.bytes >= 1 &&
+      entry.bytes <= manifest.limits.maximum_blob_bytes &&
+      digestPattern.test(entry.sha256) &&
+      entry.encoding === 'utf-8-no-bom-lf' &&
+      typeof entry.syntax === 'string' && entry.syntax.length >= 1 &&
+      Array.isArray(entry.semantic_invariants) &&
+      entry.semantic_invariants.every((value) => typeof value === 'string'),
+    message);
+    seen.add(entry.path);
+    entries.set(entry.path, entry);
+  }
+  const bootstrapEntries = bootstrapArtifactPaths.map((path) => {
+    const entry = entries.get(path);
+    assert(entry !== undefined, message);
+    return {
+      path,
+      mode: entry.mode,
+      blob: entry.blob,
+      bytes: entry.bytes,
+      sha256: entry.sha256,
+    };
+  });
+  return {
+    authorizationId: manifest.authorization_id,
+    manifestBlob: file.sha,
+    manifestBytes: file.size,
+    bootstrapEntries,
+  };
+}
+
+function parseInactiveBootstrapAuthorization(file) {
+  const message = 'Initial-install merge evidence is unavailable.';
+  const parsed = parseAuthorizationJson(file);
+  const expectedBytes = Buffer.from(canonicalInactiveAuthorizationText, 'utf8');
+  assert(parsed.bytes.equals(expectedBytes) &&
+    file.sha === gitBlobId(expectedBytes), message);
+  return { manifestBlob: file.sha, manifestBytes: file.size };
+}
+
+function parseBootstrapHeadTree(tree, headSha, authorization) {
+  const message = 'Initial-install merge evidence is unavailable.';
+  assert(isRecord(tree) && tree.sha === headSha && tree.truncated === false &&
+    Array.isArray(tree.tree), message);
+  return authorization.bootstrapEntries.map((authorized) => {
+    const matches = tree.tree.filter((entry) => isRecord(entry) &&
+      entry.path === authorized.path);
+    assert(matches.length === 1, message);
+    const entry = matches[0];
+    assert(entry.mode === '100644' && entry.type === 'blob' &&
+      entry.sha === authorized.blob && entry.size === authorized.bytes,
+    message);
+    return {
+      path: authorized.path,
+      mode: entry.mode,
+      blob: entry.sha,
+      bytes: entry.size,
+    };
+  });
 }
 
 function isRepositoryIdentity(value) {
@@ -1458,12 +1610,84 @@ async function runSelfTest() {
     status: 'completed',
     conclusion: 'success',
   };
+  const createRepositoryFile = (path, text) => {
+    const bytes = Buffer.from(text, 'utf8');
+    return {
+      type: 'file',
+      path,
+      encoding: 'base64',
+      content: bytes.toString('base64'),
+      size: bytes.length,
+      sha: gitBlobId(bytes),
+    };
+  };
+  const bootstrapWorkflowFile = createRepositoryFile(currentBaseWorkflowPath,
+    'name: Current-base validation\n');
+  const bootstrapHelperFile = createRepositoryFile(currentBaseStatusHelperPath,
+    'export {};\n');
+  const inactiveAuthorizationFile = createRepositoryFile(
+    trustRootAuthorizationPath, canonicalInactiveAuthorizationText);
+  const bootstrapEntry = (file, syntax, semanticInvariants = []) => ({
+    path: file.path,
+    mode: '100644',
+    blob: file.sha,
+    bytes: file.size,
+    sha256: createHash('sha256')
+      .update(Buffer.from(file.content, 'base64')).digest('hex'),
+    encoding: 'utf-8-no-bom-lf',
+    syntax,
+    semantic_invariants: semanticInvariants,
+  });
+  const bootstrapAuthorizationEntries = [
+    bootstrapEntry(bootstrapHelperFile, 'javascript'),
+    bootstrapEntry(bootstrapWorkflowFile, 'yaml'),
+    bootstrapEntry(inactiveAuthorizationFile, 'json'),
+  ];
+  const createActiveAuthorizationFile = ({
+    authorizationId = 'self-test-initial-install',
+    entries = bootstrapAuthorizationEntries,
+  } = {}) => createRepositoryFile(trustRootAuthorizationPath,
+    `${JSON.stringify({
+      schema_version: 2,
+      authorization_id: authorizationId,
+      limits: {
+        maximum_paths: entries.length,
+        maximum_blob_bytes: 573440,
+        maximum_manifest_bytes: 65536,
+        maximum_commits: 64,
+      },
+      allowed_paths: entries,
+    }, null, 2)}\n`);
+  const activeAuthorizationFile = createActiveAuthorizationFile();
+  const bootstrapHeadTree = {
+    sha: sameBaselinePulls[0].head.sha,
+    truncated: false,
+    tree: [bootstrapHelperFile, bootstrapWorkflowFile,
+      inactiveAuthorizationFile].map((file) => ({
+      path: file.path,
+      mode: '100644',
+      type: 'blob',
+      sha: file.sha,
+      size: file.size,
+    })),
+  };
+  const mutateBootstrapHeadTree = (path, mutation, remove = false) => ({
+    ...bootstrapHeadTree,
+    tree: bootstrapHeadTree.tree.flatMap((entry) => {
+      if (entry.path !== path) return [entry];
+      return remove ? [] : [{ ...entry, ...mutation }];
+    }),
+  });
   const createMergeClient = ({
     pullStatus = currentStatus,
     guard = successfulGuard,
     pullRun = successfulPullRun,
     guardRun = currentBaseRun,
-    currentBaseWorkflow = null,
+    baseWorkflow = null,
+    baseAuthorization = activeAuthorizationFile,
+    headAuthorization = inactiveAuthorizationFile,
+    headTree = bootstrapHeadTree,
+    bootstrapRace = null,
     defaultBranch = 'main',
     expectedReservation = 10,
     liveRace = false,
@@ -1472,6 +1696,10 @@ async function runSelfTest() {
   } = {}) => {
     let pullReadCount = 0;
     let statusReadCount = 0;
+    let baseWorkflowReadCount = 0;
+    let baseAuthorizationReadCount = 0;
+    let headAuthorizationReadCount = 0;
+    let headTreeReadCount = 0;
     return {
       repository: 'owner/repository',
       serverOrigin: 'https://example.invalid',
@@ -1498,7 +1726,43 @@ async function runSelfTest() {
         }
         if (path.includes(
           `/contents/${encodeRef(currentBaseWorkflowPath)}?ref=`)) {
-          return currentBaseWorkflow;
+          baseWorkflowReadCount += 1;
+          if (bootstrapRace === 'base workflow' &&
+            baseWorkflowReadCount > 1) return bootstrapWorkflowFile;
+          return baseWorkflow;
+        }
+        if (path.includes(
+          `/contents/${encodeRef(trustRootAuthorizationPath)}?ref=`)) {
+          if (path.endsWith(`?ref=${advancedSha}`)) {
+            baseAuthorizationReadCount += 1;
+            if (bootstrapRace === 'base authorization' &&
+              baseAuthorizationReadCount > 1) {
+              return createActiveAuthorizationFile({
+                authorizationId: 'self-test-initial-install-drift',
+              });
+            }
+            return baseAuthorization;
+          }
+          headAuthorizationReadCount += 1;
+          if (bootstrapRace === 'head authorization' &&
+            headAuthorizationReadCount > 1) return null;
+          return headAuthorization;
+        }
+        if (path.includes('/git/trees/') && path.endsWith('?recursive=1')) {
+          headTreeReadCount += 1;
+          const observedHeadTree = liveRace && pullReadCount > 1 ?
+            { ...headTree, sha: '9'.repeat(40) } : headTree;
+          if (bootstrapRace !== null &&
+            bootstrapArtifactPaths.includes(bootstrapRace) &&
+            headTreeReadCount > 1) {
+            return {
+              ...observedHeadTree,
+              tree: observedHeadTree.tree.map((entry) =>
+                entry.path === bootstrapRace ?
+                  { ...entry, sha: '9'.repeat(40) } : entry),
+            };
+          }
+          return observedHeadTree;
         }
         if (path.endsWith('/actions/runs/601')) return pullRun;
         if (path.endsWith('/actions/runs/700')) return guardRun;
@@ -1646,7 +1910,7 @@ async function runSelfTest() {
   const createInitialMergeClient = (options = {}) => createMergeClient({
     pullStatus: null,
     guard: null,
-    expectedReservation: 11,
+    expectedReservation: 17,
     ...options,
   });
   await verifyInitialMergeEvidence(createInitialMergeClient(),
@@ -1661,7 +1925,7 @@ async function runSelfTest() {
     expected: initialMergeExpected,
   }, {
     name: 'an installed current-base workflow',
-    client: createInitialMergeClient({ currentBaseWorkflow: {
+    client: createInitialMergeClient({ baseWorkflow: {
       type: 'file',
       path: currentBaseWorkflowPath,
       sha: '5'.repeat(40),
@@ -1724,6 +1988,112 @@ async function runSelfTest() {
     expected: initialMergeExpected,
     message: 'Live initial-install merge evidence changed during verification.',
   }];
+  initialMergeFailures.push({
+    name: 'a missing active authorization entry',
+    client: createInitialMergeClient({
+      baseAuthorization: createActiveAuthorizationFile({
+        entries: bootstrapAuthorizationEntries.filter((entry) =>
+          entry.path !== currentBaseWorkflowPath),
+      }),
+    }),
+    expected: initialMergeExpected,
+  }, {
+    name: 'a mismatched active authorization entry',
+    client: createInitialMergeClient({
+      baseAuthorization: createActiveAuthorizationFile({
+        entries: bootstrapAuthorizationEntries.map((entry) =>
+          entry.path === currentBaseWorkflowPath ?
+            { ...entry, blob: '8'.repeat(40) } : entry),
+      }),
+    }),
+    expected: initialMergeExpected,
+  }, {
+    name: 'an invalid active authorization ID',
+    client: createInitialMergeClient({
+      baseAuthorization: createActiveAuthorizationFile({
+        authorizationId: 'Wrong_ID',
+      }),
+    }),
+    expected: initialMergeExpected,
+  }, {
+    name: 'an inactive trusted-base authorization',
+    client: createInitialMergeClient({
+      baseAuthorization: inactiveAuthorizationFile,
+    }),
+    expected: initialMergeExpected,
+  }, {
+    name: 'a missing candidate authorization',
+    client: createInitialMergeClient({ headAuthorization: null }),
+    expected: initialMergeExpected,
+  }, {
+    name: 'a noncanonical candidate authorization',
+    client: createInitialMergeClient({
+      headAuthorization: createRepositoryFile(trustRootAuthorizationPath,
+        canonicalInactiveAuthorizationText.replace(
+          inactiveAuthorizationId, 'different-inactive-authorization')),
+    }),
+    expected: initialMergeExpected,
+  }, {
+    name: 'an active candidate authorization',
+    client: createInitialMergeClient({
+      headAuthorization: activeAuthorizationFile,
+    }),
+    expected: initialMergeExpected,
+  }, {
+    name: 'a consumed authorization after workflow deletion',
+    client: createInitialMergeClient({
+      baseWorkflow: null,
+      baseAuthorization: inactiveAuthorizationFile,
+    }),
+    expected: initialMergeExpected,
+  });
+  for (const path of bootstrapArtifactPaths) {
+    for (const mutation of [{
+      name: 'missing',
+      remove: true,
+      value: {},
+    }, {
+      name: 'wrong-blob',
+      remove: false,
+      value: { sha: '8'.repeat(40) },
+    }, {
+      name: 'wrong-mode',
+      remove: false,
+      value: { mode: '100755' },
+    }, {
+      name: 'symlink',
+      remove: false,
+      value: { mode: '120000' },
+    }, {
+      name: 'directory',
+      remove: false,
+      value: { mode: '040000', type: 'tree' },
+    }]) {
+      initialMergeFailures.push({
+        name: `a ${mutation.name} candidate artifact at ${path}`,
+        client: createInitialMergeClient({
+          headTree: mutateBootstrapHeadTree(path, mutation.value,
+            mutation.remove),
+        }),
+        expected: initialMergeExpected,
+      });
+    }
+  }
+  for (const bootstrapRace of [
+    'base workflow',
+    'base authorization',
+    'head authorization',
+    ...bootstrapArtifactPaths,
+  ]) {
+    initialMergeFailures.push({
+      name: `${bootstrapRace} drift`,
+      client: createInitialMergeClient({ bootstrapRace }),
+      expected: initialMergeExpected,
+      message: ['base workflow', 'base authorization'].includes(bootstrapRace) ?
+        'Live initial-install merge evidence changed during verification.' :
+        'Initial-install merge evidence is unavailable.',
+    });
+  }
   for (const failure of initialMergeFailures) {
     await expectRejected(async () => verifyInitialMergeEvidence(
       failure.client, failure.expected, '601'),
@@ -2758,20 +3128,41 @@ async function verifyMerge() {
 
 async function readInitialMergeSnapshot(client, pullNumber) {
   const snapshot = await readMergeSnapshot(client, pullNumber);
-  const currentBaseWorkflow = await client.request('GET',
+  const baseWorkflow = await client.request('GET',
     `repos/${client.repository}/contents/${encodeRef(currentBaseWorkflowPath)}` +
       `?ref=${snapshot.live.baseSha}`, undefined, true);
-  return { ...snapshot, currentBaseWorkflow };
+  const baseAuthorizationFile = await client.request('GET',
+    `repos/${client.repository}/contents/${encodeRef(trustRootAuthorizationPath)}` +
+      `?ref=${snapshot.live.baseSha}`);
+  const headAuthorizationFile = await client.request('GET',
+    `repos/${client.repository}/contents/${encodeRef(trustRootAuthorizationPath)}` +
+      `?ref=${snapshot.live.headSha}`);
+  const headTree = await client.request('GET',
+    `repos/${client.repository}/git/trees/${snapshot.live.headSha}?recursive=1`);
+  const baseAuthorization =
+    parseActiveBootstrapAuthorization(baseAuthorizationFile);
+  const headAuthorization =
+    parseInactiveBootstrapAuthorization(headAuthorizationFile);
+  const headArtifacts = parseBootstrapHeadTree(headTree,
+    snapshot.live.headSha, baseAuthorization);
+  return {
+    ...snapshot,
+    initialInstall: {
+      baseWorkflow,
+      baseAuthorization,
+      headAuthorization,
+      headArtifacts,
+    },
+  };
 }
 
 function initialMergeSnapshotMatchesExpected(snapshot, expected) {
-  const { defaultBranch, live, pullStatus, guard, currentBaseWorkflow } =
-    snapshot;
+  const { defaultBranch, live, pullStatus, guard, initialInstall } = snapshot;
   return defaultBranch === expected.baseRef &&
     live.pullNumber === expected.pullNumber &&
     live.baseRef === expected.baseRef && live.baseSha === expected.baseSha &&
     live.headSha === expected.headSha && pullStatus === null && guard === null &&
-    currentBaseWorkflow === null;
+    isRecord(initialInstall) && initialInstall.baseWorkflow === null;
 }
 
 async function verifyInitialMergeEvidence(client, expected, runId) {
@@ -2779,7 +3170,7 @@ async function verifyInitialMergeEvidence(client, expected, runId) {
     validRef(expected.baseRef) && shaPattern.test(expected.baseSha) &&
     shaPattern.test(expected.headSha) && /^[1-9][0-9]{0,19}$/.test(runId),
   'Initial-install merge verification input is invalid.');
-  assertCanRequest(client, 11);
+  assertCanRequest(client, 17);
   const first = await readInitialMergeSnapshot(client, expected.pullNumber);
   assert(initialMergeSnapshotMatchesExpected(first, expected),
     'Initial-install merge evidence is unavailable.');
