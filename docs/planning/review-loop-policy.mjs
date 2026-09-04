@@ -143,15 +143,25 @@ export function classifyMutation(previousState, currentState) {
     return 'NON_MATERIAL_FACT';
   }
 
-  if (canonicalJson(previousState.facts) !== canonicalJson(currentState.facts)) {
-    return 'NON_MATERIAL_FACT';
-  }
-
-  if (canonicalJson(previousState.state) !== canonicalJson(currentState.state)) {
+  const resultOrStateFields = [
+    'schemaVersion',
+    'mutationClass',
+    'materialReason',
+    'reviewRequests',
+    'codexResults',
+    'publicMutation',
+    'metrics',
+  ];
+  if (resultOrStateFields.some(
+    (field) => canonicalJson(previousState[field]) !== canonicalJson(currentState[field]),
+  )) {
     return 'RESULT_OR_STATE';
   }
 
-  if (canonicalJson(previousState.comments) !== canonicalJson(currentState.comments)) {
+  if (
+    canonicalJson(previousState.commentPublications) !==
+    canonicalJson(currentState.commentPublications)
+  ) {
     return 'COMMENT_ONLY';
   }
 
@@ -179,13 +189,23 @@ export function decideReviewRequest({
       previousReviewInput.behavior !== currentReviewInput.behavior ||
       previousReviewInput.risk !== currentReviewInput.risk;
 
-    if (codeChanged && mutationClass !== 'CODE_OR_DIFF') {
-      throw new TypeError('Code or diff identity changed without the CODE_OR_DIFF class.');
+    const derivedInvalidatingClass = codeChanged
+      ? 'CODE_OR_DIFF'
+      : materialSemanticsChanged
+        ? 'MATERIAL_SCOPE_BEHAVIOR_RISK'
+        : null;
+    const suppliedInvalidatingClass = mutationClass === 'CODE_OR_DIFF' ||
+      mutationClass === 'MATERIAL_SCOPE_BEHAVIOR_RISK'
+      ? mutationClass
+      : null;
+
+    if (derivedInvalidatingClass !== suppliedInvalidatingClass) {
+      throw new TypeError(
+        `The supplied invalidating class ${String(suppliedInvalidatingClass)} does not match ` +
+        `the derived transition ${String(derivedInvalidatingClass)}.`,
+      );
     }
 
-    if (!codeChanged && materialSemanticsChanged && mutationClass !== 'MATERIAL_SCOPE_BEHAVIOR_RISK') {
-      throw new TypeError('Reviewed semantics changed without the material class.');
-    }
   }
 
   if (
@@ -197,17 +217,23 @@ export function decideReviewRequest({
 
   const currentKey = getReviewInputKey(currentReviewInput);
   const requests = normalizeCollection(existingRequests);
+  const requestsForCurrentInput = requests.filter(
+    (request) => request.reviewInputKey === currentKey,
+  );
+  if (requestsForCurrentInput.some(
+    (request) => !isReviewRequestForInput(request, currentReviewInput),
+  )) {
+    throw new TypeError('A request for the reviewed input is malformed or mismatched.');
+  }
   const requestedChannels = new Set(
-    requests
-      .filter((request) => request.reviewInputKey === currentKey)
-      .map((request) => request.channel),
+    requestsForCurrentInput.map((request) => request.channel),
   );
   const missingChannels = ['copilot', 'codex'].filter(
     (channel) => !requestedChannels.has(channel),
   );
   for (const channel of ['copilot', 'codex']) {
-    const count = requests.filter(
-      (request) => request.reviewInputKey === currentKey && request.channel === channel,
+    const count = requestsForCurrentInput.filter(
+      (request) => request.channel === channel,
     ).length;
     if (count > 1) {
       throw new TypeError(`Duplicate ${channel} requests exist for the reviewed input.`);
@@ -258,34 +284,123 @@ function getActorLogin(item) {
   return item?.user?.login ?? item?.author?.login ?? item?.actor?.login ?? null;
 }
 
+function normalizeActorLogin(login) {
+  return typeof login === 'string'
+    ? login.toLowerCase().replace(/\[bot\]$/u, '')
+    : null;
+}
+
+function getCommitOid(item) {
+  return item?.commit_id ?? item?.commit?.oid ?? item?.commitOid ?? null;
+}
+
+function getItemId(item) {
+  const id = item?.node_id ?? item?.nodeId ?? item?.id ?? item?.databaseId;
+  return id === null || id === undefined ? null : String(id);
+}
+
+function getItemTime(item, fields) {
+  for (const field of fields) {
+    const value = item?.[field];
+    if (typeof value === 'string' && Number.isFinite(Date.parse(value))) {
+      return Date.parse(value);
+    }
+  }
+
+  return null;
+}
+
+function isReviewRequestForInput(request, reviewInput, requiredChannel = null) {
+  const reviewBaselinesAreValid = Array.isArray(request?.baselineReviewNodeIds) &&
+    request.baselineReviewNodeIds.every((id) => typeof id === 'string' && id.length > 0) &&
+    new Set(request.baselineReviewNodeIds).size === request.baselineReviewNodeIds.length;
+  const commentBaselinesAreValid = Array.isArray(request?.baselineConversationComments) &&
+    request.baselineConversationComments.every(
+      (comment) => typeof comment?.nodeId === 'string' &&
+        comment.nodeId.length > 0 &&
+        getItemTime(comment, ['updatedAt']) !== null,
+    ) &&
+    new Set(request.baselineConversationComments.map((comment) => comment.nodeId)).size ===
+      request.baselineConversationComments.length;
+  const channelIsValid = request?.channel === 'copilot' || request?.channel === 'codex';
+
+  return channelIsValid &&
+    (requiredChannel === null || request.channel === requiredChannel) &&
+    request.head === reviewInput?.head &&
+    request.reviewInputKey === getReviewInputKey(reviewInput) &&
+    getItemTime(request, ['requestedAt']) !== null &&
+    reviewBaselinesAreValid &&
+    commentBaselinesAreValid;
+}
+
 export function collectCodexResults({
   submittedReviews,
   conversationComments,
-  head,
+  reviewInput,
   actor = 'chatgpt-codex-connector',
   request = null,
 }) {
+  const head = reviewInput?.head;
+  const reviewInputKey = reviewInput === null || reviewInput === undefined
+    ? null
+    : getReviewInputKey(reviewInput);
+  const requestTime = getItemTime(request, ['requestedAt']);
+  const expectedActor = normalizeActorLogin(actor);
+  const requestMatches = reviewInputKey !== null &&
+    isReviewRequestForInput(request, reviewInput, 'codex') &&
+    expectedActor !== null &&
+    requestTime !== null;
+  if (!requestMatches) {
+    return Object.freeze({
+      submittedReviews: [],
+      conversationComments: [],
+      total: 0,
+    });
+  }
+
+  const baselineReviewIds = new Set(request.baselineReviewNodeIds);
+  const baselineComments = new Map(
+    normalizeCollection(request.baselineConversationComments).map(
+      (comment) => [comment.nodeId, Date.parse(comment.updatedAt)],
+    ),
+  );
   const reviews = normalizeCollection(submittedReviews).filter(
-    (review) => getActorLogin(review) === actor && review.commit_id === head,
+    (review) => {
+      const id = getItemId(review);
+      const submittedAt = getItemTime(review, ['submitted_at', 'submittedAt']);
+      return normalizeActorLogin(getActorLogin(review)) === expectedActor &&
+        getCommitOid(review) === head &&
+        id !== null &&
+        !baselineReviewIds.has(id) &&
+        submittedAt !== null &&
+        submittedAt >= requestTime;
+    },
   );
   const comments = normalizeCollection(conversationComments).filter(
     (comment) => {
-      if (getActorLogin(comment) !== actor || comment.body?.trim() === '@codex review') {
+      if (
+        normalizeActorLogin(getActorLogin(comment)) !== expectedActor ||
+        comment.body?.trim() === '@codex review'
+      ) {
         return false;
       }
 
-      if (comment.head !== undefined) {
-        return comment.head === head;
-      }
-
-      if (request === null || request.head !== head) {
+      const explicitHead = comment.head ?? comment.headRefOid;
+      if (explicitHead !== undefined && explicitHead !== head) {
         return false;
       }
 
-      const afterRequestId = request.commentId === undefined || comment.id > request.commentId;
-      const afterRequestTime =
-        request.createdAt === undefined || Date.parse(comment.created_at) >= Date.parse(request.createdAt);
-      return afterRequestId && afterRequestTime;
+      const id = getItemId(comment);
+      const updatedAt = getItemTime(
+        comment,
+        ['updated_at', 'updatedAt', 'created_at', 'createdAt'],
+      );
+      if (id === null || updatedAt === null || updatedAt < requestTime) {
+        return false;
+      }
+
+      const baselineTime = baselineComments.get(id);
+      return baselineTime === undefined || updatedAt > baselineTime;
     },
   );
 
@@ -302,26 +417,38 @@ export function reconcilePublicMutation({
   expected,
   localRecordSucceeded,
 }) {
-  if (response?.executed === false) {
+  const nativeResponseAccepted = response?.ok === true;
+  const readbackMatched = expected !== undefined &&
+    readback !== undefined &&
+    canonicalJson(readback) === canonicalJson(expected);
+  const recordSucceeded = Boolean(localRecordSucceeded);
+
+  if (readbackMatched) {
     return Object.freeze({
-      state: 'NOT_EXECUTED',
-      retryAllowed: true,
-      localRecordSucceeded: Boolean(localRecordSucceeded),
+      state: 'CONFIRMED',
+      nativeResponseAccepted,
+      readbackMatched,
+      retryAllowed: false,
+      localRecordSucceeded: recordSucceeded,
     });
   }
 
-  if (response?.ok === true && canonicalJson(readback) === canonicalJson(expected)) {
+  if (response?.executed === false) {
     return Object.freeze({
-      state: 'CONFIRMED',
-      retryAllowed: false,
-      localRecordSucceeded: Boolean(localRecordSucceeded),
+      state: 'NOT_EXECUTED',
+      nativeResponseAccepted,
+      readbackMatched,
+      retryAllowed: true,
+      localRecordSucceeded: recordSucceeded,
     });
   }
 
   return Object.freeze({
     state: 'AMBIGUOUS',
+    nativeResponseAccepted,
+    readbackMatched,
     retryAllowed: false,
-    localRecordSucceeded: Boolean(localRecordSucceeded),
+    localRecordSucceeded: recordSucceeded,
   });
 }
 

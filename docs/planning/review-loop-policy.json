@@ -11,7 +11,8 @@
     "reviewRequests",
     "codexResults",
     "publicMutation",
-    "metrics"
+    "metrics",
+    "commentPublications"
   ],
   "properties": {
     "schemaVersion": {
@@ -62,6 +63,12 @@
     },
     "metrics": {
       "$ref": "#/$defs/metrics"
+    },
+    "commentPublications": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
     }
   },
   "$defs": {
@@ -127,7 +134,10 @@
       "required": [
         "channel",
         "reviewInputKey",
-        "requestedAt"
+        "head",
+        "requestedAt",
+        "baselineReviewNodeIds",
+        "baselineConversationComments"
       ],
       "properties": {
         "channel": {
@@ -139,7 +149,42 @@
         "reviewInputKey": {
           "$ref": "#/$defs/sha256"
         },
+        "head": {
+          "$ref": "#/$defs/sha1"
+        },
         "requestedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "baselineReviewNodeIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "baselineConversationComments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/commentBaseline"
+          }
+        }
+      }
+    },
+    "commentBaseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodeId",
+        "updatedAt"
+      ],
+      "properties": {
+        "nodeId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "updatedAt": {
           "type": "string",
           "format": "date-time"
         }
@@ -152,7 +197,8 @@
         "state",
         "nativeResponseAccepted",
         "readbackMatched",
-        "retryAllowed"
+        "retryAllowed",
+        "localRecordSucceeded"
       ],
       "properties": {
         "state": {
@@ -170,6 +216,9 @@
           "type": "boolean"
         },
         "retryAllowed": {
+          "type": "boolean"
+        },
+        "localRecordSucceeded": {
           "type": "boolean"
         }
       }
