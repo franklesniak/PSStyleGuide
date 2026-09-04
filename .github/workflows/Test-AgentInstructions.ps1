@@ -11055,6 +11055,22 @@ if ($SelfTest) {
                     )
                 }
             }
+            else {
+                $objBranchFilterMatch = [regex]::Match(
+                    $strTriggerBody,
+                    '(?ms)^    branches:\r?\n' +
+                        '(?<Branches>(?:      - [^\r\n]+\r?\n)+)'
+                )
+                if (-not $objBranchFilterMatch.Success -or
+                    $objBranchFilterMatch.Groups['Branches'].Value -cnotmatch
+                        '^      - main\r?\n$' -or
+                    $strTriggerBody -cmatch '(?m)^    branches-ignore:' -or
+                    $strTriggerBody -cmatch '(?m)^    tags(?:-ignore)?:') {
+                    $listFailures.Add(
+                        'Pull request validation must target only main.'
+                    )
+                }
+            }
         }
         return $listFailures.ToArray()
     }
