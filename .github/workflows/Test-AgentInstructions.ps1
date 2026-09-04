@@ -2301,9 +2301,18 @@ function Get-MarkdownParseContext {
         '  if (token.type !== "list_item_open" || token.tag !== "li" || token.level !== 1 || !Array.isArray(token.map)) return [];'
         '  const closeIndex = tokens.findIndex((candidate, candidateIndex) => candidateIndex > index && candidate.type === "list_item_close" && candidate.tag === "li" && candidate.level === 1);'
         '  if (closeIndex < 0) throw new Error("Unclosed top-level list item.");'
-        '  const inlineToken = tokens.slice(index + 1, closeIndex).find((candidate) => candidate.type === "inline" && candidate.level === 3 && Array.isArray(candidate.children));'
-        '  const context = inlineToken ? getOperativeInlineContext(inlineToken.children) : null;'
-        '  return [{ range: token.map, text: context?.text ?? null, code: context?.code ?? [], links: context?.links ?? [] }];'
+        '  const blocks = [];'
+        '  for (let paragraphIndex = index + 1; paragraphIndex < closeIndex; paragraphIndex += 1) {'
+        '    const paragraphToken = tokens[paragraphIndex];'
+        '    if (paragraphToken.type !== "paragraph_open" || paragraphToken.level !== 2) continue;'
+        '    if (paragraphToken.tag !== "p" || paragraphToken.nesting !== 1 || !Array.isArray(paragraphToken.map)) throw new Error("Invalid top-level list-item paragraph.");'
+        '    const inlineToken = tokens[paragraphIndex + 1];'
+        '    const closeToken = tokens[paragraphIndex + 2];'
+        '    if (inlineToken?.type !== "inline" || inlineToken.level !== 3 || !Array.isArray(inlineToken.children) || closeToken?.type !== "paragraph_close" || closeToken.tag !== "p" || closeToken.level !== 2 || closeToken.nesting !== -1) throw new Error("Invalid top-level list-item paragraph container.");'
+        '    const context = getOperativeInlineContext(inlineToken.children);'
+        '    blocks.push({ range: paragraphToken.map, text: context.text, code: context.code, links: context.links });'
+        '  }'
+        '  return blocks;'
         '});'
         'const headings = tokens.flatMap((token, index) => {'
         '  if (token.type !== "heading_open" || token.level !== 0) return [];'
@@ -2318,8 +2327,27 @@ function Get-MarkdownParseContext {
         '  const inlineToken = tokens[index + 1];'
         '  return [{ range: token.map, text: inlineToken?.type === "inline" ? inlineToken.content : null }];'
         '});'
+        'const tableContainers = new Map();'
+        'const tableStack = [];'
+        'tokens.forEach((token, index) => {'
+        '  if (token.type === "table_open") {'
+        '    if (token.tag !== "table" || token.nesting !== 1 || !Array.isArray(token.map)) throw new Error("Invalid Markdown table container.");'
+        '    tableStack.push({ level: token.level, index });'
+        '  } else if (token.type === "table_close") {'
+        '    const table = tableStack.pop();'
+        '    if (token.tag !== "table" || token.nesting !== -1 || !table || table.level !== token.level) throw new Error("Unbalanced Markdown table container.");'
+        '  } else if (token.type === "tr_open") {'
+        '    const table = tableStack[tableStack.length - 1];'
+        '    if (!table) throw new Error("Markdown table row has no table container.");'
+        '    tableContainers.set(index, table);'
+        '  }'
+        '});'
+        'if (tableStack.length > 0) throw new Error("Unclosed Markdown table container.");'
         'const tableRows = tokens.flatMap((token, index) => {'
         '  if (token.type !== "tr_open" || token.tag !== "tr" || token.nesting !== 1 || !Array.isArray(token.map)) return [];'
+        '  const table = tableContainers.get(index);'
+        '  if (!table) throw new Error("Markdown table row has no tracked container.");'
+        '  if (table.level !== 0) return [];'
         '  const closeIndex = tokens.findIndex((candidate, candidateIndex) => candidateIndex > index && candidate.type === "tr_close" && candidate.tag === "tr" && candidate.nesting === -1 && candidate.level === token.level);'
         '  if (closeIndex < 0) throw new Error("Unclosed Markdown table row.");'
         '  const cells = [];'
@@ -2708,6 +2736,70 @@ function Assert-MarkdownParserExactContext {
         $objTableContext.TableRows[1].Cells[1].Tag -cne 'td' -or
         $objTableContext.TableRows[1].Cells[1].Text -cne 'Accepted') {
         throw "Self-test 'exact Markdown table context' changed output."
+    }
+
+    $strTopLevelListMarkdown = @(
+        '- First paragraph.'
+        ''
+        '  Status: Accepted'
+        ''
+        '  > Status: Proposed'
+        ''
+        '  - Status: Deprecated'
+    ) -join "`n"
+    $objTopLevelListContext = Get-MarkdownParseContext `
+        -Content $strTopLevelListMarkdown -LineCount 7
+    if ($objTopLevelListContext.TopLevelListItems.Count -ne 2 -or
+        $objTopLevelListContext.TopLevelListItems[0].Start -ne 0 -or
+        $objTopLevelListContext.TopLevelListItems[0].End -ne 1 -or
+        $objTopLevelListContext.TopLevelListItems[0].Text -cne 'First paragraph.' -or
+        $objTopLevelListContext.TopLevelListItems[1].Start -ne 2 -or
+        $objTopLevelListContext.TopLevelListItems[1].End -ne 3 -or
+        $objTopLevelListContext.TopLevelListItems[1].Text -cne 'Status: Accepted') {
+        throw "Self-test 'direct top-level list-item paragraphs' changed output."
+    }
+
+    $arrNestedTableFixtures = @(
+        [pscustomobject]@{
+            Name = 'blockquoted table'
+            Content = @(
+                '> | Field | Value |'
+                '> | --- | --- |'
+                '> | Status | Accepted |'
+            ) -join "`n"
+        },
+        [pscustomobject]@{
+            Name = 'listed table'
+            Content = @(
+                '- Example:'
+                ''
+                '  | Field | Value |'
+                '  | --- | --- |'
+                '  | Status | Accepted |'
+            ) -join "`n"
+        },
+        [pscustomobject]@{
+            Name = 'nested-list table'
+            Content = @(
+                '- Outer'
+                '  - Inner:'
+                ''
+                '    | Field | Value |'
+                '    | --- | --- |'
+                '    | Status | Accepted |'
+            ) -join "`n"
+        }
+    )
+    foreach ($objNestedTableFixture in $arrNestedTableFixtures) {
+        $intNestedTableLineCount = @(
+            [regex]::Split($objNestedTableFixture.Content, '\r\n|\r|\n')
+        ).Count
+        $objNestedTableContext = Get-MarkdownParseContext `
+            -Content $objNestedTableFixture.Content `
+            -LineCount $intNestedTableLineCount
+        if ($objNestedTableContext.TableRows.Count -ne 0) {
+            throw "$($objNestedTableFixture.Name) became document-level table context."
+        }
     }
 
     $strHeadingMarkdown = @(
@@ -8215,6 +8307,51 @@ if ($SelfTest) {
             'Status field outside Metadata.')) {
         throw 'A Status prose field escaped lifecycle validation.'
     }
+    $strLaterListStatusFieldRecord = $strCompliantDecisionRecord.Replace(
+        'Changed legacy context.',
+        @(
+            '- Example paragraph.'
+            ''
+            '  Status: Accepted'
+        ) -join "`n"
+    )
+    if (@(Get-DecisionRecordLifecycleFailure `
+            -Name 'docs/decisions/0001-legacy.md' `
+            -CurrentContent $strLaterListStatusFieldRecord `
+            -BaselineContent $strLegacyDecisionRecord) -cnotcontains
+        ('docs/decisions/0001-legacy.md must not contain a separate operative ' +
+            'Status field outside Metadata.')) {
+        throw 'A later direct top-level list-item Status field escaped lifecycle validation.'
+    }
+    $arrNonOperativeListStatusFieldFixtures = @(
+        [pscustomobject]@{
+            Name = 'nested-list Status field example'
+            Payload = @(
+                '- Example paragraph.'
+                '  - Status: Accepted'
+            ) -join "`n"
+        },
+        [pscustomobject]@{
+            Name = 'list-item blockquoted Status field example'
+            Payload = @(
+                '- Example paragraph.'
+                ''
+                '  > Status: Accepted'
+            ) -join "`n"
+        }
+    )
+    foreach ($objStatusFieldFixture in $arrNonOperativeListStatusFieldFixtures) {
+        $strNonOperativeListStatusFieldRecord = $strCompliantDecisionRecord.Replace(
+            'Changed legacy context.',
+            $objStatusFieldFixture.Payload
+        )
+        if (@(Get-DecisionRecordLifecycleFailure `
+                -Name 'docs/decisions/0001-legacy.md' `
+                -CurrentContent $strNonOperativeListStatusFieldRecord `
+                -BaselineContent $strLegacyDecisionRecord).Count -ne 0) {
+            throw "$($objStatusFieldFixture.Name) caused a false lifecycle finding."
+        }
+    }
     $strQuotedStatusFieldRecord = $strCompliantDecisionRecord.Replace(
         'Changed legacy context.',
         '> **Status:** Proposed'
@@ -8294,6 +8431,47 @@ if ($SelfTest) {
                         '| Field | Value | Rationale |'
                         '| --- | --- | --- |'
                         '| Status | Accepted | Current decision |'
+                    ) -join "`n")
+            )
+        },
+        [pscustomobject]@{
+            Name = 'blockquoted two-cell Status table'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '> | Field | Value |'
+                        '> | --- | --- |'
+                        '> | Status | Accepted |'
+                    ) -join "`n")
+            )
+        },
+        [pscustomobject]@{
+            Name = 'listed two-cell Status table'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '- Example:'
+                        ''
+                        '  | Field | Value |'
+                        '  | --- | --- |'
+                        '  | Status | Accepted |'
+                    ) -join "`n")
+            )
+        },
+        [pscustomobject]@{
+            Name = 'nested-list two-cell Status table'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '- Outer'
+                        '  - Inner:'
+                        ''
+                        '    | Field | Value |'
+                        '    | --- | --- |'
+                        '    | Status | Accepted |'
                     ) -join "`n")
             )
         },
