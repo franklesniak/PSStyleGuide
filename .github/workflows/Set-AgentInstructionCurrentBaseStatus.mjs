@@ -985,6 +985,61 @@ async function runSelfTest() {
   assert(!isCurrentPull(pull,
     { object: { type: 'commit', sha: baselineSha } }, expected),
   'A stale live base must fail finalization.');
+  const reconciliationReadClient = (read) => ({
+    repository: 'owner/repository',
+    requestWithNotFoundState: async (method, path) => {
+      assert(method === 'GET' &&
+        path === 'repos/owner/repository/pulls/101',
+      'A reconciliation read must allow only an exact pull-request 404.');
+      return read();
+    },
+  });
+  const reconciliationLive = await readReconciliationPullSnapshot(
+    reconciliationReadClient(() => ({ notFound: false, value: pull })), 101);
+  assert(JSON.stringify(reconciliationLive) === JSON.stringify(expected),
+    'An open reconciliation pull must return its strict live snapshot.');
+  assert(await readReconciliationPullSnapshot(
+    reconciliationReadClient(() => ({
+      notFound: false,
+      value: { number: 101, state: 'closed' },
+    })),
+    101) === null,
+  'An exact closed reconciliation pull must be inactive.');
+  assert(await readReconciliationPullSnapshot(
+    reconciliationReadClient(() => ({ notFound: true, value: null })),
+    101) === null,
+  'A reconciliation pull HTTP 404 must be inactive.');
+  for (const failure of [{
+    name: 'malformed open response',
+    read: () => ({
+      notFound: false,
+      value: { number: 101, state: 'open' },
+    }),
+    message: 'Live pull request response is invalid.',
+  }, {
+    name: 'wrong closed pull identity',
+    read: () => ({
+      notFound: false,
+      value: { number: 102, state: 'closed' },
+    }),
+    message: 'Live pull request response is invalid.',
+  }, {
+    name: 'empty successful response',
+    read: () => ({ notFound: false, value: null }),
+    message: 'Live pull request response is invalid.',
+  }, {
+    name: 'request timeout',
+    read: () => { throw new Error('GitHub API request timed out.'); },
+    message: 'GitHub API request timed out.',
+  }, {
+    name: 'server error',
+    read: () => { throw new Error('GitHub API returned 503.'); },
+    message: 'GitHub API returned 503.',
+  }]) {
+    await expectRejected(async () => readReconciliationPullSnapshot(
+      reconciliationReadClient(failure.read), 101), failure.message,
+    `Reconciliation must fail closed for ${failure.name}.`);
+  }
   const workflowRun = {
     id: 501,
     event: 'push',
@@ -2215,7 +2270,15 @@ async function runSelfTest() {
   const createSweepHarness = ({ pulls = sweepPulls,
     dispatchFailureAt = null, openQueryFailure = false,
     statusFailureAt = null, deletedBranch = false,
-    headRaceOnSuccess = false, baseRaceOnSuccess = false } = {}) => {
+    headRaceOnSuccess = false, baseRaceOnSuccess = false,
+    reconciliationInactive = null } = {}) => {
+    assert(reconciliationInactive === null || [
+      'closed-before-authentication',
+      'not-found-before-authentication',
+      'closed-after-success',
+      'not-found-after-success',
+    ].includes(reconciliationInactive),
+    'The reconciliation inactivity fixture is invalid.');
     const state = {
       pulls: [...pulls],
       baseSha: advancedSha,
@@ -2230,6 +2293,7 @@ async function runSelfTest() {
       statusWrites: [],
       statuses: new Map(pulls.map((item) => [item.number, staleStatus])),
       raceTriggered: false,
+      reconciliationSuccessPublished: false,
     };
     state.runs.set('501', { ...workflowRun });
 
@@ -2263,6 +2327,27 @@ async function runSelfTest() {
         assert(requestCount <= maximumApiRequests,
           'A sweep invocation exceeded its request bound.');
       };
+      const livePullFor = (pullNumber) => {
+        const item = state.pulls.find((candidate) =>
+          candidate.number === pullNumber);
+        assert(item !== undefined, 'The sweep requested an unknown pull.');
+        return {
+          number: pullNumber,
+          state: 'open',
+          base: {
+            ref: 'main',
+            sha: state.baseSha,
+            repo: { ...baseRepository, full_name: 'owner/repository' },
+          },
+          head: {
+            sha: item.headRefOid,
+            repo: {
+              ...headRepository,
+              full_name: 'contributor/repository-fork',
+            },
+          },
+        };
+      };
       return {
         repository: 'owner/repository',
         serverOrigin: 'https://example.invalid',
@@ -2295,27 +2380,31 @@ async function runSelfTest() {
           }
           if (path.includes('/pulls/')) {
             const pullNumber = Number(path.split('/').at(-1));
-            const item = state.pulls.find((candidate) =>
-              candidate.number === pullNumber);
-            assert(item !== undefined, 'The sweep requested an unknown pull.');
-            return {
-              number: pullNumber,
-              state: 'open',
-              base: {
-                ref: 'main',
-                sha: state.baseSha,
-                repo: { ...baseRepository, full_name: 'owner/repository' },
-              },
-              head: {
-                sha: item.headRefOid,
-                repo: {
-                  ...headRepository,
-                  full_name: 'contributor/repository-fork',
-                },
-              },
-            };
+            return livePullFor(pullNumber);
           }
           throw new Error('The sweep requested an unexpected REST resource.');
+        },
+        requestWithNotFoundState: async (method, path) => {
+          beginRequest();
+          assert(method === 'GET' && path.includes('/pulls/'),
+            'A reconciliation read must use an exact pull resource.');
+          const pullNumber = Number(path.split('/').at(-1));
+          const livePull = livePullFor(pullNumber);
+          const inactiveBeforeAuthentication =
+            reconciliationInactive?.endsWith('before-authentication');
+          const inactiveAfterSuccess =
+            reconciliationInactive?.endsWith('after-success') &&
+            state.reconciliationSuccessPublished;
+          if (inactiveBeforeAuthentication || inactiveAfterSuccess) {
+            return reconciliationInactive.startsWith('not-found') ?
+              { notFound: true, value: null } :
+              { notFound: false,
+                value: { number: pullNumber, state: 'closed' } };
+          }
+          return {
+            notFound: false,
+            value: livePull,
+          };
         },
         graphql: async (request) => {
           beginRequest();
@@ -2360,6 +2449,9 @@ async function runSelfTest() {
               item.headRefOid = 'f'.repeat(40);
             }
             if (baseRaceOnSuccess) state.baseSha = baselineSha;
+          }
+          if (status === 'success') {
+            state.reconciliationSuccessPublished = true;
           }
         },
         postStatusAtContext: async (sha, context, status, description,
@@ -2592,6 +2684,35 @@ async function runSelfTest() {
     headRaceRestart.payload.progress.restart_count === 1 &&
     headRaceHarness.state.guard.state === 'pending',
   'Head churn during reconciliation must revoke success and restart the sweep.');
+
+  for (const inactivity of [
+    'closed-before-authentication',
+    'not-found-before-authentication',
+    'closed-after-success',
+    'not-found-after-success',
+  ]) {
+    const inactiveHarness = createSweepHarness({
+      pulls: sweepPulls.slice(0, 1),
+      reconciliationInactive: inactivity,
+    });
+    inactiveHarness.addPendingValidation(1, '795');
+    const inactiveSignal = await runUntilReconciliation(
+      inactiveHarness, '1150');
+    await invalidateStatuses(inactiveHarness.createInvocationClient(),
+      inactiveSignal);
+    const inactiveRestart = inactiveHarness.state.dispatches.at(-1);
+    const afterSuccess = inactivity.endsWith('after-success');
+    const pullWrites = inactiveHarness.state.statusWrites.filter((write) =>
+      write.pullNumber === 1);
+    assert(inactiveRestart.payload.progress.phase === 'invalidate' &&
+      inactiveRestart.payload.progress.restart_count === 1 &&
+      inactiveHarness.state.guard.state === 'pending' &&
+      (afterSuccess ?
+        pullWrites.length === 2 && pullWrites[0].state === 'success' &&
+          pullWrites[1].state === 'error' :
+        pullWrites.length === 0),
+    `Reconciliation must restart safely for ${inactivity}.`);
+  }
 
   const baseRaceHarness = createSweepHarness({
     pulls: sweepPulls.slice(0, 1),
@@ -2975,7 +3096,9 @@ function createClient() {
   const requestBudget = createRequestBudget();
 
   async function requestAtRoot(root, method, path, body,
-    allowNotFound = false) {
+    allowNotFound = false, returnNotFoundState = false) {
+    assert(!returnNotFoundState || allowNotFound,
+      'A not-found-aware request must allow HTTP 404.');
     requestBudget.beginRequest();
     const payload = body === undefined ? undefined :
       Buffer.from(JSON.stringify(body), 'utf8');
@@ -3006,8 +3129,12 @@ function createClient() {
         });
         response.on('end', () => {
           try {
-            resolve(decodeApiResponse(response.statusCode,
-              Buffer.concat(chunks), allowNotFound));
+            const value = decodeApiResponse(response.statusCode,
+              Buffer.concat(chunks), allowNotFound);
+            resolve(returnNotFoundState ? {
+              notFound: response.statusCode === 404,
+              value,
+            } : value);
           } catch (error) {
             reject(error);
           }
@@ -3025,6 +3152,12 @@ function createClient() {
 
   async function request(method, path, body, allowNotFound = false) {
     return await requestAtRoot(apiRoot, method, path, body, allowNotFound);
+  }
+
+  async function requestWithNotFoundState(method, path) {
+    assert(method === 'GET',
+      'A not-found-aware request must use GET.');
+    return await requestAtRoot(apiRoot, method, path, undefined, true, true);
   }
 
   async function graphql(body) {
@@ -3061,6 +3194,7 @@ function createClient() {
     repository,
     serverOrigin: serverUrl.origin,
     request,
+    requestWithNotFoundState,
     graphql,
     postStatus,
     postStatusAtContext,
@@ -3109,6 +3243,21 @@ function parseLivePullState(client, pull, pullNumber) {
 async function readLivePullSnapshot(client, pullNumber) {
   const pull = await client.request('GET',
     `repos/${client.repository}/pulls/${pullNumber}`);
+  return parseLivePullState(client, pull, pullNumber);
+}
+
+async function readReconciliationPullSnapshot(client, pullNumber) {
+  const response = await client.requestWithNotFoundState('GET',
+    `repos/${client.repository}/pulls/${pullNumber}`);
+  assert(isRecord(response) &&
+    hasExactProperties(response, ['notFound', 'value']) &&
+    typeof response.notFound === 'boolean' &&
+    (!response.notFound || response.value === null),
+  'Live pull request response is invalid.');
+  if (response.notFound) return null;
+  const pull = response.value;
+  if (isRecord(pull) && pull.number === pullNumber &&
+    pull.state === 'closed') return null;
   return parseLivePullState(client, pull, pullNumber);
 }
 
@@ -3649,8 +3798,8 @@ async function reconcileValidationResults(client, session, page,
   const successes = [];
   let inventoryChanged = false;
   for (const { pull, latest } of candidates) {
-    const live = await readLivePullSnapshot(client, pull.number);
-    if (!livePullMatchesSweepPage(live, pull, session)) {
+    const live = await readReconciliationPullSnapshot(client, pull.number);
+    if (live === null || !livePullMatchesSweepPage(live, pull, session)) {
       inventoryChanged = true;
       continue;
     }
@@ -3682,8 +3831,9 @@ async function reconcileValidationResults(client, session, page,
   }
 
   for (const success of successes) {
-    const live = await readLivePullSnapshot(client, success.pull.number);
-    if (!livePullMatchesSweepPage(live, success.pull, session) ||
+    const live = await readReconciliationPullSnapshot(
+      client, success.pull.number);
+    if (live === null || !livePullMatchesSweepPage(live, success.pull, session) ||
       JSON.stringify(live) !== JSON.stringify(success.live)) {
       inventoryChanged = true;
     }
