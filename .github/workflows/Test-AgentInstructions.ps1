@@ -8823,9 +8823,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strTrustRootAuthorizationSource,
-            '(?m)^# Version: 1\.2\.20260904\.1$'
+            '(?m)^# Version: 1\.2\.20260904\.2$'
         ).Count -ne 1) {
-        throw 'The trust-root authorization script lacks version 1.2.20260904.1.'
+        throw 'The trust-root authorization script lacks version 1.2.20260904.2.'
     }
     & (Join-Path $strRepositoryRootPath $strTrustRootAuthorizationPath) `
         -RepositoryRootPath $strRepositoryRootPath `

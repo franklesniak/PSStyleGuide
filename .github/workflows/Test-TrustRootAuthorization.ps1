@@ -33,7 +33,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.2.20260904.1
+# Version: 1.2.20260904.2
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -2763,7 +2763,9 @@ if ($SelfTest) {
         & git -C $strSchemaFixtureRoot switch --quiet --detach $strSchemaTrusted
         & $scriptblockExpectSchemaRejection -Base $strSchemaTrusted `
             -Head $strChangedManifestHead `
-            -ExpectedMessage 'changed-path count does not match'
+            -ExpectedMessage (
+                'contains unauthorized path ' + $strAuthorizationPath
+            )
 
         & git -C $strSchemaFixtureRoot switch --quiet --detach $strSchemaCandidate
         $strUnexpectedPath = Join-Path $strSchemaFixtureRoot 'unexpected.txt'
@@ -2784,7 +2786,7 @@ if ($SelfTest) {
         & git -C $strSchemaFixtureRoot switch --quiet --detach $strSchemaTrusted
         & $scriptblockExpectSchemaRejection -Base $strSchemaTrusted `
             -Head $strChangedPathSetHead `
-            -ExpectedMessage 'changed-path count does not match'
+            -ExpectedMessage 'contains unauthorized path unexpected.txt'
 
         & git -C $strSchemaFixtureRoot switch --quiet --detach $strSchemaCandidate
         $strBadFinalPath = Join-Path $strSchemaFixtureRoot $arrSchemaPathSpec[0].Path
@@ -3060,6 +3062,13 @@ if ($SelfTest) {
                 $strSameBaseIndex
             )
             & git -C $strSchemaFixtureRoot read-tree $strTransitionBaseTree
+            $objUnchangedAuthorizedPath = @($listSchemaAllowedPath |
+                    Where-Object {
+                        $_.path -ceq '.github/actionlint.yaml'
+                    })[0]
+            & git -C $strSchemaFixtureRoot update-index --add `
+                --cacheinfo `
+                "100644,$($objUnchangedAuthorizedPath.blob),$($objUnchangedAuthorizedPath.path)"
             & git -C $strSchemaFixtureRoot update-index --add `
                 --cacheinfo `
                 "100644,$strSameBaseTransitionManifestBlob,$strAuthorizationPath"
@@ -3594,8 +3603,8 @@ for ($intIndex = 0; $intIndex -lt $arrDiffFields.Count; $intIndex += 2) {
         throw 'The candidate contains a deleted, renamed, duplicate, or malformed path.'
     }
 }
-if ($setChangedPaths.Count -ne $setAllowedPaths.Count) {
-    throw 'The candidate changed-path count does not match the authorization.'
+if ($setChangedPaths.Count -lt 1) {
+    throw 'The candidate does not change an authorized path.'
 }
 foreach ($strChangedPath in $setChangedPaths) {
     if (-not $setAllowedPaths.Contains($strChangedPath)) {
