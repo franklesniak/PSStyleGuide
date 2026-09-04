@@ -1,18 +1,11 @@
 {
-  "schema_version": 1,
-  "authorization_id": "issue176-review-gaps-cbd1200d",
-  "candidate": {
-    "base_commit": "70bf7522233a6c8558809a2c2fc22be83a23a7b9",
-    "head_commit": "cbd1200d5a2529165bdcd5c10d9aa4aa4b12f73e",
-    "head_tree": "142c5d2f6a1f30b46ac7cdd581856b3908b20295",
-    "parent_commits": [
-      "d02a766957fd5932c7c0a6a3c44a051118b3a70c"
-    ]
-  },
+  "schema_version": 2,
+  "authorization_id": "issue176-same-base-deactivation-96a7d738",
   "limits": {
     "maximum_paths": 15,
     "maximum_blob_bytes": 573440,
-    "maximum_manifest_bytes": 65536
+    "maximum_manifest_bytes": 65536,
+    "maximum_commits": 64
   },
   "allowed_paths": [
     {
@@ -103,9 +96,9 @@
     {
       "path": ".github/workflows/Test-TrustRootAuthorization.ps1",
       "mode": "100644",
-      "blob": "67302242541f25f672d2c433bfc41bf539250541",
-      "bytes": 157090,
-      "sha256": "a7f815124c92d8a204bc4f564c9a59bac6771f23ca6dbe8404dc500947ee881b",
+      "blob": "dcfb55aa077970b5903ece123d8e2498a08c2937",
+      "bytes": 168066,
+      "sha256": "415966da356fc93399f841bfa01514dc3b0f55c4a57d0966ee801312b3eaa2f6",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
