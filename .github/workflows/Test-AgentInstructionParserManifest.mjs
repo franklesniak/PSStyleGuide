@@ -1,14 +1,16 @@
 #!/usr/bin/env node
 
 // Validates the parser dependency contract without executing proposed bytes.
-// Version: 1.0.20260821.5
+// Version: 1.1.20260903.0
 
 import { spawnSync } from "node:child_process";
 
 const PACKAGE_MAXIMUM_BYTES = 131_072;
 const LOCK_MAXIMUM_BYTES = 2_097_152;
-const PARSER_NAME = "markdown-it";
-const PARSER_PATH = `node_modules/${PARSER_NAME}`;
+const EXECUTABLE_PARSER_NAMES = ["js-yaml", "markdown-it"];
+const EXECUTABLE_PARSER_PATHS = EXECUTABLE_PARSER_NAMES.map(
+  (name) => `node_modules/${name}`,
+);
 const REVISION_PATTERN = /^(?:[0-9a-f]{40}|[0-9a-f]{64})$/i;
 const OBJECT_ID_PATTERN = /^(?:[0-9a-f]{40}|[0-9a-f]{64})$/;
 const FORBIDDEN_INSTALL_INPUTS = [".npmrc", "npm-shrinkwrap.json"];
@@ -231,11 +233,13 @@ function getDependencyNames(descriptor) {
 
 function getParserClosure(lock, name) {
   const packages = requireRecord(lock.packages, `${name}.packages`);
-  if (!Object.hasOwn(packages, PARSER_PATH)) {
-    fail(`${name} does not contain ${PARSER_PATH}.`);
+  for (const parserPath of EXECUTABLE_PARSER_PATHS) {
+    if (!Object.hasOwn(packages, parserPath)) {
+      fail(`${name} does not contain ${parserPath}.`);
+    }
   }
   const closure = new Map();
-  const queue = [PARSER_PATH];
+  const queue = [...EXECUTABLE_PARSER_PATHS];
   while (queue.length > 0) {
     const packagePath = queue.shift();
     if (closure.has(packagePath)) {
@@ -455,8 +459,14 @@ function validateContract(trustedPackage, trustedLock, inputPackage, inputLock) 
   validateRuntimeSelectorContract(trustedPackage, trustedRoot, inputPackage, inputRoot);
   const trustedClosure = getParserClosure(trustedLock, "trusted lock");
   const inputClosure = getParserClosure(inputLock, "input lock");
-  const trustedParser = trustedClosure.get(PARSER_PATH);
-  const expectedVersion = trustedParser.version;
+  const trustedDevDependencies = requireRecord(
+    trustedPackage.devDependencies,
+    "trusted package.json.devDependencies",
+  );
+  const trustedRootDevDependencies = requireRecord(
+    trustedRoot.devDependencies,
+    "trusted package-lock.json root devDependencies",
+  );
   const inputDevDependencies = requireRecord(
     inputPackage.devDependencies,
     "package.json.devDependencies",
@@ -465,11 +475,25 @@ function validateContract(trustedPackage, trustedLock, inputPackage, inputLock) 
     inputRoot.devDependencies,
     "package-lock.json root devDependencies",
   );
-  if (inputDevDependencies[PARSER_NAME] !== expectedVersion) {
-    fail(`package.json must declare ${PARSER_NAME} at exact version ${expectedVersion}.`);
-  }
-  if (inputRootDevDependencies[PARSER_NAME] !== expectedVersion) {
-    fail(`package-lock.json must declare ${PARSER_NAME} at exact version ${expectedVersion}.`);
+  for (const parserName of EXECUTABLE_PARSER_NAMES) {
+    const parserPath = `node_modules/${parserName}`;
+    const expectedVersion = trustedClosure.get(parserPath).version;
+    if (trustedDevDependencies[parserName] !== expectedVersion) {
+      fail(
+        `trusted package.json must declare ${parserName} at exact version ${expectedVersion}.`,
+      );
+    }
+    if (trustedRootDevDependencies[parserName] !== expectedVersion) {
+      fail(
+        `trusted package-lock.json must declare ${parserName} at exact version ${expectedVersion}.`,
+      );
+    }
+    if (inputDevDependencies[parserName] !== expectedVersion) {
+      fail(`package.json must declare ${parserName} at exact version ${expectedVersion}.`);
+    }
+    if (inputRootDevDependencies[parserName] !== expectedVersion) {
+      fail(`package-lock.json must declare ${parserName} at exact version ${expectedVersion}.`);
+    }
   }
   for (const field of ["name", "version"]) {
     if (trustedPackage[field] !== trustedRoot[field] || trustedPackage[field] !== trustedLock[field]) {
@@ -515,7 +539,7 @@ function runSelfTests() {
     name: "fixture",
     version: "1.0.0",
     engines: { node: "24.18.0", npm: "11.16.0" },
-    devDependencies: {},
+    devDependencies: { "js-yaml": "5.2.2", "markdown-it": "14.2.0" },
   };
   const trustedLock = {
     name: "fixture",
@@ -526,9 +550,16 @@ function runSelfTests() {
         name: "fixture",
         version: "1.0.0",
         engines: { node: "24.18.0", npm: "11.16.0" },
-        devDependencies: {},
+        devDependencies: { "js-yaml": "5.2.2", "markdown-it": "14.2.0" },
       },
-      [PARSER_PATH]: {
+      "node_modules/js-yaml": {
+        version: "5.2.2",
+        resolved: "https://registry.npmjs.org/js-yaml/-/js-yaml-5.2.2.tgz",
+        integrity: "sha512-js-yaml",
+        dev: true,
+        dependencies: { argparse: "^2.0.1" },
+      },
+      "node_modules/markdown-it": {
         version: "14.2.0",
         resolved: "https://registry.npmjs.org/markdown-it/-/markdown-it-14.2.0.tgz",
         integrity: "sha512-parser",
@@ -547,28 +578,64 @@ function runSelfTests() {
     name: "fixture",
     version: "1.0.0",
     engines: { node: "24.18.0", npm: "11.16.0" },
-    devDependencies: { [PARSER_NAME]: "14.2.0" },
+    devDependencies: { "js-yaml": "5.2.2", "markdown-it": "14.2.0" },
   };
   const inputLock = clone(trustedLock);
-  inputLock.packages[""].devDependencies[PARSER_NAME] = "14.2.0";
   validateContract(trustedPackage, trustedLock, inputPackage, inputLock);
 
   const mutations = [
-    ["direct deletion", (pkg) => delete pkg.devDependencies[PARSER_NAME], "must declare"],
-    ["direct drift", (pkg) => (pkg.devDependencies[PARSER_NAME] = "14.2.1"), "must declare"],
+    ["direct deletion", (pkg) => delete pkg.devDependencies["markdown-it"], "must declare"],
+    ["direct drift", (pkg) => (pkg.devDependencies["markdown-it"] = "14.2.1"), "must declare"],
+    ["js-yaml direct deletion", (pkg) => delete pkg.devDependencies["js-yaml"], "must declare"],
+    ["js-yaml direct drift", (pkg) => (pkg.devDependencies["js-yaml"] = "5.2.1"), "must declare"],
     [
       "root lock drift",
-      (_pkg, lock) => (lock.packages[""].devDependencies[PARSER_NAME] = "14.2.1"),
+      (_pkg, lock) => (lock.packages[""].devDependencies["markdown-it"] = "14.2.1"),
+      "must declare",
+    ],
+    [
+      "js-yaml root lock drift",
+      (_pkg, lock) => (lock.packages[""].devDependencies["js-yaml"] = "5.2.1"),
       "must declare",
     ],
     [
       "parser integrity drift",
-      (_pkg, lock) => (lock.packages[PARSER_PATH].integrity = "sha512-changed"),
+      (_pkg, lock) => (lock.packages["node_modules/markdown-it"].integrity = "sha512-changed"),
       "descriptor changed",
     ],
     [
-      "transitive drift",
+      "js-yaml version drift",
+      (_pkg, lock) => (lock.packages["node_modules/js-yaml"].version = "5.2.1"),
+      "descriptor changed",
+    ],
+    [
+      "js-yaml resolved drift",
+      (_pkg, lock) => (lock.packages["node_modules/js-yaml"].resolved = "https://example.invalid/js-yaml.tgz"),
+      "descriptor changed",
+    ],
+    [
+      "js-yaml integrity drift",
+      (_pkg, lock) => (lock.packages["node_modules/js-yaml"].integrity = "sha512-changed"),
+      "descriptor changed",
+    ],
+    [
+      "js-yaml dependency edge drift",
+      (_pkg, lock) => (lock.packages["node_modules/js-yaml"].dependencies.argparse = "^2.0.2"),
+      "descriptor changed",
+    ],
+    [
+      "transitive version drift",
       (_pkg, lock) => (lock.packages["node_modules/argparse"].version = "2.0.2"),
+      "descriptor changed",
+    ],
+    [
+      "transitive resolved drift",
+      (_pkg, lock) => (lock.packages["node_modules/argparse"].resolved = "https://example.invalid/argparse.tgz"),
+      "descriptor changed",
+    ],
+    [
+      "transitive integrity drift",
+      (_pkg, lock) => (lock.packages["node_modules/argparse"].integrity = "sha512-changed"),
       "descriptor changed",
     ],
     [
@@ -579,7 +646,7 @@ function runSelfTests() {
     [
       "closure shadowing",
       (_pkg, lock) => {
-        lock.packages[`${PARSER_PATH}/node_modules/argparse`] = {
+        lock.packages["node_modules/js-yaml/node_modules/argparse"] = {
           ...lock.packages["node_modules/argparse"],
           version: "2.0.2",
         };
@@ -666,7 +733,7 @@ function runSelfTests() {
     ],
     [
       "nested parser override",
-      (pkg) => (pkg.overrides = { [PARSER_NAME]: { argparse: "1.0.10" } }),
+      (pkg) => (pkg.overrides = { "markdown-it": { argparse: "1.0.10" } }),
       "package.json.overrides must remain absent",
     ],
     [
@@ -690,6 +757,18 @@ function runSelfTests() {
       expectedText,
     );
   }
+
+  const unrelatedPackage = clone(inputPackage);
+  const unrelatedLock = clone(inputLock);
+  unrelatedPackage.devDependencies.unrelated = "1.0.0";
+  unrelatedLock.packages[""].devDependencies.unrelated = "1.0.0";
+  unrelatedLock.packages["node_modules/unrelated"] = {
+    version: "1.0.0",
+    resolved: "https://example.invalid/unrelated.tgz",
+    integrity: "sha512-unrelated",
+    dev: true,
+  };
+  validateContract(trustedPackage, trustedLock, unrelatedPackage, unrelatedLock);
 
   const trustedNpmMismatch = clone(trustedLock);
   trustedNpmMismatch.packages[""].engines.npm = "99.0.0";

@@ -1,0 +1,87 @@
+name: Agent instruction current-base invalidation
+
+on:
+  repository_dispatch:
+    types:
+      - agent-instruction-current-base-continuation-v1
+      - agent-instruction-current-base-bootstrap-v1
+  workflow_run:
+    workflows:
+      - Agent instruction validation
+    types:
+      - requested
+      - completed
+
+run-name: >-
+  ${{ github.event_name == 'repository_dispatch' &&
+  github.event.action == 'agent-instruction-current-base-continuation-v1' &&
+  format('Agent current-base continuation: branch={0}; base={1}; state={2}; code={3}',
+  github.event.client_payload.session.branch,
+  github.event.client_payload.session.base_sha,
+  github.event.client_payload.state_token, github.sha) ||
+  github.event_name == 'repository_dispatch' &&
+  format('Agent current-base bootstrap: branch={0}; code={1}',
+  github.event.client_payload.branch, github.sha) ||
+  format('Agent current-base signal: run={0}', github.event.workflow_run.id) }}
+
+permissions: {}
+
+jobs:
+  invalidate-stale-current-base-status:
+    name: Invalidate stale current-base status
+    if: >-
+      (github.event_name == 'workflow_run' &&
+      github.event.workflow_run.event == 'push') ||
+      (github.event_name == 'repository_dispatch' &&
+      (github.event.action ==
+      'agent-instruction-current-base-continuation-v1' ||
+      github.event.action == 'agent-instruction-current-base-bootstrap-v1'))
+    concurrency:
+      group: agent-instruction-current-base-status
+      queue: max
+      cancel-in-progress: false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: write
+      pull-requests: read
+      statuses: write
+    steps:
+      - name: Check out trusted current-base helper
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ github.sha }}
+          token: ${{ github.token }}
+          persist-credentials: false
+          clean: true
+          fetch-depth: 1
+          fetch-tags: false
+          show-progress: true
+          lfs: false
+          submodules: false
+          set-safe-directory: true
+          allow-unsafe-pr-checkout: false
+
+      - name: Invalidate affected pull request heads from live state
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+          EXPECTED_REPOSITORY: ${{ github.repository }}
+          SWEEP_EVENT_NAME: ${{ github.event_name }}
+          SWEEP_RUN_ID: ${{ github.run_id }}
+          SWEEP_RUN_REF: ${{ github.ref_name }}
+          SWEEP_RUN_SHA: ${{ github.sha }}
+          SWEEP_EVENT_TYPE: ${{ github.event.action }}
+          SWEEP_CLIENT_PAYLOAD: ${{ toJson(github.event.client_payload) }}
+          SIGNAL_ACTIVITY: ${{ github.event.action }}
+          SIGNAL_RUN_ID: ${{ github.event.workflow_run.id }}
+          SIGNAL_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          SIGNAL_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          STATUS_TARGET_URL: >-
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{
+              github.run_id }}
+        run: >-
+          node .github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs
+          invalidate

@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.7.20260902.0
+# Version: 1.9.20260903.1
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -82,12 +82,16 @@ $script:arrOperationalLintGuidePaths = @(
 )
 $script:arrTrustRootPaths = @(
     $script:arrCheckoutAttributePaths
+    '.github/actionlint.yaml',
     '.github/workflows/Test-TrustRootAuthorization.ps1',
     '.github/workflows/Test-AgentInstructions.SelfTest.ps1',
     '.github/workflows/Test-AgentInstructions.ps1',
     '.github/workflows/Test-AgentInstructionParserManifest.mjs',
+    '.github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs',
     '.github/workflows/trust-root-authorization.json',
-    '.github/workflows/agent-instructions.yml'
+    '.github/workflows/agent-instruction-current-base.yml',
+    '.github/workflows/agent-instructions.yml',
+    '.pre-commit-config.yaml'
 )
 $script:arrGovernedInstructionRootPaths = @(
     '.hermes.md',
@@ -104,7 +108,9 @@ $script:arrPushGovernedExactPaths = @(
     '.github/workflows/Test-TrustRootAuthorization.ps1',
     '.github/workflows/Test-AgentInstructions.SelfTest.ps1',
     '.github/workflows/Test-AgentInstructions.ps1',
+    '.github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs',
     '.github/workflows/trust-root-authorization.json',
+    '.github/workflows/agent-instruction-current-base.yml',
     '.github/workflows/agent-instructions.yml',
     '.gitignore',
     '.npmrc',
@@ -917,9 +923,9 @@ function Read-GitPublishedEndpointChangedPath {
     # Reads bounded paths changed between the published baseline and final state.
     #
     # .DESCRIPTION
-    # Uses authenticated endpoint trees. A created ref uses its graph-derived
-    # introduced set and outside-parent boundaries. Only a genuine root uses
-    # the complete final tree.
+    # Uses authenticated endpoint trees. A created ref with one authenticated
+    # outside-parent boundary compares that boundary tree with the final tree.
+    # Only a genuine root uses the complete final tree.
     #
     # .PARAMETER RepositoryRootPath
     # The absolute path of the trusted Git repository.
@@ -957,7 +963,7 @@ function Read-GitPublishedEndpointChangedPath {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20260902.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -986,12 +992,15 @@ function Read-GitPublishedEndpointChangedPath {
         @('-C', $RepositoryRootPath, 'ls-tree', '-r', '-z', '--name-only',
             $FinalRevision)
     }
-    elseif ($BaselineAbsent) {
+    elseif ($BaselineAbsent -and $arrBoundaries.Count -eq 1) {
         @(
-            '-C', $RepositoryRootPath, 'log', '--format=', '--name-only', '-z',
-            '-m', '--no-renames', '--no-ext-diff', '--no-textconv',
-            $FinalRevision, '--not'
-        ) + $arrBoundaries + @('--', ':(top)**')
+            '-C', $RepositoryRootPath, 'diff', '--name-only', '-z',
+            '--no-renames', '--no-ext-diff', '--no-textconv',
+            $arrBoundaries[0], $FinalRevision, '--', ':(top)**'
+        )
+    }
+    elseif ($BaselineAbsent) {
+        throw 'A created ref with introduced commits must have one boundary.'
     }
     else {
         @('-C', $RepositoryRootPath, 'diff', '--name-only', '-z',
@@ -1014,8 +1023,7 @@ function Read-GitPublishedEndpointChangedPath {
     if ($objResult.ExitCode -ne 0) {
         throw 'Could not enumerate paths changed between published endpoints.'
     }
-    $arrPaths = @(ConvertFrom-GitPathListData -Bytes $objResult.Bytes `
-            -AllowDuplicatePath:$BaselineAbsent)
+    $arrPaths = @(ConvertFrom-GitPathListData -Bytes $objResult.Bytes)
     return @($arrPaths | Sort-Object -Unique)
 }
 
@@ -2159,7 +2167,8 @@ function Get-MarkdownParseContext {
     # .DESCRIPTION
     # Uses the repository-locked markdown-it package to identify code-block ranges,
     # prose blocks with operative code spans and link destinations, top-level
-    # blocks, top-level list items, and level-two headings.
+    # blocks, table rows and cells, top-level list items, all top-level headings,
+    # and level-two headings.
     # It validates all parser output before returning it.
     #
     # .PARAMETER Content
@@ -2183,7 +2192,7 @@ function Get-MarkdownParseContext {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20260902.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -2226,6 +2235,7 @@ function Get-MarkdownParseContext {
         '  const deletionStack = [];'
         '  const htmlContainerStack = [];'
         '  const output = [];'
+        '  const renderedOutput = [];'
         '  const code = [];'
         '  const links = [];'
         '  for (const child of children) {'
@@ -2257,16 +2267,26 @@ function Get-MarkdownParseContext {
         '      if (typeof href !== "string") throw new Error("Invalid Markdown link destination.");'
         '      links.push(href);'
         '    }'
-        '    if (child.type === "text" || child.type === "text_special") output.push(child.content);'
-        '    else if (child.type === "softbreak" || child.type === "hardbreak") output.push("\n");'
-        '    else if (child.type === "code_inline") code.push(child.content);'
+        '    if (child.type === "text" || child.type === "text_special") {'
+        '      output.push(child.content);'
+        '      renderedOutput.push(child.content);'
+        '    } else if (child.type === "softbreak" || child.type === "hardbreak") {'
+        '      output.push("\n");'
+        '      renderedOutput.push("\n");'
+        '    } else if (child.type === "code_inline") {'
+        '      code.push(child.content);'
+        '      renderedOutput.push(child.content);'
+        '    }'
         '  }'
         '  if (deletionStack.length > 0) throw new Error("Unclosed deletion container.");'
         '  if (htmlContainerStack.length > 0) throw new Error("Unclosed inline HTML container.");'
-        '  return { text: output.join(""), code, links };'
+        '  return { text: output.join(""), renderedText: renderedOutput.join(""), code, links };'
         '};'
         'const codeBlockRanges = tokens.filter((token) => token.type === "fence" || token.type === "code_block").map((token) => token.map);'
-        'const proseBlocks = tokens.filter((token) => token.type === "inline" && Array.isArray(token.map) && Array.isArray(token.children)).map((token) => ({ range: token.map, ...getOperativeInlineContext(token.children) }));'
+        'const proseBlocks = tokens.filter((token) => token.type === "inline" && Array.isArray(token.map) && Array.isArray(token.children)).map((token) => {'
+        '  const context = getOperativeInlineContext(token.children);'
+        '  return { range: token.map, text: context.text, code: context.code, links: context.links };'
+        '});'
         'const topLevelBlocks = tokens.flatMap((token, index) => {'
         '  if (token.level !== 0 || !Array.isArray(token.map) || (token.nesting !== 0 && token.nesting !== 1)) return [];'
         '  let text = null;'
@@ -2281,16 +2301,70 @@ function Get-MarkdownParseContext {
         '  if (token.type !== "list_item_open" || token.tag !== "li" || token.level !== 1 || !Array.isArray(token.map)) return [];'
         '  const closeIndex = tokens.findIndex((candidate, candidateIndex) => candidateIndex > index && candidate.type === "list_item_close" && candidate.tag === "li" && candidate.level === 1);'
         '  if (closeIndex < 0) throw new Error("Unclosed top-level list item.");'
-        '  const inlineToken = tokens.slice(index + 1, closeIndex).find((candidate) => candidate.type === "inline" && candidate.level === 3 && Array.isArray(candidate.children));'
-        '  const context = inlineToken ? getOperativeInlineContext(inlineToken.children) : null;'
-        '  return [{ range: token.map, text: context?.text ?? null, code: context?.code ?? [], links: context?.links ?? [] }];'
+        '  const blocks = [];'
+        '  for (let paragraphIndex = index + 1; paragraphIndex < closeIndex; paragraphIndex += 1) {'
+        '    const paragraphToken = tokens[paragraphIndex];'
+        '    if (paragraphToken.type !== "paragraph_open" || paragraphToken.level !== 2) continue;'
+        '    if (paragraphToken.tag !== "p" || paragraphToken.nesting !== 1 || !Array.isArray(paragraphToken.map)) throw new Error("Invalid top-level list-item paragraph.");'
+        '    const inlineToken = tokens[paragraphIndex + 1];'
+        '    const closeToken = tokens[paragraphIndex + 2];'
+        '    if (inlineToken?.type !== "inline" || inlineToken.level !== 3 || !Array.isArray(inlineToken.children) || closeToken?.type !== "paragraph_close" || closeToken.tag !== "p" || closeToken.level !== 2 || closeToken.nesting !== -1) throw new Error("Invalid top-level list-item paragraph container.");'
+        '    const context = getOperativeInlineContext(inlineToken.children);'
+        '    blocks.push({ range: paragraphToken.map, text: context.text, code: context.code, links: context.links });'
+        '  }'
+        '  return blocks;'
+        '});'
+        'const headings = tokens.flatMap((token, index) => {'
+        '  if (token.type !== "heading_open" || token.level !== 0) return [];'
+        '  if (!/^h[1-6]$/.test(token.tag) || token.nesting !== 1 || !Array.isArray(token.map)) throw new Error("Invalid Markdown heading.");'
+        '  const inlineToken = tokens[index + 1];'
+        '  const closeToken = tokens[index + 2];'
+        '  if (inlineToken?.type !== "inline" || !Array.isArray(inlineToken.children) || closeToken?.type !== "heading_close" || closeToken.tag !== token.tag || closeToken.nesting !== -1) throw new Error("Invalid Markdown heading container.");'
+        '  return [{ tag: token.tag, range: token.map, text: getOperativeInlineContext(inlineToken.children).text }];'
         '});'
         'const levelTwoHeadings = tokens.flatMap((token, index) => {'
         '  if (token.type !== "heading_open" || token.tag !== "h2" || token.level !== 0) return [];'
         '  const inlineToken = tokens[index + 1];'
         '  return [{ range: token.map, text: inlineToken?.type === "inline" ? inlineToken.content : null }];'
         '});'
-        'process.stdout.write(JSON.stringify({ codeBlockRanges, proseBlocks, topLevelBlocks, topLevelListItems, levelTwoHeadings }));'
+        'const tableContainers = new Map();'
+        'const tableStack = [];'
+        'tokens.forEach((token, index) => {'
+        '  if (token.type === "table_open") {'
+        '    if (token.tag !== "table" || token.nesting !== 1 || !Array.isArray(token.map)) throw new Error("Invalid Markdown table container.");'
+        '    tableStack.push({ level: token.level, index });'
+        '  } else if (token.type === "table_close") {'
+        '    const table = tableStack.pop();'
+        '    if (token.tag !== "table" || token.nesting !== -1 || !table || table.level !== token.level) throw new Error("Unbalanced Markdown table container.");'
+        '  } else if (token.type === "tr_open") {'
+        '    const table = tableStack[tableStack.length - 1];'
+        '    if (!table) throw new Error("Markdown table row has no table container.");'
+        '    tableContainers.set(index, table);'
+        '  }'
+        '});'
+        'if (tableStack.length > 0) throw new Error("Unclosed Markdown table container.");'
+        'const tableRows = tokens.flatMap((token, index) => {'
+        '  if (token.type !== "tr_open" || token.tag !== "tr" || token.nesting !== 1 || !Array.isArray(token.map)) return [];'
+        '  const table = tableContainers.get(index);'
+        '  if (!table) throw new Error("Markdown table row has no tracked container.");'
+        '  if (table.level !== 0) return [];'
+        '  const closeIndex = tokens.findIndex((candidate, candidateIndex) => candidateIndex > index && candidate.type === "tr_close" && candidate.tag === "tr" && candidate.nesting === -1 && candidate.level === token.level);'
+        '  if (closeIndex < 0) throw new Error("Unclosed Markdown table row.");'
+        '  const cells = [];'
+        '  for (let cellIndex = index + 1; cellIndex < closeIndex; cellIndex += 1) {'
+        '    const cellToken = tokens[cellIndex];'
+        '    if (cellToken.type !== "th_open" && cellToken.type !== "td_open") continue;'
+        '    if ((cellToken.tag !== "th" && cellToken.tag !== "td") || cellToken.nesting !== 1) throw new Error("Invalid Markdown table cell.");'
+        '    const inlineToken = tokens[cellIndex + 1];'
+        '    const closeToken = tokens[cellIndex + 2];'
+        '    if (inlineToken?.type !== "inline" || !Array.isArray(inlineToken.children) || closeToken?.type !== `${cellToken.tag}_close` || closeToken.tag !== cellToken.tag || closeToken.nesting !== -1) throw new Error("Invalid Markdown table-cell container.");'
+        '    const context = getOperativeInlineContext(inlineToken.children);'
+        '    cells.push({ tag: cellToken.tag, text: context.renderedText, code: context.code, links: context.links });'
+        '  }'
+        '  if (cells.length === 0) throw new Error("Markdown table row has no cells.");'
+        '  return [{ range: token.map, cells }];'
+        '});'
+        'process.stdout.write(JSON.stringify({ codeBlockRanges, proseBlocks, tableRows, topLevelBlocks, topLevelListItems, headings, levelTwoHeadings }));'
     ) -join "`n"
 
     $objStartInfo = [System.Diagnostics.ProcessStartInfo]::new()
@@ -2326,8 +2400,10 @@ function Get-MarkdownParseContext {
     if ($null -eq $objRawContext -or
         $null -eq $objRawContext.codeBlockRanges -or
         $null -eq $objRawContext.proseBlocks -or
+        $null -eq $objRawContext.tableRows -or
         $null -eq $objRawContext.topLevelBlocks -or
         $null -eq $objRawContext.topLevelListItems -or
+        $null -eq $objRawContext.headings -or
         $null -eq $objRawContext.levelTwoHeadings) {
         throw 'The locked Markdown parser returned incomplete context data.'
     }
@@ -2387,6 +2463,58 @@ function Get-MarkdownParseContext {
                 Code = [string[]]@($objRawProseBlock.code)
                 Links = [string[]]@($objRawProseBlock.links)
             })
+    }
+
+    $listTableRows = [Collections.Generic.List[pscustomobject]]::new()
+    $intPreviousTableRowEnd = 0
+    foreach ($objRawTableRow in @($objRawContext.tableRows)) {
+        if ($null -eq $objRawTableRow -or
+            $objRawTableRow.range -isnot [array] -or
+            $objRawTableRow.range.Count -ne 2 -or
+            $objRawTableRow.cells -isnot [array] -or
+            $objRawTableRow.cells.Count -eq 0) {
+            throw 'The locked Markdown parser returned a malformed table row.'
+        }
+
+        $intStart = [int64] 0
+        $intEnd = [int64] 0
+        if (-not [int64]::TryParse([string]$objRawTableRow.range[0], [ref]$intStart) -or
+            -not [int64]::TryParse([string]$objRawTableRow.range[1], [ref]$intEnd) -or
+            $intStart -lt $intPreviousTableRowEnd -or
+            $intStart -lt 0 -or
+            $intEnd -le $intStart -or
+            $intEnd -gt $LineCount) {
+            throw 'The locked Markdown parser returned an invalid table-row range.'
+        }
+
+        $listCells = [Collections.Generic.List[pscustomobject]]::new()
+        foreach ($objRawCell in @($objRawTableRow.cells)) {
+            if ($null -eq $objRawCell -or
+                $objRawCell.tag -isnot [string] -or
+                @('th', 'td') -cnotcontains $objRawCell.tag -or
+                $objRawCell.text -isnot [string] -or
+                $objRawCell.code -isnot [array] -or
+                @($objRawCell.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or
+                $objRawCell.links -isnot [array] -or
+                @($objRawCell.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {
+                throw 'The locked Markdown parser returned a malformed table cell.'
+            }
+            $listCells.Add([pscustomobject]@{
+                    Tag = [string]$objRawCell.tag
+                    Start = [int]$intStart
+                    End = [int]$intEnd
+                    Text = [string]$objRawCell.text
+                    Code = [string[]]@($objRawCell.code)
+                    Links = [string[]]@($objRawCell.links)
+                })
+        }
+
+        $listTableRows.Add([pscustomobject]@{
+                Start = [int]$intStart
+                End = [int]$intEnd
+                Cells = [pscustomobject[]]$listCells.ToArray()
+            })
+        $intPreviousTableRowEnd = [int]$intEnd
     }
 
     $listTopLevelBlocks = [Collections.Generic.List[pscustomobject]]::new()
@@ -2467,6 +2595,38 @@ function Get-MarkdownParseContext {
         $intPreviousTopLevelListItemEnd = [int]$intEnd
     }
 
+    $listHeadings = [Collections.Generic.List[pscustomobject]]::new()
+    $intPreviousHeadingEnd = 0
+    foreach ($objRawHeading in @($objRawContext.headings)) {
+        if ($null -eq $objRawHeading -or
+            $objRawHeading.tag -isnot [string] -or
+            $objRawHeading.tag -cnotmatch '^h[1-6]$' -or
+            $objRawHeading.range -isnot [array] -or
+            $objRawHeading.range.Count -ne 2 -or
+            $objRawHeading.text -isnot [string]) {
+            throw 'The locked Markdown parser returned a malformed heading.'
+        }
+
+        $intStart = [int64] 0
+        $intEnd = [int64] 0
+        if (-not [int64]::TryParse([string]$objRawHeading.range[0], [ref]$intStart) -or
+            -not [int64]::TryParse([string]$objRawHeading.range[1], [ref]$intEnd) -or
+            $intStart -lt $intPreviousHeadingEnd -or
+            $intStart -lt 0 -or
+            $intEnd -le $intStart -or
+            $intEnd -gt $LineCount) {
+            throw 'The locked Markdown parser returned an invalid heading range.'
+        }
+
+        $listHeadings.Add([pscustomobject]@{
+                Tag = [string]$objRawHeading.tag
+                Start = [int]$intStart
+                End = [int]$intEnd
+                Text = [string]$objRawHeading.text
+            })
+        $intPreviousHeadingEnd = [int]$intEnd
+    }
+
     $listLevelTwoHeadings = [Collections.Generic.List[pscustomobject]]::new()
     $intPreviousHeadingEnd = 0
     foreach ($objRawHeading in @($objRawContext.levelTwoHeadings)) {
@@ -2499,8 +2659,10 @@ function Get-MarkdownParseContext {
     return [pscustomobject]@{
         CodeBlockRanges = [pscustomobject[]]$listRanges.ToArray()
         ProseBlocks = [pscustomobject[]]$listProseBlocks.ToArray()
+        TableRows = [pscustomobject[]]$listTableRows.ToArray()
         TopLevelBlocks = [pscustomobject[]]$listTopLevelBlocks.ToArray()
         TopLevelListItems = [pscustomobject[]]$listTopLevelListItems.ToArray()
+        Headings = [pscustomobject[]]$listHeadings.ToArray()
         LevelTwoHeadings = [pscustomobject[]]$listLevelTwoHeadings.ToArray()
     }
 }
@@ -2527,7 +2689,7 @@ function Assert-MarkdownParserExactContext {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20260902.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param()
@@ -2542,13 +2704,165 @@ function Assert-MarkdownParserExactContext {
     $strExpected = '{"CodeBlockRanges":[],"ProseBlocks":[' +
         '{"Start":0,"End":1,"Text":"Transport","Code":[],"Links":[]},' +
         '{"Start":2,"End":3,"Text":"Paragraph .","Code":["code"],"Links":[]}],' +
+        '"TableRows":[],' +
         '"TopLevelBlocks":[' +
         '{"Type":"heading_open","Tag":"h2","Start":0,"End":1,"Text":"Transport"},' +
         '{"Type":"paragraph_open","Tag":"p","Start":2,"End":3,"Text":"Paragraph ."}],' +
-        '"TopLevelListItems":[],"LevelTwoHeadings":[' +
+        '"TopLevelListItems":[],"Headings":[' +
+        '{"Tag":"h2","Start":0,"End":1,"Text":"Transport"}],' +
+        '"LevelTwoHeadings":[' +
         '{"Start":0,"End":1,"Text":"Transport"}]}'
     if ($strActual -cne $strExpected) {
         throw "Self-test 'ordinary exact Markdown parser context' changed output."
+    }
+
+    $strTableMarkdown = @(
+        '| **Decision** `Status` | Value |'
+        '| :--- | ---: |'
+        '| Field | *Accepted* |'
+    ) -join "`n"
+    $objTableContext = Get-MarkdownParseContext `
+        -Content $strTableMarkdown -LineCount 3
+    if ($objTableContext.TableRows.Count -ne 2 -or
+        $objTableContext.TableRows[0].Start -ne 0 -or
+        $objTableContext.TableRows[0].End -ne 1 -or
+        $objTableContext.TableRows[0].Cells.Count -ne 2 -or
+        $objTableContext.TableRows[0].Cells[0].Tag -cne 'th' -or
+        $objTableContext.TableRows[0].Cells[0].Text -cne 'Decision Status' -or
+        $objTableContext.TableRows[0].Cells[0].Code.Count -ne 1 -or
+        $objTableContext.TableRows[0].Cells[0].Code[0] -cne 'Status' -or
+        $objTableContext.TableRows[1].Start -ne 2 -or
+        $objTableContext.TableRows[1].End -ne 3 -or
+        $objTableContext.TableRows[1].Cells[1].Tag -cne 'td' -or
+        $objTableContext.TableRows[1].Cells[1].Text -cne 'Accepted') {
+        throw "Self-test 'exact Markdown table context' changed output."
+    }
+
+    $strTopLevelListMarkdown = @(
+        '- First paragraph.'
+        ''
+        '  Status: Accepted'
+        ''
+        '  > Status: Proposed'
+        ''
+        '  - Status: Deprecated'
+    ) -join "`n"
+    $objTopLevelListContext = Get-MarkdownParseContext `
+        -Content $strTopLevelListMarkdown -LineCount 7
+    if ($objTopLevelListContext.TopLevelListItems.Count -ne 2 -or
+        $objTopLevelListContext.TopLevelListItems[0].Start -ne 0 -or
+        $objTopLevelListContext.TopLevelListItems[0].End -ne 1 -or
+        $objTopLevelListContext.TopLevelListItems[0].Text -cne 'First paragraph.' -or
+        $objTopLevelListContext.TopLevelListItems[1].Start -ne 2 -or
+        $objTopLevelListContext.TopLevelListItems[1].End -ne 3 -or
+        $objTopLevelListContext.TopLevelListItems[1].Text -cne 'Status: Accepted') {
+        throw "Self-test 'direct top-level list-item paragraphs' changed output."
+    }
+
+    $arrNestedTableFixtures = @(
+        [pscustomobject]@{
+            Name = 'blockquoted table'
+            Content = @(
+                '> | Field | Value |'
+                '> | --- | --- |'
+                '> | Status | Accepted |'
+            ) -join "`n"
+        },
+        [pscustomobject]@{
+            Name = 'listed table'
+            Content = @(
+                '- Example:'
+                ''
+                '  | Field | Value |'
+                '  | --- | --- |'
+                '  | Status | Accepted |'
+            ) -join "`n"
+        },
+        [pscustomobject]@{
+            Name = 'nested-list table'
+            Content = @(
+                '- Outer'
+                '  - Inner:'
+                ''
+                '    | Field | Value |'
+                '    | --- | --- |'
+                '    | Status | Accepted |'
+            ) -join "`n"
+        }
+    )
+    foreach ($objNestedTableFixture in $arrNestedTableFixtures) {
+        $intNestedTableLineCount = @(
+            [regex]::Split($objNestedTableFixture.Content, '\r\n|\r|\n')
+        ).Count
+        $objNestedTableContext = Get-MarkdownParseContext `
+            -Content $objNestedTableFixture.Content `
+            -LineCount $intNestedTableLineCount
+        if ($objNestedTableContext.TableRows.Count -ne 0) {
+            throw "$($objNestedTableFixture.Name) became document-level table context."
+        }
+    }
+
+    $strHeadingMarkdown = @(
+        '## Context'
+        '### Decision **Status**'
+        '#### `Status`'
+    ) -join "`n"
+    $objHeadingContext = Get-MarkdownParseContext `
+        -Content $strHeadingMarkdown -LineCount 3
+    if ($objHeadingContext.Headings.Count -ne 3 -or
+        $objHeadingContext.Headings[0].Tag -cne 'h2' -or
+        $objHeadingContext.Headings[0].Text -cne 'Context' -or
+        $objHeadingContext.Headings[1].Tag -cne 'h3' -or
+        $objHeadingContext.Headings[1].Text -cne 'Decision Status' -or
+        $objHeadingContext.Headings[2].Tag -cne 'h4' -or
+        $objHeadingContext.Headings[2].Text -cne '' -or
+        $objHeadingContext.LevelTwoHeadings.Count -ne 1 -or
+        $objHeadingContext.LevelTwoHeadings[0].Text -cne 'Context') {
+        throw "Self-test 'all Markdown headings context' changed output."
+    }
+
+    $strNestedHeadingMarkdown = @(
+        '## Context'
+        '> ### Decision Status'
+        '- Item'
+        '  #### Status'
+        '```markdown'
+        '##### Status'
+        '```'
+        '<!--'
+        '###### Decision Status'
+        '-->'
+        '##### Decision Status'
+    ) -join "`n"
+    $objNestedHeadingContext = Get-MarkdownParseContext `
+        -Content $strNestedHeadingMarkdown -LineCount 11
+    $strNestedHeadingActual = [pscustomobject]@{
+        CodeBlockRanges = $objNestedHeadingContext.CodeBlockRanges
+        Headings = $objNestedHeadingContext.Headings
+        LevelTwoHeadings = $objNestedHeadingContext.LevelTwoHeadings
+    } | ConvertTo-Json -Depth 5 -Compress
+    $strNestedHeadingExpected = '{"CodeBlockRanges":[' +
+        '{"Start":4,"End":7}],"Headings":[' +
+        '{"Tag":"h2","Start":0,"End":1,"Text":"Context"},' +
+        '{"Tag":"h5","Start":10,"End":11,"Text":"Decision Status"}],' +
+        '"LevelTwoHeadings":[{"Start":0,"End":1,"Text":"Context"}]}'
+    if ($strNestedHeadingActual -cne $strNestedHeadingExpected) {
+        throw "Self-test 'top-level Markdown headings context' changed output."
+    }
+
+    $strParserSource = [IO.File]::ReadAllText($PSCommandPath)
+    $strTopLevelHeadingGuard =
+        'if (token.type !== "heading_open" || token.level !== 0) return [];'
+    $strNestedHeadingMutation = $strParserSource.Replace(
+        $strTopLevelHeadingGuard,
+        'if (token.type !== "heading_open") return [];'
+    )
+    if ($strNestedHeadingMutation -ceq $strParserSource -or
+        $strNestedHeadingMutation.Contains(
+            $strTopLevelHeadingGuard,
+            [StringComparison]::Ordinal
+        )) {
+        throw 'The top-level heading collector mutation was not detected.'
     }
 }
 
@@ -2578,7 +2892,7 @@ function Get-OperativeMarkdownContext {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20260902.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -2615,7 +2929,10 @@ function Get-OperativeMarkdownContext {
         SourceLines = [string[]]$arrLines
         CodeBlockLines = [bool[]]$arrCodeBlockLines
         ProseBlocks = [pscustomobject[]]$objParseContext.ProseBlocks
+        TableRows = [pscustomobject[]]$objParseContext.TableRows
+        TopLevelBlocks = [pscustomobject[]]$objParseContext.TopLevelBlocks
         TopLevelListItems = [pscustomobject[]]$objParseContext.TopLevelListItems
+        Headings = [pscustomobject[]]$objParseContext.Headings
         LevelTwoHeadings = [pscustomobject[]]$objParseContext.LevelTwoHeadings
     }
 }
@@ -4110,7 +4427,7 @@ function Get-CreatedRefBoundaryContext {
             }
         }
         if (-not $boolAuthenticatedBoundary) {
-            throw 'A created-push boundary lacks authenticated other-ref provenance.'
+            throw 'A created-push boundary lacks authenticated other-ref provenance within the bounded history depth.'
         }
     }
 
@@ -4125,6 +4442,61 @@ function Get-CreatedRefBoundaryContext {
         IsGenuineRootIntroduction =
             $arrIntroducedCommits.Count -gt 0 -and $arrBoundaries.Count -eq 0
     }
+}
+
+function Get-CreatedRefMetadataBaselineRevision {
+    # .SYNOPSIS
+    # Selects the authenticated metadata baseline for one created ref.
+    # .DESCRIPTION
+    # Reuses the exact head when the ref introduces no commits, uses the sole
+    # outside-parent boundary for introduced non-root history, returns no
+    # baseline for a genuine root, and rejects ambiguous multi-boundary history.
+    # .PARAMETER Context
+    # The authenticated context returned by Get-CreatedRefBoundaryContext.
+    # .PARAMETER HeadRevision
+    # The exact created-ref final commit.
+    # .EXAMPLE
+    # Get-CreatedRefMetadataBaselineRevision @hashtableArguments
+    #
+    # # Returns the authenticated metadata baseline.
+    # .INPUTS
+    # None. No pipeline input.
+    # .OUTPUTS
+    # [string] The baseline commit, or an empty string for a genuine root.
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260902.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][pscustomobject] $Context,
+        [Parameter(Mandatory)][string] $HeadRevision
+    )
+
+    $arrIntroduced = @($Context.IntroducedCommitRevisions)
+    $arrBoundaries = @($Context.BoundaryRevisions)
+    $strEffectiveBaseline = [string] $Context.EffectiveBaselineRevision
+    if ($Context.IsGenuineRootIntroduction) {
+        if ($arrIntroduced.Count -lt 1 -or $arrBoundaries.Count -ne 0 -or
+            -not [string]::IsNullOrEmpty($strEffectiveBaseline)) {
+            throw 'The genuine-root created-ref metadata context is inconsistent.'
+        }
+        return ''
+    }
+    if ($arrIntroduced.Count -eq 0) {
+        if ($arrBoundaries.Count -ne 0 -or
+            $strEffectiveBaseline -cne $HeadRevision) {
+            throw 'The zero-introduction created-ref metadata context is inconsistent.'
+        }
+        return $HeadRevision
+    }
+    if ($arrBoundaries.Count -eq 1 -and
+        $strEffectiveBaseline -ceq $arrBoundaries[0]) {
+        return $strEffectiveBaseline
+    }
+    throw 'An introduced created ref lacks one unambiguous metadata baseline.'
 }
 
 function Test-GovernedInstructionPath {
@@ -4827,6 +5199,254 @@ function Get-DocumentationClaimFailure {
     }
 }
 
+function Get-DecisionLifecyclePolicyFailure {
+    # .SYNOPSIS
+    # Finds an invalid decision-record lifecycle policy.
+    #
+    # .DESCRIPTION
+    # Requires one decision-record Status representation, the four retained
+    # lifecycle values, an explicit prohibition on a second narrative status,
+    # and the unchanged-byte legacy migration boundary.
+    #
+    # .PARAMETER Content
+    # The documentation instruction content to inspect.
+    #
+    # .EXAMPLE
+    # Get-DecisionLifecyclePolicyFailure -Content $strDocs
+    #
+    # # Returns one string for each lifecycle-policy failure.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [string] One record for each decision lifecycle policy failure.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260902.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $Content
+    )
+
+    $arrSectionMatches = @([regex]::Matches(
+            $Content,
+            '(?ms)^## Decision Record Standards\s*\r?\n(?<Body>.*?)(?=^## |\z)'
+        ))
+    if ($arrSectionMatches.Count -ne 1) {
+        Write-Output (
+            'Documentation instructions must contain exactly one Decision Record ' +
+            'Standards section.'
+        )
+        return
+    }
+
+    $strSectionBody = $arrSectionMatches[0].Groups['Body'].Value
+    if ([regex]::Matches($strSectionBody, '\*\*Status\*\*').Count -ne 1) {
+        Write-Output (
+            'Decision records must use exactly one Tier 1 Status representation.'
+        )
+    }
+
+    $arrAllowedValuesMatches = @([regex]::Matches(
+            $strSectionBody,
+            'For decision records, its value MUST be ' +
+                '(?<Values>[A-Za-z]+(?: \| [A-Za-z]+)+)\.'
+        ))
+    $strExpectedValues = 'Proposed | Accepted | Superseded | Deprecated'
+    if ($arrAllowedValuesMatches.Count -ne 1 -or
+        $arrAllowedValuesMatches[0].Groups['Values'].Value -cne $strExpectedValues) {
+        Write-Output (
+            'Decision record Status must allow exactly ' + $strExpectedValues + '.'
+        )
+    }
+
+    if ([regex]::Matches(
+            $strSectionBody,
+            'A decision record MUST NOT add a separate narrative status field or section\.'
+        ).Count -ne 1) {
+        Write-Output (
+            'Decision records must prohibit a separate narrative status representation.'
+        )
+    }
+
+    if ([regex]::Matches(
+            $strSectionBody,
+            ('Published legacy decision records that predate this lifecycle rule ' +
+                'MAY retain their existing status representation while their bytes ' +
+                'remain unchanged\. The next change to such a record MUST migrate it ' +
+                'to the single Tier 1 Status metadata field and MUST remove each ' +
+                'separate narrative status field or section\.')
+        ).Count -ne 1) {
+        Write-Output (
+            'Decision records must document the unchanged legacy migration boundary.'
+        )
+    }
+}
+
+function Test-DecisionLifecycleStatusLabel {
+    # .SYNOPSIS
+    # Tests one normalized decision lifecycle label.
+    # .DESCRIPTION
+    # Returns true only for Status or Decision Status after trimming and
+    # collapsing whitespace. Comparison is case-insensitive.
+    # .PARAMETER Label
+    # The heading or field label to test.
+    # .EXAMPLE
+    # Test-DecisionLifecycleStatusLabel -Label 'Decision Status'
+    #
+    # # Returns true.
+    # .INPUTS
+    # None. No pipeline input.
+    # .OUTPUTS
+    # [bool] True only for one exact supported lifecycle label.
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260903.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)]
+        [AllowEmptyString()]
+        [string] $Label
+    )
+
+    $strNormalizedLabel = [regex]::Replace($Label.Trim(), '\s+', ' ')
+    return (
+        $strNormalizedLabel -ieq 'Status' -or
+        $strNormalizedLabel -ieq 'Decision Status'
+    )
+}
+
+function Get-DecisionRecordLifecycleFailure {
+    # .SYNOPSIS
+    # Finds lifecycle representation failures in one decision record.
+    # .DESCRIPTION
+    # Requires one four-state metadata Status and no separate structured Status
+    # field or section for a new or changed ADR. An unchanged published legacy ADR
+    # remains valid until its next content change under the migration boundary.
+    # .PARAMETER Name
+    # The repository-relative decision-record path.
+    # .PARAMETER CurrentContent
+    # The final decision-record content.
+    # .PARAMETER BaselineContent
+    # The published baseline content, or null when no baseline document exists.
+    # .EXAMPLE
+    # Get-DecisionRecordLifecycleFailure @hashtableArguments
+    #
+    # # Returns lifecycle failures for one changed decision record.
+    # .INPUTS
+    # None. No pipeline input.
+    # .OUTPUTS
+    # [string] Zero or more lifecycle diagnostics.
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260902.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][string] $Name,
+        [Parameter(Mandatory)][string] $CurrentContent,
+        [Parameter()][AllowNull()][string] $BaselineContent
+    )
+
+    if ($null -ne $BaselineContent -and
+        $CurrentContent -ceq $BaselineContent) {
+        return
+    }
+    $objMetadata = Get-DocumentMetadataContext `
+        -Content $CurrentContent -RequiresVersion $false
+    if ($null -ne $objMetadata.Failure) {
+        return
+    }
+    $arrAllowedStatuses = @(
+        'Proposed', 'Accepted', 'Superseded', 'Deprecated'
+    )
+    if ($arrAllowedStatuses -cnotcontains $objMetadata.Status) {
+        Write-Output (
+            "$Name Status must be Proposed, Accepted, Superseded, or Deprecated."
+        )
+    }
+    $objMarkdownContext = Get-OperativeMarkdownContext -Content $CurrentContent
+    $objMetadataHeading = @(
+        $objMarkdownContext.LevelTwoHeadings |
+            Where-Object Text -CEQ 'Metadata'
+    )[0]
+    $intMetadataSectionEnd = $objMarkdownContext.SourceLines.Count
+    foreach ($objLevelTwoHeading in $objMarkdownContext.LevelTwoHeadings) {
+        if ($objLevelTwoHeading.Start -gt $objMetadataHeading.Start) {
+            $intMetadataSectionEnd = $objLevelTwoHeading.Start
+            break
+        }
+    }
+    if (@($objMarkdownContext.Headings |
+            Where-Object {
+                $_.Tag -cne 'h1' -and
+                $_.Start -ne $objMetadataHeading.Start -and
+                (Test-DecisionLifecycleStatusLabel -Label $_.Text)
+            }).Count -ne 0) {
+        Write-Output "$Name must not contain a separate operative Status section."
+    }
+    $arrTopLevelLifecycleFieldBlocks = @(
+        $objMarkdownContext.TopLevelBlocks |
+            Where-Object { $_.Type -ceq 'paragraph_open' }
+        $objMarkdownContext.TopLevelListItems
+    )
+    if (@($arrTopLevelLifecycleFieldBlocks |
+            Where-Object {
+                $boolOutsideMetadata =
+                    $_.Start -le $objMetadataHeading.Start -or
+                    $_.Start -ge $intMetadataSectionEnd
+                $objFieldMatch = [regex]::Match(
+                    $_.Text,
+                    '^\s*(?<Label>[^:\r\n]+?)\s*:\s*\S'
+                )
+                $boolOutsideMetadata -and
+                    $objFieldMatch.Success -and
+                    (Test-DecisionLifecycleStatusLabel `
+                        -Label $objFieldMatch.Groups['Label'].Value)
+            }).Count -ne 0) {
+        Write-Output (
+            "$Name must not contain a separate operative Status field outside Metadata."
+        )
+    }
+    if (@($objMarkdownContext.TableRows |
+            Where-Object {
+                $boolOutsideMetadata =
+                    $_.Start -le $objMetadataHeading.Start -or
+                    $_.Start -ge $intMetadataSectionEnd
+                $boolHasStatusField = $false
+                if ($boolOutsideMetadata -and
+                    $_.Cells.Count -eq 2 -and
+                    $_.Cells[0].Tag -ceq 'td' -and
+                    $_.Cells[1].Tag -ceq 'td') {
+                    $strValue = [regex]::Replace(
+                        $_.Cells[1].Text.Trim(),
+                        '\s+',
+                        ' '
+                    )
+                    $boolHasStatusField =
+                        (Test-DecisionLifecycleStatusLabel `
+                            -Label $_.Cells[0].Text) -and
+                        -not [string]::IsNullOrWhiteSpace($strValue)
+                }
+                $boolHasStatusField
+            }).Count -ne 0) {
+        Write-Output (
+            "$Name must not contain a separate operative Status field outside Metadata."
+        )
+    }
+}
+
 function Get-DocumentMetadataContext {
     # .SYNOPSIS
     # Gets validated document-level metadata context.
@@ -5071,6 +5691,7 @@ function Get-DocumentMetadataContext {
 
     return [pscustomobject]@{
         Failure = $null
+        Status = $hashtableFieldMatches['Status'].Groups['Value'].Value
         Major = if ($RequiresVersion) {$objVersionMatch.Groups['Major'].Value} else {$null}
         Minor = if ($RequiresVersion) {$objVersionMatch.Groups['Minor'].Value} else {$null}
         VersionDate = if ($RequiresVersion) {$objVersionMatch.Groups['Date'].Value} else {$null}
@@ -5187,20 +5808,19 @@ function Get-PublishedEndpointMetadataFailure {
         if (-not $IsNewDocumentTransition) {
             return
         }
-        if (-not $RequireExpectedUtcDateForRenderedChange) {
-            return
-        }
-        if ([string]::IsNullOrEmpty($ExpectedUtcDate) -or
-            -not (Test-MetadataCalendarDatePair `
-                -VersionDate $ExpectedUtcDate.Replace('-', '') `
-                -UpdatedDate $ExpectedUtcDate)) {
-            Write-Output "The expected UTC date for $Name is unavailable or invalid."
-            return
-        }
-        if ($strCurrentUpdatedDate -cne $ExpectedUtcDate) {
-            Write-Output (
-                "$Name Last Updated must be $ExpectedUtcDate after a rendered-content change."
-            )
+        if ($RequireExpectedUtcDateForRenderedChange) {
+            if ([string]::IsNullOrEmpty($ExpectedUtcDate) -or
+                -not (Test-MetadataCalendarDatePair `
+                    -VersionDate $ExpectedUtcDate.Replace('-', '') `
+                    -UpdatedDate $ExpectedUtcDate)) {
+                Write-Output "The expected UTC date for $Name is unavailable or invalid."
+                return
+            }
+            if ($strCurrentUpdatedDate -cne $ExpectedUtcDate) {
+                Write-Output (
+                    "$Name Last Updated must be $ExpectedUtcDate after a rendered-content change."
+                )
+            }
         }
         if ($intCurrentRevision -ne 0) {
             Write-Output (
@@ -5287,6 +5907,31 @@ function Get-PublishedEndpointMetadataFailure {
         return
     }
 
+    $boolRevisionChanged = $intCurrentRevision -ne $intParentRevision
+    if ($boolSameVersionTuple -and
+        ($boolRenderedContentChanged -or $boolRevisionChanged)) {
+        if ($intParentRevision -eq [int64]::MaxValue) {
+            Write-Output (
+                "The published baseline $Name Version revision cannot be incremented safely."
+            )
+            return
+        }
+        $intExpectedRevision = $intParentRevision + 1
+        if ($intCurrentRevision -ne $intExpectedRevision) {
+            Write-Output (
+                "$Name Version revision must be exactly $intExpectedRevision after a " +
+                'published change with an unchanged published-baseline major, minor, ' +
+                'and date tuple.'
+            )
+        }
+    }
+    elseif (-not $boolSameVersionTuple -and $intCurrentRevision -ne 0) {
+        Write-Output (
+            "$Name Version revision must be exactly 0 when a published-baseline " +
+            'major, minor, or date segment changes.'
+        )
+    }
+
     if (-not $boolRenderedContentChanged) {
         return
     }
@@ -5305,22 +5950,6 @@ function Get-PublishedEndpointMetadataFailure {
         }
     }
 
-    if ($boolSameVersionTuple) {
-        if ($intParentRevision -eq [int64]::MaxValue) {
-            Write-Output (
-                "The published baseline $Name Version revision cannot be incremented safely."
-            )
-            return
-        }
-        $intMinimumRevision = $intParentRevision + 1
-        if ($intCurrentRevision -lt $intMinimumRevision) {
-            Write-Output (
-                "$Name Version revision must be at least $intMinimumRevision after a " +
-                'rendered-content change with an unchanged published-baseline major, ' +
-                'minor, and date tuple.'
-            )
-        }
-    }
 }
 
 function Get-TrustRootRangeMutationFailure {
@@ -6388,9 +7017,14 @@ if (-not $boolPublishedEndpointsRequested -and
         $PublishedBaselineAbsent -or $PublishedFinalDeleted)) {
     throw 'Metadata event fields require complete published endpoints.'
 }
+$objTrustedEventTimestamp = $null
+$strTrustedEventUtcDate = ''
 if (-not [string]::IsNullOrEmpty($TrustedEventTimestamp)) {
-    [void] (
+    $objTrustedEventTimestamp =
         ConvertFrom-TrustedEventTimestamp -Timestamp $TrustedEventTimestamp
+    $strTrustedEventUtcDate = $objTrustedEventTimestamp.ToString(
+        'yyyy-MM-dd',
+        [Globalization.CultureInfo]::InvariantCulture
     )
 }
 if ($boolPublishedEndpointsRequested) {
@@ -6403,6 +7037,7 @@ if ($boolPublishedEndpointsRequested) {
         -PullRequestBaseChanged $PullRequestBaseChanged
 }
 $objCreatedRefContext = $null
+$strCreatedRefMetadataBaselineRevision = ''
 if ($PublishedBaselineAbsent) {
     $objCreatedRefContext = Get-CreatedRefBoundaryContext `
         -RepositoryRootPath $strRepositoryRootPath `
@@ -6412,6 +7047,10 @@ if ($PublishedBaselineAbsent) {
         -EventHeadDistinct $EventHeadDistinct `
         -PushCommitEvidenceJson $PushCommitEvidenceJson `
         -OtherRefEvidenceJson $OtherRefEvidenceJson
+    $strCreatedRefMetadataBaselineRevision =
+        Get-CreatedRefMetadataBaselineRevision `
+            -Context $objCreatedRefContext `
+            -HeadRevision $PublishedFinalRevision
 }
 elseif (-not [string]::IsNullOrEmpty($DestinationRef) -or
     -not [string]::IsNullOrEmpty($EventHeadRevision) -or
@@ -6419,6 +7058,12 @@ elseif (-not [string]::IsNullOrEmpty($DestinationRef) -or
     -not [string]::IsNullOrEmpty($PushCommitEvidenceJson) -or
     -not [string]::IsNullOrEmpty($OtherRefEvidenceJson)) {
     throw 'Created-push evidence is valid only when the destination ref is new.'
+}
+$strEffectivePublishedBaselineRevision = if ($PublishedBaselineAbsent) {
+    $strCreatedRefMetadataBaselineRevision
+}
+else {
+    $PublishedBaselineRevision
 }
 $arrPublishedGraphBases = @()
 if ($boolPublishedEndpointsRequested) {
@@ -6688,13 +7333,24 @@ if (-not [string]::IsNullOrEmpty($strValidatedInputRevision) -and
         [StringComparison]::OrdinalIgnoreCase
     )) {
     $arrTrustRootBaseRevisions = @($arrPublishedGraphBases)
-    $arrTrustRootFailures = @(Get-TrustRootRangeMutationFailure `
-            -ExactAuthorizedMaintenanceProductionCall `
-            -RepositoryRootPath $strRepositoryRootPath `
-            -BaseRevision $arrTrustRootBaseRevisions `
-            -HeadRevision $PublishedFinalRevision `
-            -RepositoryRelativePath $script:arrTrustRootPaths) |
-        Sort-Object -Unique
+    $arrTrustRootFailures = if (
+        $script:boolTrustedMaintenanceAuthorizationValidated
+    ) {
+        @(Get-TrustRootRangeMutationFailure `
+                -ExactAuthorizedMaintenanceProductionCall `
+                -RepositoryRootPath $strRepositoryRootPath `
+                -BaseRevision $arrTrustRootBaseRevisions `
+                -HeadRevision $PublishedFinalRevision `
+                -RepositoryRelativePath $script:arrTrustRootPaths)
+    }
+    else {
+        @(Get-TrustRootRangeMutationFailure `
+                -RepositoryRootPath $strRepositoryRootPath `
+                -BaseRevision $arrTrustRootBaseRevisions `
+                -HeadRevision $PublishedFinalRevision `
+                -RepositoryRelativePath $script:arrTrustRootPaths)
+    }
+    $arrTrustRootFailures = @($arrTrustRootFailures | Sort-Object -Unique)
     if (@($arrTrustRootFailures).Count -gt 0) {
         throw (
             'Trusted validation root changed:' + [Environment]::NewLine + '- ' +
@@ -6720,10 +7376,12 @@ if ($boolPublishedEndpointsRequested) {
             $objCreatedRefContext.IntroducedCommitRevisions
         )
     }
-    if (-not $PublishedBaselineAbsent) {
+    if (-not [string]::IsNullOrEmpty(
+            $strEffectivePublishedBaselineRevision
+        )) {
         $arrPublishedBaselinePaths = @(Read-GitTrackedPath `
             -RepositoryRootPath $strRepositoryRootPath `
-            -Revision $PublishedBaselineRevision `
+            -Revision $strEffectivePublishedBaselineRevision `
             -MaximumBytes $intGitPathListMaximumBytes)
     }
     $arrPublishedChangedPaths = @(Read-GitPublishedEndpointChangedPath `
@@ -6919,20 +7577,15 @@ $listGovernedDocumentContexts = [Collections.Generic.List[pscustomobject]]::new(
 foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
     $objParentContext = if ($boolPublishedEndpointsRequested) {
         $strPublishedBaselineContent = $null
-        $boolGenuineRootIntroduction = $PublishedBaselineAbsent -and
-            $null -ne $objCreatedRefContext -and
-            $objCreatedRefContext.IsGenuineRootIntroduction
-        if ($PublishedBaselineAbsent -and -not $boolGenuineRootIntroduction) {
-            $strPublishedBaselineContent =
-                $hashtableGovernedInstructionContent[$objDocumentSpec.Path]
-        }
-        elseif (-not $PublishedBaselineAbsent) {
+        $strMetadataBaselineRevision =
+            $strEffectivePublishedBaselineRevision
+        if (-not [string]::IsNullOrEmpty($strMetadataBaselineRevision)) {
             & git -C $strRepositoryRootPath cat-file -e `
-                "$PublishedBaselineRevision`:$($objDocumentSpec.Path)" 2>$null
+                "$strMetadataBaselineRevision`:$($objDocumentSpec.Path)" 2>$null
             if ($LASTEXITCODE -eq 0) {
                 $strPublishedBaselineContent = Read-GitRevisionText `
                     -RepositoryRootPath $strRepositoryRootPath `
-                    -Revision $PublishedBaselineRevision `
+                    -Revision $strMetadataBaselineRevision `
                     -RepositoryRelativePath $objDocumentSpec.Path `
                     -MaximumBytes $objDocumentSpec.MaximumBytes `
                     -RequireRegularFile
@@ -6940,13 +7593,9 @@ foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
         }
         [pscustomobject]@{
             ParentContent = $strPublishedBaselineContent
-            ExpectedUtcDate = ''
-            ParentRevision = if ($PublishedBaselineAbsent) {
-                $null
-            } else {
-                $PublishedBaselineRevision
-            }
-            IsWorktreeTransition = $false
+            ExpectedUtcDate = $strTrustedEventUtcDate
+            ParentRevision = $strMetadataBaselineRevision
+            IsWorktreeTransition = $true
         }
     }
     elseif ([string]::IsNullOrEmpty($strValidatedInputRevision)) {
@@ -7010,6 +7659,8 @@ elseif (-not (Test-GitIgnorePathEffective `
 $arrRepositoryFailures += @(Get-DocumentationClaimFailure `
         -Content $strDocsInstructionsContent `
         -TrackedPaths $arrTrackedRepositoryPaths)
+$arrRepositoryFailures += @(Get-DecisionLifecyclePolicyFailure `
+        -Content $strDocsInstructionsContent)
 $arrCanonicalDecisionGuideLinks = @(
     '../../STYLE_GUIDE.md',
     '../../STYLE_GUIDE_RATIONALE.md'
@@ -7023,6 +7674,10 @@ foreach ($objDecisionContext in @(
     if ($null -eq $objDecisionContext.Content) {
         continue
     }
+    $arrRepositoryFailures += @(Get-DecisionRecordLifecycleFailure `
+            -Name $objDecisionContext.Path `
+            -CurrentContent $objDecisionContext.Content `
+            -BaselineContent $objDecisionContext.ParentContent)
     $objDecisionMarkdownContext = Get-OperativeMarkdownContext `
         -Content $objDecisionContext.Content
     $arrDecisionLinks = [string[]]@(
@@ -7087,6 +7742,18 @@ if ($SelfTest) {
     }
 
     $strValidatorSource = [IO.File]::ReadAllText($PSCommandPath)
+    $strTrustRootAuthorizationPath =
+        '.github/workflows/Test-TrustRootAuthorization.ps1'
+    $strExtractedSelfTestPath =
+        '.github/workflows/Test-AgentInstructions.SelfTest.ps1'
+    $strTrustRootAuthorizationSource = [IO.File]::ReadAllText(
+        (Join-Path $strRepositoryRootPath $strTrustRootAuthorizationPath),
+        [Text.UTF8Encoding]::new($false)
+    )
+    $strExtractedSelfTestSource = [IO.File]::ReadAllText(
+        (Join-Path $strRepositoryRootPath $strExtractedSelfTestPath),
+        [Text.UTF8Encoding]::new($false)
+    )
     $objValidatorTokens = $null
     $arrValidatorParseErrors = $null
     $objValidatorAst = [Management.Automation.Language.Parser]::ParseInput(
@@ -7096,76 +7763,214 @@ if ($SelfTest) {
         [ref] $arrValidatorParseErrors
     )
     if (@($arrValidatorParseErrors).Count -ne 0) {
-        throw 'The validator source did not parse for the function-help inventory.'
+        throw 'The validator source did not parse for the self-test AST inventory.'
     }
-    $arrValidatorFunctionAsts = @($objValidatorAst.FindAll({
-        param($objNode)
-        $objNode -is [Management.Automation.Language.FunctionDefinitionAst]
-    }, $true))
-    if ($arrValidatorFunctionAsts.Count -ne 55) {
-        throw 'The validator function-help inventory must contain exactly 55 functions.'
-    }
-    foreach ($objFunctionAst in $arrValidatorFunctionAsts) {
-        $objHelp = $objFunctionAst.GetHelpContent()
-        $listMissingHelp = [Collections.Generic.List[string]]::new()
-        if ($null -eq $objHelp) {
-            $listMissingHelp.Add('comment-based help')
+    $scriptBlockGetFunctionHelpFailure = {
+        param(
+            [Parameter(Mandatory)][string] $Source,
+            [Parameter(Mandatory)][string] $Path,
+            [Parameter(Mandatory)][int] $ExpectedFunctionCount
+        )
+
+        $objTokens = $null
+        $arrParseErrors = $null
+        $objAst = [Management.Automation.Language.Parser]::ParseInput(
+            $Source,
+            $Path,
+            [ref] $objTokens,
+            [ref] $arrParseErrors
+        )
+        if (@($arrParseErrors).Count -ne 0) {
+            Write-Output "$Path did not parse for the function-help inventory."
+            return
         }
-        else {
-            foreach ($objHelpSection in @(
-                    [pscustomobject]@{ Name = 'SYNOPSIS'; Value = $objHelp.Synopsis },
-                    [pscustomobject]@{ Name = 'DESCRIPTION'; Value = $objHelp.Description },
-                    [pscustomobject]@{ Name = 'INPUTS'; Value = ($objHelp.Inputs | Out-String) },
-                    [pscustomobject]@{ Name = 'OUTPUTS'; Value = ($objHelp.Outputs | Out-String) },
-                    [pscustomobject]@{ Name = 'NOTES'; Value = $objHelp.Notes }
-                )) {
-                if ([string]::IsNullOrWhiteSpace([string]$objHelpSection.Value)) {
-                    $listMissingHelp.Add($objHelpSection.Name)
-                }
+        $arrFunctionAsts = @($objAst.FindAll({
+            param($objNode)
+            $objNode -is [Management.Automation.Language.FunctionDefinitionAst]
+        }, $true))
+        if ($arrFunctionAsts.Count -ne $ExpectedFunctionCount) {
+            Write-Output (
+                "$Path function-help inventory must contain exactly " +
+                    "$ExpectedFunctionCount functions."
+            )
+            return
+        }
+        foreach ($objFunctionAst in $arrFunctionAsts) {
+            $objHelp = $objFunctionAst.GetHelpContent()
+            $listMissingHelp = [Collections.Generic.List[string]]::new()
+            if ($null -eq $objHelp) {
+                $listMissingHelp.Add('comment-based help')
             }
-            if (@($objHelp.Examples).Count -eq 0) {
-                $listMissingHelp.Add('EXAMPLE')
-            }
-            $strFunctionNotes = [string]$objHelp.Notes
-            foreach ($strRequiredNote in @(
-                    'PRIVATE/INTERNAL HELPER - This function is not part of the public API.',
-                    'Parameters, return shape, and positional contract can change without notice.',
-                    'Positional parameters are disabled; internal callers use named arguments.'
-                )) {
-                if (-not $strFunctionNotes.Contains(
-                        $strRequiredNote,
-                        [StringComparison]::Ordinal
+            else {
+                foreach ($objHelpSection in @(
+                        [pscustomobject]@{
+                            Name = 'SYNOPSIS'
+                            Value = $objHelp.Synopsis
+                        },
+                        [pscustomobject]@{
+                            Name = 'DESCRIPTION'
+                            Value = $objHelp.Description
+                        },
+                        [pscustomobject]@{
+                            Name = 'INPUTS'
+                            Value = ($objHelp.Inputs | Out-String)
+                        },
+                        [pscustomobject]@{
+                            Name = 'OUTPUTS'
+                            Value = ($objHelp.Outputs | Out-String)
+                        },
+                        [pscustomobject]@{
+                            Name = 'NOTES'
+                            Value = $objHelp.Notes
+                        }
                     )) {
-                    $listMissingHelp.Add("NOTES literal: $strRequiredNote")
+                    if ([string]::IsNullOrWhiteSpace(
+                            [string]$objHelpSection.Value
+                        )) {
+                        $listMissingHelp.Add($objHelpSection.Name)
+                    }
+                }
+                if (@($objHelp.Examples).Count -eq 0) {
+                    $listMissingHelp.Add('EXAMPLE')
+                }
+                $strFunctionNotes = [string]$objHelp.Notes
+                foreach ($strRequiredNote in @(
+                        'PRIVATE/INTERNAL HELPER - This function is not part of the public API.',
+                        'Parameters, return shape, and positional contract can change without notice.',
+                        'Positional parameters are disabled; internal callers use named arguments.'
+                    )) {
+                    if (-not $strFunctionNotes.Contains(
+                            $strRequiredNote,
+                            [StringComparison]::Ordinal
+                        )) {
+                        $listMissingHelp.Add("NOTES literal: $strRequiredNote")
+                    }
+                }
+                if ([regex]::Matches(
+                        $strFunctionNotes,
+                        '(?m)^Version: 1\.0\.(?:202608(?:30|31)|2026090(?:2|3))\.0\.$'
+                    ).Count -ne 1) {
+                    $listMissingHelp.Add('landing or repair helper Version')
+                }
+                if ($null -ne $objFunctionAst.Body.ParamBlock) {
+                    foreach ($objParameterAst in
+                        $objFunctionAst.Body.ParamBlock.Parameters) {
+                        $strParameterName =
+                            $objParameterAst.Name.VariablePath.UserPath
+                        if (-not $objHelp.Parameters.ContainsKey(
+                                $strParameterName.ToUpperInvariant()
+                            )) {
+                            $listMissingHelp.Add("PARAMETER $strParameterName")
+                        }
+                    }
                 }
             }
-            if ([regex]::Matches(
-                    $strFunctionNotes,
-                    '(?m)^Version: 1\.0\.202608(?:30|31)\.0\.$'
-                ).Count -ne 1) {
-                $listMissingHelp.Add('landing or repair helper Version')
+            if ($null -eq $objFunctionAst.Body.ParamBlock -or
+                @($objFunctionAst.Body.ParamBlock.Attributes | Where-Object {
+                        $_.TypeName.Name -eq 'OutputType'
+                    }).Count -ne 1) {
+                $listMissingHelp.Add('OutputType')
             }
-            foreach ($objParameterAst in $objFunctionAst.Body.ParamBlock.Parameters) {
-                $strParameterName = $objParameterAst.Name.VariablePath.UserPath
-                if (-not $objHelp.Parameters.ContainsKey($strParameterName.ToUpperInvariant())) {
-                    $listMissingHelp.Add("PARAMETER $strParameterName")
-                }
+            if ($listMissingHelp.Count -ne 0) {
+                Write-Output (
+                    "$Path function $($objFunctionAst.Name) lacks: " +
+                        "$($listMissingHelp -join ', ')."
+                )
             }
         }
-        if (@($objFunctionAst.Body.ParamBlock.Attributes | Where-Object {
-                    $_.TypeName.Name -eq 'OutputType'
-                }).Count -ne 1) {
-            $listMissingHelp.Add('OutputType')
+    }
+    foreach ($objFunctionHelpInventory in @(
+            [pscustomobject]@{
+                Source = $strValidatorSource
+                Path = '.github/workflows/Test-AgentInstructions.ps1'
+                ExpectedFunctionCount = 59
+            },
+            [pscustomobject]@{
+                Source = $strTrustRootAuthorizationSource
+                Path = $strTrustRootAuthorizationPath
+                ExpectedFunctionCount = 7
+            },
+            [pscustomobject]@{
+                Source = $strExtractedSelfTestSource
+                Path = $strExtractedSelfTestPath
+                ExpectedFunctionCount = 1
+            }
+        )) {
+        $arrFunctionHelpFailures = @(& $scriptBlockGetFunctionHelpFailure `
+                -Source $objFunctionHelpInventory.Source `
+                -Path $objFunctionHelpInventory.Path `
+                -ExpectedFunctionCount `
+                    $objFunctionHelpInventory.ExpectedFunctionCount)
+        if ($arrFunctionHelpFailures.Count -ne 0) {
+            throw ($arrFunctionHelpFailures -join [Environment]::NewLine)
         }
-        if ($listMissingHelp.Count -ne 0) {
-            throw "Function $($objFunctionAst.Name) lacks: $($listMissingHelp -join ', ')."
+    }
+    foreach ($objFunctionHelpMutation in @(
+            [pscustomobject]@{
+                Name = 'trust-root authorization helper'
+                Source = $strTrustRootAuthorizationSource
+                Path = $strTrustRootAuthorizationPath
+                ExpectedFunctionCount = 7
+                FunctionName = 'Invoke-BoundedProcessByte'
+            },
+            [pscustomobject]@{
+                Name = 'extracted self-test helper'
+                Source = $strExtractedSelfTestSource
+                Path = $strExtractedSelfTestPath
+                ExpectedFunctionCount = 1
+                FunctionName = 'ConvertTo-CreatedPushCommitEvidenceObject'
+            }
+        )) {
+        $strFunctionMarker = "function $($objFunctionHelpMutation.FunctionName) {"
+        $intFunctionOffset = $objFunctionHelpMutation.Source.IndexOf(
+            $strFunctionMarker,
+            [StringComparison]::Ordinal
+        )
+        $intSynopsisOffset = if ($intFunctionOffset -ge 0) {
+            $objFunctionHelpMutation.Source.IndexOf(
+                '# .SYNOPSIS',
+                $intFunctionOffset,
+                [StringComparison]::Ordinal
+            )
+        }
+        else { -1 }
+        if ($intSynopsisOffset -lt 0) {
+            throw "Could not create $($objFunctionHelpMutation.Name) mutation."
+        }
+        $strFunctionHelpMutation =
+            $objFunctionHelpMutation.Source.Remove(
+                $intSynopsisOffset,
+                '# .SYNOPSIS'.Length
+            ).Insert($intSynopsisOffset, '# .SYNOPSI')
+        $arrFunctionHelpMutationFailures = @(
+            & $scriptBlockGetFunctionHelpFailure `
+                -Source $strFunctionHelpMutation `
+                -Path $objFunctionHelpMutation.Path `
+                -ExpectedFunctionCount `
+                    $objFunctionHelpMutation.ExpectedFunctionCount
+        )
+        if ($arrFunctionHelpMutationFailures.Count -eq 0 -or
+            -not ($arrFunctionHelpMutationFailures -join '; ').Contains(
+                $objFunctionHelpMutation.FunctionName,
+                [StringComparison]::Ordinal
+            )) {
+            throw "$($objFunctionHelpMutation.Name) help mutation passed."
         }
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.7\.20260902\.0$'
+            '(?m)^# Version: 1\.9\.20260903\.1$'
         ).Count -ne 1) {
-        throw 'The validator script version does not use build date 20260902.'
+        throw 'The validator script version is not 1.9.20260903.1.'
+    }
+    $strBoundedEvidenceDiagnostic =
+        'A created-push boundary lacks authenticated other-ref provenance ' +
+            'within the bounded history depth.'
+    if ([regex]::Matches(
+            $strValidatorSource,
+            [regex]::Escape($strBoundedEvidenceDiagnostic)
+        ).Count -ne 1) {
+        throw 'The bounded created-ref evidence diagnostic is not exact.'
     }
     $boolSavedWindowsPython = $script:useWindowsPythonLauncher
     $arrSavedPythonNames = $script:pythonPathNames
@@ -7241,6 +8046,535 @@ if ($SelfTest) {
             'The documentation claim baseline failed validation: ' +
             ($arrDocumentationClaimFailures -join '; ')
         )
+    }
+    $arrDecisionLifecycleFailures = @(Get-DecisionLifecyclePolicyFailure `
+            -Content $strDocsInstructionsContent)
+    if ($arrDecisionLifecycleFailures.Count -ne 0) {
+        throw (
+            'The decision lifecycle baseline failed validation: ' +
+            ($arrDecisionLifecycleFailures -join '; ')
+        )
+    }
+    $strGenericDecisionStatusMutation = $strDocsInstructionsContent.Replace(
+        'Proposed | Accepted | Superseded | Deprecated',
+        'Draft | Proposed | Active | Accepted | Superseded | Deprecated'
+    )
+    if ($strGenericDecisionStatusMutation -ceq $strDocsInstructionsContent -or
+        @(Get-DecisionLifecyclePolicyFailure `
+                -Content $strGenericDecisionStatusMutation) -cnotcontains
+            ('Decision record Status must allow exactly ' +
+                'Proposed | Accepted | Superseded | Deprecated.')) {
+        throw 'A generic decision Status set did not fail closed.'
+    }
+    $strDuplicateDecisionStatusMutation = $strDocsInstructionsContent.Replace(
+        'A decision record MUST NOT add a separate narrative status field or section.',
+        ('A second **Status** representation records decision history. ' +
+            'A decision record MUST NOT add a separate narrative status field or section.')
+    )
+    if ($strDuplicateDecisionStatusMutation -ceq $strDocsInstructionsContent -or
+        @(Get-DecisionLifecyclePolicyFailure `
+                -Content $strDuplicateDecisionStatusMutation) -cnotcontains
+            'Decision records must use exactly one Tier 1 Status representation.') {
+        throw 'A duplicate decision Status representation did not fail closed.'
+    }
+    $strNarrativeDecisionStatusMutation = $strDocsInstructionsContent.Replace(
+        'A decision record MUST NOT add a separate narrative status field or section.',
+        'A decision record MAY add a separate narrative status field or section.'
+    )
+    if ($strNarrativeDecisionStatusMutation -ceq $strDocsInstructionsContent -or
+        @(Get-DecisionLifecyclePolicyFailure `
+                -Content $strNarrativeDecisionStatusMutation) -cnotcontains
+            'Decision records must prohibit a separate narrative status representation.') {
+        throw 'A permitted narrative decision Status did not fail closed.'
+    }
+    $strPermanentLegacyDecisionMutation = $strDocsInstructionsContent.Replace(
+        'while their bytes remain unchanged.',
+        'without a required migration boundary.'
+    )
+    if ($strPermanentLegacyDecisionMutation -ceq $strDocsInstructionsContent -or
+        @(Get-DecisionLifecyclePolicyFailure `
+                -Content $strPermanentLegacyDecisionMutation) -cnotcontains
+            'Decision records must document the unchanged legacy migration boundary.') {
+        throw 'A permanent legacy decision exception did not fail closed.'
+    }
+    $strOptionalLegacyMigrationMutation = $strDocsInstructionsContent.Replace(
+        'The next change to such a record MUST migrate it',
+        'The next change to such a record MAY migrate it'
+    )
+    if ($strOptionalLegacyMigrationMutation -ceq $strDocsInstructionsContent -or
+        @(Get-DecisionLifecyclePolicyFailure `
+                -Content $strOptionalLegacyMigrationMutation) -cnotcontains
+            'Decision records must document the unchanged legacy migration boundary.') {
+        throw 'An optional legacy decision migration did not fail closed.'
+    }
+    $strLegacyDecisionRecord = @(
+        '# Decision 0001: Legacy fixture'
+        '## Metadata'
+        '- **Status:** Active'
+        '- **Owner:** Repository Maintainers'
+        '- **Last Updated:** 2026-08-30'
+        '- **Scope:** Tests transition-aware ADR lifecycle enforcement.'
+        '## Status'
+        'Accepted before the lifecycle migration.'
+        '## Context'
+        'Legacy context.'
+    ) -join "`n"
+    if (@(Get-DecisionRecordLifecycleFailure `
+            -Name 'docs/decisions/0001-legacy.md' `
+            -CurrentContent $strLegacyDecisionRecord `
+            -BaselineContent $strLegacyDecisionRecord).Count -ne 0) {
+        throw 'An unchanged published legacy ADR did not remain valid.'
+    }
+    $strChangedLegacyDecisionRecord = $strLegacyDecisionRecord.Replace(
+        'Legacy context.',
+        'Changed legacy context.'
+    )
+    $arrChangedLegacyDecisionFailures = @(Get-DecisionRecordLifecycleFailure `
+            -Name 'docs/decisions/0001-legacy.md' `
+            -CurrentContent $strChangedLegacyDecisionRecord `
+            -BaselineContent $strLegacyDecisionRecord)
+    foreach ($strExpectedFailure in @(
+            ('docs/decisions/0001-legacy.md Status must be Proposed, Accepted, ' +
+                'Superseded, or Deprecated.'),
+            ('docs/decisions/0001-legacy.md must not contain a separate operative ' +
+                'Status section.')
+        )) {
+        if ($arrChangedLegacyDecisionFailures -cnotcontains $strExpectedFailure) {
+            throw (
+                'A changed legacy ADR did not require lifecycle migration: ' +
+                ($arrChangedLegacyDecisionFailures -join '; ')
+            )
+        }
+    }
+    $strCompliantDecisionRecord = $strChangedLegacyDecisionRecord.Replace(
+        '- **Status:** Active',
+        '- **Status:** Accepted'
+    ).Replace(
+        "## Status`nAccepted before the lifecycle migration.`n",
+        ''
+    )
+    if (@(Get-DecisionRecordLifecycleFailure `
+            -Name 'docs/decisions/0001-legacy.md' `
+            -CurrentContent $strCompliantDecisionRecord `
+            -BaselineContent $strLegacyDecisionRecord).Count -ne 0) {
+        throw 'A changed ADR with one valid lifecycle Status did not pass.'
+    }
+    foreach ($strAcceptedStatusLabel in @(
+            'Status', 'status', 'Decision Status', " Decision`tStatus "
+        )) {
+        if (-not (Test-DecisionLifecycleStatusLabel `
+                -Label $strAcceptedStatusLabel)) {
+            throw "Exact lifecycle label was rejected: $strAcceptedStatusLabel"
+        }
+    }
+    foreach ($strRejectedStatusLabel in @(
+            '', 'HTTP Status Codes', 'Deployment Status',
+            'Deployment Status Checks', 'Status Check'
+        )) {
+        if (Test-DecisionLifecycleStatusLabel -Label $strRejectedStatusLabel) {
+            throw "Unrelated lifecycle label was accepted: $strRejectedStatusLabel"
+        }
+    }
+    $strDecisionStatusSectionRecord = $strCompliantDecisionRecord.Replace(
+        "## Context`n",
+        "## Decision Status`nAccepted.`n## Context`n"
+    )
+    if (@(Get-DecisionRecordLifecycleFailure `
+            -Name 'docs/decisions/0001-legacy.md' `
+            -CurrentContent $strDecisionStatusSectionRecord `
+            -BaselineContent $strLegacyDecisionRecord) -cnotcontains
+        ('docs/decisions/0001-legacy.md must not contain a separate operative ' +
+            'Status section.')) {
+        throw 'A Decision Status section escaped lifecycle validation.'
+    }
+    $arrSubordinateStatusSectionFixtures = @(
+        [pscustomobject]@{
+            Name = 'level-three Decision Status section'
+            Heading = '### Decision Status'
+        },
+        [pscustomobject]@{
+            Name = 'formatted level-three Decision Status section'
+            Heading = '### Decision **Status**'
+        },
+        [pscustomobject]@{
+            Name = 'linked level-four Status section'
+            Heading = '#### Decision [Status](https://example.invalid/status)'
+        },
+        [pscustomobject]@{
+            Name = 'level-five Status section'
+            Heading = '##### Status'
+        },
+        [pscustomobject]@{
+            Name = 'level-six Decision Status section'
+            Heading = '###### Decision Status'
+        }
+    )
+    foreach ($objStatusSectionFixture in $arrSubordinateStatusSectionFixtures) {
+        $strSubordinateStatusSectionRecord = $strCompliantDecisionRecord.Replace(
+            'Changed legacy context.',
+            "Changed legacy context.`n$($objStatusSectionFixture.Heading)`nAccepted."
+        )
+        if (@(Get-DecisionRecordLifecycleFailure `
+                -Name 'docs/decisions/0001-legacy.md' `
+                -CurrentContent $strSubordinateStatusSectionRecord `
+                -BaselineContent $strLegacyDecisionRecord) -cnotcontains
+            ('docs/decisions/0001-legacy.md must not contain a separate operative ' +
+                'Status section.')) {
+            throw "$($objStatusSectionFixture.Name) escaped lifecycle validation."
+        }
+    }
+    foreach ($strUnrelatedStatusHeading in @(
+            '### HTTP Status Codes', '#### Deployment Status Checks'
+        )) {
+        $strUnrelatedStatusHeadingRecord = $strCompliantDecisionRecord.Replace(
+            'Changed legacy context.',
+            "Changed legacy context.`n$strUnrelatedStatusHeading`nNo lifecycle field."
+        )
+        if (@(Get-DecisionRecordLifecycleFailure `
+                -Name 'docs/decisions/0001-legacy.md' `
+                -CurrentContent $strUnrelatedStatusHeadingRecord `
+                -BaselineContent $strLegacyDecisionRecord).Count -ne 0) {
+            throw "Unrelated heading caused a lifecycle finding: $strUnrelatedStatusHeading"
+        }
+    }
+    $arrNonOperativeStatusHeadingFixtures = @(
+        [pscustomobject]@{
+            Name = 'quoted level-three Status heading'
+            Payload = '> ### Decision Status'
+        },
+        [pscustomobject]@{
+            Name = 'listed level-four Status heading'
+            Payload = "- Example`n  #### Status"
+        },
+        [pscustomobject]@{
+            Name = 'fenced level-three Status heading example'
+            Payload = @(
+                '```markdown'
+                '### Decision Status'
+                '```'
+            ) -join "`n"
+        },
+        [pscustomobject]@{
+            Name = 'indented level-three Status heading example'
+            Payload = '    ### Decision Status'
+        },
+        [pscustomobject]@{
+            Name = 'commented level-three Status heading example'
+            Payload = '<!-- ### Decision Status -->'
+        },
+        [pscustomobject]@{
+            Name = 'inline-code-only level-three Status heading example'
+            Payload = '### `Decision Status`'
+        },
+        [pscustomobject]@{
+            Name = 'raw-HTML-only level-three Status heading example'
+            Payload = '### <span>Decision Status</span>'
+        }
+    )
+    foreach ($objStatusHeadingFixture in $arrNonOperativeStatusHeadingFixtures) {
+        $strNonOperativeStatusHeadingRecord = $strCompliantDecisionRecord.Replace(
+            'Changed legacy context.',
+            "Changed legacy context.`n$($objStatusHeadingFixture.Payload)"
+        )
+        if (@(Get-DecisionRecordLifecycleFailure `
+                -Name 'docs/decisions/0001-legacy.md' `
+                -CurrentContent $strNonOperativeStatusHeadingRecord `
+                -BaselineContent $strLegacyDecisionRecord).Count -ne 0) {
+            throw "$($objStatusHeadingFixture.Name) caused a false lifecycle finding."
+        }
+    }
+    $strDecisionStatusFieldRecord = $strCompliantDecisionRecord.Replace(
+        "## Context`n",
+        "## Context`n- **Decision Status:** Accepted`n"
+    )
+    if (@(Get-DecisionRecordLifecycleFailure `
+            -Name 'docs/decisions/0001-legacy.md' `
+            -CurrentContent $strDecisionStatusFieldRecord `
+            -BaselineContent $strLegacyDecisionRecord) -cnotcontains
+        ('docs/decisions/0001-legacy.md must not contain a separate operative ' +
+            'Status field outside Metadata.')) {
+        throw 'A Decision Status field escaped lifecycle validation.'
+    }
+    $strStatusFieldRecord = $strCompliantDecisionRecord.Replace(
+        'Changed legacy context.',
+        'Status: Accepted'
+    )
+    if (@(Get-DecisionRecordLifecycleFailure `
+            -Name 'docs/decisions/0001-legacy.md' `
+            -CurrentContent $strStatusFieldRecord `
+            -BaselineContent $strLegacyDecisionRecord) -cnotcontains
+        ('docs/decisions/0001-legacy.md must not contain a separate operative ' +
+            'Status field outside Metadata.')) {
+        throw 'A Status prose field escaped lifecycle validation.'
+    }
+    $strLaterListStatusFieldRecord = $strCompliantDecisionRecord.Replace(
+        'Changed legacy context.',
+        @(
+            '- Example paragraph.'
+            ''
+            '  Status: Accepted'
+        ) -join "`n"
+    )
+    if (@(Get-DecisionRecordLifecycleFailure `
+            -Name 'docs/decisions/0001-legacy.md' `
+            -CurrentContent $strLaterListStatusFieldRecord `
+            -BaselineContent $strLegacyDecisionRecord) -cnotcontains
+        ('docs/decisions/0001-legacy.md must not contain a separate operative ' +
+            'Status field outside Metadata.')) {
+        throw 'A later direct top-level list-item Status field escaped lifecycle validation.'
+    }
+    $arrNonOperativeListStatusFieldFixtures = @(
+        [pscustomobject]@{
+            Name = 'nested-list Status field example'
+            Payload = @(
+                '- Example paragraph.'
+                '  - Status: Accepted'
+            ) -join "`n"
+        },
+        [pscustomobject]@{
+            Name = 'list-item blockquoted Status field example'
+            Payload = @(
+                '- Example paragraph.'
+                ''
+                '  > Status: Accepted'
+            ) -join "`n"
+        }
+    )
+    foreach ($objStatusFieldFixture in $arrNonOperativeListStatusFieldFixtures) {
+        $strNonOperativeListStatusFieldRecord = $strCompliantDecisionRecord.Replace(
+            'Changed legacy context.',
+            $objStatusFieldFixture.Payload
+        )
+        if (@(Get-DecisionRecordLifecycleFailure `
+                -Name 'docs/decisions/0001-legacy.md' `
+                -CurrentContent $strNonOperativeListStatusFieldRecord `
+                -BaselineContent $strLegacyDecisionRecord).Count -ne 0) {
+            throw "$($objStatusFieldFixture.Name) caused a false lifecycle finding."
+        }
+    }
+    $strQuotedStatusFieldRecord = $strCompliantDecisionRecord.Replace(
+        'Changed legacy context.',
+        '> **Status:** Proposed'
+    )
+    if (@(Get-DecisionRecordLifecycleFailure `
+            -Name 'docs/decisions/0001-legacy.md' `
+            -CurrentContent $strQuotedStatusFieldRecord `
+            -BaselineContent $strLegacyDecisionRecord).Count -ne 0) {
+        throw 'A blockquoted Status example caused a false lifecycle finding.'
+    }
+    $arrTableStatusFailureFixtures = @(
+        [pscustomobject]@{
+            Name = 'exact two-cell Status data row'
+            Content = $strCompliantDecisionRecord.Replace(
+                "## Context`n",
+                (@(
+                        '## Context'
+                        '| Field | Value |'
+                        '| --- | --- |'
+                        '| Status | Accepted |'
+                    ) -join "`n") + "`n"
+            )
+        },
+        [pscustomobject]@{
+            Name = 'body Decision Status field with alignment and inline formatting'
+            Content = $strCompliantDecisionRecord.Replace(
+                "## Context`n",
+                (@(
+                        '## Context'
+                        '| Field | Value |'
+                        '| :--- | ---: |'
+                        '| **decision** `status` | *Accepted* |'
+                    ) -join "`n") + "`n"
+            )
+        }
+    )
+    foreach ($objTableStatusFixture in $arrTableStatusFailureFixtures) {
+        if (@(Get-DecisionRecordLifecycleFailure `
+                -Name 'docs/decisions/0001-legacy.md' `
+                -CurrentContent $objTableStatusFixture.Content `
+                -BaselineContent $strLegacyDecisionRecord) -cnotcontains
+            ('docs/decisions/0001-legacy.md must not contain a separate operative ' +
+                'Status field outside Metadata.')) {
+            throw "$($objTableStatusFixture.Name) escaped lifecycle validation."
+        }
+    }
+    $arrTableStatusAcceptedFixtures = @(
+        [pscustomobject]@{
+            Name = 'header-only Status row'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '| STATUS | Accepted |'
+                        '| --- | --- |'
+                    ) -join "`n")
+            )
+        },
+        [pscustomobject]@{
+            Name = 'ordinary three-column option table'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '| Option | Status | Rationale |'
+                        '| --- | --- | --- |'
+                        '| Keep | Accepted | Least churn |'
+                    ) -join "`n")
+            )
+        },
+        [pscustomobject]@{
+            Name = 'multi-column Status data row'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '| Field | Value | Rationale |'
+                        '| --- | --- | --- |'
+                        '| Status | Accepted | Current decision |'
+                    ) -join "`n")
+            )
+        },
+        [pscustomobject]@{
+            Name = 'blockquoted two-cell Status table'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '> | Field | Value |'
+                        '> | --- | --- |'
+                        '> | Status | Accepted |'
+                    ) -join "`n")
+            )
+        },
+        [pscustomobject]@{
+            Name = 'listed two-cell Status table'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '- Example:'
+                        ''
+                        '  | Field | Value |'
+                        '  | --- | --- |'
+                        '  | Status | Accepted |'
+                    ) -join "`n")
+            )
+        },
+        [pscustomobject]@{
+            Name = 'nested-list two-cell Status table'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '- Outer'
+                        '  - Inner:'
+                        ''
+                        '    | Field | Value |'
+                        '    | --- | --- |'
+                        '    | Status | Accepted |'
+                    ) -join "`n")
+            )
+        },
+        [pscustomobject]@{
+            Name = 'fenced table example'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '```markdown'
+                        '| Status | Accepted |'
+                        '| --- | --- |'
+                        '```'
+                    ) -join "`n")
+            )
+        },
+        [pscustomobject]@{
+            Name = 'commented table example'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '<!--'
+                        '| Status | Accepted |'
+                        '| --- | --- |'
+                        '-->'
+                    ) -join "`n")
+            )
+        },
+        [pscustomobject]@{
+            Name = 'unrelated table'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '| State | Owner |'
+                        '| --- | --- |'
+                        '| Accepted | Maintainers |'
+                    ) -join "`n")
+            )
+        },
+        [pscustomobject]@{
+            Name = 'unrelated exact two-cell Deployment Status data row'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '| Field | Value |'
+                        '| --- | --- |'
+                        '| Deployment Status | healthy |'
+                    ) -join "`n")
+            )
+        },
+        [pscustomobject]@{
+            Name = 'empty Status table value'
+            Content = $strCompliantDecisionRecord.Replace(
+                'Changed legacy context.',
+                (@(
+                        'Changed legacy context.'
+                        '| Field | Value |'
+                        '| --- | --- |'
+                        '| Status | |'
+                    ) -join "`n")
+            )
+        }
+    )
+    foreach ($objTableStatusFixture in $arrTableStatusAcceptedFixtures) {
+        if (@(Get-DecisionRecordLifecycleFailure `
+                -Name 'docs/decisions/0001-legacy.md' `
+                -CurrentContent $objTableStatusFixture.Content `
+                -BaselineContent $strLegacyDecisionRecord).Count -ne 0) {
+            throw "$($objTableStatusFixture.Name) caused a false lifecycle finding."
+        }
+    }
+    $strDecisionStatusProseRecord = $strCompliantDecisionRecord.Replace(
+        'Changed legacy context.',
+        'The decision status remains accepted in ordinary prose.'
+    )
+    if (@(Get-DecisionRecordLifecycleFailure `
+            -Name 'docs/decisions/0001-legacy.md' `
+            -CurrentContent $strDecisionStatusProseRecord `
+            -BaselineContent $strLegacyDecisionRecord).Count -ne 0) {
+        throw 'Ordinary decision status prose was rejected as a second representation.'
+    }
+    foreach ($strUnrelatedStatusField in @(
+            'Deployment Status: healthy', 'HTTP Status Codes: 200 and 204'
+        )) {
+        $strUnrelatedStatusFieldRecord = $strCompliantDecisionRecord.Replace(
+            'Changed legacy context.',
+            $strUnrelatedStatusField
+        )
+        if (@(Get-DecisionRecordLifecycleFailure `
+                -Name 'docs/decisions/0001-legacy.md' `
+                -CurrentContent $strUnrelatedStatusFieldRecord `
+                -BaselineContent $strLegacyDecisionRecord).Count -ne 0) {
+            throw "Unrelated prose field caused a lifecycle finding: $strUnrelatedStatusField"
+        }
+    }
+    if (@(Get-DecisionRecordLifecycleFailure `
+            -Name 'docs/decisions/0003-new.md' `
+            -CurrentContent $strLegacyDecisionRecord `
+            -BaselineContent $null).Count -ne 2) {
+        throw 'A new ADR accepted the legacy two-status representation.'
     }
     foreach ($strOwnerPath in $script:arrDocumentationClaimOwnerPaths) {
         $arrMissingOwnerFailures = @(Get-DocumentationClaimFailure `
@@ -7373,7 +8707,7 @@ if ($SelfTest) {
             -ExpectedUtcDate $objDocsMetadataContext.UpdatedDate `
             -IsNewDocumentTransition $false)
     if (-not ($arrDocsStaleMetadataFailures -match [regex]::Escape(
-                '.github/instructions/docs.instructions.md Version revision must be at least'
+                '.github/instructions/docs.instructions.md Version revision must be exactly'
             ))) {
         throw 'The docs-only stale-metadata mutation did not fail closed.'
     }
@@ -7401,7 +8735,7 @@ if ($SelfTest) {
                 -ParentContent $objDocumentContext.Content `
                 -ExpectedUtcDate $objMetadataContext.UpdatedDate `
                 -IsNewDocumentTransition $false)
-        $strFailure = "$strNewlyCoveredPath Version revision must be at least"
+        $strFailure = "$strNewlyCoveredPath Version revision must be exactly"
         if (-not ($arrStaleMetadataFailures -match [regex]::Escape(
                     $strFailure
                 ))) {
@@ -7444,8 +8778,71 @@ if ($SelfTest) {
     if (Test-ProhibitedClaudeLocalPath -RepositoryRelativePath 'CLAUDE.local.md.bak') {
         throw 'A Claude local-memory near miss was prohibited.'
     }
-    $strExtractedSelfTestPath =
-        '.github/workflows/Test-AgentInstructions.SelfTest.ps1'
+    $arrTrustRootAuthorizationTokens = $null
+    $arrTrustRootAuthorizationParseErrors = $null
+    $objTrustRootAuthorizationAst =
+        [Management.Automation.Language.Parser]::ParseInput(
+            $strTrustRootAuthorizationSource,
+            [ref] $arrTrustRootAuthorizationTokens,
+            [ref] $arrTrustRootAuthorizationParseErrors
+        )
+    if (@($arrTrustRootAuthorizationParseErrors).Count -ne 0 -or
+        $null -eq $objTrustRootAuthorizationAst.ParamBlock) {
+        throw 'The trust-root authorization script parameter inventory is invalid.'
+    }
+    $strTrustRootAuthorizationHelpSource =
+        $strTrustRootAuthorizationSource.Substring(
+            0,
+            $objTrustRootAuthorizationAst.ParamBlock.Extent.StartOffset
+        )
+    $arrTrustRootAuthorizationParameterNames = @(
+        $objTrustRootAuthorizationAst.ParamBlock.Parameters |
+            ForEach-Object { $_.Name.VariablePath.UserPath }
+    )
+    $arrTrustRootAuthorizationHelpMatches = @(
+        [regex]::Matches(
+            $strTrustRootAuthorizationHelpSource,
+            '(?m)^# \.PARAMETER ([A-Za-z][A-Za-z0-9]*)$'
+        )
+    )
+    if ($arrTrustRootAuthorizationHelpMatches.Count -ne
+        $arrTrustRootAuthorizationParameterNames.Count) {
+        throw 'The trust-root authorization script parameter help inventory is incomplete.'
+    }
+    foreach ($strTrustRootAuthorizationParameterName in
+        $arrTrustRootAuthorizationParameterNames) {
+        if (@($arrTrustRootAuthorizationHelpMatches | Where-Object {
+                    $_.Groups[1].Value -ceq
+                        $strTrustRootAuthorizationParameterName
+                }).Count -ne 1) {
+            throw (
+                'The trust-root authorization script lacks exactly one help ' +
+                    "entry for $strTrustRootAuthorizationParameterName."
+            )
+        }
+    }
+    if ([regex]::Matches(
+            $strTrustRootAuthorizationSource,
+            '(?m)^# Version: 1\.2\.20260903\.1$'
+        ).Count -ne 1) {
+        throw 'The trust-root authorization script lacks version 1.2.20260903.1.'
+    }
+    & (Join-Path $strRepositoryRootPath $strTrustRootAuthorizationPath) `
+        -RepositoryRootPath $strRepositoryRootPath `
+        -TrustedRevision $strCheckedOutRevision `
+        -BaseRevision $strCheckedOutRevision `
+        -HeadRevision $strCheckedOutRevision `
+        -SelfTest
+    foreach ($strProtectedValidationPath in @(
+            '.github/actionlint.yaml',
+            '.pre-commit-config.yaml'
+        )) {
+        if (@($script:arrTrustRootPaths | Where-Object {
+                    $_ -ceq $strProtectedValidationPath
+                }).Count -ne 1) {
+            throw "$strProtectedValidationPath is outside trust-root governance."
+        }
+    }
     if (@($script:arrTrustRootPaths | Where-Object {
                 $_ -ceq $strExtractedSelfTestPath
             }).Count -ne 1 -or
@@ -7454,10 +8851,6 @@ if ($SelfTest) {
             }).Count -ne 1) {
         throw 'The extracted self-test is outside exact governance.'
     }
-    $strExtractedSelfTestSource = [IO.File]::ReadAllText(
-        (Join-Path $strRepositoryRootPath $strExtractedSelfTestPath),
-        [Text.UTF8Encoding]::new($false)
-    )
     foreach ($strHelpSection in @(
             'SYNOPSIS', 'DESCRIPTION', 'EXAMPLE', 'INPUTS', 'OUTPUTS', 'NOTES'
         )) {
@@ -7481,9 +8874,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strExtractedSelfTestSource,
-            '(?m)^# Version: 1\.2\.20260831\.0$'
+            '(?m)^# Version: 1\.2\.20260902\.4$'
         ).Count -ne 1) {
-        throw 'The extracted self-test lacks version 1.2.20260831.0.'
+        throw 'The extracted self-test lacks version 1.2.20260902.4.'
     }
     $strExtractedSelfTestRevision = if (
         [string]::IsNullOrEmpty($strValidatedInputRevision)
@@ -7737,7 +9130,7 @@ if ($SelfTest) {
             -ExpectedUtcDate $objDocsMetadataContext.UpdatedDate `
             -IsNewDocumentTransition $false)
     if (-not ($arrNestedGeminiMetadataFailures -match [regex]::Escape(
-                'tools/GEMINI.md Version revision must be at least'
+                'tools/GEMINI.md Version revision must be exactly'
             ))) {
         throw 'A cataloged nested GEMINI.md bypassed rendered metadata transition.'
     }
@@ -8485,8 +9878,8 @@ if ($SelfTest) {
         -AgentsContent $strRenderedAgentsMutation `
         -ParentAgentsContent $strAgentsContent `
         -AgentsExpectedUtcDate $objAgentsUpdatedMatch.Groups['Date'].Value `
-        -Failure ("AGENTS.md Version revision must be at least " +
-            "$intNextAgentsRevision after a rendered-content change with an " +
+        -Failure ("AGENTS.md Version revision must be exactly " +
+            "$intNextAgentsRevision after a published change with an " +
             'unchanged published-baseline major, minor, and date tuple.')
 
     $strHigherRevisionParent = $strAgentsContent.Replace(
@@ -8521,10 +9914,13 @@ if ($SelfTest) {
         $objAgentsVersionMatch.Value,
         $strAgentsVersionStem + $intJumpedAgentsRevision
     )
-    Assert-FixtureAccepted `
+    Assert-Failure `
         -AgentsContent $strSameDayRevisionJump `
         -ParentAgentsContent $strAgentsContent `
-        -AgentsExpectedUtcDate $objAgentsUpdatedMatch.Groups['Date'].Value
+        -AgentsExpectedUtcDate $objAgentsUpdatedMatch.Groups['Date'].Value `
+        -Failure ("AGENTS.md Version revision must be exactly " +
+            "$intNextAgentsRevision after a published change with an " +
+            'unchanged published-baseline major, minor, and date tuple.')
 
     $objIsoEvent = ConvertFrom-TrustedEventTimestamp -Timestamp `
         ($objAgentsUpdatedMatch.Groups['Date'].Value + 'T00:00:00Z')
@@ -8669,8 +10065,10 @@ if ($SelfTest) {
         -Name 'endpoint-fixture.md' -CurrentContent $strHigherRevisionPublishedFinal `
         -ParentContent $strEndpointBaseline -ExpectedUtcDate '2026-08-31' `
         -IsNewDocumentTransition $false)
-    if ($arrHigherRevisionPublishedFinalFailures.Count -ne 0) {
-        throw 'A higher published final revision was rejected.'
+    if ($arrHigherRevisionPublishedFinalFailures -cnotcontains
+        ('endpoint-fixture.md Version revision must be exactly 0 when a ' +
+            'published-baseline major, minor, or date segment changes.')) {
+        throw 'A nonzero revision after a higher-order change did not fail closed.'
     }
     $strSameTupleFinal = $strEndpointBaseline.Replace(
         '**Version:** 1.0.20260830.0', '**Version:** 1.0.20260830.1'
@@ -8685,8 +10083,11 @@ if ($SelfTest) {
     if (@(Get-PublishedEndpointMetadataFailure -Name 'endpoint-fixture.md' `
             -CurrentContent $strSkippedRevisionFinal `
             -ParentContent $strEndpointBaseline -ExpectedUtcDate '2026-08-30' `
-            -IsNewDocumentTransition $false).Count -ne 0) {
-        throw 'A higher same-tuple published final revision was rejected.'
+            -IsNewDocumentTransition $false) -cnotcontains
+        ('endpoint-fixture.md Version revision must be exactly 1 after a ' +
+            'published change with an unchanged published-baseline major, ' +
+            'minor, and date tuple.')) {
+        throw 'A skipped same-tuple published final revision did not fail closed.'
     }
     foreach ($strLifecycleStatus in @(
             'Draft', 'Proposed', 'Active', 'Accepted', 'Superseded', 'Deprecated'
@@ -8695,7 +10096,7 @@ if ($SelfTest) {
             '- **Status:** Active', "- **Status:** $strLifecycleStatus")
         if ($null -ne (Get-DocumentMetadataContext `
                 -Content $strLifecycleFixture).Failure) {
-            throw "ADR lifecycle status was rejected: $strLifecycleStatus"
+            throw "A generic Tier 1 lifecycle status was rejected: $strLifecycleStatus"
         }
     }
     Assert-PublishedEndpointContext -RepositoryRootPath $strRepositoryRootPath `
@@ -8834,6 +10235,119 @@ if ($SelfTest) {
     if (-not $boolBoundedIntroductionPathSetMatches) {
         throw 'A nonzero-boundary created ref returned an incorrect changed-path set.'
     }
+    $objRootMetadataContext = [pscustomobject]@{
+        IntroducedCommitRevisions = @($strCheckedOutRevision)
+        BoundaryRevisions = @()
+        EffectiveBaselineRevision = ''
+        IsGenuineRootIntroduction = $true
+    }
+    if ((Get-CreatedRefMetadataBaselineRevision `
+            -Context $objRootMetadataContext `
+            -HeadRevision $strCheckedOutRevision) -cne '') {
+        throw 'A genuine-root introduction did not keep an empty inventory baseline.'
+    }
+    $objBoundaryMetadataContext = [pscustomobject]@{
+        IntroducedCommitRevisions = @($strCheckedOutRevision)
+        BoundaryRevisions = @($strPublishedPathParentRevision)
+        EffectiveBaselineRevision = $strPublishedPathParentRevision
+        IsGenuineRootIntroduction = $false
+    }
+    $strEffectiveInventoryFixtureRevision =
+        Get-CreatedRefMetadataBaselineRevision `
+            -Context $objBoundaryMetadataContext `
+            -HeadRevision $strCheckedOutRevision
+    $arrEffectiveInventoryFixture = @(Read-GitTrackedPath `
+            -RepositoryRootPath $strRepositoryRootPath `
+            -Revision $strEffectiveInventoryFixtureRevision `
+            -MaximumBytes $intGitPathListMaximumBytes)
+    $strOptionalDecisionFixture =
+        'docs/decisions/0001-accept-in-repository-trust-root.md'
+    if ($arrEffectiveInventoryFixture -cnotcontains $strOptionalDecisionFixture -or
+        $arrEffectiveInventoryFixture -cnotcontains 'AGENTS.md') {
+        throw 'The effective created-ref baseline inventory fixture is incomplete.'
+    }
+    $arrDeletionFixtureFinal = @(
+        $arrEffectiveInventoryFixture |
+            Where-Object { $_ -cne $strOptionalDecisionFixture }
+    )
+    $boolOptionalDecisionWasDeleted =
+        $arrEffectiveInventoryFixture -ccontains $strOptionalDecisionFixture -and
+        $arrDeletionFixtureFinal -cnotcontains $strOptionalDecisionFixture
+    $strOptionalDecisionFinalContent = if ($boolOptionalDecisionWasDeleted) {
+        $null
+    }
+    else {
+        'unexpected retained content'
+    }
+    if (-not $boolOptionalDecisionWasDeleted -or
+        $null -ne $strOptionalDecisionFinalContent) {
+        throw 'A created-ref optional decision-record deletion was not retained as null final content.'
+    }
+    $strRenamedDecisionFixture = 'docs/decisions/0002-renamed-trust-root.md'
+    $arrRenameFixtureFinal = @(
+        $arrDeletionFixtureFinal + $strRenamedDecisionFixture |
+            Sort-Object -Unique
+    )
+    if ($arrEffectiveInventoryFixture -cnotcontains $strOptionalDecisionFixture -or
+        $arrRenameFixtureFinal -ccontains $strOptionalDecisionFixture -or
+        $arrRenameFixtureFinal -cnotcontains $strRenamedDecisionFixture) {
+        throw 'A created-ref decision-record rename did not retain both inventory endpoints.'
+    }
+    $arrRequiredDeletionFixtureFinal = @(
+        $arrEffectiveInventoryFixture | Where-Object { $_ -cne 'AGENTS.md' }
+    )
+    if (-not ($arrEffectiveInventoryFixture -ccontains 'AGENTS.md' -and
+            $arrRequiredDeletionFixtureFinal -cnotcontains 'AGENTS.md')) {
+        throw 'A created-ref required-document deletion did not fail its inventory fixture.'
+    }
+    $objRequiredDeletionFixtureSpec = @(
+        $listGovernedDocumentContexts |
+            Where-Object { $_.Path -ceq 'AGENTS.md' }
+    )[0]
+    $listRequiredDeletionFixtureFailure =
+        [Collections.Generic.List[string]]::new()
+    $strRequiredDeletionFixtureContent = $null
+    if ($null -eq $strRequiredDeletionFixtureContent -and
+        $objRequiredDeletionFixtureSpec.RequiredDocument) {
+        $listRequiredDeletionFixtureFailure.Add(
+            'AGENTS.md is required in the published final state.'
+        )
+    }
+    if ($listRequiredDeletionFixtureFailure.Count -ne 1 -or
+        $listRequiredDeletionFixtureFailure[0] -cne
+            'AGENTS.md is required in the published final state.') {
+        throw 'A created-ref required-document deletion did not fail closed.'
+    }
+    $strEffectiveInventorySource = [IO.File]::ReadAllText($PSCommandPath)
+    $scriptblockAssertEffectiveInventory = {
+        param([Parameter(Mandatory)][string] $Content)
+        if (-not $Content.Contains(
+                '$strEffectivePublishedBaselineRevision = if ($PublishedBaselineAbsent)',
+                [StringComparison]::Ordinal
+            ) -or -not $Content.Contains(
+                '-Revision $strEffectivePublishedBaselineRevision',
+                [StringComparison]::Ordinal
+            )) {
+            throw 'The created-ref effective-baseline inventory binding is missing.'
+        }
+    }
+    & $scriptblockAssertEffectiveInventory -Content $strEffectiveInventorySource
+    $strRemovedEffectiveInventoryMutation =
+        $strEffectiveInventorySource.Replace(
+            '-Revision $strEffectivePublishedBaselineRevision',
+            '-Revision $PublishedBaselineRevision'
+        )
+    try {
+        & $scriptblockAssertEffectiveInventory `
+            -Content $strRemovedEffectiveInventoryMutation
+        throw 'Removing the effective-baseline inventory binding was accepted.'
+    }
+    catch {
+        if ($_.Exception.Message -cne
+            'The created-ref effective-baseline inventory binding is missing.') {
+            throw
+        }
+    }
     foreach ($objMalformedPublishedPathRange in @(
             [pscustomobject]@{
                 Name = 'null boundary'
@@ -8944,7 +10458,19 @@ if ($SelfTest) {
     $strAgentWorkflowContent = [IO.File]::ReadAllText(
         [IO.Path]::Combine($PSScriptRoot, 'agent-instructions.yml')
     )
+    $strCurrentBaseWorkflowContent = [IO.File]::ReadAllText(
+        [IO.Path]::Combine(
+            $PSScriptRoot,
+            'agent-instruction-current-base.yml'
+        )
+    )
     $strValidatorSourceContent = [IO.File]::ReadAllText($PSCommandPath)
+    $strParserManifestValidationCall =
+        'node .github/workflows/Test-AgentInstructionParserManifest.mjs'
+    $strLockedDependencyInstallCall =
+        'npm ci --ignore-scripts --no-audit --fund=false'
+    $strTrustRootAuthorizationCall =
+        '& ./.github/workflows/Test-TrustRootAuthorization.ps1'
     $scriptBlockGetFixtureCloneSourceFailure = {
         param([Parameter(Mandatory)][string] $Content)
 
@@ -9127,19 +10653,24 @@ if ($SelfTest) {
                 'refs/remotes/event/pr-head',
                 'id: created-push-boundary',
                 'PUSH_COMMIT_EVIDENCE: ${{ toJson(github.event.commits) }}',
-                'git ls-remote --refs --heads --tags origin',
+                'git ls-remote --sort=refname --refs --heads --tags origin',
+                'Initial remote ref snapshot output bounding failed.',
+                'Initial authenticated remote ref query failed.',
+                'Final remote ref snapshot output bounding failed.',
+                'Final remote ref evidence exceeded 1048576 bytes.',
+                'Final authenticated remote ref query failed.',
+                'Remote ref evidence changed during authentication.',
                 'const evidence = process.env.PUSH_COMMIT_EVIDENCE;',
                 'Buffer.byteLength(evidence, "utf8") > 1048576',
                 'commits = JSON.parse(evidence);',
-                '!Array.isArray(commits) || commits.length > 2048',
+                '!Array.isArray(commits) || commits.length >= 2048',
                 '!/^[0-9a-f]{40}$/.test(entry.id)',
                 'seenCommitIds.has(entry.id)',
                 'if (ids.length > 0 &&',
                 'ids[ids.length - 1] !== process.env.PUSH_AFTER_SHA',
+                'String(ids.length) + "\n", "utf8");',
                 '(ids.length > 0 ? "\n" : ""), "utf8");',
                 'mapfile -t push_commit_ids <"${push_commit_ids_file}"',
-                'fetch_depth=$((push_commit_count + 1))',
-                'test "${fetch_depth}" -le 2049',
                 "destination_local_ref='refs/remotes/event/created-destination'",
                 '--no-write-fetch-head --no-recurse-submodules origin',
                 '"${PUSH_REF}:${destination_local_ref}"',
@@ -9150,6 +10681,9 @@ if ($SelfTest) {
                 'const { TextDecoder } = require("util");',
                 'new TextDecoder("utf-8", { fatal: true })',
                 'seenRefs.has(fields[1])',
+                'fields.length !== 4',
+                'fields.some((field) => field.length === 0)',
+                'Created-ref evidence row is malformed.',
                 'const compareOrdinal = (left, right) =>',
                 'left < right ? -1 : left > right ? 1 : 0;',
                 'mapfile -t remote_rows <"${sorted_refs}"',
@@ -9170,6 +10704,28 @@ if ($SelfTest) {
                 "github.event.changes.base.ref.from != ''",
                 'AGENT_INSTRUCTION_PULL_REQUEST_BASE_CHANGED:',
                 '-PullRequestBaseChanged $env:AGENT_INSTRUCTION_PULL_REQUEST_BASE_CHANGED',
+                'mark-current-base-pending:',
+                'name: Mark current-base validation pending',
+                '      - mark-current-base-pending',
+                "needs.mark-current-base-pending.result == 'success'",
+                'publish-current-base-status:',
+                'needs:',
+                '      - validate-agent-instructions',
+                'always() && github.event_name == ''pull_request_target'' &&',
+                'group: agent-instruction-current-base-status',
+                'queue: max',
+                'cancel-in-progress: false',
+                '      contents: read',
+                '      pull-requests: read',
+                '      statuses: write',
+                'GITHUB_SERVER_URL: ${{ github.server_url }}',
+                'Authenticate live base and head before marking pending',
+                'VALIDATION_RESULT: ${{ needs.validate-agent-instructions.result }}',
+                'ref: ${{ github.sha }}',
+                'persist-credentials: false',
+                'node .github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs',
+                'start',
+                'finalize',
                 'test "${fetched_base}" = "${PUSH_BASE_SHA}"',
                 'test "${fetched_head}" = "${PR_HEAD_SHA}"',
                 'AGENT_INSTRUCTION_PUBLISHED_BASELINE:',
@@ -9192,6 +10748,109 @@ if ($SelfTest) {
                 )
             }
         }
+        $objCreatedPushBoundaryStepMatch = [regex]::Match(
+            $Content,
+            '(?ms)^  validate-agent-instructions:\r?\n.*?' +
+                '^      - name: Authenticate created push boundary refs as data\r?\n' +
+                '(?<Body>.*?)' +
+                '(?=^      - name: Validate parser manifests as inert data\r?$)'
+        )
+        if (-not $objCreatedPushBoundaryStepMatch.Success) {
+            $listFailures.Add(
+                'The created-ref history fetch contract is outside its validation step.'
+            )
+        }
+        else {
+            $strCreatedPushBoundaryStepBody =
+                $objCreatedPushBoundaryStepMatch.Groups['Body'].Value
+            $strBoundedFetchLiteral =
+                'timeout 60s git fetch --depth="${fetch_depth}" --no-tags'
+            $intFirstBoundedFetch =
+                $strCreatedPushBoundaryStepBody.IndexOf(
+                    $strBoundedFetchLiteral,
+                    [StringComparison]::Ordinal
+                )
+            $strComparisonDepthResetLiteral =
+                'fetch_depth="${comparison_ref_fetch_depth}"'
+            $intComparisonDepthReset =
+                $strCreatedPushBoundaryStepBody.IndexOf(
+                    $strComparisonDepthResetLiteral,
+                    [StringComparison]::Ordinal
+                )
+            $intSecondBoundedFetch = if ($intFirstBoundedFetch -ge 0) {
+                $strCreatedPushBoundaryStepBody.IndexOf(
+                    $strBoundedFetchLiteral,
+                    $intFirstBoundedFetch + $strBoundedFetchLiteral.Length,
+                    [StringComparison]::Ordinal
+                )
+            }
+            else { -1 }
+            if ([regex]::Matches(
+                    $strCreatedPushBoundaryStepBody,
+                    '(?m)^          fetch_depth=' +
+                        '\$\(\(push_commit_count \+ 1\)\)\r?$'
+                ).Count -ne 1 -or
+                [regex]::Matches(
+                    $strCreatedPushBoundaryStepBody,
+                    '(?m)^          test "\$\{fetch_depth\}" ' +
+                        '-ge 1\r?$'
+                ).Count -ne 1 -or
+                [regex]::Matches(
+                    $strCreatedPushBoundaryStepBody,
+                    '(?m)^          test "\$\{fetch_depth\}" ' +
+                        '-le 2048\r?$'
+                ).Count -ne 1 -or
+                $intFirstBoundedFetch -lt 0 -or
+                $intComparisonDepthReset -le $intFirstBoundedFetch) {
+                $listFailures.Add(
+                    'The created-ref destination fetch must use exactly the ' +
+                        'payload-derived N+1 depth within its validation step.'
+                )
+            }
+            if ([regex]::Matches(
+                    $strCreatedPushBoundaryStepBody,
+                    '(?m)^          comparison_ref_fetch_depth=2048\r?$'
+                ).Count -ne 1 -or
+                [regex]::Matches(
+                    $strCreatedPushBoundaryStepBody,
+                    '(?m)^            ' +
+                        [regex]::Escape($strComparisonDepthResetLiteral) +
+                        '\r?$'
+                ).Count -ne 1 -or
+                $intSecondBoundedFetch -le $intComparisonDepthReset) {
+                $listFailures.Add(
+                    'The created-ref comparison refs must use exactly the ' +
+                        '2048-commit depth within their validation step.'
+                )
+            }
+            if ([regex]::Matches(
+                    $strCreatedPushBoundaryStepBody,
+                    [regex]::Escape($strBoundedFetchLiteral)
+                ).Count -ne 2) {
+                $listFailures.Add(
+                    'The created-ref validation step must contain exactly two ' +
+                        'bounded history fetches.'
+                )
+            }
+        }
+        $strSortedRemoteSnapshotLiteral =
+            'git ls-remote --sort=refname --refs --heads --tags origin'
+        if ([regex]::Matches(
+                $Content,
+                [regex]::Escape($strSortedRemoteSnapshotLiteral)
+            ).Count -ne 2 -or
+            [regex]::Matches(
+                $Content,
+                '(?m)git ls-remote[^\r\n|]*origin'
+            ).Count -ne 2 -or
+            $Content.Contains(
+                'git ls-remote --refs --heads --tags origin',
+                [StringComparison]::Ordinal
+            )) {
+            $listFailures.Add(
+                'Both remote snapshots must use exactly the sorted ls-remote form.'
+            )
+        }
         if ($Content -cmatch '(?m)(^|\s)--force(\s|$)' -or
             $Content -cmatch '"\+[^" ]+:') {
             $listFailures.Add('Event-data fetches must not force a destination ref.')
@@ -9202,6 +10861,26 @@ if ($SelfTest) {
             )) {
             $listFailures.Add(
                 'Remote ref evidence must be parsed and sorted by ordinal ref name.'
+            )
+        }
+        $intParserManifestValidation = $Content.IndexOf(
+            $strParserManifestValidationCall,
+            [StringComparison]::Ordinal
+        )
+        $intLockedDependencyInstall = $Content.IndexOf(
+            $strLockedDependencyInstallCall,
+            [StringComparison]::Ordinal
+        )
+        $intTrustRootAuthorization = $Content.IndexOf(
+            $strTrustRootAuthorizationCall,
+            [StringComparison]::Ordinal
+        )
+        if ($intParserManifestValidation -lt 0 -or
+            $intLockedDependencyInstall -le $intParserManifestValidation -or
+            $intTrustRootAuthorization -le $intLockedDependencyInstall) {
+            $listFailures.Add(
+                'The executable parser closure must be validated before its ' +
+                    'trusted installation and privileged trust-root use.'
             )
         }
         foreach ($strForbiddenTransitionLiteral in @(
@@ -9229,6 +10908,120 @@ if ($SelfTest) {
         if ($intExpensiveGateCount -ne 6) {
             $listFailures.Add(
                 'All six expensive validation steps require the applicability gate.'
+            )
+        }
+        if ([regex]::Matches(
+                $Content,
+                '(?m)^      statuses: write$'
+            ).Count -ne 2) {
+            $listFailures.Add(
+                'Only the two current-base status jobs may receive status write permission.'
+            )
+        }
+        $objPendingStatusJobMatch = [regex]::Match(
+            $Content,
+            '(?ms)^  mark-current-base-pending:\r?\n' +
+                '(?<Body>.*?)(?=^  validate-agent-instructions:)'
+        )
+        $objValidationJobMatch = [regex]::Match(
+            $Content,
+            '(?ms)^  validate-agent-instructions:\r?\n' +
+                '(?<Body>.*?)(?=^  publish-current-base-status:)'
+        )
+        $objFinalStatusJobMatch = [regex]::Match(
+            $Content,
+            '(?ms)^  publish-current-base-status:\r?\n(?<Body>.*)\z'
+        )
+        foreach ($objStatusJobMatch in @(
+                $objPendingStatusJobMatch,
+                $objFinalStatusJobMatch
+            )) {
+            if (-not $objStatusJobMatch.Success -or
+                [regex]::Matches(
+                    $objStatusJobMatch.Groups['Body'].Value,
+                    '(?m)^\s+uses: ' +
+                        'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1'
+                ).Count -ne 1 -or
+                $objStatusJobMatch.Groups['Body'].Value.Contains(
+                    'contents: write',
+                    [StringComparison]::Ordinal
+                ) -or
+                $objStatusJobMatch.Groups['Body'].Value.Contains(
+                    'pull-requests: write',
+                    [StringComparison]::Ordinal
+                )) {
+                $listFailures.Add(
+                    'A current-base status writer exceeds its trusted job boundary.'
+                )
+            }
+        }
+        $strValidationGatePattern =
+            '(?m)^    needs:\r?\n' +
+            '      - mark-current-base-pending\r?\n' +
+            '    if: >-\r?\n' +
+            '      always\(\) &&\r?\n' +
+            "      \(github\.event_name != 'pull_request_target' \|\|\r?\n" +
+            "      \(\(github\.event\.action != 'edited' \|\|\r?\n" +
+            "      github\.event\.changes\.base\.ref\.from != ''\) &&\r?\n" +
+            "      needs\.mark-current-base-pending\.result == 'success'\)\)\r?$"
+        if (-not $objValidationJobMatch.Success -or
+            [regex]::Matches(
+                $objValidationJobMatch.Groups['Body'].Value,
+                $strValidationGatePattern
+            ).Count -ne 1 -or
+            [regex]::Matches(
+                $objValidationJobMatch.Groups['Body'].Value,
+                '(?m)^    if:'
+            ).Count -ne 1) {
+            $listFailures.Add(
+                'Validation must remain gated on successful pending status publication.'
+            )
+        }
+        $strFinalStatusGatePattern =
+            '(?m)^    needs:\r?\n' +
+            '      - mark-current-base-pending\r?\n' +
+            '      - validate-agent-instructions\r?\n' +
+            '    if: >-\r?\n' +
+            "      always\(\) && github\.event_name == 'pull_request_target' &&\r?\n" +
+            "      \(github\.event\.action != 'edited' \|\|\r?\n" +
+            "      github\.event\.changes\.base\.ref\.from != ''\)\r?$"
+        $strFinalStatusJobBody =
+            $objFinalStatusJobMatch.Groups['Body'].Value
+        if (-not $objFinalStatusJobMatch.Success -or
+            [regex]::Matches(
+                $strFinalStatusJobBody,
+                $strFinalStatusGatePattern
+            ).Count -ne 1 -or
+            [regex]::Matches(
+                $strFinalStatusJobBody,
+                '(?m)^    if:'
+            ).Count -ne 1 -or
+            $strFinalStatusJobBody.Contains(
+                "needs.mark-current-base-pending.result == 'success'",
+                [StringComparison]::Ordinal
+            ) -or
+            -not $strFinalStatusJobBody.Contains(
+                'VALIDATION_RESULT: ${{ needs.validate-agent-instructions.result }}',
+                [StringComparison]::Ordinal
+            )) {
+            $listFailures.Add(
+                'Final status publication must run after every completed prerequisite result.'
+            )
+        }
+        if ([regex]::Matches(
+                $Content,
+                '(?m)^      group: agent-instruction-current-base-status\r?$'
+            ).Count -ne 2 -or
+            [regex]::Matches(
+                $Content,
+                '(?m)^      queue: max\r?$'
+            ).Count -ne 2 -or
+            [regex]::Matches(
+                $Content,
+                '(?m)^      cancel-in-progress: false\r?$'
+            ).Count -ne 2) {
+            $listFailures.Add(
+                'Both current-base status writers must use the bounded shared queue.'
             )
         }
 
@@ -9275,6 +11068,457 @@ if ($SelfTest) {
             ($arrAgentWorkflowFailures -join '; ')
         )
     }
+    $strUnsafeParserOrderMutation = $strAgentWorkflowContent.Replace(
+        $strParserManifestValidationCall,
+        '__PARSER_MANIFEST_VALIDATION_CALL__'
+    ).Replace(
+        $strTrustRootAuthorizationCall,
+        $strParserManifestValidationCall
+    ).Replace(
+        '__PARSER_MANIFEST_VALIDATION_CALL__',
+        $strTrustRootAuthorizationCall
+    )
+    $arrUnsafeParserOrderFailures = @(
+        & $scriptBlockGetAgentWorkflowFailure `
+            -Content $strUnsafeParserOrderMutation
+    )
+    if ($strUnsafeParserOrderMutation -ceq $strAgentWorkflowContent -or
+        $arrUnsafeParserOrderFailures -cnotcontains
+            ('The executable parser closure must be validated before its ' +
+                'trusted installation and privileged trust-root use.')) {
+        throw 'An unsafe executable parser validation order did not fail closed.'
+    }
+
+    $strCreatedRefDepthSystemTempRoot =
+        [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+    $strCreatedRefDepthFixtureRoot = [IO.Path]::Combine(
+        $strCreatedRefDepthSystemTempRoot,
+        'agent-instruction-created-ref-depth-' + [Guid]::NewGuid().ToString('N')
+    )
+    $strCreatedRefDepthSource =
+        [IO.Path]::Combine($strCreatedRefDepthFixtureRoot, 'source')
+    $strCreatedRefZeroCorrectClone =
+        [IO.Path]::Combine($strCreatedRefDepthFixtureRoot, 'zero-correct')
+    $strCreatedRefZeroCoupledClone =
+        [IO.Path]::Combine($strCreatedRefDepthFixtureRoot, 'zero-coupled')
+    $strCreatedRefManyCorrectClone =
+        [IO.Path]::Combine($strCreatedRefDepthFixtureRoot, 'many-correct')
+    $strCreatedRefManyCoupledClone =
+        [IO.Path]::Combine($strCreatedRefDepthFixtureRoot, 'many-coupled')
+    [void] [IO.Directory]::CreateDirectory($strCreatedRefDepthSource)
+    try {
+        $objCreatedRefDepthUtf8 = [Text.UTF8Encoding]::new($false)
+        & git -C $strCreatedRefDepthSource init --quiet --initial-branch=other
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not initialize the created-ref depth fixture.'
+        }
+        & git -C $strCreatedRefDepthSource config user.name `
+            'Created-ref depth self-test'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not configure the created-ref depth fixture name.'
+        }
+        & git -C $strCreatedRefDepthSource config user.email `
+            'created-ref-depth@example.invalid'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not configure the created-ref depth fixture email.'
+        }
+        [IO.File]::WriteAllText(
+            [IO.Path]::Combine($strCreatedRefDepthSource, 'root.txt'),
+            "root`n",
+            $objCreatedRefDepthUtf8
+        )
+        & git -C $strCreatedRefDepthSource add -- root.txt
+        & git -C $strCreatedRefDepthSource commit --quiet -m root
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not commit the created-ref depth fixture root.'
+        }
+        [IO.File]::WriteAllText(
+            [IO.Path]::Combine($strCreatedRefDepthSource, 'boundary.txt'),
+            "boundary`n",
+            $objCreatedRefDepthUtf8
+        )
+        & git -C $strCreatedRefDepthSource add -- boundary.txt
+        & git -C $strCreatedRefDepthSource commit --quiet -m boundary
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not commit the created-ref depth fixture boundary.'
+        }
+        $strCreatedRefDepthBoundary = ([string] (
+                & git -C $strCreatedRefDepthSource rev-parse --verify `
+                    'HEAD^{commit}'
+            )).Trim()
+        if ($LASTEXITCODE -ne 0 -or
+            $strCreatedRefDepthBoundary -notmatch '^[0-9a-fA-F]{40}$') {
+            throw 'Could not resolve the created-ref depth fixture boundary.'
+        }
+        & git -C $strCreatedRefDepthSource branch created-zero `
+            $strCreatedRefDepthBoundary
+        & git -C $strCreatedRefDepthSource switch --quiet -c created-many `
+            $strCreatedRefDepthBoundary
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not create the created-ref depth fixture branches.'
+        }
+        [string[]] $arrCreatedRefDepthIntroduced = @()
+        $intCreatedRefDepthIntroducedCount = 2
+        for ($intCreatedRefDepthIndex = 1;
+            $intCreatedRefDepthIndex -le $intCreatedRefDepthIntroducedCount;
+            $intCreatedRefDepthIndex++) {
+            $strCreatedRefDepthIntroducedPath =
+                "created-$intCreatedRefDepthIndex.txt"
+            [IO.File]::WriteAllText(
+                [IO.Path]::Combine(
+                    $strCreatedRefDepthSource,
+                    $strCreatedRefDepthIntroducedPath
+                ),
+                "created $intCreatedRefDepthIndex`n",
+                $objCreatedRefDepthUtf8
+            )
+            & git -C $strCreatedRefDepthSource add -- `
+                $strCreatedRefDepthIntroducedPath
+            & git -C $strCreatedRefDepthSource commit --quiet `
+                -m "created $intCreatedRefDepthIndex"
+            if ($LASTEXITCODE -ne 0) {
+                throw 'Could not commit introduced created-ref depth history.'
+            }
+            $strCreatedRefDepthIntroducedRevision = ([string] (
+                    & git -C $strCreatedRefDepthSource rev-parse --verify `
+                        'HEAD^{commit}'
+                )).Trim()
+            if ($LASTEXITCODE -ne 0 -or
+                $strCreatedRefDepthIntroducedRevision -notmatch
+                    '^[0-9a-fA-F]{40}$') {
+                throw 'Could not resolve introduced created-ref depth history.'
+            }
+            $arrCreatedRefDepthIntroduced +=
+                $strCreatedRefDepthIntroducedRevision
+        }
+        & git -C $strCreatedRefDepthSource switch --quiet other
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not restore the created-ref depth comparison branch.'
+        }
+        $intCreatedRefDepthComparisonDistance = 5
+        for ($intCreatedRefDepthIndex = 1;
+            $intCreatedRefDepthIndex -le $intCreatedRefDepthComparisonDistance;
+            $intCreatedRefDepthIndex++) {
+            $strCreatedRefDepthComparisonPath =
+                "comparison-$intCreatedRefDepthIndex.txt"
+            [IO.File]::WriteAllText(
+                [IO.Path]::Combine(
+                    $strCreatedRefDepthSource,
+                    $strCreatedRefDepthComparisonPath
+                ),
+                "comparison $intCreatedRefDepthIndex`n",
+                $objCreatedRefDepthUtf8
+            )
+            & git -C $strCreatedRefDepthSource add -- `
+                $strCreatedRefDepthComparisonPath
+            & git -C $strCreatedRefDepthSource commit --quiet `
+                -m "comparison $intCreatedRefDepthIndex"
+            if ($LASTEXITCODE -ne 0) {
+                throw 'Could not commit created-ref comparison history.'
+            }
+        }
+        $strCreatedRefDepthComparisonTip = ([string] (
+                & git -C $strCreatedRefDepthSource rev-parse --verify `
+                    'HEAD^{commit}'
+            )).Trim()
+        $intCreatedRefDepthActualDistance = [int] ([string] (
+                & git -C $strCreatedRefDepthSource rev-list --count `
+                    "$strCreatedRefDepthBoundary..$strCreatedRefDepthComparisonTip"
+            )).Trim()
+        if ($LASTEXITCODE -ne 0 -or
+            $intCreatedRefDepthActualDistance -ne
+                $intCreatedRefDepthComparisonDistance -or
+            $intCreatedRefDepthActualDistance -le
+                $intCreatedRefDepthIntroducedCount) {
+            throw 'The created-ref depth fixture did not exceed the payload depth.'
+        }
+
+        $intCreatedRefZeroDestinationDepth = 1
+        $intCreatedRefComparisonDepth = 2048
+        & git clone --quiet --depth 1 --no-local --no-hardlinks `
+            --branch other -- $strCreatedRefDepthSource `
+            $strCreatedRefZeroCorrectClone
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not clone the zero-introduction depth fixture.'
+        }
+        & git -C $strCreatedRefZeroCorrectClone fetch --quiet `
+            "--depth=$intCreatedRefZeroDestinationDepth" --no-tags `
+            --no-write-fetch-head --no-recurse-submodules origin `
+            'refs/heads/created-zero:refs/remotes/event/created-destination'
+        $intCreatedRefZeroDestinationCommitCount = [int] ([string] (
+                & git -C $strCreatedRefZeroCorrectClone rev-list --count `
+                    refs/remotes/event/created-destination
+            )).Trim()
+        if ($LASTEXITCODE -ne 0 -or
+            $intCreatedRefZeroDestinationCommitCount -ne 1) {
+            throw 'The zero-introduction destination fetch was not depth one.'
+        }
+        & git -C $strCreatedRefZeroCorrectClone fetch --quiet `
+            "--depth=$intCreatedRefComparisonDepth" --no-tags `
+            --no-write-fetch-head --no-recurse-submodules origin `
+            'refs/heads/other:refs/remotes/event/created-other-0000'
+        [string[]] $arrCreatedRefZeroIntroduced = @(
+            & git -C $strCreatedRefZeroCorrectClone rev-list --topo-order `
+                refs/remotes/event/created-destination --not `
+                refs/remotes/event/created-other-0000
+        )
+        $intCreatedRefZeroIntroducedExitCode = $LASTEXITCODE
+        & git -C $strCreatedRefZeroCorrectClone merge-base --is-ancestor `
+            $strCreatedRefDepthBoundary `
+            refs/remotes/event/created-other-0000
+        $intCreatedRefZeroAncestorExitCode = $LASTEXITCODE
+        if ($intCreatedRefZeroIntroducedExitCode -ne 0 -or
+            $arrCreatedRefZeroIntroduced.Count -ne 0 -or
+            $intCreatedRefZeroAncestorExitCode -ne 0) {
+            throw 'The deep zero-introduction comparison fixture failed.'
+        }
+
+        & git clone --quiet --depth 1 --no-local --no-hardlinks `
+            --branch other -- $strCreatedRefDepthSource `
+            $strCreatedRefZeroCoupledClone
+        & git -C $strCreatedRefZeroCoupledClone fetch --quiet `
+            "--depth=$intCreatedRefZeroDestinationDepth" --no-tags `
+            --no-write-fetch-head --no-recurse-submodules origin `
+            'refs/heads/created-zero:refs/remotes/event/created-destination'
+        & git -C $strCreatedRefZeroCoupledClone fetch --quiet `
+            "--depth=$intCreatedRefZeroDestinationDepth" --no-tags `
+            --no-write-fetch-head --no-recurse-submodules origin `
+            'refs/heads/other:refs/remotes/event/created-other-0000'
+        [string[]] $arrCreatedRefZeroCoupledIntroduced = @(
+            & git -C $strCreatedRefZeroCoupledClone rev-list --topo-order `
+                refs/remotes/event/created-destination --not `
+                refs/remotes/event/created-other-0000
+        )
+        $intCreatedRefZeroCoupledIntroducedExitCode = $LASTEXITCODE
+        & git -C $strCreatedRefZeroCoupledClone merge-base --is-ancestor `
+            $strCreatedRefDepthBoundary `
+            refs/remotes/event/created-other-0000
+        $intCreatedRefZeroCoupledAncestorExitCode = $LASTEXITCODE
+        if ($intCreatedRefZeroCoupledIntroducedExitCode -ne 0 -or
+            $arrCreatedRefZeroCoupledIntroduced.Count -ne 1 -or
+            $arrCreatedRefZeroCoupledIntroduced[0] -cne
+                $strCreatedRefDepthBoundary -or
+            $intCreatedRefZeroCoupledAncestorExitCode -ne 1) {
+            throw 'The payload-coupled zero-introduction control was vacuous.'
+        }
+
+        $intCreatedRefManyDestinationDepth =
+            $intCreatedRefDepthIntroducedCount + 1
+        & git clone --quiet --depth 1 --no-local --no-hardlinks `
+            --branch other -- $strCreatedRefDepthSource `
+            $strCreatedRefManyCorrectClone
+        & git -C $strCreatedRefManyCorrectClone fetch --quiet `
+            "--depth=$intCreatedRefManyDestinationDepth" --no-tags `
+            --no-write-fetch-head --no-recurse-submodules origin `
+            'refs/heads/created-many:refs/remotes/event/created-destination'
+        $intCreatedRefManyDestinationCommitCount = [int] ([string] (
+                & git -C $strCreatedRefManyCorrectClone rev-list --count `
+                    refs/remotes/event/created-destination
+            )).Trim()
+        if ($LASTEXITCODE -ne 0 -or
+            $intCreatedRefManyDestinationCommitCount -ne
+                $intCreatedRefManyDestinationDepth) {
+            throw 'The introduced destination fetch did not use N+1 depth.'
+        }
+        & git -C $strCreatedRefManyCorrectClone fetch --quiet `
+            "--depth=$intCreatedRefComparisonDepth" --no-tags `
+            --no-write-fetch-head --no-recurse-submodules origin `
+            'refs/heads/other:refs/remotes/event/created-other-0000'
+        [string[]] $arrCreatedRefManyIntroduced = @(
+            & git -C $strCreatedRefManyCorrectClone rev-list --topo-order `
+                refs/remotes/event/created-destination --not `
+                refs/remotes/event/created-other-0000
+        )
+        $intCreatedRefManyIntroducedExitCode = $LASTEXITCODE
+        & git -C $strCreatedRefManyCorrectClone merge-base --is-ancestor `
+            $strCreatedRefDepthBoundary `
+            refs/remotes/event/created-other-0000
+        $intCreatedRefManyAncestorExitCode = $LASTEXITCODE
+        if ($intCreatedRefManyIntroducedExitCode -ne 0 -or
+            $arrCreatedRefManyIntroduced.Count -ne
+                $intCreatedRefDepthIntroducedCount -or
+            @($arrCreatedRefManyIntroduced | Where-Object {
+                    $arrCreatedRefDepthIntroduced -cnotcontains $_
+                }).Count -ne 0 -or
+            $intCreatedRefManyAncestorExitCode -ne 0) {
+            throw 'The deep N-introduction comparison fixture failed.'
+        }
+
+        & git clone --quiet --depth 1 --no-local --no-hardlinks `
+            --branch other -- $strCreatedRefDepthSource `
+            $strCreatedRefManyCoupledClone
+        & git -C $strCreatedRefManyCoupledClone fetch --quiet `
+            "--depth=$intCreatedRefManyDestinationDepth" --no-tags `
+            --no-write-fetch-head --no-recurse-submodules origin `
+            'refs/heads/created-many:refs/remotes/event/created-destination'
+        & git -C $strCreatedRefManyCoupledClone fetch --quiet `
+            "--depth=$intCreatedRefManyDestinationDepth" --no-tags `
+            --no-write-fetch-head --no-recurse-submodules origin `
+            'refs/heads/other:refs/remotes/event/created-other-0000'
+        [string[]] $arrCreatedRefManyCoupledIntroduced = @(
+            & git -C $strCreatedRefManyCoupledClone rev-list --topo-order `
+                refs/remotes/event/created-destination --not `
+                refs/remotes/event/created-other-0000
+        )
+        $intCreatedRefManyCoupledIntroducedExitCode = $LASTEXITCODE
+        & git -C $strCreatedRefManyCoupledClone merge-base --is-ancestor `
+            $strCreatedRefDepthBoundary `
+            refs/remotes/event/created-other-0000
+        $intCreatedRefManyCoupledAncestorExitCode = $LASTEXITCODE
+        if ($intCreatedRefManyCoupledIntroducedExitCode -ne 0 -or
+            $arrCreatedRefManyCoupledIntroduced.Count -ne
+                ($intCreatedRefDepthIntroducedCount + 1) -or
+            $arrCreatedRefManyCoupledIntroduced -cnotcontains
+                $strCreatedRefDepthBoundary -or
+            $intCreatedRefManyCoupledAncestorExitCode -ne 1) {
+            throw 'The payload-coupled N-introduction control was vacuous.'
+        }
+    }
+    finally {
+        if ([IO.Directory]::Exists($strCreatedRefDepthFixtureRoot) -and
+            $strCreatedRefDepthFixtureRoot.StartsWith(
+                $strCreatedRefDepthSystemTempRoot,
+                [StringComparison]::OrdinalIgnoreCase
+            ) -and
+            [IO.Path]::GetFileName($strCreatedRefDepthFixtureRoot).StartsWith(
+                'agent-instruction-created-ref-depth-',
+                [StringComparison]::Ordinal
+            )) {
+            Remove-Item -LiteralPath $strCreatedRefDepthFixtureRoot `
+                -Recurse -Force
+        }
+    }
+    $scriptBlockGetCurrentBaseWorkflowFailure = {
+        param([Parameter(Mandatory)][string] $Content)
+
+        $listFailures = [Collections.Generic.List[string]]::new()
+        $strInvalidatorPattern =
+            '(?s)^(?!.*pull_request_target:)(?!.*workflow_dispatch:)' +
+            '(?!.*actions: write)(?!.*pull-requests: write).*?' +
+            'repository_dispatch:.*?types:.*?' +
+            'agent-instruction-current-base-continuation-v1.*?' +
+            'agent-instruction-current-base-bootstrap-v1.*?workflow_run:.*?' +
+            'requested.*?completed.*?run-name:.*?' +
+            'Agent current-base continuation:.*?github\.sha.*?' +
+            "workflow_run\.event == 'push'.*?repository_dispatch.*?" +
+            'group: agent-instruction-current-base-status.*?queue: max.*?' +
+            'cancel-in-progress: false.*?actions: read.*?contents: write.*?' +
+            'pull-requests: read.*?statuses: write.*?' +
+            'ref: \$\{\{ github\.sha \}\}.*?persist-credentials: false.*?' +
+            'GITHUB_SERVER_URL: \$\{\{ github\.server_url \}\}.*?' +
+            'SWEEP_RUN_REF: \$\{\{ github\.ref_name \}\}.*?' +
+            'SWEEP_RUN_SHA: \$\{\{ github\.sha \}\}.*?' +
+            'SWEEP_EVENT_TYPE: \$\{\{ github\.event\.action \}\}.*?' +
+            'SWEEP_CLIENT_PAYLOAD: ' +
+            '\$\{\{ toJson\(github\.event\.client_payload\) \}\}.*?' +
+            'Set-AgentInstructionCurrentBaseStatus\.mjs\s+invalidate'
+        if ($Content -cnotmatch $strInvalidatorPattern -or
+            [regex]::Matches(
+                $Content,
+                '(?m)^      (?:group: agent-instruction-current-base-status|' +
+                    'queue: max|cancel-in-progress: false)\r?$'
+            ).Count -ne 3) {
+            $listFailures.Add(
+                'The current-base invalidator contract is not fail closed.'
+            )
+        }
+        return $listFailures.ToArray()
+    }
+    $arrCurrentBaseWorkflowFailures = @(
+        & $scriptBlockGetCurrentBaseWorkflowFailure `
+            -Content $strCurrentBaseWorkflowContent
+    )
+    if ($arrCurrentBaseWorkflowFailures.Count -ne 0) {
+        throw (
+            'Current-base invalidator workflow contract failed: ' +
+            ($arrCurrentBaseWorkflowFailures -join '; ')
+        )
+    }
+    foreach ($objInvalidatorMutation in @(
+            [pscustomobject]@{
+                Name = 'single pending invalidator queue'
+                Content = $strCurrentBaseWorkflowContent.Replace(
+                    'queue: max',
+                    'queue: single'
+                )
+                Expected = 'The current-base invalidator contract is not fail closed.'
+            },
+            [pscustomobject]@{
+                Name = 'cancelling invalidator queue'
+                Content = $strCurrentBaseWorkflowContent.Replace(
+                    'cancel-in-progress: false',
+                    'cancel-in-progress: true'
+                )
+                Expected = 'The current-base invalidator contract is not fail closed.'
+            },
+            [pscustomobject]@{
+                Name = 'write-capable Actions permission'
+                Content = $strCurrentBaseWorkflowContent.Replace(
+                    '      actions: read',
+                    '      actions: write'
+                )
+                Expected = 'The current-base invalidator contract is not fail closed.'
+            },
+            [pscustomobject]@{
+                Name = 'read-only repository dispatch permission'
+                Content = $strCurrentBaseWorkflowContent.Replace(
+                    '      contents: write',
+                    '      contents: read'
+                )
+                Expected = 'The current-base invalidator contract is not fail closed.'
+            },
+            [pscustomobject]@{
+                Name = 'branch-selectable continuation trigger'
+                Content = $strCurrentBaseWorkflowContent.Replace(
+                    '  repository_dispatch:',
+                    '  workflow_dispatch:'
+                )
+                Expected = 'The current-base invalidator contract is not fail closed.'
+            },
+            [pscustomobject]@{
+                Name = 'broad continuation event type'
+                Content = $strCurrentBaseWorkflowContent.Replace(
+                    'agent-instruction-current-base-continuation-v1',
+                    'agent-instruction-current-base-continuation'
+                )
+                Expected = 'The current-base invalidator contract is not fail closed.'
+            },
+            [pscustomobject]@{
+                Name = 'projected continuation payload'
+                Content = $strCurrentBaseWorkflowContent.Replace(
+                    '${{ toJson(github.event.client_payload) }}',
+                    '${{ github.event.client_payload.session }}'
+                )
+                Expected = 'The current-base invalidator contract is not fail closed.'
+            },
+            [pscustomobject]@{
+                Name = 'non-default current run ref'
+                Content = $strCurrentBaseWorkflowContent.Replace(
+                    '          SWEEP_RUN_REF: ${{ github.ref_name }}',
+                    '          SWEEP_RUN_REF: ${{ github.event.ref }}'
+                )
+                Expected = 'The current-base invalidator contract is not fail closed.'
+            }
+        )) {
+        if ($objInvalidatorMutation.Content -ceq $strCurrentBaseWorkflowContent) {
+            throw "Invalidator mutation changed zero bytes: $($objInvalidatorMutation.Name)"
+        }
+        $arrInvalidatorMutationFailures = @(
+            & $scriptBlockGetCurrentBaseWorkflowFailure `
+                -Content $objInvalidatorMutation.Content
+        )
+        if ($arrInvalidatorMutationFailures -cnotcontains
+            $objInvalidatorMutation.Expected) {
+            throw "Invalidator workflow mutation passed: $($objInvalidatorMutation.Name)"
+        }
+    }
+    & node ([IO.Path]::Combine(
+            $PSScriptRoot,
+            'Set-AgentInstructionCurrentBaseStatus.mjs'
+        )) self-test
+    if ($LASTEXITCODE -ne 0) {
+        throw 'The current-base helper self-test failed.'
+    }
     $arrShaFirstConflictRows = [object[]] @(
         [pscustomobject]@{
             Object = '0000000000000000000000000000000000000001'
@@ -9304,7 +11548,166 @@ if ($SelfTest) {
         $arrOrdinalSortedConflictRows[1].Ref -cne 'refs/heads/z-sha-first') {
         throw 'The SHA-first versus ordinal-ref adversarial fixture did not pass.'
     }
+    $strBoundedFetchLiteral =
+        'timeout 60s git fetch --depth="${fetch_depth}" --no-tags'
+    $intFirstBoundedFetch = $strAgentWorkflowContent.IndexOf(
+        $strBoundedFetchLiteral,
+        [StringComparison]::Ordinal
+    )
+    $intSecondBoundedFetch = if ($intFirstBoundedFetch -ge 0) {
+        $strAgentWorkflowContent.IndexOf(
+            $strBoundedFetchLiteral,
+            $intFirstBoundedFetch + $strBoundedFetchLiteral.Length,
+            [StringComparison]::Ordinal
+        )
+    }
+    else { -1 }
+    if ($intSecondBoundedFetch -lt 0) {
+        throw 'Could not locate both bounded created-ref fetches.'
+    }
+    $strUnboundedOtherRefWorkflow = $strAgentWorkflowContent.Remove(
+        $intSecondBoundedFetch,
+        $strBoundedFetchLiteral.Length
+    ).Insert(
+        $intSecondBoundedFetch,
+        'timeout 60s git fetch --no-tags'
+    )
+    $strPayloadCoupledOtherRefWorkflow = $strAgentWorkflowContent.Replace(
+        'fetch_depth="${comparison_ref_fetch_depth}"',
+        'fetch_depth=$((push_commit_count + 1))'
+    )
+    $strOverDepthOtherRefWorkflow = $strAgentWorkflowContent.Replace(
+        'comparison_ref_fetch_depth=2048',
+        'comparison_ref_fetch_depth=2049'
+    )
+    $intFinalStatusJobIndex = $strAgentWorkflowContent.IndexOf(
+        '  publish-current-base-status:',
+        [StringComparison]::Ordinal
+    )
+    if ($intFinalStatusJobIndex -lt 0) {
+        throw 'Could not locate the final current-base status job for mutation tests.'
+    }
+    $strWorkflowNewLine = if ($strAgentWorkflowContent.Contains("`r`n")) {
+        "`r`n"
+    }
+    else {
+        "`n"
+    }
+    $strFinalStatusWorkflowPrefix =
+        $strAgentWorkflowContent.Substring(0, $intFinalStatusJobIndex)
+    $strFinalStatusWorkflowBody =
+        $strAgentWorkflowContent.Substring($intFinalStatusJobIndex)
+    $strFinalStatusGateTail =
+        "      github.event.changes.base.ref.from != '')"
+    $strBadFinalStatusWorkflowBody = $strFinalStatusWorkflowBody.Replace(
+        $strFinalStatusGateTail,
+        $strFinalStatusGateTail + ' &&' + $strWorkflowNewLine +
+            "      needs.mark-current-base-pending.result == 'success'"
+    )
+    $strBadFinalStatusWorkflow =
+        $strFinalStatusWorkflowPrefix + $strBadFinalStatusWorkflowBody
     $arrWorkflowMutations = @(
+        [pscustomobject]@{
+            Name = 'missing initial snapshot output-bound diagnostic'
+            Content = $strAgentWorkflowContent.Replace(
+                'Initial remote ref snapshot output bounding failed.',
+                'Initial remote ref snapshot failed.'
+            )
+            Expected =
+                'Workflow contract literal is missing: ' +
+                'Initial remote ref snapshot output bounding failed.'
+        },
+        [pscustomobject]@{
+            Name = 'missing initial authenticated-query diagnostic'
+            Content = $strAgentWorkflowContent.Replace(
+                'Initial authenticated remote ref query failed.',
+                'Initial remote ref query failed.'
+            )
+            Expected =
+                'Workflow contract literal is missing: ' +
+                'Initial authenticated remote ref query failed.'
+        },
+        [pscustomobject]@{
+            Name = 'missing final snapshot output-bound diagnostic'
+            Content = $strAgentWorkflowContent.Replace(
+                'Final remote ref snapshot output bounding failed.',
+                'Final remote ref snapshot failed.'
+            )
+            Expected =
+                'Workflow contract literal is missing: ' +
+                'Final remote ref snapshot output bounding failed.'
+        },
+        [pscustomobject]@{
+            Name = 'missing final snapshot size diagnostic'
+            Content = $strAgentWorkflowContent.Replace(
+                'Final remote ref evidence exceeded 1048576 bytes.',
+                'Final remote ref evidence was too large.'
+            )
+            Expected =
+                'Workflow contract literal is missing: ' +
+                'Final remote ref evidence exceeded 1048576 bytes.'
+        },
+        [pscustomobject]@{
+            Name = 'missing final authenticated-query diagnostic'
+            Content = $strAgentWorkflowContent.Replace(
+                'Final authenticated remote ref query failed.',
+                'Final remote ref query failed.'
+            )
+            Expected =
+                'Workflow contract literal is missing: ' +
+                'Final authenticated remote ref query failed.'
+        },
+        [pscustomobject]@{
+            Name = 'missing remote snapshot-change diagnostic'
+            Content = $strAgentWorkflowContent.Replace(
+                'Remote ref evidence changed during authentication.',
+                'Remote ref evidence changed.'
+            )
+            Expected =
+                'Workflow contract literal is missing: ' +
+                'Remote ref evidence changed during authentication.'
+        },
+        [pscustomobject]@{
+            Name = 'unsorted remote ref snapshots'
+            Content = $strAgentWorkflowContent.Replace(
+                'git ls-remote --sort=refname --refs --heads --tags origin',
+                'git ls-remote --refs --heads --tags origin'
+            )
+            Expected =
+                'Both remote snapshots must use exactly the sorted ls-remote form.'
+        },
+        [pscustomobject]@{
+            Name = 'single pending status-writer queue'
+            Content = $strAgentWorkflowContent.Replace(
+                'queue: max',
+                'queue: single'
+            )
+            Expected =
+                'Both current-base status writers must use the bounded shared queue.'
+        },
+        [pscustomobject]@{
+            Name = 'cancelling status-writer queue'
+            Content = $strAgentWorkflowContent.Replace(
+                'cancel-in-progress: false',
+                'cancel-in-progress: true'
+            )
+            Expected =
+                'Both current-base status writers must use the bounded shared queue.'
+        },
+        [pscustomobject]@{
+            Name = 'validation bypasses pending prerequisite'
+            Content = $strAgentWorkflowContent.Replace(
+                "needs.mark-current-base-pending.result == 'success'",
+                'true'
+            )
+            Expected = 'Workflow contract literal is missing: needs.mark-current-base-pending.result'
+        },
+        [pscustomobject]@{
+            Name = 'finalizer skips after failed pending prerequisite'
+            Content = $strBadFinalStatusWorkflow
+            Expected =
+                'Final status publication must run after every completed prerequisite result.'
+        },
         [pscustomobject]@{
             Name = 'push path filter'
             Content = $strAgentWorkflowContent.Replace(
@@ -9411,6 +11814,30 @@ if ($SelfTest) {
             Expected = 'Workflow contract literal is missing: seenRefs.has(fields[1])'
         },
         [pscustomobject]@{
+            Name = 'missing created-ref evidence field accepted'
+            Content = $strAgentWorkflowContent.Replace(
+                'fields.length !== 4',
+                'fields.length > 4'
+            )
+            Expected = 'Workflow contract literal is missing: fields.length !== 4'
+        },
+        [pscustomobject]@{
+            Name = 'extra created-ref evidence field accepted'
+            Content = $strAgentWorkflowContent.Replace(
+                'fields.length !== 4',
+                'fields.length < 4'
+            )
+            Expected = 'Workflow contract literal is missing: fields.length !== 4'
+        },
+        [pscustomobject]@{
+            Name = 'empty created-ref evidence field accepted'
+            Content = $strAgentWorkflowContent.Replace(
+                'fields.some((field) => field.length === 0)',
+                'false'
+            )
+            Expected = 'Workflow contract literal is missing: fields.some((field)'
+        },
+        [pscustomobject]@{
             Name = 'missing push commit byte bound'
             Content = $strAgentWorkflowContent.Replace(
                 'Buffer.byteLength(evidence, "utf8") > 1048576',
@@ -9419,10 +11846,18 @@ if ($SelfTest) {
             Expected = 'Workflow contract literal is missing: Buffer.byteLength'
         },
         [pscustomobject]@{
-            Name = 'missing push commit array and count bound'
+            Name = 'missing push commit array and truncation-cap bound'
             Content = $strAgentWorkflowContent.Replace(
-                '!Array.isArray(commits) || commits.length > 2048',
+                '!Array.isArray(commits) || commits.length >= 2048',
                 'false'
+            )
+            Expected = 'Workflow contract literal is missing: !Array.isArray(commits)'
+        },
+        [pscustomobject]@{
+            Name = 'weakened push commit truncation-cap comparison'
+            Content = $strAgentWorkflowContent.Replace(
+                '!Array.isArray(commits) || commits.length >= 2048',
+                '!Array.isArray(commits) || commits.length > 2048'
             )
             Expected = 'Workflow contract literal is missing: !Array.isArray(commits)'
         },
@@ -9451,6 +11886,14 @@ if ($SelfTest) {
             Expected = 'Workflow contract literal is missing: if (ids.length > 0 &&'
         },
         [pscustomobject]@{
+            Name = 'shell-expansive push count template reintroduced'
+            Content = $strAgentWorkflowContent.Replace(
+                'String(ids.length) + "\n", "utf8");',
+                '`${ids.length}\n`, "utf8");'
+            )
+            Expected = 'Workflow contract literal is missing: String(ids.length)'
+        },
+        [pscustomobject]@{
             Name = 'empty push commit array serialized as one blank record'
             Content = $strAgentWorkflowContent.Replace(
                 '(ids.length > 0 ? "\n" : ""), "utf8");',
@@ -9472,7 +11915,40 @@ if ($SelfTest) {
                 'fetch_depth=$((push_commit_count + 1))',
                 'fetch_depth=2147483647'
             )
-            Expected = 'Workflow contract literal is missing: fetch_depth=$((push_commit_count + 1))'
+            Expected =
+                'The created-ref destination fetch must use exactly the ' +
+                'payload-derived N+1 depth within its validation step.'
+        },
+        [pscustomobject]@{
+            Name = 'weakened destination history fetch cap'
+            Content = $strAgentWorkflowContent.Replace(
+                'test "${fetch_depth}" -le 2048',
+                'test "${fetch_depth}" -le 2049'
+            )
+            Expected =
+                'The created-ref destination fetch must use exactly the ' +
+                'payload-derived N+1 depth within its validation step.'
+        },
+        [pscustomobject]@{
+            Name = 'payload-coupled other-ref history fetch'
+            Content = $strPayloadCoupledOtherRefWorkflow
+            Expected =
+                'The created-ref comparison refs must use exactly the ' +
+                '2048-commit depth within their validation step.'
+        },
+        [pscustomobject]@{
+            Name = 'other-ref history fetch above policy bound'
+            Content = $strOverDepthOtherRefWorkflow
+            Expected =
+                'The created-ref comparison refs must use exactly the ' +
+                '2048-commit depth within their validation step.'
+        },
+        [pscustomobject]@{
+            Name = 'unbounded other-ref history fetch'
+            Content = $strUnboundedOtherRefWorkflow
+            Expected =
+                'The created-ref comparison refs must use exactly the ' +
+                '2048-commit depth within their validation step.'
         },
         [pscustomobject]@{
             Name = 'forcing created destination fetch'

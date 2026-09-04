@@ -16,12 +16,65 @@ permissions:
   contents: read
 
 jobs:
+  mark-current-base-pending:
+    name: Mark current-base validation pending
+    if: >-
+      github.event_name == 'pull_request_target' &&
+      (github.event.action != 'edited' ||
+      github.event.changes.base.ref.from != '')
+    concurrency:
+      group: agent-instruction-current-base-status
+      queue: max
+      cancel-in-progress: false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+      statuses: write
+    steps:
+      - name: Check out trusted current-base helper
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ github.sha }}
+          token: ${{ github.token }}
+          persist-credentials: false
+          clean: true
+          fetch-depth: 1
+          fetch-tags: false
+          show-progress: true
+          lfs: false
+          submodules: false
+          set-safe-directory: true
+          allow-unsafe-pr-checkout: false
+
+      - name: Authenticate live base and head before marking pending
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+          EXPECTED_REPOSITORY: ${{ github.repository }}
+          EXPECTED_PULL_NUMBER: ${{ github.event.pull_request.number }}
+          EXPECTED_BASE_REF: ${{ github.event.pull_request.base.ref }}
+          EXPECTED_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          EXPECTED_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          STATUS_TARGET_URL: >-
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{
+              github.run_id }}
+        run: >-
+          node .github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs
+          start
+
   validate-agent-instructions:
     name: Validate agent instructions
+    needs:
+      - mark-current-base-pending
     if: >-
-      github.event_name != 'pull_request_target' ||
-      github.event.action != 'edited' ||
-      github.event.changes.base.ref.from != ''
+      always() &&
+      (github.event_name != 'pull_request_target' ||
+      ((github.event.action != 'edited' ||
+      github.event.changes.base.ref.from != '') &&
+      needs.mark-current-base-pending.result == 'success'))
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -185,7 +238,7 @@ jobs:
             } catch {
               throw new Error("Push commit evidence is malformed JSON.");
             }
-            if (!Array.isArray(commits) || commits.length > 2048) {
+            if (!Array.isArray(commits) || commits.length >= 2048) {
               throw new Error("Push commit evidence is not a bounded array.");
             }
             const seenCommitIds = new Set();
@@ -206,7 +259,7 @@ jobs:
             }
             fs.writeFileSync(process.argv[1], ids.join("\n") +
               (ids.length > 0 ? "\n" : ""), "utf8");
-            fs.writeFileSync(process.argv[2], `${ids.length}\n`, "utf8");
+            fs.writeFileSync(process.argv[2], String(ids.length) + "\n", "utf8");
           ' "${push_commit_ids_file}" "${push_commit_count_file}"; then
             echo 'Push commit evidence parsing failed.' >&2
             exit 1
@@ -217,23 +270,30 @@ jobs:
           test "${push_commit_count}" -eq "${#push_commit_ids[@]}"
           fetch_depth=$((push_commit_count + 1))
           test "${fetch_depth}" -ge 1
-          test "${fetch_depth}" -le 2049
+          test "${fetch_depth}" -le 2048
+          comparison_ref_fetch_depth=2048
           authorization="$(printf 'x-access-token:%s' "${GITHUB_TOKEN}" |
             base64 -w 0)"
           set +e
           GIT_CONFIG_COUNT=1 \
             GIT_CONFIG_KEY_0="http.${GITHUB_SERVER_URL}/.extraheader" \
             GIT_CONFIG_VALUE_0="Authorization: Basic ${authorization}" \
-            timeout 30s git ls-remote --refs --heads --tags origin |
+            timeout 30s git ls-remote --sort=refname --refs --heads --tags origin |
             head -c 1048577 >"${raw_refs}"
           pipeline_status=("${PIPESTATUS[@]}")
           set -e
-          test "${pipeline_status[1]}" -eq 0
+          if test "${pipeline_status[1]}" -ne 0; then
+            echo 'Initial remote ref snapshot output bounding failed.' >&2
+            exit 1
+          fi
           if test "$(wc -c <"${raw_refs}")" -gt 1048576; then
             echo 'Remote ref evidence exceeded 1048576 bytes.' >&2
             exit 1
           fi
-          test "${pipeline_status[0]}" -eq 0
+          if test "${pipeline_status[0]}" -ne 0; then
+            echo 'Initial authenticated remote ref query failed.' >&2
+            exit 1
+          fi
 
           if ! node -e '
             const fs = require("fs");
@@ -323,24 +383,38 @@ jobs:
           done
 
           if test "${#fetch_arguments[@]}" -gt 0; then
+            fetch_depth="${comparison_ref_fetch_depth}"
             GIT_CONFIG_COUNT=1 \
               GIT_CONFIG_KEY_0="http.${GITHUB_SERVER_URL}/.extraheader" \
               GIT_CONFIG_VALUE_0="Authorization: Basic ${authorization}" \
-              timeout 60s git fetch --no-tags --no-write-fetch-head \
+              timeout 60s git fetch --depth="${fetch_depth}" --no-tags \
+                --no-write-fetch-head \
                 --no-recurse-submodules origin "${fetch_arguments[@]}"
           fi
           set +e
           GIT_CONFIG_COUNT=1 \
             GIT_CONFIG_KEY_0="http.${GITHUB_SERVER_URL}/.extraheader" \
             GIT_CONFIG_VALUE_0="Authorization: Basic ${authorization}" \
-            timeout 30s git ls-remote --refs --heads --tags origin |
+            timeout 30s git ls-remote --sort=refname --refs --heads --tags origin |
             head -c 1048577 >"${raw_refs_after}"
           pipeline_status=("${PIPESTATUS[@]}")
           set -e
-          test "${pipeline_status[1]}" -eq 0
-          test "$(wc -c <"${raw_refs_after}")" -le 1048576
-          test "${pipeline_status[0]}" -eq 0
-          cmp --silent "${raw_refs}" "${raw_refs_after}"
+          if test "${pipeline_status[1]}" -ne 0; then
+            echo 'Final remote ref snapshot output bounding failed.' >&2
+            exit 1
+          fi
+          if test "$(wc -c <"${raw_refs_after}")" -gt 1048576; then
+            echo 'Final remote ref evidence exceeded 1048576 bytes.' >&2
+            exit 1
+          fi
+          if test "${pipeline_status[0]}" -ne 0; then
+            echo 'Final authenticated remote ref query failed.' >&2
+            exit 1
+          fi
+          if ! cmp --silent "${raw_refs}" "${raw_refs_after}"; then
+            echo 'Remote ref evidence changed during authentication.' >&2
+            exit 1
+          fi
           unset authorization
 
           evidence_index=0
@@ -372,8 +446,12 @@ jobs:
             const fs = require("fs");
             const rows = fs.readFileSync(process.argv[1], "utf8")
               .split("\n").filter(Boolean).map((row) => {
-                const [ref, object, commit, local_ref] = row.split("\t");
-                if (!ref || !object || !commit || !local_ref) throw Error();
+                const fields = row.split("\t");
+                if (fields.length !== 4 ||
+                    fields.some((field) => field.length === 0)) {
+                  throw new Error("Created-ref evidence row is malformed.");
+                }
+                const [ref, object, commit, local_ref] = fields;
                 return { ref, object, commit, local_ref };
               });
             process.stdout.write(JSON.stringify(rows));
@@ -534,3 +612,56 @@ jobs:
           $env:AGENT_INSTRUCTION_PUSH_COMMIT_EVIDENCE
           -OtherRefEvidenceJson `
           $env:AGENT_INSTRUCTION_OTHER_REF_EVIDENCE
+
+  publish-current-base-status:
+    name: Publish current-base status
+    needs:
+      - mark-current-base-pending
+      - validate-agent-instructions
+    if: >-
+      always() && github.event_name == 'pull_request_target' &&
+      (github.event.action != 'edited' ||
+      github.event.changes.base.ref.from != '')
+    concurrency:
+      group: agent-instruction-current-base-status
+      queue: max
+      cancel-in-progress: false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+      statuses: write
+    steps:
+      - name: Check out trusted current-base helper
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ github.sha }}
+          token: ${{ github.token }}
+          persist-credentials: false
+          clean: true
+          fetch-depth: 1
+          fetch-tags: false
+          show-progress: true
+          lfs: false
+          submodules: false
+          set-safe-directory: true
+          allow-unsafe-pr-checkout: false
+
+      - name: Publish status after live base and head verification
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+          EXPECTED_REPOSITORY: ${{ github.repository }}
+          EXPECTED_PULL_NUMBER: ${{ github.event.pull_request.number }}
+          EXPECTED_BASE_REF: ${{ github.event.pull_request.base.ref }}
+          EXPECTED_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          EXPECTED_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          VALIDATION_RESULT: ${{ needs.validate-agent-instructions.result }}
+          STATUS_TARGET_URL: >-
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{
+              github.run_id }}
+        run: >-
+          node .github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs
+          finalize

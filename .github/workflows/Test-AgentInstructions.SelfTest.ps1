@@ -29,7 +29,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.2.20260831.0
+# Version: 1.2.20260902.4
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -52,6 +52,30 @@ if ($arrDeclaredOutputTypes.Count -ne 1 -or
 $script:strMaximumMetadataUtcDate = $MaximumMetadataUtcDate
 
 function ConvertTo-CreatedPushCommitEvidenceObject {
+    # .SYNOPSIS
+    # Creates one Actions-shaped created-push commit evidence object.
+    # .DESCRIPTION
+    # Returns the exact bounded property shape that the created-push evidence
+    # parser accepts, with optional timestamp data for focused self-tests.
+    # .PARAMETER Id
+    # The full Git object ID used for both commit and tree fixture fields.
+    # .PARAMETER Distinct
+    # Whether the fixture commit is distinct from every retained remote ref.
+    # .PARAMETER Timestamp
+    # The optional timestamp string included in the inert evidence object.
+    # .EXAMPLE
+    # ConvertTo-CreatedPushCommitEvidenceObject -Id $strId -Distinct $true
+    #
+    # # Returns one bounded created-push evidence fixture.
+    # .INPUTS
+    # None. This helper does not accept pipeline input.
+    # .OUTPUTS
+    # [System.Management.Automation.PSCustomObject] One evidence fixture object.
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260902.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -116,8 +140,100 @@ $strHigherTerminalRevision = $strFinal.Replace(
 if (@(Get-PublishedEndpointMetadataFailure `
     -Name 'fixture.md' -CurrentContent $strHigherTerminalRevision `
     -ParentContent $strBaseline -ExpectedUtcDate '2026-08-31' `
+    -IsNewDocumentTransition $false) -cnotcontains
+    ('fixture.md Version revision must be exactly 0 when a published-baseline ' +
+        'major, minor, or date segment changes.')) {
+    throw 'The extracted higher-order revision reset did not fail closed.'
+}
+
+$strMetadataOnlyHigherRevision = $strBaseline.Replace(
+    '**Version:** 1.0.20260830.0',
+    '**Version:** 1.0.20260902.5'
+).Replace(
+    '- **Last Updated:** 2026-08-30',
+    '- **Last Updated:** 2026-09-02'
+)
+if (@(Get-PublishedEndpointMetadataFailure `
+    -Name 'fixture.md' -CurrentContent $strMetadataOnlyHigherRevision `
+    -ParentContent $strBaseline -ExpectedUtcDate '2026-09-02' `
+    -IsNewDocumentTransition $false) -cnotcontains
+    ('fixture.md Version revision must be exactly 0 when a published-baseline ' +
+        'major, minor, or date segment changes.')) {
+    throw 'The extracted metadata-only higher-order reset did not fail closed.'
+}
+$strMetadataOnlyHigherReset = $strMetadataOnlyHigherRevision.Replace(
+    '**Version:** 1.0.20260902.5',
+    '**Version:** 1.0.20260902.0'
+)
+if (@(Get-PublishedEndpointMetadataFailure `
+        -Name 'fixture.md' -CurrentContent $strMetadataOnlyHigherReset `
+        -ParentContent $strBaseline -ExpectedUtcDate '2026-09-02' `
+        -IsNewDocumentTransition $false).Count -ne 0) {
+    throw 'The extracted metadata-only higher-order reset was rejected.'
+}
+
+$strMetadataOnlySameTupleIncrement = $strBaseline.Replace(
+    '**Version:** 1.0.20260830.0',
+    '**Version:** 1.0.20260830.1'
+)
+if (@(Get-PublishedEndpointMetadataFailure `
+        -Name 'fixture.md' -CurrentContent $strMetadataOnlySameTupleIncrement `
+        -ParentContent $strBaseline -ExpectedUtcDate '2026-08-30' `
+        -IsNewDocumentTransition $false).Count -ne 0) {
+    throw 'The extracted metadata-only same-tuple increment was rejected.'
+}
+$strMetadataOnlySameTupleSkip = $strMetadataOnlySameTupleIncrement.Replace(
+    '**Version:** 1.0.20260830.1',
+    '**Version:** 1.0.20260830.2'
+)
+if (@(Get-PublishedEndpointMetadataFailure `
+    -Name 'fixture.md' -CurrentContent $strMetadataOnlySameTupleSkip `
+    -ParentContent $strBaseline -ExpectedUtcDate '2026-08-30' `
+    -IsNewDocumentTransition $false) -cnotcontains
+    ('fixture.md Version revision must be exactly 1 after a published change ' +
+        'with an unchanged published-baseline major, minor, and date tuple.')) {
+    throw 'The extracted metadata-only same-tuple skip did not fail closed.'
+}
+
+$strSameTupleFinal = $strBaseline.Replace(
+    '**Version:** 1.0.20260830.0',
+    '**Version:** 1.0.20260830.1'
+).Replace('Published baseline.', 'Published final on the same tuple.')
+if (@(Get-PublishedEndpointMetadataFailure `
+    -Name 'fixture.md' -CurrentContent $strSameTupleFinal `
+    -ParentContent $strBaseline -ExpectedUtcDate '2026-08-30' `
     -IsNewDocumentTransition $false).Count -ne 0) {
-    throw 'The extracted higher terminal revision was rejected.'
+    throw 'The extracted exact same-tuple revision increment was rejected.'
+}
+$strSkippedSameTupleRevision = $strSameTupleFinal.Replace(
+    '**Version:** 1.0.20260830.1',
+    '**Version:** 1.0.20260830.2'
+)
+if (@(Get-PublishedEndpointMetadataFailure `
+    -Name 'fixture.md' -CurrentContent $strSkippedSameTupleRevision `
+    -ParentContent $strBaseline -ExpectedUtcDate '2026-08-30' `
+    -IsNewDocumentTransition $false) -cnotcontains
+    ('fixture.md Version revision must be exactly 1 after a published change ' +
+        'with an unchanged published-baseline major, minor, and date tuple.')) {
+    throw 'The extracted skipped same-tuple revision did not fail closed.'
+}
+
+if (@(Get-PublishedEndpointMetadataFailure -Name 'fixture.md' `
+        -CurrentContent $strFinal -ParentContent $null -ExpectedUtcDate '' `
+        -IsNewDocumentTransition $true `
+        -RequireExpectedUtcDateForRenderedChange $false).Count -ne 0) {
+    throw 'The extracted baseline-absent revision zero was rejected.'
+}
+$strNewDocumentNonzeroRevision = $strFinal.Replace(
+    '**Version:** 1.0.20260831.0',
+    '**Version:** 1.0.20260831.1'
+)
+if (@(Get-PublishedEndpointMetadataFailure -Name 'fixture.md' `
+        -CurrentContent $strNewDocumentNonzeroRevision -ParentContent $null `
+        -ExpectedUtcDate '' -IsNewDocumentTransition $true `
+        -RequireExpectedUtcDateForRenderedChange $false) -cnotcontains
+    'fixture.md Version revision must be exactly 0 when no published baseline exists.') {
+    throw 'The extracted baseline-absent nonzero revision did not fail closed.'
 }
 
 $strSameTupleRollback = $strBaseline.Replace(
@@ -204,6 +320,10 @@ $strTopologyRoot = [IO.Path]::Combine(
     $strTempRoot,
     'agent-instruction-created-ref-' + [Guid]::NewGuid().ToString('N')
 )
+$strBoundedFetchClone = [IO.Path]::Combine(
+    $strTempRoot,
+    'agent-instruction-bounded-fetch-' + [Guid]::NewGuid().ToString('N')
+)
 [void] [IO.Directory]::CreateDirectory($strTopologyRoot)
 try {
     $objUtf8 = [Text.UTF8Encoding]::new($false)
@@ -238,6 +358,9 @@ try {
         -OtherRefEvidenceJson $strRootEvidence
     if (@($objZeroContext.IntroducedCommitRevisions).Count -ne 0 -or
         @($objZeroContext.BoundaryRevisions).Count -ne 0 -or
+        (Get-CreatedRefMetadataBaselineRevision `
+            -Context $objZeroContext -HeadRevision $strRootCommit) -cne
+            $strRootCommit -or
         @(Read-GitPublishedEndpointChangedPath `
             -RepositoryRootPath $strTopologyRoot `
             -BaselineRevision ('0' * 40) -FinalRevision $strRootCommit `
@@ -322,6 +445,9 @@ try {
     if (@($objOneContext.IntroducedCommitRevisions).Count -ne 1 -or
         @($objOneContext.BoundaryRevisions).Count -ne 1 -or
         $objOneContext.BoundaryRevisions[0] -cne $strRootCommit -or
+        (Get-CreatedRefMetadataBaselineRevision `
+            -Context $objOneContext -HeadRevision $strOneCommit) -cne
+            $strRootCommit -or
         $arrOnePaths.Count -ne 1 -or $arrOnePaths[0] -cne 'one.txt') {
         throw 'The one-introduced created-ref fixture found an incorrect boundary.'
     }
@@ -334,6 +460,29 @@ try {
     & git -C $strTopologyRoot add -- two.txt
     & git -C $strTopologyRoot commit --quiet -m two
     $strTwoCommit = ([string] (& git -C $strTopologyRoot rev-parse HEAD)).Trim()
+    $strTopologyBranch = ([string] (& git -C $strTopologyRoot `
+                symbolic-ref --short HEAD)).Trim()
+    & git clone --quiet --depth 1 --no-local --no-hardlinks -- `
+        $strTopologyRoot $strBoundedFetchClone
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Could not create the bounded-fetch shallow clone.'
+    }
+    & git -C $strBoundedFetchClone fetch --depth=2 --no-tags `
+        --no-write-fetch-head --no-recurse-submodules origin `
+        "refs/heads/$($strTopologyBranch):refs/remotes/event/bounded-other"
+    $intBoundedFetchCommitCount = [int] ([string] (
+            & git -C $strBoundedFetchClone rev-list --count `
+                refs/remotes/event/bounded-other
+        )).Trim()
+    & git -C $strBoundedFetchClone cat-file -e "$strRootCommit`^{commit}" 2>$null
+    $boolBoundedFetchExcludedRoot = $LASTEXITCODE -ne 0
+    $strBoundedFetchShallow = ([string] (& git -C $strBoundedFetchClone `
+                rev-parse --is-shallow-repository)).Trim()
+    if ($intBoundedFetchCommitCount -ne 2 -or
+        -not $boolBoundedFetchExcludedRoot -or
+        $strBoundedFetchShallow -cne 'true') {
+        throw 'The bounded other-ref fetch imported history beyond its depth.'
+    }
     $objTwoPayloadCommit = ConvertTo-CreatedPushCommitEvidenceObject `
         -Id $strTwoCommit -Distinct $true
     $strManyPayload = ConvertTo-Json -Depth 4 -Compress -InputObject `
@@ -354,8 +503,65 @@ try {
             -MaximumBytes $MaximumBytes)
     if (@($objManyContext.IntroducedCommitRevisions).Count -ne 2 -or
         @($objManyContext.BoundaryRevisions).Count -ne 1 -or
+        (Get-CreatedRefMetadataBaselineRevision `
+            -Context $objManyContext -HeadRevision $strTwoCommit) -cne
+            $strRootCommit -or
         [string]::Join("`n", $arrManyPaths) -cne "one.txt`ntwo.txt") {
         throw 'The many-introduced created-ref fixture lost changed paths.'
+    }
+
+    $strTransientDecisionDirectory = Join-Path $strTopologyRoot 'docs/decisions'
+    [void] [IO.Directory]::CreateDirectory($strTransientDecisionDirectory)
+    $strTransientDecisionPath = Join-Path `
+        $strTransientDecisionDirectory '0002-temp.md'
+    [IO.File]::WriteAllText(
+        $strTransientDecisionPath,
+        "# Decision 0002: Transient fixture`n",
+        $objUtf8
+    )
+    & git -C $strTopologyRoot add -- docs/decisions/0002-temp.md
+    & git -C $strTopologyRoot commit --quiet -m transient-create
+    $strTransientCreateCommit = ([string] (
+            & git -C $strTopologyRoot rev-parse HEAD
+        )).Trim()
+    & git -C $strTopologyRoot rm --quiet -- docs/decisions/0002-temp.md
+    & git -C $strTopologyRoot commit --quiet -m transient-delete
+    $strTransientDeleteCommit = ([string] (
+            & git -C $strTopologyRoot rev-parse HEAD
+        )).Trim()
+    $strTransientPayload = ConvertTo-Json -Depth 4 -Compress -InputObject `
+        ([object[]] @(
+                $objOnePayloadCommit,
+                $objTwoPayloadCommit,
+                (ConvertTo-CreatedPushCommitEvidenceObject `
+                    -Id $strTransientCreateCommit -Distinct $true),
+                (ConvertTo-CreatedPushCommitEvidenceObject `
+                    -Id $strTransientDeleteCommit -Distinct $true)
+            ))
+    $objTransientContext = Get-CreatedRefBoundaryContext `
+        -RepositoryRootPath $strTopologyRoot `
+        -DestinationRef 'refs/heads/new-transient' `
+        -HeadRevision $strTransientDeleteCommit `
+        -EventHeadRevision $strTransientDeleteCommit `
+        -EventHeadDistinct 'true' `
+        -PushCommitEvidenceJson $strTransientPayload `
+        -OtherRefEvidenceJson $strRootEvidence
+    $arrTransientPaths = @(Read-GitPublishedEndpointChangedPath `
+            -RepositoryRootPath $strTopologyRoot `
+            -BaselineRevision ('0' * 40) `
+            -FinalRevision $strTransientDeleteCommit `
+            -BaselineAbsent $true `
+            -NewRefBoundaryRevision $objTransientContext.BoundaryRevisions `
+            -NewRefIntroducedCommitRevision `
+                $objTransientContext.IntroducedCommitRevisions `
+            -MaximumBytes $MaximumBytes)
+    if (@($objTransientContext.IntroducedCommitRevisions).Count -ne 4 -or
+        @($objTransientContext.BoundaryRevisions).Count -ne 1 -or
+        (Get-CreatedRefMetadataBaselineRevision `
+            -Context $objTransientContext `
+            -HeadRevision $strTransientDeleteCommit) -cne $strRootCommit -or
+        [string]::Join("`n", $arrTransientPaths) -cne "one.txt`ntwo.txt") {
+        throw 'A transient created-ref path escaped the published endpoint diff.'
     }
 
     & git -C $strTopologyRoot checkout --quiet -b left $strRootCommit
@@ -403,18 +609,41 @@ try {
         -HeadRevision $strMergeCommit -EventHeadRevision $strMergeCommit `
         -EventHeadDistinct 'true' -PushCommitEvidenceJson $strMergePayload `
         -OtherRefEvidenceJson $strMergeEvidence
-    $arrMergePaths = @(Read-GitPublishedEndpointChangedPath `
-            -RepositoryRootPath $strTopologyRoot `
-            -BaselineRevision ('0' * 40) -FinalRevision $strMergeCommit `
-            -BaselineAbsent $true `
-            -NewRefBoundaryRevision $objMergeContext.BoundaryRevisions `
-            -NewRefIntroducedCommitRevision `
-                $objMergeContext.IntroducedCommitRevisions `
-            -MaximumBytes $MaximumBytes)
     if (@($objMergeContext.IntroducedCommitRevisions).Count -ne 1 -or
-        @($objMergeContext.BoundaryRevisions).Count -ne 2 -or
-        [string]::Join("`n", $arrMergePaths) -cne "left.txt`nright.txt") {
-        throw 'The merge created-ref fixture lost a parent boundary.'
+        @($objMergeContext.BoundaryRevisions).Count -ne 2) {
+        throw 'The merge created-ref fixture lost a graph boundary.'
+    }
+    try {
+        [void] @(Read-GitPublishedEndpointChangedPath `
+                -RepositoryRootPath $strTopologyRoot `
+                -BaselineRevision ('0' * 40) -FinalRevision $strMergeCommit `
+                -BaselineAbsent $true `
+                -NewRefBoundaryRevision $objMergeContext.BoundaryRevisions `
+                -NewRefIntroducedCommitRevision `
+                    $objMergeContext.IntroducedCommitRevisions `
+                -MaximumBytes $MaximumBytes)
+        throw 'A multi-boundary created-ref path range was accepted.'
+    }
+    catch {
+        if (-not $_.Exception.Message.Contains(
+                'must have one boundary',
+                [StringComparison]::Ordinal
+            )) {
+            throw
+        }
+    }
+    try {
+        [void] (Get-CreatedRefMetadataBaselineRevision `
+                -Context $objMergeContext -HeadRevision $strMergeCommit)
+        throw 'An ambiguous multi-boundary metadata baseline was accepted.'
+    }
+    catch {
+        if (-not $_.Exception.Message.Contains(
+                'lacks one unambiguous metadata baseline',
+                [StringComparison]::Ordinal
+            )) {
+            throw
+        }
     }
 
     $strRootPayload = ConvertTo-Json -Depth 4 -Compress -InputObject `
@@ -434,6 +663,10 @@ try {
                 $objGenuineRootContext.IntroducedCommitRevisions `
             -MaximumBytes $MaximumBytes)
     if (-not $objGenuineRootContext.IsGenuineRootIntroduction -or
+        -not [string]::IsNullOrEmpty(
+            (Get-CreatedRefMetadataBaselineRevision `
+                -Context $objGenuineRootContext -HeadRevision $strRootCommit)
+        ) -or
         $arrGenuineRootPaths.Count -ne 1 -or
         $arrGenuineRootPaths[0] -cne 'root.txt') {
         throw 'The genuine-root created-ref fixture did not use the final tree.'
@@ -682,6 +915,13 @@ try {
     }
 }
 finally {
+    if ([IO.Directory]::Exists($strBoundedFetchClone) -and
+        $strBoundedFetchClone.StartsWith(
+            $strTempRoot,
+            [StringComparison]::OrdinalIgnoreCase
+        )) {
+        Remove-Item -LiteralPath $strBoundedFetchClone -Recurse -Force
+    }
     if ([IO.Directory]::Exists($strTopologyRoot) -and
         $strTopologyRoot.StartsWith(
             $strTempRoot,

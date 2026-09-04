@@ -1,0 +1,9 @@
+# GitHub supports concurrency.queue, but actionlint does not yet model that key.
+# These path-scoped exceptions are also covered by schema and mutation checks.
+paths:
+  .github/workflows/agent-instruction-current-base.yml:
+    ignore:
+      - '^unexpected key "queue" for "concurrency" section\. expected one of "cancel-in-progress", "group"$'
+  .github/workflows/agent-instructions.yml:
+    ignore:
+      - '^unexpected key "queue" for "concurrency" section\. expected one of "cancel-in-progress", "group"$'

@@ -7,6 +7,7 @@
 # manifest to the canonical inactive schema 2 manifest. Schema 1 is retained
 # only to bootstrap schema 2. Candidate blobs are decoded and parsed, but never
 # sourced, imported, invoked, built, or executed.
+# The inactive candidate revision records completion of that one-way authority.
 # .PARAMETER RepositoryRootPath
 # The trusted repository worktree.
 # .PARAMETER TrustedRevision

@@ -19,7 +19,7 @@ repos:
         files: >-
           (?x)^(
             \.pre-commit-config\.yaml|
-            \.github/dependabot\.yml|
+            \.github/(actionlint\.yaml|dependabot\.yml)|
             \.github/workflows/.*\.ya?ml
           )$
       - id: end-of-file-fixer
@@ -29,6 +29,7 @@ repos:
             .*\.(md|mdc)|
             package(-lock)?\.json|
             \.pre-commit-config\.yaml|
+            \.github/actionlint\.yaml|
             \.github/workflows/.*\.(mjs|ps1|ya?ml)
           )$
       - id: trailing-whitespace
@@ -40,6 +41,7 @@ repos:
             .*\.(md|mdc)|
             package(-lock)?\.json|
             \.pre-commit-config\.yaml|
+            \.github/actionlint\.yaml|
             \.github/workflows/.*\.(mjs|ps1|ya?ml)
           )$
 
@@ -57,10 +59,11 @@ repos:
               truthy:
                 check-keys: false
         files: >-
-          ^(\.pre-commit-config\.yaml|\.github/dependabot\.yml|\.github/workflows/.*\.ya?ml)$
+          ^(\.pre-commit-config\.yaml|\.github/(actionlint\.yaml|dependabot\.yml)|\.github/workflows/.*\.ya?ml)$
 
   - repo: https://github.com/rhysd/actionlint
-    rev: "v1.7.12"
+    # This exact upstream commit fixes the v1.7.12 ShellCheck stdin deadlock.
+    rev: "011a6d15e749bb3f2d771eed9c7aa0e7e3e10ee7"
     hooks:
       - id: actionlint
         files: ^\.github/workflows/.*\.ya?ml$
